@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.dwfa</groupId>
     <artifactId>dwfa-pom</artifactId>
-    <version>2.26</version>
+    <version>2.29</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
@@ -21,10 +21,6 @@
     <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/foundation/trunk</developerConnection>
     <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
   </scm>
-  <ciManagement>
-    <system>continuum</system>
-    <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum/projectView.action?projectId=1</url>
-  </ciManagement>
   <dependencies>
     <dependency>
       <groupId>net.jini</groupId>
