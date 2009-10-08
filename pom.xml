@@ -1,8 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.dwfa</groupId>
         <artifactId>dwfa-pom</artifactId>
-        <version>2.26</version>
+        <version>2.29</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dwfa</groupId>
@@ -28,19 +30,19 @@
         </license>
     </licenses>
     <inceptionYear>2006</inceptionYear>
-    <description>This project provides a set of maven goals that are used to
-        transform terminology data in preparation for importing into standard file
-        formats used by the version-oriented database, and by other applications.</description>
+    <description>This project provides a set of maven goals that are used to transform terminology
+        data in preparation for importing into standard file formats used by the version-oriented
+        database, and by other applications.</description>
     <dependencies>
         <dependency>
             <groupId>org.dwfa</groupId>
             <artifactId>dwfa-mojo</artifactId>
-            <version>2.0.29-SNAPSHOT</version>
+            <version>2.0.29</version>
         </dependency>
         <dependency>
-            <groupId>org.dwfa</groupId>                                                                                     
+            <groupId>org.dwfa</groupId>
             <artifactId>vodb</artifactId>
-            <version>1.38-SNAPSHOT</version>
+            <version>1.38</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -97,7 +99,7 @@
             <plugin>
                 <groupId>org.dwfa</groupId>
                 <artifactId>pbl-mojo</artifactId>
-                <version>1.1</version>
+                <version>1.6</version>
                 <configuration>
                     <cubitProject>cubitci</cubitProject>
                     <siteRoot>ace-mojo</siteRoot>
