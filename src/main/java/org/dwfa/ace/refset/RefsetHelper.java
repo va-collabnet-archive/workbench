@@ -334,7 +334,7 @@ public class RefsetHelper {
         return true;
     }
 
-    private UUID generateUuid(UUID uuid, UUID uuid2, UUID uuid3) {
+    public UUID generateUuid(UUID uuid, UUID uuid2, UUID uuid3) {
         try {
             UUID intermediateUuid = Type5UuidFactory.get(uuid, uuid2.toString());
             return Type5UuidFactory.get(intermediateUuid, uuid3.toString());
