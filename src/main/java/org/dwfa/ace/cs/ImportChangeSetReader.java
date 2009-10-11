@@ -104,12 +104,6 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 				updateTimer.stop();
 			}
 		}
-
-		public void normalCompletion() {
-			activity.complete();
-			updateTimer.stop();
-		}
-
 	}
 
 	public ImportChangeSetReader(final Configuration riverConfig, I_ShowActivity secondaryProgressPanel, Frame parentFrame) {

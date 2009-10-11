@@ -436,9 +436,16 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			try {
 				AceLog.getEditLog().fine("commitUncommittedIds: " + id);
 				ThinIdVersioned tid = null;
+				I_Path path;
 				for (UniversalAceIdentificationPart part : id.getVersions()) {
-					I_Path path = getVodb().getPath(
-							getVodb().uuidToNative(part.getPathId()));
+					try {
+						path = getVodb().getPath(
+								getVodb().uuidToNative(part.getPathId()));
+					} catch (DatabaseException ex) {
+						AceLog.getAppLog().alertAndLogException(ex);
+						path = getVodb().newPath(null, getVodb().getConcept(part.getPathId()));
+					}
+						
 					if (tid == null) {
 						try {
 							int nid = getNid(id.getUIDs());
@@ -464,7 +471,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 						}
 					}
 					ThinIdPart newPart = new ThinIdPart();
-					newPart.setIdStatus(getNid(part.getIdStatus()));
+					newPart.setStatusId(getNid(part.getIdStatus()));
 					newPart.setPathId(getVodb().uuidToNative(part.getPathId()));
 					newPart.setSource(getNid(part.getSource()));
 					newPart.setSourceId(part.getSourceId());
@@ -488,19 +495,6 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				 * proper branch and version values here...
 				 */
 				getVodb().writeId(tid);
-			} catch (DatabaseException e) {
-				if (firstException) {
-					AceLog.getEditLog().alertAndLog(
-							Level.SEVERE,
-							"Exception. Ignoring component, and continuing import. Examine log for future exceptions. "
-									+ id, e);
-					firstException = false;
-				} else {
-					AceLog.getEditLog().log(
-							Level.SEVERE,
-							"Exception. Ignoring component, and continuing import. Examine log for future exceptions. "
-									+ id, e);
-				}
 			} catch (TerminologyException e) {
 				if (firstException) {
 					AceLog.getEditLog().alertAndLog(
@@ -552,8 +546,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					if (part.getTime() == Long.MAX_VALUE) {
 						ThinConPart newPart = new ThinConPart();
 						newPart.setPathId(getNid(part.getPathId()));
-						newPart
-								.setConceptStatus(getNid(part
+						newPart.setStatusId(getNid(part
 										.getConceptStatus()));
 						newPart.setDefined(part.isDefined());
 						newPart.setVersion(ThinVersionHelper.convert(time));
@@ -595,7 +588,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					.getVersions()) {
 				ThinConPart newPart = new ThinConPart();
 				newPart.setPathId(getNid(part.getPathId()));
-				newPart.setConceptStatus(getNid(part.getConceptStatus()));
+				newPart.setStatusId(getNid(part.getConceptStatus()));
 				newPart.setDefined(part.isDefined());
 				if (part.getTime() == Long.MAX_VALUE) {
 					newPart.setVersion(ThinVersionHelper.convert(time));
@@ -729,7 +722,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					newPart.setGroup(part.getGroup());
 					newPart.setPathId(getNid(part.getPathId()));
 					newPart.setRefinabilityId(getNid(part.getRefinabilityId()));
-					newPart.setRelTypeId(getNid(part.getRelTypeId()));
+					newPart.setTypeId(getNid(part.getRelTypeId()));
 					newPart.setStatusId(getNid(part.getStatusId()));
 					newPart.setVersion(ThinVersionHelper
 							.convert(part.getTime()));
@@ -798,7 +791,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 						newPart.setPathId(getNid(part.getPathId()));
 						newPart.setRefinabilityId(getNid(part
 								.getRefinabilityId()));
-						newPart.setRelTypeId(getNid(part.getRelTypeId()));
+						newPart.setTypeId(getNid(part.getRelTypeId()));
 						newPart.setStatusId(getNid(part.getStatusId()));
 						if (part.getTime() == Long.MAX_VALUE) {
 							newPart.setVersion(ThinVersionHelper.convert(time));
@@ -832,7 +825,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 							newPart.setPathId(getNid(part.getPathId()));
 							newPart.setRefinabilityId(getNid(part
 									.getRefinabilityId()));
-							newPart.setRelTypeId(getNid(part.getRelTypeId()));
+							newPart.setTypeId(getNid(part.getRelTypeId()));
 							newPart.setStatusId(getNid(part.getStatusId()));
 							newPart.setVersion(ThinVersionHelper.convert(time));
 							if (thinRel.getVersions().contains(newPart)) {
@@ -1027,7 +1020,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					}
 				}
 				ThinIdPart newPart = new ThinIdPart();
-				newPart.setIdStatus(getNid(part.getIdStatus()));
+				newPart.setStatusId(getNid(part.getIdStatus()));
 				newPart.setPathId(getVodb().uuidToNative(part.getPathId()));
 				newPart.setSource(getNid(part.getSource()));
 				newPart.setSourceId(part.getSourceId());

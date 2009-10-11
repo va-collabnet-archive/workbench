@@ -223,8 +223,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 								conceptNid, c2Id, versionCount);
 						conceptBean.sourceRels.add(relv);
 						for (int y = 0; y < versionCount; y++) {
-							relv.addVersionNoRedundancyCheck(relPartBdb
-									.getRelPart(ti.readInt()));
+							I_RelPart relPart = relPartBdb.getRelPart(ti.readInt());
+							assert relPart.getTypeId() != Integer.MAX_VALUE;
+							relv.addVersionNoRedundancyCheck(relPart);
 						}
 					}
 					int relOriginCount = ti.readInt();
@@ -315,6 +316,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 							to.writeShort(rel.versionCount());
 							for (I_RelPart part : rel.getVersions()) {
 								try {
+									assert part.getTypeId() != Integer.MAX_VALUE;
 									to.writeInt(relPartBdb.getRelPartId(part));
 								} catch (DatabaseException e) {
 									throw new RuntimeException(e);
@@ -325,8 +327,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					if (conceptBean.getRelOrigins() == null) {
 						to.writeInt(0);
 					} else {
-						to
-								.writeInt(conceptBean.getRelOrigins()
+						to.writeInt(conceptBean.getRelOrigins()
 										.getSetValues().length);
 						for (int i : conceptBean.getRelOrigins().getSetValues()) {
 							to.writeInt(i);
@@ -623,8 +624,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 								conceptNid, c2Id, versionCount);
 						conceptBean.sourceRels.add(relv);
 						for (int y = 0; y < versionCount; y++) {
-							relv.addVersionNoRedundancyCheck(relPartBdb
-									.getRelPart(ti.readShort()));
+							I_RelPart relPart = relPartBdb.getRelPart(ti.readShort());
+							assert relPart.getTypeId() != Integer.MAX_VALUE;
+							relv.addVersionNoRedundancyCheck(relPart);
 						}
 					}
 					int relOriginCount = ti.readInt();
@@ -843,8 +845,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 								conceptNid, c2Id, versionCount);
 						conceptBean.sourceRels.add(relv);
 						for (int y = 0; y < versionCount; y++) {
-							relv.addVersionNoRedundancyCheck(relPartBdb
-									.getRelPart(ti.readShort()));
+							I_RelPart relPart = relPartBdb.getRelPart(ti.readShort());
+							assert relPart.getTypeId() != Integer.MAX_VALUE;
+							relv.addVersionNoRedundancyCheck(relPart);
 						}
 					}
 					int relOriginCount = ti.readInt();
@@ -930,10 +933,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 							}
 							to.writeShort(rel.versionCount());
 							for (I_RelPart part : rel.getVersions()) {
+								assert part.getTypeId() != Integer.MAX_VALUE;
 								try {
-									to
-											.writeShort(relPartBdb
-													.getRelPartId(part));
+									to.writeShort(relPartBdb.getRelPartId(part));
 								} catch (DatabaseException e) {
 									throw new RuntimeException(e);
 								}

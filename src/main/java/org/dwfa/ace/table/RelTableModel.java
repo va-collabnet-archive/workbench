@@ -195,6 +195,7 @@ public abstract class RelTableModel extends AbstractTableModel implements
 				if (workStopped) {
 					return -1;
 				}
+				assert r.getTypeId() != Integer.MAX_VALUE;
 				conceptsToFetch.add(r.getC1Id());
 				conceptsToFetch.add(r.getC2Id());
 				conceptsToFetch.add(r.getCharacteristicId());

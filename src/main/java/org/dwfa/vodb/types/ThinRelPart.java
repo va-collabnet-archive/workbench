@@ -11,13 +11,13 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinRelPart implements I_RelPart {
 	
-	private int pathId;
-	private int version;
-	private int statusId;
-	private int relTypeId;
-	private int characteristicId;
-	private int refinabilityId;
-	private int group;
+	private int pathId = Integer.MAX_VALUE;
+	private int version = Integer.MAX_VALUE;
+	private int statusId = Integer.MAX_VALUE;
+	private int relTypeId = Integer.MAX_VALUE;
+	private int characteristicId = Integer.MAX_VALUE;
+	private int refinabilityId = Integer.MAX_VALUE;
+	private int group = Integer.MAX_VALUE;
 
 	public ArrayIntList getPartComponentNids() {
 		ArrayIntList partComponentNids = new ArrayIntList(5);

@@ -1207,6 +1207,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException,
             IOException {
+    	if (origins == null) {
+    		origins = new HashSet<I_Position>();
+    	}
         Path newPath = new Path(pathConcept.getConceptId(), new ArrayList<I_Position>(origins));
         AceLog.getEditLog().fine("writing new path: \n" + newPath);
         AceConfig.getVodb().writePath(newPath);

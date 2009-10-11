@@ -100,6 +100,9 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 	}
 
 	public static ConceptBean get(int conceptId) {
+		if (conceptId == Integer.MAX_VALUE) {
+			throw new RuntimeException("Invalid identifier: " + conceptId);
+		}
 		try {
 			return privateGet(conceptId);
 		} catch (IOException e) {

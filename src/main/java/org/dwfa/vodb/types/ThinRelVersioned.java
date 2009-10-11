@@ -274,7 +274,9 @@ public class ThinRelVersioned implements I_RelVersioned {
 
 		@Override
 		public I_RelTuple makeTuple(I_AmPart part, ThinRelVersioned core) {
-			return new ThinRelTuple(core, (I_RelPart) part);
+			I_RelPart relPart = (I_RelPart) part;
+			assert relPart.getTypeId() != Integer.MAX_VALUE;
+			return new ThinRelTuple(core, relPart);
 		}
 
 	}
