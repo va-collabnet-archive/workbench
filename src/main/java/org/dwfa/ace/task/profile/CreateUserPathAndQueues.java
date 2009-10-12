@@ -107,6 +107,13 @@ public class CreateUserPathAndQueues extends AbstractTask {
 
 			createClassifierPath(config, commitConfig, positionSet);
 			
+        	try {
+        		LocalVersionedTerminology.get().commit();
+			} catch (Exception e) {
+				throw new TaskFailedException();
+			}
+			
+			
 			// Set roots
 			for (int rootNid: commitConfig.getRoots().getSetValues()) {
 				config.getRoots().add(rootNid);
@@ -333,11 +340,6 @@ public class CreateUserPathAndQueues extends AbstractTask {
         			tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
         	
-        	try {
-				tf.commit();
-			} catch (Exception e) {
-				throw new TaskFailedException();
-			}
         return tf.newPath(positionSet, pathConcept);
 	}
 

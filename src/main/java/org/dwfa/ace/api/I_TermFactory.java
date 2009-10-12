@@ -1,5 +1,14 @@
 package org.dwfa.ace.api;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -18,19 +27,11 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 public interface I_TermFactory {
 
@@ -188,9 +189,17 @@ public interface I_TermFactory {
      * @return An unmodifiable set of uncommitted items.
      */
     Set<I_Transact> getUncommitted();
+    
+    /**
+     * Method to call prior to commit that will list all commit failures that will be encountered. 
+     * Useful for checking for errors prior to commit performed by a workflow process. 
+     * @return Data Constraint failures that would be encountered if <code>commit()</code> is called. 
+     */
+
+    List<AlertToDataConstraintFailure> getCommitErrors();
 
     void commit() throws Exception;
-
+    
     void addChangeSetWriter(I_WriteChangeSet writer);
 
     void removeChangeSetWriter(I_WriteChangeSet writer);
