@@ -348,7 +348,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             IS_SAME_AS_REL("is same as (relationship type)",
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_ANALOG("is an analog of (relationship type)",
-                             new I_ConceptualizeUniversally[] { RELATIONSHIP }),         
+                             new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_ALIAS_OF("is alias of (relationship type)",
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             DUP_REL_TYPE("dup rel type (terminology constant)",
@@ -525,6 +525,14 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                             new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
                     FLAGGED_POTENTIAL_DESC_STYLE_ERROR("desc style flag (active status type)",
                             new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    UNREVIEWED_NEW_ADDITION("unreviewed new addition (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    UNREVIEWED_NEW_DELETION("unreviewed new deletion (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    REVIEWED_APPROVED("reviewed and approved (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    REVIEWED_REJECTED("reviewed and rejected (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
             INACTIVE("inactive (inactive status type)",
                     new I_ConceptualizeUniversally[] { STATUS }),
                     CONFLICTING("conflicting (inactive status type)",
@@ -616,7 +624,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 new I_ConceptualizeUniversally[] { ID_SOURCE });
        ;
         private Collection<UUID> conceptUids = new ArrayList<UUID>();
-        
+
         public String[] parents_S;
         public String[] descriptions_S;
 
@@ -629,14 +637,14 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         private static PrimordialId[] descTypeOrder;
 
         private I_ConceptualizeLocally local;
-        
+
 		public String[] getParents_S(){
 			return parents_S;
 		}
-		
+
 		public String[] getDescriptions_S(){
 			return descriptions_S;
-		}  
+		}
 
       private Concept(String descriptionString, I_ConceptualizeUniversally[] parents) {
          this(new String[] {descriptionString}, null, parents);
@@ -663,7 +671,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             			descriptionStrings = newDescriptionStrings;
             		}
             	}
-            if(parents.length > 0){	
+            if(parents.length > 0){
             parents_S = new String[parents.length];
             for(int i=0;i<parents.length ; i++)
             {
@@ -674,7 +682,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             	descriptions_S = descriptionStrings;
             }
 
-            
+
 
                 this.rels = makeRels(this, parents);
                 this.descriptions = makeDescriptions(this, descriptionStrings, defString);
