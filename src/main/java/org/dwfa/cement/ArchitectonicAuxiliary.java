@@ -313,6 +313,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
                   READ_KEY_DESC(new String[] {"read key (description type)", "read key"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  READ_OPCS_20_DESC(new String[] {"read opcs code (description type)", "read opcs"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),  
+                  READ_ICD10_20_DESC(new String[] {"read icd10 (description type)", "read icd10"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),          
 
                   FULLY_SPECIFIED_DESCRIPTION_TYPE(PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID,
                           new String[] {"fully specified name (description type)", "fully specified name"}, null,
