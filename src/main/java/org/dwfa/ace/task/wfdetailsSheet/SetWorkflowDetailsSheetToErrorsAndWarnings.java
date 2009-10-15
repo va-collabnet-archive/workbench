@@ -1,16 +1,21 @@
 package org.dwfa.ace.task.wfdetailsSheet;
 
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.ACE.ListenForDataChecks;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.search.DifferenceSearchPanel;
+import org.dwfa.ace.grant.GrantPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -21,39 +26,31 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
-public class SetWorkflowDetailsSheetToCriterionPanel extends AbstractTask {
+public class SetWorkflowDetailsSheetToErrorsAndWarnings extends AbstractTask {
 	private static final long serialVersionUID = 1;
 
-	private static final int dataVersion = 2;
+	private static final int dataVersion = 1;
 
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	private String errorsAndWarningsPropName = ProcessAttachmentKeys.ERRORS_AND_WARNINGS.getAttachmentKey();
 	
 	private transient Exception ex = null;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
+		out.writeObject(errorsAndWarningsPropName);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion >= 1) {
+		if (objDataVersion == 1) {
 			profilePropName = (String) in.readObject();
-			if (objDataVersion == 1) {
-				in.readObject();
-			}
+			errorsAndWarningsPropName = (String) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
-	}
-
-	public String getProfilePropName() {
-		return profilePropName;
-	}
-
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
 	}
 
 
@@ -93,19 +90,28 @@ public class SetWorkflowDetailsSheetToCriterionPanel extends AbstractTask {
 			final I_Work worker) {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+			Collection<AlertToDataConstraintFailure> warningsAndErrors = 
+				(Collection<AlertToDataConstraintFailure>) process.readProperty(errorsAndWarningsPropName);
 			ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
 			clear.setProfilePropName(getProfilePropName());
 			clear.evaluate(process, worker);
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
-	        int width = 750;
-	        int height = 150;
+	        int width = 400;
+	        int height = 500;
 	        workflowDetailsSheet.setSize(width, height);
+	        
+	        JPanel dataCheckListPanel = new JPanel(new GridBagLayout());
+	        JScrollPane dataCheckListScroller = new JScrollPane(dataCheckListPanel);
+	        
 
-			workflowDetailsSheet.add(new DifferenceSearchPanel(config));
+	            
+	        workflowDetailsSheet.setLayout(new GridLayout(1, 1));
+			workflowDetailsSheet.add(dataCheckListScroller);
 		} catch (Exception e) {
 			ex = e;
 		}
 	}
+
 
 	/**
 	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
@@ -121,5 +127,21 @@ public class SetWorkflowDetailsSheetToCriterionPanel extends AbstractTask {
 	 */
 	public Collection<Condition> getConditions() {
 		return AbstractTask.CONTINUE_CONDITION;
+	}
+
+	public String getProfilePropName() {
+		return profilePropName;
+	}
+
+	public void setProfilePropName(String profilePropName) {
+		this.profilePropName = profilePropName;
+	}
+
+	public String getErrorsAndWarningsPropName() {
+		return errorsAndWarningsPropName;
+	}
+
+	public void setErrorsAndWarningsPropName(String errorsAndWarningsPropName) {
+		this.errorsAndWarningsPropName = errorsAndWarningsPropName;
 	}
 }

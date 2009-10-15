@@ -385,7 +385,7 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
                     tokenType = st.nextToken();
                     UUID pathUuid = (UUID) getId(st);
 
-                    finishMemberRead(refsetType, st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+                    finishMemberRead(refsetType, st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid, rf.getAbsolutePath());
 
                     members++;
 
@@ -414,7 +414,6 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
                 r.close();
                 getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed members: " + members);
             } catch (Exception ex) {
-                ex.printStackTrace();
                 throw ex;
             }
             return true;
@@ -423,28 +422,28 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	}
 
 	private void finishMemberRead(REFSET_FILE_TYPES refsetFileType, StreamTokenizer st, UUID refsetUuid,
-			UUID memberUuid, UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+			UUID memberUuid, UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
 		switch (refsetFileType) {
 		case BOOLEAN:
-			readBooleanMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			readBooleanMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid, readInfo);
 			break;
 		case CONCEPT:
-			readConceptMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			readConceptMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid, readInfo);
 			break;
 		case CONINT:
-			readConIntMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			readConIntMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid, readInfo);
 			break;
 		case INTEGER:
-			readIntegerMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			readIntegerMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid, readInfo);
 			break;
 		case LANGUAGE:
-			readLanguageMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			readLanguageMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid, readInfo);
 			break;
 		case MEASUREMENT:
-			readMeasurementMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+			readMeasurementMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid, readInfo);
 			break;
 		case STRING:
-            readStringMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid);
+            readStringMember(st, refsetUuid, memberUuid, statusUuid, componentUuid, statusDate, pathUuid, readInfo);
             break;
 		default:
 			throw new IOException("Can't handle refset type: " + refsetFileType);
@@ -456,13 +455,13 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 	protected abstract void finishRefsetRead(REFSET_FILE_TYPES refsetFileType, File rf, CountDownLatch refsetLatch) throws IOException, Exception;
 
     protected abstract void readConIntMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
-			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws IOException, ParseException, DatabaseException, Exception;
+			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws IOException, ParseException, DatabaseException, Exception;
 
 	protected abstract void readConceptMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
-			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid)throws IOException, ParseException, DatabaseException, Exception;
+			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo)throws IOException, ParseException, DatabaseException, Exception;
 
 	protected abstract void readBooleanMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid,
-			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid) throws IOException, ParseException, DatabaseException, Exception;
+			UUID statusUuid, UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws IOException, ParseException, DatabaseException, Exception;
 
 	public void execute(File jarFile, String dataDir, FORMAT format)
 			throws Exception {
@@ -556,18 +555,18 @@ public abstract class ProcessAceFormatSources extends ProcessSources {
 
 	protected abstract void readMeasurementMember(StreamTokenizer st, UUID refsetUuid,
 			UUID memberUuid, UUID statusUuid, UUID componentUuid,
-			Date statusDate, UUID pathUuid) throws Exception;
+			Date statusDate, UUID pathUuid, String readInfo) throws Exception;
 
 	protected abstract void readIntegerMember(StreamTokenizer st, UUID refsetUuid,
 			UUID memberUuid, UUID statusUuid, UUID componentUuid,
-			Date statusDate, UUID pathUuid) throws Exception;
+			Date statusDate, UUID pathUuid, String readInfo) throws Exception;
 
     protected abstract void readLanguageMember(StreamTokenizer st, UUID refsetUuid,
         UUID memberUuid, UUID statusUuid, UUID componentUuid,
-        Date statusDate, UUID pathUuid) throws Exception;
+        Date statusDate, UUID pathUuid, String readInfo) throws Exception;
 
     protected abstract void readStringMember(StreamTokenizer st, UUID refsetUuid,
         UUID memberUuid, UUID statusUuid, UUID componentUuid,
-        Date statusDate, UUID pathUuid) throws Exception;
+        Date statusDate, UUID pathUuid, String readInfo) throws Exception;
 
 }

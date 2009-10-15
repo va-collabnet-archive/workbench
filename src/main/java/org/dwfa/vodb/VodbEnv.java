@@ -88,6 +88,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -1269,6 +1270,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             try {
                 AceFrame newFrame = new AceFrame(AceRunner.args, AceRunner.lc, frameConfig, false);
                 newFrame.setVisible(true);
+                AceFrameConfig nativeConfig = (AceFrameConfig) frameConfig;
+                nativeConfig.setAceFrame(newFrame);
+                
             } catch (Exception e) {
                 ex = e;
             }
@@ -1824,6 +1828,10 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			I_ConfigAceFrame config) throws DatabaseException, IOException,
 			ParseException {
 		bdbEnv.searchConcepts(tracker, matches, latch, checkList, config);
+	}
+
+	public List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
+		return ACE.getCommitErrorsAndWarnings();
 	}
     
     

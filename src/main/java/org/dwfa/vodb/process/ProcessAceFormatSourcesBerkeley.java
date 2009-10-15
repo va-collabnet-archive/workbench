@@ -414,7 +414,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
     }
 
     protected void readBooleanMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+        UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
 
         st.nextToken();
         boolean booleanValue = st.sval.toLowerCase().startsWith("t");
@@ -430,7 +430,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readConIntMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+        UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
         st.nextToken();
         UUID conceptUuid = (UUID) getId(st);
         st.nextToken();
@@ -448,7 +448,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readConceptMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+        UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
 
         ProcessMemberTaskConcept.check();
 
@@ -467,7 +467,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readMeasurementMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+        UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
         st.nextToken();
         double doubleVal = Double.parseDouble(st.sval);
         st.nextToken();
@@ -486,22 +486,26 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readIntegerMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+        UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
         st.nextToken();
-        int intValue = Integer.parseInt(st.sval);
-        int version = ThinVersionHelper.convert(statusDate.getTime());
-        int memberId = map.getIntId((UUID) memberUuid, aceAuxPath, version);
+        try {
+            int intValue = Integer.parseInt(st.sval);
+            int version = ThinVersionHelper.convert(statusDate.getTime());
+            int memberId = map.getIntId((UUID) memberUuid, aceAuxPath, version);
 
-        // Now done with reading file, and getting member id. Could return
-        // control back to caller here.
+            // Now done with reading file, and getting member id. Could return
+            // control back to caller here.
 
-        ProcessMemberTaskInteger.acquire(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId, intValue);
+            ProcessMemberTaskInteger.acquire(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId, intValue);
+        } catch (NumberFormatException ex) {
+        	AceLog.getAppLog().info(ex.toString() + " in file: " + readInfo);
+        }
 
     }
 
     @Override
     protected void readLanguageMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+        UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
         st.nextToken();
         UUID acceptabilityUuid = (UUID) getId(st);
 
@@ -523,7 +527,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readStringMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+        UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
         st.nextToken();
         String strExt = st.sval;
         int version = ThinVersionHelper.convert(statusDate.getTime());

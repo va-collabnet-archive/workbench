@@ -663,6 +663,23 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public static int commitSequence = 0;
     private static boolean commitInProgress = false;
+    
+    public static List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
+        List<AlertToDataConstraintFailure> warningsAndErrors =
+            new ArrayList<AlertToDataConstraintFailure>();
+        for (I_Transact to : uncommitted) {
+            for (I_TestDataConstraints test : commitTests) {
+                try {
+                    for (AlertToDataConstraintFailure failure : test.test(to, true)) {
+                        warningsAndErrors.add(failure);
+                    }
+                } catch (Exception e) {
+                    AceLog.getEditLog().alertAndLogException(e);
+                }
+            }
+        }
+    	return warningsAndErrors;
+    }
 
     /*
 	 *
@@ -3294,7 +3311,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private void executeShutdownProcesses(File shutdownFolder) {
         if (shutdownFolder.exists()) {
-            AceLog.getAppLog().info("Shutdown folder exists");
+            AceLog.getAppLog().info("Shutdown folder exists: " + shutdownFolder.getAbsolutePath());
             File[] startupFiles = shutdownFolder.listFiles(new FilenameFilter() {
 
                 public boolean accept(File dir, String name) {
@@ -3320,7 +3337,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 AceLog.getAppLog().info("No shutdown processes found. Folder exists: " + shutdownFolder.exists());
             }
         } else {
-            AceLog.getAppLog().info("NO shutdown folder exists");
+            AceLog.getAppLog().info("No shutdown folder exists: " + shutdownFolder.getAbsolutePath());
         }
     }
 
