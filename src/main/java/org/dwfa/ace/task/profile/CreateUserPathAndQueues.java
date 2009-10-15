@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -26,6 +27,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -44,17 +46,19 @@ import org.dwfa.util.io.FileIO;
 public class CreateUserPathAndQueues extends AbstractTask {
 	private static final long serialVersionUID = 1;
 
-	private static final int dataVersion = 2;
+	private static final int dataVersion = 3;
 
 	private String commitProfilePropName = ProcessAttachmentKeys.COMMIT_PROFILE.getAttachmentKey();
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 	private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
+	private String errorsAndWarningsPropName = ProcessAttachmentKeys.ERRORS_AND_WARNINGS.getAttachmentKey();
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
 		out.writeObject(commitProfilePropName);
 		out.writeObject(positionSetPropName);
+		out.writeObject(errorsAndWarningsPropName);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
@@ -68,6 +72,11 @@ public class CreateUserPathAndQueues extends AbstractTask {
 			} else {
 				profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 				positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
+			}
+			if (objDataVersion >= 3) {
+				errorsAndWarningsPropName = (String) in.readObject();
+			} else {
+				errorsAndWarningsPropName = ProcessAttachmentKeys.ERRORS_AND_WARNINGS.getAttachmentKey();
 			}
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -107,6 +116,13 @@ public class CreateUserPathAndQueues extends AbstractTask {
 
 			createClassifierPath(config, commitConfig, positionSet);
 			
+			List<AlertToDataConstraintFailure> errorsAndWarnings = 
+				LocalVersionedTerminology.get().getCommitErrorsAndWarnings();
+			if (errorsAndWarnings.size() > 0) {
+				LocalVersionedTerminology.get().cancel();
+				process.setProperty(errorsAndWarningsPropName, errorsAndWarnings);
+				return Condition.FALSE;
+			}
         	try {
         		LocalVersionedTerminology.get().commit();
 			} catch (Exception e) {
@@ -149,7 +165,7 @@ public class CreateUserPathAndQueues extends AbstractTask {
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
-		return Condition.CONTINUE;
+		return Condition.TRUE;
 	}
 	
 	String[] QueueTypes = new String[] {"aging", "archival", "compute", "inbox", "launcher", "outbox" };
@@ -357,7 +373,7 @@ public class CreateUserPathAndQueues extends AbstractTask {
 	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
 	 */
 	public Collection<Condition> getConditions() {
-		return AbstractTask.CONTINUE_CONDITION;
+		return AbstractTask.CONDITIONAL_TEST_CONDITIONS;
 	}
 
 	public String getPositionSetPropName() {
@@ -374,6 +390,14 @@ public class CreateUserPathAndQueues extends AbstractTask {
 
 	public void setCommitProfilePropName(String commitProfilePropName) {
 		this.commitProfilePropName = commitProfilePropName;
+	}
+
+	public String getErrorsAndWarningsPropName() {
+		return errorsAndWarningsPropName;
+	}
+
+	public void setErrorsAndWarningsPropName(String errorsAndWarningsPropName) {
+		this.errorsAndWarningsPropName = errorsAndWarningsPropName;
 	}
 
 }

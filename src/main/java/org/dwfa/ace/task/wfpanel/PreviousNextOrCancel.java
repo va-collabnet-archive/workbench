@@ -157,23 +157,15 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
 
 	protected void restore() throws InterruptedException,
 			InvocationTargetException {
-		SwingUtilities.invokeAndWait(new Runnable() {
-
-			public void run() {
-				Component[] components = workflowPanel.getComponents();
-				for (int i = 0; i < components.length; i++) {
-					workflowPanel.remove(components[i]);
+		if (SwingUtilities.isEventDispatchThread()) {
+			doRun();
+		} else {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+					doRun();
 				}
-				workflowPanel.setVisible(false);
-				workflowPanel.validate();
-				Container cont = workflowPanel;
-				while (cont != null) {
-					cont.validate();
-					cont = cont.getParent();
-				}
-			}
-
-		});
+			});
+		}
 		config.setBuilderToggleVisible(builderVisible);
 		config.setSubversionToggleVisible(subversionButtonVisible);
 		config.setInboxToggleVisible(inboxButtonVisible);
@@ -211,6 +203,20 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
 
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
+	}
+
+	private void doRun() {
+		Component[] components = workflowPanel.getComponents();
+		for (int i = 0; i < components.length; i++) {
+			workflowPanel.remove(components[i]);
+		}
+		workflowPanel.setVisible(false);
+		workflowPanel.validate();
+		Container cont = workflowPanel;
+		while (cont != null) {
+			cont.validate();
+			cont = cont.getParent();
+		}
 	}
 
 	protected static String getPreviousImage() {

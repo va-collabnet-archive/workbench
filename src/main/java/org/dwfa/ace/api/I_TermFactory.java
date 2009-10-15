@@ -196,7 +196,7 @@ public interface I_TermFactory {
      * @return Data Constraint failures that would be encountered if <code>commit()</code> is called. 
      */
 
-    List<AlertToDataConstraintFailure> getCommitErrors();
+    List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings();
 
     void commit() throws Exception;
     
