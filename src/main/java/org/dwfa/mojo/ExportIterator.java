@@ -174,7 +174,6 @@ public class ExportIterator implements I_ProcessConcepts {
 			}
 		} else {
 			conceptsSuppressed++;
-			log.info("Suppressing: " + concept);
 		}
 		} catch (Exception e) {
 			throw new Exception("Exception caught processing concept " + concept.getUids() + " postions " + positions, e);
