@@ -448,6 +448,7 @@ public class Sct2AceMojo extends AbstractMojo {
 
         // SHOW input directories from POM file
         for (int i = 0; i < sctInputDirArray.length; i++) {
+            sctInputDirArray[i] = sctInputDirArray[i].replace('/', File.separatorChar);
             getLog().info("POM Input Directory (" + i + "): " + sctInputDirArray[i]);
             if (!sctInputDirArray[i].startsWith(FILE_SEPARATOR)) {
                 sctInputDirArray[i] = FILE_SEPARATOR + sctInputDirArray[i];
@@ -553,7 +554,7 @@ public class Sct2AceMojo extends AbstractMojo {
             		String.format("%1$s (%2$s): %3$s%4$s%5$s",
             				pattern.toUpperCase(), ii, wDir, subDir, inDirs[ii]));
 
-            File f1 = new File(wDir + subDir + inDirs[ii]);
+            File f1 = new File(new File(wDir, subDir), inDirs[ii]);
             ArrayList<File> fv = new ArrayList<File>();
             listFilesRecursive(fv, f1, "sct_"+ pattern);
             
@@ -567,7 +568,7 @@ public class Sct2AceMojo extends AbstractMojo {
 						return true;
 					} else {
 						for(String filter : inputFilters) {
-							if(pathname.getAbsolutePath().matches(filter)) {
+							if(pathname.getAbsolutePath().replace(File.separatorChar, '/').matches(filter)) {
 								return true;
 							}
 						}
