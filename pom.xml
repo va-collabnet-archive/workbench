@@ -37,18 +37,6 @@
             <version>1.6</version>
         </dependency>
         <dependency>
-            <!-- An alternative to:
-                <dependency>
-                <groupId>javax.activation</groupId>
-                <artifactId>activation</artifactId>
-                <version>1.1</version>
-                </dependency>
-                secondary to licensing issues -->
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-activation_1.1_spec</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
             <groupId>net.jini</groupId>
             <artifactId>jsk-lib</artifactId>
             <version>2.1</version>
