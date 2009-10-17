@@ -1809,13 +1809,17 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 
 	public Set<String> getLocators(String input) {
 		Set<String> locaters = new HashSet<String>();
-		String[] parts = input.split("\\$\\{");
-		if (parts.length > 1) {
-			for (int i = 1; i < parts.length; i++) {
-				String part = parts[i];
-				String locator = part.split("}", 2)[0];
-				locaters.add(locator);
+		if (input != null) {
+			String[] parts = input.split("\\$\\{");
+			if (parts.length > 1) {
+				for (int i = 1; i < parts.length; i++) {
+					String part = parts[i];
+					String locator = part.split("}", 2)[0];
+					locaters.add(locator);
+				}
 			}
+		} else {
+			logger.log(Level.WARNING, "Input is null in getLocators...");
 		}
 		return locaters;
 	}
