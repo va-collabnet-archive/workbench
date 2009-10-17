@@ -12,8 +12,6 @@ import java.util.UUID;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
-import sun.security.action.GetLongAction;
-
 import junit.framework.TestCase;
 
 public class Type3UuidFactoryTest extends TestCase {
