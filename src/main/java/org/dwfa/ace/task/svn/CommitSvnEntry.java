@@ -44,13 +44,8 @@ public class CommitSvnEntry extends AbstractSvnEntryTask {
 			SPECIAL_SVN_ENTRIES entry = SPECIAL_SVN_ENTRIES.valueOf(svnEntryKey);
 			BundleType bundleType = config.getBundleType();
 			switch (entry) {
-			case BERKELEY_DB:
-				// nothing to do
-				
-				break;
 			case PROFILE_CSU:
 				switch (bundleType) {
-				case DATABASE_UPDATE:
 				case STAND_ALONE:
 					// nothing to do...
 					break;
@@ -62,20 +57,6 @@ public class CommitSvnEntry extends AbstractSvnEntryTask {
 					throw new TaskFailedException("Can't handle: " + bundleType);
 				}
 				
-				break;
-			case PROFILE_DBU:
-				switch (bundleType) {
-				case CHANGE_SET_UPDATE:
-				case STAND_ALONE:
-					// nothing to do...
-					break;
-
-				case DATABASE_UPDATE:
-					config.svnCommit(svd);
-					break;
-				default:
-					throw new TaskFailedException("Can't handle: " + bundleType);
-				}
 				break;
 
 			default:

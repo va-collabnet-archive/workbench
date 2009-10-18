@@ -32,7 +32,7 @@ import org.dwfa.tapi.TerminologyException;
 public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public enum SPECIAL_SVN_ENTRIES {
-        PROFILE_CSU(), PROFILE_DBU(), BERKELEY_DB();
+        PROFILE_CSU();
     };
 
     public enum LANGUAGE_SORT_PREF {

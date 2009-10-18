@@ -43,15 +43,9 @@ public class PurgeSvnEntry extends AbstractSvnEntryTask {
 		try {
 			SPECIAL_SVN_ENTRIES entry = SPECIAL_SVN_ENTRIES.valueOf(svnEntryKey);
 			switch (entry) {
-			case BERKELEY_DB:
-				// nothing to do
-				break;
 			case PROFILE_CSU:
 				// nothing to do
 				break;
-			case PROFILE_DBU:
-				// nothing to do
-
 			default:
 				throw new TaskFailedException("Don't know how to handle: " + entry);
 			}

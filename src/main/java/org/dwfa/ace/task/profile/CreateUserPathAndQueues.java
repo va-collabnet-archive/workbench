@@ -355,7 +355,7 @@ public class CreateUserPathAndQueues extends AbstractTask {
         			tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), 
         			tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
-        	
+        
         return tf.newPath(positionSet, pathConcept);
 	}
 

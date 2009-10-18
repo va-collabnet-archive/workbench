@@ -7,6 +7,7 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
+
 public class AddRefsetMembersToListViewBeanInfo extends SimpleBeanInfo {
 
 	public PropertyDescriptor[] getPropertyDescriptors() {
