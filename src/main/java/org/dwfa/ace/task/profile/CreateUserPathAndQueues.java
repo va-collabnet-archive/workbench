@@ -118,9 +118,9 @@ public class CreateUserPathAndQueues extends AbstractTask {
 			
 			List<AlertToDataConstraintFailure> errorsAndWarnings = 
 				LocalVersionedTerminology.get().getCommitErrorsAndWarnings();
+			process.setProperty(errorsAndWarningsPropName, errorsAndWarnings);
 			if (errorsAndWarnings.size() > 0) {
 				LocalVersionedTerminology.get().cancel();
-				process.setProperty(errorsAndWarningsPropName, errorsAndWarnings);
 				return Condition.FALSE;
 			}
         	try {

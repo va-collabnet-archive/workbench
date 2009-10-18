@@ -49,7 +49,6 @@ public class Commit extends AbstractTask {
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
-
     }
 
     public Collection<Condition> getConditions() {
@@ -59,6 +58,5 @@ public class Commit extends AbstractTask {
     public int[] getDataContainerIds() {
         return new int[] {  };
     }
-
 
 }

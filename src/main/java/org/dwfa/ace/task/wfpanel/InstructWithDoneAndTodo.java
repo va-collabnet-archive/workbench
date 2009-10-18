@@ -237,11 +237,9 @@ public class InstructWithDoneAndTodo extends AbstractTask {
             c.gridy = 0;
             c.weightx = 1.0;
             c.weighty = 0;
-            c.anchor = GridBagConstraints.WEST;
-            workflowPanel.add(new JPanel(), c); // Filler
-            c.gridx++;
-            c.weightx = 0.0;
+            c.anchor = GridBagConstraints.EAST;
             workflowPanel.add(new JLabel(instruction), c);
+            c.weightx = 0.0;
             setupDoneAndTodoButtons(workflowPanel, c);
         }
 

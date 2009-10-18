@@ -521,12 +521,10 @@ public class InstructAndWaitDo extends AbstractTask {
 					c.gridy = 0;
 					c.weightx = 1.0;
 					c.weighty = 0;
-					c.anchor = GridBagConstraints.WEST;
-					workflowPanel.add(new JPanel(), c); // Filler
-					c.gridx++;
-					c.weightx = 0.0;
+					c.anchor = GridBagConstraints.EAST;
 					workflowPanel.add(new JLabel("<html><b>Matches for:</b> "
 							+ term), c);
+					c.weightx = 0.0;
 					c.gridx++;
 					workflowPanel.add(new JLabel("  "), c);
 					c.gridx++;

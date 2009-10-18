@@ -9,7 +9,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.dwfa.bpa.process.Condition;
@@ -98,11 +97,9 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
 			c.gridy = 0;
 			c.weightx = 1.0;
 			c.weighty = 0;
-			c.anchor = GridBagConstraints.WEST;
-			workflowPanel.add(new JPanel(), c); // Filler
-			c.gridx++;
-			c.weightx = 0.0;
+			c.anchor = GridBagConstraints.EAST;
 			workflowPanel.add(instruction, c);
+			c.weightx = 0.0;
 			c.gridx++;
 			c.weightx = 1.0;
 			if (showFullName()) {
