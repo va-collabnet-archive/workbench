@@ -1212,6 +1212,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     		origins = new HashSet<I_Position>();
     	}
         Path newPath = new Path(pathConcept.getConceptId(), new ArrayList<I_Position>(origins));
+        ACE.addUncommitted(newPath);
         AceLog.getEditLog().fine("writing new path: \n" + newPath);
         AceConfig.getVodb().writePath(newPath);
         return newPath;

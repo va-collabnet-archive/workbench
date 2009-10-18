@@ -2521,10 +2521,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public BundleType getBundleType() {
         if (bundleType == null) {
             File profileDirSvn = new File("profiles" + File.separator + ".svn");
-            File databaseSvn = new File(getDbConfig().getDbFolder(), ".svn");
-            if (profileDirSvn.exists() && databaseSvn.exists()) {
-                bundleType = BundleType.DATABASE_UPDATE;
-            } else if (profileDirSvn.exists()) {
+             if (profileDirSvn.exists()) {
                 bundleType = BundleType.CHANGE_SET_UPDATE;
             } else {
                 bundleType = BundleType.STAND_ALONE;

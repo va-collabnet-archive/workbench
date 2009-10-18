@@ -201,7 +201,6 @@ public class Path implements I_Transact, I_Path {
 	 */
 	public void commit(int version, Set<TimePathId> values) throws IOException {
 		AceConfig.getVodb().writePath(this);
-
 	}
 
 	/*
