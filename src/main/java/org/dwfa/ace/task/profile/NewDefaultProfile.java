@@ -330,6 +330,8 @@ public class NewDefaultProfile extends NewProfile {
 						.getConcept(Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
 								.getUids()));
 
+		activeConfig.setSubversionToggleVisible(false);
+		
 		activeConfig.setDefaultRelationshipType(tf.getConcept(Concept.IS_A_REL
 				.getUids()));
 		activeConfig.setDefaultRelationshipCharacteristic(tf
