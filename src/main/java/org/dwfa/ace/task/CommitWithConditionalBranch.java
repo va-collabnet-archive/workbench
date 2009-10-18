@@ -12,7 +12,12 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
 
+@BeanList(specs = 
+{ @Spec(directory = "tasks/ide/db", type = BeanType.TASK_BEAN)})
 public class CommitWithConditionalBranch extends AbstractTask {
 	private static final long serialVersionUID = 1;
 
