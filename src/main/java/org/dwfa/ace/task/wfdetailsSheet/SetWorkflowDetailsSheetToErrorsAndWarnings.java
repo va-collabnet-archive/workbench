@@ -1,5 +1,8 @@
 package org.dwfa.ace.task.wfdetailsSheet;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.io.IOException;
@@ -7,13 +10,14 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-import org.dwfa.ace.ACE.ListenForDataChecks;
+import org.dwfa.ace.AceImages;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.grant.GrantPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.Condition;
@@ -101,10 +105,9 @@ public class SetWorkflowDetailsSheetToErrorsAndWarnings extends AbstractTask {
 	        workflowDetailsSheet.setSize(width, height);
 	        
 	        JPanel dataCheckListPanel = new JPanel(new GridBagLayout());
+	        layoutAlerts(dataCheckListPanel, warningsAndErrors);
 	        JScrollPane dataCheckListScroller = new JScrollPane(dataCheckListPanel);
 	        
-
-	            
 	        workflowDetailsSheet.setLayout(new GridLayout(1, 1));
 			workflowDetailsSheet.add(dataCheckListScroller);
 		} catch (Exception e) {
@@ -112,6 +115,81 @@ public class SetWorkflowDetailsSheetToErrorsAndWarnings extends AbstractTask {
 		}
 	}
 
+	private void layoutAlerts(JPanel dataCheckListPanel, Collection<AlertToDataConstraintFailure> warningsAndErrors) {
+		for (Component component : dataCheckListPanel.getComponents()) {
+			dataCheckListPanel.remove(component);
+		}
+
+		dataCheckListPanel.setLayout(new GridBagLayout());
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridheight = 1;
+		c.gridwidth = 1;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.weighty = 0;
+
+		for (AlertToDataConstraintFailure alert : warningsAndErrors) {
+			setupAlert(alert);
+			dataCheckListPanel.add(alert.getRendererComponent(), c);
+			c.gridy++;
+		}
+
+		c.weighty = 1;
+		c.gridy++;
+		dataCheckListPanel.add(new JPanel(), c);
+	}
+
+    private void setupAlert(AlertToDataConstraintFailure alert) {
+        if (alert.getRendererComponent() == null) {
+
+            JLabel label = new JLabel();
+            label.setText(alert.getAlertMessage());
+            switch (alert.getAlertType()) {
+            case ERROR:
+                label.setIcon(AceImages.errorIcon);
+            case INFORMATIONAL:
+                label.setIcon(AceImages.errorIcon);
+                break;
+            case RESOLVED:
+                label.setIcon(AceImages.errorIcon);
+                break;
+            case WARNING:
+                label.setIcon(AceImages.errorIcon);
+                break;
+            }
+
+            JPanel componentPanel = new JPanel(new GridBagLayout());
+
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 0;
+            c.gridheight = 1;
+            c.gridwidth = 2;
+            c.anchor = GridBagConstraints.NORTHWEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.weightx = 1;
+            c.weighty = 0;
+            componentPanel.add(label, c);
+            c.weightx = 0;
+            c.gridwidth = 1;
+            c.gridy++;
+            c.anchor = GridBagConstraints.EAST;
+            boolean isSelected = false;
+            if (isSelected) {
+                componentPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1,
+                    1, 1, Color.BLUE), BorderFactory.createEmptyBorder(1, 0, 0, 0)));
+            } else {
+                componentPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0,
+                    1, 0, Color.BLACK), BorderFactory.createEmptyBorder(1, 1, 0, 1)));
+            }
+
+            alert.setRendererComponent(componentPanel);
+        }
+    }
 
 	/**
 	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,

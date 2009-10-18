@@ -12,15 +12,22 @@ public class SetWorkflowDetailsSheetToErrorsAndWarningsBeanInfo extends SimpleBe
     public PropertyDescriptor[] getPropertyDescriptors() {
          try {  
 
-            PropertyDescriptor profilePropName =
-                new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
-            profilePropName.setBound(true);
-            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName.setShortDescription("The property that contains the working profile.");
+             PropertyDescriptor errorsAndWarningsPropName =
+                 new PropertyDescriptor("errorsAndWarningsPropName", getBeanDescriptor().getBeanClass());
+             errorsAndWarningsPropName.setBound(true);
+             errorsAndWarningsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+             errorsAndWarningsPropName.setDisplayName("<html><font color='green'>error set prop:");
+             errorsAndWarningsPropName.setShortDescription("The property that contains the errors and warnings.");
+
+             PropertyDescriptor profilePropName =
+                 new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
+             profilePropName.setBound(true);
+             profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+             profilePropName.setShortDescription("The property that contains the working profile.");
 
             PropertyDescriptor rv[] =
-                { profilePropName };
+                { errorsAndWarningsPropName, profilePropName };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
