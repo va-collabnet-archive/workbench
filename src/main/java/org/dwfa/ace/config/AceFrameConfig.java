@@ -2215,76 +2215,92 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setAddressToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setAddressToggleVisible(visible);
-        if (visible) {
-            hiddenTopToggles.remove(TopToggleTypes.ADDRESS);
-        } else {
-            hiddenTopToggles.add(TopToggleTypes.ADDRESS);
-        }
+    	if (aceFrame != null) {
+            aceFrame.getCdePanel().setAddressToggleVisible(visible);
+            if (visible) {
+                hiddenTopToggles.remove(TopToggleTypes.ADDRESS);
+            } else {
+                hiddenTopToggles.add(TopToggleTypes.ADDRESS);
+            }
+    	}
     }
 
     public void setBuilderToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setBuilderToggleVisible(visible);
-        if (visible) {
-            hiddenTopToggles.remove(TopToggleTypes.BUILDER);
-        } else {
-            hiddenTopToggles.add(TopToggleTypes.BUILDER);
-        }
+    	if (aceFrame != null) {
+            aceFrame.getCdePanel().setBuilderToggleVisible(visible);
+            if (visible) {
+                hiddenTopToggles.remove(TopToggleTypes.BUILDER);
+            } else {
+                hiddenTopToggles.add(TopToggleTypes.BUILDER);
+            }
+    	}
     }
 
     public void setComponentToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setComponentToggleVisible(visible);
-        if (visible) {
-            hiddenTopToggles.remove(TopToggleTypes.COMPONENT);
-        } else {
-            hiddenTopToggles.add(TopToggleTypes.COMPONENT);
-        }
+    	if (aceFrame != null) {
+            aceFrame.getCdePanel().setComponentToggleVisible(visible);
+            if (visible) {
+                hiddenTopToggles.remove(TopToggleTypes.COMPONENT);
+            } else {
+                hiddenTopToggles.add(TopToggleTypes.COMPONENT);
+            }
+    	}
     }
 
     public void setHierarchyToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setHierarchyToggleVisible(visible);
-        if (visible) {
-            hiddenTopToggles.remove(TopToggleTypes.TAXONOMY);
-        } else {
-            hiddenTopToggles.add(TopToggleTypes.TAXONOMY);
-        }
+    	if (aceFrame != null) {
+            aceFrame.getCdePanel().setHierarchyToggleVisible(visible);
+            if (visible) {
+                hiddenTopToggles.remove(TopToggleTypes.TAXONOMY);
+            } else {
+                hiddenTopToggles.add(TopToggleTypes.TAXONOMY);
+            }
+    	}
     }
 
     public void setHistoryToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setHistoryToggleVisible(visible);
-        if (visible) {
-            hiddenTopToggles.remove(TopToggleTypes.HISTORY);
-        } else {
-            hiddenTopToggles.add(TopToggleTypes.HISTORY);
-        }
+    	if (aceFrame != null) {
+            aceFrame.getCdePanel().setHistoryToggleVisible(visible);
+            if (visible) {
+                hiddenTopToggles.remove(TopToggleTypes.HISTORY);
+            } else {
+                hiddenTopToggles.add(TopToggleTypes.HISTORY);
+            }
+    	}
     }
 
     public void setInboxToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setInboxToggleVisible(visible);
-        if (visible) {
-            hiddenTopToggles.remove(TopToggleTypes.INBOX);
-        } else {
-            hiddenTopToggles.add(TopToggleTypes.INBOX);
-        }
+    	if (aceFrame != null) {
+            aceFrame.getCdePanel().setInboxToggleVisible(visible);
+            if (visible) {
+                hiddenTopToggles.remove(TopToggleTypes.INBOX);
+            } else {
+                hiddenTopToggles.add(TopToggleTypes.INBOX);
+            }
+    	}
     }
 
     public void setPreferencesToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setPreferencesToggleVisible(visible);
-        if (visible) {
-            hiddenTopToggles.remove(TopToggleTypes.PREFERENCES);
-        } else {
-            hiddenTopToggles.add(TopToggleTypes.PREFERENCES);
-        }
+    	if (aceFrame != null) {
+            aceFrame.getCdePanel().setPreferencesToggleVisible(visible);
+            if (visible) {
+                hiddenTopToggles.remove(TopToggleTypes.PREFERENCES);
+            } else {
+                hiddenTopToggles.add(TopToggleTypes.PREFERENCES);
+            }
+    	}
     }
 
 
     public void setSubversionToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setSubversionToggleVisible(visible);
-        if (visible) {
-            hiddenTopToggles.remove(TopToggleTypes.SUBVERSION);
-        } else {
-            hiddenTopToggles.add(TopToggleTypes.SUBVERSION);
-        }
+    	if (aceFrame != null) {
+            aceFrame.getCdePanel().setSubversionToggleVisible(visible);
+            if (visible) {
+                hiddenTopToggles.remove(TopToggleTypes.SUBVERSION);
+            } else {
+                hiddenTopToggles.add(TopToggleTypes.SUBVERSION);
+            }
+    	}
     }
 
     public Set<EXT_TYPE> getEnabledConceptExtTypes() {
