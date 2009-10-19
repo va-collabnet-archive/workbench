@@ -354,22 +354,16 @@ public class NewDefaultProfile extends NewProfile {
 		}
 
 		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.ID, true);
-		activeConfig
-				.setTogglesInComponentPanelVisible(TOGGLES.ATTRIBUTES, true);
-		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.DESCRIPTIONS,
-				true);
-		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.SOURCE_RELS,
-				true);
+		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.ATTRIBUTES, true);
+		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.DESCRIPTIONS, true);
+		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.SOURCE_RELS, true);
 		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.DEST_RELS, true);
 		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.LINEAGE, true);
-		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.LINEAGE_GRAPH,
-				false);
+		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.LINEAGE_GRAPH, false);
 		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.IMAGE, true);
 		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.CONFLICT, true);
-		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.STATED_INFERRED,
-				false);
-		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.PREFERENCES,
-				true);
+		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.STATED_INFERRED, false);
+		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.PREFERENCES, true);
 		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.HISTORY, true);
 		activeConfig.setTogglesInComponentPanelVisible(TOGGLES.REFSETS, false);
 
