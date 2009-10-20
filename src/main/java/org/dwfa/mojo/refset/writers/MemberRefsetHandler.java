@@ -14,6 +14,8 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -277,11 +279,42 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         if (sctId) {
             // TODO this assumes that the componentId is a concept! it might be
             // a description or relationship
-            return Long.toString(getSctGenerator().getWithGeneration(tf.getUids(componentId).iterator().next(),
-                TYPE.CONCEPT));
+
+            // check if there's an existing snomed ID to use first
+            String snomedId = getSnomedIntegerId(tf, componentId);
+            if (snomedId != null) {
+                return snomedId;
+            } else {
+                return Long.toString(getSctGenerator().getWithGeneration(tf.getUids(componentId).iterator().next(),
+                    TYPE.CONCEPT));
+            }
         } else { // uuid
             return tf.getUids(componentId).iterator().next().toString();
         }
+    }
+
+    public String getSnomedIntegerId(I_TermFactory tf, int componentId) throws TerminologyException, IOException {
+
+        I_IdVersioned idVersioned = tf.getId(componentId);
+        int snomedIntegerId =
+                tf.getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNativeId();
+
+        List<I_IdPart> parts = idVersioned.getVersions();
+        I_IdPart latestPart = null;
+        for (I_IdPart part : parts) {
+            if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
+                if (part.getSource() == snomedIntegerId) {
+                    latestPart = part;
+                }
+            }
+        }
+
+        if (latestPart != null) {
+            return latestPart.getSourceId().toString();
+        } else {
+            return null;
+        }
+
     }
 
     private static synchronized UuidSnomedMapHandler getSctGenerator() throws IOException {

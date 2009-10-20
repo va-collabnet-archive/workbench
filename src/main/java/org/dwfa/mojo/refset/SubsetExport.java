@@ -23,6 +23,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.refset.spec.RefsetInclusionSpec;
 import org.dwfa.mojo.refset.writers.MemberRefsetHandler;
 import org.dwfa.tapi.TerminologyException;
@@ -259,7 +260,10 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
             // first time this subset member has been found, so add to index
             // table as well
-            String subOriginalId = getSubsetOriginalId(tf, refsetId);
+            String subOriginalId = refsetType.getRefsetHandler().getSnomedIntegerId(tf, refsetId);
+            if (subOriginalId == null) {
+                subOriginalId = "UNKNOWN";
+            }
             subsetIndexFileWriter.write(refsetType.getRefsetHandler().getRefsetSctID(tf, refsetId) + FILE_DELIMITER
                 + subOriginalId + FILE_DELIMITER + "UNKNOWN" + FILE_DELIMITER
                 + referenceSetExport.getPreferredTerm(tf.getConcept(refsetId)) + FILE_DELIMITER + "UNKNOWN"
@@ -272,23 +276,5 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
         subsetMemberFileWriter.newLine();
     }
 
-    public String getSubsetOriginalId(I_TermFactory tf, int refsetId) throws TerminologyException, IOException {
 
-        I_IdVersioned idVersioned = tf.getId(refsetId);
-
-        List<I_IdPart> parts = idVersioned.getVersions();
-        I_IdPart latestPart = null;
-        for (I_IdPart part : parts) {
-            if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
-                latestPart = part;
-            }
-        }
-
-        if (latestPart.getSourceId() instanceof Long) {
-            return latestPart.getSourceId().toString();
-        } else {
-            return "UNKNOWN";
-        }
-
-    }
 }
