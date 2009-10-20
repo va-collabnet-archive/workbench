@@ -275,7 +275,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         return dateFormat.format(tf.convertToThickVersion(version));
     }
 
-    protected String toId(I_TermFactory tf, int componentId, boolean sctId) throws TerminologyException, IOException {
+    public String toId(I_TermFactory tf, int componentId, boolean sctId) throws TerminologyException, IOException {
         if (sctId) {
             // TODO this assumes that the componentId is a concept! it might be
             // a description or relationship

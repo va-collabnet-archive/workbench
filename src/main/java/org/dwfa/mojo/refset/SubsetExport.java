@@ -5,16 +5,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -23,7 +23,6 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.refset.spec.RefsetInclusionSpec;
 import org.dwfa.mojo.refset.writers.MemberRefsetHandler;
 import org.dwfa.tapi.TerminologyException;
@@ -53,14 +52,6 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
      * @required
      */
     File subsetOutputDirectory;
-
-    /**
-     * Directory where the fixed SCTID map is located
-     * 
-     * @parameter
-     * @required
-     */
-    // File fixedMapDirectory;
 
     /**
      * Directory where the read/write SCTID maps are stored
@@ -124,7 +115,6 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
             subsetOutputDirectory.mkdirs();
 
-            // MemberRefsetHandler.setFixedMapDirectory(fixedMapDirectory);
             MemberRefsetHandler.setFixedMapDirectory(readWriteMapDirectory);
             MemberRefsetHandler.setReadWriteMapDirectory(readWriteMapDirectory);
 
@@ -163,12 +153,52 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
     private void exportRefsets(int refsetId) throws TerminologyException, Exception {
 
         List<I_ThinExtByRefVersioned> extensions = tf.getRefsetExtensionMembers(refsetId);
+        TreeMap<Long, I_ThinExtByRefTuple> treeMap = new TreeMap<Long, I_ThinExtByRefTuple>();
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
             for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses, positions,
                 true, true)) {
-                export(thinExtByRefTuple);
+                try {
+
+                    RefsetType refsetType = refsetTypeMap.get(refsetId);
+                    if (refsetType == null) {
+                        try {
+                            refsetType = RefsetType.findByExtension(thinExtByRefTuple.getPart());
+                        } catch (EnumConstantNotPresentException e) {
+                            getLog().warn(
+                                "No handler for tuple " + thinExtByRefTuple.getPart() + " of type "
+                                    + thinExtByRefTuple.getPart().getClass(), e);
+                            return;
+                        }
+                        refsetTypeMap.put(refsetId, refsetType);
+                    }
+
+                    Long memberId =
+                            Long.parseLong(refsetType.getRefsetHandler().toId(tf, thinExtByRefTuple.getComponentId(),
+                                true));
+                    if (treeMap.containsKey(memberId)) {
+                        getLog().warn(
+                            "Refset " + tf.getConcept(refsetId).getInitialText()
+                                + " export has multiple entries with same member ID : " + thinExtByRefTuple + " "
+                                + memberId);
+                    }
+                    treeMap.put(memberId, thinExtByRefTuple);
+                } catch (NumberFormatException e) {
+                    getLog().warn(
+                        "Refset " + tf.getConcept(refsetId).getInitialText()
+                            + " fails to allocate member ID for tuple : " + thinExtByRefTuple);
+                    return;
+                }
             }
+        }
+        Iterator<Long> iterator = treeMap.keySet().iterator();
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            I_ThinExtByRefTuple ext = treeMap.get(key);
+
+            System.out.println(key);
+            System.out.println(ext);
+            export(ext);
         }
     }
 
@@ -275,6 +305,5 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             refsetId, componentId, true));
         subsetMemberFileWriter.newLine();
     }
-
 
 }

@@ -217,8 +217,6 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
      * @throws Exception on DB or file error.
      */
     private void exportRefsets(int refsetId) throws TerminologyException, Exception {
-        // List<I_ThinExtByRefVersioned> extensions =
-        // tf.getAllExtensionsForComponent(componentId);
         List<I_ThinExtByRefVersioned> extensions = tf.getRefsetExtensionMembers(refsetId);
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
             for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses, positions,
