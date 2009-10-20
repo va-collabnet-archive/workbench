@@ -18,8 +18,6 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
-
 /**
  * The SetPropertiesToUserInfo class is a Workflow task that takes the name of
  * the working profile for the current process and sets the associated username 
@@ -28,6 +26,7 @@ import org.dwfa.util.bean.Spec;
  * @author  Perry Reid
  * @version 1.0, October 2009 
  */
+@BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class SetPropertiesToUserInfo extends AbstractTask {
 	
 	// CLASS PROPERTIES 
