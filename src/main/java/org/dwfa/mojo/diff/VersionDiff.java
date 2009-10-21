@@ -727,6 +727,8 @@ public class VersionDiff extends AbstractMojo {
 		newExtension.addVersion(ext);
 		tf.addUncommitted(newExtension);
 		//
+		if (change_id == this.config || change_id == this.stats)
+			return;
 		I_GetConceptData member_refset = refsets.get(change_id);
 		if (member_refset == null) {
 			System.out.println("None for " + change_id);
