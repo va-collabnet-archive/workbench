@@ -292,6 +292,11 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                       new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
                   EXTERNAL_REFERENCE(new String[] {"external reference (description type)", "external reference"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  
+                  READ_XHTML_DESC(new String[] {"read XHMTL desc (description type)", "read XHTML desc"}, null,
+                                new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),  
+                  READ_SYN_XHTML_DESC(new String[] {"read synonym XHMTL desc (description type)", "read synonym XHMTL desc"}, null,
+                                new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),              
 
                   READ_198_DESC(new String[] {"read 198 desc (description type)", "read 198 desc"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
@@ -349,6 +354,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_ANALOG("is an analog of (relationship type)",
                              new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_READ_V2_V3_ANALOG("is a Read V2 analog of Read V3(relationship type)",
+                       		new I_ConceptualizeUniversally[] { RELATIONSHIP }), 
+            IS_READ_4B_V3_ANALOG("is a Read 4Byte analog of Read V3 (relationship type)",
+                           new I_ConceptualizeUniversally[] { RELATIONSHIP }),                       		
             IS_ALIAS_OF("is alias of (relationship type)",
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             DUP_REL_TYPE("dup rel type (terminology constant)",
