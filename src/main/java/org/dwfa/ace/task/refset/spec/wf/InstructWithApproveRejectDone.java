@@ -343,9 +343,9 @@ public class InstructWithApproveRejectDone extends AbstractTask {
         reviewedApprovedDeletionStatus =
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION.getUids());
         reviewedRejectedAdditionStatus =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_REJECTED_ADDITION.getUids());
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
         reviewedRejectedDeletionStatus =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_REJECTED_DELETION.getUids());
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
 
         if (initialPromotionStatus.equals(unreviewedAdditionStatus)
             || initialPromotionStatus.equals(reviewedApprovedAdditionStatus)
