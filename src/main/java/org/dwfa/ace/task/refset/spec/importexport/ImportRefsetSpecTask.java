@@ -78,8 +78,9 @@ public class ImportRefsetSpecTask extends AbstractTask {
         // initialize the progress panel
         I_ShowActivity activityPanel = null;
         try {
-        	activityPanel = LocalVersionedTerminology.get().newActivityPanel(true, 
-        			LocalVersionedTerminology.get().getActiveAceFrameConfig());
+            activityPanel =
+                    LocalVersionedTerminology.get().newActivityPanel(true,
+                        LocalVersionedTerminology.get().getActiveAceFrameConfig());
             String importFileName = (String) process.readProperty(inputFilePropName);
             String outputFileName = (String) process.readProperty(outputFilePropName);
             Object pathObj = process.readProperty(pathUuidPropName);
@@ -110,12 +111,15 @@ public class ImportRefsetSpecTask extends AbstractTask {
                     .get().getUids(memberRefset.getConceptId()).iterator().next());
             }
 
+            LocalVersionedTerminology.get().getActiveAceFrameConfig().setBuilderToggleVisible(true);
+            LocalVersionedTerminology.get().getActiveAceFrameConfig().setInboxToggleVisible(true);
+
             return Condition.CONTINUE;
         } catch (Exception ex) {
             try {
-            	if (activityPanel != null) {
+                if (activityPanel != null) {
                     activityPanel.complete();
-            	}
+                }
                 LocalVersionedTerminology.get().cancel();
             } catch (IOException e) {
                 e.printStackTrace();

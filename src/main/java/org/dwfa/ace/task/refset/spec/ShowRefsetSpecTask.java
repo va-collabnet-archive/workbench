@@ -78,6 +78,9 @@ public class ShowRefsetSpecTask extends AbstractTask {
                     Thread.sleep(1000);
                     count++;
                 }
+            } else {
+                termFactory.getActiveAceFrameConfig().setShowQueueViewer(false);
+                termFactory.getActiveAceFrameConfig().showRefsetSpecPanel();
             }
 
         } catch (Exception e) {

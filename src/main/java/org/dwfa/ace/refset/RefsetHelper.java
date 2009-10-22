@@ -1,9 +1,12 @@
 package org.dwfa.ace.refset;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -28,6 +31,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.AllowDataCheckSuppression;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 
 @AllowDataCheckSuppression
@@ -895,6 +899,138 @@ public class RefsetHelper {
 
     public void setConceptTypeId(int conceptTypeId) {
         this.conceptTypeId = conceptTypeId;
+    }
+
+    public boolean newConceptExtensionPart(int refsetId, int componentId, int c1Id) {
+        return newConceptExtensionPart(refsetId, componentId, c1Id, currentStatusId);
+    }
+
+    public boolean newConceptExtensionPart(int refsetId, int componentId, int c1Id, int statusId) {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        try {
+            for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(componentId)) {
+                if (extension.getRefsetId() == refsetId) {
+                    // get the latest version
+                    I_ThinExtByRefPart latestPart = null;
+                    for (I_ThinExtByRefPart part : extension.getVersions()) {
+                        if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                            latestPart = part;
+                        }
+                    }
+                    if (latestPart == null) {
+                        return false;
+                    }
+
+                    if (latestPart instanceof I_ThinExtByRefPartConcept) {
+                        // found a member to retire
+                        I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                        clone.setStatusId(statusId);
+                        clone.setVersion(Integer.MAX_VALUE);
+                        clone.setC1id(c1Id);
+                        extension.addVersion(clone);
+                        termFactory.addUncommittedNoChecks(extension);
+                        termFactory.commit();
+                        return true;
+                    }
+                }
+            }
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    public boolean retireConceptExtension(int refsetId, int componentId) {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        try {
+            for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(componentId)) {
+                if (extension.getRefsetId() == refsetId) {
+                    // get the latest version
+                    I_ThinExtByRefPart latestPart = null;
+                    for (I_ThinExtByRefPart part : extension.getVersions()) {
+                        if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                            latestPart = part;
+                        }
+                    }
+                    if (latestPart == null) {
+                        return false;
+                    }
+
+                    // confirm its the right extension value and its status is
+                    // current
+                    if (latestPart.getStatusId() == currentStatusId) {
+                        if (latestPart instanceof I_ThinExtByRefPartConcept) {
+                            // found a member to retire
+                            I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                            clone.setStatusId(retiredStatusId);
+                            clone.setVersion(Integer.MAX_VALUE);
+                            extension.addVersion(clone);
+                            termFactory.addUncommittedNoChecks(extension);
+                            termFactory.commit();
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    public List<I_GetConceptData> filterListByConceptType(List<I_ThinExtByRefVersioned> allExtensions,
+            I_GetConceptData requiredPromotionStatusConcept) throws Exception {
+
+        List<I_GetConceptData> filteredList = new ArrayList<I_GetConceptData>();
+
+        for (I_ThinExtByRefVersioned extension : allExtensions) {
+            I_ThinExtByRefPart latestMemberPart = getLatestCurrentPart(extension);
+            if (latestMemberPart == null) {
+                throw new Exception("Member extension exists with no parts.");
+            }
+            I_GetConceptData promotionStatus = null;
+            if (extension != null) {
+                promotionStatus = getPromotionStatus(extension);
+            }
+            if (promotionStatus != null && promotionStatus.equals(requiredPromotionStatusConcept)) {
+                filteredList.add(termFactory.getConcept(extension.getComponentId()));
+            }
+        }
+        return filteredList;
+    }
+
+    private I_GetConceptData getPromotionStatus(I_ThinExtByRefVersioned promotionExtension) throws Exception {
+        I_ThinExtByRefPart latestPart = getLatestCurrentPart(promotionExtension);
+        if (latestPart == null) {
+            return null;
+        } else {
+            if (latestPart instanceof I_ThinExtByRefPartConcept) {
+                I_ThinExtByRefPartConcept latestConceptPart = (I_ThinExtByRefPartConcept) latestPart;
+                return termFactory.getConcept(latestConceptPart.getC1id());
+            } else {
+                throw new Exception("Don't know how to handle promotion ext of type : " + latestPart);
+            }
+        }
+    }
+
+    private I_ThinExtByRefPart getLatestCurrentPart(I_ThinExtByRefVersioned memberExtension)
+            throws TerminologyException, IOException {
+        I_ThinExtByRefPart latestPart = null;
+        I_GetConceptData currentStatusConcept =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+
+        for (I_ThinExtByRefPart part : memberExtension.getVersions()) {
+            if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                if (part.getStatusId() == currentStatusConcept.getConceptId()) {
+                    latestPart = part;
+                }
+            }
+        }
+        return latestPart;
     }
 
 }

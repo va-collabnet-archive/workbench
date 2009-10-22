@@ -1,17 +1,14 @@
-package org.dwfa.ace.task;
+package org.dwfa.ace.task.prop;
 
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
-import javax.swing.JList;
-
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -21,17 +18,23 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN) })
-public class TakeFirstItemInList extends AbstractTask {
+/**
+ * Sets the specified property to the UUID of the refset spec currently in the
+ * refset spec editor window.
+ * 
+ * @author Chrissy Hill
+ * 
+ */
+@BeanList(specs = { @Spec(directory = "tasks/ide/prop", type = BeanType.TASK_BEAN) })
+public class SetPropertyToRefsetSpecUuid extends AbstractTask {
 
     /**
-	 * 
+	 *
 	 */
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-
-    private String propName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
+    private String propName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -41,6 +44,7 @@ public class TakeFirstItemInList extends AbstractTask {
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
+            //
             propName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -55,20 +59,15 @@ public class TakeFirstItemInList extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config =
-                    (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            JList conceptList = config.getBatchConceptList();
-            I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-            I_GetConceptData concept = (I_GetConceptData) model.removeElement(0);
-            process.setProperty(this.propName, concept);
+            I_TermFactory termFactory = LocalVersionedTerminology.get();
+            I_GetConceptData refsetSpec = termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor();
+            if (refsetSpec != null) {
+                process.setProperty(propName, termFactory.getUids(refsetSpec.getConceptId()).iterator().next());
+            } else {
+                process.setProperty(propName, null);
+            }
             return Condition.CONTINUE;
-        } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
-        } catch (IntrospectionException e) {
+        } catch (Exception e) {
             throw new TaskFailedException(e);
         }
     }

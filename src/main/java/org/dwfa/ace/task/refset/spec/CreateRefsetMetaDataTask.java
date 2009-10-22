@@ -217,6 +217,9 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             process.setProperty(ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey(), refsetSpec.getUids()
                 .iterator().next());
 
+            termFactory.getActiveAceFrameConfig().setBuilderToggleVisible(true);
+            termFactory.getActiveAceFrameConfig().setInboxToggleVisible(true);
+
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
@@ -227,6 +230,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         }
 
         returnCondition = Condition.ITEM_COMPLETE;
+
     }
 
     private I_GetConceptData newConcept() throws Exception {

@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -26,7 +25,6 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -52,8 +50,10 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     private I_GetConceptData memberRefsetConcept;
     private I_GetConceptData unreviewedAdditionStatus;
     private I_GetConceptData unreviewedDeletionStatus;
-    private I_GetConceptData reviewedApprovedStatus;
-    private I_GetConceptData reviewedRejectedStatus;
+    private I_GetConceptData reviewedApprovedDeletionStatus;
+    private I_GetConceptData reviewedApprovedAdditionStatus;
+    private I_GetConceptData reviewedRejectedDeletionStatus;
+    private I_GetConceptData reviewedRejectedAdditionStatus;
 
     private transient Exception ex = null;
     private transient Condition returnCondition = Condition.ITEM_COMPLETE;
@@ -107,24 +107,33 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             retiredStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
 
             UUID refsetSpecUuid = (UUID) process.readProperty(refsetSpecUuidPropName);
+            if (refsetSpecUuid == null) {
+                throw new Exception("No refset spec currently in refset spec panel.");
+            }
             I_GetConceptData refsetSpecConcept = termFactory.getConcept(new UUID[] { refsetSpecUuid });
             RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept);
 
             memberRefsetConcept = refsetSpec.getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
-                throw new Exception("Member refset is null");
+                throw new Exception("Unable to find member refset.");
             }
             promotionConcept = refsetSpec.getPromotionRefsetConcept();
             if (promotionConcept == null) {
-                throw new Exception("Promotion refset is null");
+                throw new Exception("Unable to find promotion refset.");
             }
 
             unreviewedAdditionStatus =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids());
             unreviewedDeletionStatus =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
-            reviewedApprovedStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED.getUids());
-            reviewedRejectedStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_REJECTED.getUids());
+            reviewedApprovedAdditionStatus =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION.getUids());
+            reviewedApprovedDeletionStatus =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION.getUids());
+            reviewedRejectedAdditionStatus =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_REJECTED_ADDITION.getUids());
+            reviewedRejectedDeletionStatus =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_REJECTED_DELETION.getUids());
 
             List<I_ThinExtByRefVersioned> memberExtensions =
                     termFactory.getRefsetExtensionMembers(memberRefsetConcept.getConceptId());
@@ -132,6 +141,9 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                     termFactory.getRefsetExtensionMembers(promotionConcept.getConceptId());
 
             updatePromotionsRefset(memberExtensions, promotionExtensions);
+
+            process.setProperty(ProcessAttachmentKeys.PROMOTION_UUID.getAttachmentKey(), termFactory.getUids(
+                promotionConcept.getConceptId()).iterator().next());
 
             termFactory.commit();
 
@@ -148,6 +160,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
 
     private void updatePromotionsRefset(List<I_ThinExtByRefVersioned> memberExtensions,
             List<I_ThinExtByRefVersioned> promotionExtensions) throws Exception {
+        RefsetHelper refsetHelper = new RefsetHelper();
         for (I_ThinExtByRefVersioned memberExtension : memberExtensions) {
             I_ThinExtByRefPart latestMemberPart = getLatestPart(memberExtension);
             I_ThinExtByRefVersioned promotionExtension =
@@ -163,15 +176,40 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed addition
-                        newConceptExtension(promotionConcept.getConceptId(), memberExtension.getComponentId(),
-                            unreviewedAdditionStatus.getConceptId());
+                        refsetHelper.newRefsetExtension(promotionConcept.getConceptId(), memberExtension
+                            .getComponentId(), unreviewedAdditionStatus.getConceptId());
+                    } else if (promotionStatus.equals(unreviewedAdditionStatus)
+                        || promotionStatus.equals(reviewedApprovedAdditionStatus)
+                        || promotionStatus.equals(reviewedRejectedAdditionStatus)) {
+                        // no change
+                    } else if (promotionStatus.equals(unreviewedDeletionStatus)
+                        || promotionStatus.equals(reviewedApprovedDeletionStatus)
+                        || promotionStatus.equals(reviewedRejectedDeletionStatus)) {
+                        refsetHelper.retireConceptExtension(promotionConcept.getConceptId(), memberExtension
+                            .getComponentId());
+                        refsetHelper.newConceptExtensionPart(promotionConcept.getConceptId(), memberExtension
+                            .getComponentId(), unreviewedAdditionStatus.getConceptId(), currentStatusConcept
+                            .getConceptId());
                     }
+
                 } else if (latestMemberPart.getStatusId() == retiredStatusConcept.getConceptId()) {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed deletion
-                        newConceptExtension(promotionConcept.getConceptId(), memberExtension.getComponentId(),
-                            unreviewedDeletionStatus.getConceptId());
+                        refsetHelper.newRefsetExtension(promotionConcept.getConceptId(), memberExtension
+                            .getComponentId(), unreviewedDeletionStatus.getConceptId());
+                    } else if (promotionStatus.equals(unreviewedAdditionStatus)
+                        || promotionStatus.equals(reviewedApprovedAdditionStatus)
+                        || promotionStatus.equals(reviewedRejectedAdditionStatus)) {
+                        refsetHelper.retireConceptExtension(promotionConcept.getConceptId(), memberExtension
+                            .getComponentId());
+                        refsetHelper.newConceptExtensionPart(promotionConcept.getConceptId(), memberExtension
+                            .getComponentId(), unreviewedDeletionStatus.getConceptId(), currentStatusConcept
+                            .getConceptId());
+                    } else if (promotionStatus.equals(unreviewedDeletionStatus)
+                        || promotionStatus.equals(reviewedApprovedDeletionStatus)
+                        || promotionStatus.equals(reviewedRejectedDeletionStatus)) {
+                        // no change
                     }
                 } else {
                     throw new Exception("Don't know how to handle status : "
@@ -179,45 +217,6 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                 }
             }
         }
-    }
-
-    private boolean newConceptExtension(int refsetId, int componentId, int c1Id) {
-
-        try {
-            UUID memberUuid =
-                    new RefsetHelper().generateUuid(termFactory.getUids(refsetId).iterator().next(), termFactory
-                        .getUids(componentId).iterator().next(), termFactory.getUids(c1Id).iterator().next());
-            if (memberUuid == null) {
-                memberUuid = UUID.randomUUID();
-            }
-
-            int newMemberId =
-                    termFactory.uuidToNativeWithGeneration(memberUuid, ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-                        .localize().getNid(), termFactory.getActiveAceFrameConfig().getEditingPathSet(),
-                        Integer.MAX_VALUE);
-
-            I_ThinExtByRefVersioned newExtension =
-                    termFactory.newExtensionNoChecks(refsetId, newMemberId, componentId,
-                        RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid());
-
-            for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-
-                I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
-
-                conceptExtension.setPathId(editPath.getConceptId());
-                conceptExtension.setStatusId(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-                conceptExtension.setVersion(Integer.MAX_VALUE);
-                conceptExtension.setC1id(c1Id);
-
-                newExtension.addVersion(conceptExtension);
-            }
-
-            termFactory.addUncommittedNoChecks(newExtension);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
     }
 
     private I_GetConceptData getPromotionStatus(I_ThinExtByRefVersioned promotionExtension) throws Exception {
