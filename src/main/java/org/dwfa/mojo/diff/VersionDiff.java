@@ -118,6 +118,13 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 public class VersionDiff extends AbstractMojo {
 
 	/**
+	 * The name to identify this comparison
+	 * 
+	 * @parameter
+	 */
+	private String name;
+
+	/**
 	 * The uuid of the path.
 	 * 
 	 * @parameter
@@ -593,15 +600,17 @@ public class VersionDiff extends AbstractMojo {
 				.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
 		UUID uuid = UUID.randomUUID();
 		I_GetConceptData new_refset = tf.newConcept(uuid, false, config);
-		String name = "Compare "
+		String refset_name = "Compare "
+				+ this.name
+				+ " "
 				+ (member_refset != null ? member_refset_con.getInitialText()
-						: "") + " of " + pos1 + " and " + pos2 + " @ "
+						+ " " : "") + "of " + pos1 + " and " + pos2 + " @ "
 				+ new Date();
 		// Install the FSN
-		tf.newDescription(UUID.randomUUID(), new_refset, "en", name,
+		tf.newDescription(UUID.randomUUID(), new_refset, "en", refset_name,
 				fully_specified_description_type, config);
 		// Install the preferred term
-		tf.newDescription(UUID.randomUUID(), new_refset, "en", name,
+		tf.newDescription(UUID.randomUUID(), new_refset, "en", refset_name,
 				preferred_description_type, config);
 		tf
 				.newRelationship(
@@ -1236,18 +1245,44 @@ public class VersionDiff extends AbstractMojo {
 		I_Position pos1 = tf.newPosition(path, v1_id);
 		I_Position pos2 = tf.newPosition(path, v2_id);
 		this.createRefsetConcept(pos1, pos2, null);
-		for (int con : Arrays.asList(this.added_concept_change,
-				this.deleted_concept_change, this.concept_status_change,
-				this.defined_change, this.added_description_change,
-				this.deleted_description_change,
-				this.description_status_change, this.description_term_change,
-				this.description_type_change, this.description_language_change,
-				this.description_case_change, this.added_relationship_change,
-				this.deleted_relationship_change,
-				this.relationship_status_change,
-				this.relationship_characteristic_change,
-				this.relationship_refinability_change,
-				this.relationship_type_change, this.relationship_group_change)) {
+		ArrayList<Integer> change_cons = new ArrayList<Integer>();
+		if (this.added_concepts)
+			change_cons.add(this.added_concept_change);
+		if (this.deleted_concepts)
+			change_cons.add(this.deleted_concept_change);
+		if (this.changed_concept_status)
+			change_cons.add(this.concept_status_change);
+		if (this.changed_defined)
+			change_cons.add(this.defined_change);
+		if (this.added_descriptions)
+			change_cons.add(this.added_description_change);
+		if (this.deleted_descriptions)
+			change_cons.add(this.deleted_description_change);
+		if (this.changed_description_status)
+			change_cons.add(this.description_status_change);
+		if (this.changed_description_term)
+			change_cons.add(this.description_term_change);
+		if (this.changed_description_type)
+			change_cons.add(this.description_type_change);
+		if (this.changed_description_language)
+			change_cons.add(this.description_language_change);
+		if (this.changed_description_case)
+			change_cons.add(this.description_case_change);
+		if (this.added_relationships)
+			change_cons.add(this.added_relationship_change);
+		if (this.deleted_relationships)
+			change_cons.add(this.deleted_relationship_change);
+		if (this.changed_relationship_status)
+			change_cons.add(this.relationship_status_change);
+		if (this.changed_relationship_characteristic)
+			change_cons.add(this.relationship_characteristic_change);
+		if (this.changed_relationship_refinability)
+			change_cons.add(this.relationship_refinability_change);
+		if (this.changed_relationship_type)
+			change_cons.add(this.relationship_type_change);
+		if (this.changed_relationship_group)
+			change_cons.add(this.relationship_group_change);
+		for (int con : change_cons) {
 			this.createRefsetConcept(pos1, pos2, con);
 		}
 		getLog().info("Refset: " + refset.getInitialText());
@@ -1784,6 +1819,25 @@ public class VersionDiff extends AbstractMojo {
 	 * <br>&lt;/goals&gt;
 	 * 
 	 * <br>&lt;configuration&gt;
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 * 
 	 * 
 	 * 
