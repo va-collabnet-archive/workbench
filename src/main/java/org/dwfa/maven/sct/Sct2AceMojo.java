@@ -1488,7 +1488,7 @@ public class Sct2AceMojo extends AbstractMojo {
             // SNOMED_CORE Path UUID
             puuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator().next().toString();
             getLog().info("  PATH UUID: " + "SNOMED_CORE " + puuid);
-        } else if (s.equals(NHS_UK_EXTENSION_FILE_PATH)) {
+        } else if (s.startsWith(NHS_UK_EXTENSION_FILE_PATH)) {
             // "UK Extensions" Path UUID
             try {
                 u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "NHS UK Extension Path");
@@ -1503,7 +1503,7 @@ public class Sct2AceMojo extends AbstractMojo {
                     + "getFilePathID() UnsupportedEncodingException", e);
             }
             getLog().info("  PATH UUID (uke): " + s + " " + puuid);
-        } else if (s.equals(NHS_UK_DRUG_EXTENSION_FILE_PATH)) {
+        } else if (s.startsWith(NHS_UK_DRUG_EXTENSION_FILE_PATH)) {
             // "UK Drug Extensions" Path UUID
             try {
                 u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "NHS UK Drug Extension Path");
