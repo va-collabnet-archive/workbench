@@ -66,9 +66,11 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel  {
 						switch (col.invokeOnObjectType) {
 						case CONCEPT_COMPONENT:
 							if (col.readParamaters != null) {
-								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ConceptBean.get(extension.getComponentId()), col.readParamaters));
+								conceptsToFetch.add((Integer) col.getReadMethod().invoke(
+										ConceptBean.get(extension.getComponentId()), col.readParamaters));
 							} else {
-								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ConceptBean.get(extension.getComponentId())));
+								conceptsToFetch.add((Integer) col.getReadMethod().invoke(
+										ConceptBean.get(extension.getComponentId())));
 							}
 							break;
 						case COMPONENT:
@@ -77,14 +79,16 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel  {
 							throw new UnsupportedOperationException();
 						case IMMUTABLE:
 							if (col.readParamaters != null) {
-								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple, col.readParamaters));
+								conceptsToFetch.add((Integer) col.getReadMethod().invoke(
+										ebrTuple, col.readParamaters));
 							} else {
 								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple));
 							}
 							break;
 						case PART:
 							if (col.readParamaters != null) {
-								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart(), col.readParamaters));
+								conceptsToFetch.add((Integer) col.getReadMethod().invoke(
+										ebrTuple.getPart(), col.readParamaters));
 							} else {
 								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart()));
 							}

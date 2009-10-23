@@ -2,6 +2,7 @@ package org.dwfa.vodb.types;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -11,6 +12,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -140,6 +142,28 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
 	@Override
 	public String toString() {
+		   try {
+			   StringBuffer buff = new StringBuffer();
+			   buff.append(this.getClass().getSimpleName());
+			   buff.append(" refset: ");
+			   buff.append(LocalVersionedTerminology.get().getConcept(refsetId).toString());
+			   buff.append(" memberId: ");
+			   buff.append(memberId);
+			   if (LocalVersionedTerminology.get().hasConcept(componentId)) {
+				   buff.append(" component: ");
+				   buff.append(LocalVersionedTerminology.get().getConcept(componentId).toString());
+			   } else {
+				   buff.append(" componentId: ");
+				   buff.append(componentId);
+			   }
+			   buff.append(" type: ");
+			   buff.append(LocalVersionedTerminology.get().getConcept(typeId).toString());
+			   buff.append(" versions: ");
+			   buff.append(versions);
+			   return buff.toString();
+		   } catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		   }
 		return "ThinExtByRefVersioned refsetId: " + refsetId + " memberId: "
 				+ memberId + " componentId: " + componentId + " typeId: "
 				+ typeId + " versions: " + versions;

@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
@@ -98,9 +99,27 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 													ebrTuple.getPart(),
 													col.readParamaters));
 								} else {
-									conceptsToFetch.add((Integer) col
-											.getReadMethod().invoke(
+									switch (col.type) {
+										case COMPONENT_IDENTIFIER:
+											if (LocalVersionedTerminology.get().hasConcept((Integer) 
+													col.getReadMethod().invoke(
+															ebrTuple.getPart())) == false) {
+												conceptsToFetch.add((Integer) col.getReadMethod().invoke(
+													ebrTuple.getPart()));			
+												break;
+											}
+										case CONCEPT_IDENTIFIER:
+											conceptsToFetch.add((Integer) col.getReadMethod().invoke(
 													ebrTuple.getPart()));
+											break;
+										case STRING:
+											break;
+										case VERSION:
+											break;
+										default:
+											throw new UnsupportedOperationException("Don't know how to handle: " + 
+													col.type);
+									}
 								}
 								break;
 							}

@@ -33,9 +33,14 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
@@ -351,6 +356,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 	}
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
+		I_TermFactory tf = LocalVersionedTerminology.get();
 		if (allTuples == null || tableComponentId == Integer.MIN_VALUE) {
 			return " ";
 		}
@@ -377,7 +383,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 				}
 				break;
 			case COMPONENT:
-				throw new UnsupportedOperationException();
+				value = tuple.getComponentId();
+				break;
 			case CONCEPT:
 				throw new UnsupportedOperationException();
 			case IMMUTABLE:
@@ -419,10 +426,28 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 				}
 				return new StringWithExtTuple(value.toString(), tuple, id);
 			case COMPONENT_IDENTIFIER:
-				int componentId = (Integer) value;
-				return new StringWithExtTuple(Integer.toString(componentId),
-						tuple, componentId);
-
+				if (Integer.class.isAssignableFrom(value.getClass())) {
+					id = (Integer) value;
+					if (tf.hasConcept(id)) {
+						I_GetConceptData concept = tf.getConcept(id);
+						I_DescriptionTuple obj = concept.getDescTuple((I_IntList)columns[columnIndex].readParamaters[0], 
+								(I_ConfigAceFrame) columns[columnIndex].readParamaters[1]);
+						return obj.getText();
+					} else if (tf.hasExtension(id)) {
+						I_ThinExtByRefVersioned ext = tf.getExtension(id);
+						I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
+						List<I_ThinExtByRefTuple> tuples = ext.getTuples(config.getAllowedStatus(), 
+								config.getViewPositionSet(), false);
+						if (tuples.size() > 0) {
+							I_ThinExtByRefTuple obj = tuples.iterator().next();
+							return new StringWithExtTuple(obj.toString(),
+									obj, id);
+						}
+					} else {
+						throw new UnsupportedOperationException("Can't find component for id: " + id);
+					}
+				}
+				return value;
 			case VERSION:
 				if (tuple.getVersion() == Integer.MAX_VALUE) {
 					return new StringWithExtTuple(ThinVersionHelper

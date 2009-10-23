@@ -1,8 +1,11 @@
 package org.dwfa.vodb.types;
 
 import java.io.IOException;
+import java.util.Date;
 
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 
@@ -95,6 +98,20 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
    }
    
    public String toString() {
+	   try {
+		   StringBuffer buff = new StringBuffer();
+		   buff.append(this.getClass().getSimpleName());
+		   buff.append(" path: ");
+		   buff.append(LocalVersionedTerminology.get().getConcept(pathId).toString());
+		   buff.append(" version: ");
+		   buff.append(new Date(LocalVersionedTerminology.get().convertToThickVersion(version)));
+		   buff.append(" status: ");
+		   buff.append(LocalVersionedTerminology.get().getConcept(status).toString());
+		   
+		   return buff.toString();
+	   } catch (Exception e) {
+		AceLog.getAppLog().alertAndLogException(e);
+	   }
        return this.getClass().getSimpleName() + " pathId: " + pathId + " version: " + version + " status: " + status;
    }
 

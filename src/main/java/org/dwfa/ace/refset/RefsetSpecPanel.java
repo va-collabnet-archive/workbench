@@ -21,6 +21,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.ExtTableRenderer;
+import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.ReflexiveRefsetTableModel;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
@@ -58,10 +59,12 @@ public class RefsetSpecPanel extends JPanel {
     private I_ConfigAceFrame aceFrameConfig;
 
 	private ReflexiveRefsetTableModel refsetTableModel;
+	private ReflexiveRefsetCommentTableModel commentTableModel;
 
-    private static final String HIERARCHICAL_VIEW = "refset taxonomy";
-    private static final String REFSET_AND_PARENT_ONLY_VIEW = "refset tree";
-    private static final String TABLE_VIEW = "table view";
+    private static final String HIERARCHICAL_VIEW =           "taxonomy";
+    private static final String REFSET_AND_PARENT_ONLY_VIEW = "  tree  ";
+    private static final String TABLE_VIEW =                  " members";
+    private static final String COMMENT_VIEW =                "comments";
 
     public RefsetSpecPanel(ACE ace) throws Exception {
         super(new GridBagLayout());
@@ -93,7 +96,9 @@ public class RefsetSpecPanel extends JPanel {
         bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
 
         bottomTabs.addTab(TABLE_VIEW, new JScrollPane());
+        bottomTabs.addTab(COMMENT_VIEW, new JScrollPane());
         setupRefsetTable();
+        setupCommentTable();
         editor.getLabel().setTermComponent(editor.getTermComponent());
         editor.addHistoryActionListener(new HistoryActionListener());
 
@@ -114,6 +119,129 @@ public class RefsetSpecPanel extends JPanel {
         c.weighty = 1.0;
         add(split, c);
         refsetTableModel.propertyChange(null);
+    }
+
+    public void setupCommentTable() throws NoSuchMethodException, Exception {
+        List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
+        ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
+        column1.setColumnName("referenced component");
+        column1.setCreationEditable(true);
+        column1.setUpdateEditable(true);
+        column1.setFieldClass(Number.class);
+        column1.setMin(5);
+        column1.setPref(150);
+        column1.setMax(1000);
+        column1.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.COMPONENT);
+        List<Object> parameters = new ArrayList<Object>();
+        parameters.add(aceFrameConfig.getTableDescPreferenceList());
+        parameters.add(aceFrameConfig);
+        column1.setReadParamaters(parameters);
+        column1.setType(REFSET_FIELD_TYPE.COMPONENT_IDENTIFIER);
+        columns.add(column1);
+
+        ReflexiveRefsetFieldData column2 = new ReflexiveRefsetFieldData();
+        column2.setColumnName("comment");
+        column2.setCreationEditable(true);
+        column2.setUpdateEditable(true);
+        column2.setFieldClass(Number.class);
+        column2.setMin(5);
+        column2.setPref(50);
+        column2.setMax(150);
+        column2.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
+        column2.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod(
+                "getStringValue"));
+        column2.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod(
+                "setStringValue", String.class));
+        column2.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+        columns.add(column2);
+
+        ReflexiveRefsetFieldData column3 = new ReflexiveRefsetFieldData();
+        column3.setColumnName("status");
+        column3.setCreationEditable(false);
+        column3.setUpdateEditable(false);
+        column3.setFieldClass(String.class);
+        column3.setMin(5);
+        column3.setPref(150);
+        column3.setMax(150);
+        column3.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
+        column3.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod(
+                "getStatusId"));
+        column3.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod(
+                "setStatusId", int.class));
+        column3.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+        columns.add(column3);
+
+        if (editor.getShowHistory()) {
+            ReflexiveRefsetFieldData column4 = new ReflexiveRefsetFieldData();
+            column4.setColumnName("version");
+            column4.setCreationEditable(false);
+            column4.setUpdateEditable(false);
+            column4.setFieldClass(Number.class);
+            column4.setMin(5);
+            column4.setPref(150);
+            column4.setMax(150);
+            column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
+            column4.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod(
+                    "getVersion"));
+            column4.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod(
+                    "setVersion", int.class));
+            column4.setType(REFSET_FIELD_TYPE.VERSION);
+            columns.add(column4);
+
+            ReflexiveRefsetFieldData column5 = new ReflexiveRefsetFieldData();
+            column5.setColumnName("path");
+            column5.setCreationEditable(false);
+            column5.setUpdateEditable(false);
+            column5.setFieldClass(String.class);
+            column5.setMin(5);
+            column5.setPref(150);
+            column5.setMax(150);
+            column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
+            column5.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod(
+                    "getPathId"));
+            column5.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod(
+                    "setPathId", int.class));
+            column5.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+            columns.add(column5);
+        }
+
+        commentTableModel = new ReflexiveRefsetCommentTableModel(
+                editor, columns.toArray(new ReflexiveRefsetFieldData[columns
+                        .size()]));
+        aceFrameConfig.addPropertyChangeListener("viewPositions", commentTableModel);
+        aceFrameConfig.addPropertyChangeListener("commit", commentTableModel);
+        editor.getLabel().addTermChangeListener(commentTableModel);
+        
+
+        commentTableModel.setComponentId(Integer.MIN_VALUE);
+        commentTableModel.getRowCount();
+        TableSorter sortingTable = new TableSorter(commentTableModel);
+
+        JTableWithDragImage commentTable = new JTableWithDragImage(sortingTable);
+        commentTable.getColumnModel().getColumn(0).setIdentifier(column1);
+        commentTable.getColumnModel().getColumn(1).setIdentifier(column2);
+
+        sortingTable.setTableHeader(commentTable.getTableHeader());
+        sortingTable
+                .getTableHeader()
+                .setToolTipText(
+                        "Click to specify sorting; Control-Click to specify secondary sorting");
+
+        ExtTableRenderer renderer = new ExtTableRenderer();
+        commentTable.setDefaultRenderer(StringWithExtTuple.class, renderer);
+        commentTable.setDefaultRenderer(Number.class, renderer);
+        commentTable.setDefaultRenderer(Boolean.class, renderer);
+        commentTable.setDefaultRenderer(Integer.class, renderer);
+        commentTable.setDefaultRenderer(Double.class, renderer);
+        commentTable.setDefaultRenderer(String.class, renderer);
+        for (int i = 0; i < bottomTabs.getTabCount(); i++) {
+            if (bottomTabs.getTitleAt(i).equals(COMMENT_VIEW)) {
+                JScrollPane tableScroller = (JScrollPane) bottomTabs
+                        .getComponentAt(i);
+                tableScroller.setViewportView(commentTable);
+                break;
+            }
+        }
     }
 
     public void setupRefsetTable() throws NoSuchMethodException, Exception {
@@ -205,8 +333,7 @@ public class RefsetSpecPanel extends JPanel {
         refsetTableModel = new ReflexiveRefsetTableModel(
                 editor, columns.toArray(new ReflexiveRefsetFieldData[columns
                         .size()]));
-        aceFrameConfig.addPropertyChangeListener("viewPositions",
-                refsetTableModel);
+        aceFrameConfig.addPropertyChangeListener("viewPositions", refsetTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", refsetTableModel);
         editor.getLabel().addTermChangeListener(refsetTableModel);
         

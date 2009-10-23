@@ -225,6 +225,10 @@ public class LineagePlugin extends AbstractPlugin {
 				getHost().getConfig().getDestRelTypes(), 
 				getHost().getConfig().getViewPositionSet(), false);
 		if ((sourceRelTuples.size() > 0) && (depth < 40)) {
+			if (depth > 3) {
+				String test = "test";
+				test.compareTo(test);
+			}
 			for (I_RelTuple rel : sourceRelTuples) {
 				ConceptBean parent = ConceptBean.get(rel.getC2Id());
 				List<List<ConceptBean>> parentLineage = getLineage(parent,

@@ -1589,7 +1589,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
              * fileMenu.add(menuItem); fileMenu.addSeparator();
              */
             menuItem = new JMenuItem("Import Java Changeset...");
-            menuItem.addActionListener(new ImportJavaChangeset(config, aceFrame));
+            menuItem.addActionListener(new ImportJavaChangeset(config, aceFrame, aceConfig));
             fileMenu.add(menuItem);
             fileMenu.addSeparator();
             /*
@@ -1655,21 +1655,21 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, this, LINK_TYPE.SEARCH_LINK, conceptTabs, 2);
         conceptPanels.add(c2Panel);
         conceptTabs.addComponentListener(new ResizePalettesListener());
-        conceptTabs.addTab("Tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel, "Tree Linked");
-        conceptTabs.addTab("Search", ConceptPanel.SMALL_SEARCH_LINK_ICON, c2Panel, "Search Linked");
+        conceptTabs.addTab("tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel, "tree Linked");
+        conceptTabs.addTab("search", ConceptPanel.SMALL_SEARCH_LINK_ICON, c2Panel, "search Linked");
 
         ConceptPanel c3panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R3, this, LINK_TYPE.UNLINKED, conceptTabs, 3);
         conceptPanels.add(c3panel);
-        conceptTabs.addTab("Empty", null, c3panel, "Unlinked");
+        conceptTabs.addTab("empty", null, c3panel, "Unlinked");
         ConceptPanel c4panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R4, this, LINK_TYPE.UNLINKED, conceptTabs, 4);
         conceptPanels.add(c4panel);
-        conceptTabs.addTab("Empty", null, c4panel, "Unlinked");
-        conceptTabs.addTab("List", new ImageIcon(ACE.class.getResource("/16x16/plain/notebook.png")),
+        conceptTabs.addTab("empty", null, c4panel, "Unlinked");
+        conceptTabs.addTab("   list   ", new ImageIcon(ACE.class.getResource("/16x16/plain/notebook.png")),
             getConceptListEditor());
         refsetTabIndex = conceptTabs.getTabCount();
 
         refsetSpecPanel = new RefsetSpecPanel(this);
-        conceptTabs.addTab("RefSet Spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")),
+        conceptTabs.addTab("refSet spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")),
             refsetSpecPanel);
 
         conceptTabs.setMinimumSize(new Dimension(0, 0));
@@ -1680,7 +1680,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         ConceptPanel c5panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_L1, this, LINK_TYPE.UNLINKED, leftTabs, 3);
         conceptPanels.add(c5panel);
-        leftTabs.addTab("Empty", null, c5panel, "Unlinked");
+        leftTabs.addTab("empty", null, c5panel, "Unlinked");
         leftTabs.setMinimumSize(new Dimension(0, 0));
 
         termTreeConceptSplit.setLeftComponent(leftTabs);

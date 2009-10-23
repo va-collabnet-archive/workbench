@@ -2217,90 +2217,90 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setAddressToggleVisible(boolean visible) {
     	if (aceFrame != null) {
             aceFrame.getCdePanel().setAddressToggleVisible(visible);
-            if (visible) {
-                hiddenTopToggles.remove(TopToggleTypes.ADDRESS);
-            } else {
-                hiddenTopToggles.add(TopToggleTypes.ADDRESS);
-            }
     	}
+        if (visible) {
+            hiddenTopToggles.remove(TopToggleTypes.ADDRESS);
+        } else {
+            hiddenTopToggles.add(TopToggleTypes.ADDRESS);
+        }
     }
 
     public void setBuilderToggleVisible(boolean visible) {
     	if (aceFrame != null) {
             aceFrame.getCdePanel().setBuilderToggleVisible(visible);
-            if (visible) {
-                hiddenTopToggles.remove(TopToggleTypes.BUILDER);
-            } else {
-                hiddenTopToggles.add(TopToggleTypes.BUILDER);
-            }
     	}
+        if (visible) {
+            hiddenTopToggles.remove(TopToggleTypes.BUILDER);
+        } else {
+            hiddenTopToggles.add(TopToggleTypes.BUILDER);
+        }
     }
 
     public void setComponentToggleVisible(boolean visible) {
     	if (aceFrame != null) {
             aceFrame.getCdePanel().setComponentToggleVisible(visible);
-            if (visible) {
-                hiddenTopToggles.remove(TopToggleTypes.COMPONENT);
-            } else {
-                hiddenTopToggles.add(TopToggleTypes.COMPONENT);
-            }
     	}
+        if (visible) {
+            hiddenTopToggles.remove(TopToggleTypes.COMPONENT);
+        } else {
+            hiddenTopToggles.add(TopToggleTypes.COMPONENT);
+        }
     }
 
     public void setHierarchyToggleVisible(boolean visible) {
     	if (aceFrame != null) {
             aceFrame.getCdePanel().setHierarchyToggleVisible(visible);
-            if (visible) {
-                hiddenTopToggles.remove(TopToggleTypes.TAXONOMY);
-            } else {
-                hiddenTopToggles.add(TopToggleTypes.TAXONOMY);
-            }
     	}
+        if (visible) {
+            hiddenTopToggles.remove(TopToggleTypes.TAXONOMY);
+        } else {
+            hiddenTopToggles.add(TopToggleTypes.TAXONOMY);
+        }
     }
 
     public void setHistoryToggleVisible(boolean visible) {
     	if (aceFrame != null) {
             aceFrame.getCdePanel().setHistoryToggleVisible(visible);
-            if (visible) {
-                hiddenTopToggles.remove(TopToggleTypes.HISTORY);
-            } else {
-                hiddenTopToggles.add(TopToggleTypes.HISTORY);
-            }
     	}
+        if (visible) {
+            hiddenTopToggles.remove(TopToggleTypes.HISTORY);
+        } else {
+            hiddenTopToggles.add(TopToggleTypes.HISTORY);
+        }
     }
 
     public void setInboxToggleVisible(boolean visible) {
     	if (aceFrame != null) {
             aceFrame.getCdePanel().setInboxToggleVisible(visible);
-            if (visible) {
-                hiddenTopToggles.remove(TopToggleTypes.INBOX);
-            } else {
-                hiddenTopToggles.add(TopToggleTypes.INBOX);
-            }
     	}
+        if (visible) {
+            hiddenTopToggles.remove(TopToggleTypes.INBOX);
+        } else {
+            hiddenTopToggles.add(TopToggleTypes.INBOX);
+        }
     }
 
     public void setPreferencesToggleVisible(boolean visible) {
     	if (aceFrame != null) {
             aceFrame.getCdePanel().setPreferencesToggleVisible(visible);
-            if (visible) {
-                hiddenTopToggles.remove(TopToggleTypes.PREFERENCES);
-            } else {
-                hiddenTopToggles.add(TopToggleTypes.PREFERENCES);
-            }
     	}
+        if (visible) {
+            hiddenTopToggles.remove(TopToggleTypes.PREFERENCES);
+        } else {
+            hiddenTopToggles.add(TopToggleTypes.PREFERENCES);
+        }
     }
 
 
     public void setSubversionToggleVisible(boolean visible) {
     	if (aceFrame != null) {
             aceFrame.getCdePanel().setSubversionToggleVisible(visible);
-            if (visible) {
-                hiddenTopToggles.remove(TopToggleTypes.SUBVERSION);
-            } else {
-                hiddenTopToggles.add(TopToggleTypes.SUBVERSION);
-            }
     	}
+        if (visible) {
+            hiddenTopToggles.remove(TopToggleTypes.SUBVERSION);
+        } else {
+            hiddenTopToggles.add(TopToggleTypes.SUBVERSION);
+        }
     }
 
     public Set<EXT_TYPE> getEnabledConceptExtTypes() {

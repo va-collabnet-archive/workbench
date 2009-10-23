@@ -43,6 +43,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -814,8 +815,15 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
             }
         }
     }
-
+    
     private JComponent getContentPane() throws Exception {
+    	JTabbedPane refsetTabs = new JTabbedPane();
+    	refsetTabs.addTab("specification", getSpecPane());
+    	refsetTabs.addTab("comments", new JPanel());
+    	return refsetTabs;
+    }
+
+    private JComponent getSpecPane() throws Exception {
         JPanel content = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -834,7 +842,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
         reflexiveModel.getRowCount();
 
         JPanel clauseTablePanel = ReflexiveRefsetUtil.getExtensionPanel(
-                "Refset Specification:", reflexiveModel, RefsetSpecEditor.this,
+                null, reflexiveModel, RefsetSpecEditor.this,
                 false, false);
         clauseTable = (JTableWithDragImage) clauseTablePanel
                 .getClientProperty("extTable");
@@ -1147,21 +1155,23 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
                 HashMap<Integer, RefsetSpecTreeNode> extensionMap,
                 HashSet<Integer> fetchedComponents) throws IOException {
             for (I_ThinExtByRefVersioned ext : extensions) {
-                int currentTupleCount = ext.getTuples(
-                        ace.getAceFrameConfig().getAllowedStatus(),
-                        ace.getAceFrameConfig().getViewPositionSet(), true)
-                        .size();
-                if (currentTupleCount > 0 || historyButton.isSelected()) {
-                    extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(
-                            ext, ace.getAceFrameConfig()));
-                    if (fetchedComponents.contains(ext.getMemberId()) == false) {
-                        fetchedComponents.add(ext.getMemberId());
-                        addExtensionsToMap(LocalVersionedTerminology.get()
-                                .getAllExtensionsForComponent(
-                                        ext.getMemberId(), true), extensionMap,
-                                fetchedComponents);
+            	if (ext.getRefsetId() == localRefsetSpecConcept.getConceptId()) {
+                    int currentTupleCount = ext.getTuples(
+                            ace.getAceFrameConfig().getAllowedStatus(),
+                            ace.getAceFrameConfig().getViewPositionSet(), true)
+                            .size();
+                    if (currentTupleCount > 0 || historyButton.isSelected()) {
+                        extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(
+                                ext, ace.getAceFrameConfig()));
+                        if (fetchedComponents.contains(ext.getMemberId()) == false) {
+                            fetchedComponents.add(ext.getMemberId());
+                            addExtensionsToMap(LocalVersionedTerminology.get()
+                                    .getAllExtensionsForComponent(
+                                            ext.getMemberId(), true), extensionMap,
+                                    fetchedComponents);
+                        }
                     }
-                }
+            	}
             }
         }
 

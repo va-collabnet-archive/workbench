@@ -275,7 +275,7 @@ class AceSvn {
 		}
 	}
 
-	private void doStealthChangeSetImport(List<File> changeLocations) {
+	public void doStealthChangeSetImport(List<File> changeLocations) {
 		// import any change sets that may be downloaded
 		// from svn...
 		try {

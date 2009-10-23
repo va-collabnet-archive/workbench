@@ -158,6 +158,12 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 		return returnValues;
 	}
 
+	public static boolean hasNew(int memberId) {
+		if (newExtensions.contains(memberId)) {
+			return true;
+		}
+		return false;
+	}
 	public static I_ThinExtByRefVersioned getNewExtensionMember(
 			int memberId) throws IOException {
 		for (I_GetExtensionData newEbr : newExtensions) {

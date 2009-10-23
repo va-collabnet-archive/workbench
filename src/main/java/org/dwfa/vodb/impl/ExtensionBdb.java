@@ -356,6 +356,9 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 	 * @see org.dwfa.vodb.impl.I_StoreExtensions#hasExtension(int)
 	 */
 	public boolean hasExtension(int memberId) throws DatabaseException {
+		if (ExtensionByReferenceBean.hasNew(memberId)) {
+			return true;
+		}
 		DatabaseEntry extKey = new DatabaseEntry();
 		DatabaseEntry extValue = new DatabaseEntry();
 		intBinder.objectToEntry(memberId, extKey);

@@ -820,8 +820,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins,
 					conceptTabs.setTitleAt(index, shortDesc);
 					conceptTabs.setToolTipTextAt(index, desc);
 				} else {
-					conceptTabs.setTitleAt(index, "empty");
-					conceptTabs.setToolTipTextAt(index, "empty");
+					if (conceptTabs.getTabCount() > index) {
+						conceptTabs.setTitleAt(index, "empty");
+						conceptTabs.setToolTipTextAt(index, "empty");
+					}
 				}
 				conceptTabs.setIconAt(index, tabIcon);
 			}

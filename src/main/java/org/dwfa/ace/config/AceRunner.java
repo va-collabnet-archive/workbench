@@ -154,6 +154,10 @@ public class AceRunner {
 				new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(
 						new File("config", "ace.properties"),
 						true);
+			} else if (profileDir.exists()) {
+				ArrayList<File> profileLoc = new ArrayList<File>();
+				profileLoc.add(profileDir);
+				new AceSvn(AceRunner.class, jiniConfig).doStealthChangeSetImport(profileLoc);
 			}
 
             if (aceConfigFile == null || !aceConfigFile.exists()) {
