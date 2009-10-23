@@ -44,15 +44,15 @@ public class SelectRefsetPurposeBeanInfo extends SimpleBeanInfo {
 			instruction.setDisplayName("<html><font color='green'>Instruction:");
 			instruction.setShortDescription("Instructions to present to the user in the workflow panel. ");
 
-			// Property Description: refsetSpecUuidPropName
-            PropertyDescriptor refsetSpecUuidPropName =
-                    new PropertyDescriptor("refsetSpecUuidPropName", getBeanDescriptor().getBeanClass());
-            refsetSpecUuidPropName.setBound(true);
-            refsetSpecUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            refsetSpecUuidPropName.setDisplayName("<html><font color='green'>Refset spec UUID prop:");
-            refsetSpecUuidPropName.setShortDescription("The refset spec UUID prop.");
+			// Property Description: refsetUuidPropName
+            PropertyDescriptor refsetUuidPropName =
+                    new PropertyDescriptor("refsetUuidPropName", getBeanDescriptor().getBeanClass());
+            refsetUuidPropName.setBound(true);
+            refsetUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetUuidPropName.setDisplayName("<html><font color='green'>Refset UUID prop:");
+            refsetUuidPropName.setShortDescription("The refset UUID prop.");
 
-			PropertyDescriptor rv[] = { profilePropName, instruction, refsetSpecUuidPropName };
+			PropertyDescriptor rv[] = { profilePropName, instruction, refsetUuidPropName };
 			return rv;
 		} catch (IntrospectionException e) {
 			throw new Error(e.toString());

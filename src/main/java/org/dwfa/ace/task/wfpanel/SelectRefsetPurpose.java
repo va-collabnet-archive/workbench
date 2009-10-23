@@ -59,7 +59,7 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 	// Task Attribute Properties 
 	private String instruction = "<html>Select Purpose:";
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-    private String refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();    
+    private String refsetUuidPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();    
     
 	// Other Properties 
 	private JComboBox refsetSelectionComboBox;
@@ -78,14 +78,14 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
        out.writeInt(dataVersion);
        out.writeObject(profilePropName);
        out.writeObject(instruction);
-       out.writeObject(refsetSpecUuidPropName);
+       out.writeObject(refsetUuidPropName);
    }
    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
        int objDataVersion = in.readInt();
        if (objDataVersion == 1) {
            profilePropName = (String) in.readObject();
            instruction = (String) in.readObject();
-           refsetSpecUuidPropName = (String) in.readObject();
+           refsetUuidPropName = (String) in.readObject();
        } else {
            throw new IOException("Can't handle dataversion: " + objDataVersion);
        }
@@ -144,8 +144,8 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 				
 				// Turn the provided refsetSpecUuidPropName (provided in this task) into a refsetSpecConcept
 				I_TermFactory termFactory = LocalVersionedTerminology.get();
-	            UUID refsetSpecUuid = (UUID) process.readProperty(refsetSpecUuidPropName);
-	            I_GetConceptData refsetSpecConcept = termFactory.getConcept(new UUID[] { refsetSpecUuid });
+	            UUID refsetUuid = (UUID) process.readProperty(refsetUuidPropName);
+	            I_GetConceptData refsetConcept = termFactory.getConcept(new UUID[] { refsetUuid });
 	            
 				// Get the config from the worker 
 				I_ConfigAceFrame config = (I_ConfigAceFrame) worker
@@ -156,7 +156,7 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 		
 				// Add the relationship 
 				LocalVersionedTerminology.get().newRelationship(UUID.randomUUID(),
-						refsetSpecConcept, 
+						refsetConcept, 
 						LocalVersionedTerminology.get().getConcept(relType.ids),
 						selectedPurposeConcept, 
 						LocalVersionedTerminology.get().getConcept(relCharacteristic.ids),
@@ -308,19 +308,19 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 		this.profilePropName = profilePropName;
 	}
 	
-	/** Get the UUID for the current Refset Spec
-	 * @return	The UUID for the current Refset Spec 
+	/** Get the UUID for the current Refset 
+	 * @return	The UUID for the current Refset  
 	 */
-	public String getRefsetSpecUuidPropName() {
-		return refsetSpecUuidPropName;
+	public String getRefsetUuidPropName() {
+		return refsetUuidPropName;
 	}
 	
-	/** Set the UUID for the current Refset Spec
-	 * @param  	refsetSpecUuidPropName The UUID for the current Refset Spec. 
+	/** Set the UUID for the current Refset 
+	 * @param  	refsetUuidPropName The UUID for the current Refset . 
 	 * @return	void 
 	 */
-	public void setRefsetSpecUuidPropName(String refsetSpecUuidPropName) {
-		this.refsetSpecUuidPropName = refsetSpecUuidPropName;
+	public void setRefsetUuidPropName(String refsetUuidPropName) {
+		this.refsetUuidPropName = refsetUuidPropName;
 	}
 
 
