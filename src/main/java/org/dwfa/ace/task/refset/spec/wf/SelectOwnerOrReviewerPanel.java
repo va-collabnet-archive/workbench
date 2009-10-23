@@ -1,5 +1,6 @@
 package org.dwfa.ace.task.refset.spec.wf;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -18,7 +19,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -46,7 +48,7 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
 
     // components
     private ButtonGroup options;
-    private JTextField commentsTextField;
+    private JTextArea commentsTextField;
 
     public SelectOwnerOrReviewerPanel(UUID[] reviewerUuids, I_GetConceptData owner) throws TerminologyException,
             IOException {
@@ -125,7 +127,13 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
         } else {
             commentsLabel = new JLabel("Comments for workflow recipient:");
         }
-        commentsTextField = new JTextField(30);
+        commentsTextField = new JTextArea();
+        commentsTextField.setLineWrap(true);
+        commentsTextField.setWrapStyleWord(true);
+
+        JScrollPane scrollPane = new JScrollPane(commentsTextField);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setPreferredSize(new Dimension(450, 50));
 
         y++;
 
@@ -143,7 +151,7 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
         gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(commentsTextField, gridBagConstraints);
+        this.add(scrollPane, gridBagConstraints);
 
         // column filler
         gridBagConstraints = new GridBagConstraints();
