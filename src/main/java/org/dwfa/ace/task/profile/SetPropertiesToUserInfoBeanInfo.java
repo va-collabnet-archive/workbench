@@ -19,7 +19,6 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
  */
 public class SetPropertiesToUserInfoBeanInfo extends SimpleBeanInfo {
     
-
 	/**
 	 * Returns a list of property descriptors for this task.   
 	 * @return  	Returns a PropertyDescriptor array containing the properties of this task  
@@ -57,10 +56,11 @@ public class SetPropertiesToUserInfoBeanInfo extends SimpleBeanInfo {
      }   
     
     
-    /**
+    /** 
+     * Return the descriptor for this JavaBean which contains a reference to the JavaBean 
+	 * that implements this task as well as the display name of the task along with formating information.
      * @see java.beans.BeanInfo#getBeanDescriptor()
-	 * @return	Returns the BeanDescriptor for this task which contains a reference to the JavaBean 
-	 * that implements this task as well as the display name of the task along with formating information.     
+	 * @return	Returns the BeanDescriptor for this task      
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetPropertiesToUserInfo.class);

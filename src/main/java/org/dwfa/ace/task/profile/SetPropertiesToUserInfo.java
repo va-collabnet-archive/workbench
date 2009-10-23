@@ -29,31 +29,26 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class SetPropertiesToUserInfo extends AbstractTask {
 	
-	// CLASS PROPERTIES 
+    /* -----------------------
+     * Properties 
+     * -----------------------
+     */
 	private static final long serialVersionUID = 1L;
 	private static final int dataVersion = 1;
 	private String profilePropName  = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 	private String usernamePropName = ProcessAttachmentKeys.USERNAME.getAttachmentKey();
 	private String fullNamePropName = ProcessAttachmentKeys.FULLNAME.getAttachmentKey();
 
-	/** 
-	 * Writes the object to an output stream 
-	 * @return  	void
-	 * @exception  	IOException If there is a problem.
-	 */
+    /* -----------------------
+     * Serialization Methods
+     * -----------------------
+     */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
 		out.writeObject(usernamePropName);
 		out.writeObject(fullNamePropName);
 	}
-
-	/** 
-	 * Reads and initializes the object's properties from an input stream 
-	 * @return  	void
-	 * @exception  	IOException Produced by failed or interrupted I/O operations.
-	 * @exception  	ClassNotFoundException If no definition for the class could be found
-	 */
 	private void readObject(ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
 		int objDataVersion = in.readInt();
@@ -115,8 +110,7 @@ public class SetPropertiesToUserInfo extends AbstractTask {
 		}
 	}
 
-	/**
-	 * Returns the current condition of the executing task... which during normal execution 
+	/** Returns the condition of the executing task... which normally 
 	 * will be the CONTINUE_CONDITION.     
 	 * @return	The current condition of the task
 	 */
@@ -124,16 +118,14 @@ public class SetPropertiesToUserInfo extends AbstractTask {
         return AbstractTask.CONTINUE_CONDITION;
 	}
 	
-	/**
-	 * Get the current user's profile name
+	/** Get the current user's profile name
 	 * @return	The name of the current user's profile. 
 	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
-	/**
-	 * Set the current user's profile name
+	/** Set the current user's profile name
 	 * @param  	profilePropName The name of the current profile. 
 	 * @return	void 
 	 */
@@ -141,32 +133,28 @@ public class SetPropertiesToUserInfo extends AbstractTask {
 		this.profilePropName = profilePropName;
 	}
 
-	/**
-	 * Get the current user's username 
+	/** Get the current user's username 
 	 * @return The username of the current user
 	 */
 	public String getUsernamePropName() {
 		return usernamePropName;
 	}
 
-	/**
-	 * Set the current user's username
+	/** Set the current user's username
 	 * @param usernamePropName The username of the current user
 	 */
 	public void setUsernamePropName(String usernamePropName) {
 		this.usernamePropName = usernamePropName;
 	}
 
-	/**
-	 * Get the current user's FullName 
+	/** Get the current user's FullName 
 	 * @return The FullName of the current user
 	 */
 	public String getFullNamePropName() {
 		return fullNamePropName;
 	}
 
-	/**
-	 * Set the current user's FullName
+	/** Set the current user's FullName
 	 * @param fullNamePropName The FullName of the current user
 	 */
 	public void setFullNamePropName(String fullNamePropName) {
