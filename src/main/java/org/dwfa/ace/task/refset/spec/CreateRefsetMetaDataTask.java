@@ -47,23 +47,28 @@ import org.dwfa.util.bean.Spec;
  * Required input to this task is the name of the refset spec being created.
  * 
  * @author Chrissy Hill
+ * @author Perry Reid
  * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public class CreateRefsetMetaDataTask extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
     private String newRefsetPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
     private String reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
     private String ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
+    private String newRefsetUUIDPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
+    private String newRefsetSpecUUIDPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
+
     private I_TermFactory termFactory;
     private I_GetConceptData status;
 
     private transient Exception ex = null;
-    private transient Condition returnCondition = Condition.ITEM_COMPLETE;
+
+	private transient Condition returnCondition = Condition.ITEM_COMPLETE;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -72,22 +77,47 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         out.writeObject(reviewerUuidPropName);
         out.writeObject(ownerUuidPropName);
         out.writeObject(editorUuidPropName);
+        out.writeObject(newRefsetUUIDPropName);
+        out.writeObject(newRefsetSpecUUIDPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
-            newRefsetPropName = (String) in.readObject();
-        } else if (objDataVersion == 2) {
-            newRefsetPropName = (String) in.readObject();
-            statusTermEntry = (TermEntry) in.readObject();
-            reviewerUuidPropName = (String) in.readObject();
-            ownerUuidPropName = (String) in.readObject();
-            editorUuidPropName = (String) in.readObject();
-        } else {
+		if (objDataVersion <= dataVersion) {
+	        if (objDataVersion >= 1) {
+	        	// Read version 1 data fields
+	            newRefsetPropName = (String) in.readObject(); 
+	        } else {
+	        	// Set version 1 default values
+	        	newRefsetPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
+	        }
+	        if (objDataVersion >= 2) {
+	        	// Read data fields added in version 2 (should have read version 1 already) 
+	            statusTermEntry = (TermEntry) in.readObject();
+	            reviewerUuidPropName = (String) in.readObject();
+	            ownerUuidPropName = (String) in.readObject();
+	            editorUuidPropName = (String) in.readObject();            
+	        } else {
+	        	// Set version 2 default values
+	            statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
+	            reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
+	            ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
+	            editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
+	        }
+	        if (objDataVersion >= 3) {
+	        	// Read data fields added in version 3 (should have read version 1 & 2 already) 
+	        	newRefsetUUIDPropName = (String) in.readObject();
+	        	newRefsetSpecUUIDPropName = (String) in.readObject();
+	        } else {
+	            // The following field were not in this version, so set default values for them.  
+	            newRefsetUUIDPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();          
+	            newRefsetSpecUUIDPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();          
+	        }
+          } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
+    
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
@@ -373,4 +403,21 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
     public void setEditorUuidPropName(String editorUuidPropName) {
         this.editorUuidPropName = editorUuidPropName;
     }
+    
+    public String getNewRefsetUUIDPropName() {
+		return newRefsetUUIDPropName;
+	}
+
+	public void setNewRefsetUUIDPropName(String newRefsetUUIDPropName) {
+		this.newRefsetUUIDPropName = newRefsetUUIDPropName;
+	}
+
+	public String getNewRefsetSpecUUIDPropName() {
+		return newRefsetSpecUUIDPropName;
+	}
+
+	public void setNewRefsetSpecUUIDPropName(String newRefsetSpecUUIDPropName) {
+		this.newRefsetSpecUUIDPropName = newRefsetSpecUUIDPropName;
+	}
+
 }

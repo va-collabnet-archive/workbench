@@ -27,6 +27,20 @@ public class CreateRefsetMetaDataTaskBeanInfo extends SimpleBeanInfo {
             newRefsetPropName.setDisplayName("<html><font color='green'>refset Name:");
             newRefsetPropName.setShortDescription("The property to put the refset name into.");
 
+            PropertyDescriptor newRefsetUUIDPropName;
+            newRefsetUUIDPropName = new PropertyDescriptor("newRefsetUUIDPropName", getBeanDescriptor().getBeanClass());
+            newRefsetUUIDPropName.setBound(true);
+            newRefsetUUIDPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            newRefsetUUIDPropName.setDisplayName("<html><font color='green'>refset UUID:");
+            newRefsetUUIDPropName.setShortDescription("The property to put the refset UUID into.");
+
+            PropertyDescriptor newRefsetSpecUUIDPropName;
+            newRefsetSpecUUIDPropName = new PropertyDescriptor("newRefsetSpecUUIDPropName", getBeanDescriptor().getBeanClass());
+            newRefsetSpecUUIDPropName.setBound(true);
+            newRefsetSpecUUIDPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            newRefsetSpecUUIDPropName.setDisplayName("<html><font color='green'>refset spec UUID:");
+            newRefsetSpecUUIDPropName.setShortDescription("The property to put the refset spec UUID into.");
+
             PropertyDescriptor statusTermEntry;
             statusTermEntry = new PropertyDescriptor("statusTermEntry", getBeanDescriptor().getBeanClass());
             statusTermEntry.setBound(true);
@@ -56,7 +70,8 @@ public class CreateRefsetMetaDataTaskBeanInfo extends SimpleBeanInfo {
             editorUuidPropName.setShortDescription("The property to put the editor UUID into.");
 
             PropertyDescriptor rv[] =
-                    { newRefsetPropName, statusTermEntry, reviewerUuidPropName, ownerUuidPropName, editorUuidPropName };
+                    { newRefsetPropName, newRefsetUUIDPropName, newRefsetSpecUUIDPropName, 
+            		  statusTermEntry, reviewerUuidPropName, ownerUuidPropName, editorUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
