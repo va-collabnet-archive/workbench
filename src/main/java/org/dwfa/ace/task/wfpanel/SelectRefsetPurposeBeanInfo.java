@@ -20,6 +20,13 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 public class SelectRefsetPurposeBeanInfo extends SimpleBeanInfo {
 	
 	
+    /**
+     * Constructor - calls the parent constructor 
+     */
+	public SelectRefsetPurposeBeanInfo() {
+		super();
+	}
+
 	/**
 	 * Returns a list of property descriptors for this task.   
 	 * @return  	Returns a PropertyDescriptor array containing the properties of this task  

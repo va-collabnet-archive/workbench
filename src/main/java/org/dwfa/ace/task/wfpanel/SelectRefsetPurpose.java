@@ -64,10 +64,10 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 	// Other Properties 
 	private JComboBox refsetSelectionComboBox;
 	private I_GetConceptData selectedPurposeConcept; 
-    private TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-    private TermEntry relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-    private TermEntry relRefinability = new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-    private TermEntry relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+    private transient TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+    private transient TermEntry relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+    private transient TermEntry relRefinability = new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+    private transient TermEntry relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
 
     /* -----------------------
@@ -82,11 +82,26 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
    }
    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
        int objDataVersion = in.readInt();
-       if (objDataVersion == 1) {
-           profilePropName = (String) in.readObject();
-           instruction = (String) in.readObject();
-           refsetUuidPropName = (String) in.readObject();
-       } else {
+       if (objDataVersion <= dataVersion) {
+		   if (objDataVersion >= 1) {
+			   // Read version 1 data fields
+			   profilePropName = (String) in.readObject();
+			   instruction = (String) in.readObject();
+			   refsetUuidPropName = (String) in.readObject();
+		   	} else {
+			   // Set version 1 default values
+			   instruction = "<html>Select Purpose:";
+			   profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+			   refsetUuidPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();    
+		   	}
+
+		   	// Now initialize transient properties 
+			relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+			relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+			relRefinability = new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+			relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+			
+		} else {
            throw new IOException("Can't handle dataversion: " + objDataVersion);
        }
    }
@@ -110,8 +125,8 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 	/**
 	 * Performs the primary action of the task, which in this case is to present
 	 * a small user interface to the user which allows them to select a purpose for this 
-	 * Refset Spec.  Once the purpose is selected, the concept associated with this purpose
-	 * is added as a relationship to the current Refset Spec.     
+	 * Refset.  Once the purpose is selected, the concept associated with this purpose
+	 * is added as a relationship to the current Refset.     
 	 * @return  	The exit condition of the task
 	 * @param   	process	The currently executing Workflow process
 	 * @param 		worker	The worker currently executing this task 
@@ -154,15 +169,68 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 					throw new TaskFailedException("You must select at least one editing path. ");
 				}
 		
+				
+//				/*
+//				 * DEBUG MESSAGES START 
+//				 * ====================
+//				 */
+//				// Set variables for so I can display the values: 
+//				UUID d_newRelUid = UUID.randomUUID(); 
+//				I_GetConceptData d_concept = refsetConcept; 
+//				I_GetConceptData d_relType = LocalVersionedTerminology.get().getConcept(relType.ids);  
+//				I_GetConceptData d_relDestination = selectedPurposeConcept; 
+//				I_GetConceptData d_relCharacteristic = LocalVersionedTerminology.get().getConcept(relCharacteristic.ids); 
+//				I_GetConceptData d_relRefinability = LocalVersionedTerminology.get().getConcept(relRefinability.ids);  
+//				I_GetConceptData d_relStatus = LocalVersionedTerminology.get().getConcept(relStatus.ids);  
+//				int d_relGroup = 0; 
+//				I_ConfigAceFrame d_aceFrameConfig = config; 
+//	
+//				// Debug statement to see what are in these variables
+//				System.out.println("TASK_DEBUG_MSG: SelectRefsetPurpose.evaluate(): " 
+//						+ "\n Current values of input parameters before calling LocalVersionedTerminology... " 
+//						+ "\n      d_newRelUid=" + d_newRelUid 
+//						+ "\n      d_concept=" + d_concept 
+//						+ "\n      d_relType=" + d_relType 
+//						+ "\n      d_relDestination=" + d_relDestination 
+//						+ "\n      d_relCharacteristic=" + d_relCharacteristic 
+//						+ "\n      d_relRefinability=" + d_relRefinability 
+//						+ "\n      d_relStatus=" + d_relStatus 
+//						+ "\n      d_relGroup=" + d_relGroup 
+//						+ "\n      d_aceFrameConfig=" + d_aceFrameConfig 
+//						+ "\n      =======================================" 
+//						+ "\n      refsetConcept=" + refsetConcept 
+//						+ "\n      refsetConcept UUID=" + refsetConcept.getUids() 
+//						+ "\n      selectedPurposeConcept=" + selectedPurposeConcept 
+//						+ "\n      selectedPurposeConcept UUID=" + selectedPurposeConcept.getUids() 
+//						+ "\n\n\n");
+//				LocalVersionedTerminology.get().newRelationship(
+//						d_newRelUid,
+//						d_concept, 
+//						d_relType,
+//						d_relDestination, 
+//						d_relCharacteristic,
+//						d_relRefinability, 
+//						d_relStatus,
+//						d_relGroup,
+//						d_aceFrameConfig);
+//				/*
+//				 * DEBUG MESSAGES END 
+//				 * ===================
+//				 */
+
+				
 				// Add the relationship 
-				LocalVersionedTerminology.get().newRelationship(UUID.randomUUID(),
+				LocalVersionedTerminology.get().newRelationship(
+						UUID.randomUUID(),
 						refsetConcept, 
 						LocalVersionedTerminology.get().getConcept(relType.ids),
 						selectedPurposeConcept, 
 						LocalVersionedTerminology.get().getConcept(relCharacteristic.ids),
 						LocalVersionedTerminology.get().getConcept(relRefinability.ids), 
-						LocalVersionedTerminology.get().getConcept(relStatus.ids),0,
+						LocalVersionedTerminology.get().getConcept(relStatus.ids),
+						0,
 						config);
+				
 				LocalVersionedTerminology.get().addUncommitted(selectedPurposeConcept);
 			}
 
