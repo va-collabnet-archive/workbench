@@ -312,7 +312,7 @@ public class RefsetHelper {
         UUID memberUuid =
                 generateUuid(termFactory.getUids(refsetId).iterator().next(), termFactory.getUids(conceptId).iterator()
                     .next(), termFactory.getUids(memberTypeId).iterator().next());
-        if (memberUuid == null) {
+        if (memberUuid == null || termFactory.hasId(memberUuid)) {
             memberUuid = UUID.randomUUID();
         }
 
