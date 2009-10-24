@@ -37,22 +37,27 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * Creates meta data required for a new refset.
- * Meta data created includes :
+ * Meta data created includes:
  * concepts (member refset, refset spec, marked parent, comments refset,
  * promotion refset)
  * descriptions (FSN and PT for each concept)
  * relationships (member refset -> refset identity, remaining concepts ->
  * supporting refset)
  * 
- * Required input to this task is the name of the refset spec being created.
+ * Required input to this task is the name of the refset being created.
  * 
  * @author Chrissy Hill
  * @author Perry Reid
+ * @version 3, October 2009 
  * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public class CreateRefsetMetaDataTask extends AbstractTask {
 
+    /* -----------------------
+     * Properties 
+     * -----------------------
+     */
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 3;
     private String newRefsetPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
@@ -67,9 +72,12 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
     private I_GetConceptData status;
 
     private transient Exception ex = null;
-
 	private transient Condition returnCondition = Condition.ITEM_COMPLETE;
 
+    /* -----------------------
+     * Serialization Methods
+     * -----------------------
+     */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(newRefsetPropName);
@@ -113,16 +121,43 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 	            newRefsetUUIDPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();          
 	            newRefsetSpecUUIDPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();          
 	        }
+	        
+	        // Initialize transient properties 
+	        ex = null;
+	        returnCondition = Condition.ITEM_COMPLETE;
+	        
           } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
     
 
+	/**
+	 * Handles actions required by the task after normal task completion (such as moving a 
+	 * process to another user's input queue).   
+	 * @return  	void
+	 * @param   	process	The currently executing Workflow process
+	 * @param 		worker	The worker currently executing this task 
+	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
+	 * @see 		org.dwfa.bpa.process.I_DefineTask#complete(
+	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      		org.dwfa.bpa.process.I_Work)
+	 */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
+	/**
+	 * Performs the primary action of the task, which in this case is to present
+	 * a small user interface to the user which allows them to specify the characteristics 
+	 * of this refset to be created.      
+	 * @return  	The exit condition of the task
+	 * @param   	process	The currently executing Workflow process
+	 * @param 		worker	The worker currently executing this task 
+	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
+	 * @see 		org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      		org.dwfa.bpa.process.I_Work)
+	 */
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
 
         try {
@@ -145,6 +180,15 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         return returnCondition;
     }
 
+	/**
+	 * Creates the new refset.      
+	 * @return  	void
+	 * @param   	process	The currently executing Workflow process
+	 * @param 		worker	The worker currently executing this task 
+	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
+	 * @see 		org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      		org.dwfa.bpa.process.I_Work)
+	 */
     public void doRun(final I_EncodeBusinessProcess process, I_Work worker) {
 
         try {
@@ -246,7 +290,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                 .next());
             process.setProperty(ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey(), refsetSpec.getUids()
                 .iterator().next());
-
+            
             termFactory.getActiveAceFrameConfig().setBuilderToggleVisible(true);
             termFactory.getActiveAceFrameConfig().setInboxToggleVisible(true);
 

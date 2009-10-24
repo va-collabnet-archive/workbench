@@ -8,15 +8,29 @@ import java.beans.SimpleBeanInfo;
 import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
+/**
+ * The CreateRefsetMetaDataTaskBeanInfo class describes the visible elements of the 
+ * Workflow task CreateRefsetMetaDataTask so that it can be displayed in the Process Builder. 
+ * The CreateRefsetMetaDataTask task creates meta data required for a new refset..
+ * 
+ * @author  Chrissy Hill
+ * @author  Perry Reid
+ * @version 3, October 2009 
+ */
 public class CreateRefsetMetaDataTaskBeanInfo extends SimpleBeanInfo {
 
     /**
-    *
-    */
+     * Constructor - calls the parent constructor 
+     */
     public CreateRefsetMetaDataTaskBeanInfo() {
         super();
     }
 
+	/**
+	 * Returns a list of property descriptors for this task.   
+	 * @return  	Returns a PropertyDescriptor array containing the properties of this task  
+	 * @exception  	Error Thrown when an exception happens during Introspection
+	 */
     public PropertyDescriptor[] getPropertyDescriptors() {
 
         try {
@@ -78,8 +92,11 @@ public class CreateRefsetMetaDataTaskBeanInfo extends SimpleBeanInfo {
         }
     }
 
-    /**
+    /** 
+     * Return the descriptor for this JavaBean which contains a reference to the JavaBean 
+	 * that implements this task as well as the display name of the task along with formating information.
      * @see java.beans.BeanInfo#getBeanDescriptor()
+	 * @return	Returns the BeanDescriptor for this task      
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(CreateRefsetMetaDataTask.class);
