@@ -23,6 +23,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.mojo.refset.spec.RefsetInclusionSpec;
 import org.dwfa.mojo.refset.writers.MemberRefsetHandler;
 import org.dwfa.tapi.TerminologyException;
@@ -103,6 +104,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
     private ReferenceSetExport referenceSetExport = new ReferenceSetExport();
 
+    private RefsetInclusionSpec currentSpec;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (!readWriteMapDirectory.exists() || !readWriteMapDirectory.isDirectory() || !readWriteMapDirectory.canRead()) {
@@ -119,6 +122,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             MemberRefsetHandler.setReadWriteMapDirectory(readWriteMapDirectory);
 
             for (RefsetInclusionSpec spec : refsetInclusionSpecs) {
+                currentSpec = spec;
                 processConcept(spec.refsetConcept.getVerifiedConcept());
             }
 
@@ -196,8 +200,6 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             Long key = iterator.next();
             I_ThinExtByRefTuple ext = treeMap.get(key);
 
-            System.out.println(key);
-            System.out.println(ext);
             export(ext);
         }
     }
@@ -290,7 +292,24 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
             // first time this subset member has been found, so add to index
             // table as well
-            String subOriginalId = refsetType.getRefsetHandler().getSnomedIntegerId(tf, refsetId);
+            String subOriginalId = null;
+            if (!(currentSpec.specContainsSnomedId)) {
+                subOriginalId = refsetType.getRefsetHandler().getSnomedIntegerId(tf, refsetId);
+            } else {
+                // check if the spec has the original snomed id
+                I_IntSet allowedTypes = tf.newIntSet();
+                allowedTypes.add(tf.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids()).getConceptId());
+
+                Set<I_GetConceptData> concepts =
+                        refsetConcept.getDestRelOrigins(allowedStatuses, allowedTypes, positions, true, true);
+                for (I_GetConceptData concept : concepts) {
+                    subOriginalId = refsetType.getRefsetHandler().getSnomedIntegerId(tf, concept.getConceptId());
+                    if (subOriginalId != null) {
+                        break;
+                    }
+                }
+            }
+
             if (subOriginalId == null) {
                 subOriginalId = "UNKNOWN";
             }
@@ -305,5 +324,4 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             refsetId, componentId, true));
         subsetMemberFileWriter.newLine();
     }
-
 }
