@@ -38,6 +38,7 @@ public class RefsetSpecPanel extends JPanel {
         public void actionPerformed(ActionEvent arg0) {
             try {
                 setupRefsetTable();
+                setupCommentTable();
             } catch (NoSuchMethodException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             } catch (Exception e) {
@@ -59,7 +60,6 @@ public class RefsetSpecPanel extends JPanel {
     private I_ConfigAceFrame aceFrameConfig;
 
 	private ReflexiveRefsetTableModel refsetTableModel;
-	private ReflexiveRefsetCommentTableModel commentTableModel;
 
     private static final String HIERARCHICAL_VIEW =           "taxonomy";
     private static final String REFSET_AND_PARENT_ONLY_VIEW = "  tree  ";
@@ -122,7 +122,20 @@ public class RefsetSpecPanel extends JPanel {
     }
 
     public void setupCommentTable() throws NoSuchMethodException, Exception {
-        List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
+        JTableWithDragImage commentTable = createCommentTable(aceFrameConfig, editor);
+        for (int i = 0; i < bottomTabs.getTabCount(); i++) {
+            if (bottomTabs.getTitleAt(i).equals(COMMENT_VIEW)) {
+                JScrollPane tableScroller = (JScrollPane) bottomTabs
+                        .getComponentAt(i);
+                tableScroller.setViewportView(commentTable);
+                break;
+            }
+        }
+    }
+
+	protected static JTableWithDragImage createCommentTable(I_ConfigAceFrame aceFrameConfig, RefsetSpecEditor editor)
+			throws NoSuchMethodException, Exception {
+		List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
         column1.setColumnName("referenced component");
         column1.setCreationEditable(true);
@@ -143,7 +156,7 @@ public class RefsetSpecPanel extends JPanel {
         column2.setColumnName("comment");
         column2.setCreationEditable(true);
         column2.setUpdateEditable(true);
-        column2.setFieldClass(Number.class);
+        column2.setFieldClass(String.class);
         column2.setMin(5);
         column2.setPref(50);
         column2.setMax(150);
@@ -152,7 +165,7 @@ public class RefsetSpecPanel extends JPanel {
                 "getStringValue"));
         column2.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod(
                 "setStringValue", String.class));
-        column2.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+        column2.setType(REFSET_FIELD_TYPE.STRING);
         columns.add(column2);
 
         ReflexiveRefsetFieldData column3 = new ReflexiveRefsetFieldData();
@@ -205,7 +218,7 @@ public class RefsetSpecPanel extends JPanel {
             columns.add(column5);
         }
 
-        commentTableModel = new ReflexiveRefsetCommentTableModel(
+        ReflexiveRefsetCommentTableModel commentTableModel = new ReflexiveRefsetCommentTableModel(
                 editor, columns.toArray(new ReflexiveRefsetFieldData[columns
                         .size()]));
         aceFrameConfig.addPropertyChangeListener("viewPositions", commentTableModel);
@@ -234,15 +247,8 @@ public class RefsetSpecPanel extends JPanel {
         commentTable.setDefaultRenderer(Integer.class, renderer);
         commentTable.setDefaultRenderer(Double.class, renderer);
         commentTable.setDefaultRenderer(String.class, renderer);
-        for (int i = 0; i < bottomTabs.getTabCount(); i++) {
-            if (bottomTabs.getTitleAt(i).equals(COMMENT_VIEW)) {
-                JScrollPane tableScroller = (JScrollPane) bottomTabs
-                        .getComponentAt(i);
-                tableScroller.setViewportView(commentTable);
-                break;
-            }
-        }
-    }
+		return commentTable;
+	}
 
     public void setupRefsetTable() throws NoSuchMethodException, Exception {
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();

@@ -524,6 +524,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	private JScrollPane specTreeScroller;
 
+	private JScrollPane commentScroller;
+
 	private TermTreeHelper refsetTree;
 
     public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper, TermTreeHelper refsetTree)
@@ -819,7 +821,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
     private JComponent getContentPane() throws Exception {
     	JTabbedPane refsetTabs = new JTabbedPane();
     	refsetTabs.addTab("specification", getSpecPane());
-    	refsetTabs.addTab("comments", new JPanel());
+    	commentScroller = new JScrollPane(
+    			RefsetSpecPanel.createCommentTable(ace.getAceFrameConfig(), this));
+    	refsetTabs.addTab("comments", commentScroller);
     	return refsetTabs;
     }
 
@@ -1015,12 +1019,15 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
         private RefsetSpecTreeNode root;
         private TreePath selectionPath;
         private boolean newRefset = true;
-		private int scrollHorizValue;
-		private int scrollVertValue;
+		private int specScrollHorizValue;
+		private int specScrollVertValue;
+		private int commentScrollHorizValue;
+		private int commentScrollVertValue;
 		private IntSet childrenExpandedNodes = new IntSet();
 		private int selectedNodeId = Integer.MAX_VALUE;
         private RefsetSpecTreeNode newSelectedNode;
 		private ConceptBean localRefsetSpecConcept;
+		private JTableWithDragImage commentTable;
 		
 		private void addChildrenExpandedNodes(RefsetSpecTreeNode node) {
 			if (specTree.hasBeenExpanded(new TreePath(node.getPath()))) {
@@ -1047,8 +1054,11 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
             if (cancel) {
                 return null;
             }
-            scrollHorizValue = specTreeScroller.getHorizontalScrollBar().getValue();
-            scrollVertValue = specTreeScroller.getVerticalScrollBar().getValue();
+            commentTable = RefsetSpecPanel.createCommentTable(ace.getAceFrameConfig(), RefsetSpecEditor.this);
+            specScrollHorizValue = specTreeScroller.getHorizontalScrollBar().getValue();
+            specScrollVertValue = specTreeScroller.getVerticalScrollBar().getValue();
+            commentScrollHorizValue = commentScroller.getHorizontalScrollBar().getValue();
+            commentScrollVertValue = commentScroller.getVerticalScrollBar().getValue();
             selectionPath = specTree.getLeadSelectionPath();
             if (selectionPath != null) {
             	RefsetSpecTreeNode selectedNode = (RefsetSpecTreeNode) selectionPath.getLastPathComponent();
@@ -1189,19 +1199,21 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
                     return;
                 }
                 ;
+                commentScroller.setViewportView(commentTable);
                 if (newRefset == false) {
                     expandNodes(root);
                     if (newSelectedNode != null) {
                         specTree.setSelectionPath(new TreePath(newSelectedNode.getPath()));
                         specTree.setLeadSelectionPath(new TreePath(newSelectedNode.getPath()));
                     }
-                    specTreeScroller.getHorizontalScrollBar().setValue(scrollHorizValue);
-                    specTreeScroller.getVerticalScrollBar().setValue(scrollVertValue);
+                    specTreeScroller.getHorizontalScrollBar().setValue(specScrollHorizValue);
+                    specTreeScroller.getVerticalScrollBar().setValue(specScrollVertValue);
+                    commentScroller.getHorizontalScrollBar().setValue(commentScrollHorizValue);
+                    commentScroller.getVerticalScrollBar().setValue(commentScrollVertValue);
                 } else {
-                    specTreeScroller.getHorizontalScrollBar().setValue(0);
-                    specTreeScroller.getVerticalScrollBar().setValue(0);
+                	commentScroller.getHorizontalScrollBar().setValue(0);
+                	commentScroller.getVerticalScrollBar().setValue(0);
                 }
-
             } catch (InterruptedException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             } catch (ExecutionException e) {

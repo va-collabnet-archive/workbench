@@ -109,8 +109,14 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 												break;
 											}
 										case CONCEPT_IDENTIFIER:
-											conceptsToFetch.add((Integer) col.getReadMethod().invoke(
-													ebrTuple.getPart()));
+											Object obj = col.getReadMethod().invoke(
+													ebrTuple.getPart());
+											if (obj instanceof Integer) {
+												conceptsToFetch.add((Integer) obj);
+											} else {
+												AceLog.getAppLog().alertAndLogException(
+														new Exception(obj + " is not an instance of Integer"));
+											}
 											break;
 										case STRING:
 											break;

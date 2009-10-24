@@ -9,25 +9,36 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
+import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
+import org.dwfa.vodb.types.IntSet;
 
 public class RefsetSpecTreeMouseListener implements MouseListener {
 
@@ -146,16 +157,20 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 				List<I_ThinExtByRefTuple> tuples = specPart.getTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(), true);
 				
 				if (tuples.iterator().hasNext()) {
+					I_ThinExtByRefTuple firstTuple = tuples.iterator().next();
+					JMenuItem commentActionItem = new JMenuItem("Comment");
+					commentActionItem.addActionListener(new CommentSpecAction(firstTuple));
+					popup.add(commentActionItem);
+					popup.addSeparator();
 					JMenuItem retireActionItem = new JMenuItem("Retire");
-					retireActionItem.addActionListener(new RetireSpecAction(tuples.iterator().next()));
+					retireActionItem.addActionListener(new RetireSpecAction(firstTuple));
 					popup.add(retireActionItem);
+					
+					JMenuItem changeActionItem = new JMenuItem("Change...");
+					changeActionItem.addActionListener(new ChangeSpecAction(firstTuple));
+					popup.add(changeActionItem);
 				} else {
 					tuples = specPart.getTuples(null, aceConfig.getViewPositionSet(), true);
-				}
-				if (tuples.iterator().hasNext()) {
-					JMenuItem changeActionItem = new JMenuItem("Change...");
-					changeActionItem.addActionListener(new ChangeSpecAction(tuples.iterator().next()));
-					popup.add(changeActionItem);
 				} 
 			}
 			
@@ -164,6 +179,61 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 		return popup;
 	}
 	
+	private class CommentSpecAction implements ActionListener {
+		private I_ThinExtByRefTuple thinExtByRefTuple;
+		
+		private CommentSpecAction(I_ThinExtByRefTuple thinExtByRefTuple) {
+			super();
+			this.thinExtByRefTuple = thinExtByRefTuple;
+		}
+
+		public void actionPerformed(ActionEvent arg0) {
+			String commentText = (String)JOptionPane.showInputDialog(
+						aceConfig.getTreeInSpecEditor().getRootPane(),
+			                    "",
+			                    "Enter comment:",
+			                    JOptionPane.PLAIN_MESSAGE,
+			                    null,
+			                    null,
+			                    "");
+			if (commentText != null && commentText.length() > 2) {
+				try {
+					I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
+					I_TermFactory tf = LocalVersionedTerminology.get();
+					I_IntSet allowedTypes = new IntSet();
+					allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
+					Set<I_GetConceptData> commentRefsets = 
+						refsetIdentityConcept.getSourceRelTargets(aceConfig.getAllowedStatus(), 
+							allowedTypes, 
+							aceConfig.getViewPositionSet(), false);
+					int newMemberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(), 
+							ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), 
+							aceConfig.getEditingPathSet(), 
+							Integer.MAX_VALUE);
+					if (commentRefsets.size() > 0) {
+						I_GetConceptData commentRefsetIdentityConcept = commentRefsets.iterator().next();
+						I_ThinExtByRefVersioned commentExt = tf.newExtension(
+								commentRefsetIdentityConcept.getConceptId(), 
+								newMemberId, 
+								thinExtByRefTuple.getMemberId(), 
+								RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
+						LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
+						for (I_Path p: aceConfig.getEditingPathSet()) {
+							I_ThinExtByRefPartString commentPart = LocalVersionedTerminology.get().newStringExtensionPart();
+							commentPart.setStringValue(commentText);
+							commentPart.setPathId(p.getConceptId());
+							commentPart.setStatusId(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+							commentPart.setVersion(Integer.MAX_VALUE);
+							commentExt.addVersion(commentPart);
+						}
+						tf.addUncommitted(commentExt);
+					}
+				} catch (Exception e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				}
+			}
+		}		
+	}
 	private class RetireSpecAction implements ActionListener {
 		private I_ThinExtByRefTuple thinExtByRefTuple;
 		
