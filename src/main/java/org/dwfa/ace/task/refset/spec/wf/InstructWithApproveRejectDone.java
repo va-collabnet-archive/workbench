@@ -2,9 +2,7 @@ package org.dwfa.ace.task.refset.spec.wf;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.IntrospectionException;
@@ -20,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -89,6 +88,7 @@ public class InstructWithApproveRejectDone extends AbstractTask {
     protected transient boolean subversionButtonVisible;
     protected transient boolean inboxButtonVisible;
     protected transient JPanel workflowPanel;
+    protected transient Box workflowBox;
     protected transient I_TermFactory termFactory;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -250,15 +250,16 @@ public class InstructWithApproveRejectDone extends AbstractTask {
         return this.done;
     }
 
-    protected void setupButtons(final JPanel workflowPanel, GridBagConstraints c) {
-        c.gridy++;
-        c.insets = new Insets(0, 5, 0, 5); // padding
+    protected void setupButtons(final JPanel workflowPanel) {
+
+        Box buttonBox = new Box(BoxLayout.X_AXIS);
+        buttonBox.add(Box.createHorizontalGlue());
 
         JButton approveButton = new JButton("Approve selected");
         approveButton.setToolTipText("Approve selected");
-        workflowPanel.add(approveButton, c);
+        buttonBox.add(approveButton);
         approveButton.addActionListener(new ApproveActionListener());
-        c.gridx++;
+        buttonBox.add(Box.createHorizontalGlue());
 
         if (initialPromotionStatus.equals(reviewedApprovedAdditionStatus)
             || initialPromotionStatus.equals(reviewedApprovedDeletionStatus)) {
@@ -269,9 +270,9 @@ public class InstructWithApproveRejectDone extends AbstractTask {
 
         JButton rejectButton = new JButton("Disapprove selected");
         rejectButton.setToolTipText("Disapprove selected");
-        workflowPanel.add(rejectButton, c);
+        buttonBox.add(rejectButton);
         rejectButton.addActionListener(new RejectActionListener());
-        c.gridx++;
+        buttonBox.add(Box.createHorizontalGlue());
         if (initialPromotionStatus.equals(reviewedRejectedAdditionStatus)
             || initialPromotionStatus.equals(reviewedRejectedDeletionStatus)) {
             rejectButton.setEnabled(false);
@@ -281,24 +282,33 @@ public class InstructWithApproveRejectDone extends AbstractTask {
 
         JButton doneButton = new JButton("Return to list menu");
         doneButton.setToolTipText("Return to list menu");
-        workflowPanel.add(doneButton, c);
+        buttonBox.add(doneButton);
         doneButton.addActionListener(new DoneActionListener());
-        c.gridx++;
-        c.gridy++;
+        buttonBox.add(Box.createHorizontalGlue());
 
         // filler
-        c.weighty = 1.0;
-        c.weightx = 1.0;
-        c.anchor = GridBagConstraints.LINE_END;
-        workflowPanel.add(Box.createGlue(), c);
+        workflowBox.add(Box.createVerticalStrut(5));
+        workflowBox.add(buttonBox);
 
+        workflowPanel.add(workflowBox);
         workflowPanel.validate();
         workflowPanel.setVisible(true);
         Container cont = workflowPanel;
-        while (cont != null) {
-            cont.validate();
-            cont = cont.getParent();
-        }
+        /*
+         * while (cont != null) {
+         * cont.validate();
+         * cont = cont.getParent();
+         * }
+         */
+        workflowPanel.setPreferredSize(new Dimension(0, 0));
+        workflowPanel.setMaximumSize(new Dimension(0, 0));
+        workflowPanel.setMinimumSize(new Dimension(0, 0));
+        workflowPanel.revalidate();
+
+        workflowPanel.setPreferredSize(null);
+        workflowPanel.setMaximumSize(null);
+        workflowPanel.setMinimumSize(null);
+
         doneButton.requestFocusInWindow();
     }
 
@@ -416,20 +426,18 @@ public class InstructWithApproveRejectDone extends AbstractTask {
             for (int i = 0; i < components.length; i++) {
                 workflowPanel.remove(components[i]);
             }
-            workflowPanel.setLayout(new GridBagLayout());
 
-            GridBagConstraints c = new GridBagConstraints();
-            c.gridx = 0;
-            c.gridy = 0;
-            c.weighty = 0.0;
-            c.weightx = 0.0;
-            c.anchor = GridBagConstraints.FIRST_LINE_START;
+            workflowBox = new Box(BoxLayout.Y_AXIS);
+            Box labelBox = new Box(BoxLayout.X_AXIS);
             try {
-                workflowPanel.add(new JLabel(instruction + " " + initialPromotionStatus.getInitialText() + "(s)"), c);
+                labelBox.add(new JLabel(instruction + " " + initialPromotionStatus.getInitialText() + "(s)"));
             } catch (IOException e) {
-                workflowPanel.add(new JLabel(instruction), c);
+                labelBox.add(new JLabel(instruction));
             }
-            setupButtons(workflowPanel, c);
+            labelBox.add(Box.createHorizontalGlue());
+            workflowBox.add(labelBox);
+
+            setupButtons(workflowPanel);
         }
 
     }

@@ -185,6 +185,7 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
             cont = cont.getParent();
         }
         reviewButton.requestFocusInWindow();
+        workflowPanel.revalidate();
     }
 
     protected void restore() throws InterruptedException, InvocationTargetException {
