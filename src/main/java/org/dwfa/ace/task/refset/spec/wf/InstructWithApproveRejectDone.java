@@ -279,8 +279,8 @@ public class InstructWithApproveRejectDone extends AbstractTask {
             rejectButton.setEnabled(true);
         }
 
-        JButton doneButton = new JButton("Done");
-        doneButton.setToolTipText("Done");
+        JButton doneButton = new JButton("Return to list menu");
+        doneButton.setToolTipText("Return to list menu");
         workflowPanel.add(doneButton, c);
         doneButton.addActionListener(new DoneActionListener());
         c.gridx++;

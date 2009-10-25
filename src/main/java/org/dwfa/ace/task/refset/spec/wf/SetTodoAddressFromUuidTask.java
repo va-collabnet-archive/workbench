@@ -79,7 +79,9 @@ public class SetTodoAddressFromUuidTask extends AbstractTask {
             return Condition.ITEM_COMPLETE;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TaskFailedException(e.getMessage());
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                "Refset wizard cannot be completed. Exception : " + e.getMessage(), "", JOptionPane.ERROR_MESSAGE);
+            return Condition.ITEM_CANCELED;
         }
     }
 

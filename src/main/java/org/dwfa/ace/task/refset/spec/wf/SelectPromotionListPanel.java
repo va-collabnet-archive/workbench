@@ -11,6 +11,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -19,6 +20,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.RefsetHelper;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.util.LogWithAlerts;
 
 /**
  * A panel to select the promotion list the user wishes to review/edit.
@@ -241,6 +243,9 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
             gridBagConstraints.weighty = 0.0;
             gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
             this.add(label, gridBagConstraints);
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                "The current refset has no members. Please run the refset compute.", "", JOptionPane.ERROR_MESSAGE);
+            // TODO
         }
     }
 
