@@ -64,10 +64,10 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 	// Other Properties 
 	private JComboBox refsetSelectionComboBox;
 	private I_GetConceptData selectedPurposeConcept; 
-    private transient TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+    private transient TermEntry relType = new TermEntry(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
     private transient TermEntry relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
     private transient TermEntry relRefinability = new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-    private transient TermEntry relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+    private transient TermEntry relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
 
 
     /* -----------------------
@@ -99,7 +99,7 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 			relType = new TermEntry(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
 			relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
 			relRefinability = new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-			relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+			relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
 			
 		} else {
            throw new IOException("Can't handle dataversion: " + objDataVersion);
