@@ -96,7 +96,7 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 		   	}
 
 		   	// Now initialize transient properties 
-			relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+			relType = new TermEntry(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
 			relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
 			relRefinability = new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
 			relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
