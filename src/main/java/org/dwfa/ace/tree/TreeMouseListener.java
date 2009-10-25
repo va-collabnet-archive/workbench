@@ -24,6 +24,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.RefsetCommentPopupListener;
 import org.dwfa.ace.search.QueryBean;
 import org.dwfa.ace.search.SimilarConceptQuery;
 import org.dwfa.vodb.bind.ThinExtBinder;
@@ -67,7 +68,7 @@ public class TreeMouseListener implements MouseListener {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath
 						.getLastPathComponent();
 				if (e.isPopupTrigger()) {
-					makeAndShowPopup(e);
+					makeAndShowPopup(e, (I_GetConceptData) node.getUserObject());
 				} else {
 					I_RenderAndFocusOnBean renderer = (I_RenderAndFocusOnBean) tree
 							.getCellRenderer();
@@ -100,10 +101,10 @@ public class TreeMouseListener implements MouseListener {
 		}
 	}
 
-	private void makeAndShowPopup(MouseEvent e) {
+	private void makeAndShowPopup(MouseEvent e, I_GetConceptData selectedConcept) {
 		JPopupMenu popup;
 		try {
-			popup = makePopup(e);
+			popup = makePopup(e, selectedConcept);
 			popup.show(e.getComponent(), e.getX(), e.getY());
 		} catch (FileNotFoundException e1) {
 			AceLog.getAppLog().alertAndLogException(e1);
@@ -114,12 +115,13 @@ public class TreeMouseListener implements MouseListener {
 		}
 	}
 
-	private JPopupMenu makePopup(MouseEvent e) throws FileNotFoundException, IOException, ClassNotFoundException {
+	private JPopupMenu makePopup(MouseEvent e, I_GetConceptData selectedConcept) throws FileNotFoundException, IOException, ClassNotFoundException {
 			JPopupMenu popup = new JPopupMenu();
 			JMenuItem noActionItem = new JMenuItem("");
 			popup.add(noActionItem);
 			
-			if (ace.getRefsetSpecInSpecEditor() != null && ace.refsetTabIsSelected()) {
+		if (ace.getRefsetSpecInSpecEditor() != null) {
+			if (ace.refsetTabIsSelected()) {
 				JTree specTree = ace.getTreeInSpecEditor();
 				if (specTree.isVisible() && specTree.getSelectionCount() > 0) {
 					TreePath selPath = specTree.getSelectionPath();
@@ -132,14 +134,22 @@ public class TreeMouseListener implements MouseListener {
 						case CONCEPT_CONCEPT:
 							popup.addSeparator();
 							addRefsetItems(popup, new File(AceFrame.pluginRoot,
-							"refsetspec/branch-popup"), specPart);
+									"refsetspec/branch-popup"), specPart);
 							break;
 						default:
 						}
 					}
 				}
 			}
-			
+			popup.addSeparator();
+			RefsetCommentPopupListener refsetCommentActionListener = 
+				new RefsetCommentPopupListener(ace.getAceFrameConfig(), ace.getRefsetSpecEditor());
+			refsetCommentActionListener.setConceptForComment(selectedConcept);
+
+			JMenuItem refsetCommmentItem = new JMenuItem(refsetCommentActionListener.getPrompt());
+			refsetCommmentItem.addActionListener(refsetCommentActionListener.getActionListener());
+			popup.add(refsetCommmentItem);
+		}			
 			
 			popup.addSeparator();
 			JMenuItem searchForSimilarConcepts = new JMenuItem("Search for similar concepts...");
@@ -229,10 +239,19 @@ public class TreeMouseListener implements MouseListener {
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		if (e.isPopupTrigger()) {
-			makeAndShowPopup(e);
+		JTree tree = (JTree) e.getSource();
+		int selRow = tree.getRowForLocation(e.getX(), e.getY());
+		// AceLog.getLog().info("Selected row: " + selRow);
+		TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
+		if (selPath != null) {
+			if (selRow != -1) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath
+						.getLastPathComponent();
+				if (e.isPopupTrigger()) {
+					makeAndShowPopup(e, (I_GetConceptData) node.getUserObject());
+				}
+			}
 		}
-		
 	}
 
 	public void mouseClicked(MouseEvent e) {

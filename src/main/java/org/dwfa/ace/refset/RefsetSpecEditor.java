@@ -65,6 +65,7 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
+import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
@@ -78,6 +79,7 @@ import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.util.SwingWorker;
+import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
@@ -274,8 +276,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
                         column6.setMin(5);
                         column6.setPref(150);
                         column6.setMax(150);
-                        column6
-                                .setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
+                        column6.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
                         column6.setReadMethod(extType.getPartClass().getMethod(
                                 "getPathId"));
                         column6.setWriteMethod(extType.getPartClass()
@@ -489,7 +490,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
             }
         }
     }
-
+    
     private ACE ace;
 
     private LinkedList<I_GetConceptData> tabHistoryList;
@@ -528,12 +529,19 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	private TermTreeHelper refsetTree;
 
-    public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper, TermTreeHelper refsetTree)
+	private JTableWithDragImage commentTable;
+
+	private ReflexiveRefsetCommentTableModel commentTableModel;
+	
+	private RefsetSpecPanel refsetSpecPanel;
+	
+    public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper, TermTreeHelper refsetTree, RefsetSpecPanel refsetSpecPanel)
             throws Exception {
         super();
         this.ace = ace;
         this.treeHelper = treeHelper;
         this.refsetTree = refsetTree;
+        this.refsetSpecPanel = refsetSpecPanel;
         topPanel = new JPanel(new GridBagLayout());
 
         this.tabHistoryList = (LinkedList<I_GetConceptData>) ace
@@ -550,6 +558,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
         ace.getAceFrameConfig().addPropertyChangeListener("uncommitted",
                 new UncommittedChangeListener());
         label = new TermComponentLabel(this.ace.getAceFrameConfig());
+        label.addMouseListener(new RefsetCommentPopupListener(ace.getAceFrameConfig(), this));
         fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
         this.ace.getAceFrameConfig().addPropertyChangeListener(
                 "visibleRefsets", fixedToggleChangeActionListener);
@@ -821,8 +830,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
     private JComponent getContentPane() throws Exception {
     	JTabbedPane refsetTabs = new JTabbedPane();
     	refsetTabs.addTab("specification", getSpecPane());
-    	commentScroller = new JScrollPane(
-    			RefsetSpecPanel.createCommentTable(ace.getAceFrameConfig(), this));
+    	commentTable = RefsetSpecPanel.createCommentTable(ace.getAceFrameConfig(), this);
+    	TableSorter sorter = (TableSorter) commentTable.getModel();
+    	commentTableModel = (ReflexiveRefsetCommentTableModel) sorter.getTableModel();
+    	commentScroller = new JScrollPane(commentTable);
     	refsetTabs.addTab("comments", commentScroller);
     	return refsetTabs;
     }
@@ -1297,5 +1308,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
     public void removeHistoryActionListener(ActionListener al) {
         this.historyButton.removeActionListener(al);
     }
+
+	public ReflexiveRefsetCommentTableModel getCommentTableModel() {
+		return commentTableModel;
+	}
+
+	public RefsetSpecPanel getRefsetSpecPanel() {
+		return refsetSpecPanel;
+	}
 
 }

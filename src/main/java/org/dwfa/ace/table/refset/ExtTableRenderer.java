@@ -5,6 +5,8 @@ import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
+import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.text.View;
 
 import org.dwfa.ace.table.AceTableRenderer;
 
@@ -33,11 +35,6 @@ public class ExtTableRenderer extends AceTableRenderer {
                         if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
                             renderComponent.setText("");
                         }
-                	} else {
-                		boolean test = true;
-                		if (test) {
-                    		Object obj = table.getValueAt(row - 1, column);
-                		}
                 	}
                 } else {
                     setBorder(column, this, false, uncommitted);
@@ -56,7 +53,5 @@ public class ExtTableRenderer extends AceTableRenderer {
             renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
         }       
          return renderComponent;
-    }
-
-
+  }
 }

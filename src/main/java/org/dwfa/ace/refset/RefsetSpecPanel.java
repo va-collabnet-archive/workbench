@@ -24,6 +24,7 @@ import org.dwfa.ace.table.refset.ExtTableRenderer;
 import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.ReflexiveRefsetTableModel;
+import org.dwfa.ace.table.refset.ReflexiveTableModel;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
@@ -37,8 +38,8 @@ public class RefsetSpecPanel extends JPanel {
 
         public void actionPerformed(ActionEvent arg0) {
             try {
-                setupRefsetTable();
-                setupCommentTable();
+            	commentTableModel = setupCommentTable();
+                setupRefsetTable(commentTableModel);
             } catch (NoSuchMethodException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             } catch (Exception e) {
@@ -52,6 +53,8 @@ public class RefsetSpecPanel extends JPanel {
 	 *
 	 */
     private static final long serialVersionUID = 1L;
+
+	private ReflexiveRefsetCommentTableModel commentTableModel;
 
     RefsetSpecEditor editor;
 
@@ -78,7 +81,7 @@ public class RefsetSpecPanel extends JPanel {
         TermTreeHelper refsetAndParentOnlyTreeHelper = new TermTreeHelper(
                 new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), true), ace);
         
-        editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper);
+        editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper, this);
         split.setTopComponent(editor.getContentPanel());
 
         ace.getAceFrameConfig().addPropertyChangeListener("viewPositions",
@@ -97,8 +100,8 @@ public class RefsetSpecPanel extends JPanel {
 
         bottomTabs.addTab(TABLE_VIEW, new JScrollPane());
         bottomTabs.addTab(COMMENT_VIEW, new JScrollPane());
-        setupRefsetTable();
-        setupCommentTable();
+        commentTableModel = setupCommentTable();
+        setupRefsetTable(commentTableModel);
         editor.getLabel().setTermComponent(editor.getTermComponent());
         editor.addHistoryActionListener(new HistoryActionListener());
 
@@ -121,7 +124,7 @@ public class RefsetSpecPanel extends JPanel {
         refsetTableModel.propertyChange(null);
     }
 
-    public void setupCommentTable() throws NoSuchMethodException, Exception {
+    public ReflexiveRefsetCommentTableModel setupCommentTable() throws NoSuchMethodException, Exception {
         JTableWithDragImage commentTable = createCommentTable(aceFrameConfig, editor);
         for (int i = 0; i < bottomTabs.getTabCount(); i++) {
             if (bottomTabs.getTitleAt(i).equals(COMMENT_VIEW)) {
@@ -131,6 +134,8 @@ public class RefsetSpecPanel extends JPanel {
                 break;
             }
         }
+    	TableSorter sorter = (TableSorter) commentTable.getModel();
+        return (ReflexiveRefsetCommentTableModel) sorter.getTableModel();
     }
 
 	protected static JTableWithDragImage createCommentTable(I_ConfigAceFrame aceFrameConfig, RefsetSpecEditor editor)
@@ -250,7 +255,7 @@ public class RefsetSpecPanel extends JPanel {
 		return commentTable;
 	}
 
-    public void setupRefsetTable() throws NoSuchMethodException, Exception {
+    public void setupRefsetTable(ReflexiveRefsetCommentTableModel commentTableModel) throws NoSuchMethodException, Exception {
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
         column1.setColumnName("referenced concept");
@@ -373,6 +378,11 @@ public class RefsetSpecPanel extends JPanel {
                 break;
             }
         }
+        List<ReflexiveTableModel> commentTableModels = new ArrayList<ReflexiveTableModel>();
+        commentTableModels.add(editor.getCommentTableModel());
+        commentTableModels.add(commentTableModel);
+        refsetTable.addMouseListener(new MemberTablePopupListener(refsetTable, 
+        		aceFrameConfig, commentTableModels));
     }
 
     public I_GetConceptData getRefsetInSpecEditor() {
@@ -394,4 +404,12 @@ public class RefsetSpecPanel extends JPanel {
     public void setRefsetInSpecEditor(I_GetConceptData refset) {
         editor.setTermComponent(refset);
     }
+
+	public ReflexiveRefsetCommentTableModel getCommentTableModel() {
+		return commentTableModel;
+	}
+
+	public RefsetSpecEditor getRefsetSpecEditor() {
+		return editor;
+	}
 }

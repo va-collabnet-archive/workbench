@@ -132,6 +132,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.ace.queue.AddQueueListener;
 import org.dwfa.ace.queue.NewQueueListener;
+import org.dwfa.ace.refset.RefsetSpecEditor;
 import org.dwfa.ace.refset.RefsetSpecPanel;
 import org.dwfa.ace.search.SearchPanel;
 import org.dwfa.ace.table.refset.RefsetDefaults;
@@ -3600,4 +3601,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public void setWorkflowDetailSheetDimensions(Dimension dim) {
         workflowDetailsSheet.setSize(dim);
     }
+
+	public RefsetSpecEditor getRefsetSpecEditor() {
+		return refsetSpecPanel.getRefsetSpecEditor();
+	}
 }

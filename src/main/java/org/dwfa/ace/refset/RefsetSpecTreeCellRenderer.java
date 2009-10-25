@@ -26,6 +26,7 @@ import org.dwfa.ace.table.AceTableRenderer;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 
@@ -71,24 +72,45 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 				row, hasFocus);
 
 		this.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 0));
+		generateHtmlRendering(value);
+		return this;
+	}
+	
+	public String getHtmlRendering(Object value) {
+		generateHtmlRendering(new DefaultMutableTreeNode(value));
+		return this.getText();
+	}
+
+	private void generateHtmlRendering(Object value) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 		if (node.getUserObject() != null &&
-				I_ThinExtByRefVersioned.class.isAssignableFrom(node.getUserObject().getClass())) {
-			I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) node
-			.getUserObject();
-			List<I_ThinExtByRefTuple> tuples = ext.getTuples(configAceFrame
-					.getAllowedStatus(), configAceFrame.getViewPositionSet(),
-					true);
+				(I_ThinExtByRefVersioned.class.isAssignableFrom(node.getUserObject().getClass()) ||
+						I_ThinExtByRefTuple.class.isAssignableFrom(node.getUserObject().getClass()))) {
 			I_ThinExtByRefTuple firstTuple = null;
 			I_ThinExtByRefTuple lastTuple = null;
-			if (tuples != null && tuples.size() > 0) {
-				firstTuple = tuples.get(0);
-			}
-			if (tuples != null && tuples.size() > 0) {
-				lastTuple = tuples.get(tuples.size() -1);
-				if (lastTuple.getVersion() == Integer.MAX_VALUE) {
-					this.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, AceTableRenderer.UNCOMMITTED_COLOR));					
+			EXT_TYPE extType = null;
+			List<I_ThinExtByRefTuple> tuples = null;
+			if (I_ThinExtByRefVersioned.class.isAssignableFrom(node.getUserObject().getClass())) {
+				I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) node
+				.getUserObject();
+				tuples = ext.getTuples(configAceFrame
+						.getAllowedStatus(), configAceFrame.getViewPositionSet(),
+						true);
+				if (tuples != null && tuples.size() > 0) {
+					firstTuple = tuples.get(0);
 				}
+				if (tuples != null && tuples.size() > 0) {
+					lastTuple = tuples.get(tuples.size() -1);
+					if (lastTuple.getVersion() == Integer.MAX_VALUE) {
+						this.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, AceTableRenderer.UNCOMMITTED_COLOR));					
+					}
+				}
+				extType = ThinExtBinder.getExtensionType(firstTuple.getCore());
+			} else {
+				firstTuple = (I_ThinExtByRefTuple) node.getUserObject();
+				extType = ThinExtBinder.getExtensionType(firstTuple.getCore());
+				tuples = new ArrayList<I_ThinExtByRefTuple>();
+				tuples.add(firstTuple);
 			}
 
 			boolean indent = false;
@@ -104,7 +126,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 			if (firstTuple != null) {
 				setOpaque(false);
 				try {
-					switch (ThinExtBinder.getExtensionType(ext)) {
+					switch (extType) {
 					case CONCEPT_CONCEPT:
 						renderBranchingClause(firstTuple);
 						break;
@@ -122,6 +144,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 			} else {
 				setBackground(Color.LIGHT_GRAY);
 				setOpaque(true);
+				I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) node.getUserObject();
 				tuples = ext.getTuples(null, configAceFrame.getViewPositionSet(),
 						true);
 				firstTuple = null;
@@ -130,7 +153,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 				}
 				if (firstTuple != null) {
 					try {
-						switch (ThinExtBinder.getExtensionType(ext)) {
+						switch (extType) {
 						case CONCEPT_CONCEPT:
 							renderBranchingClause(firstTuple);
 							break;
@@ -146,7 +169,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 						AceLog.getAppLog().log(Level.WARNING, ex.getLocalizedMessage(), ex);
 					}
 				} else {
-					switch (ThinExtBinder.getExtensionType(ext)) {
+					switch (extType) {
 					case CONCEPT_CONCEPT:
 						this.setText("Branching clause is Primoridal or Extinct");
 						break;
@@ -157,14 +180,12 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 						this.setText("Text clause is Primoridal or Extinct");
 						break;
 					default:
-						this.setText("Can't handle extinct type: "
-								+ ThinExtBinder.getExtensionType(ext));
+						this.setText("Can't handle extinct type: " + extType);
 					}
 
 				}
 			}
 		}
-		return this;
 	}
 
 	private void renderTextQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent)

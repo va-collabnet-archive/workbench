@@ -42,6 +42,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.RefsetSpecTreeCellRenderer;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
@@ -432,7 +433,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 						I_GetConceptData concept = tf.getConcept(id);
 						I_DescriptionTuple obj = concept.getDescTuple((I_IntList)columns[columnIndex].readParamaters[0], 
 								(I_ConfigAceFrame) columns[columnIndex].readParamaters[1]);
-						return obj.getText();
+						return new StringWithExtTuple(obj.getText(),
+								tuple, id);
 					} else if (tf.hasExtension(id)) {
 						I_ThinExtByRefVersioned ext = tf.getExtension(id);
 						I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
@@ -440,8 +442,23 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 								config.getViewPositionSet(), false);
 						if (tuples.size() > 0) {
 							I_ThinExtByRefTuple obj = tuples.iterator().next();
-							return new StringWithExtTuple(obj.toString(),
-									obj, id);
+							ConceptBean componentRefset = ConceptBean.get(obj.getRefsetId());
+							I_DescriptionTuple refsetDesc = componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(),
+									host.getConfig());
+							StringBuffer buff = new StringBuffer();
+							buff.append("<html>");
+							buff.append(refsetDesc.getText());
+							buff.append(" member: ");
+							// @TODO replace this test with a call to determine "refset purpose" once the purpose is available. 
+							if (refsetDesc.getText().toLowerCase().endsWith("refset spec")) {
+								RefsetSpecTreeCellRenderer renderer = new RefsetSpecTreeCellRenderer(host.getConfig());
+								buff.append(renderer.getHtmlRendering(obj));
+							} else {
+								buff.append(obj.getPart().toString());
+							}
+							
+							return new StringWithExtTuple(buff.toString(),
+									tuple, id);
 						}
 					} else {
 						throw new UnsupportedOperationException("Can't find component for id: " + id);

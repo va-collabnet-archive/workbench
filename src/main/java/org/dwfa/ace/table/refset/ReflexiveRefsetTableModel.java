@@ -136,10 +136,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 						return false;
 					}
 					if (allTuples == null) {
-						AceLog
-								.getAppLog()
-								.info(
-										"all tuples for RefsetMemberTableModel is  null");
+						AceLog.getAppLog()
+								.info("all tuples for RefsetMemberTableModel is  null");
 						return false;
 					}
 					allTuples.add(ebrTuple);

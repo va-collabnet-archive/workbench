@@ -20,6 +20,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -158,8 +159,12 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 				
 				if (tuples.iterator().hasNext()) {
 					I_ThinExtByRefTuple firstTuple = tuples.iterator().next();
-					JMenuItem commentActionItem = new JMenuItem("Comment");
-					commentActionItem.addActionListener(new CommentSpecAction(firstTuple));
+					ConceptBean refsetConcept = ConceptBean.get(firstTuple.getRefsetId());
+					I_DescriptionTuple refsetDesc = refsetConcept.getDescTuple(aceConfig.getTableDescPreferenceList(), 
+							aceConfig);
+					String prompt = "Add comment for '" + refsetDesc.getText() + "'";
+					JMenuItem commentActionItem = new JMenuItem(prompt + "...");
+					commentActionItem.addActionListener(new CommentSpecAction(firstTuple, prompt));
 					popup.add(commentActionItem);
 					popup.addSeparator();
 					JMenuItem retireActionItem = new JMenuItem("Retire");
@@ -181,17 +186,19 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 	
 	private class CommentSpecAction implements ActionListener {
 		private I_ThinExtByRefTuple thinExtByRefTuple;
+		private String prompt;
 		
-		private CommentSpecAction(I_ThinExtByRefTuple thinExtByRefTuple) {
+		private CommentSpecAction(I_ThinExtByRefTuple thinExtByRefTuple, String prompt) {
 			super();
 			this.thinExtByRefTuple = thinExtByRefTuple;
+			this.prompt = prompt;
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
 			String commentText = (String)JOptionPane.showInputDialog(
 						aceConfig.getTreeInSpecEditor().getRootPane(),
 			                    "",
-			                    "Enter comment:",
+			                    prompt + ":             ",
 			                    JOptionPane.PLAIN_MESSAGE,
 			                    null,
 			                    null,
