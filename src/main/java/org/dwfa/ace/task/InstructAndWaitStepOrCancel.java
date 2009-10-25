@@ -161,7 +161,8 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
                         cont.validate();
                         cont = cont.getParent();
                     }
-					workflowPanel.setVisible(true);
+                    workflowPanel.setVisible(true);
+                    workflowPanel.repaint();
                     stepButton.requestFocusInWindow();
                 }
             });
