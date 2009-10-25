@@ -663,10 +663,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public static int commitSequence = 0;
     private static boolean commitInProgress = false;
-    
+
     public static List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
-        List<AlertToDataConstraintFailure> warningsAndErrors =
-            new ArrayList<AlertToDataConstraintFailure>();
+        List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
         for (I_Transact to : uncommitted) {
             for (I_TestDataConstraints test : commitTests) {
                 try {
@@ -678,7 +677,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 }
             }
         }
-    	return warningsAndErrors;
+        return warningsAndErrors;
     }
 
     /*
@@ -1005,11 +1004,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
 
     }
-    
+
     private class WorkflowDetailsSheetActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
         }
-    	
+
     }
 
     private class PreferencesPaletteActionListener implements ActionListener {
@@ -1025,8 +1024,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 getRootPane().getLayeredPane().moveToFront(preferencesPalette);
                 deselectOthers(showPreferencesButton);
             }
-            preferencesPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), 
-            		TOGGLE_DIRECTION.LEFT_RIGHT);
+            preferencesPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
         }
 
     }
@@ -1041,8 +1039,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     getRootPane().getLayeredPane().moveToFront(subversionPalette);
                     deselectOthers(showSubversionButton);
                 }
-                subversionPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), 
-                		TOGGLE_DIRECTION.LEFT_RIGHT);
+                subversionPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(),
+                    TOGGLE_DIRECTION.LEFT_RIGHT);
             } catch (Exception e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
             }
@@ -1065,8 +1063,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
             queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
                 .getHeight() + 4);
-            queuePalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), 
-            		TOGGLE_DIRECTION.LEFT_RIGHT);
+            queuePalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
@@ -1101,8 +1098,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
             processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
                 .getHeight() + 4);
-            processPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), 
-            		TOGGLE_DIRECTION.LEFT_RIGHT);
+            processPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
         }
 
     }
@@ -1116,8 +1112,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             if (((JToggleButton) e.getSource()).isSelected()) {
                 getRootPane().getLayeredPane().moveToFront(historyPalette);
             }
-            historyPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), 
-            		TOGGLE_DIRECTION.LEFT_RIGHT);
+            historyPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
         }
     }
 
@@ -1130,8 +1125,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             if (((JToggleButton) e.getSource()).isSelected()) {
                 getRootPane().getLayeredPane().moveToFront(addressPalette);
             }
-            addressPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), 
-            		TOGGLE_DIRECTION.LEFT_RIGHT);
+            addressPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
         }
     }
 
@@ -1343,21 +1337,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     private class CenteredPalettePoint implements I_GetPalettePoint {
-    	JPanel palette;
-    	
-        private CenteredPalettePoint(JPanel palette) {
-			super();
-			this.palette = palette;
-		}
+        JPanel palette;
 
-		public Point getPalettePoint() {
-			int x = (topPanel.getLocation().x + (getWidth() /2) - (palette.getWidth()/2));
-            return new Point(x, topPanel.getLocation().y + topPanel.getHeight()
-                + getMenuSpacer() + 1);
+        private CenteredPalettePoint(JPanel palette) {
+            super();
+            this.palette = palette;
+        }
+
+        public Point getPalettePoint() {
+            int x = (topPanel.getLocation().x + (getWidth() / 2) - (palette.getWidth() / 2));
+            return new Point(x, topPanel.getLocation().y + topPanel.getHeight() + getMenuSpacer() + 1);
         }
     }
 
-    
     private String pluginRoot;
     private JScrollPane dataCheckListScroller;
     private JPanel dataCheckListPanel;
@@ -1465,7 +1457,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        searchPanel = new SearchPanel(aceFrameConfig);
+        searchPanel = new SearchPanel(aceFrameConfig, this);
         searchPanel.addComponentListener(new ResizePalettesListener());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -1487,7 +1479,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridy++;
         c.gridwidth = 2;
         add(getBottomPanel(), c);
-        
+
         aceFrameConfig.addPropertyChangeListener("statusMessage", new StatusChangeListener());
         if (aceFrameConfig.getTabHistoryMap().get("viewerHistoryList") == null) {
             aceFrameConfig.getTabHistoryMap().put("viewerHistoryList", new ArrayList<I_GetConceptData>());
@@ -1748,7 +1740,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JPanel descListProcessBuilderPanel;
 
     private JPanel workflowPanel;
-    
+
     private JPanel workflowDetailsSheet;
 
     private JPanel signpostPanel = new JPanel();
@@ -1935,7 +1927,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     boolean svnPositionSet = false;
     private JButton showProgressButton;
-	private ActivityPanel topActivityListener;
+    private ActivityPanel topActivityListener;
 
     private void setInitialSvnPosition() {
         if (svnPositionSet == false) {
@@ -1997,8 +1989,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             try {
                 makeConfigPalette();
                 getRootPane().getLayeredPane().moveToFront(preferencesPalette);
-                preferencesPalette.togglePalette(showPreferencesButton.isSelected(), 
-                		TOGGLE_DIRECTION.LEFT_RIGHT);
+                preferencesPalette.togglePalette(showPreferencesButton.isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
@@ -2106,7 +2097,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         langPrefPanel.add(new JScrollPane(makeTermList("Langauge (Dialect) preference order:", aceFrameConfig
             .getLanguagePreferenceList())), gbc);
-        
+
         gbc.gridy++;
         TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getShortLabelDescPreferenceList().getListValues()) {
@@ -2733,7 +2724,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         historyPalette.setVisible(true);
     }
 
-
     private void makeAddressPalette() {
         JLayeredPane layers = getRootPane().getLayeredPane();
         addressPalette = new CdePalette(new BorderLayout(), new LeftPalettePoint());
@@ -3172,13 +3162,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public JPanel getWorkflowPanel() {
         return workflowPanel;
     }
-    
+
     public void setWorkflowPanel(JPanel workflowPanel) {
         this.workflowPanel = workflowPanel;
     }
 
     public JPanel getWorkflowDetailsPanel() {
-    	return workflowDetailsSheet;
+        return workflowDetailsSheet;
     }
 
     public JList getAddressList() {
@@ -3591,22 +3581,23 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public void setWorkflowDetailsSheet(JPanel workflowDetailsSheet) {
-    	this.workflowDetailsSheet = workflowDetailsSheet;
+        this.workflowDetailsSheet = workflowDetailsSheet;
     }
-	public JPanel getWorkflowDetailsSheet() {
-		return workflowDetailsSheet;
-	}
 
-	public void setWorfklowDetailSheetVisible(final boolean visible) {
-		SwingUtilities.invokeLater(new Runnable() {
-			
-			public void run() {
-				workflowDetailsSheet.setVisible(visible);
-			}
-		});
-	}
+    public JPanel getWorkflowDetailsSheet() {
+        return workflowDetailsSheet;
+    }
 
-	public void setWorkflowDetailSheetDimensions(Dimension dim) {
-		workflowDetailsSheet.setSize(dim);
-	}
+    public void setWorfklowDetailSheetVisible(final boolean visible) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                workflowDetailsSheet.setVisible(visible);
+            }
+        });
+    }
+
+    public void setWorkflowDetailSheetDimensions(Dimension dim) {
+        workflowDetailsSheet.setSize(dim);
+    }
 }
