@@ -147,6 +147,7 @@ public class InstructWithReviewSelectedAndDone extends AbstractTask {
             cont.validate();
             cont = cont.getParent();
         }
+        workflowPanel.repaint();
         reviewButton.requestFocusInWindow();
     }
 

@@ -308,7 +308,7 @@ public class InstructWithApproveRejectDone extends AbstractTask {
         workflowPanel.setPreferredSize(null);
         workflowPanel.setMaximumSize(null);
         workflowPanel.setMinimumSize(null);
-
+        workflowPanel.repaint();
         doneButton.requestFocusInWindow();
     }
 

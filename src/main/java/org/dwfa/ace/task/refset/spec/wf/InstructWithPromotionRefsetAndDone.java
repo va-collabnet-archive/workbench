@@ -252,6 +252,7 @@ public class InstructWithPromotionRefsetAndDone extends AbstractTask {
             cont.validate();
             cont = cont.getParent();
         }
+        workflowPanel.repaint();
         doneButton.requestFocusInWindow();
     }
 

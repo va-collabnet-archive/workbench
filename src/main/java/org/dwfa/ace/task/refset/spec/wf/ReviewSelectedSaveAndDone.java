@@ -184,6 +184,7 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
             cont.validate();
             cont = cont.getParent();
         }
+        workflowPanel.repaint();
         reviewButton.requestFocusInWindow();
         workflowPanel.revalidate();
     }
