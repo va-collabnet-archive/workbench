@@ -48,14 +48,15 @@ import org.dwfa.util.bean.Spec;
  * 
  * @author Chrissy Hill
  * @author Perry Reid
- * @version 3, October 2009 
+ * @version 3, October 2009
  * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public class CreateRefsetMetaDataTask extends AbstractTask {
 
-    /* -----------------------
-     * Properties 
+    /*
+     * -----------------------
+     * Properties
      * -----------------------
      */
     private static final long serialVersionUID = 1L;
@@ -72,9 +73,10 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
     private I_GetConceptData status;
 
     private transient Exception ex = null;
-	private transient Condition returnCondition = Condition.ITEM_COMPLETE;
+    private transient Condition returnCondition = Condition.ITEM_COMPLETE;
 
-    /* -----------------------
+    /*
+     * -----------------------
      * Serialization Methods
      * -----------------------
      */
@@ -91,73 +93,78 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-		if (objDataVersion <= dataVersion) {
-	        if (objDataVersion >= 1) {
-	        	// Read version 1 data fields
-	            newRefsetPropName = (String) in.readObject(); 
-	        } else {
-	        	// Set version 1 default values
-	        	newRefsetPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
-	        }
-	        if (objDataVersion >= 2) {
-	        	// Read data fields added in version 2 (should have read version 1 already) 
-	            statusTermEntry = (TermEntry) in.readObject();
-	            reviewerUuidPropName = (String) in.readObject();
-	            ownerUuidPropName = (String) in.readObject();
-	            editorUuidPropName = (String) in.readObject();            
-	        } else {
-	        	// Set version 2 default values
-	            statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
-	            reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
-	            ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
-	            editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
-	        }
-	        if (objDataVersion >= 3) {
-	        	// Read data fields added in version 3 (should have read version 1 & 2 already) 
-	        	newRefsetUUIDPropName = (String) in.readObject();
-	        	newRefsetSpecUUIDPropName = (String) in.readObject();
-	        } else {
-	            // The following field were not in this version, so set default values for them.  
-	            newRefsetUUIDPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();          
-	            newRefsetSpecUUIDPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();          
-	        }
-	        
-	        // Initialize transient properties 
-	        ex = null;
-	        returnCondition = Condition.ITEM_COMPLETE;
-	        
-          } else {
+        if (objDataVersion <= dataVersion) {
+            if (objDataVersion >= 1) {
+                // Read version 1 data fields
+                newRefsetPropName = (String) in.readObject();
+            } else {
+                // Set version 1 default values
+                newRefsetPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
+            }
+            if (objDataVersion >= 2) {
+                // Read data fields added in version 2 (should have read version
+                // 1 already)
+                statusTermEntry = (TermEntry) in.readObject();
+                reviewerUuidPropName = (String) in.readObject();
+                ownerUuidPropName = (String) in.readObject();
+                editorUuidPropName = (String) in.readObject();
+            } else {
+                // Set version 2 default values
+                statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
+                reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
+                ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
+                editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
+            }
+            if (objDataVersion >= 3) {
+                // Read data fields added in version 3 (should have read version
+                // 1 & 2 already)
+                newRefsetUUIDPropName = (String) in.readObject();
+                newRefsetSpecUUIDPropName = (String) in.readObject();
+            } else {
+                // The following field were not in this version, so set default
+                // values for them.
+                newRefsetUUIDPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
+                newRefsetSpecUUIDPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
+            }
+
+            // Initialize transient properties
+            ex = null;
+            returnCondition = Condition.ITEM_COMPLETE;
+
+        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
-    
 
-	/**
-	 * Handles actions required by the task after normal task completion (such as moving a 
-	 * process to another user's input queue).   
-	 * @return  	void
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#complete(
-	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
-	 */
+    /**
+     * Handles actions required by the task after normal task completion (such
+     * as moving a
+     * process to another user's input queue).
+     * 
+     * @return void
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-	/**
-	 * Performs the primary action of the task, which in this case is to present
-	 * a small user interface to the user which allows them to specify the characteristics 
-	 * of this refset to be created.      
-	 * @return  	The exit condition of the task
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
-	 */
+    /**
+     * Performs the primary action of the task, which in this case is to present
+     * a small user interface to the user which allows them to specify the
+     * characteristics
+     * of this refset to be created.
+     * 
+     * @return The exit condition of the task
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
 
         try {
@@ -180,15 +187,16 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         return returnCondition;
     }
 
-	/**
-	 * Creates the new refset.      
-	 * @return  	void
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
-	 */
+    /**
+     * Creates the new refset.
+     * 
+     * @return void
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
     public void doRun(final I_EncodeBusinessProcess process, I_Work worker) {
 
         try {
@@ -224,6 +232,15 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             I_GetConceptData refsetEditorRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_EDITOR.getUids());
             I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
             I_GetConceptData commentsRel = termFactory.getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
+            I_GetConceptData purposeRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
+            I_GetConceptData stringAnnotation =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.STRING_ANNOTATION_PURPOSE.getUids());
+            I_GetConceptData markedParentAnnotation =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PARENT_MEMBER_PURPOSE.getUids());
+            I_GetConceptData enumeratedAnnotation =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
+            I_GetConceptData specAnnotation =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_SPECIFICATION.getUids());
 
             // check that the name isn't null or empty etc
             if (name == null || name.trim().equals("")) {
@@ -286,11 +303,17 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             newRelationship(memberRefset, promotionRel, promotionRefset);
             newRelationship(memberRefset, commentsRel, commentsRefset);
 
+            // supporting refsets purpose relationships
+            newRelationship(commentsRefset, purposeRel, stringAnnotation);
+            newRelationship(markedParent, purposeRel, markedParentAnnotation);
+            newRelationship(promotionRefset, purposeRel, enumeratedAnnotation);
+            newRelationship(refsetSpec, purposeRel, specAnnotation);
+
             process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), memberRefset.getUids().iterator()
                 .next());
             process.setProperty(ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey(), refsetSpec.getUids()
                 .iterator().next());
-            
+
             termFactory.getActiveAceFrameConfig().setBuilderToggleVisible(true);
             termFactory.getActiveAceFrameConfig().setInboxToggleVisible(true);
 
@@ -447,21 +470,21 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
     public void setEditorUuidPropName(String editorUuidPropName) {
         this.editorUuidPropName = editorUuidPropName;
     }
-    
+
     public String getNewRefsetUUIDPropName() {
-		return newRefsetUUIDPropName;
-	}
+        return newRefsetUUIDPropName;
+    }
 
-	public void setNewRefsetUUIDPropName(String newRefsetUUIDPropName) {
-		this.newRefsetUUIDPropName = newRefsetUUIDPropName;
-	}
+    public void setNewRefsetUUIDPropName(String newRefsetUUIDPropName) {
+        this.newRefsetUUIDPropName = newRefsetUUIDPropName;
+    }
 
-	public String getNewRefsetSpecUUIDPropName() {
-		return newRefsetSpecUUIDPropName;
-	}
+    public String getNewRefsetSpecUUIDPropName() {
+        return newRefsetSpecUUIDPropName;
+    }
 
-	public void setNewRefsetSpecUUIDPropName(String newRefsetSpecUUIDPropName) {
-		this.newRefsetSpecUUIDPropName = newRefsetSpecUUIDPropName;
-	}
+    public void setNewRefsetSpecUUIDPropName(String newRefsetSpecUUIDPropName) {
+        this.newRefsetSpecUUIDPropName = newRefsetSpecUUIDPropName;
+    }
 
 }
