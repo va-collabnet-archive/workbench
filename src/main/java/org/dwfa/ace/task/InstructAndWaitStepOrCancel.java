@@ -178,10 +178,13 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
                     }
                     workflowPanel.validate();
                     Container cont = workflowPanel;
+
                     while (cont != null) {
                         cont.validate();
                         cont = cont.getParent();
                     }
+                    workflowPanel.repaint();
+                    workflowPanel.setVisible(false);
                 }
 
             });
