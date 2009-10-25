@@ -168,57 +168,7 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 				if (config.getEditingPathSet().size() == 0) {
 					throw new TaskFailedException("You must select at least one editing path. ");
 				}
-		
-				
-//				/*
-//				 * DEBUG MESSAGES START 
-//				 * ====================
-//				 */
-//				// Set variables for so I can display the values: 
-//				UUID d_newRelUid = UUID.randomUUID(); 
-//				I_GetConceptData d_concept = refsetConcept; 
-//				I_GetConceptData d_relType = LocalVersionedTerminology.get().getConcept(relType.ids);  
-//				I_GetConceptData d_relDestination = selectedPurposeConcept; 
-//				I_GetConceptData d_relCharacteristic = LocalVersionedTerminology.get().getConcept(relCharacteristic.ids); 
-//				I_GetConceptData d_relRefinability = LocalVersionedTerminology.get().getConcept(relRefinability.ids);  
-//				I_GetConceptData d_relStatus = LocalVersionedTerminology.get().getConcept(relStatus.ids);  
-//				int d_relGroup = 0; 
-//				I_ConfigAceFrame d_aceFrameConfig = config; 
-//	
-//				// Debug statement to see what are in these variables
-//				System.out.println("TASK_DEBUG_MSG: SelectRefsetPurpose.evaluate(): " 
-//						+ "\n Current values of input parameters before calling LocalVersionedTerminology... " 
-//						+ "\n      d_newRelUid=" + d_newRelUid 
-//						+ "\n      d_concept=" + d_concept 
-//						+ "\n      d_relType=" + d_relType 
-//						+ "\n      d_relDestination=" + d_relDestination 
-//						+ "\n      d_relCharacteristic=" + d_relCharacteristic 
-//						+ "\n      d_relRefinability=" + d_relRefinability 
-//						+ "\n      d_relStatus=" + d_relStatus 
-//						+ "\n      d_relGroup=" + d_relGroup 
-//						+ "\n      d_aceFrameConfig=" + d_aceFrameConfig 
-//						+ "\n      =======================================" 
-//						+ "\n      refsetConcept=" + refsetConcept 
-//						+ "\n      refsetConcept UUID=" + refsetConcept.getUids() 
-//						+ "\n      selectedPurposeConcept=" + selectedPurposeConcept 
-//						+ "\n      selectedPurposeConcept UUID=" + selectedPurposeConcept.getUids() 
-//						+ "\n\n\n");
-//				LocalVersionedTerminology.get().newRelationship(
-//						d_newRelUid,
-//						d_concept, 
-//						d_relType,
-//						d_relDestination, 
-//						d_relCharacteristic,
-//						d_relRefinability, 
-//						d_relStatus,
-//						d_relGroup,
-//						d_aceFrameConfig);
-//				/*
-//				 * DEBUG MESSAGES END 
-//				 * ===================
-//				 */
-
-				
+						
 				// Add the relationship 
 				LocalVersionedTerminology.get().newRelationship(
 						UUID.randomUUID(),
