@@ -373,12 +373,18 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
 	 * and replaces those values with the results of the<code>toString()</code> method called on
 	 * the object returned by the <code>getObjectFromURL(URL locator)</code> or an error message
 	 * if the object returned is null. 
-	 * 
+	 *
+	 * <br>
+	 * In addition to standard url protocols, a "bpa" protocol is supported that will retrieve a business process
+	 * attachment. The form of the url would be <code>bpa:<attachment name></code>. In addition, a "tp" protocol is 
+	 * defined for "task properties", but this definition has no implementation at the moment...
+	 * <br>
 	 * @param input <code>String</code> that may contain substitution variables of the form:
 	 * <code>${locator}</code>. 
 	 * @return A <code>String</code> with the substitution variables replaced with results of the<code>toString()</code> method called on
 	 * the object returned by the <code>getObjectFromURL(URL locator)</code> or an error message
-	 * if the object returned is null.
+	 * if the object returned is null.<p>
+	 * 
 	 * @throws IOException 
 	 * @throws MalformedURLException 
 	 */
