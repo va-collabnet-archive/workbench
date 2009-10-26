@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
@@ -58,6 +59,9 @@ public abstract class RefsetSpecStatement {
 		termFactory = LocalVersionedTerminology.get();
 	}
 
+	public boolean isNegated() {
+		return useNotQualifier;
+	}
 
 	public boolean execute(I_AmTermComponent component)
 		throws IOException, TerminologyException {
@@ -162,7 +166,7 @@ public abstract class RefsetSpecStatement {
 		return false; 
 	}
 
-
+	public abstract Set<Integer> getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException, IOException;
 	/**
 	 * Negates the statement by inverting the current associated negation.
 	 */

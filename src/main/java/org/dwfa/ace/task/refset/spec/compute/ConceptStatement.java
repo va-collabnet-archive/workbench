@@ -1,28 +1,61 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 
 /**
  * Represents partial information contained in a refset spec.
  * An example of a statement is : "NOT: Concept is : Paracetamol"
  * 
- * @author Chrissy Hill
+ * @author Chrissy Hill, Keith Campbell
  * 
  */
 public class ConceptStatement extends RefsetSpecStatement {
 
+	private enum QUERY_TOKENS { 
+		CONCEPT_IS(RefsetAuxiliary.Concept.CONCEPT_IS), 
+		CONCEPT_IS_CHILD_OF(RefsetAuxiliary.Concept.CONCEPT_IS_CHILD_OF), 
+		CONCEPT_IS_KIND_OF(RefsetAuxiliary.Concept.CONCEPT_IS_KIND_OF), 
+		CONCEPT_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.CONCEPT_IS_DESCENDENT_OF), 
+		CONCEPT_IS_MEMBER_OF(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF), 
+		CONCEPT_STATUS_IS(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS), 
+		CONCEPT_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_CHILD_OF), 
+		CONCEPT_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_KIND_OF), 
+		CONCEPT_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_DESCENDENT_OF), 
+		CONCEPT_CONTAINS_REL_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING), 
+		CONCEPT_CONTAINS_DESC_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING), 
+    	;
+    	
+    	private int nid;
+    	
+    	private QUERY_TOKENS(I_ConceptualizeUniversally concept) {
+			try {
+				this.nid = concept.localize().getNid();
+			} catch (TerminologyException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+    };
+    
+    private QUERY_TOKENS tokenEnum = null;
     /**
      * Constructor for refset spec statement.
      * 
@@ -32,44 +65,96 @@ public class ConceptStatement extends RefsetSpecStatement {
      */
     public ConceptStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_GetConceptData queryConstraint) {
         super(useNotQualifier, queryToken, queryConstraint);
-    }
-
-    @Override
-    public boolean getStatementResult(I_AmTermComponent component) throws TerminologyException, IOException {
-        I_GetConceptData concept = (I_GetConceptData) component;
-
-        if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS.getUids()))) {
-            return conceptIs(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS_CHILD_OF.getUids()))) {
-            return conceptIsChildOf(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS_KIND_OF.getUids()))) {
-            return conceptIsKindOf(concept);
-        } else if (queryToken
-            .equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS_DESCENDENT_OF.getUids()))) {
-            return conceptIsDescendantOf(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF.getUids()))) {
-            return conceptIsMemberOf(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS.getUids()))) {
-            return conceptStatusIs(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_CHILD_OF
-            .getUids()))) {
-            return conceptStatusIsChildOf(concept);
-        } else if (queryToken.equals(termFactory
-            .getConcept(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_KIND_OF.getUids()))) {
-            return conceptStatusIsKindOf(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_DESCENDENT_OF
-            .getUids()))) {
-            return conceptStatusIsDescendantOf(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING
-            .getUids()))) {
-            return conceptContainsRelGrouping(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING
-            .getUids()))) {
-            return conceptContainsDescGrouping(concept);
-        } else {
-            throw new TerminologyException("Unknown query type : " + queryToken.getInitialText());
+        for (QUERY_TOKENS token: QUERY_TOKENS.values()) {
+        	if (queryToken.getConceptId() == token.nid) {
+        		tokenEnum = token;
+        		break;
+         	}
+        }
+        if (tokenEnum == null) {
+            throw new RuntimeException("Unknown query type : " + queryToken);
         }
     }
+
+    public Set<Integer> getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException, IOException {
+    	I_TermFactory tf = LocalVersionedTerminology.get();
+    	Set<Integer> possibleConcepts = new HashSet<Integer>();
+		switch (tokenEnum) {
+		case CONCEPT_CONTAINS_DESC_GROUPING:
+	        throw new TerminologyException("Unimplemented query : contains desc grouping"); // unimplemented
+		case CONCEPT_CONTAINS_REL_GROUPING:
+	        throw new TerminologyException("Unimplemented query : contains rel grouping"); // unimplemented
+		case CONCEPT_IS:
+			possibleConcepts.add(queryConstraint.getConceptId());
+			break;
+		case CONCEPT_IS_CHILD_OF:
+		case CONCEPT_IS_DESCENDENT_OF:
+		case CONCEPT_IS_KIND_OF:
+			//compute all possible children here...
+			possibleConcepts.addAll(queryConstraint.getPossibleChildren(configFrame));
+		case CONCEPT_IS_MEMBER_OF:
+			List<I_ThinExtByRefVersioned> refsetMembers = 
+				tf.getRefsetExtensionMembers(queryConstraint.getConceptId());
+			for (I_ThinExtByRefVersioned ext: refsetMembers) {
+				if (tf.hasConcept(ext.getComponentId())) {
+					possibleConcepts.add(ext.getComponentId());
+				}
+			}
+		case CONCEPT_STATUS_IS:
+			// Assume there is at least one concept is, or concept is child/kind/descendent of
+			// TODO have the query spec check for at least one concept is, or concept is child/kind/descendent of
+			break;
+		case CONCEPT_STATUS_IS_CHILD_OF:
+			// Assume there is at least one concept is, or concept is child/kind/descendent of
+			// TODO have the query spec check for at least one concept is, or concept is child/kind/descendent of
+			break;
+		case CONCEPT_STATUS_IS_DESCENDENT_OF:
+			// Assume there is at least one concept is, or concept is child/kind/descendent of
+			// TODO have the query spec check for at least one concept is, or concept is child/kind/descendent of
+			break;
+		case CONCEPT_STATUS_IS_KIND_OF:
+			// Assume there is at least one concept is, or concept is child/kind/descendent of
+			// TODO have the query spec check for at least one concept is, or concept is child/kind/descendent of
+			break;
+		default:
+			throw new RuntimeException("Can't handle queryToken: " + queryToken);
+		}
+    	return possibleConcepts;
+    }
+    
+    
+	@Override
+	public boolean getStatementResult(I_AmTermComponent component)
+			throws TerminologyException, IOException {
+		I_GetConceptData concept = (I_GetConceptData) component;
+
+		switch (tokenEnum) {
+		case CONCEPT_CONTAINS_DESC_GROUPING:
+			return conceptContainsDescGrouping(concept);
+		case CONCEPT_CONTAINS_REL_GROUPING:
+			return conceptContainsRelGrouping(concept);
+		case CONCEPT_IS:
+			return conceptIs(concept);
+		case CONCEPT_IS_CHILD_OF:
+			return conceptIsChildOf(concept);
+		case CONCEPT_IS_DESCENDENT_OF:
+			return conceptIsDescendantOf(concept);
+		case CONCEPT_IS_KIND_OF:
+			return conceptIsKindOf(concept);
+		case CONCEPT_IS_MEMBER_OF:
+			return conceptIsMemberOf(concept);
+		case CONCEPT_STATUS_IS:
+			return conceptStatusIs(concept);
+		case CONCEPT_STATUS_IS_CHILD_OF:
+			return conceptStatusIsChildOf(concept);
+		case CONCEPT_STATUS_IS_DESCENDENT_OF:
+			return conceptStatusIsDescendantOf(concept);
+		case CONCEPT_STATUS_IS_KIND_OF:
+			return conceptStatusIsKindOf(concept);
+		default:
+			throw new RuntimeException("Can't handle queryToken: " + queryToken);
+		}
+	}
 
     /**
      * Tests if the concept being tested is an immediate child of the query
@@ -131,7 +216,6 @@ public class ConceptStatement extends RefsetSpecStatement {
                 }
             }
         }
-
         return false;
     }
 
@@ -311,7 +395,6 @@ public class ConceptStatement extends RefsetSpecStatement {
                 return true;
             }
         }
-
         return false;
     }
 }

@@ -1,6 +1,7 @@
 package org.dwfa.ace.api;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -540,4 +541,16 @@ public interface I_GetConceptData extends I_AmTermComponent {
 			throws IOException, TerminologyException;
 
 	public Object getId(int identifierScheme) throws IOException, TerminologyException;
+	
+	/**
+	 *  This method efficiently determines "possible" children of a concept, 
+	 *  and bypasses more comprehensive checks (such as version checks). It is useful
+	 *  for pre-processing queries to limit number of concepts that the 
+	 *  full query spec must be tested for...
+	 * @param config
+	 * @return A collection of the native identifiers of all possible children of this concept
+	 *         according to the relationships specified in the config. 
+	 * @throws IOException 
+	 */
+	public Collection<Integer> getPossibleChildren(I_ConfigAceFrame config) throws IOException;
 }

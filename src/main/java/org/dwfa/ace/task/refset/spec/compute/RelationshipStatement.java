@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
@@ -176,4 +177,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
 	private boolean relationshipRefinabilityIsKindOf(I_RelTuple rel) {
 		return false;
 	}
+	
+	@Override
+	public Set<Integer> getPossibleConcepts(I_ConfigAceFrame configFrame)
+			throws TerminologyException, IOException {
+		throw new UnsupportedOperationException();
+	}
+
 }

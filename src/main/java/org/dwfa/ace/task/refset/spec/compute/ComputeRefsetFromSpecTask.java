@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -85,7 +84,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             I_GetConceptData normalMemberConcept =
                     termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
             int conceptsToProcess = termFactory.getConceptCount();
-            Iterator<I_GetConceptData> conceptIterator = termFactory.getConceptIterator();
+
             int conceptsProcessed = 0;
             I_GetConceptData currentConcept;
             List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
@@ -94,10 +93,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             // initialise the progress panel
             I_ShowActivity computeRefsetActivityPanel = termFactory.newActivityPanel(true, configFrame);
-            computeRefsetActivityPanel.setMaximum(conceptsToProcess);
             computeRefsetActivityPanel.setStringPainted(true);
             computeRefsetActivityPanel.setValue(0);
-            computeRefsetActivityPanel.setIndeterminate(false);
+            computeRefsetActivityPanel.setIndeterminate(true);
             ProgressReport progressReportHtmlGenerator = new ProgressReport();
             progressReportHtmlGenerator.setDatabaseCount(conceptsToProcess);
             progressReportHtmlGenerator.setStartTime(startTime);
@@ -171,8 +169,13 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     filterNonCurrentRefsetMembers(allRefsetMembers, memberRefsetHelper, refset.getConceptId(),
                         normalMemberConcept.getConceptId());
 
-            while (conceptIterator.hasNext()) {
-                currentConcept = conceptIterator.next();
+            // Compute the possible concepts to iterate over here...
+            Set<Integer> possibleConcepts = query.getPossibleConcepts(configFrame);
+            
+            computeRefsetActivityPanel.setMaximum(possibleConcepts.size());
+            computeRefsetActivityPanel.setIndeterminate(false);
+            for (int nid: possibleConcepts) {
+                currentConcept = termFactory.getConcept(nid);
                 conceptsProcessed++;
 
                 boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());

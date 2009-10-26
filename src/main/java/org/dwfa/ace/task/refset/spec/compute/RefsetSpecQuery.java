@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 
 /**
@@ -19,22 +21,53 @@ import org.dwfa.tapi.TerminologyException;
  * subqueries, and 0 or more statements. The query can be executed by passing in
  * a concept to test.
  * 
- * @author Chrissy Hill
+ * This class provides a preliminary optimization by providing a function to 
+ * return the possible concepts that should be tested based on the concepts in
+ * the spec. 
+ * 
+ * @author Chrissy Hill, Keith Campbell
  * 
  */
 public class RefsetSpecQuery {
 
     private Set<RefsetSpecQuery> subqueries;
     private Set<RefsetSpecStatement> statements;
+    
+    private enum GROUPING_TYPE { 
+    	OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true), 
+    	AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true), 
+    	CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true), 
+    	NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false), 
+    	CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true), 
+    	NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false);
+    	
+    	private int nid;
+    	private boolean truth;
+    	
+    	
+    	private GROUPING_TYPE(I_ConceptualizeUniversally concept, boolean truth) {
+			try {
+				this.nid = concept.localize().getNid();
+			} catch (TerminologyException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			this.truth = truth;
+		}
 
-    private int groupingType;
 
-    private final int OR_GROUPING = 1;
-    private final int AND_GROUPING = 2;
-    private final int CONCEPT_CONTAINS_REL_GROUPING = 3;
-    private final int CONCEPT_NOT_CONTAINS_REL_GROUPING = 4;
-    private final int CONCEPT_CONTAINS_DESC_GROUPING = 5;
-    private final int CONCEPT_NOT_CONTAINS_DESC_GROUPING = 6;
+		public int getNid() {
+			return nid;
+		}
+
+
+		public boolean isTruth() {
+			return truth;
+		}
+    };
+
+    private GROUPING_TYPE groupingType;
 
     private I_TermFactory termFactory;
 
@@ -53,23 +86,16 @@ public class RefsetSpecQuery {
         totalStatementCount = 0;
     }
 
-    private int getGroupingTypeFromConcept(I_GetConceptData concept)
+    private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept)
             throws TerminologyException, IOException {
-        if (concept.equals(LocalVersionedTerminology.get().getConcept(
-                RefsetAuxiliary.Concept.REFSET_AND_GROUPING.getUids()))) {
-            return AND_GROUPING;
-        } else if (concept.equals(LocalVersionedTerminology.get().getConcept(
-                RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids()))) {
-            return OR_GROUPING;
-        } else if (concept.equals(LocalVersionedTerminology.get()
-                .getConcept(
-                        RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING
-                                .getUids()))) {
-            return CONCEPT_CONTAINS_REL_GROUPING;
-        } else if (concept.equals(LocalVersionedTerminology.get().getConcept(
-                RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING
-                        .getUids()))) {
-            return CONCEPT_CONTAINS_DESC_GROUPING;
+        if (concept.getConceptId() == GROUPING_TYPE.AND.nid) {
+            return GROUPING_TYPE.AND;
+        } else if (concept.getConceptId() == GROUPING_TYPE.OR.nid) {
+            return GROUPING_TYPE.OR;
+        } else if (concept.getConceptId() == GROUPING_TYPE.CONCEPT_CONTAINS_REL.nid) {
+            return GROUPING_TYPE.CONCEPT_CONTAINS_REL;
+        } else if (concept.getConceptId() == GROUPING_TYPE.CONCEPT_CONTAINS_DESC.nid) {
+            return GROUPING_TYPE.CONCEPT_CONTAINS_DESC;
         } else {
             throw new TerminologyException(
                     "No valid grouping token specified : "
@@ -108,6 +134,50 @@ public class RefsetSpecQuery {
         return statement;
     }
 
+	public Set<Integer> getPossibleConcepts(I_ConfigAceFrame config) throws TerminologyException, IOException {
+		Set<Integer> possibleConcepts = new HashSet<Integer>();
+        // process all statements and subqueries
+        switch (groupingType) {
+            case AND:
+                if (statements.size() == 0 && subqueries.size() == 0) {
+                    throw new TerminologyException("Spec is invalid - dangling AND.");
+                }
+
+                for (RefsetSpecStatement statement : statements) {
+                	if (statement.isNegated() == false) {
+                   		possibleConcepts.addAll(statement.getPossibleConcepts(config));
+                	} 
+                }
+
+                for (RefsetSpecQuery subquery : subqueries) {
+                	possibleConcepts.addAll(subquery.getPossibleConcepts(config));
+                }
+            case OR:
+
+                if (statements.size() == 0 && subqueries.size() == 0) {
+                    throw new TerminologyException("Spec is invalid - dangling OR.");
+                }
+
+                for (RefsetSpecStatement statement : statements) {
+                	if (statement.isNegated() == false) {
+                   		possibleConcepts.addAll(statement.getPossibleConcepts(config));
+                	} 
+                }
+
+                for (RefsetSpecQuery subquery : subqueries) {
+                	possibleConcepts.addAll(subquery.getPossibleConcepts(config));
+                }
+            case CONCEPT_CONTAINS_DESC:
+            case CONCEPT_CONTAINS_REL:
+            case NOT_CONCEPT_CONTAINS_REL:
+            case NOT_CONCEPT_CONTAINS_DESC:
+            	throw new TerminologyException("Unsupported operation exception. Optimization not complete");
+            default:
+                throw new TerminologyException("Unknown grouping type.");
+        }
+	}
+
+	
     /**
      * Executes the specified query.
      * 
@@ -120,11 +190,9 @@ public class RefsetSpecQuery {
 
         // process all statements and subqueries
         switch (groupingType) {
-            case (AND_GROUPING):
-
+            case AND:
                 if (statements.size() == 0 && subqueries.size() == 0) {
-                    throw new TerminologyException(
-                            "Spec is invalid - dangling AND.");
+                    throw new TerminologyException("Spec is invalid - dangling AND.");
                 }
 
                 for (RefsetSpecStatement statement : statements) {
@@ -146,11 +214,10 @@ public class RefsetSpecQuery {
                 // all queries and statements have returned true, therefore AND
                 // will return true
                 return true;
-            case (OR_GROUPING):
+            case OR:
 
                 if (statements.size() == 0 && subqueries.size() == 0) {
-                    throw new TerminologyException(
-                            "Spec is invalid - dangling OR.");
+                    throw new TerminologyException("Spec is invalid - dangling OR.");
                 }
 
                 for (RefsetSpecStatement statement : statements) {
@@ -172,7 +239,7 @@ public class RefsetSpecQuery {
                 // no queries or statements have returned true, therefore the OR
                 // will return false
                 return false;
-            case (CONCEPT_CONTAINS_DESC_GROUPING):
+            case CONCEPT_CONTAINS_DESC:
 
                 // for this concept. get all relationships.
                 // execute all statements and queries on each relationship.
@@ -216,13 +283,13 @@ public class RefsetSpecQuery {
                 }
 
                 return false; // no descriptions met criteria
-            case (CONCEPT_CONTAINS_REL_GROUPING):
+            case CONCEPT_CONTAINS_REL:
                 // TODO
                 return true;
-            case (CONCEPT_NOT_CONTAINS_REL_GROUPING):
+            case NOT_CONCEPT_CONTAINS_REL:
                 // TODO
                 return true;
-            case (CONCEPT_NOT_CONTAINS_DESC_GROUPING):
+            case NOT_CONCEPT_CONTAINS_DESC:
                 // TODO
                 return true;
             default:
@@ -237,23 +304,23 @@ public class RefsetSpecQuery {
 
         // recursively negate the current query
         switch (groupingType) {
-            case (AND_GROUPING):
-                groupingType = OR_GROUPING;
+            case AND:
+                groupingType = GROUPING_TYPE.OR;
                 break;
-            case (OR_GROUPING):
-                groupingType = AND_GROUPING;
+            case OR:
+                groupingType = GROUPING_TYPE.AND;
                 break;
-            case (CONCEPT_CONTAINS_REL_GROUPING):
-                groupingType = CONCEPT_NOT_CONTAINS_REL_GROUPING;
+            case CONCEPT_CONTAINS_REL:
+                groupingType = GROUPING_TYPE.NOT_CONCEPT_CONTAINS_REL;
                 break;
-            case (CONCEPT_CONTAINS_DESC_GROUPING):
-                groupingType = CONCEPT_NOT_CONTAINS_DESC_GROUPING;
+            case CONCEPT_CONTAINS_DESC:
+                groupingType = GROUPING_TYPE.NOT_CONCEPT_CONTAINS_DESC;
                 break;
-            case (CONCEPT_NOT_CONTAINS_REL_GROUPING):
-                groupingType = CONCEPT_CONTAINS_REL_GROUPING;
+            case NOT_CONCEPT_CONTAINS_REL:
+                groupingType = GROUPING_TYPE.CONCEPT_CONTAINS_REL;
                 break;
-            case (CONCEPT_NOT_CONTAINS_DESC_GROUPING):
-                groupingType = CONCEPT_CONTAINS_DESC_GROUPING;
+            case NOT_CONCEPT_CONTAINS_DESC:
+                groupingType = GROUPING_TYPE.CONCEPT_CONTAINS_DESC;
                 break;
             default:
                 break;
@@ -291,4 +358,5 @@ public class RefsetSpecQuery {
     public void setTotalStatementCount(int totalStatementCount) {
         this.totalStatementCount = totalStatementCount;
     }
+
 }

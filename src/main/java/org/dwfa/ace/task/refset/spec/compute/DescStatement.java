@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -119,6 +120,12 @@ public class DescStatement extends RefsetSpecStatement {
         //termFactory.getActiveAceFrameConfig().performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion);
         throw new TerminologyException("Unimplemented"); // TODO
     }
+
+	@Override
+	public Set<Integer> getPossibleConcepts(I_ConfigAceFrame configFrame)
+			throws TerminologyException, IOException {
+		throw new UnsupportedOperationException();
+	}
 
 
 }
