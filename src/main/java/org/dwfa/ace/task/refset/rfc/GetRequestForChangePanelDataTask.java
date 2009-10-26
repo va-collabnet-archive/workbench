@@ -123,7 +123,7 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                         RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();
                         String inboxAddress = wizard.getInbox(editor);
                         process.setProperty(nextUserTermEntryPropName, inboxAddress);
-                        process.setProperty(ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey(), new UUID[] { editor
+                        process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { editor
                             .getUids().iterator().next() });
                         if (inboxAddress == null) {
                             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
