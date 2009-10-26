@@ -39,7 +39,7 @@ public class RefsetSpecPanel extends JPanel {
         public void actionPerformed(ActionEvent arg0) {
             try {
             	commentTableModel = setupCommentTable();
-                setupRefsetTable(commentTableModel);
+                setupRefsetMemberTable(commentTableModel);
             } catch (NoSuchMethodException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             } catch (Exception e) {
@@ -101,7 +101,7 @@ public class RefsetSpecPanel extends JPanel {
         bottomTabs.addTab(TABLE_VIEW, new JScrollPane());
         bottomTabs.addTab(COMMENT_VIEW, new JScrollPane());
         commentTableModel = setupCommentTable();
-        setupRefsetTable(commentTableModel);
+        setupRefsetMemberTable(commentTableModel);
         editor.getLabel().setTermComponent(editor.getTermComponent());
         editor.addHistoryActionListener(new HistoryActionListener());
 
@@ -255,7 +255,7 @@ public class RefsetSpecPanel extends JPanel {
 		return commentTable;
 	}
 
-    public void setupRefsetTable(ReflexiveRefsetCommentTableModel commentTableModel) throws NoSuchMethodException, Exception {
+    public void setupRefsetMemberTable(ReflexiveRefsetCommentTableModel commentTableModel) throws NoSuchMethodException, Exception {
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
         column1.setColumnName("referenced concept");
@@ -292,7 +292,7 @@ public class RefsetSpecPanel extends JPanel {
         columns.add(column2);
 
         ReflexiveRefsetFieldData column3 = new ReflexiveRefsetFieldData();
-        column3.setColumnName("status");
+        column3.setColumnName("member status");
         column3.setCreationEditable(false);
         column3.setUpdateEditable(false);
         column3.setFieldClass(String.class);
@@ -307,38 +307,54 @@ public class RefsetSpecPanel extends JPanel {
         column3.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
         columns.add(column3);
 
-        if (editor.getShowHistory()) {
-            ReflexiveRefsetFieldData column4 = new ReflexiveRefsetFieldData();
-            column4.setColumnName("version");
-            column4.setCreationEditable(false);
-            column4.setUpdateEditable(false);
-            column4.setFieldClass(Number.class);
-            column4.setMin(5);
-            column4.setPref(150);
-            column4.setMax(150);
-            column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-            column4.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                    "getVersion"));
-            column4.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                    "setVersion", int.class));
-            column4.setType(REFSET_FIELD_TYPE.VERSION);
-            columns.add(column4);
+        ReflexiveRefsetFieldData column4 = new ReflexiveRefsetFieldData();
+        column4.setColumnName("promotion status");
+        column4.setCreationEditable(false);
+        column4.setUpdateEditable(false);
+        column4.setFieldClass(String.class);
+        column4.setMin(5);
+        column4.setPref(150);
+        column4.setMax(150);
+        column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PROMOTION_REFSET_PART);
+        column4.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
+                "getStatusId"));
+        column4.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
+                "setStatusId", int.class));
+        column4.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+        columns.add(column4);
 
+        if (editor.getShowHistory()) {
             ReflexiveRefsetFieldData column5 = new ReflexiveRefsetFieldData();
-            column5.setColumnName("path");
+            column5.setColumnName("version");
             column5.setCreationEditable(false);
             column5.setUpdateEditable(false);
-            column5.setFieldClass(String.class);
+            column5.setFieldClass(Number.class);
             column5.setMin(5);
             column5.setPref(150);
             column5.setMax(150);
             column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
             column5.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                    "getPathId"));
+                    "getVersion"));
             column5.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                    "setPathId", int.class));
-            column5.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+                    "setVersion", int.class));
+            column5.setType(REFSET_FIELD_TYPE.VERSION);
             columns.add(column5);
+
+            ReflexiveRefsetFieldData column6 = new ReflexiveRefsetFieldData();
+            column6.setColumnName("path");
+            column6.setCreationEditable(false);
+            column6.setUpdateEditable(false);
+            column6.setFieldClass(String.class);
+            column6.setMin(5);
+            column6.setPref(150);
+            column6.setMax(150);
+            column6.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
+            column6.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
+                    "getPathId"));
+            column6.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
+                    "setPathId", int.class));
+            column6.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+            columns.add(column6);
         }
 
         refsetTableModel = new ReflexiveRefsetTableModel(

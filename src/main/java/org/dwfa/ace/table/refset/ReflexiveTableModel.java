@@ -7,6 +7,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -74,8 +75,6 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 		}
 
 		private JTextField textField;
-		private int row;
-		private int column;
 		private ReflexiveRefsetFieldData field;
 
 		public StringExtFieldEditor(ReflexiveRefsetFieldData field) {
@@ -109,8 +108,6 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 
 		public Component getTableCellEditorComponent(JTable table,
 				Object value, boolean isSelected, int row, int column) {
-			this.row = row;
-			this.column = column;
 			((JComponent) getComponent())
 					.setBorder(new LineBorder(Color.black));
 			return super.getTableCellEditorComponent(table, value, isSelected,
@@ -405,6 +402,13 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 							tuple.getPart());
 				}
 				break;
+			case PROMOTION_REFSET_PART:
+				value = getPromotionRefsetValue(tuple.getCore(), columns[columnIndex]);
+				break;
+				
+				default:
+					throw new UnsupportedOperationException("Don't know how to handle: " + 
+							columns[columnIndex].invokeOnObjectType);
 			}
 			if (value == null) {
 				return new StringWithExtTuple(null,
@@ -487,6 +491,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 		return null;
 	}
 
+	protected abstract Object getPromotionRefsetValue(
+			I_ThinExtByRefVersioned extension, 
+			ReflexiveRefsetFieldData reflexiveRefsetFieldData) throws IOException, IllegalAccessException, InvocationTargetException;
+
+	public abstract I_GetConceptData getPromotionRefsetIdentityConcept();
+	
 	private String getPrefText(int id) throws IOException {
 		ConceptBean cb = referencedConcepts.get(id);
 		I_DescriptionTuple desc = cb.getDescTuple(host.getConfig()

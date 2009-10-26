@@ -58,6 +58,7 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -507,7 +508,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
     private static final String TAB_HISTORY_KEY = "refset 0";
 
-    private Map<TOGGLES, org.dwfa.ace.api.I_PluginToConceptPanel> pluginMap = new HashMap<TOGGLES, org.dwfa.ace.api.I_PluginToConceptPanel>();
+    private Map<TOGGLES, I_PluginToConceptPanel> pluginMap = 
+    	new HashMap<TOGGLES, I_PluginToConceptPanel>();
 
     private JButton componentHistoryButton;
 

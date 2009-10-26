@@ -1,9 +1,12 @@
 package org.dwfa.ace.table.refset;
 
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -93,6 +96,9 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel  {
 								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart()));
 							}
 							break;
+							default:
+								throw new UnsupportedOperationException("Don't know how to handle: " + 
+										col.invokeOnObjectType);
 						}
 					}
 
@@ -187,5 +193,18 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel  {
 		}
 		return count;
 
+	}
+
+	@Override
+	public I_GetConceptData getPromotionRefsetIdentityConcept() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	protected Object getPromotionRefsetValue(I_ThinExtByRefVersioned extension,
+			ReflexiveRefsetFieldData reflexiveRefsetFieldData)
+			throws IOException, IllegalAccessException,
+			InvocationTargetException {
+		throw new UnsupportedOperationException();
 	}
 }

@@ -1,21 +1,30 @@
 package org.dwfa.ace.table.refset;
 
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
 
 public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
@@ -27,13 +36,30 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 
 	public class TableChangedSwingWorker extends SwingWorker<Boolean> implements
 			I_ChangeTableInSwing {
-		Integer refsetId;
 
 		private boolean stopWork = false;
 
 		public TableChangedSwingWorker(Integer componentId) {
 			super();
-			this.refsetId = componentId;
+			refsetId = componentId;
+			I_GetConceptData refsetConcept = ConceptBean.get(refsetId);
+			IntSet promotionRefsetIds = new IntSet();
+			List<I_RelTuple> promotionTuples;
+			try {
+				promotionRefsetIds.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
+				promotionTuples = refsetConcept.getSourceRelTuples(host.getConfig().getAllowedStatus(), 
+						promotionRefsetIds, 
+						host.getConfig().getViewPositionSet(), true);
+				Iterator<I_RelTuple> promotionIterator = promotionTuples.iterator();
+				if (promotionIterator.hasNext()) {
+					promotionRefsetId = promotionTuples.iterator().next().getC2Id();
+					promotionRefsetIdentify = ConceptBean.get(promotionRefsetId);
+				}
+			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (TerminologyException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
 		}
 
 		@Override
@@ -128,7 +154,25 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 									}
 								}
 								break;
+								case PROMOTION_REFSET_PART:
+									// TODO need a more efficient manner of getting members for a component than
+									// iterating through all members...
+									Object obj = getPromotionRefsetValue(extension, col);
+									if (obj != null) {
+										if (obj instanceof Integer) {
+											conceptsToFetch.add((Integer) obj);
+										} else {
+											AceLog.getAppLog().alertAndLogException(
+													new Exception(obj + " is not an instance of Integer"));
+										}
+									}
+									break;
+									
+							default:
+								throw new UnsupportedOperationException("Don't know how to handle: " + 
+										col.invokeOnObjectType);
 							}
+								
 						}
 
 					}
@@ -148,6 +192,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 			refConWorker.start();
 			return true;
 		}
+
 
 		@Override
 		protected void finished() {
@@ -184,6 +229,26 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 			stopWork = b;
 		}
 	}
+	
+	protected Object getPromotionRefsetValue(
+			I_ThinExtByRefVersioned extension, ReflexiveRefsetFieldData col)
+			throws IOException, IllegalAccessException,
+			InvocationTargetException {
+		for (I_ThinExtByRefVersioned extForMember: 
+			LocalVersionedTerminology.get().
+				getAllExtensionsForComponent(extension.getMemberId())) {
+			if (promotionRefsetId == extension.getMemberId()) {
+				List<I_ThinExtByRefTuple> promotionTuples = 
+					extension.getTuples(host.getConfig().getAllowedStatus(), 
+						host.getConfig().getViewPositionSet(), false);
+				if (promotionTuples.size() > 0) {
+					return col.getReadMethod().invoke(
+							promotionTuples.get(0).getPart());
+				}
+			}
+		}
+		return null;
+	}
 
 	public void propertyChange(PropertyChangeEvent arg0) {
 		if (tableChangeWorker != null) {
@@ -201,6 +266,14 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 		}
 		fireTableDataChanged();
 	}
+
+	public I_GetConceptData getPromotionRefsetIdentityConcept() {
+		return promotionRefsetIdentify;
+	}
+
+	Integer refsetId;
+	I_GetConceptData promotionRefsetIdentify;
+	int promotionRefsetId;
 
 	public ReflexiveRefsetTableModel(I_HostConceptPlugins host,
 			ReflexiveRefsetFieldData[] columns) {
