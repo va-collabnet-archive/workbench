@@ -112,60 +112,7 @@ public class InstructWithPromotionRefsetAndDone extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            /*
-             * try {
-             * final JButton button = (JButton) e.getSource();
-             * button.setEnabled(false);
-             * final I_Work worker;
-             * if (config.getWorker().isExecuting()) {
-             * worker = config.getWorker().getTransactionIndependentClone();
-             * } else {
-             * worker = config.getWorker();
-             * }
-             * 
-             * FileInputStream fis = new FileInputStream(pluginProcessFile);
-             * BufferedInputStream bis = new BufferedInputStream(fis);
-             * ObjectInputStream ois = new ObjectInputStream(bis);
-             * final BusinessProcess bp = (BusinessProcess) ois.readObject();
-             * ois.close();
-             * config.setStatusMessage("Executing: " + bp.getName());
-             * 
-             * Runnable r = new Runnable() {
-             * 
-             * public void run() {
-             * button.setEnabled(false);
-             * I_EncodeBusinessProcess process = bp;
-             * try {
-             * worker.getLogger().info(
-             * "Worker: " + worker.getWorkerDesc() + " (" + worker.getId() +
-             * ") executing process: "
-             * + process.getName());
-             * 
-             * worker.execute(process);
-             * 
-             * SortedSet<ExecutionRecord> sortedRecords =
-             * new TreeSet<ExecutionRecord>(process.getExecutionRecords());
-             * Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
-             * StringBuffer buff = new StringBuffer();
-             * while (recordItr.hasNext()) {
-             * ExecutionRecord rec = recordItr.next();
-             * buff.append("\n");
-             * buff.append(rec.toString());
-             * }
-             * worker.getLogger().info(buff.toString());
-             * button.setEnabled(true);
-             * } catch (Throwable e1) {
-             * worker.getLogger().log(Level.WARNING, e1.toString(), e1);
-             * button.setEnabled(true);
-             * }
-             * }
-             * };
-             * new Thread(r).start();
-             * 
-             * } catch (Exception e1) {
-             * e1.printStackTrace();
-             * }
-             */
+
             final JButton button = (JButton) e.getSource();
             Runnable r = new Runnable() {
 
