@@ -1396,8 +1396,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 		Set<I_GetConceptData> parents = child.getSourceRelTargets(
 				allowedStatus, allowedTypes, positions, addUncommitted);
 		if (depth == 90) {
-			AceLog
-					.getAppLog()
+			AceLog.getAppLog()
 					.log(
 							Level.SEVERE,
 							"Depth "
@@ -1457,6 +1456,22 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
 	public static void purge() {
 		cbeans = new HashMap<Integer, Reference<ConceptBean>>();
+	}
+
+	public Collection<Integer> getPossibleChildren(I_ConfigAceFrame config) throws IOException {
+		Set<Integer> possibleChildren = new HashSet<Integer>();
+		I_IntSet relTypes = config.getDestRelTypes();
+		for (I_RelVersioned destRel: getDestRels()) {
+			for (I_RelPart part: destRel.getVersions()) {
+				if (relTypes.contains(part.getTypeId())) {
+					possibleChildren.add(destRel.getC1Id());
+					ConceptBean child = ConceptBean.get(destRel.getC1Id());
+					possibleChildren.addAll(child.getPossibleChildren(config));
+					break;
+				}
+			}
+		}
+		return possibleChildren;
 	}
 
 }

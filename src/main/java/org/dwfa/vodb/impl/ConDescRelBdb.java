@@ -101,9 +101,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 
 	private class RelationshipIterator implements Iterator<I_RelVersioned> {
 
-		boolean hasNext;
-
-		private ConceptIterator conItr = new ConceptIterator();
+		private Iterator<I_GetConceptData> conItr = getConceptIterator();
 
 		private Iterator<I_RelVersioned> relItr;
 
@@ -1077,6 +1075,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			I_ConceptAttributeVersioned conceptAttributes)
 			throws DatabaseException, IOException {
 
+		if (conceptNids != null) {
+			checkConceptNids(conceptAttributes.getConId());
+		}
 		ConceptBean bean = ConceptBean.get(conceptAttributes.getConId());
 		bean.conceptAttributes = conceptAttributes;
 
@@ -1085,7 +1086,13 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		intBinder.objectToEntry(conceptAttributes.getConId(), key);
 		conDescRelBinding.objectToEntry(bean, value);
 		conDescRelDb.put(BdbEnv.transaction, key, value);
+		conceptNids = null;
 		// logStats();
+	}
+	private void checkConceptNids(int conceptId) throws DatabaseException {
+		if (hasConcept(conceptId) == false) {
+			conceptNids = null;
+		}
 	}
 
 	public void logStats() throws DatabaseException {
@@ -1131,7 +1138,12 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	 * @see org.dwfa.vodb.impl.I_StoreConceptAttributes#getConceptIterator()
 	 */
 	public Iterator<I_GetConceptData> getConceptIterator() throws IOException {
-		return new ConceptIterator();
+		//return new ConceptIterator();
+		try {
+			return new ConceptIdArrayIterator();
+		} catch (DatabaseException e) {
+			throw new IOException(e);
+		}
 	}
 
 	/*
@@ -1156,7 +1168,42 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		}
 		concCursor.close();
 	}
+	
+	private static int[] conceptNids;
 
+	private class ConceptIdArrayIterator implements Iterator<I_GetConceptData> {
+		
+		int index = 0;
+		private ConceptIdArrayIterator() throws DatabaseException {
+			super();
+			if (conceptNids == null || getConceptCount() != conceptNids.length) {
+				conceptNids = new int[getConceptCount()];
+				Cursor concCursor = conDescRelDb.openCursor(null, null);
+				DatabaseEntry foundKey = new DatabaseEntry();
+				DatabaseEntry foundData = new DatabaseEntry();
+				for (int i = 0; i < conceptNids.length; i++) {
+					if (concCursor.getNext(foundKey, foundData,
+							LockMode.DEFAULT) != OperationStatus.SUCCESS) {
+						AceLog.getAppLog().alertAndLogException(
+								new Exception("premature end of concept cursor: " + i));
+					}
+					conceptNids[i] = (Integer) intBinder.entryToObject(foundKey);
+				}
+			}
+		}
+		public boolean hasNext() {
+			return index < conceptNids.length;
+		}
+		public I_GetConceptData next() {
+			index++;
+			return ConceptBean.get(conceptNids[index-1]);
+		}
+		public void remove() {
+			throw new UnsupportedOperationException("Remove is not supported. ");
+		}
+		
+	}
+	
 	private class ConceptIterator implements Iterator<I_GetConceptData> {
 
 		DatabaseEntry foundKey = new DatabaseEntry();
@@ -1228,7 +1275,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 
 		boolean hasNext;
 
-		private ConceptIterator conItr = new ConceptIterator();
+		private Iterator<I_GetConceptData> conItr = getConceptIterator();
 
 		private Iterator<I_DescriptionVersioned> descItr;
 
@@ -1407,6 +1454,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	}
 
 	private void writeConceptToBdb(ConceptBean bean) throws DatabaseException {
+		if (conceptNids != null) {
+			checkConceptNids(bean.getConceptId());
+		}
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(bean.getConceptId(), key);

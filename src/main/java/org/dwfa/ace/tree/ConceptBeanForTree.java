@@ -2,6 +2,7 @@ package org.dwfa.ace.tree;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -349,13 +350,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getId(identifierScheme);
 	}
 
-	
-	/*
-	 * 
-	 * @Override public boolean equals(Object another) { return
-	 * bean.equals(another); }
-	 * 
-	 * @Override public int hashCode() { return bean.hashCode(); }
-	 */
-	
+	public Collection<Integer> getPossibleChildren(I_ConfigAceFrame config) throws IOException {
+		return bean.getPossibleChildren(config);
+	}
+		
 }
