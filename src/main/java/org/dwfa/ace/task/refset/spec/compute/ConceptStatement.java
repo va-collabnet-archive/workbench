@@ -91,7 +91,7 @@ public class ConceptStatement extends RefsetSpecStatement {
 		case CONCEPT_IS_DESCENDENT_OF:
 		case CONCEPT_IS_KIND_OF:
 			//compute all possible children here...
-			possibleConcepts.addAll(queryConstraint.getPossibleChildren(configFrame));
+			possibleConcepts.addAll(queryConstraint.getPossibleKindOfConcepts(configFrame));
 		case CONCEPT_IS_MEMBER_OF:
 			List<I_ThinExtByRefVersioned> refsetMembers = 
 				tf.getRefsetExtensionMembers(queryConstraint.getConceptId());

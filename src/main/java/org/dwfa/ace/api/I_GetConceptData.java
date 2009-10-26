@@ -543,7 +543,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	public Object getId(int identifierScheme) throws IOException, TerminologyException;
 	
 	/**
-	 *  This method efficiently determines "possible" children of a concept, 
+	 *  This method efficiently determines "possible" concepts that are a "kind of" a concept, 
 	 *  and bypasses more comprehensive checks (such as version checks). It is useful
 	 *  for pre-processing queries to limit number of concepts that the 
 	 *  full query spec must be tested for...
@@ -552,5 +552,5 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	 *         according to the relationships specified in the config. 
 	 * @throws IOException 
 	 */
-	public Collection<Integer> getPossibleChildren(I_ConfigAceFrame config) throws IOException;
+	public Collection<Integer> getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException;
 }
