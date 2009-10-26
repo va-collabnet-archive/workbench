@@ -350,8 +350,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getId(identifierScheme);
 	}
 
-	public Collection<Integer> getPossibleChildren(I_ConfigAceFrame config) throws IOException {
-		return bean.getPossibleChildren(config);
+	public Collection<Integer> getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
+		return bean.getPossibleKindOfConcepts(config);
 	}
 		
 }
