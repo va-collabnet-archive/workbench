@@ -13,6 +13,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
@@ -151,7 +152,9 @@ public class RefsetQueryFactory {
 
                 } else if (thinPart instanceof I_ThinExtByRefPartString) {
                     // ignore - comments refset
-                } else {
+                } else if (thinPart instanceof I_ThinExtByRefPartConcept) {
+                    // ignore - Not part of spec...
+                }  else {
                     throw new TerminologyException("Unknown extension type : " + thinPart.getClass());
                 }
             }

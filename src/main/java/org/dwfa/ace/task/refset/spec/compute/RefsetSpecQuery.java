@@ -152,6 +152,7 @@ public class RefsetSpecQuery {
                 for (RefsetSpecQuery subquery : subqueries) {
                 	possibleConcepts.addAll(subquery.getPossibleConcepts(config));
                 }
+                break;
             case OR:
 
                 if (statements.size() == 0 && subqueries.size() == 0) {
@@ -167,6 +168,7 @@ public class RefsetSpecQuery {
                 for (RefsetSpecQuery subquery : subqueries) {
                 	possibleConcepts.addAll(subquery.getPossibleConcepts(config));
                 }
+                break;
             case CONCEPT_CONTAINS_DESC:
             case CONCEPT_CONTAINS_REL:
             case NOT_CONCEPT_CONTAINS_REL:
@@ -175,6 +177,7 @@ public class RefsetSpecQuery {
             default:
                 throw new TerminologyException("Unknown grouping type.");
         }
+        return possibleConcepts;
 	}
 
 	

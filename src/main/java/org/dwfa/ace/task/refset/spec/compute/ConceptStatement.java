@@ -48,7 +48,7 @@ public class ConceptStatement extends RefsetSpecStatement {
 			try {
 				this.nid = concept.localize().getNid();
 			} catch (TerminologyException e) {
-				throw new RuntimeException(e);
+				throw new RuntimeException(this.toString(), e);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
