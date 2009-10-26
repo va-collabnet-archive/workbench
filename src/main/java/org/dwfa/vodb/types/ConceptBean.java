@@ -1458,20 +1458,21 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 		cbeans = new HashMap<Integer, Reference<ConceptBean>>();
 	}
 
-	public Collection<Integer> getPossibleChildren(I_ConfigAceFrame config) throws IOException {
-		Set<Integer> possibleChildren = new HashSet<Integer>();
+	public Collection<Integer> getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
+		Set<Integer> possibleKindOfConcepts = new HashSet<Integer>();
+		possibleKindOfConcepts.add(this.conceptId);
 		I_IntSet relTypes = config.getDestRelTypes();
 		for (I_RelVersioned destRel: getDestRels()) {
 			for (I_RelPart part: destRel.getVersions()) {
 				if (relTypes.contains(part.getTypeId())) {
-					possibleChildren.add(destRel.getC1Id());
+					possibleKindOfConcepts.add(destRel.getC1Id());
 					ConceptBean child = ConceptBean.get(destRel.getC1Id());
-					possibleChildren.addAll(child.getPossibleChildren(config));
+					possibleKindOfConcepts.addAll(child.getPossibleKindOfConcepts(config));
 					break;
 				}
 			}
 		}
-		return possibleChildren;
+		return possibleKindOfConcepts;
 	}
 
 }
