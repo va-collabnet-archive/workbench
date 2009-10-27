@@ -158,6 +158,8 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
                 		UUID.fromString("7dd8fa86-7a20-56ab-8606-f82d28f6fd67")),
                 MODULE_DEPENDENCY(new String[] { "module dependency", "module dependency"}, REFSET_PURPOSE),
                 PATH_ORIGIN(new String[] { "path origin", "path origin"}, REFSET_PURPOSE),
+                REFSET_PURPOSE_PATH(new String[] { "path", "path"}, REFSET_PURPOSE),
+                REFSET_PURPOSE_POSITION(new String[] { "position", "position"}, REFSET_PURPOSE),
             TEMPLATE_VALUE_TYPE(new String[] { "template value type", "value type"}, REFSET_AUXILIARY),
                 TEMPLATE_CODE_VALUE_TYPE(new String[] { "template code value type", "code"}, TEMPLATE_VALUE_TYPE),
                 TEMPLATE_NUMBER_VALUE_TYPE(new String[] { "template number value type", "number"}, TEMPLATE_VALUE_TYPE),
@@ -463,6 +465,12 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
                                                                  new I_ConceptualizeUniversally [] { ArchitectonicAuxiliary.Concept.IS_A_REL,
                                                                                                      REFSET_PURPOSE_REL, REFSET_TYPE_REL}),
 
+                REFSET_PATHS(new String[] { "Path reference set", "Path reference set" }, 
+                        new I_ConceptualizeUniversally[] { REFSET_IDENTITY, REFSET_PURPOSE_PATH, CONCEPT_EXTENSION }, 
+                        new I_ConceptualizeUniversally[] { ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+                REFSET_PATH_ORIGINS(new String[] { "Path origin reference set", "Path origin reference set" }, 
+                        new I_ConceptualizeUniversally[] { REFSET_IDENTITY, REFSET_PURPOSE_POSITION, CONCEPT_INT_EXTENSION }, 
+                        new I_ConceptualizeUniversally[] { ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
 	                                                                              ;
 
 		private Collection<UUID> conceptUids = new ArrayList<UUID>();
