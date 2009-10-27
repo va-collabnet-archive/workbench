@@ -25,14 +25,24 @@ public class ThinExtByRefPartInteger extends ThinExtByRefPart implements I_ThinE
 	/* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefPartInteger#getValue()
     */
+   @Deprecated
    public int getValue() {
-      return value;
+      return getIntValue();
    }
 
    /* (non-Javadoc)
     * @see org.dwfa.vodb.types.I_ThinExtByRefPartInteger#setValue(int)
     */
+   @Deprecated
    public void setValue(int value) {
+      setIntValue(value);      
+   }
+   
+   public int getIntValue() {
+      return value;
+   }
+
+   public void setIntValue(int value) {
       this.value = value;
    }
    @Override

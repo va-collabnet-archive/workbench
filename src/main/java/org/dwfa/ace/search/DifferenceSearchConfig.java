@@ -1071,5 +1071,17 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 	public I_ShowActivity getTopActivityListener() {
 		return frameConfig.getTopActivityListener();
 	}
+
+    public void fireUpdateHierarchyView() {
+        frameConfig.fireUpdateHierarchyView();
+    }
+
+    public Boolean getShowPathInfoInTaxonomy() {
+        return frameConfig.getShowPathInfoInTaxonomy();
+    }
+
+    public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy) {
+        frameConfig.setShowPathInfoInTaxonomy(showPathInfoInTaxonomy);
+    }
 	
 }

@@ -1,11 +1,11 @@
 package org.dwfa.vodb.types;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -90,6 +90,39 @@ public class Path implements I_Transact, I_Path {
 		return origins;
 	}
 
+	public Set<I_Position> getInheritedOrigins() {
+	    HashSet<I_Position> inheritedOrigins = new HashSet<I_Position>();
+	    for (I_Position origin : this.origins) {
+	        inheritedOrigins.addAll(origin.getPath().getInheritedOrigins());
+	        inheritedOrigins.add(origin);
+	    }
+	    return inheritedOrigins;
+	}
+	
+	public Set<I_Position> getNormalisedOrigins() {
+	    return getNormalisedOrigins(null);
+	}
+		
+	public Set<I_Position> getNormalisedOrigins(Collection<I_Path> paths) {
+        final Set<I_Position> inheritedOrigins = getInheritedOrigins();
+        if (paths != null) {
+            for (I_Path path : paths) {
+                if (path != this) {
+                    inheritedOrigins.addAll(path.getInheritedOrigins());
+                }
+            }
+        }
+        Set<I_Position> normalisedOrigins = new HashSet<I_Position>(inheritedOrigins);
+        for (I_Position a : inheritedOrigins) {
+            for (I_Position b : inheritedOrigins) {
+                if ((a.getPath().getConceptId() == b.getPath().getConceptId()) && (a.getVersion() < b.getVersion())) {
+                    normalisedOrigins.remove(a);
+                }
+            }
+        }
+        return normalisedOrigins;	    
+	}
+	
 	public static List<I_Path> makeBasePaths(VodbEnv vodb)
 			throws DatabaseException, ParseException, TerminologyException,
 			IOException {
@@ -125,25 +158,7 @@ public class Path implements I_Transact, I_Path {
     }
 
 
-	public static void main(String[] args) {
-		try {
-			String fileStr;
-			if (args.length == 0) {
-				fileStr = "berkeley-db";
-			} else {
-				fileStr = args[0];
-			}
-			VodbEnv vodb = new VodbEnv();
-			vodb.setup(new File(fileStr), false, 600000000L);
 
-			writeBasePaths(vodb);
-			vodb.sync();
-			vodb.close();
-		} catch (Exception ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		}
-		System.exit(0);
-	}
 
 	public static void writeBasePaths(VodbEnv vodb) throws DatabaseException,
 			ParseException, TerminologyException, IOException {
@@ -302,4 +317,8 @@ public class Path implements I_Transact, I_Path {
    public String toHtmlString() throws IOException {
 	return Path.toHtmlString(this);
    }
+
+    public void addOrigin(I_Position position) throws TerminologyException {
+        AceConfig.getVodb().writePathOrigin(this, position);        
+    }
 }

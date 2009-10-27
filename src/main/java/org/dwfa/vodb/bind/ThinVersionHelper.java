@@ -26,6 +26,8 @@ public class ThinVersionHelper {
 	private static long timeZero = 1830407753464L;
 	private static int timeZeroInt = 1830407753;
 
+	public static enum MAX_VALUE_TYPE { UNCOMITTED, LATEST };
+	
 	public ThinVersionHelper() {
 		/*
 		 * timeZero = Calendar.getInstance(); timeZero.set(2028, 0, 1); zeroRef
@@ -87,8 +89,12 @@ public class ThinVersionHelper {
 	}
 
 	public static String format(int version) {
+	    return format(version, MAX_VALUE_TYPE.UNCOMITTED);
+	}
+	
+	public static String format(int version, MAX_VALUE_TYPE maxValueType) {
 		if (version == Integer.MAX_VALUE) {
-			return "uncommitted";
+		    return maxValueType.toString().toLowerCase();		    
 		}
 		if (version == Integer.MIN_VALUE) {
 			return "beginning of time";

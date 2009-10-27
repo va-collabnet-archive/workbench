@@ -2181,6 +2181,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             aceFrameConfig.getShowViewerImagesInTaxonomy(), true), gbc);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridy++;
+        checkPanel.add(getCheckboxEditor("show path info in taxonomy view", "showPathInfoInTaxonomy",
+            aceFrameConfig.getShowPathInfoInTaxonomy(), true), gbc);
+        gbc.gridy++;
         checkPanel.add(getCheckboxEditor("show refset info in taxonomy view", "showRefsetInfoInTaxonomy",
             aceFrameConfig.getShowRefsetInfoInTaxonomy(), true), gbc);
         gbc.weighty = 1;
@@ -3075,7 +3078,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("viewPositions")) {
+        if ("viewPositions".equals(evt.getPropertyName()) || 
+                "showPathInfoInTaxonomy".equals(evt.getPropertyName()) || 
+                "showRefsetInfoInTaxonomy".equals(evt.getPropertyName()) || 
+                "showViewerImagesInTaxonomy".equals(evt.getPropertyName()) || 
+                "updateHierarchyView".equals(evt.getPropertyName())) {
             treeHelper.updateHierarchyView(evt.getPropertyName());
         } else if (evt.getPropertyName().equals("commit")) {
             treeHelper.updateHierarchyView(evt.getPropertyName());

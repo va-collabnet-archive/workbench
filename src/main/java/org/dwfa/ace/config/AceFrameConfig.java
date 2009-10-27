@@ -113,7 +113,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 41;
+    private static final int dataVersion = 42;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -297,6 +297,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     // 41
     private I_IntSet prefFilterTypesForRel = new IntSet();
 
+    // 42
+    private boolean showPathInfoInTaxonomy = true;
+    
     // transient
     private transient MasterWorker worker;
 
@@ -503,6 +506,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 41
         IntSet.writeIntSet(out, prefFilterTypesForRel);
+        
+        //42 
+        out.writeObject(showPathInfoInTaxonomy);
     }
 
     private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws DatabaseException,
@@ -915,6 +921,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 prefFilterTypesForRel = new IntSet();
             }
+            
+            if (objDataVersion >= 42) {
+                showPathInfoInTaxonomy = (Boolean) in.readObject();
+            }
+            
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -2413,6 +2424,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         changeSupport.firePropertyChange("showInferredInTaxonomy", old, showInferredInTaxonomy);
     }
 
+    public Boolean getShowPathInfoInTaxonomy() {
+        return showPathInfoInTaxonomy;
+    }
+    public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy) {
+        Boolean old = this.showPathInfoInTaxonomy;
+        this.showPathInfoInTaxonomy = showPathInfoInTaxonomy;
+        changeSupport.firePropertyChange("showPathInfoInTaxonomy", old, showPathInfoInTaxonomy);
+    }    
     public Boolean getShowRefsetInfoInTaxonomy() {
         return showRefsetInfoInTaxonomy;
     }
@@ -2892,4 +2911,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		return aceFrame.getCdePanel().getTopActivityListener();
 	}
 
+    public void fireUpdateHierarchyView() {
+        changeSupport.firePropertyChange("updateHierarchyView", false, true);
+    }
 }

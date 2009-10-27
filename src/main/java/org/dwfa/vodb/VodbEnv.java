@@ -101,9 +101,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.TerminologyRuntimeException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.LogWithAlerts;
+import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.impl.BdbEnv;
-import org.dwfa.vodb.jar.PathCollector;
 import org.dwfa.vodb.jar.TimePathCollector;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
@@ -128,7 +128,6 @@ import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptConceptString;
-import org.dwfa.vodb.types.ThinExtByRefPartConceptInt;
 import org.dwfa.vodb.types.ThinExtByRefPartConceptString;
 import org.dwfa.vodb.types.ThinExtByRefPartInteger;
 import org.dwfa.vodb.types.ThinExtByRefPartLanguage;
@@ -667,20 +666,24 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     public void writePath(I_Path p) throws IOException {
         try {
-            bdbEnv.writePath(p);
-        } catch (DatabaseException e) {
+            new PathManager().write(p);
+        } catch (Exception e) {
             throw new ToIoException(e);
         }
     }
 
-    public I_Path getPath(int nativeId) throws DatabaseException {
-        return bdbEnv.getPath(nativeId);
+    public void writePathOrigin(I_Path path, I_Position origin) throws TerminologyException {
+        new PathManager().writeOrigin(path, origin);
+    }    
+    
+    public I_Path getPath(int nativeId) throws TerminologyException {
+        return new PathManager().get(nativeId);
     }
 
     public boolean hasPath(int nativeId) throws IOException {
         try {
-            return bdbEnv.hasPath(nativeId);
-        } catch (DatabaseException e) {
+            return new PathManager().exists(nativeId);
+        } catch (Exception e) {
             throw new ToIoException(e);
         }
     }
@@ -712,9 +715,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public List<I_Path> getPaths() throws Exception {
-        PathCollector collector = new PathCollector();
-        iteratePaths(collector);
-        return collector.getPaths();
+        ArrayList<I_Path> paths = new ArrayList<I_Path>();
+        paths.addAll(new PathManager().getAll());
+        return paths;
     }
 
     public void writeTimePath(TimePathId jarTimePath) throws IOException {
@@ -912,7 +915,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return ConceptBean.get(ids);
     }
 
-    public I_GetConceptData getConcept(UUID[] ids) throws TerminologyException, IOException {
+    public I_GetConceptData getConcept(UUID... ids) throws TerminologyException, IOException {
         return ConceptBean.get(Arrays.asList(ids));
     }
 
@@ -971,8 +974,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     private class ProcessorWrapper implements I_ProcessDescriptionEntries, I_ProcessConceptAttributeEntries,
-            I_ProcessRelationshipEntries, I_ProcessIdEntries, I_ProcessImageEntries, I_ProcessPathEntries,
-            I_ProcessExtByRefEntries {
+            I_ProcessRelationshipEntries, I_ProcessIdEntries, I_ProcessImageEntries, I_ProcessExtByRefEntries {
 
         I_ProcessConceptAttributes conceptAttributeProcessor;
 
@@ -984,7 +986,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
         I_ProcessImages imageProcessor;
 
-        I_ProcessPaths pathProcessor;
 
         I_ProcessExtByRef extProcessor;
 
@@ -1063,19 +1064,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         public void processImages(DatabaseEntry key, DatabaseEntry value) throws Exception {
             I_ImageVersioned imageV = bdbEnv.imageEntryToObject(key, value);
             this.imageProcessor.processImages(imageV);
-        }
 
-        public I_ProcessPaths getPathProcessor() {
-            return pathProcessor;
-        }
 
-        public void setPathProcessor(I_ProcessPaths pathProcessor) {
-            this.pathProcessor = pathProcessor;
-        }
 
-        public void processPath(DatabaseEntry key, DatabaseEntry value) throws Exception {
-            I_Path path = bdbEnv.pathEntryToObject(key, value);
-            this.pathProcessor.processPath(path);
         }
 
         public void setExtProcessor(I_ProcessExtByRef extProcessor) {
@@ -1086,7 +1077,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             I_ThinExtByRefVersioned extension = bdbEnv.extEntryToObject(key, value);
             this.extProcessor.processExtensionByReference(extension);
         }
-
     }
 
     public class ConceptIteratorWrapper implements I_ProcessConceptAttributeEntries {
@@ -1155,9 +1145,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public void iteratePaths(I_ProcessPaths processor) throws Exception {
-        ProcessorWrapper wrapper = new ProcessorWrapper();
-        wrapper.setPathProcessor(processor);
-        iteratePaths(wrapper);
+        for (I_Path path : new PathManager().getAll()) {
+            processor.processPath(path);
+        }
     }
 
     public void iterateRelationships(I_ProcessRelationships processor) throws Exception {
@@ -1191,30 +1181,21 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public I_Path getPath(Collection<UUID> uids) throws TerminologyException, IOException {
-        try {
-            return getPath(uuidToNative(uids));
-        } catch (DatabaseException e) {
-            throw new ToIoException(e);
-        }
+        return getPath(uuidToNative(uids));
     }
 
-    public I_Path getPath(UUID[] uuids) throws TerminologyException, IOException {
-        try {
-            return getPath(uuidToNative(Arrays.asList(uuids)));
-        } catch (DatabaseException e) {
-            throw new ToIoException(e);
-        }
+    public I_Path getPath(UUID... uuids) throws TerminologyException, IOException {
+        return getPath(uuidToNative(Arrays.asList(uuids)));
     }
 
-    public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException,
-            IOException {
-    	if (origins == null) {
-    		origins = new HashSet<I_Position>();
-    	}
-        Path newPath = new Path(pathConcept.getConceptId(), new ArrayList<I_Position>(origins));
-        ACE.addUncommitted(newPath);
+    public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException, IOException {
+        ArrayList<I_Position> originList = new ArrayList<I_Position>();
+        if (origins != null) {
+            originList.addAll(origins);
+        }
+        Path newPath = new Path(pathConcept.getConceptId(), originList);
         AceLog.getEditLog().fine("writing new path: \n" + newPath);
-        AceConfig.getVodb().writePath(newPath);
+        new PathManager().write(newPath);
         return newPath;
     }
 
@@ -1342,21 +1323,24 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return new ThinRelPart();
     }
 
-    public I_ThinExtByRefPartBoolean newBooleanExtensionPart() {
-        return new ThinExtByRefPartBoolean();
-    }
 
-    public I_ThinExtByRefPartConcept newConceptExtensionPart() {
-        return new ThinExtByRefPartConcept();
+    public <T extends I_ThinExtByRefPart> T newExtensionPart(Class<T> t) {
+        return VodbTypeFactory.create(t);
     }
 
     public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId) {
         ThinExtByRefVersioned thinEbr = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId);
         ExtensionByReferenceBean ebrBean = ExtensionByReferenceBean.makeNew(memberId, thinEbr);
-        ACE.addUncommitted(ebrBean);
+        addUncommitted(ebrBean);
         return thinEbr;
     }
 
+    public I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId,
+            Class<? extends I_ThinExtByRefPart> partType) {
+        int typeId = ThinExtBinder.getExtensionType(partType).getNid();
+        return newExtension(refsetId, memberId, componentId, typeId);
+    }
+    @Deprecated
     public I_ThinExtByRefVersioned newExtensionNoChecks(int refsetId, int memberId, int componentId, int typeId) {
 
         ThinExtByRefVersioned thinEbr = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId);
@@ -1372,32 +1356,67 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return thinEbr;
     }
 
+    @Deprecated
     public I_ThinExtByRefPartInteger newIntegerExtensionPart() {
-        return new ThinExtByRefPartInteger();
+        return newExtensionPart(ThinExtByRefPartInteger.class);
     }
 
+    @Deprecated
     public I_ThinExtByRefPartLanguage newLanguageExtensionPart() {
-        return new ThinExtByRefPartLanguage();
+        return newExtensionPart(ThinExtByRefPartLanguage.class);
     }
 
+    @Deprecated
     public I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart() {
-        return new ThinExtByRefPartLanguageScoped();
+        return newExtensionPart(ThinExtByRefPartLanguageScoped.class);
     }
 
+    @Deprecated
     public I_ThinExtByRefPartMeasurement newMeasurementExtensionPart() {
-        return new ThinExtByRefPartMeasurement();
+        return newExtensionPart(ThinExtByRefPartMeasurement.class);
     }
 
+    @Deprecated
     public I_ThinExtByRefPartString newStringExtensionPart() {
-        return new ThinExtByRefPartString();
+        return newExtensionPart(ThinExtByRefPartString.class);
     }
 
+    @Deprecated
+    public I_ThinExtByRefPartConceptInt newConceptIntExtensionPart() {
+        return newExtensionPart(I_ThinExtByRefPartConceptInt.class);
+    }
+
+    @Deprecated
+    public I_ThinExtByRefPartBoolean newBooleanExtensionPart() {
+        return newExtensionPart(ThinExtByRefPartBoolean.class);
+    }
+
+    @Deprecated
+    public I_ThinExtByRefPartConcept newConceptExtensionPart() {
+        return newExtensionPart(ThinExtByRefPartConcept.class);
+    }
+
+    @Deprecated
+    public I_ThinExtByRefPartConceptConceptConcept newConceptConceptConceptExtensionPart() {
+        return new ThinExtByRefPartConceptConceptConcept();
+    }
+
+    @Deprecated
+    public I_ThinExtByRefPartConceptConcept newConceptConceptExtensionPart() {
+        return new ThinExtByRefPartConceptConcept();
+    }
+
+    @Deprecated
+    public I_ThinExtByRefPartConceptConceptString newConceptConceptStringExtensionPart() {
+        return new ThinExtByRefPartConceptConceptString();
+    }
+
+    @Deprecated
+    public I_ThinExtByRefPartConceptString newConceptStringExtensionPart() {
+        return new ThinExtByRefPartConceptString();
+    }
     public Set<I_Transact> getUncommitted() {
         return ACE.getUncommitted();
-    }
-
-    public I_ThinExtByRefPartConceptInt newConceptIntExtensionPart() {
-        return new ThinExtByRefPartConceptInt();
     }
 
     public I_GetExtensionData getExtensionWrapper(int nid) throws IOException {
@@ -1675,22 +1694,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     public I_HandleSubversion getSvnHandler() {
         return new Svn();
-    }
-
-    public I_ThinExtByRefPartConceptConceptConcept newConceptConceptConceptExtensionPart() {
-        return new ThinExtByRefPartConceptConceptConcept();
-    }
-
-    public I_ThinExtByRefPartConceptConcept newConceptConceptExtensionPart() {
-        return new ThinExtByRefPartConceptConcept();
-    }
-
-    public I_ThinExtByRefPartConceptConceptString newConceptConceptStringExtensionPart() {
-        return new ThinExtByRefPartConceptConceptString();
-    }
-
-    public I_ThinExtByRefPartConceptString newConceptStringExtensionPart() {
-        return new ThinExtByRefPartConceptString();
     }
 
     /**

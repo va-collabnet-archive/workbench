@@ -10,6 +10,7 @@ import org.dwfa.vodb.types.Path;
 
 import com.sleepycat.je.DatabaseEntry;
 
+@Deprecated
 public class PathCollector implements I_ProcessPathEntries {
 	List<I_Path> paths = new ArrayList<I_Path>();
 	PathBinder binder = new PathBinder();

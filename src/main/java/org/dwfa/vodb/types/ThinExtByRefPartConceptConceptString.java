@@ -104,11 +104,21 @@ public class ThinExtByRefPartConceptConceptString extends ThinExtByRefPart imple
 		this.c2id = c2id;
 	}
 
+	@Deprecated
 	public String getStr() {
-		return str;
+		return getStringValue();
 	}
 
+	@Deprecated
 	public void setStr(String str) {
-		this.str = str;
+	    setStringValue(str);
 	}
+	
+    public String getStringValue() {
+        return str;
+    }
+
+    public void setStringValue(String str) {
+        this.str = str;
+    }	
 }

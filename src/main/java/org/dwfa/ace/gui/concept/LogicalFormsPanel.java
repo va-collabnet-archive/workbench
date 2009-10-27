@@ -481,7 +481,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
             try {
                 path = ((VodbEnv) LocalVersionedTerminology.get())
                         .getPath(config.getClassifierInputPath().getConceptId());
-            } catch (DatabaseException e) {
+            } catch (Exception e) {
                 throw new ToIoException(e);
             }
             I_Position p = new Position(Integer.MAX_VALUE, path);

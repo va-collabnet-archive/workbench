@@ -19,7 +19,7 @@ public abstract class StringWithTuple implements I_CellTextWithTuple {
 			if (text.startsWith("<html>")) {
 				text = text.substring(5);
 			}
-			text = "<html><strong><em style=\"color:red\">" + text + "</em></strong>";
+			text = "<html><em style=\"color:red\">" + text + "</em>";
 		}
 		return text;
 	}

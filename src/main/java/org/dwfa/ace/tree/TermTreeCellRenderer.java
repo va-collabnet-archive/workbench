@@ -26,6 +26,8 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -38,21 +40,26 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.PathManager;
 import org.dwfa.vodb.bind.ThinExtBinder;
+import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.bind.ThinVersionHelper.MAX_VALUE_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 
 public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements PropertyChangeListener, I_RenderAndFocusOnBean {
 
-   private static ImageIcon multiParentClosed = new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_green.png"));
+   private static ImageIcon multiParentClosed = 
+           new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_green.png"));
 
-   private static ImageIcon multiParentOpen = new ImageIcon(ACE.class
-         .getResource("/16x16/plain/nav_up_right_green.png"));
+   private static ImageIcon multiParentOpen = 
+           new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_right_green.png"));
 
-   private static ImageIcon focusMultiParentOpen = new ImageIcon(ACE.class
-         .getResource("/16x16/plain/nav_up_right_blue.png"));
+   private static ImageIcon focusMultiParentOpen = 
+           new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_right_blue.png"));
 
-   private static ImageIcon multiParentRoot = new ImageIcon(ACE.class.getResource("/16x16/plain/pin_green.png"));
+   private static ImageIcon multiParentRoot = 
+           new ImageIcon(ACE.class.getResource("/16x16/plain/pin_green.png"));
 
    private I_ConfigAceFrame aceConfig;
 
@@ -85,7 +92,9 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
    private I_IntList refsetsToShow;
 
-private Boolean highlightConflictsInTaxonomyView;
+   private Boolean highlightConflictsInTaxonomyView;
+   
+   private boolean showPathInfoInTaxonomy;
 
    /**
     * 
@@ -98,6 +107,7 @@ private Boolean highlightConflictsInTaxonomyView;
       showViewerImagesInTaxonomy = this.aceConfig.getShowViewerImagesInTaxonomy();
       variableHeightTaxonomyView = this.aceConfig.getVariableHeightTaxonomyView();
       showRefsetInfoInTaxonomy = this.aceConfig.getShowRefsetInfoInTaxonomy();
+      showPathInfoInTaxonomy = this.aceConfig.getShowPathInfoInTaxonomy();
       highlightConflictsInTaxonomyView = this.aceConfig.getHighlightConflictsInTaxonomyView();
       this.aceConfig.addPropertyChangeListener(this);
       refsetsToShow = this.aceConfig.getRefsetsToShowInTaxonomy();
@@ -110,6 +120,7 @@ private Boolean highlightConflictsInTaxonomyView;
       viewerImageTypes.add(viewerImageType.getConceptId());
    }
 
+   @SuppressWarnings("deprecation")
    @Override
    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
          int row, boolean hasFocus) {
@@ -160,6 +171,40 @@ private Boolean highlightConflictsInTaxonomyView;
                      }
                   }
 
+                  if (showPathInfoInTaxonomy) {
+                      PathManager pathMan = new PathManager();
+                      if (pathMan.exists(cb.getConceptId())) {
+                          I_Position latestInheritedViewPosition = null;
+                          
+                          for (I_Path editPath : aceConfig.getEditingPathSet()) {
+                              if (editPath.getConceptId() == cb.getConceptId()) {
+                                  htmlSuffixes.add("<font color=red>&nbsp;[Editing]</font>");                                  
+                              }
+                          }
+
+                          for (I_Position viewPosition : aceConfig.getViewPositionSet()) {
+                              if (viewPosition.getPath().getConceptId() == cb.getConceptId()) {
+                                  String version = ThinVersionHelper.format(viewPosition.getVersion(), MAX_VALUE_TYPE.LATEST);
+                                  htmlSuffixes.add("<font color='#007FAE'>&nbsp;[Viewing:" + version + "]</font>");                                  
+                              }
+                              for (I_Position origin : viewPosition.getPath().getNormalisedOrigins()) {
+                                  if (origin.getPath().getConceptId() == cb.getConceptId()) {
+                                      if ((latestInheritedViewPosition == null) ||
+                                              (origin.getVersion() > latestInheritedViewPosition.getVersion())) {
+                                          latestInheritedViewPosition = origin;
+                                      }
+                                  }
+                              }
+                          }
+                          
+                          if (latestInheritedViewPosition != null) {
+                              String version = ThinVersionHelper.format(
+                                  latestInheritedViewPosition.getVersion(), MAX_VALUE_TYPE.LATEST);
+                              htmlSuffixes.add("<font color='#967F49'>&nbsp;[Inheritied view:" + version + "]</font>");
+                          }
+                      }
+                  }
+                  
                   if (showRefsetInfoInTaxonomy) {
                      List<I_GetExtensionData> extensions = AceConfig.getVodb().getExtensionsForComponent(
                            cb.getConceptId());
@@ -248,9 +293,9 @@ private Boolean highlightConflictsInTaxonomyView;
                      } else {
                         buff.append(text);
                      }
-                     if (htmlSuffixes.size() > 0) {
-                        buff.append("<br>");
-                     }
+//                     if (htmlSuffixes.size() > 0) {
+//                        buff.append("<br>");
+//                     }
                      for (String suffix : htmlSuffixes) {
                         buff.append(suffix);
                      }
@@ -424,21 +469,20 @@ private Boolean highlightConflictsInTaxonomyView;
       this.focusBean = focusBean;
    }
 
-   public void propertyChange(PropertyChangeEvent evt) {
-      if (evt.getPropertyName().equals("showRefsetInfoInTaxonomy")) {
-			showRefsetInfoInTaxonomy = aceConfig.getShowRefsetInfoInTaxonomy();
-		} else if (evt.getPropertyName().equals("variableHeightTaxonomyView")) {
-			variableHeightTaxonomyView = aceConfig
-					.getVariableHeightTaxonomyView();
-		} else if (evt.getPropertyName().equals("highlightConflictsInTaxonomyView")) {
-			highlightConflictsInTaxonomyView = aceConfig
-					.getHighlightConflictsInTaxonomyView();
-		} else if (evt.getPropertyName().equals("showViewerImagesInTaxonomy")) {
-			showViewerImagesInTaxonomy = aceConfig
-					.getShowViewerImagesInTaxonomy();
-		} else if (evt.getPropertyName().equals("refsetsToShow")) {
-		      refsetsToShow = this.aceConfig.getRefsetsToShowInTaxonomy();
-		}
-   }
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("showRefsetInfoInTaxonomy")) {
+            showRefsetInfoInTaxonomy = aceConfig.getShowRefsetInfoInTaxonomy();
+        } else if (evt.getPropertyName().equals("variableHeightTaxonomyView")) {
+            variableHeightTaxonomyView = aceConfig.getVariableHeightTaxonomyView();
+        } else if (evt.getPropertyName().equals("highlightConflictsInTaxonomyView")) {
+            highlightConflictsInTaxonomyView = aceConfig.getHighlightConflictsInTaxonomyView();
+        } else if (evt.getPropertyName().equals("showViewerImagesInTaxonomy")) {
+            showViewerImagesInTaxonomy = aceConfig.getShowViewerImagesInTaxonomy();
+        } else if (evt.getPropertyName().equals("refsetsToShow")) {
+            refsetsToShow = this.aceConfig.getRefsetsToShowInTaxonomy();
+        } else if (evt.getPropertyName().equals("showPathInfoInTaxonomy")) {
+            showPathInfoInTaxonomy = this.aceConfig.getShowPathInfoInTaxonomy();
+        }
+    }
 
 }

@@ -304,7 +304,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 			AceLog.getEditLog().fine(
 					"Importing path that already exists: \n" + path + "\n\n"
 							+ newPath);
-		} catch (DatabaseException e) {
+		} catch (TerminologyException e) {
 			if (path.getOrigins() != null) {
 				origins = new ArrayList<I_Position>(path.getOrigins().size());
 				for (UniversalAcePosition pos : path.getOrigins()) {
@@ -418,8 +418,6 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 							"Importing changed extension: \n" + extension);
 				}
 			}
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
 		} catch (TerminologyException e) {
 			throw new ToIoException(e);
 		}
@@ -441,7 +439,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 					try {
 						path = getVodb().getPath(
 								getVodb().uuidToNative(part.getPathId()));
-					} catch (DatabaseException ex) {
+					} catch (TerminologyException ex) {
 						AceLog.getAppLog().alertAndLogException(ex);
 						path = getVodb().newPath(null, getVodb().getConcept(part.getPathId()));
 					}

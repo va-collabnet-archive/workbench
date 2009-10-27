@@ -5,6 +5,7 @@ import org.dwfa.vodb.types.I_ProcessPathEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
+@Deprecated
 public class PathCounter extends TermCounter implements I_ProcessPathEntries {
 
 	public void processPath(DatabaseEntry key, DatabaseEntry value)

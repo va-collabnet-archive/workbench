@@ -1133,6 +1133,17 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 		return frameConfig.getPathColorMap();
 	}
 
+    public Boolean getShowPathInfoInTaxonomy() {
+        return frameConfig.getShowPathInfoInTaxonomy();
+    }
+
+    public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy) {
+        frameConfig.setShowPathInfoInTaxonomy(showPathInfoInTaxonomy);        
+    }
+
+    public void fireUpdateHierarchyView() {
+        frameConfig.fireUpdateHierarchyView();
+    }
 	public I_ShowActivity getTopActivityListener() {
 		return frameConfig.getTopActivityListener();
 	}

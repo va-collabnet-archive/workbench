@@ -143,6 +143,10 @@ public class ThinExtBinder extends TupleBinding {
 		public Class<? extends I_ThinExtByRefPart> getPartClass() {
 			return partClass;
 		}
+		
+		public int getNid() {
+		    return getExtensionTypeNid(this);
+		}
     }
 
     private boolean fixedOnly;
@@ -792,6 +796,15 @@ public class ThinExtBinder extends TupleBinding {
         }
     }
 
+    public static EXT_TYPE getExtensionType(Class<? extends I_ThinExtByRefPart> partType) {
+        for (EXT_TYPE extType : EXT_TYPE.values()) {
+            if (extType.getPartClass().equals(partType)) {
+                return extType;
+            }
+        }
+        throw new UnsupportedOperationException("Can't convert to type: " + partType);
+    }
+    
     public static EXT_TYPE getExtensionType(I_ThinExtByRefVersioned versioned) {
         if (versioned.getVersions() == null || versioned.getVersions().size() == 0) {
             try {

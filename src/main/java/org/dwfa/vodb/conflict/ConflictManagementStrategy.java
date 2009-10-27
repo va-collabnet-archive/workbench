@@ -25,143 +25,170 @@ import org.dwfa.tapi.TerminologyException;
 
 public abstract class ConflictManagementStrategy implements I_ManageConflict {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Base implementation of the method that determines if a concept is in conflict.
-	 * This method can check just the concept attributes, or if passed the instruction
-	 * to check the dependent entities of the concept (descriptions, relationships, 
-	 * extensions etc) it will check through each.
-	 * 
-	 * @see org.dwfa.ace.api.I_ManageConflict#isInConflict(org.dwfa.ace.api.I_GetConceptData, boolean)
-	 */
-	public boolean isInConflict(I_GetConceptData concept,
-			boolean includeDependentEntities) throws IOException,
-			TerminologyException {
+    /**
+     * Base implementation of the method that determines if a concept is in
+     * conflict.
+     * This method can check just the concept attributes, or if passed the
+     * instruction
+     * to check the dependent entities of the concept (descriptions,
+     * relationships,
+     * extensions etc) it will check through each.
+     * 
+     * @see org.dwfa.ace.api.I_ManageConflict#isInConflict(org.dwfa.ace.api.I_GetConceptData,
+     *      boolean)
+     */
+    public boolean isInConflict(I_GetConceptData concept, boolean includeDependentEntities) throws IOException,
+            TerminologyException {
 
-		if (isInConflict(concept)) {
-			return true;
-		}
+        if (isInConflict(concept)) {
+            return true;
+        }
 
-		if (!includeDependentEntities) {
-			return false;
-		}
+        if (!includeDependentEntities) {
+            return false;
+        }
 
-		for (I_DescriptionVersioned description : concept.getDescriptions()) {
-			if (isInConflict(description)) {
-				return true;
-			}
-		}
+        for (I_DescriptionVersioned description : concept.getDescriptions()) {
+            if (isInConflict(description)) {
+                return true;
+            }
+        }
 
-		for (I_RelVersioned relationship : concept.getSourceRels()) {
-			if (isInConflict(relationship)) {
-				return true;
-			}
-		}
+        for (I_RelVersioned relationship : concept.getSourceRels()) {
+            if (isInConflict(relationship)) {
+                return true;
+            }
+        }
 
-		for (I_ThinExtByRefVersioned id : concept.getExtensions()) {
-			if (isInConflict(id)) {
-				return true;
-			}
-		}
+        for (I_ThinExtByRefVersioned id : concept.getExtensions()) {
+            if (isInConflict(id)) {
+                return true;
+            }
+        }
 
-		for (I_ImageVersioned image : concept.getImages()) {
-			if (isInConflict(image)) {
-				return true;
-			}
-		}
+        for (I_ImageVersioned image : concept.getImages()) {
+            if (isInConflict(image)) {
+                return true;
+            }
+        }
 
-		if (isInConflict(concept.getId())) {
-			return true;
-		}
+        if (isInConflict(concept.getId())) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public String toString() {
-		return getDisplayName();
-	}
+    public String toString() {
+        return getDisplayName();
+    }
 
-	private I_ConfigAceFrame getConfig() throws TerminologyException,
-			IOException {
-		return LocalVersionedTerminology.get().getActiveAceFrameConfig();
-	}
+    private I_ConfigAceFrame getConfig() throws TerminologyException, IOException {
+        return LocalVersionedTerminology.get().getActiveAceFrameConfig();
+    }
 
-	public boolean isInConflict(I_GetConceptData concept) throws IOException,
-			TerminologyException {
-		I_ConfigAceFrame config = getConfig();
+    public boolean isInConflict(I_GetConceptData concept) throws IOException, TerminologyException {
+        I_ConfigAceFrame config = getConfig();
 
-		List<I_ConceptAttributeTuple> tuples = concept
-				.getConceptAttributeTuples(config.getAllowedStatus(), config
-						.getViewPositionSet());
-		return doesConflictExist(tuples);
-	}
+        if (isNull(concept, config)) {
+            return false;
+        }
+        
+        List<I_ConceptAttributeTuple> tuples =
+                concept.getConceptAttributeTuples(config.getAllowedStatus(), config.getViewPositionSet());
+        return doesConflictExist(tuples);
+    }
 
-	public boolean isInConflict(I_ConceptAttributeVersioned conceptAttribute)
-			throws TerminologyException, IOException {
-		I_ConfigAceFrame config = getConfig();
+    public boolean isInConflict(I_ConceptAttributeVersioned conceptAttribute) throws TerminologyException, IOException {
+        I_ConfigAceFrame config = getConfig();
 
-		return doesConflictExist(conceptAttribute.getTuples(config
-				.getAllowedStatus(), config.getViewPositionSet()));
-	}
+        if (isNull(conceptAttribute, config)) {
+            return false;
+        }
+        
+        return doesConflictExist(conceptAttribute.getTuples(config.getAllowedStatus(), config.getViewPositionSet()));
+    }
 
-	public boolean isInConflict(I_IdVersioned id) throws IOException {
-		//TODO - must think of a better way to deal with IDs
-		// the problem is that if the id parts are treated the same way as the
-		// other entities parts then an entity with more than one identifier
-		// is immediately in conflict in the default strategy, which is not
-		// what is desired.
-		return false;
-	}
+    public boolean isInConflict(I_IdVersioned id) throws IOException {
+        // TODO - must think of a better way to deal with IDs
+        // the problem is that if the id parts are treated the same way as the
+        // other entities parts then an entity with more than one identifier
+        // is immediately in conflict in the default strategy, which is not
+        // what is desired.
+        return false;
+    }
 
-	public boolean isInConflict(I_ImageVersioned image) throws IOException,
-			TerminologyException {
-		I_ConfigAceFrame config = getConfig();
-		List<I_ImageTuple> matchingTuples = new ArrayList<I_ImageTuple>();
+    public boolean isInConflict(I_ImageVersioned image) throws IOException, TerminologyException {
+        I_ConfigAceFrame config = getConfig();
 
-		image.addTuples(config.getAllowedStatus(), null, config
-				.getViewPositionSet(), matchingTuples);
+        if (isNull(image, config)) {
+            return false;
+        }        
+        
+        List<I_ImageTuple> matchingTuples = new ArrayList<I_ImageTuple>();
 
-		return doesConflictExist(matchingTuples);
-	}
+        image.addTuples(config.getAllowedStatus(), null, config.getViewPositionSet(), matchingTuples);
 
-	public boolean isInConflict(I_RelVersioned relationship)
-			throws IOException, TerminologyException {
-		I_ConfigAceFrame config = getConfig();
-		List<I_RelTuple> matchingTuples = new ArrayList<I_RelTuple>();
+        return doesConflictExist(matchingTuples);
+    }
 
-		I_IntSet srcTypes = config.getSourceRelTypes();
-		relationship.addTuples(config.getAllowedStatus(), srcTypes
-				.getSetValues().length == 0 ? null : srcTypes, config
-				.getViewPositionSet(), matchingTuples, true);
+    public boolean isInConflict(I_RelVersioned relationship) throws IOException, TerminologyException {
+        I_ConfigAceFrame config = getConfig();
 
-		return doesConflictExist(matchingTuples);
-	}
+        if (isNull(relationship, config)) {
+            return false;
+        }
+        
+        List<I_RelTuple> matchingTuples = new ArrayList<I_RelTuple>();
 
-	public boolean isInConflict(I_DescriptionVersioned description)
-			throws IOException, TerminologyException {
-		I_ConfigAceFrame config = getConfig();
-		List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
+        I_IntSet srcTypes = config.getSourceRelTypes();
+        relationship.addTuples(config.getAllowedStatus(), srcTypes.getSetValues().length == 0 ? null : srcTypes, config
+            .getViewPositionSet(), matchingTuples, true);
 
-		I_IntSet descTypes = config.getDescTypes();
-		description.addTuples(config.getAllowedStatus(), descTypes
-				.getSetValues().length == 0 ? null : descTypes, config
-				.getViewPositionSet(), matchingTuples, true);
+        return doesConflictExist(matchingTuples);
+    }
 
-		return doesConflictExist(matchingTuples);
-	}
+    public boolean isInConflict(I_DescriptionVersioned description) throws IOException, TerminologyException {
+        I_ConfigAceFrame config = getConfig();
 
-	public boolean isInConflict(I_ThinExtByRefVersioned extension)
-			throws TerminologyException, IOException {
-		I_ConfigAceFrame config = getConfig();
-		List<I_ThinExtByRefTuple> matchingTuples = new ArrayList<I_ThinExtByRefTuple>();
+        if (isNull(description, config)) {
+            return false;
+        }
+        
+        List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
 
-		extension.addTuples(config.getAllowedStatus(), config
-				.getViewPositionSet(), matchingTuples, true);
+        I_IntSet descTypes = config.getDescTypes();
+        description.addTuples(config.getAllowedStatus(), descTypes.getSetValues().length == 0 ? null : descTypes,
+            config.getViewPositionSet(), matchingTuples, true);
 
-		return doesConflictExist(matchingTuples);
-	}
+        return doesConflictExist(matchingTuples);
+    }
 
-	protected abstract <T extends I_AmPart> boolean doesConflictExist(
-			List<T> versions);
+    public boolean isInConflict(I_ThinExtByRefVersioned extension) throws TerminologyException, IOException {
+        I_ConfigAceFrame config = getConfig();
+
+        if (isNull(extension, config)) {
+            return false;
+        }
+        
+        List<I_ThinExtByRefTuple> matchingTuples = new ArrayList<I_ThinExtByRefTuple>();
+
+        extension.addTuples(null, null, matchingTuples, true, false);
+
+        return doesConflictExist(matchingTuples);
+    }
+
+    protected abstract <T extends I_AmPart> boolean doesConflictExist(List<T> versions);
+    
+    private boolean isNull(Object ... obj) {
+        if (obj == null) {
+            return true;
+        }
+        for (int i = 0; i < obj.length; i++) {
+            if (obj[i] == null) return true;
+        }
+        return false;
+    }
 }

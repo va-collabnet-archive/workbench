@@ -7,6 +7,7 @@ import org.dwfa.vodb.types.I_ProcessPathEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
+@Deprecated
 public class PathWriter extends TermWriter implements I_ProcessPathEntries {
 
 	public PathWriter(OutputStream outStream) {

@@ -40,6 +40,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -59,8 +60,10 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaults;
+import org.dwfa.ace.refset.RefsetHelper;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
@@ -670,6 +673,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 
 	private TOGGLES toggle;
 
+	private RefsetHelper refsetHelper = new RefsetHelper();
+	
 	protected Class<? extends ThinExtByRefPart> getExtPartClass() {
 		switch (refsetType) {
 		case BOOLEAN:
@@ -769,94 +774,87 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 
 		@Override
 		protected Boolean construct() throws Exception {
-			if (refConWorker != null) {
-				refConWorker.stop();
-			}
-			if (componentId == null || componentId == Integer.MIN_VALUE) {
-				return true;
-			}
-			List<I_GetExtensionData> extensions = AceConfig.getVodb()
-					.getExtensionsForComponent(componentId);
-			extensions.addAll(ExtensionByReferenceBean
-					.getNewExtensions(componentId));
-			for (I_GetExtensionData ebrBean : extensions) {
-				if (stopWork) {
-					return false;
-				}
-				conceptsToFetch.add(ebrBean.getExtension().getRefsetId());
-				for (I_ThinExtByRefPart part : ebrBean.getExtension()
-						.getVersions()) {
-					if (getExtPartClass().equals(part.getClass()) == false) {
-						break;
-					}
-					if (ThinExtByRefPartBoolean.class.equals(part.getClass())) {
-						conceptsToFetch.add(part.getStatusId());
-						conceptsToFetch.add(part.getPathId());
-					} else if (ThinExtByRefPartString.class.equals(part
-							.getClass())) {
-						conceptsToFetch.add(part.getStatusId());
-						conceptsToFetch.add(part.getPathId());
-					} else if (ThinExtByRefPartConcept.class.equals(part
-							.getClass())) {
-						I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
-						conceptsToFetch.add(conceptPart.getConceptId());
-						conceptsToFetch.add(part.getStatusId());
-						conceptsToFetch.add(part.getPathId());
-					} else if (ThinExtByRefPartConceptInt.class.equals(part
-							.getClass())) {
-						I_ThinExtByRefPartConceptInt conceptPart = (I_ThinExtByRefPartConceptInt) part;
-						conceptsToFetch.add(conceptPart.getConceptId());
-						conceptsToFetch.add(part.getStatusId());
-						conceptsToFetch.add(part.getPathId());
-					} else if (ThinExtByRefPartMeasurement.class.equals(part
-							.getClass())) {
-						I_ThinExtByRefPartMeasurement conceptPart = (I_ThinExtByRefPartMeasurement) part;
-						conceptsToFetch.add(conceptPart.getUnitsOfMeasureId());
-						conceptsToFetch.add(part.getStatusId());
-						conceptsToFetch.add(part.getPathId());
-					} else if (ThinExtByRefPartInteger.class.equals(part
-							.getClass())) {
-						conceptsToFetch.add(part.getStatusId());
-						conceptsToFetch.add(part.getPathId());
-					} else if (ThinExtByRefPartLanguage.class.equals(part
-							.getClass())) {
-						I_ThinExtByRefPartLanguage conceptPart = (I_ThinExtByRefPartLanguage) part;
-						conceptsToFetch.add(conceptPart.getAcceptabilityId());
-						conceptsToFetch.add(conceptPart.getCorrectnessId());
-						conceptsToFetch
-								.add(conceptPart.getDegreeOfSynonymyId());
-						conceptsToFetch.add(part.getStatusId());
-						conceptsToFetch.add(part.getPathId());
-					} else if (ThinExtByRefPartLanguageScoped.class.equals(part
-							.getClass())) {
-						ThinExtByRefPartLanguageScoped conceptPart = (ThinExtByRefPartLanguageScoped) part;
-						conceptsToFetch.add(conceptPart.getScopeId());
-						conceptsToFetch.add(conceptPart.getTagId());
-						conceptsToFetch.add(conceptPart.getAcceptabilityId());
-						conceptsToFetch.add(conceptPart.getCorrectnessId());
-						conceptsToFetch
-								.add(conceptPart.getDegreeOfSynonymyId());
-						conceptsToFetch.add(part.getStatusId());
-						conceptsToFetch.add(part.getPathId());
-					}
-					if (stopWork) {
-						return false;
-					}
-					if (allTuples == null) {
-						AceLog
-								.getAppLog()
-								.info(
-										"all tuples for RefsetMemberTableModel is  null");
-						return false;
-					}
-					allTuples.add(new ThinExtByRefTuple(ebrBean.getExtension(),
-							part));
-				}
-			}
+            if (refConWorker != null) {
+                refConWorker.stop();
+            }
+            if (componentId == null || componentId == Integer.MIN_VALUE) {
+                return true;
+            }
+            List<I_GetExtensionData> extensions = AceConfig.getVodb().getExtensionsForComponent(componentId);
+            extensions.addAll(ExtensionByReferenceBean.getNewExtensions(componentId));
+            I_IntSet allowedStatus = host.getConfig().getAllowedStatus();
+            for (I_GetExtensionData ebrBean : extensions) {
+                if (stopWork) {
+                    return false;
+                }
+                conceptsToFetch.add(ebrBean.getExtension().getRefsetId());
+                List<I_ThinExtByRefPart> parts = new ArrayList<I_ThinExtByRefPart>();
+                if (!host.getShowHistory()) {
+                    for (I_ThinExtByRefTuple tuple : ebrBean.getExtension().getTuples(allowedStatus, null, true, true)) {
+                        parts.add(tuple.getPart());
+                    }
+                } else {
+                    parts.addAll(ebrBean.getExtension().getVersions());
+                }
+                for (I_ThinExtByRefPart part : parts) {
+                    if (getExtPartClass().equals(part.getClass()) == false) {
+                        break;
+                    }
+                    if (ThinExtByRefPartBoolean.class.equals(part.getClass())) {
+                        conceptsToFetch.add(part.getStatusId());
+                        conceptsToFetch.add(part.getPathId());
+                    } else if (ThinExtByRefPartString.class.equals(part.getClass())) {
+                        conceptsToFetch.add(part.getStatusId());
+                        conceptsToFetch.add(part.getPathId());
+                    } else if (ThinExtByRefPartConcept.class.equals(part.getClass())) {
+                        I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
+                        conceptsToFetch.add(conceptPart.getC1id());
+                        conceptsToFetch.add(part.getStatusId());
+                        conceptsToFetch.add(part.getPathId());
+                    } else if (ThinExtByRefPartConceptInt.class.equals(part.getClass())) {
+                        I_ThinExtByRefPartConceptInt conceptPart = (I_ThinExtByRefPartConceptInt) part;
+                        conceptsToFetch.add(conceptPart.getC1id());
+                        conceptsToFetch.add(part.getStatusId());
+                        conceptsToFetch.add(part.getPathId());
+                    } else if (ThinExtByRefPartMeasurement.class.equals(part.getClass())) {
+                        I_ThinExtByRefPartMeasurement conceptPart = (I_ThinExtByRefPartMeasurement) part;
+                        conceptsToFetch.add(conceptPart.getUnitsOfMeasureId());
+                        conceptsToFetch.add(part.getStatusId());
+                        conceptsToFetch.add(part.getPathId());
+                    } else if (ThinExtByRefPartInteger.class.equals(part.getClass())) {
+                        conceptsToFetch.add(part.getStatusId());
+                        conceptsToFetch.add(part.getPathId());
+                    } else if (ThinExtByRefPartLanguage.class.equals(part.getClass())) {
+                        I_ThinExtByRefPartLanguage conceptPart = (I_ThinExtByRefPartLanguage) part;
+                        conceptsToFetch.add(conceptPart.getAcceptabilityId());
+                        conceptsToFetch.add(conceptPart.getCorrectnessId());
+                        conceptsToFetch.add(conceptPart.getDegreeOfSynonymyId());
+                        conceptsToFetch.add(part.getStatusId());
+                        conceptsToFetch.add(part.getPathId());
+                    } else if (ThinExtByRefPartLanguageScoped.class.equals(part.getClass())) {
+                        ThinExtByRefPartLanguageScoped conceptPart = (ThinExtByRefPartLanguageScoped) part;
+                        conceptsToFetch.add(conceptPart.getScopeId());
+                        conceptsToFetch.add(conceptPart.getTagId());
+                        conceptsToFetch.add(conceptPart.getAcceptabilityId());
+                        conceptsToFetch.add(conceptPart.getCorrectnessId());
+                        conceptsToFetch.add(conceptPart.getDegreeOfSynonymyId());
+                        conceptsToFetch.add(part.getStatusId());
+                        conceptsToFetch.add(part.getPathId());
+                    }
+                    if (stopWork) {
+                        return false;
+                    }
+                    if (allTuples == null) {
+                        AceLog.getAppLog().info("all tuples for RefsetMemberTableModel is  null");
+                        return false;
+                    }
+                    allTuples.add(new ThinExtByRefTuple(ebrBean.getExtension(), part));
+                }
+            }
 
-			refConWorker = new ReferencedConceptsSwingWorker();
-			refConWorker.start();
-			return true;
+            refConWorker = new ReferencedConceptsSwingWorker();
+            refConWorker.start();
+            return true;
 		}
 
 		@Override
@@ -1022,197 +1020,170 @@ public class RefsetMemberTableModel extends AbstractTableModel implements
 	}
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		if (allTuples == null) {
-			return null;
-		}
-		try {
-			I_ThinExtByRefTuple tuple = allTuples.get(rowIndex);
-			switch (columns[columnIndex]) {
-			case REFSET_ID:
-				if (referencedConcepts.containsKey(tuple.getRefsetId())) {
-					return new StringWithExtTuple(getPrefText(tuple
-							.getRefsetId()), tuple, tuple.getRefsetId());
-				}
-				return new StringWithExtTuple(Integer.toString(tuple
-						.getRefsetId()), tuple, tuple.getRefsetId());
-			case MEMBER_ID:
-				return new StringWithExtTuple(Integer.toString(tuple
-						.getMemberId()), tuple, tuple.getMemberId());
-			case COMPONENT_ID:
-				return new StringWithExtTuple(Integer.toString(tuple
-						.getComponentId()), tuple, tuple.getComponentId());
+        if (allTuples == null) {
+            return null;
+        }
+        try {
+            I_ThinExtByRefTuple tuple = allTuples.get(rowIndex);
+            
+            boolean inConflict = 
+                    (host.getConfig().getHighlightConflictsInComponentPanel() && 
+                     host.getConfig().getConflictResolutionStrategy().isInConflict(tuple.getCore()));            
+            
+            switch (columns[columnIndex]) {
+            
+            case REFSET_ID:
+                if (referencedConcepts.containsKey(tuple.getRefsetId())) {
+                    return new StringWithExtTuple(getPrefText(tuple.getRefsetId()), tuple, tuple.getRefsetId(), inConflict);
+                }
+                return new StringWithExtTuple(Integer.toString(tuple.getRefsetId()), tuple, tuple.getRefsetId(), inConflict);
+                
+            case MEMBER_ID:
+                return new StringWithExtTuple(Integer.toString(tuple.getMemberId()), tuple, tuple.getMemberId(), inConflict);
+                
+            case COMPONENT_ID:
+                return new StringWithExtTuple(Integer.toString(tuple.getComponentId()), tuple, tuple.getComponentId(), inConflict);
 
-			case STATUS:
-				if (referencedConcepts.containsKey(tuple.getStatusId())) {
-					return new StringWithExtTuple(
-							getPrefText(tuple.getStatusId()), tuple, tuple.getStatusId());
-				}
-				return new StringWithExtTuple(Integer.toString(tuple
-						.getStatusId()), tuple, tuple.getStatusId());
-			case VERSION:
-				if (tuple.getVersion() == Integer.MAX_VALUE) {
-					return new StringWithExtTuple(ThinVersionHelper
-							.uncommittedHtml(), tuple, tuple.getMemberId());
-				}
-				return new StringWithExtTuple(ThinVersionHelper.format(tuple
-						.getVersion()), tuple, tuple.getMemberId());
-			case PATH:
-				if (referencedConcepts.containsKey(tuple.getPathId())) {
-					return new StringWithExtTuple(
-							getPrefText(tuple.getPathId()), tuple, tuple.getPathId());
-				}
-				return new StringWithExtTuple(Integer.toString(tuple
-						.getPathId()), tuple, tuple.getPathId());
+            case STATUS:
+                if (referencedConcepts.containsKey(tuple.getStatusId())) {
+                    return new StringWithExtTuple(getPrefText(tuple.getStatusId()), tuple, tuple.getStatusId(), inConflict);
+                }
+                return new StringWithExtTuple(Integer.toString(tuple.getStatusId()), tuple, tuple.getStatusId(), inConflict);
+                
+            case VERSION:
+                if (tuple.getVersion() == Integer.MAX_VALUE) {
+                    return new StringWithExtTuple(ThinVersionHelper.uncommittedHtml(), tuple, tuple.getMemberId(), inConflict);
+                }
+                return new StringWithExtTuple(ThinVersionHelper.format(tuple.getVersion()), tuple, tuple.getMemberId(), inConflict);
+                
+            case PATH:
+                if (referencedConcepts.containsKey(tuple.getPathId())) {
+                    return new StringWithExtTuple(getPrefText(tuple.getPathId()), tuple, tuple.getPathId(), inConflict);
+                }
+                return new StringWithExtTuple(Integer.toString(tuple.getPathId()), tuple, tuple.getPathId(), inConflict);
 
-				// Boolean extension
-			case BOOLEAN_VALUE:
-				return new StringWithExtTuple(Boolean
-						.toString(((I_ThinExtByRefPartBoolean) tuple.getPart())
-								.getValue()), tuple, tuple.getMemberId());
-				// String extension
-			case STRING_VALUE:
-				return new StringWithExtTuple(((I_ThinExtByRefPartString) tuple
-						.getPart()).getStringValue(), tuple, tuple.getMemberId());
-				// Concept extension
-			case CONCEPT_ID:
-				if (referencedConcepts
-						.containsKey(((I_ThinExtByRefPartConcept) tuple
-								.getPart()).getConceptId())) {
-					return new StringWithExtTuple(
-							getPrefText(((I_ThinExtByRefPartConcept) tuple
-									.getPart()).getConceptId()), tuple, ((I_ThinExtByRefPartConcept) tuple
-											.getPart()).getConceptId());
-				}
-				return new StringWithExtTuple(Integer
-						.toString(((I_ThinExtByRefPartConcept) tuple.getPart())
-								.getConceptId()), tuple, ((I_ThinExtByRefPartConcept) tuple
-										.getPart()).getConceptId());
+            
+            case BOOLEAN_VALUE:
+                return new StringWithExtTuple(
+                    Boolean.toString(((I_ThinExtByRefPartBoolean) tuple.getPart()).getValue()), 
+                    tuple, tuple.getMemberId(), inConflict);
+                
+            
+            case STRING_VALUE:
+                return new StringWithExtTuple(
+                    ((I_ThinExtByRefPartString) tuple.getPart()).getStringValue(), tuple, tuple.getMemberId(), inConflict);
+            
+            case CONCEPT_ID:
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartConcept) tuple.getPart()).getC1id())) {
+                    return new StringWithExtTuple(
+                        getPrefText(((I_ThinExtByRefPartConcept) tuple.getPart()).getC1id()), 
+                        tuple, ((I_ThinExtByRefPartConcept) tuple.getPart()).getC1id(), inConflict);
+                }
+                return new StringWithExtTuple(
+                    Integer.toString(((I_ThinExtByRefPartConcept) tuple.getPart()).getC1id()), 
+                    tuple, ((I_ThinExtByRefPartConcept) tuple.getPart()).getC1id(), inConflict);
 
-				// Integer extension
-			case INTEGER_VALUE:
-				if (ThinExtByRefPartConceptInt.class.isAssignableFrom(tuple
-						.getPart().getClass())) {
-					return new StringWithExtTuple(Integer
-							.toString(((ThinExtByRefPartConceptInt) tuple
-									.getPart()).getIntValue()), tuple, tuple.getMemberId());
-				} else {
-					return new StringWithExtTuple(Integer
-							.toString(((I_ThinExtByRefPartInteger) tuple
-									.getPart()).getValue()), tuple, tuple.getMemberId());
-				}
+            case INTEGER_VALUE:
+                if (ThinExtByRefPartConceptInt.class.isAssignableFrom(tuple.getPart().getClass())) {
+                    int value = ((ThinExtByRefPartConceptInt) tuple.getPart()).getIntValue();
+                    if (refsetHelper.hasPurpose(tuple.getRefsetId(), RefsetAuxiliary.Concept.REFSET_PURPOSE_POSITION)) {
+                        return new StringWithExtTuple(
+                            (value == Integer.MAX_VALUE) ? "latest" : ThinVersionHelper.format(value), 
+                            tuple, tuple.getMemberId(), inConflict);
+                    } else {
+                        return new StringWithExtTuple(Integer.toString(value), tuple, tuple.getMemberId(), inConflict);
+                    }
+                } else {
+                    int value = ((I_ThinExtByRefPartInteger) tuple.getPart()).getIntValue();
+                    return new StringWithExtTuple(Integer.toString(value), tuple, tuple.getMemberId(), inConflict);
+                }
 
-				// Language extension
-			case ACCEPTABILITY:
-				if (referencedConcepts
-						.containsKey(((I_ThinExtByRefPartLanguage) tuple
-								.getPart()).getAcceptabilityId())) {
-					return new StringWithExtTuple(
-							getPrefText(((I_ThinExtByRefPartLanguage) tuple
-									.getPart()).getAcceptabilityId()), tuple, ((I_ThinExtByRefPartLanguage) tuple
-											.getPart()).getAcceptabilityId());
-				}
-				return new StringWithExtTuple(
-						Integer.toString(((I_ThinExtByRefPartLanguage) tuple
-								.getPart()).getAcceptabilityId()), tuple, ((I_ThinExtByRefPartLanguage) tuple
-										.getPart()).getAcceptabilityId());
-			case CORRECTNESS:
-				if (referencedConcepts
-						.containsKey(((I_ThinExtByRefPartLanguage) tuple
-								.getPart()).getCorrectnessId())) {
-					return new StringWithExtTuple(
-							getPrefText(((I_ThinExtByRefPartLanguage) tuple
-									.getPart()).getCorrectnessId()), tuple, ((I_ThinExtByRefPartLanguage) tuple
-											.getPart()).getCorrectnessId());
-				}
-				return new StringWithExtTuple(
-						Integer.toString(((I_ThinExtByRefPartLanguage) tuple
-								.getPart()).getCorrectnessId()), tuple, ((I_ThinExtByRefPartLanguage) tuple
-										.getPart()).getCorrectnessId());
-			case DEGREE_OF_SYNONYMY:
-				if (referencedConcepts
-						.containsKey(((I_ThinExtByRefPartLanguage) tuple
-								.getPart()).getDegreeOfSynonymyId())) {
-					return new StringWithExtTuple(
-							getPrefText(((I_ThinExtByRefPartLanguage) tuple
-									.getPart()).getDegreeOfSynonymyId()), tuple, ((I_ThinExtByRefPartLanguage) tuple
-											.getPart()).getDegreeOfSynonymyId());
-				}
-				return new StringWithExtTuple(
-						Integer.toString(((I_ThinExtByRefPartLanguage) tuple
-								.getPart()).getDegreeOfSynonymyId()), tuple, ((I_ThinExtByRefPartLanguage) tuple
-										.getPart()).getDegreeOfSynonymyId());
+            case ACCEPTABILITY:
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId())) {
+                    return new StringWithExtTuple(
+                        getPrefText(((I_ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId()), 
+                        tuple, ((I_ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId(), inConflict);
+                }
+                return new StringWithExtTuple(
+                    Integer.toString(((I_ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId()), 
+                    tuple, ((I_ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId(), inConflict);
+                
+            case CORRECTNESS:
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId())) {
+                    return new StringWithExtTuple(
+                        getPrefText(((I_ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId()), 
+                        tuple, ((I_ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId(), inConflict);
+                }
+                return new StringWithExtTuple(
+                    Integer.toString(((I_ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId()), 
+                    tuple, ((I_ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId(), inConflict);
+                
+            case DEGREE_OF_SYNONYMY:
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId())) {
+                    return new StringWithExtTuple(
+                        getPrefText(((I_ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId()), 
+                        tuple, ((I_ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId(), inConflict);
+                }
+                return new StringWithExtTuple(
+                    Integer.toString(((I_ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId()), 
+                    tuple, ((I_ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId(), inConflict);
 
-				// Scoped language extension
-			case TAG:
-				if (referencedConcepts
-						.containsKey(((I_ThinExtByRefPartLanguageScoped) tuple
-								.getPart()).getTagId())) {
-					return new StringWithExtTuple(
-							getPrefText(((I_ThinExtByRefPartLanguageScoped) tuple
-									.getPart()).getTagId()), tuple, ((I_ThinExtByRefPartLanguageScoped) tuple
-											.getPart()).getTagId());
-				}
-				return new StringWithExtTuple(Integer
-						.toString(((I_ThinExtByRefPartLanguageScoped) tuple
-								.getPart()).getTagId()), tuple, ((I_ThinExtByRefPartLanguageScoped) tuple
-										.getPart()).getTagId());
-			case SCOPE:
-				if (referencedConcepts
-						.containsKey(((I_ThinExtByRefPartLanguageScoped) tuple
-								.getPart()).getScopeId())) {
-					return new StringWithExtTuple(
-							getPrefText(((I_ThinExtByRefPartLanguageScoped) tuple
-									.getPart()).getScopeId()), tuple, ((I_ThinExtByRefPartLanguageScoped) tuple
-											.getPart()).getScopeId());
-				}
-				return new StringWithExtTuple(Integer
-						.toString(((I_ThinExtByRefPartLanguageScoped) tuple
-								.getPart()).getScopeId()), tuple, ((I_ThinExtByRefPartLanguageScoped) tuple
-										.getPart()).getScopeId());
-			case PRIORITY:
-				return new StringWithExtTuple(Integer
-						.toString(((I_ThinExtByRefPartLanguageScoped) tuple
-								.getPart()).getPriority()), tuple, ((I_ThinExtByRefPartLanguageScoped) tuple
-										.getPart()).getPriority());
-			case MEASUREMENT_UNITS_ID:
-				if (referencedConcepts
-						.containsKey(((I_ThinExtByRefPartMeasurement) tuple
-								.getPart()).getUnitsOfMeasureId())) {
-					return new StringWithExtTuple(
-							getPrefText(((I_ThinExtByRefPartMeasurement) tuple
-									.getPart()).getUnitsOfMeasureId()), tuple,
-									((I_ThinExtByRefPartMeasurement) tuple
-											.getPart()).getUnitsOfMeasureId());
-				}
-				return new StringWithExtTuple(Integer
-						.toString(((I_ThinExtByRefPartMeasurement) tuple
-								.getPart()).getUnitsOfMeasureId()), tuple,
-								((I_ThinExtByRefPartMeasurement) tuple
-										.getPart()).getUnitsOfMeasureId());
-			case MEASUREMENT_VALUE:
-				return new StringWithExtTuple(Double
-						.toString(((I_ThinExtByRefPartMeasurement) tuple
-								.getPart()).getMeasurementValue()), tuple, tuple.getMemberId());
-			case MAP_REFINABILITY:
-				return new StringWithExtTuple(Double
-						.toString(((I_ThinExtByRefPartCrossmap) tuple
-								.getPart()).getRefineFlagId()), tuple, ((I_ThinExtByRefPartCrossmap) tuple
-										.getPart()).getRefineFlagId());
-			case MAP_STATUS:
-				return new StringWithExtTuple(Double
-						.toString(((I_ThinExtByRefPartCrossmap) tuple
-								.getPart()).getMapStatusId()), tuple, ((I_ThinExtByRefPartCrossmap) tuple
-										.getPart()).getMapStatusId());
-			}
-			
-				
-			AceLog.getAppLog().alertAndLogException(
-					new Exception("Can't handle column type: "
-							+ columns[columnIndex]));
-		} catch (IOException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
-		return null;
+            case TAG:
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId())) {
+                    return new StringWithExtTuple(
+                        getPrefText(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId()), 
+                        tuple, ((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId(), inConflict);
+                }
+                return new StringWithExtTuple(
+                    Integer.toString(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId()), 
+                    tuple, ((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId(), inConflict);
+                
+            case SCOPE:
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId())) {
+                    return new StringWithExtTuple(
+                        getPrefText(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId()), 
+                        tuple, ((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId(), inConflict);
+                }
+                return new StringWithExtTuple(
+                    Integer.toString(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId()), 
+                    tuple, ((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId(), inConflict);
+                
+            case PRIORITY:
+                return new StringWithExtTuple(
+                    Integer.toString(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getPriority()), 
+                    tuple, ((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getPriority(), inConflict);
+                
+            case MEASUREMENT_UNITS_ID:
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId())) {
+                    return new StringWithExtTuple(
+                        getPrefText(((I_ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId()), 
+                        tuple, ((I_ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId(), inConflict);
+                }
+                return new StringWithExtTuple(
+                    Integer.toString(((I_ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId()), 
+                    tuple, ((I_ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId(), inConflict);
+                
+            case MEASUREMENT_VALUE:
+                return new StringWithExtTuple(
+                    Double.toString(((I_ThinExtByRefPartMeasurement) tuple.getPart()).getMeasurementValue()), 
+                    tuple, tuple.getMemberId(), inConflict);
+                
+            case MAP_REFINABILITY:
+                return new StringWithExtTuple(
+                    Double.toString(((I_ThinExtByRefPartCrossmap) tuple.getPart()).getRefineFlagId()), 
+                    tuple, ((I_ThinExtByRefPartCrossmap) tuple.getPart()).getRefineFlagId(), inConflict);
+                
+            case MAP_STATUS:
+                return new StringWithExtTuple(
+                    Double.toString(((I_ThinExtByRefPartCrossmap) tuple.getPart()).getMapStatusId()), 
+                    tuple, ((I_ThinExtByRefPartCrossmap) tuple.getPart()).getMapStatusId(), inConflict);
+            }
+
+            AceLog.getAppLog().alertAndLogException(new Exception("Can't handle column type: " + columns[columnIndex]));
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return null;
 	}
 
 	private String getPrefText(int id) throws IOException {

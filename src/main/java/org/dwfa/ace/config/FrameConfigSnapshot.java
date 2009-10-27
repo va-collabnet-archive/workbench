@@ -1148,6 +1148,18 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 		return baseFrame.getPathColorMap();
 	}
 
+    public Boolean getShowPathInfoInTaxonomy() {
+        return baseFrame.getShowPathInfoInTaxonomy();
+    }
+
+    public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy) {
+        baseFrame.setShowPathInfoInTaxonomy(showPathInfoInTaxonomy);
+    }
+
+    public void fireUpdateHierarchyView() {
+        baseFrame.fireUpdateHierarchyView();
+    }
+
 	public I_ShowActivity getTopActivityListener() {
 		return baseFrame.getTopActivityListener();
 	}

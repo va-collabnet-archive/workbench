@@ -6,6 +6,7 @@ import org.dwfa.vodb.types.I_ProcessPathEntries;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 
+@Deprecated
 public interface I_StorePaths extends I_StoreInBdb {
 
 	public void writePath(I_Path p) throws DatabaseException;
