@@ -16,7 +16,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -105,7 +105,7 @@ public class AddPromotionConceptsToListViewTask extends AbstractTask {
             UUID promotionStatusUuid = (UUID) process.readProperty(statusUuidPropName);
             I_GetConceptData promotionStatusConcept = termFactory.getConcept(new UUID[] { promotionStatusUuid });
 
-            RefsetHelper refsetHelper = new RefsetHelper();
+            SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
             List<I_GetConceptData> filteredConcepts =
                     refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(memberRefsetConcept
                         .getConceptId()), promotionStatusConcept);

@@ -18,7 +18,7 @@ import javax.swing.JRadioButton;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.LogWithAlerts;
 
@@ -40,7 +40,7 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
     private static final long serialVersionUID = 1L;
 
     private I_TermFactory termFactory;
-    private RefsetHelper refsetHelper;
+    private SpecRefsetHelper refsetHelper;
 
     // components
     private ButtonGroup options;
@@ -64,7 +64,7 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
 
     public SelectPromotionListPanel(I_GetConceptData promotionRefsetConcept) throws Exception {
         super();
-        refsetHelper = new RefsetHelper();
+        refsetHelper = new SpecRefsetHelper();
         this.promotionRefsetConcept = promotionRefsetConcept;
         termFactory = LocalVersionedTerminology.get();
         unreviewedAdditionStatus =

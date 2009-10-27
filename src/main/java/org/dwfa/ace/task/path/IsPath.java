@@ -23,17 +23,14 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@Deprecated
 @BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
-public class IsValidPath extends AbstractTask {
+public class IsPath extends AbstractTask {
 
-    /**
-	 *
-	 */
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    private String propName = ProcessAttachmentKeys.PATH_UUID.getAttachmentKey();
+    
+    private String propName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -58,35 +55,15 @@ public class IsValidPath extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
+            I_GetConceptData concept = getProperty(process, I_GetConceptData.class, getPropName());
+            
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-            Object obj = process.readProperty(propName);
-            UUID uuid = null;
-            if (obj == null) {
-                uuid = null;
+            if (termFactory.hasPath(concept.getConceptId())) {
+                return Condition.TRUE;
             } else {
-                uuid = (UUID) obj;
-            }
-            if (uuid != null) {
-                I_GetConceptData path = termFactory.getConcept(new UUID[] { uuid });
-                I_GetConceptData pathTopHierarchy =
-                        termFactory.getConcept(ArchitectonicAuxiliary.Concept.PATH.getUids());
-
-                I_IntSet allowedStatus = termFactory.getActiveAceFrameConfig().getAllowedStatus();
-                I_IntSet allowedTypes = termFactory.newIntSet();
-                allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
-                    .getConceptId());
-                Set<I_Position> positions = termFactory.getActiveAceFrameConfig().getViewPositionSet();
-
-                if (pathTopHierarchy.isParentOf(path, allowedStatus, allowedTypes, positions, true)) {
-                    return Condition.TRUE;
-                } else {
-                    process.setProperty(propName, null);
-                    return Condition.FALSE;
-                }
-            } else {
-                process.setProperty(propName, null);
                 return Condition.FALSE;
             }
+            
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }

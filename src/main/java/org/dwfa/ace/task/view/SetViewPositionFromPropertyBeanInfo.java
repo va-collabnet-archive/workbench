@@ -5,6 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditorOneLine;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
@@ -35,8 +36,15 @@ public class SetViewPositionFromPropertyBeanInfo extends SimpleBeanInfo {
             viewPathConceptPropName.setDisplayName("<html><font color='green'>view path:");
             viewPathConceptPropName.setShortDescription("The property that contains the concept that identifies the view path.");
 
+            PropertyDescriptor keepExistingViewPaths = 
+                new PropertyDescriptor("keepExistingViewPaths", getBeanDescriptor().getBeanClass());
+            keepExistingViewPaths.setBound(true);
+            keepExistingViewPaths.setPropertyEditorClass(CheckboxEditor.class);
+            keepExistingViewPaths.setDisplayName("<html><font color='green'>Keep existing view paths");
+            keepExistingViewPaths.setShortDescription("Uncheck to view just the specified path");            
+            
             PropertyDescriptor rv[] =
-                { profilePropName, positionStr, viewPathConceptPropName };
+                { profilePropName, positionStr, viewPathConceptPropName, keepExistingViewPaths };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());

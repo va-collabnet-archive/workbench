@@ -30,7 +30,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -65,7 +65,7 @@ public class InstructWithApproveRejectDone extends AbstractTask {
     private String memberRefsetUuidPropName = ProcessAttachmentKeys.PROMOTION_UUID.getAttachmentKey();
     private String statusUuidPropName = ProcessAttachmentKeys.STATUS_UUID.getAttachmentKey();
 
-    private RefsetHelper refsetHelper;
+    private SpecRefsetHelper refsetHelper;
     private int refsetId;
     private I_GetConceptData initialPromotionStatus;
     private int approveId;
@@ -444,7 +444,7 @@ public class InstructWithApproveRejectDone extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
-            refsetHelper = new RefsetHelper();
+            refsetHelper = new SpecRefsetHelper();
             DoSwing swinger = new DoSwing(process);
             swinger.start();
             swinger.get();

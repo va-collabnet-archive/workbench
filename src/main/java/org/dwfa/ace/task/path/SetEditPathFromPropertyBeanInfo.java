@@ -5,6 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class SetEditPathFromPropertyBeanInfo extends SimpleBeanInfo {
@@ -12,24 +13,23 @@ public class SetEditPathFromPropertyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {  
-            PropertyDescriptor profilePropName =
-                new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
-            profilePropName.setBound(true);
-            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName.setDisplayName("<html><font color='green'>profile property:");
-            profilePropName.setShortDescription("The property containing the profile to change.");
+            PropertyDescriptor editPathPropName =
+                new PropertyDescriptor("editPathPropName", getBeanDescriptor().getBeanClass());
+            editPathPropName.setBound(true);
+            editPathPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            editPathPropName.setDisplayName("<html><font color='green'>editing path:");
+            editPathPropName.setShortDescription("The property that contains the edit path concept");
 
-
-            PropertyDescriptor editPathConceptPropName =
-                new PropertyDescriptor("editPathConceptPropName", getBeanDescriptor().getBeanClass());
-            editPathConceptPropName.setBound(true);
-            editPathConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            editPathConceptPropName.setDisplayName("<html><font color='green'>editing path prop:");
-            editPathConceptPropName.setShortDescription("The property name that contains the editing path.");
-
-            PropertyDescriptor rv[] =
-                { profilePropName, editPathConceptPropName };
+            PropertyDescriptor keepExistingEditPaths = 
+                new PropertyDescriptor("keepExistingEditPaths", getBeanDescriptor().getBeanClass());
+            keepExistingEditPaths.setBound(true);
+            keepExistingEditPaths.setPropertyEditorClass(CheckboxEditor.class);
+            keepExistingEditPaths.setDisplayName("<html><font color='green'>Keep existing edit paths");
+            keepExistingEditPaths.setShortDescription("Uncheck to edit just the specified path");
+            
+            PropertyDescriptor rv[] = { editPathPropName, keepExistingEditPaths };
             return rv;
+            
         } catch (IntrospectionException e) {
              throw new Error(e.toString());
         }
@@ -39,7 +39,7 @@ public class SetEditPathFromPropertyBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetEditPathFromProperty.class);
-        bd.setDisplayName("<html><font color='green'><center>add edit path<br>from property");
+        bd.setDisplayName("<html><font color='green'><center>Set edit path<br/>from property");
         return bd;
     }
 }

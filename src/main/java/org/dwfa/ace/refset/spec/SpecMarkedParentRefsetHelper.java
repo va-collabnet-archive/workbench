@@ -1,31 +1,29 @@
-package org.dwfa.ace.refset;
+package org.dwfa.ace.refset.spec;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.dwfa.ace.api.BeanPropertyMap;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.ThinExtByRefPartProperty;
+import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 
-public class MarkedParentRefsetHelper extends RefsetHelper {
+public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
 
     protected RefsetHelper refsetHelper;
 
-    private Logger logger = Logger.getLogger(MarkedParentRefsetHelper.class.getName());
+    private Logger logger = Logger.getLogger(SpecMarkedParentRefsetHelper.class.getName());
 
     private int refsetId;
     private int memberTypeId;
     private int parentRefsetId;
     private int parentMemberTypeId;
 
-    public MarkedParentRefsetHelper(int refsetId, int memberTypeId) throws Exception {
+    public SpecMarkedParentRefsetHelper(int refsetId, int memberTypeId) throws Exception {
         super();
         this.refsetId = refsetId;
         this.memberTypeId = memberTypeId;
@@ -45,8 +43,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         }
 
         for (I_GetConceptData concept : ancestors) {
-            newRefsetExtension(parentRefsetId, concept.getConceptId(), I_ThinExtByRefPartConcept.class, 
-                    new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, parentMemberTypeId));
+            newRefsetExtension(parentRefsetId, concept.getConceptId(), parentMemberTypeId);
         }
     }
 
@@ -95,19 +92,16 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
 
         // Retire the rest
         for (Integer markedParentId : toBeRetired) {
-            retireRefsetExtension(parentRefsetId, markedParentId, 
-                    new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, parentMemberTypeId));
+            retireRefsetExtension(parentRefsetId, markedParentId, parentMemberTypeId);
         }
     }
 
     public boolean isMarkedParent(int conceptId) throws Exception {
-        return hasCurrentRefsetExtension(parentRefsetId, conceptId, 
-                new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, parentMemberTypeId));
+        return hasCurrentRefsetExtension(parentRefsetId, conceptId, parentMemberTypeId);
     }
 
     private boolean isMember(int conceptId) throws Exception {
-        return hasCurrentRefsetExtension(refsetId, conceptId, 
-                new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, memberTypeId));
+        return hasCurrentRefsetExtension(refsetId, conceptId, memberTypeId);
     }
 
     public int getParentRefset() throws Exception {
@@ -167,9 +161,8 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         return this.isARelTypes;
     }
 
-    public boolean hasCurrentMarkedParentExtension(int conceptId) throws Exception {        
-        return super.hasCurrentRefsetExtension(parentRefsetId, conceptId, 
-                new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, parentMemberTypeId));
+    public boolean hasCurrentMarkedParentExtension(int conceptId) throws Exception {
+        return super.hasCurrentRefsetExtension(parentRefsetId, conceptId, parentMemberTypeId);
     }
 
     /**
@@ -181,5 +174,42 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         }
     }
 
+    private class HasExtension implements Condition {
+        private int refsetId;
+        private int memberTypeId;
 
+        public HasExtension(int refsetId, int memberTypeId) {
+            this.refsetId = refsetId;
+            this.memberTypeId = memberTypeId;
+        }
+
+        public boolean evaluate(I_GetConceptData concept) throws Exception {
+            return hasCurrentRefsetExtension(this.refsetId, concept.getConceptId(), this.memberTypeId);
+        }
+    }
+
+    private class NotAlreadyVisited implements Condition {
+        private HashSet<Integer> visited = new HashSet<Integer>();
+
+        public boolean evaluate(I_GetConceptData concept) throws Exception {
+            return visited.add(concept.getConceptId());
+        }
+    }
+
+    private class OrOperator implements Condition {
+        private Condition[] conditions;
+
+        public OrOperator(Condition... conditions) {
+            this.conditions = conditions;
+        }
+
+        public boolean evaluate(I_GetConceptData concept) throws Exception {
+            for (Condition condition : this.conditions) {
+                if (condition.evaluate(concept)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 }

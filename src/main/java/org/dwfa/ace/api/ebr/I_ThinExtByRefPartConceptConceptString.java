@@ -8,7 +8,15 @@ public interface I_ThinExtByRefPartConceptConceptString extends I_ThinExtByRefPa
 	   public int getC2id();
 	   public void setC2id(int c2id);
 
+	   /** @deprecated Use {@link #getStringValue()} */
+	   @Deprecated
 	   public String getStr();
+	   
+	   /** @deprecated Use {@link #setStringValue(String)} */
+	   @Deprecated
 	   public void setStr(String str);
+	   
+	   public String getStringValue();
+	   public void setStringValue(String value);
 
 }

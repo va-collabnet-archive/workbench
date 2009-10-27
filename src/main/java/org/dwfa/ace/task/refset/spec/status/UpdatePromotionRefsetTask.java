@@ -16,7 +16,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.Condition;
@@ -160,7 +160,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
 
     private void updatePromotionsRefset(List<I_ThinExtByRefVersioned> memberExtensions,
             List<I_ThinExtByRefVersioned> promotionExtensions) throws Exception {
-        RefsetHelper refsetHelper = new RefsetHelper();
+        SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
         for (I_ThinExtByRefVersioned memberExtension : memberExtensions) {
             I_ThinExtByRefPart latestMemberPart = getLatestPart(memberExtension);
             I_ThinExtByRefVersioned promotionExtension =

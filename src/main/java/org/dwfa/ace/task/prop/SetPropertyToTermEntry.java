@@ -7,6 +7,10 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
+import org.apache.lucene.index.TermFreqVector;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -27,24 +31,29 @@ public class SetPropertyToTermEntry extends AbstractTask {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
     private String termPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
     private TermEntry termEntry = new TermEntry(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
 
+    private boolean convertToConcept = true;
+    
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(termPropName);
         out.writeObject(termEntry);
+        out.writeObject(convertToConcept);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
-            termPropName = (String) in.readObject();
-            termEntry = (TermEntry) in.readObject();
-        } else {
+        if (objDataVersion > dataVersion) {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+        termPropName = (String) in.readObject();
+        termEntry = (TermEntry) in.readObject();
+        if (objDataVersion >= 2) {
+            convertToConcept = (Boolean) in.readObject();
         }
     }
 
@@ -54,17 +63,17 @@ public class SetPropertyToTermEntry extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
+            if (convertToConcept) {
+                I_TermFactory tf = LocalVersionedTerminology.get();
+                I_GetConceptData concept = tf.getConcept(termEntry.getIds());
+                process.setProperty(termPropName, concept);
+            } else {
+                process.setProperty(termPropName, termEntry);
+            }
             
-            process.setProperty(termPropName, termEntry);
             return Condition.CONTINUE;
             
-        } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             throw new TaskFailedException(e);
         } 
     }
@@ -91,5 +100,13 @@ public class SetPropertyToTermEntry extends AbstractTask {
 
     public void setTermEntry(TermEntry rootEntry) {
         this.termEntry = rootEntry;
+    }
+
+    public boolean isConvertToConcept() {
+        return convertToConcept;
+    }
+
+    public void setConvertToConcept(boolean convertToConcept) {
+        this.convertToConcept = convertToConcept;
     }
 }

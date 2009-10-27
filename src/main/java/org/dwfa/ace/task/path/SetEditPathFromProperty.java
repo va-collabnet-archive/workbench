@@ -1,25 +1,23 @@
 package org.dwfa.ace.task.path;
 
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -27,31 +25,29 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
 public class SetEditPathFromProperty extends AbstractTask {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
     
-     private String editPathConceptPropName = ProcessAttachmentKeys.EDIT_PATH_CONCEPT.getAttachmentKey();
+    private String editPathPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
 
-     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-
-     private void writeObject(ObjectOutputStream out) throws IOException {
+    private boolean keepExistingEditPaths = false;
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(editPathConceptPropName);
-        out.writeObject(profilePropName);
+        out.writeObject(editPathPropName);
+        out.writeObject(keepExistingEditPaths);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
-            editPathConceptPropName = (String) in.readObject();
-            profilePropName = (String) in.readObject();
-        } else {
+        if (objDataVersion > dataVersion) {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+        editPathPropName = (String) in.readObject();
+        if (objDataVersion > 1) {
+            keepExistingEditPaths = (Boolean) in.readObject();
         }
 
     }
@@ -65,32 +61,30 @@ public class SetEditPathFromProperty extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
-            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-	          if (profile == null) {
-	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-	          }
-            I_GetConceptData editPathConcept = AceTaskUtil.getConceptFromProperty(process, editPathConceptPropName);
-            I_Path editPath = LocalVersionedTerminology.get().getPath(editPathConcept.getUids());
+            I_GetConceptData pathConcept = getProperty(process, I_GetConceptData.class, editPathPropName);
+            
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            
+            I_Path editPath = tf.getPath(pathConcept.getUids());
+            I_ConfigAceFrame frameConfig = tf.getActiveAceFrameConfig();
+            
+            Set<I_Path> editSet = frameConfig.getEditingPathSet();
+            if (!keepExistingEditPaths) {
+                editSet.clear();
+            }
+            frameConfig.addEditingPath(editPath);
 
-            profile.addEditingPath(editPath);
-
+            Set<I_Position> viewPositionSet = frameConfig.getViewPositionSet();
+            viewPositionSet.add(tf.newPosition(editPath, Integer.MAX_VALUE));
+            
+            frameConfig.fireUpdateHierarchyView();
+            
             return Condition.CONTINUE;
-        } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IOException e) {
-            throw new TaskFailedException(e);
-        } catch (TerminologyException e) {
+            
+        } catch (Exception e) {
             throw new TaskFailedException(e);
         }
     }
-
-
 
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
@@ -100,21 +94,20 @@ public class SetEditPathFromProperty extends AbstractTask {
         return new int[] {};
     }
 
-
-    public String getProfilePropName() {
-        return profilePropName;
+    public String getEditPathPropName() {
+        return editPathPropName;
     }
 
-    public void setProfilePropName(String profilePropName) {
-        this.profilePropName = profilePropName;
+    public void setEditPathPropName(String editPathPropName) {
+        this.editPathPropName = editPathPropName;
     }
 
-    public String getEditPathConceptPropName() {
-        return editPathConceptPropName;
+    public boolean isKeepExistingEditPaths() {
+        return keepExistingEditPaths;
     }
 
-    public void setEditPathConceptPropName(String editPathEntry) {
-        this.editPathConceptPropName = editPathEntry;
+    public void setKeepExistingEditPaths(boolean keepExistingEditPaths) {
+        this.keepExistingEditPaths = keepExistingEditPaths;
     }
 
 }

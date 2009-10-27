@@ -14,6 +14,7 @@ import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
@@ -62,7 +63,7 @@ public interface I_TermFactory {
 
     I_GetConceptData getConcept(Collection<UUID> ids) throws TerminologyException, IOException;
 
-    I_GetConceptData getConcept(UUID[] ids) throws TerminologyException, IOException;
+    I_GetConceptData getConcept(UUID ... ids) throws TerminologyException, IOException;
 
     I_GetConceptData getConcept(int nid) throws TerminologyException, IOException;
 
@@ -159,7 +160,7 @@ public interface I_TermFactory {
 
     I_Path getPath(Collection<UUID> uids) throws TerminologyException, IOException;
 
-    I_Path getPath(UUID[] ids) throws TerminologyException, IOException;
+    I_Path getPath(UUID ... ids) throws TerminologyException, IOException;
 
     List<I_Path> getPaths() throws Exception;
 
@@ -338,6 +339,102 @@ public interface I_TermFactory {
      */
     I_DescriptionPart newDescriptionPart();
 
+    // TODO getAllExtensionsForConcept() -- return all extensions of the
+    // concept, or any desc, rel, or ext of this concept...
+    I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId);
+
+    
+    I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, Class<? extends I_ThinExtByRefPart> partType);
+    
+    /**
+     * @deprecated Use {@link #newExtension(int, int, int, int)} using 
+     * {@link AllowDataCheckSuppression} and {@link SuppressDataChecks} annotations.
+     */
+    @Deprecated
+    I_ThinExtByRefVersioned newExtensionNoChecks(int refsetId, int memberId, int componentId, int typeId);
+
+    /**
+     * Create a new concrete extension part.
+     * <p>
+     * eg. newExtensionPart(I_ThinExtByRefPartConcept.class)
+     * @param <T> A sub-type of {@link I_ThinExtByRefPart}.
+     * @param t The interface to be instantiated.  
+     * @return A new strongly typed extension part which is assignable from T. 
+     */
+    <T extends I_ThinExtByRefPart> T newExtensionPart(Class<T> t);
+    
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartBoolean.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartBoolean newBooleanExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartConcept.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartConcept newConceptExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartConceptConcept.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartConceptConcept newConceptConceptExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartConceptConceptConcept.class)
+     */
+    @Deprecated    
+    I_ThinExtByRefPartConceptConceptConcept newConceptConceptConceptExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartConceptConceptString.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartConceptConceptString newConceptConceptStringExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartConceptInt.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartConceptInt newConceptIntExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartConceptString.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartConceptString newConceptStringExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartInteger.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartInteger newIntegerExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartLanguage.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartLanguage newLanguageExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartLanguageScoped.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartMeasurement.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartMeasurement newMeasurementExtensionPart();
+
+    /**
+     * @deprecated Use newExtensionPart(I_ThinExtByRefPartString.class)
+     */
+    @Deprecated
+    I_ThinExtByRefPartString newStringExtensionPart();
+    
     /**
      *
      * @return a new concept attribute part with all content uninitialized.
@@ -378,36 +475,6 @@ public interface I_TermFactory {
     // TODO We need a method call that will include the concept id...
     List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId, boolean addUncommitted)
             throws IOException;
-
-    // TODO getAllExtensionsForConcept() -- return all extensions of the
-    // concept, or any desc, rel, or ext of this concept...
-    I_ThinExtByRefVersioned newExtension(int refsetId, int memberId, int componentId, int typeId);
-
-    I_ThinExtByRefVersioned newExtensionNoChecks(int refsetId, int memberId, int componentId, int typeId);
-
-    I_ThinExtByRefPartBoolean newBooleanExtensionPart();
-
-    I_ThinExtByRefPartConcept newConceptExtensionPart();
-
-    I_ThinExtByRefPartConceptConcept newConceptConceptExtensionPart();
-
-    I_ThinExtByRefPartConceptConceptConcept newConceptConceptConceptExtensionPart();
-
-    I_ThinExtByRefPartConceptConceptString newConceptConceptStringExtensionPart();
-
-    I_ThinExtByRefPartConceptInt newConceptIntExtensionPart();
-
-    I_ThinExtByRefPartConceptString newConceptStringExtensionPart();
-
-    I_ThinExtByRefPartInteger newIntegerExtensionPart();
-
-    I_ThinExtByRefPartLanguage newLanguageExtensionPart();
-
-    I_ThinExtByRefPartLanguageScoped newLanguageScopedExtensionPart();
-
-    I_ThinExtByRefPartMeasurement newMeasurementExtensionPart();
-
-    I_ThinExtByRefPartString newStringExtensionPart();
 
     String getStats() throws IOException;
 
@@ -469,4 +536,17 @@ public interface I_TermFactory {
     
     public List<TimePathId> getTimePathList() throws Exception;
 
+    /**
+     * Create or modify a path
+     * 
+     * @param p
+     * @throws IOException
+     */
+    public void writePath(I_Path p) throws IOException;
+    
+    /**
+     * Add or update an origin position to a path 
+     */
+    public void writePathOrigin(I_Path path, I_Position origin) throws TerminologyException;
+   
 }

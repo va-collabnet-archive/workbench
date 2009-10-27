@@ -88,7 +88,7 @@ public class AddListViewConceptsToRefset extends AbstractTask {
 			}
 			
 			new MemberRefsetHelper(refset.getConceptId(), value.getConceptId())
-					.addAllToRefset(newMembers, "Adding concepts from list view to refset");
+			        .addAllToRefset(newMembers, "Adding concepts from list view to refset");
 			
 			// use commit in business process
 			

@@ -17,7 +17,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -46,19 +45,13 @@ import org.dwfa.util.id.Type5UuidFactory;
 @BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
 public class NewPath extends AbstractTask {
     /*This task has the same function with the "new path" in the preference panel */
-    
-	
-private static final long serialVersionUID = 1L;
+    	
+   private static final long serialVersionUID = 1L;
 
-   private static final int DATA_VERSION = 2;
-   
-   // path's origin, need to be a "real" path
-   private TermEntry originPathTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());  
+   private static final int DATA_VERSION = 3;
    
    //parent in the hierarchy, it could be any concept
    private TermEntry parentPathTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
-
-   private String originTime = "latest";
 
    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
    
@@ -68,8 +61,6 @@ private static final long serialVersionUID = 1L;
 
    private void writeObject(ObjectOutputStream out) throws IOException {
       out.writeInt(DATA_VERSION);
-      out.writeObject(originPathTermEntry);;
-      out.writeObject(originTime);
       out.writeObject(profilePropName);
       out.writeObject(parentPathTermEntry );
       out.writeObject(PathDescription);
@@ -77,25 +68,28 @@ private static final long serialVersionUID = 1L;
    }
 
    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-      int objDataVersion = in.readInt();      
-      if (objDataVersion <= DATA_VERSION) {
-    	  originPathTermEntry = (TermEntry)in.readObject();
-    	  originTime = (String)in.readObject();
-          profilePropName = (String)in.readObject();
-          parentPathTermEntry = (TermEntry)in.readObject();
-          PathDescription = (String)in.readObject();
-      } else {
-         throw new IOException("Can't handle dataversion: " + objDataVersion);
+      int objDataVersion = in.readInt();
+      
+      if (objDataVersion > DATA_VERSION) {
+          throw new IOException("Can't handle dataversion: " + objDataVersion);
       }
       
-      if (objDataVersion == DATA_VERSION) {
+      if (objDataVersion < 3) {
+          in.readObject();
+          in.readObject();
+      }
+	  
+      profilePropName = (String)in.readObject();
+      parentPathTermEntry = (TermEntry)in.readObject();
+      PathDescription = (String)in.readObject();
+      
+      if (objDataVersion >= 2) {
           newConceptPropName = (String)in.readObject();          
-      } 
+      }
    }
 
    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
       // Nothing to do...
-
    }
 
    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
@@ -108,13 +102,8 @@ private static final long serialVersionUID = 1L;
             // create parent of path
             I_GetConceptData newPathConcept =
                     createComponents(descriptionForNewPath, tf, activeProfile, parentPathTermEntry);
-            // create origin of path
-            Set<I_Position> origins = new HashSet<I_Position>();
 
-            I_Path originPath = tf.getPath(originPathTermEntry.ids);
-            origins.add(tf.newPosition(originPath, tf.convertToThinVersion(originTime)));
-
-            I_Path editPath = tf.newPath(origins, newPathConcept);
+            I_Path editPath = tf.newPath(null, newPathConcept);
 
             if (!isBlank(profilePropName)) {
                 I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
@@ -199,14 +188,6 @@ private static final long serialVersionUID = 1L;
       return new int[] {};
    }
 
-   public String getOriginTime() {
-      return originTime;
-   }
-
-   public void setOriginTime(String originTime) {
-      this.originTime = originTime;
-   }
-
    public TermEntry getParentPathTermEntry() {
       return parentPathTermEntry;
    }
@@ -223,29 +204,22 @@ private static final long serialVersionUID = 1L;
       this.profilePropName = profilePropName;
    }
 
-public TermEntry getOriginPathTermEntry() {
-	return originPathTermEntry;
-}
 
-public void setOriginPathTermEntry(TermEntry originPathTermEntry) {
-	this.originPathTermEntry = originPathTermEntry;
-}
-
-public String getPathDescription() {
-	return PathDescription;
-}
-
-public void setPathDescription(String pathDescription) {
-	PathDescription = pathDescription;
-}
-
-public String getNewConceptPropName() {
-    return newConceptPropName;
-}
-
-public void setNewConceptPropName(String newConceptPropName) {
-    this.newConceptPropName = newConceptPropName;
-}
+    public String getPathDescription() {
+    	return PathDescription;
+    }
+    
+    public void setPathDescription(String pathDescription) {
+    	PathDescription = pathDescription;
+    }
+    
+    public String getNewConceptPropName() {
+        return newConceptPropName;
+    }
+    
+    public void setNewConceptPropName(String newConceptPropName) {
+        this.newConceptPropName = newConceptPropName;
+    }
 
 
 }

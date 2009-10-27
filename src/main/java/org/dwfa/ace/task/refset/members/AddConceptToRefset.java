@@ -80,8 +80,7 @@ public class AddConceptToRefset extends AbstractTask {
 					"' as member of refset '" + refset.getInitialText() +
 					"' with a value '" + value.getInitialText() + "'.");	
 			
-			new MemberRefsetHelper(refset.getConceptId(), value.getConceptId())
-					.addToRefset(member.getConceptId());
+			new MemberRefsetHelper(refset.getConceptId(), value.getConceptId()).addToRefset(member.getConceptId());
 			
 			// use commit in business process
 			

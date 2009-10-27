@@ -22,13 +22,6 @@ public class NewPathBeanInfo extends SimpleBeanInfo {
             profilePropName.setDisplayName("<html><font color='green'>profile property:");
             profilePropName.setShortDescription("The property containing the profile which will be set to view and edit the newly created path. Leave blank to ignore.");
             
-            PropertyDescriptor originPathTermEntry =
-                new PropertyDescriptor("originPathTermEntry", getBeanDescriptor().getBeanClass());
-            originPathTermEntry.setBound(true);
-            originPathTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
-            originPathTermEntry.setDisplayName("<html><font color='green'>origin Path:");
-            originPathTermEntry.setShortDescription("The parent for the new editing path.");
-            
             PropertyDescriptor parentPathTermEntry =
                 new PropertyDescriptor("parentPathTermEntry", getBeanDescriptor().getBeanClass());
             parentPathTermEntry.setBound(true);
@@ -36,13 +29,6 @@ public class NewPathBeanInfo extends SimpleBeanInfo {
             parentPathTermEntry.setDisplayName("<html><font color='green'>path parent:");
             parentPathTermEntry.setShortDescription("The parent for the new editing path.");
             
-
-            PropertyDescriptor originTime =
-                new PropertyDescriptor("originTime", getBeanDescriptor().getBeanClass());
-            originTime.setBound(true);
-            originTime.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            originTime.setDisplayName("<html><font color='green'>origin time:");
-            originTime.setShortDescription("The origin time in yyyy.MM.dd HH:mm:ss format or 'latest' for the latest change on the path.");
  
             PropertyDescriptor pathDescription =
                 new PropertyDescriptor("PathDescription", getBeanDescriptor().getBeanClass());
@@ -59,7 +45,7 @@ public class NewPathBeanInfo extends SimpleBeanInfo {
             newConceptPropName.setShortDescription("The property which will be set to contain the new path concept");
             
             PropertyDescriptor rv[] =
-                { originPathTermEntry, parentPathTermEntry, originTime, profilePropName, pathDescription, newConceptPropName};
+                { parentPathTermEntry, profilePropName, pathDescription, newConceptPropName};
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());

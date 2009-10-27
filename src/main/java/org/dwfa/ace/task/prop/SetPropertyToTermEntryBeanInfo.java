@@ -5,6 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
@@ -28,8 +29,15 @@ public class SetPropertyToTermEntryBeanInfo extends SimpleBeanInfo {
             termEntry.setDisplayName("<html><font color='green'>term:");
             termEntry.setShortDescription("The concept to add to the property.");
 
+            PropertyDescriptor convertToConcept = 
+                new PropertyDescriptor("convertToConcept", getBeanDescriptor().getBeanClass());
+            convertToConcept.setBound(true);
+            convertToConcept.setPropertyEditorClass(CheckboxEditor.class);
+            convertToConcept.setDisplayName("<html><font color='green'>Convert to concept");
+            convertToConcept.setShortDescription("If checked the property will be set as a concept bean rather than as a term entry");
+            
             PropertyDescriptor rv[] =
-                { termPropName, termEntry };
+                { termPropName, termEntry, convertToConcept };
             return rv;
         } catch (IntrospectionException e) {
              throw new Error(e.toString());

@@ -65,7 +65,7 @@ public class SetEditPath extends AbstractTask {
             Set<I_Path> editSet = frameConfig.getEditingPathSet();
             editSet.clear();
             frameConfig.addEditingPath(editPath);
-
+            frameConfig.fireUpdateHierarchyView();
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);

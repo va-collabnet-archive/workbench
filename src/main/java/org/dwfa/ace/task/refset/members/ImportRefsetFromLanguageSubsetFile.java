@@ -15,7 +15,7 @@ import org.dwfa.ace.batch.BatchCancelledException;
 import org.dwfa.ace.batch.BatchMonitor;
 import org.dwfa.ace.file.LanguageSubsetMemberReader;
 import org.dwfa.ace.file.LanguageSubsetMemberReader.LanguageSubsetMemberLine;
-import org.dwfa.ace.refset.MemberRefsetHelper;
+import org.dwfa.ace.refset.spec.SpecMemberRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -54,7 +54,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
     private static int COMMIT_SIZE = 50000;
 
     /** Create/updated reset extensions. */
-    private MemberRefsetHelper memberRefsetHelper;
+    private SpecMemberRefsetHelper memberRefsetHelper;
 
     /** The number of processed lines */
     private long processedLineCount;
@@ -123,7 +123,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
                     (String) process.readProperty(languageSpcificationFileName));
             int refsetId = ((I_GetConceptData) process.readProperty(refsetConceptPropName)).getConceptId();
 
-            memberRefsetHelper = new MemberRefsetHelper(refsetId, RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid());
+            memberRefsetHelper = new SpecMemberRefsetHelper(refsetId, RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid());
             LanguageSubsetMemberReader reader = new LanguageSubsetMemberReader();
             reader.setSourceFile(new File((String) process.readProperty(languageSpcificationFileName)));
             reader.setHasHeader(true);

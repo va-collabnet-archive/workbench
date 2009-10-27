@@ -23,7 +23,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
-import org.dwfa.ace.refset.MemberRefsetHelper;
+import org.dwfa.ace.refset.spec.SpecMemberRefsetHelper;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -138,8 +138,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             // Step 1: create the query object, based on the refset spec
             RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
-            MemberRefsetHelper memberRefsetHelper =
-                    new MemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
+            SpecMemberRefsetHelper memberRefsetHelper =
+                    new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
             // check validity of query
             if (query.getTotalStatementCount() == 0) {
@@ -324,7 +324,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
     }
 
     private HashSet<Integer> filterNonCurrentRefsetMembers(List<I_ThinExtByRefVersioned> list,
-            MemberRefsetHelper refsetHelper, int refsetId, int memberTypeId) throws Exception {
+            SpecMemberRefsetHelper refsetHelper, int refsetId, int memberTypeId) throws Exception {
 
         HashSet<Integer> newList = new HashSet<Integer>();
         for (I_ThinExtByRefVersioned v : list) {

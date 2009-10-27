@@ -27,7 +27,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -215,7 +215,7 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
         I_GetConceptData unreviewedDeletionStatus =
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
 
-        RefsetHelper refsetHelper = new RefsetHelper();
+        SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
         List<I_GetConceptData> newAdditions =
                 refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(memberRefsetConcept
                     .getConceptId()), unreviewedAdditionStatus);

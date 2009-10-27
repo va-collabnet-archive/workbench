@@ -1,4 +1,4 @@
-package org.dwfa.ace.refset;
+package org.dwfa.ace.refset.spec;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import org.dwfa.ace.api.BeanPropertyMap;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -17,8 +16,8 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.api.ebr.ThinExtByRefPartProperty;
 import org.dwfa.ace.batch.Batch;
+import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
@@ -27,14 +26,14 @@ import org.dwfa.tapi.AllowDataCheckSuppression;
  * Utility class providing refset membership operations.
  */
 @AllowDataCheckSuppression
-public class MemberRefsetHelper extends RefsetHelper {
+public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
-    private Logger logger = Logger.getLogger(MemberRefsetHelper.class.getName());
+    private Logger logger = Logger.getLogger(SpecMemberRefsetHelper.class.getName());
 
     private int memberTypeId;
     private int memberRefsetId;
 
-    public MemberRefsetHelper(int memberRefsetId, int memberTypeId) throws Exception {
+    public SpecMemberRefsetHelper(int memberRefsetId, int memberTypeId) throws Exception {
         super();
         setMemberRefsetId(memberRefsetId);
         setMemberTypeId(memberTypeId);
@@ -58,9 +57,7 @@ public class MemberRefsetHelper extends RefsetHelper {
 
             @Override
             public void processItem(I_GetConceptData item) throws Exception {
-                boolean extAdded = newRefsetExtension(getMemberRefsetId(), item.getConceptId(), I_ThinExtByRefPartConcept.class, 
-                        new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId())); 
-                if (extAdded) {
+                if (newRefsetExtension(getMemberRefsetId(), item.getConceptId(), getMemberTypeId())) {
                     newMembers.add(item.getConceptId());
                 }
             }
@@ -106,11 +103,11 @@ public class MemberRefsetHelper extends RefsetHelper {
     }
 
     public void addMarkedParents(Integer... conceptIds) throws Exception {
-        new MarkedParentRefsetHelper(memberRefsetId, memberTypeId).addParentMembers(conceptIds);
+        new SpecMarkedParentRefsetHelper(memberRefsetId, memberTypeId).addParentMembers(conceptIds);
     }
 
     public void removeMarkedParents(Integer... conceptIds) throws Exception {
-        new MarkedParentRefsetHelper(memberRefsetId, memberTypeId).removeParentMembers(conceptIds);
+        new SpecMarkedParentRefsetHelper(memberRefsetId, memberTypeId).removeParentMembers(conceptIds);
     }
 
     /**
@@ -131,8 +128,7 @@ public class MemberRefsetHelper extends RefsetHelper {
 
             @Override
             public void processItem(I_GetConceptData item) throws Exception {
-                if (retireRefsetExtension(getMemberRefsetId(), item.getConceptId(), 
-                        new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId()))) {
+                if (retireRefsetExtension(getMemberRefsetId(), item.getConceptId(), getMemberTypeId())) {
                     removedMembers.add(item.getConceptId());
                 }
             }
@@ -184,9 +180,7 @@ public class MemberRefsetHelper extends RefsetHelper {
      *            The concept to be added
      */
     public boolean addToRefset(int conceptId) throws Exception {
-        boolean extAdded = newRefsetExtension(getMemberRefsetId(), conceptId, I_ThinExtByRefPartConcept.class, 
-                new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId())); 
-        if (extAdded) {
+        if (newRefsetExtension(getMemberRefsetId(), conceptId, getMemberTypeId())) {
             addMarkedParents(conceptId);
             return true;
         } else
@@ -200,8 +194,7 @@ public class MemberRefsetHelper extends RefsetHelper {
      *            The concept to be removed
      */
     public boolean removeFromRefset(int conceptId) throws Exception {
-        if (retireRefsetExtension(getMemberRefsetId(), conceptId, 
-                new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId()))) {
+        if (retireRefsetExtension(getMemberRefsetId(), conceptId, getMemberTypeId())) {
             removeMarkedParents(conceptId);
             return true;
         } else
