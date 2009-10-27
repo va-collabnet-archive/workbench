@@ -1796,7 +1796,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             try {
                 elementClass = Class.forName(e.getClassName());
             } catch (ClassNotFoundException ex) {
-                throw new TerminologyRuntimeException("No class for " + e.getClassName(), ex);
+                // We have encountered a class on the call stack which is not available to our classloader
+                // so we will stop here and assert we can check no further.
+                return false;
             }
 
             // Skip this class
