@@ -282,8 +282,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             bdbEnv = new BdbEnv(this, envHome, readOnly, null, luceneDir, dbSetupConfig);
             if (this.stealth == false) {
                 LocalVersionedTerminology.set(this);
-                LocalFixedTerminology.setStore(new VodbFixedServer(this));
             }
+                LocalFixedTerminology.setStore(new VodbFixedServer(this));
+
             activityFrame.setProgressInfoLower("complete");
             activityFrame.complete();
             long loadTime = System.currentTimeMillis() - startTime;
