@@ -11,7 +11,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.ace.task.search.IsChildOf;
+import org.dwfa.ace.task.search.IsKindOf;
 import org.dwfa.ace.task.search.RelSubsumptionMatch;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.vodb.types.ConceptBean;
@@ -56,7 +56,7 @@ public class SimilarConceptQuery {
 		for (I_RelTuple rel: concept.getSourceRelTuples(config.getAllowedStatus(), null, config.getViewPositionSet(), true)) {
 			// Get "is-a" relationships for is-child-of queries...
 			if (config.getSourceRelTypes().contains(rel.getTypeId())) {
-				IsChildOf ico = new IsChildOf();
+				IsKindOf ico = new IsKindOf();
 				ico.setParentTerm(new TermEntry(ConceptBean.get(rel.getC2Id()).getUids()));
 				extraCriterion.add(ico);
 			} else {

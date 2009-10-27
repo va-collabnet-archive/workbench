@@ -50,8 +50,6 @@ import org.dwfa.tapi.I_DescribeConceptUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescTuple;
-import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class TerminologyTransferHandler extends TransferHandler {
 
@@ -60,14 +58,6 @@ public class TerminologyTransferHandler extends TransferHandler {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public static String conceptBeanType = DataFlavor.javaJVMLocalObjectMimeType
-			+ ";class=" + ConceptBean.class.getName();
-
-	public static String thinDescTupleType = DataFlavor.javaJVMLocalObjectMimeType
-			+ ";class=" + ThinDescTuple.class.getName();
-
-	public static final String thinDescVersionedType = DataFlavor.javaJVMLocalObjectMimeType
-			+ ";class=" + ThinDescVersioned.class.getName();
 
 	public static DataFlavor conceptBeanFlavor;
 
@@ -88,11 +78,11 @@ public class TerminologyTransferHandler extends TransferHandler {
 		if (conceptBeanFlavor == null) {
 			try {
 				conceptBeanFlavor = new DataFlavor(
-						TerminologyTransferHandler.conceptBeanType);
+						ConceptTransferable.conceptBeanType);
 				thinDescVersionedFlavor = new DataFlavor(
-						TerminologyTransferHandler.thinDescVersionedType);
+						DescriptionTransferable.thinDescVersionedType);
 				thinDescTupleFlavor = new DataFlavor(
-						TerminologyTransferHandler.thinDescTupleType);
+						DescriptionTransferable.thinDescTupleType);
 				supportedFlavors = new DataFlavor[] { thinDescVersionedFlavor,
 						thinDescTupleFlavor, 
 						conceptBeanFlavor,
@@ -150,7 +140,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 							.getC1Id()));
 				case REL_TYPE:
 					return new ConceptTransferable(ConceptBean.get(rel
-							.getRelTypeId()));
+							.getTypeId()));
 				case DEST_ID:
 					return new ConceptTransferable(ConceptBean.get(rel
 							.getC2Id()));
@@ -199,7 +189,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 					case LANG:
 						return new StringSelection(desc.getLang());
 					case TEXT:
-						return new DescriptionTransferable(desc);
+							return new DescriptionTransferable(desc);
 					case DESC_ID:
 					case VERSION:
 					case PATH:

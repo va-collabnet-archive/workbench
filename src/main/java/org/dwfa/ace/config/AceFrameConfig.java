@@ -81,7 +81,7 @@ import org.dwfa.ace.table.refset.RefsetPreferences;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.ace.task.search.IsChildOf;
+import org.dwfa.ace.task.search.IsKindOf;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.bpa.data.SortedSetModel;
@@ -1925,7 +1925,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         try {
             List<I_TestSearchResults> extraCriterion = new ArrayList<I_TestSearchResults>();
             if (root != null) {
-                IsChildOf childTest = new IsChildOf();
+                IsKindOf childTest = new IsKindOf();
                 childTest.setParentTerm(new TermEntry(root.getUids()));
             }
             aceFrame.performLuceneSearch(query, extraCriterion);

@@ -30,6 +30,7 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.DeadlockException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
@@ -115,8 +116,9 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.impl.I_StoreExtensions#writeExt(org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned)
 	 */
-	public void writeExt(I_ThinExtByRefVersioned ext) throws DatabaseException,
+	public synchronized void writeExt(I_ThinExtByRefVersioned ext) throws DatabaseException,
 			IOException {
+		AceLog.getAppLog().info("getAllExtensionsForComponent: " + 		getAllExtensionsForComponent);
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(ext.getMemberId(), key);
@@ -216,12 +218,16 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 		return matches;
 	}
 
+	
+	private int getAllExtensionsForComponent = 0;
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.impl.I_StoreExtensions#getAllExtensionsForComponent(int)
 	 */
 	public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(
 			int componentId) throws IOException {
+		getAllExtensionsForComponent++;
 		try {
+			try{
 			Stopwatch timer = null;
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 				AceLog.getAppLog().fine("Getting extensions from componentId for: "
@@ -271,7 +277,12 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 						+ " elapsed time: " + timer.getElapsedTime() / 1000
 						+ " secs");
 			}
+			getAllExtensionsForComponent--;
 			return matches;
+			} catch (DeadlockException ex) {
+				ex.printStackTrace();
+				return getAllExtensionsForComponent(componentId);
+			}
 		} catch (DatabaseException ex) {
 			throw new ToIoException(ex);
 		}

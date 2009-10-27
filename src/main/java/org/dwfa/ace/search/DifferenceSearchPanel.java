@@ -17,7 +17,7 @@ import org.dwfa.ace.task.search.DifferenceRelsDestination;
 import org.dwfa.ace.task.search.DifferenceRelsSource;
 import org.dwfa.ace.task.search.DifferenceRelsSourceOrDestination;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.ace.task.search.IsChildOf;
+import org.dwfa.ace.task.search.IsKindOf;
 import org.dwfa.ace.task.search.RefsetMatch;
 
 public class DifferenceSearchPanel extends JPanel implements I_MakeCriterionPanel {
@@ -110,7 +110,7 @@ public class DifferenceSearchPanel extends JPanel implements I_MakeCriterionPane
     	criterionOptions.add(new DifferenceRelsSource());
     	criterionOptions.add(new DifferenceRelsSourceOrDestination());
     	criterionOptions.add(new RefsetMatch());
-    	criterionOptions.add(new IsChildOf());
+    	criterionOptions.add(new IsKindOf());
         return new CriterionPanel(this, null, criterionOptions);
     }
 

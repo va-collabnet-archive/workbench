@@ -1,6 +1,5 @@
 package org.dwfa.ace.config;
 
-import java.awt.Frame;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -278,8 +277,14 @@ class AceSvn {
 	public void doStealthChangeSetImport(List<File> changeLocations) {
 		// import any change sets that may be downloaded
 		// from svn...
+		boolean transactional = VodbEnv.isTransactional();
+		boolean txnNoSync = VodbEnv.getTxnNoSync();
+		boolean deferredWrite = VodbEnv.isDeferredWrite();
 		try {
 			AceLog.getAppLog().info("Starting stealth import");
+			VodbEnv.setTransactional(false);
+			VodbEnv.setTxnNoSync(false);
+			VodbEnv.setDeferredWrite(true);
 			File dbFolder = (File) jiniConfig.getEntry(jiniClass.getName(), "dbFolder", File.class, new File(
 					"target/berkeley-db"));
 
@@ -318,6 +323,9 @@ class AceSvn {
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
+		VodbEnv.setTransactional(transactional);
+		VodbEnv.setDeferredWrite(deferredWrite);
+		VodbEnv.setTxnNoSync(txnNoSync);
 		AceConfig.stealthVodb = null;
 		LocalVersionedTerminology.setStealthfactory(null);
 	}	

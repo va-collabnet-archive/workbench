@@ -19,7 +19,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -84,6 +86,7 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.AceRunner;
 import org.dwfa.ace.cs.BinaryChangeSetReader;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
+import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
@@ -279,10 +282,13 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
             AceLog.getAppLog().info("Berkeley DB info: " + JEVersion.CURRENT_VERSION.getVersionString());
 
-            bdbEnv = new BdbEnv(this, envHome, readOnly, null, luceneDir, dbSetupConfig);
-            if (this.stealth == false) {
+            if (this.stealth ) {
+               	bdbEnv = new BdbEnv(this, envHome, readOnly, null, luceneDir, dbSetupConfig);
+           } else 	{
+            	bdbEnv = new BdbEnv(this, envHome, readOnly, null, luceneDir, dbSetupConfig);
                 LocalVersionedTerminology.set(this);
             }
+
                 LocalFixedTerminology.setStore(new VodbFixedServer(this));
 
             activityFrame.setProgressInfoLower("complete");
@@ -1837,6 +1843,11 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
 	public List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
 		return ACE.getCommitErrorsAndWarnings();
+	}
+
+	public TransferHandler makeTerminologyTransferHandler(
+			JComponent thisComponent) {
+		return new TerminologyTransferHandler(thisComponent);
 	}
     
     

@@ -22,6 +22,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 
+import com.sleepycat.je.DeadlockException;
+
 /**
  * Path management. 
  * 
@@ -94,13 +96,12 @@ public class PathManager implements I_Manage<I_Path> {
 
     protected List<I_Position> getPathOrigins(int nid) throws TerminologyException {
         try {
-            ArrayList<I_Position> result = new ArrayList<I_Position>();
-            for (I_ThinExtByRefPartConceptInt extPart : 
-                    refsetHelper.<I_ThinExtByRefPartConceptInt>getAllCurrentRefsetExtensions(pathOriginRefsetId, nid)) {
-                result.add(new Position(extPart.getIntValue(), get(extPart.getC1id())));
-            }        
-            return result;
-            
+				ArrayList<I_Position> result = new ArrayList<I_Position>();
+				for (I_ThinExtByRefPartConceptInt extPart : 
+				        refsetHelper.<I_ThinExtByRefPartConceptInt>getAllCurrentRefsetExtensions(pathOriginRefsetId, nid)) {
+				    result.add(new Position(extPart.getIntValue(), get(extPart.getC1id())));
+				}        
+				return result;
         } catch (Exception e) {
             throw new TerminologyException("Unable to retrieve path origins.", e);
         }
