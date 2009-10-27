@@ -19,7 +19,7 @@ import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN), 
         @Spec(directory = "search", type = BeanType.TASK_BEAN) })
-public class IsChildOf extends AbstractSearchTest {
+public class IsKindOf extends AbstractSearchTest {
 
     private static final long serialVersionUID = 1;
 

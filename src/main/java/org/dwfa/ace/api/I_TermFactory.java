@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.swing.JComponent;
+import javax.swing.TransferHandler;
+
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -535,6 +538,8 @@ public interface I_TermFactory {
     void writeId(I_IdVersioned versioned) throws IOException;
     
     public List<TimePathId> getTimePathList() throws Exception;
+    
+    public TransferHandler makeTerminologyTransferHandler(JComponent thisComponent);
 
     /**
      * Create or modify a path

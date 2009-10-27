@@ -4,9 +4,9 @@ import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 
-public class IsChildOfSearchInfo extends AbstractSeachTestSearchInfo {
+public class IsKindOfSearchInfo extends AbstractSeachTestSearchInfo {
 
 	@Override
 	protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
@@ -14,7 +14,7 @@ public class IsChildOfSearchInfo extends AbstractSeachTestSearchInfo {
             PropertyDescriptor parentTerm =
                 new PropertyDescriptor("parentTerm", getBeanDescriptor().getBeanClass());
             parentTerm.setBound(true);
-            parentTerm.setPropertyEditorClass(ConceptLabelEditor.class);
+            parentTerm.setPropertyEditorClass(ConceptLabelPropEditor.class);
             parentTerm.setDisplayName("<html><font color='green'>parent:");
             parentTerm.setShortDescription("The concept to test for parentage of.");
 
@@ -29,8 +29,8 @@ public class IsChildOfSearchInfo extends AbstractSeachTestSearchInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(IsChildOf.class);
-        bd.setDisplayName("is child of");
+        BeanDescriptor bd = new BeanDescriptor(IsKindOf.class);
+        bd.setDisplayName("is kind of");
         return bd;
     }
 }

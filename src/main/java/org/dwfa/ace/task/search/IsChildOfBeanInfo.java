@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class IsChildOfBeanInfo extends AbstractSearchTestBeanInfo {
-    private static  IsChildOfSearchInfo searchInfo = new IsChildOfSearchInfo();
+    private static  IsKindOfSearchInfo searchInfo = new IsKindOfSearchInfo();
 
     
     public PropertyDescriptor[] getPropertyDescriptors() {
