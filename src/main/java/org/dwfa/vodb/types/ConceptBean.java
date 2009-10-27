@@ -194,6 +194,9 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			conceptAttributes = AceConfig.getVodb().getConceptAttributes(
 					conceptId);
 		}
+		if (conceptAttributes == null && uncommittedConceptAttributes != null) {
+			return uncommittedConceptAttributes;
+		}
 		return conceptAttributes;
 	}
 

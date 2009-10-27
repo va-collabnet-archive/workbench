@@ -493,7 +493,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 
 	protected abstract Object getPromotionRefsetValue(
 			I_ThinExtByRefVersioned extension, 
-			ReflexiveRefsetFieldData reflexiveRefsetFieldData) throws IOException, IllegalAccessException, InvocationTargetException;
+			ReflexiveRefsetFieldData reflexiveRefsetFieldData) 
+					throws IOException, IllegalAccessException, InvocationTargetException;
 
 	public abstract I_GetConceptData getPromotionRefsetIdentityConcept();
 	
