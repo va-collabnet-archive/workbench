@@ -17,7 +17,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
-import org.dwfa.ace.refset.MemberRefsetHelper;
+import org.dwfa.ace.refset.spec.SpecMemberRefsetHelper;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
@@ -91,8 +91,8 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
             RefsetSpecQuery query =
                     RefsetQueryFactory.createQuery(termFactory.getActiveAceFrameConfig(), termFactory, refsetSpec,
                         refset);
-            MemberRefsetHelper memberRefsetHelper =
-                    new MemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
+            SpecMemberRefsetHelper memberRefsetHelper =
+                    new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
             // check validity of query
             if (query.getTotalStatementCount() == 0) {
@@ -181,7 +181,7 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
     }
 
     private HashSet<Integer> filterNonCurrentRefsetMembers(List<I_ThinExtByRefVersioned> list,
-            MemberRefsetHelper refsetHelper, int refsetId, int memberTypeId) throws Exception {
+            SpecMemberRefsetHelper refsetHelper, int refsetId, int memberTypeId) throws Exception {
 
         HashSet<Integer> newList = new HashSet<Integer>();
         for (I_ThinExtByRefVersioned v : list) {
