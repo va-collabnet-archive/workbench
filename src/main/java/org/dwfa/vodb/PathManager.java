@@ -38,7 +38,7 @@ public class PathManager implements I_Manage<I_Path> {
     protected int pathOriginRefsetId;
     protected int pathConceptId;
     
-    protected boolean autoCommit = true;
+    protected boolean autoCommit = false;
     
     protected RefsetHelper refsetHelper;
     
