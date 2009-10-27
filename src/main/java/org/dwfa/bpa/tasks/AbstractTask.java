@@ -39,8 +39,10 @@ import net.jini.security.ProxyPreparer;
 
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_DefineTask;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 
 
@@ -408,4 +410,25 @@ public abstract class AbstractTask  implements I_DefineTask {
         throw new UnsupportedOperationException();
     }
 
+    protected <T> T getProperty(I_EncodeBusinessProcess process, Class<T> type, String propertyName) 
+            throws TerminologyException {
+        try { 
+            Object rawProperty = process.readProperty(propertyName);
+            if (rawProperty == null) {
+                throw new TerminologyException(
+                    "The property '" + propertyName + "' has not been specified.");
+            }
+            try {
+                return type.cast(rawProperty);
+            } catch (ClassCastException e) { 
+                throw new TerminologyException(
+                    "Incorrect type for property '" + propertyName +"'. Expected " 
+                    + type.getName() + " but got " + rawProperty.getClass().getName());
+            }
+        } catch (TerminologyException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new TerminologyException("Invalid property. " + e.getMessage(), e);
+        }
+    }
 }
