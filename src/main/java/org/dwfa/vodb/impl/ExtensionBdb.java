@@ -118,7 +118,6 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 	 */
 	public synchronized void writeExt(I_ThinExtByRefVersioned ext) throws DatabaseException,
 			IOException {
-		AceLog.getAppLog().info("getAllExtensionsForComponent: " + 		getAllExtensionsForComponent);
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		intBinder.objectToEntry(ext.getMemberId(), key);
@@ -219,13 +218,11 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 	}
 
 	
-	private int getAllExtensionsForComponent = 0;
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.impl.I_StoreExtensions#getAllExtensionsForComponent(int)
 	 */
 	public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(
 			int componentId) throws IOException {
-		getAllExtensionsForComponent++;
 		try {
 			try{
 			Stopwatch timer = null;
@@ -277,7 +274,6 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 						+ " elapsed time: " + timer.getElapsedTime() / 1000
 						+ " secs");
 			}
-			getAllExtensionsForComponent--;
 			return matches;
 			} catch (DeadlockException ex) {
 				ex.printStackTrace();
