@@ -1174,11 +1174,12 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	private class ConceptIdArrayIterator implements Iterator<I_GetConceptData> {
 		
 		int index = 0;
+		Cursor concCursor;
 		private ConceptIdArrayIterator() throws DatabaseException {
 			super();
 			if (conceptNids == null || getConceptCount() != conceptNids.length) {
 				conceptNids = new int[getConceptCount()];
-				Cursor concCursor = conDescRelDb.openCursor(null, null);
+				concCursor = conDescRelDb.openCursor(null, null);
 				DatabaseEntry foundKey = new DatabaseEntry();
 				DatabaseEntry foundData = new DatabaseEntry();
 				for (int i = 0; i < conceptNids.length; i++) {
@@ -1192,7 +1193,16 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 			}
 		}
 		public boolean hasNext() {
-			return index < conceptNids.length;
+		    if (index >= conceptNids.length) {
+		        if (concCursor != null) {
+		            try {
+		                concCursor.close();
+	                } catch (DatabaseException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
+	        return index < conceptNids.length;
 		}
 		public I_GetConceptData next() {
 			index++;
