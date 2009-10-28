@@ -32,7 +32,8 @@ public class ExtTableRenderer extends AceTableRenderer {
                         StringWithExtTuple prevSwt = (StringWithExtTuple) table.getValueAt(row - 1, column);
                         same = swt.getTuple().getMemberId() == prevSwt.getTuple().getMemberId();
                         setBorder(column, this, same, uncommitted);
-                        if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
+                        if ((same) && swt.getCellText() != null &&
+                        		(swt.getCellText().equals(prevSwt.getCellText()))) {
                             renderComponent.setText("");
                         }
                 	}

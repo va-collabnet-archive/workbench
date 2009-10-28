@@ -100,13 +100,14 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
    public String toString() {
 	   try {
 		   StringBuffer buff = new StringBuffer();
-		   buff.append(this.getClass().getSimpleName());
 		   buff.append(" path: ");
 		   buff.append(LocalVersionedTerminology.get().getConcept(pathId).toString());
 		   buff.append(" version: ");
 		   buff.append(new Date(LocalVersionedTerminology.get().convertToThickVersion(version)));
 		   buff.append(" status: ");
 		   buff.append(LocalVersionedTerminology.get().getConcept(status).toString());
+		   buff.append(" class: ");
+		   buff.append(this.getClass().getSimpleName());
 		   
 		   return buff.toString();
 	   } catch (Exception e) {

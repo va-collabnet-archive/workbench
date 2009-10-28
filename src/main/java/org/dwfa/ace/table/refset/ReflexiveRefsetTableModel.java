@@ -15,6 +15,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
@@ -135,14 +136,20 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 												break;
 											}
 										case CONCEPT_IDENTIFIER:
+											I_ThinExtByRefPart conceptIdPart = ebrTuple.getPart();
+										try {
 											Object obj = col.getReadMethod().invoke(
-													ebrTuple.getPart());
+													conceptIdPart);
 											if (obj instanceof Integer) {
 												conceptsToFetch.add((Integer) obj);
 											} else {
 												AceLog.getAppLog().alertAndLogException(
 														new Exception(obj + " is not an instance of Integer"));
 											}
+										} catch (Exception e) {
+											AceLog.getAppLog().warning("ReflexiveRefsetTableModel.CONCEPT_IDENTIFIER:" + 
+													e.getLocalizedMessage());
+										}
 											break;
 										case STRING:
 											break;

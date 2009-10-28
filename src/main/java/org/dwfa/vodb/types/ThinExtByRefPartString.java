@@ -84,5 +84,9 @@ public class ThinExtByRefPartString extends ThinExtByRefPart implements I_ThinEx
        }
        return 1;
    }
+   
+   public String toString() {
+	   return stringValue + super.toString();
+   }
 
  }

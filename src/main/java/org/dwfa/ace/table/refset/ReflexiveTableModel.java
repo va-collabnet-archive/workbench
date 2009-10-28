@@ -398,8 +398,14 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements
 					value = columns[columnIndex].getReadMethod().invoke(
 							tuple.getPart(), columns[columnIndex].readParamaters);
 				} else {
-					value = columns[columnIndex].getReadMethod().invoke(
-							tuple.getPart());
+					try {
+						value = columns[columnIndex].getReadMethod().invoke(
+								tuple.getPart());
+					} catch (Exception e) {
+						value = tuple.getPart().toString();
+						AceLog.getAppLog().warning(e.getMessage() +
+								": " + value);
+					}
 				}
 				break;
 			case PROMOTION_REFSET_PART:
