@@ -1468,10 +1468,12 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 		for (I_RelVersioned destRel: getDestRels()) {
 			for (I_RelPart part: destRel.getVersions()) {
 				if (relTypes.contains(part.getTypeId())) {
-					possibleKindOfConcepts.add(destRel.getC1Id());
-					ConceptBean child = ConceptBean.get(destRel.getC1Id());
-					possibleKindOfConcepts.addAll(child.getPossibleKindOfConcepts(config));
-					break;
+					if (possibleKindOfConcepts.contains(destRel.getC1Id()) == false) {
+						possibleKindOfConcepts.add(destRel.getC1Id());
+						ConceptBean child = ConceptBean.get(destRel.getC1Id());
+						possibleKindOfConcepts.addAll(child.getPossibleKindOfConcepts(config));
+						break;
+					}
 				}
 			}
 		}
