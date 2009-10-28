@@ -6,9 +6,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.UUID;
 
 import javax.swing.BorderFactory;
@@ -23,6 +21,7 @@ import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -104,64 +103,73 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
      */
     public void actionPerformed(ActionEvent e) {
         try {
-    	int n = JOptionPane.showConfirmDialog(
-    		    this,
-    		    "This operation will perform an immediate commit of all changes. \n\nDo you wish to proceed?",
-    		    "Confirm commit...",
-    		    JOptionPane.YES_NO_OPTION); 
-    	if (n != JOptionPane.YES_OPTION) {
-    		return;
-    	}
-        AceLog.getAppLog().info("Create new path: " + desc.getText());
-        if (desc.getText() == null || desc.getText().length() == 0) {
-            JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Path description cannot be empty.");
-            return;
-        }
-        Collection<I_Position> origins = this.sppp.getSelectedPositions();
-        AceLog.getAppLog().info(origins.toString());
-        if (origins.size() == 0) {
-            JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must select at least one origin for path.");
-            return;
-        }
-        ConceptBean selectedParent = (ConceptBean) parent.getTermComponent();
-        if (selectedParent == null) {
-            JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must designate one parent for path.");
-            return;
-        }
-        	UUID newPathUid = UUID.randomUUID();
-        	I_Path p = new Path(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()), null);
-        	Date now = new Date();
-        	int thinDate = ThinVersionHelper.convert(now.getTime());
-        	int idSource = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        	int nativePathId = AceConfig.getVodb().uuidToNativeWithGeneration(newPathUid, idSource,
-        			p, thinDate);
-        	Path newPath = new Path(nativePathId, new ArrayList<I_Position>(origins));
-         	// path id and uuid == the corresponding concepts UUID...
+        	int n = JOptionPane.showConfirmDialog(
+        		    this,
+        		    "This operation will perform an immediate commit of all changes. \n\nDo you wish to proceed?",
+        		    "Confirm commit...",
+        		    JOptionPane.YES_NO_OPTION); 
         	
-        	ConceptBean cb = ConceptBean.get(nativePathId);
-           	cb.getUncommittedIds().add(nativePathId);
+        	if (n != JOptionPane.YES_OPTION) {
+        		return;
+        	}
         	
+            AceLog.getAppLog().info("Create new path: " + desc.getText());
+            if (desc.getText() == null || desc.getText().length() == 0) {
+                JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Path description cannot be empty.");
+                return;
+            }
+            HashSet<I_Position> origins = new HashSet<I_Position>();
+            origins.addAll(this.sppp.getSelectedPositions());
+            
+            AceLog.getAppLog().info(origins.toString());
+            if (origins.size() == 0) {
+                JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must select at least one origin for path.");
+                return;
+            }
+            ConceptBean selectedParent = (ConceptBean) parent.getTermComponent();
+            if (selectedParent == null) {
+                JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must designate one parent for path.");
+                return;
+            }
+        
+            
+            I_TermFactory termFactory = AceConfig.getVodb();
+            I_Path workbenchPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            
+            int currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+        	int presentTime = ThinVersionHelper.convert(System.currentTimeMillis());
+        	int unspecifiedSourceId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
+
+        	// Create a concept for the path
+        	
+            int newNativeId = termFactory.uuidToNativeWithGeneration(
+                UUID.randomUUID(), unspecifiedSourceId, workbenchPath, presentTime);
+        	ConceptBean cb = ConceptBean.get(newNativeId);
+           	cb.getUncommittedIds().add(newNativeId);
+           	
         	//Needs a concept record...
-        	I_ConceptAttributeVersioned con = new ThinConVersioned(nativePathId, 1);
+        	I_ConceptAttributeVersioned con = new ThinConVersioned(newNativeId, 1);
         	ThinConPart part = new ThinConPart();
-        	part.setPathId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
+        	part.setPathId(workbenchPath.getConceptId());
         	part.setVersion(Integer.MAX_VALUE);
-        	part.setStatusId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+        	
+            part.setStatusId(currentStatusId);
         	part.setDefined(false);
         	con.addVersion(part);
         	cb.setUncommittedConceptAttributes(con);
            	cb.getUncommittedIds().add(con.getConId());
          	
         	//Needs a description record...
-        	int nativeDescId = AceConfig.getVodb().uuidToNativeWithGeneration(UUID.randomUUID(), idSource,
-        			p, thinDate);
-        	ThinDescVersioned descV = new ThinDescVersioned(nativeDescId, nativePathId, 1);
+        	int nativeDescId = termFactory.uuidToNativeWithGeneration(
+        	    UUID.randomUUID(), unspecifiedSourceId, workbenchPath, presentTime);
+        	ThinDescVersioned descV = new ThinDescVersioned(nativeDescId, newNativeId, 1);
         	ThinDescPart descPart = new ThinDescPart();
-        	descPart.setPathId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
+        	descPart.setPathId(workbenchPath.getConceptId());
         	descPart.setVersion(Integer.MAX_VALUE);
-        	descPart.setStatusId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+        	descPart.setStatusId(currentStatusId);
         	descPart.setInitialCaseSignificant(true);
-        	descPart.setTypeId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
+        	descPart.setTypeId(termFactory.uuidToNative(
+        	    ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
         	descPart.setLang("en");
         	descPart.setText(desc.getText());
         	descV.addVersion(descPart);
@@ -169,17 +177,16 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
            	cb.getUncommittedIds().add(descV.getDescId());
         	
         	//Needs a relationship record...
-        	int nativeRelId = AceConfig.getVodb().uuidToNativeWithGeneration(UUID.randomUUID(), idSource,
-        			p, thinDate);
-        	ThinRelVersioned relV = new ThinRelVersioned(nativeRelId, nativePathId, 
-        			selectedParent.getConceptId(), 1);
+        	int nativeRelId = termFactory.uuidToNativeWithGeneration(
+        	    UUID.randomUUID(), unspecifiedSourceId, workbenchPath, presentTime);
+        	ThinRelVersioned relV = new ThinRelVersioned(nativeRelId, newNativeId, selectedParent.getConceptId(), 1);
         	ThinRelPart relPart = new ThinRelPart();
-        	relPart.setPathId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
+        	relPart.setPathId(workbenchPath.getConceptId());
         	relPart.setVersion(Integer.MAX_VALUE);
-        	relPart.setStatusId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
-        	relPart.setTypeId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-        	relPart.setCharacteristicId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()));
-        	relPart.setRefinabilityId(AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()));
+        	relPart.setStatusId(currentStatusId);
+        	relPart.setTypeId(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+        	relPart.setCharacteristicId(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()));
+        	relPart.setRefinabilityId(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()));
         	relPart.setGroup(0);
         	relV.addVersion(relPart);
         	cb.getUncommittedSourceRels().add(relV);
@@ -187,8 +194,11 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
         	        	        	
         	ACE.addUncommitted(cb);
             ACE.commit();
-           	ACE.addUncommitted(newPath);
            	
+            // Now make the concept a path
+            
+           	termFactory.newPath(origins, cb);
+            
             AceLog.getAppLog().info("Created new path: " + desc.getText() + " " + origins);
             this.desc.setText("");
             this.parent.setTermComponent(null);
