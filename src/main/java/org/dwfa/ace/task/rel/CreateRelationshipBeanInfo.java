@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class CreateRelationshipBeanInfo extends SimpleBeanInfo {
@@ -36,28 +36,28 @@ public class CreateRelationshipBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor relType =
                 new PropertyDescriptor("relType", CreateRelationship.class);
             relType.setBound(true);
-            relType.setPropertyEditorClass(ConceptLabelEditor.class);
+            relType.setPropertyEditorClass(ConceptLabelPropEditor.class);
             relType.setDisplayName("Rel type:");
             relType.setShortDescription("The relationship type for the new relationship.");
 
             PropertyDescriptor relCharacteristic =
                 new PropertyDescriptor("relCharacteristic", CreateRelationship.class);
             relCharacteristic.setBound(true);
-            relCharacteristic.setPropertyEditorClass(ConceptLabelEditor.class);
+            relCharacteristic.setPropertyEditorClass(ConceptLabelPropEditor.class);
             relCharacteristic.setDisplayName("Rel characteristic:");
             relCharacteristic.setShortDescription("The characteristic for the new relationship.");
 
             PropertyDescriptor relRefinability =
                 new PropertyDescriptor("relRefinability", CreateRelationship.class);
             relRefinability.setBound(true);
-            relRefinability.setPropertyEditorClass(ConceptLabelEditor.class);
+            relRefinability.setPropertyEditorClass(ConceptLabelPropEditor.class);
             relRefinability.setDisplayName("Rel refinability:");
             relRefinability.setShortDescription("The refinability of the new relationship.");
 
             PropertyDescriptor relStatus =
                 new PropertyDescriptor("relStatus", CreateRelationship.class);
             relStatus.setBound(true);
-            relStatus.setPropertyEditorClass(ConceptLabelEditor.class);
+            relStatus.setPropertyEditorClass(ConceptLabelPropEditor.class);
             relStatus.setDisplayName("Rel status:");
             relStatus.setShortDescription("The status of the new relationship.");
 

@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class ChangeConceptStatusBeanInfo extends SimpleBeanInfo {
@@ -16,7 +16,7 @@ public class ChangeConceptStatusBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor newStatus =
                 new PropertyDescriptor("newStatus", getBeanDescriptor().getBeanClass());
             newStatus.setBound(true);
-            newStatus.setPropertyEditorClass(ConceptLabelEditor.class);
+            newStatus.setPropertyEditorClass(ConceptLabelPropEditor.class);
             newStatus.setDisplayName("New status:");
             newStatus.setShortDescription("The new status value for the concept.");
 

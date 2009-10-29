@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class ChangeRelsOfTypeToStatusBeanInfo extends SimpleBeanInfo {
@@ -22,14 +22,14 @@ public class ChangeRelsOfTypeToStatusBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor relType =
                 new PropertyDescriptor("relType", ChangeRelsOfTypeToStatus.class);
             relType.setBound(true);
-            relType.setPropertyEditorClass(ConceptLabelEditor.class);
+            relType.setPropertyEditorClass(ConceptLabelPropEditor.class);
             relType.setDisplayName("Rel type:");
             relType.setShortDescription("The type of rels to change the status of.");
 
             PropertyDescriptor newStatus =
                 new PropertyDescriptor("newStatus", ChangeRelsOfTypeToStatus.class);
             newStatus.setBound(true);
-            newStatus.setPropertyEditorClass(ConceptLabelEditor.class);
+            newStatus.setPropertyEditorClass(ConceptLabelPropEditor.class);
             newStatus.setDisplayName("New status:");
             newStatus.setShortDescription("The new status value for the concept.");
 

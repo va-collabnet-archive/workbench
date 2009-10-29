@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
 public class ClassifyBeanInfo extends SimpleBeanInfo {
@@ -22,7 +22,7 @@ public class ClassifyBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor classifyRoot =
                 new PropertyDescriptor("classifyRoot", Classify.class);
             classifyRoot.setBound(true);
-            classifyRoot.setPropertyEditorClass(ConceptLabelEditor.class);
+            classifyRoot.setPropertyEditorClass(ConceptLabelPropEditor.class);
             classifyRoot.setDisplayName("<html><font color='green'>Classification Root Concept:");
             classifyRoot.setShortDescription("Define the root Concept for classification.");
 

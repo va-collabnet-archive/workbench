@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class IsChildOfBeanInfo extends AbstractSearchTestBeanInfo {
+public class IsKindOfBeanInfo extends AbstractSearchTestBeanInfo {
     private static  IsKindOfSearchInfo searchInfo = new IsKindOfSearchInfo();
 
     

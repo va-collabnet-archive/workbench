@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class EditPopupAddBeanInfo extends SimpleBeanInfo {
@@ -16,7 +16,7 @@ public class EditPopupAddBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor conceptToAdd =
                 new PropertyDescriptor("conceptToAdd", getBeanDescriptor().getBeanClass());
             conceptToAdd.setBound(true);
-            conceptToAdd.setPropertyEditorClass(ConceptLabelEditor.class);
+            conceptToAdd.setPropertyEditorClass(ConceptLabelPropEditor.class);
             conceptToAdd.setDisplayName("<html><font color='green'>concept to add:");
             conceptToAdd.setShortDescription("The concept to add to the selected type edit popup...");
 

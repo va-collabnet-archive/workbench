@@ -52,6 +52,9 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public LANGUAGE_SORT_PREF getLanguageSortPref();
 
     public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref);
+    
+    public boolean searchWithDescTypeFilter();
+    public void setSearchWithDescTypeFilter(boolean filter);
 
     public boolean isActive();
 

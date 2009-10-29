@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 
 /**
  * Bean info to AddRoot class.
@@ -26,7 +26,7 @@ public class AddRootBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor root =
                 new PropertyDescriptor("root", AddRoot.class);
             root.setBound(true);
-            root.setPropertyEditorClass(ConceptLabelEditor.class);
+            root.setPropertyEditorClass(ConceptLabelPropEditor.class);
             root.setDisplayName("<html><font color='green'>Drag root here:");
             root.setShortDescription("Choose root to add to hierarchy " +
                     "and drag it here.");

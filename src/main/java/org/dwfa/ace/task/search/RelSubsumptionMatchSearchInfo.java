@@ -4,8 +4,8 @@ import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.CheckboxEditor;
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
 public class RelSubsumptionMatchSearchInfo extends AbstractSeachTestSearchInfo {
 
@@ -22,14 +22,14 @@ public class RelSubsumptionMatchSearchInfo extends AbstractSeachTestSearchInfo {
             PropertyDescriptor relTypeTerm = 
 				new PropertyDescriptor("relTypeTerm", getBeanDescriptor().getBeanClass());
 			relTypeTerm.setBound(true);
-			relTypeTerm.setPropertyEditorClass(ConceptLabelEditor.class);
+			relTypeTerm.setPropertyEditorClass(ConceptLabelPropEditor.class);
 			relTypeTerm.setDisplayName("<html><font color='green'>type kind:");
 			relTypeTerm.setShortDescription("The concept to test for type is kind of.");
 
 			PropertyDescriptor relRestrictionTerm = 
 				new PropertyDescriptor("relRestrictionTerm", getBeanDescriptor().getBeanClass());
 			relRestrictionTerm.setBound(true);
-			relRestrictionTerm.setPropertyEditorClass(ConceptLabelEditor.class);
+			relRestrictionTerm.setPropertyEditorClass(ConceptLabelPropEditor.class);
 			relRestrictionTerm.setDisplayName("<html><font color='green'>restriction kind:");
 			relRestrictionTerm.setShortDescription("The concept to test for restriction is kind of.");
 

@@ -45,7 +45,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.config.AceConfiguration;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;

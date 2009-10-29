@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class CopyTermEntryToPropertyBeanInfo extends SimpleBeanInfo {
@@ -16,7 +16,7 @@ public class CopyTermEntryToPropertyBeanInfo extends SimpleBeanInfo {
            PropertyDescriptor termEntry =
                new PropertyDescriptor("termEntry", getBeanDescriptor().getBeanClass());
            termEntry.setBound(true);
-           termEntry.setPropertyEditorClass(ConceptLabelEditor.class);
+           termEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
            termEntry.setDisplayName("concept:");
            termEntry.setShortDescription("The concept to copy to the property.");
 

@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
@@ -58,7 +58,7 @@ public class CreateRefsetMetaDataTaskBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor statusTermEntry;
             statusTermEntry = new PropertyDescriptor("statusTermEntry", getBeanDescriptor().getBeanClass());
             statusTermEntry.setBound(true);
-            statusTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
+            statusTermEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
             statusTermEntry.setDisplayName("<html><font color='green'>status concept to use:");
             statusTermEntry.setShortDescription("The status concept to use.");
 

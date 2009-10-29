@@ -3,10 +3,8 @@ package org.dwfa.ace.task.search;
 import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.CheckboxEditor;
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 
 public class RefsetMatchSearchInfo extends AbstractSeachTestSearchInfo {
 
@@ -16,7 +14,7 @@ public class RefsetMatchSearchInfo extends AbstractSeachTestSearchInfo {
             PropertyDescriptor refsetTerm =
                 new PropertyDescriptor("refset", getBeanDescriptor().getBeanClass());
             refsetTerm.setBound(true);
-            refsetTerm.setPropertyEditorClass(ConceptLabelEditor.class);
+            refsetTerm.setPropertyEditorClass(ConceptLabelPropEditor.class);
             refsetTerm.setDisplayName("<html><font color='green'>refset:");
             refsetTerm.setShortDescription("The refset to test the component is in.");
 

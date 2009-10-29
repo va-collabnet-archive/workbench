@@ -4,7 +4,7 @@ import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 
 public class HasStatusSearchInfo extends AbstractSeachTestSearchInfo {
 
@@ -15,7 +15,7 @@ public class HasStatusSearchInfo extends AbstractSeachTestSearchInfo {
             PropertyDescriptor statusTerm =
                 new PropertyDescriptor("statusTerm", getBeanDescriptor().getBeanClass());
             statusTerm.setBound(true);
-            statusTerm.setPropertyEditorClass(ConceptLabelEditor.class);
+            statusTerm.setPropertyEditorClass(ConceptLabelPropEditor.class);
             statusTerm.setDisplayName("<html><font color='green'>status kind:");
             statusTerm.setShortDescription("The concept to test for status is kind of.");
 

@@ -5,7 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
 public class PerformLuceneSearchBeanInfo extends SimpleBeanInfo {
@@ -22,7 +22,7 @@ public class PerformLuceneSearchBeanInfo extends SimpleBeanInfo {
 	            PropertyDescriptor searchRoot =
 	                new PropertyDescriptor("searchRoot", PerformLuceneSearch.class);
 	            searchRoot.setBound(true);
-	            searchRoot.setPropertyEditorClass(ConceptLabelEditor.class);
+	            searchRoot.setPropertyEditorClass(ConceptLabelPropEditor.class);
 	            searchRoot.setDisplayName("Query root:");
 	            searchRoot.setShortDescription("Root used for query. Null search the whole database");
 	            

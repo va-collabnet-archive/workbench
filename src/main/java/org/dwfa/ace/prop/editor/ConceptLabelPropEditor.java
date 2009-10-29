@@ -30,7 +30,7 @@ public class ConceptLabelPropEditor extends PropertyEditorSupport
      */
     public ConceptLabelPropEditor() throws Exception {
         super();
-        this.editor.addPropertyChangeListener("concept", this);
+        this.editor.addPropertyChangeListener("termComponent", this);
     }
     
     /**
