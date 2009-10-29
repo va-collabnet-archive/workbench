@@ -86,12 +86,13 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                     RequestForChangePanel panel = (RequestForChangePanel) c;
 
                     I_GetConceptData refset = panel.getRefset();
-                    I_GetConceptData editor = panel.getEditor(); // TODO check
+                    I_GetConceptData editor = panel.getEditor();
                     String originalRequest = panel.getOriginalRequest();
                     String comments = panel.getComments();
                     Calendar deadline = panel.getDeadline();
                     String priority = panel.getPriority();
                     HashSet<File> attachments = panel.getAttachments();
+                    I_GetConceptData owner = config.getDbConfig().getUserConcept();
 
                     Priority p;
                     if (priority == null) {
@@ -124,6 +125,8 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                         String inboxAddress = wizard.getInbox(editor);
                         process.setProperty(nextUserTermEntryPropName, inboxAddress);
                         process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { editor
+                            .getUids().iterator().next() });
+                        process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { owner
                             .getUids().iterator().next() });
                         if (inboxAddress == null) {
                             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
