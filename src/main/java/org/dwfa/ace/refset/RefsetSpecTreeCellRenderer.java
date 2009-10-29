@@ -105,7 +105,9 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 						this.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, AceTableRenderer.UNCOMMITTED_COLOR));					
 					}
 				}
-				extType = ThinExtBinder.getExtensionType(firstTuple.getCore());
+				if (firstTuple != null) {
+					extType = ThinExtBinder.getExtensionType(firstTuple.getCore());
+				}
 			} else {
 				firstTuple = (I_ThinExtByRefTuple) node.getUserObject();
 				extType = ThinExtBinder.getExtensionType(firstTuple.getCore());
@@ -153,6 +155,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 				}
 				if (firstTuple != null) {
 					try {
+						extType = ThinExtBinder.getExtensionType(firstTuple.getCore());
 						switch (extType) {
 						case CONCEPT_CONCEPT:
 							renderBranchingClause(firstTuple);

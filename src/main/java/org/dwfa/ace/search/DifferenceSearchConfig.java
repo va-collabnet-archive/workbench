@@ -1091,5 +1091,21 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 	public void setSearchWithDescTypeFilter(boolean filter) {
 		frameConfig.setSearchWithDescTypeFilter(filter);
 	}
+
+	public void addMergePath(I_Path p) {
+		frameConfig.addMergePath(p);
+	}
+
+	public Set<I_Path> getMergePathSet() {
+		return frameConfig.getMergePathSet();
+	}
+
+	public void removeMergePath(I_Path p) {
+		frameConfig.removeMergePath(p);
+	}
+
+	public void replaceMergePath(I_Path oldPath, I_Path newPath) {
+		frameConfig.replaceMergePath(oldPath, newPath);
+	}
 	
 }

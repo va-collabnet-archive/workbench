@@ -113,7 +113,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 43;
+    private static final int dataVersion = 44;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -303,6 +303,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     // 43
     
     private boolean searchWithDescTypeFilter = false;
+    
+    // 44
+    private Set<I_Path> mergePathSet = new HashSet<I_Path>();
+
     
     // transient
     private transient MasterWorker worker;
@@ -516,6 +520,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         
         //43
         out.writeBoolean(searchWithDescTypeFilter);
+        
+        //44
+        Path.writePathSet(out, mergePathSet);
+
     }
 
     private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws DatabaseException,
@@ -941,6 +949,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	searchWithDescTypeFilter = false;
             }
             
+            if (objDataVersion >= 44) {
+                mergePathSet = Path.readPathSet(in);
+            } else {
+            	mergePathSet = new HashSet<I_Path>();
+            }
+            
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -1230,6 +1244,49 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     public Set<I_Path> getEditingPathSet() {
         return editingPathSet;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#addEditingPath(org.dwfa.vodb.types
+     * .Path)
+     */
+    public void addMergePath(I_Path p) {
+        mergePathSet.add(p);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#removeEditingPath(org.dwfa.vodb.
+     * types.Path)
+     */
+    public void removeMergePath(I_Path p) {
+    	mergePathSet.remove(p);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#replaceEditingPath(org.dwfa.vodb
+     * .types.Path, org.dwfa.vodb.types.Path)
+     */
+    public void replaceMergePath(I_Path oldPath, I_Path newPath) {
+        this.mergePathSet.remove(oldPath);
+        this.mergePathSet.add(newPath);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditingPathSet()
+     */
+    public Set<I_Path> getMergePathSet() {
+        return mergePathSet;
     }
 
     /*
