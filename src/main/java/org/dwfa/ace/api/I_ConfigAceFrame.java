@@ -114,12 +114,14 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void setDestRelTypes(I_IntSet browseUpRels);
 
     public void addEditingPath(I_Path p);
-
     public void removeEditingPath(I_Path p);
-
     public void replaceEditingPath(I_Path oldPath, I_Path newPath);
-
     public Set<I_Path> getEditingPathSet();
+
+    public void addMergePath(I_Path p);
+    public void removeMergePath(I_Path p);
+    public void replaceMergePath(I_Path oldPath, I_Path newPath);
+    public Set<I_Path> getMergePathSet();
 
     public void addViewPosition(I_Position p);
 

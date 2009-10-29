@@ -138,6 +138,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             // Step 1: create the query object, based on the refset spec
             RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
+            RefsetSpecQuery possibleQuery = RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset);
             SpecMemberRefsetHelper memberRefsetHelper =
                     new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
@@ -170,7 +171,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                         normalMemberConcept.getConceptId());
 
             // Compute the possible concepts to iterate over here...
-            Set<Integer> possibleConcepts = query.getPossibleConcepts(configFrame);
+            Set<Integer> possibleConcepts = possibleQuery.getPossibleConcepts(configFrame);
+            
             
             computeRefsetActivityPanel.setMaximum(possibleConcepts.size());
             computeRefsetActivityPanel.setIndeterminate(false);
