@@ -1147,4 +1147,12 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	public I_ShowActivity getTopActivityListener() {
 		return frameConfig.getTopActivityListener();
 	}
+
+	public boolean searchWithDescTypeFilter() {
+		return frameConfig.searchWithDescTypeFilter();
+	}
+
+	public void setSearchWithDescTypeFilter(boolean filter) {
+		frameConfig.setSearchWithDescTypeFilter(filter);
+	}
 }

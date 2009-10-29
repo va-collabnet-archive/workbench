@@ -74,7 +74,13 @@ import org.dwfa.vodb.types.ConceptBean;
 
 public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
-    public class MaximizeSearchListener implements ActionListener {
+    private class FilterSearchActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			config.setSearchWithDescTypeFilter(searchWithDescTypeFilter.isSelected());
+		}
+	}
+
+	public class MaximizeSearchListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             JToggleButton toggle = (JToggleButton) e.getSource();
@@ -90,6 +96,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             removeButton.setVisible(!toggle.isSelected());
             linkSpinner.setVisible(!toggle.isSelected());
             showHistory.setVisible(!toggle.isSelected());
+            searchWithDescTypeFilter.setVisible(!toggle.isSelected());
             for (CriterionPanel test : criterionPanels) {
                 test.setVisible(toggle.isSelected());
             }
@@ -357,6 +364,9 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private JButton saveButton;
 
     private JToggleButton showHistory;
+    
+    private JToggleButton searchWithDescTypeFilter;;
+    
 
     private List<I_TestSearchResults> extraCriterion;
 
@@ -522,6 +532,15 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             .setToolTipText("show current and historical descriptions, including retired descriptions and descriptions of retired concepts");
         add(showHistory, gbc);
         gbc.gridx++;
+        
+        searchWithDescTypeFilter= new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/component_preferences.png")));
+        searchWithDescTypeFilter
+        	.setToolTipText("filter search using preferences");
+        searchWithDescTypeFilter.setSelected(config.searchWithDescTypeFilter());
+        searchWithDescTypeFilter.addActionListener(new FilterSearchActionListener());
+        add(searchWithDescTypeFilter, gbc);
+        gbc.gridx++;
+        
         loadButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/read_from_disk.png")));
         loadButton.setToolTipText("read search specification from disk");
         loadButton.addActionListener(new LoadQuery());
@@ -588,7 +607,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         sortingTable.setSortingStatus(0, SortOrder.DESCENDING);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridwidth = 12;
+        gbc.gridwidth = 13;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         JScrollPane scrollPane = new JScrollPane(descTable);

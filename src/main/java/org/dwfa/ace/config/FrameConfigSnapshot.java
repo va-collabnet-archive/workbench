@@ -1163,4 +1163,12 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 	public I_ShowActivity getTopActivityListener() {
 		return baseFrame.getTopActivityListener();
 	}
+
+	public boolean searchWithDescTypeFilter() {
+		return baseFrame.searchWithDescTypeFilter();
+	}
+
+	public void setSearchWithDescTypeFilter(boolean filter) {
+		baseFrame.setSearchWithDescTypeFilter(filter);
+	}
 }

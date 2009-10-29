@@ -1083,5 +1083,13 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
     public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy) {
         frameConfig.setShowPathInfoInTaxonomy(showPathInfoInTaxonomy);
     }
+
+	public boolean searchWithDescTypeFilter() {
+		return frameConfig.searchWithDescTypeFilter();
+	}
+
+	public void setSearchWithDescTypeFilter(boolean filter) {
+		frameConfig.setSearchWithDescTypeFilter(filter);
+	}
 	
 }

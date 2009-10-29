@@ -113,7 +113,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 42;
+    private static final int dataVersion = 43;
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -299,6 +299,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 42
     private boolean showPathInfoInTaxonomy = true;
+    
+    // 43
+    
+    private boolean searchWithDescTypeFilter = false;
     
     // transient
     private transient MasterWorker worker;
@@ -509,6 +513,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         
         //42 
         out.writeObject(showPathInfoInTaxonomy);
+        
+        //43
+        out.writeBoolean(searchWithDescTypeFilter);
     }
 
     private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws DatabaseException,
@@ -924,6 +931,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             
             if (objDataVersion >= 42) {
                 showPathInfoInTaxonomy = (Boolean) in.readObject();
+            } else {
+            	showPathInfoInTaxonomy = true;
+            }
+            
+            if (objDataVersion >=43) {
+            	searchWithDescTypeFilter = in.readBoolean();
+            } else {
+            	searchWithDescTypeFilter = false;
             }
             
         } else {
@@ -2914,4 +2929,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void fireUpdateHierarchyView() {
         changeSupport.firePropertyChange("updateHierarchyView", false, true);
     }
+
+	public boolean searchWithDescTypeFilter() {
+		return searchWithDescTypeFilter;
+	}
+
+	public void setSearchWithDescTypeFilter(boolean searchWithDescTypeFilter) {
+		boolean old = this.searchWithDescTypeFilter;
+		this.searchWithDescTypeFilter = searchWithDescTypeFilter;
+		this.changeSupport.firePropertyChange("searchWithDescTypeFilter", old, searchWithDescTypeFilter);
+	}
 }
