@@ -138,7 +138,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             // Step 1: create the query object, based on the refset spec
             RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
-            RefsetSpecQuery possibleQuery = RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset);
+            RefsetSpecQuery possibleQuery =
+                    RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset);
             SpecMemberRefsetHelper memberRefsetHelper =
                     new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
@@ -172,11 +173,11 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             // Compute the possible concepts to iterate over here...
             Set<Integer> possibleConcepts = possibleQuery.getPossibleConcepts(configFrame);
-            
-            
+            possibleConcepts.addAll(currentRefsetMemberIds);
+
             computeRefsetActivityPanel.setMaximum(possibleConcepts.size());
             computeRefsetActivityPanel.setIndeterminate(false);
-            for (int nid: possibleConcepts) {
+            for (int nid : possibleConcepts) {
                 currentConcept = termFactory.getConcept(nid);
                 conceptsProcessed++;
 
@@ -204,6 +205,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             }
 
             progressReportHtmlGenerator.setStep2Complete(true);
+            progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
+            progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
             computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
             computeRefsetActivityPanel.setIndeterminate(true);
             computeRefsetActivityPanel.setStringPainted(false);
@@ -256,16 +259,6 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                         break;
                     }
                 }
-
-                /*
-                 * if (!cancelComputation) {
-                 * memberRefsetHelper.addMarkedParents(newMembers .toArray(new
-                 * Integer[] {})); }
-                 * 
-                 * if (!cancelComputation) {
-                 * memberRefsetHelper.removeMarkedParents(retiredMembers
-                 * .toArray(new Integer[] {})); }
-                 */
             }
             progressReportHtmlGenerator.setStep5Complete(true);
             computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
