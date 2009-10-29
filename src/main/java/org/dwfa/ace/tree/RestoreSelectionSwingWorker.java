@@ -3,6 +3,7 @@ package org.dwfa.ace.tree;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -82,8 +83,10 @@ public class RestoreSelectionSwingWorker extends SwingWorker<Object> implements 
 					helper.removeStaleExpansionWorker(helper.getExpansionWorkers().keySet().iterator().next());
 				}
 			} else {
-				AceLog.getAppLog().info("RestoreSelectionSwingWorker ending secondary to inequal propigationId: " + lastPropagationId
-						+ " " + tree.getLastPropagationId());
+				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+					AceLog.getAppLog().fine("RestoreSelectionSwingWorker ending secondary to inequal propigationId: " + lastPropagationId
+							+ " " + tree.getLastPropagationId());
+				}
 			}
 		} catch (InterruptedException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -93,7 +96,9 @@ public class RestoreSelectionSwingWorker extends SwingWorker<Object> implements 
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		AceLog.getAppLog().info("RestoreSelectionSwingWorker timer thread finished: " + lastPropagationId);
+		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+			AceLog.getAppLog().info("RestoreSelectionSwingWorker timer thread finished: " + lastPropagationId);
+		}
 		helper.getTreeExpandThread().execute(this);
 	}
 }

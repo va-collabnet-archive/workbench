@@ -243,10 +243,10 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 			InvocationTargetException {
 		for (I_ThinExtByRefVersioned extForMember: 
 			LocalVersionedTerminology.get().
-				getAllExtensionsForComponent(extension.getMemberId())) {
-			if (promotionRefsetId == extension.getMemberId()) {
+				getAllExtensionsForComponent(extension.getComponentId())) {
+			if (promotionRefsetId == extForMember.getRefsetId()) {
 				List<I_ThinExtByRefTuple> promotionTuples = 
-					extension.getTuples(host.getConfig().getAllowedStatus(), 
+					extForMember.getTuples(host.getConfig().getAllowedStatus(), 
 						host.getConfig().getViewPositionSet(), false);
 				if (promotionTuples.size() > 0) {
 					return col.getReadMethod().invoke(
