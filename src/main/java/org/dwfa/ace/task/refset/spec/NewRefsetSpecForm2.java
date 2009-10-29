@@ -51,17 +51,17 @@ public class NewRefsetSpecForm2 extends JPanel {
     private JButton addReviewerButton;
     private Set<String> editors;
     private Set<String> reviewers;
-    private HashMap<String, I_GetConceptData> fsnUserMap;
-    private HashMap<String, I_GetConceptData> refsetMap;
+    private HashMap<String, I_GetConceptData> validUserMap;
+    private HashMap<String, I_GetConceptData> validNewRefsetParentMap;
     private Set<String> selectedReviewers;
 
     private NewRefsetSpecWizard wizard;
 
-    public NewRefsetSpecForm2(NewRefsetSpecWizard wizard, HashMap<String, I_GetConceptData> fsnUserMap,
-            HashMap<String, I_GetConceptData> refsetMap) {
+    public NewRefsetSpecForm2(NewRefsetSpecWizard wizard, HashMap<String, I_GetConceptData> validUserMap,
+            HashMap<String, I_GetConceptData> validNewRefsetParentMap) {
         super();
-        this.fsnUserMap = fsnUserMap;
-        this.refsetMap = refsetMap;
+        this.validUserMap = validUserMap;
+        this.validNewRefsetParentMap = validNewRefsetParentMap;
         selectedReviewers = new HashSet<String>();
         this.wizard = wizard;
         init();
@@ -97,8 +97,8 @@ public class NewRefsetSpecForm2 extends JPanel {
         String parentString = form1.getSelectedParent();
 
         if (parentString == null) {
-            editors = fsnUserMap.keySet();
-            reviewers = fsnUserMap.keySet();
+            editors = validUserMap.keySet();
+            reviewers = validUserMap.keySet();
         } else {
             editors = getPermissibleEditors(parentString);
             reviewers = getPermissibleReviewers(parentString);
@@ -110,36 +110,37 @@ public class NewRefsetSpecForm2 extends JPanel {
 
     private Set<String> getPermissibleEditors(String refsetString) {
         try {
-            I_GetConceptData refset = refsetMap.get(refsetString);
+            I_GetConceptData refset = validNewRefsetParentMap.get(refsetString);
             if (refset == null) {
-                return fsnUserMap.keySet();
+                return validUserMap.keySet();
             }
             Set<String> permissibleEditors = new HashSet<String>();
 
-            for (I_GetConceptData concept : fsnUserMap.values()) {
+            for (String key : validUserMap.keySet()) {
+                I_GetConceptData concept = validUserMap.get(key);
                 TestForEditRefsetPermission permissionTest = new TestForEditRefsetPermission();
                 Set<I_GetConceptData> permissibleRefsetParents = new HashSet<I_GetConceptData>();
                 permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(concept));
                 permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(concept));
 
                 if (permissibleRefsetParents.contains(refset)) {
-                    permissibleEditors.add(concept.getInitialText());
+                    permissibleEditors.add(key);
                 }
             }
             return permissibleEditors;
         } catch (Exception e) {
             e.printStackTrace();
-            return fsnUserMap.keySet();
+            return validUserMap.keySet();
         }
     }
 
     private Set<String> getPermissibleReviewers(String refsetString) {
         try {
             // TODO implement after review data check is created
-            return fsnUserMap.keySet();
+            return validUserMap.keySet();
         } catch (Exception e) {
             e.printStackTrace();
-            return fsnUserMap.keySet();
+            return validUserMap.keySet();
         }
     }
 

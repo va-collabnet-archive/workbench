@@ -32,7 +32,6 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.bpa.tasks.util.FileContent;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
@@ -86,7 +85,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
 
             // create list of editors -> FSN, for use in the drop down list
             final Set<I_GetConceptData> allValidUsers = userParent.getDestRelOrigins(allowedTypes, true, true);
-            final HashMap<String, I_GetConceptData> fsnUserMap = new HashMap<String, I_GetConceptData>();
+            final HashMap<String, I_GetConceptData> validUserMap = new HashMap<String, I_GetConceptData>();
             I_GetConceptData fsnConcept =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
             I_IntSet fsnAllowedTypes = termFactory.newIntSet();
@@ -105,7 +104,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
                 }
 
                 if (getInbox(validUser) != null) {
-                    fsnUserMap.put(latestDescription, validUser);
+                    validUserMap.put(latestDescription, validUser);
                 }
             }
 
@@ -118,7 +117,8 @@ public class RefsetSpecWizardTask extends AbstractTask {
             permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(owner));
             permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(owner));
 
-            final HashMap<String, I_GetConceptData> fsnRefsetMap = createFsnConceptMap(permissibleRefsetParents);
+            final HashMap<String, I_GetConceptData> validNewRefsetParentMap =
+                    createFsnConceptMap(permissibleRefsetParents);
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
 
@@ -126,10 +126,10 @@ public class RefsetSpecWizardTask extends AbstractTask {
                     NewRefsetSpecWizard wizard = new NewRefsetSpecWizard(frame);
                     wizard.getDialog().setTitle("New refset spec wizard");
 
-                    NewRefsetSpecForm1 panel1 = new NewRefsetSpecForm1(wizard, fsnRefsetMap.keySet());
+                    NewRefsetSpecForm1 panel1 = new NewRefsetSpecForm1(wizard, validNewRefsetParentMap.keySet());
                     wizard.registerWizardPanel("panel1", panel1);
 
-                    NewRefsetSpecForm2 panel2 = new NewRefsetSpecForm2(wizard, fsnUserMap, fsnRefsetMap);
+                    NewRefsetSpecForm2 panel2 = new NewRefsetSpecForm2(wizard, validUserMap, validNewRefsetParentMap);
                     wizard.registerWizardPanel("panel2", panel2);
 
                     wizard.setCurrentPanel("panel1");
@@ -145,10 +145,10 @@ public class RefsetSpecWizardTask extends AbstractTask {
                             comments = "";
                         }
                         HashSet<File> attachments = panel1.getAttachments();
-                        I_GetConceptData refsetParent = fsnRefsetMap.get(panel1.getSelectedParent());
+                        I_GetConceptData refsetParent = validNewRefsetParentMap.get(panel1.getSelectedParent());
 
                         String requestor = panel2.getRequestor();
-                        I_GetConceptData editor = fsnUserMap.get(panel2.getSelectedEditor());
+                        I_GetConceptData editor = validUserMap.get(panel2.getSelectedEditor());
 
                         Calendar deadline = panel2.getDeadline();
                         String priority = panel2.getPriority();
@@ -182,7 +182,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
                                     JOptionPane.ERROR_MESSAGE);
                             }
                             for (String reviewerName : reviewerNames) {
-                                reviewers.add((fsnUserMap.get(reviewerName)).getUids().iterator().next());
+                                reviewers.add((validUserMap.get(reviewerName)).getUids().iterator().next());
                             }
 
                             process.setOriginator(config.getUsername());
@@ -236,46 +236,12 @@ public class RefsetSpecWizardTask extends AbstractTask {
         }
     }
 
-    private HashMap<String, I_GetConceptData> getAllRefsetParents() throws TerminologyException, IOException {
-        HashMap<String, I_GetConceptData> refsets = new HashMap<String, I_GetConceptData>();
-
-        I_GetConceptData concept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.CAB_SNOMED_FULL.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.CAB_SNOMED_LITE.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.CAB_OTHER.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.CAB.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.DSP_CLINICAL.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.DSP_PHARMACY.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.DSP_PHARMACY_EPRESCRIBING.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.SSERP.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.LONDON_IT.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.CLINICAL_MESSAGING.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.SCG.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.SCG_RELIGIONS.getUids());
-        refsets.put(concept.getInitialText(), concept);
-        concept = termFactory.getConcept(RefsetAuxiliary.Concept.TECHNICAL.getUids());
-        refsets.put(concept.getInitialText(), concept);
-
-        return refsets;
-    }
-
     private HashMap<String, I_GetConceptData> createFsnConceptMap(Set<I_GetConceptData> concepts)
             throws TerminologyException, IOException {
         HashMap<String, I_GetConceptData> map = new HashMap<String, I_GetConceptData>();
 
         for (I_GetConceptData concept : concepts) {
+
             map.put(concept.getInitialText(), concept);
         }
         return map;
@@ -307,7 +273,6 @@ public class RefsetSpecWizardTask extends AbstractTask {
 
         List<I_DescriptionTuple> descriptionResults =
                 concept.getDescriptionTuples(activeStatuses, allowedTypes, null, true);
-
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
             if (descriptionTuple.getVersion() > latestVersion) {
                 latestVersion = descriptionTuple.getVersion();
