@@ -60,6 +60,9 @@ public class IsKindOf extends AbstractSearchTest {
             } else {
                 return applyInversion(false);
             }
+            if (parent.getConceptId() == potChild.getConceptId()) {
+            	return applyInversion(true);
+            }
             
             return applyInversion(parent.isParentOf(potChild, frameConfig.getAllowedStatus(), 
                                      frameConfig.getDestRelTypes(), frameConfig.getViewPositionSet(), false));
