@@ -151,7 +151,7 @@ public class InstructWithApproveRejectDone extends AbstractTask {
                     if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptId(), approveId)) {
                         // nothing to do
                     } else {
-                        refsetHelper.retireConceptExtension(refsetId, concept.getConceptId());
+                        // refsetHelper.retireConceptExtension(refsetId, concept.getConceptId());
                         refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptId(), approveId);
                         temporaryList.remove(concept);
                     }
@@ -205,7 +205,7 @@ public class InstructWithApproveRejectDone extends AbstractTask {
                     if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptId(), rejectId)) {
                         // nothing to do
                     } else {
-                        refsetHelper.retireConceptExtension(refsetId, concept.getConceptId());
+                        // refsetHelper.retireConceptExtension(refsetId, concept.getConceptId());
                         refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptId(), rejectId);
                         temporaryList.remove(concept);
                     }
