@@ -34,7 +34,12 @@ public class RefsetSpecQuery {
     private Set<RefsetSpecStatement> statements;
 
     private enum GROUPING_TYPE {
-        OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true), AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true), CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true), NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false), CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true), NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false);
+        OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true),
+        AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true),
+        CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true),
+        NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false),
+        CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true),
+        NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false);
 
         private int nid;
         private boolean truth;
@@ -64,8 +69,10 @@ public class RefsetSpecQuery {
     private I_TermFactory termFactory;
 
     private int totalStatementCount;
+    private HashSet<Integer> allConcepts;
 
-    public RefsetSpecQuery(I_GetConceptData groupingConcept) throws TerminologyException, IOException {
+    public RefsetSpecQuery(I_GetConceptData groupingConcept, HashSet<Integer> allConcepts) throws TerminologyException,
+            IOException {
 
         // create query object (statements + any sub-queries)
         subqueries = new HashSet<RefsetSpecQuery>();
@@ -75,6 +82,7 @@ public class RefsetSpecQuery {
         termFactory = LocalVersionedTerminology.get();
 
         totalStatementCount = 0;
+        this.allConcepts = allConcepts;
     }
 
     private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept) throws TerminologyException, IOException {
@@ -92,28 +100,29 @@ public class RefsetSpecQuery {
     }
 
     public RefsetSpecQuery addSubquery(I_GetConceptData groupingConcept) throws TerminologyException, IOException {
-        RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept);
+        RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept, allConcepts);
         subqueries.add(subquery);
         return subquery;
     }
 
     public RefsetSpecStatement addRelStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
             I_GetConceptData constraint) {
-        RefsetSpecStatement statement = new RelationshipStatement(useNotQualifier, groupingToken, constraint);
+        RefsetSpecStatement statement =
+                new RelationshipStatement(useNotQualifier, groupingToken, constraint, allConcepts);
         statements.add(statement);
         return statement;
     }
 
     public RefsetSpecStatement addConceptStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
             I_GetConceptData constraint) {
-        RefsetSpecStatement statement = new ConceptStatement(useNotQualifier, groupingToken, constraint);
+        RefsetSpecStatement statement = new ConceptStatement(useNotQualifier, groupingToken, constraint, allConcepts);
         statements.add(statement);
         return statement;
     }
 
     public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
             I_GetConceptData constraint) {
-        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint);
+        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint, allConcepts);
         statements.add(statement);
         return statement;
     }

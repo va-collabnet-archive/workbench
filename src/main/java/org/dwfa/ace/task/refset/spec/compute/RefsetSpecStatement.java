@@ -3,7 +3,6 @@ package org.dwfa.ace.task.refset.spec.compute;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -124,21 +123,14 @@ public abstract class RefsetSpecStatement {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, I_GetConceptData constraint) {
-        try {
-            this.useNotQualifier = useNotQualifier;
-            this.queryToken = groupingToken;
-            this.queryConstraint = constraint;
-            termFactory = LocalVersionedTerminology.get();
-            allConcepts = new HashSet<Integer>();
+    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, I_GetConceptData constraint,
+            HashSet<Integer> allConcepts) {
 
-            Iterator<I_GetConceptData> iterator = termFactory.getConceptIterator();
-            while (iterator.hasNext()) {
-                allConcepts.add(iterator.next().getConceptId());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.useNotQualifier = useNotQualifier;
+        this.queryToken = groupingToken;
+        this.queryConstraint = constraint;
+        termFactory = LocalVersionedTerminology.get();
+        this.allConcepts = allConcepts;
     }
 
     public boolean isNegated() {
@@ -219,11 +211,6 @@ public abstract class RefsetSpecStatement {
 
         for (I_ThinExtByRefVersioned ext : extensions) {
             if (ext.getRefsetId() == queryConstraint.getConceptId()) { // check
-                // they
-                // are of
-                // the
-                // specified
-                // refset
 
                 List<? extends I_ThinExtByRefPart> parts = ext.getVersions();
 
@@ -246,6 +233,7 @@ public abstract class RefsetSpecStatement {
         }
 
         return false;
+
     }
 
     public abstract Set<Integer> getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException,

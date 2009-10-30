@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -137,9 +138,15 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
 
             // Step 1: create the query object, based on the refset spec
-            RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
+            Iterator<I_GetConceptData> iterator = termFactory.getConceptIterator();
+            HashSet<Integer> allConcepts = new HashSet<Integer>();
+            while (iterator.hasNext()) {
+                allConcepts.add(iterator.next().getConceptId());
+            }
+            RefsetSpecQuery query =
+                    RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset, allConcepts);
             RefsetSpecQuery possibleQuery =
-                    RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset);
+                    RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset, allConcepts);
             SpecMemberRefsetHelper memberRefsetHelper =
                     new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 

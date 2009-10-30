@@ -2,6 +2,7 @@ package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -10,6 +11,8 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -29,8 +32,9 @@ public class DescStatement extends RefsetSpecStatement {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public DescStatement(boolean useNotQualifier, I_GetConceptData queryType, I_GetConceptData queryDestination) {
-        super(useNotQualifier, queryType, queryDestination);
+    public DescStatement(boolean useNotQualifier, I_GetConceptData queryType, I_GetConceptData queryDestination,
+            HashSet<Integer> allConcepts) {
+        super(useNotQualifier, queryType, queryDestination, allConcepts);
     }
 
     public boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException {
@@ -66,40 +70,6 @@ public class DescStatement extends RefsetSpecStatement {
         default:
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
-    }
-
-    private boolean descriptionTypeIsDescendentOf(I_DescriptionTuple descriptionTuple) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    private boolean descriptionTypeIsChildOf(I_DescriptionTuple descriptionTuple) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    private boolean descriptionStatusIsDescendentOf(I_DescriptionTuple descriptionTuple) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    private boolean descriptionStatusIsKindOf(I_DescriptionTuple descriptionTuple) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    private boolean descriptionStatusIsChildOf(I_DescriptionTuple descriptionTuple) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    private boolean descriptionStatusIs(I_DescriptionTuple descriptionTuple) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    private boolean descriptionIs(I_DescriptionTuple descriptionTuple) throws TerminologyException {
-        throw new TerminologyException("Unimplemented query : desc is"); // unimplemented
     }
 
     @Override
@@ -140,25 +110,91 @@ public class DescStatement extends RefsetSpecStatement {
         return possibleConcepts;
     }
 
-    // //////////////////////////////////////////////////////////////////////////////////
-    private boolean descriptionIsMemberOf(I_DescriptionTuple descriptionTuple) throws IOException, TerminologyException {
-        return componentIsMemberOf(descriptionTuple.getDescId());
+    private boolean descriptionTypeIsChildOf(I_DescriptionTuple descriptionTuple) throws TerminologyException {
+        throw new TerminologyException("Unimplemented query : desc type is child of");
     }
 
-    private boolean descriptionTypeIs(I_DescriptionTuple descriptionTuple) {
-        return descriptionTypeIs(queryConstraint, descriptionTuple);
+    private boolean descriptionStatusIsDescendentOf(I_DescriptionTuple descriptionTuple) throws TerminologyException {
+        throw new TerminologyException("Unimplemented query : desc status is descendent of");
     }
 
-    private boolean descriptionTypeIs(I_GetConceptData descriptionType, I_DescriptionTuple descriptionTuple) {
-        return descriptionTuple.getTypeId() == descriptionType.getConceptId();
+    private boolean descriptionStatusIsKindOf(I_DescriptionTuple descriptionTuple) throws TerminologyException {
+        throw new TerminologyException("Unimplemented query : desc status is kind of");
     }
 
-    private boolean descriptionTypeIsKindOf(I_DescriptionTuple descriptionTuple) throws IOException,
+    private boolean descriptionStatusIsChildOf(I_DescriptionTuple descriptionTuple) throws TerminologyException {
+        throw new TerminologyException("Unimplemented query : desc status is child of");
+    }
+
+    private boolean descriptionStatusIs(I_DescriptionTuple descriptionTuple) throws TerminologyException {
+        throw new TerminologyException("Unimplemented query : desc status is");
+    }
+
+    private boolean descriptionIs(I_DescriptionTuple descriptionTuple) throws TerminologyException {
+        throw new TerminologyException("Unimplemented query : desc is"); // unimplemented
+    }
+
+    private boolean descriptionIsMemberOf(I_DescriptionTuple descriptionBeingTested) throws IOException,
             TerminologyException {
 
-        if (descriptionTypeIs(descriptionTuple)) {
+        // get all extensions for this component
+        List<I_ThinExtByRefVersioned> extensions =
+                termFactory.getAllExtensionsForComponent(descriptionBeingTested.getDescId());
+
+        for (I_ThinExtByRefVersioned ext : extensions) {
+            if (ext.getRefsetId() == queryConstraint.getConceptId()) {
+                // check they are of the specified refset
+
+                List<? extends I_ThinExtByRefPart> parts = ext.getVersions();
+
+                I_ThinExtByRefPart latestPart = null;
+                int latestPartVersion = Integer.MIN_VALUE;
+
+                // get latest part & check that it is current
+                for (I_ThinExtByRefPart part : parts) {
+                    if (part.getVersion() > latestPartVersion) {
+                        latestPartVersion = part.getVersion();
+                        latestPart = part;
+                    }
+                }
+
+                if (latestPart.getStatusId() == termFactory
+                    .getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean descriptionTypeIs(I_DescriptionTuple descriptionBeingTested) {
+        return descriptionTypeIs(queryConstraint, descriptionBeingTested);
+    }
+
+    private boolean descriptionTypeIs(I_GetConceptData requiredDescriptionType,
+            I_DescriptionTuple descriptionBeingTested) {
+        return descriptionBeingTested.getTypeId() == requiredDescriptionType.getConceptId();
+    }
+
+    // //////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Checks if the description being tested has a description type matching the query constraint.
+     * This also checks for the description type's children (depth >= 1);
+     */
+    private boolean descriptionTypeIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws IOException,
+            TerminologyException {
+
+        if (descriptionTypeIs(descriptionBeingChecked)) {
             return true;
         }
+
+        return descriptionTypeIsDescendentOf(descriptionBeingChecked);
+    }
+
+    // TODO
+    private boolean descriptionTypeIsDescendentOf(I_DescriptionTuple descriptionBeingChecked) throws IOException,
+            TerminologyException {
 
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
@@ -170,7 +206,7 @@ public class DescStatement extends RefsetSpecStatement {
 
         // call descriptionTypeIs on each
         for (I_GetConceptData childDescType : childDescTypes) {
-            if (descriptionTypeIs(childDescType, descriptionTuple)) {
+            if (descriptionTypeIs(childDescType, descriptionBeingChecked)) {
                 return true;
             }
         }

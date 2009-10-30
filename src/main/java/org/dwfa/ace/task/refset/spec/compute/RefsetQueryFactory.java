@@ -29,8 +29,8 @@ public class RefsetQueryFactory {
     private final static int CONCEPT = 3;
 
     public static RefsetSpecQuery createQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
-            I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
-            ParseException {
+            I_GetConceptData refsetSpec, I_GetConceptData refset, HashSet<Integer> allConcepts) throws IOException,
+            TerminologyException, ParseException {
 
         // create tree object that corresponds to the database's refset spec
         List<I_ThinExtByRefVersioned> extensions =
@@ -53,14 +53,15 @@ public class RefsetQueryFactory {
         // create refset spec query
         I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
 
-        RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
+        RefsetSpecQuery query = new RefsetSpecQuery(orConcept, allConcepts);
         query = processNode(root, query, CONCEPT, configFrame, termFactory);
         return query;
 
     }
 
     /**
-     * Create a "possible" query that contains all historical clauses to iterate over, even retired clauses. 
+     * Create a "possible" query that contains all historical clauses to iterate over, even retired clauses.
+     * 
      * @param configFrame
      * @param termFactory
      * @param refsetSpec
@@ -71,8 +72,8 @@ public class RefsetQueryFactory {
      * @throws ParseException
      */
     public static RefsetSpecQuery createPossibleQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
-            I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
-            ParseException {
+            I_GetConceptData refsetSpec, I_GetConceptData refset, HashSet<Integer> allConcepts) throws IOException,
+            TerminologyException, ParseException {
 
         // create tree object that corresponds to the database's refset spec
         List<I_ThinExtByRefVersioned> extensions =
@@ -95,7 +96,7 @@ public class RefsetQueryFactory {
         // create refset spec query
         I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
 
-        RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
+        RefsetSpecQuery query = new RefsetSpecQuery(orConcept, allConcepts);
         query = processNode(root, query, CONCEPT, configFrame, termFactory);
         return query;
 
@@ -196,7 +197,7 @@ public class RefsetQueryFactory {
                     // ignore - comments refset
                 } else if (thinPart instanceof I_ThinExtByRefPartConcept) {
                     // ignore - Not part of spec...
-                }  else {
+                } else {
                     throw new TerminologyException("Unknown extension type : " + thinPart.getClass());
                 }
             }
@@ -292,7 +293,7 @@ public class RefsetQueryFactory {
 
                     // process each grandchild
                     if (!childNode.isLeaf()) {
-                    	processPossibleNode(childNode, subquery, subtype, configFrame, termFactory);
+                        processPossibleNode(childNode, subquery, subtype, configFrame, termFactory);
                     }
                     if (negate) {
                         subquery.negateQuery();
@@ -302,7 +303,7 @@ public class RefsetQueryFactory {
                     // ignore - comments refset
                 } else if (thinPart instanceof I_ThinExtByRefPartConcept) {
                     // ignore - Not part of spec...
-                }  else {
+                } else {
                     throw new TerminologyException("Unknown extension type : " + thinPart.getClass());
                 }
             }
