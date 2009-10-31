@@ -1,0 +1,156 @@
+package org.dwfa.ace.task.promote;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.bpa.process.Condition;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
+
+
+@BeanList(specs = {
+		@Spec(directory = "tasks/refset/instruct", type = BeanType.TASK_BEAN) })
+public class PromoteRefset extends AbstractTask {
+	private static final long serialVersionUID = 1;
+
+	private static final int dataVersion = 1;
+
+	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+		out.writeObject(profilePropName);
+	}
+
+	private void readObject(java.io.ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == 1) {
+			profilePropName = (String) in.readObject();
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
+
+	public String getProfilePropName() {
+		return profilePropName;
+	}
+
+	public void setProfilePropName(String profilePropName) {
+		this.profilePropName = profilePropName;
+	}
+
+
+	/**
+	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      org.dwfa.bpa.process.I_Work)
+	 */
+	public Condition evaluate(final I_EncodeBusinessProcess process,
+			final I_Work worker) throws TaskFailedException {
+		try {
+			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(profilePropName);
+			Set<I_Position> viewPositionSet = config.getViewPositionSet();
+			Set<I_Path> mergePaths = config.getMergePathSet();
+			if (viewPositionSet.size() != 1 || mergePaths.size() != 1) {
+				throw new TaskFailedException("There must be only one view position, and one merge path: viewPaths " +
+						viewPositionSet + " mergePaths: " + mergePaths);
+			}
+			I_GetConceptData refsetToPromote = config.getRefsetInSpecEditor();
+			if (refsetToPromote == null) {
+				throw new TaskFailedException("The refset in the spec editor is null. ");
+			}
+			
+			I_TermFactory tf = LocalVersionedTerminology.get();
+			
+			I_Position viewPosition = viewPositionSet.iterator().next();
+			promoteRefset(config, viewPosition, mergePaths, tf,
+					refsetToPromote);
+			
+			for (I_GetConceptData refsetIdentity: RefsetHelper.getSpecificationRefsetForRefset(refsetToPromote, config)) {
+				promoteRefset(config, viewPosition, mergePaths, tf,
+						refsetIdentity);
+			}
+			for (I_GetConceptData refsetIdentity: RefsetHelper.getPromotionRefsetForRefset(refsetToPromote, config)) {
+				promoteRefset(config, viewPosition, mergePaths, tf,
+						refsetIdentity);
+			}
+			for (I_GetConceptData refsetIdentity: RefsetHelper.getMarkedParentRefsetForRefset(refsetToPromote, config)) {
+				promoteRefset(config, viewPosition, mergePaths, tf,
+						refsetIdentity);
+			}
+			for (I_GetConceptData refsetIdentity: RefsetHelper.getCommentsRefsetForRefset(refsetToPromote, config)) {
+				promoteRefset(config, viewPosition, mergePaths, tf,
+						refsetIdentity);
+			}
+			
+		} catch (Exception e) {
+			throw new TaskFailedException(e);
+		}
+		return Condition.CONTINUE;
+	}
+
+	private void promoteRefset(I_ConfigAceFrame config,
+			I_Position viewPosition, Set<I_Path> mergePaths,
+			I_TermFactory tf, I_GetConceptData refsetIdentity)
+			throws TerminologyException, IOException {
+		refsetIdentity.promote(viewPosition, mergePaths, config.getAllowedStatus());
+		promoteMembers(config, viewPosition, mergePaths, 
+				tf.getRefsetExtensionMembers(refsetIdentity.getConceptId()));
+	}
+
+	private void promoteMembers(I_ConfigAceFrame config,
+			I_Position viewPosition, Set<I_Path> promitionSets,
+			List<I_ThinExtByRefVersioned> refsetMembers)
+			throws TerminologyException, IOException {
+		I_TermFactory tf = LocalVersionedTerminology.get();
+		Set<I_Position> positionSet = new HashSet<I_Position>();
+		positionSet.add(viewPosition);
+		for (I_ThinExtByRefVersioned ext: refsetMembers) {
+			for (I_ThinExtByRefTuple tuple: ext.getTuples(config.getAllowedStatus(), 
+					positionSet, false, false)) {
+				for (I_Path path: promitionSets) {
+					if (tuple.promote(path)) {
+						tf.addUncommitted(tuple.getCore());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      org.dwfa.bpa.process.I_Work)
+	 */
+	public void complete(I_EncodeBusinessProcess process, I_Work worker)
+			throws TaskFailedException {
+		// Nothing to do
+
+	}
+	/**
+	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+	 */
+	public Collection<Condition> getConditions() {
+		return AbstractTask.CONTINUE_CONDITION;
+	}
+
+}

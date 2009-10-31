@@ -553,4 +553,5 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	 * @throws IOException 
 	 */
 	public Collection<Integer> getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException;
+	
 }

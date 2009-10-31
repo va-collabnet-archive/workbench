@@ -161,11 +161,11 @@ public class CopyConceptFromPathToPath extends AbstractTask {
 
    public static void copyId(I_Path toPath, I_IdVersioned id, I_GetConceptData copyStatus) {
       for (I_IdTuple t: id.getTuples()) {
-         I_IdPart newPart = t.duplicatePart();
+         I_IdPart newPart = t.duplicate();
          newPart.setPathId(toPath.getConceptId());
          newPart.setVersion(Integer.MAX_VALUE);
          if (copyStatus != null) {
-            newPart.setIdStatus(copyStatus.getConceptId());
+            newPart.setStatusId(copyStatus.getConceptId());
          }
          t.getIdVersioned().addVersion(newPart);
       }
