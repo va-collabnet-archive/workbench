@@ -25,7 +25,9 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -172,6 +174,65 @@ public class SpecRefsetHelper {
                     if (latestPart instanceof I_ThinExtByRefPartConcept) {
                         int cValue = ((I_ThinExtByRefPartConcept) latestPart).getConceptId();
                         if (cValue == conceptId) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasCurrentConceptStringRefsetExtension(int refsetId, int componentId, int conceptId,
+            String extString, int statusId) throws Exception {
+        for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(componentId, true)) {
+
+            if (extension.getRefsetId() == refsetId) {
+
+                // get the latest version
+                I_ThinExtByRefPart latestPart = null;
+                for (I_ThinExtByRefPart part : extension.getVersions()) {
+                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                        latestPart = part;
+                    }
+                }
+
+                // confirm its the right extension value and its status is
+                // current
+                if (latestPart.getStatusId() == statusId) {
+                    if (latestPart instanceof I_ThinExtByRefPartConceptString) {
+                        String extensionString = ((I_ThinExtByRefPartConceptString) latestPart).getStr();
+                        int currentc1Id = ((I_ThinExtByRefPartConceptString) latestPart).getC1id();
+                        if (extString.equals(extensionString) && conceptId == currentc1Id) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasCurrentStringRefsetExtension(int refsetId, int componentId, String extString, int statusId)
+            throws Exception {
+        for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(componentId, true)) {
+
+            if (extension.getRefsetId() == refsetId) {
+
+                // get the latest version
+                I_ThinExtByRefPart latestPart = null;
+                for (I_ThinExtByRefPart part : extension.getVersions()) {
+                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                        latestPart = part;
+                    }
+                }
+
+                // confirm its the right extension value and its status is
+                // current
+                if (latestPart.getStatusId() == statusId) {
+                    if (latestPart instanceof I_ThinExtByRefPartString) {
+                        String extensionString = ((I_ThinExtByRefPartString) latestPart).getStringValue();
+                        if (extString.equals(extensionString)) {
                             return true;
                         }
                     }
@@ -422,6 +483,148 @@ public class SpecRefsetHelper {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    public boolean newStringRefsetExtension(int refsetId, int componentId, String extString, UUID memberUuid,
+            UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception {
+        try {
+            Collection<I_Path> paths = termFactory.getPaths();
+            paths.clear();
+            paths.add(termFactory.getPath(new UUID[] { pathUuid }));
+
+            if (memberUuid == null) {
+                memberUuid = UUID.randomUUID();
+            }
+            if (statusUuid == null) {
+                statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
+            }
+
+            int extTypeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid();
+
+            // check subject is not already a member
+            if (hasCurrentStringRefsetExtension(refsetId, componentId, extString, termFactory.getConcept(
+                new UUID[] { statusUuid }).getConceptId())) {
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Component is already a member of the refset. Skipping.");
+                }
+                return false;
+            }
+
+            // create a new extension (with a part for each path the user is
+            // editing)
+
+            int newMemberId = Integer.MAX_VALUE;
+            if (!termFactory.hasId(memberUuid)) {
+                newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
+            } else {
+                newMemberId = termFactory.getId(memberUuid).getNativeId();
+            }
+
+            I_ThinExtByRefVersioned newExtension =
+                    termFactory.newExtensionNoChecks(refsetId, newMemberId, componentId, extTypeId);
+
+            for (I_Path editPath : paths) {
+                I_ThinExtByRefPartString extension = termFactory.newStringExtensionPart();
+
+                extension.setPathId(editPath.getConceptId());
+                extension.setStatusId(termFactory.getConcept(new UUID[] { statusUuid }).getConceptId());
+                extension.setVersion(Integer.MAX_VALUE);
+                extension.setStringValue(extString);
+
+                newExtension.addVersion(extension);
+            }
+
+            termFactory.addUncommittedNoChecks(newExtension);
+            termFactory.commit();
+
+            // edit the existing part's effectiveDate/version - this needs to
+            // occur after the part has been committed, or else the
+            // effectiveDate is set to the time at commit
+            int index = newExtension.getVersions().size() - 1;
+            I_ThinExtByRefPartString extension = (I_ThinExtByRefPartString) newExtension.getVersions().get(index);
+            extension.setVersion(effectiveTime);
+            newExtension.addVersion(extension);
+
+            termFactory.addUncommittedNoChecks(newExtension);
+            termFactory.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+    }
+
+    public boolean newConceptStringRefsetExtension(int refsetId, int componentId, int c1Id, String extString,
+            UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception {
+        try {
+            Collection<I_Path> paths = termFactory.getPaths();
+            paths.clear();
+            paths.add(termFactory.getPath(new UUID[] { pathUuid }));
+
+            if (memberUuid == null) {
+                memberUuid = UUID.randomUUID();
+            }
+            if (statusUuid == null) {
+                statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
+            }
+
+            int extTypeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid();
+
+            // check subject is not already a member
+            if (hasCurrentConceptStringRefsetExtension(refsetId, componentId, c1Id, extString, termFactory.getConcept(
+                new UUID[] { statusUuid }).getConceptId())) {
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Component is already a member of the refset. Skipping.");
+                }
+                return false;
+            }
+
+            // create a new extension (with a part for each path the user is
+            // editing)
+
+            int newMemberId = Integer.MAX_VALUE;
+            if (!termFactory.hasId(memberUuid)) {
+                newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
+            } else {
+                newMemberId = termFactory.getId(memberUuid).getNativeId();
+            }
+
+            I_ThinExtByRefVersioned newExtension =
+                    termFactory.newExtensionNoChecks(refsetId, newMemberId, componentId, extTypeId);
+
+            for (I_Path editPath : paths) {
+                I_ThinExtByRefPartConceptString extension = termFactory.newConceptStringExtensionPart();
+
+                extension.setPathId(editPath.getConceptId());
+                extension.setStatusId(termFactory.getConcept(new UUID[] { statusUuid }).getConceptId());
+                extension.setVersion(Integer.MAX_VALUE);
+                extension.setC1id(c1Id);
+                extension.setStr(extString);
+
+                newExtension.addVersion(extension);
+            }
+
+            termFactory.addUncommittedNoChecks(newExtension);
+            termFactory.commit();
+
+            // edit the existing part's effectiveDate/version - this needs to
+            // occur after the part has been committed, or else the
+            // effectiveDate is set to the time at commit
+            int index = newExtension.getVersions().size() - 1;
+            I_ThinExtByRefPartConceptString extension =
+                    (I_ThinExtByRefPartConceptString) newExtension.getVersions().get(index);
+            extension.setVersion(effectiveTime);
+            newExtension.addVersion(extension);
+
+            termFactory.addUncommittedNoChecks(newExtension);
+            termFactory.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+
     }
 
     public boolean newIntRefsetExtension(int refsetId, int componentId, int value, UUID memberUuid, UUID pathUuid,
