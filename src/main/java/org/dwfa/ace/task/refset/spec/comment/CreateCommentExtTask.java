@@ -24,7 +24,9 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Creates a comment extension on the refset currently in the refset spec panel.
+ * Creates a comment extension on the refset currently in the refset spec panel, based on the string stored in the
+ * comments prop name. The refset spec input parameter specifies the refset spec to use (to derive the appropriate
+ * comments refset).
  * 
  * @author Chrissy Hill
  * 
@@ -73,17 +75,19 @@ public class CreateCommentExtTask extends AbstractTask {
             UUID refsetSpecUuid = (UUID) process.readProperty(refsetSpecUuidPropName);
             I_GetConceptData refsetSpecConcept = termFactory.getConcept(refsetSpecUuid);
             String comments = (String) process.readProperty(commentsPropName);
-            UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
-            if (refsetSpecConcept != null) {
-                RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept);
-                I_GetConceptData commentsRefset = refsetSpec.getCommentsRefsetConcept();
-                I_GetConceptData memberRefset = refsetSpec.getMemberRefsetConcept();
-                if (commentsRefset != null && memberRefset != null) {
-                    SpecRefsetHelper specRefsetHelper = new SpecRefsetHelper();
-                    for (I_Path path : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                        specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptId(), memberRefset
-                            .getConceptId(), comments, UUID.randomUUID(), termFactory.getConcept(path.getConceptId())
-                            .getUids().iterator().next(), currentUuid, Integer.MAX_VALUE);
+            if (comments != null && !comments.trim().equals("")) {
+                UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
+                if (refsetSpecConcept != null) {
+                    RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept);
+                    I_GetConceptData commentsRefset = refsetSpec.getCommentsRefsetConcept();
+                    I_GetConceptData memberRefset = refsetSpec.getMemberRefsetConcept();
+                    if (commentsRefset != null && memberRefset != null) {
+                        SpecRefsetHelper specRefsetHelper = new SpecRefsetHelper();
+                        for (I_Path path : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
+                            specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptId(), memberRefset
+                                .getConceptId(), comments, UUID.randomUUID(), termFactory.getConcept(
+                                path.getConceptId()).getUids().iterator().next(), currentUuid, Integer.MAX_VALUE);
+                        }
                     }
                 }
             }
