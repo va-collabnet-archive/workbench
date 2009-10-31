@@ -106,6 +106,7 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
             }
 
             wfSheet.add(new RequestForChangePanel(refsets, wfSheet));
+            wfSheet.repaint();
         } catch (Exception e) {
             ex = e;
         }
