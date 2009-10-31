@@ -1,9 +1,16 @@
 package org.dwfa.vodb.conflict;
 
+import java.io.IOException;
+import java.util.Set;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.tapi.TerminologyException;
 
 public class MockTuple implements I_AmTuple {
 
@@ -24,6 +31,16 @@ public class MockTuple implements I_AmTuple {
 
 			public int getTermComponentId() {
 				return id;
+			}
+
+			public int getNid() {
+				return id;
+			}
+
+			public boolean promote(I_Position viewPosition,
+					Set<I_Path> pomotionPaths, I_IntSet allowedStatus)
+					throws IOException, TerminologyException {
+				throw new UnsupportedOperationException();
 			}
 			
 		};

@@ -16,9 +16,10 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.TupleAdder;
@@ -330,4 +331,24 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
       return universal;
    }
 
+   public int getNid() {
+	   return descId;
+   }
+
+   public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+	   Set<I_Position> positions = new HashSet<I_Position>();
+	   positions.add(viewPosition);
+	   List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
+	   addTuples(allowedStatus, null, positions,
+	         matchingTuples, false);
+	   for (I_Path promotionPath: pomotionPaths) {
+		   for (I_DescriptionTuple dt: matchingTuples) {
+			   I_DescriptionPart promotionPart = dt.getPart().duplicate();
+			   promotionPart.setVersion(Integer.MAX_VALUE);
+			   promotionPart.setPathId(promotionPath.getConceptId());
+			   dt.getDescVersioned().addVersion(promotionPart);
+		   }
+	   }
+	   return matchingTuples.size() > 0;
+   }
 }

@@ -20,6 +20,7 @@ import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -352,6 +353,15 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 
 	public Collection<Integer> getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
 		return bean.getPossibleKindOfConcepts(config);
+	}
+
+	public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths,
+			I_IntSet allowedStatus) throws IOException, TerminologyException {
+		return bean.promote(viewPosition, pomotionPaths, allowedStatus);
+	}
+
+	public int getNid() {
+		return bean.getNid();
 	}
 		
 }

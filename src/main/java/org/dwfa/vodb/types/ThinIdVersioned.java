@@ -8,10 +8,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageTuple;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
 import org.dwfa.tapi.TerminologyException;
@@ -166,5 +173,40 @@ public class ThinIdVersioned implements I_IdVersioned {
    public int hashCode() {
       return nativeId;
    }
+   public int getNid() {
+	   return nativeId;
+   }
 
+	private class IdTupleAdder extends
+		TupleAdder<I_IdTuple, ThinIdVersioned> {
+
+		@Override
+		public I_IdTuple makeTuple(I_AmPart part, ThinIdVersioned core) {
+			return new ThinIdTuple(core, (I_IdPart) part);
+		}
+	}
+
+	IdTupleAdder adder = new IdTupleAdder();
+
+	public void addTuples(I_IntSet allowedStatus, 
+			Set<I_Position> positions, List<I_IdTuple> matchingTuples) {
+		adder.addTuples(allowedStatus, positions, matchingTuples,
+				true, versions, this);
+	}
+
+   public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+	   Set<I_Position> positions = new HashSet<I_Position>();
+	   positions.add(viewPosition);
+	   List<I_IdTuple> matchingTuples = new ArrayList<I_IdTuple>();
+	   addTuples(allowedStatus, positions, matchingTuples);
+	   for (I_Path promotionPath: pomotionPaths) {
+		   for (I_IdTuple it: matchingTuples) {
+			   I_IdPart promotionPart = it.getPart().duplicate();
+			   promotionPart.setVersion(Integer.MAX_VALUE);
+			   promotionPart.setPathId(promotionPath.getConceptId());
+			   it.getIdVersioned().addVersion(promotionPart);
+		   }
+	   }
+	   return matchingTuples.size() > 0;
+   }
 }

@@ -53,12 +53,8 @@ public class MemberTablePopupListener extends MouseAdapter {
 				try {
 					I_GetConceptData refsetIdentityConcept = config.getRefsetInSpecEditor();
 					I_TermFactory tf = LocalVersionedTerminology.get();
-					I_IntSet allowedTypes = new IntSet();
-					allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
 					Set<I_GetConceptData> commentRefsets = 
-						refsetIdentityConcept.getSourceRelTargets(config.getAllowedStatus(), 
-							allowedTypes, 
-							config.getViewPositionSet(), false);
+						RefsetHelper.getCommentsRefsetForRefset(refsetIdentityConcept, config);
 					int newMemberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(), 
 							ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), 
 							config.getEditingPathSet(), 

@@ -12,8 +12,11 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -419,5 +422,25 @@ public class ThinRelVersioned implements I_RelVersioned {
 			throw new RuntimeException("Cannot change the relid once set");
 		}
 	}
+
+	public int getNid() {
+		return relId;
+	}
+	   public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+		   Set<I_Position> positions = new HashSet<I_Position>();
+		   positions.add(viewPosition);
+		   List<I_RelTuple> matchingTuples = new ArrayList<I_RelTuple>();
+		   addTuples(allowedStatus, null, positions,
+		         matchingTuples, false);
+		   for (I_Path promotionPath: pomotionPaths) {
+			   for (I_RelTuple rt: matchingTuples) {
+				   I_RelPart promotionPart = rt.getPart().duplicate();
+				   promotionPart.setVersion(Integer.MAX_VALUE);
+				   promotionPart.setPathId(promotionPath.getConceptId());
+				   rt.getRelVersioned().addVersion(promotionPart);
+			   }
+		   }
+		   return matchingTuples.size() > 0;
+	   }
 
 }

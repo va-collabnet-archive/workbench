@@ -14,6 +14,7 @@ import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.table.TupleAdder;
@@ -224,5 +225,27 @@ public class ThinImageVersioned implements I_ImageVersioned {
 		}
 		return universal;
 	}
+
+	public int getNid() {
+		return imageId;
+	}
+
+	   public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+		   Set<I_Position> positions = new HashSet<I_Position>();
+		   positions.add(viewPosition);
+		   List<I_ImageTuple> matchingTuples = new ArrayList<I_ImageTuple>();
+		   addTuples(allowedStatus, null, positions,
+		         matchingTuples);
+		   for (I_Path promotionPath: pomotionPaths) {
+			   for (I_ImageTuple it: matchingTuples) {
+				   I_ImagePart promotionPart = it.getPart().duplicate();
+				   promotionPart.setVersion(Integer.MAX_VALUE);
+				   promotionPart.setPathId(promotionPath.getConceptId());
+				   it.getVersioned().addVersion(promotionPart);
+			   }
+		   }
+		   return matchingTuples.size() > 0;
+	   }
+
 
 }

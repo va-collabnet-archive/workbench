@@ -35,6 +35,7 @@ import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -179,7 +180,12 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 		super();
 		this.conceptId = conceptId;
 	}
+	
+	public int getNid() {
+		return conceptId;
+	}
 
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -1478,6 +1484,53 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			}
 		}
 		return possibleKindOfConcepts;
+	}
+
+	public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths,
+			I_IntSet allowedStatus) throws IOException, TerminologyException {
+		  boolean promotedAnything = false;
+		  if (getId().promote(viewPosition, pomotionPaths, allowedStatus)) {
+			  promotedAnything = true;
+		  }
+		  
+		  if (conceptAttributes.promote(viewPosition, pomotionPaths, allowedStatus)) {
+			  promotedAnything = true;
+		  }
+		  
+	      I_IntSet idsToCopy = LocalVersionedTerminology.get().newIntSet();
+	      
+		  if (conceptAttributes.promote(viewPosition, pomotionPaths, allowedStatus)) {
+			  promotedAnything = true;
+		  }
+
+		  for (I_DescriptionVersioned dv: getDescriptions()) {
+			  if (dv.promote(viewPosition, pomotionPaths, allowedStatus)) {
+			         idsToCopy.add(dv.getNid());
+			         promotedAnything = true;
+			  }
+	      }
+		  
+	      for (I_RelVersioned rv: getSourceRels()) {
+	    	  if (rv.promote(viewPosition, pomotionPaths, allowedStatus)) {
+			         idsToCopy.add(rv.getNid());
+			         promotedAnything = true;
+	    	  }
+	      }
+	      
+	      for (I_ImageVersioned img: getImages()) {
+	    	  if (img.promote(viewPosition, pomotionPaths, allowedStatus)) {
+			         idsToCopy.add(img.getNid());
+			         promotedAnything = true;
+	    	  }
+	      }
+	      for (int id: idsToCopy.getSetValues()) {
+	    	  I_IdVersioned idv = LocalVersionedTerminology.get().getId(id);
+	    	  if (idv.promote(viewPosition, pomotionPaths, allowedStatus)) {
+	    		  promotedAnything = true;
+	    		  uncommittedIds.add(idv.getNid());
+	    	  }
+	      }
+		return promotedAnything;
 	}
 
 }

@@ -14,9 +14,10 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.TupleAdder;
@@ -38,6 +39,10 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 		super();
 		this.conId = conId;
 		this.versions = new ArrayList<I_ConceptAttributePart>(count);
+	}
+	
+	public int getNid() {
+		return conId;
 	}
 
 	/*
@@ -264,4 +269,22 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 		
 		return returnList;
 	}
+
+	public boolean promote(I_Position viewPosition, Set<I_Path> promotionPaths,
+			I_IntSet allowedStatus) {
+		Set<I_Position> viewPositionSet = new HashSet<I_Position>();
+		viewPositionSet.add(viewPosition);
+		boolean promotedAnything = false;
+		for (I_Path promotionPath: promotionPaths) {
+			for (I_ConceptAttributeTuple tuple: getTuples(allowedStatus, viewPositionSet)) {
+				I_ConceptAttributePart promotionPart = tuple.getPart().duplicate();
+				promotionPart.setVersion(Integer.MAX_VALUE);
+				promotionPart.setPathId(promotionPath.getConceptId());
+				addVersion(promotionPart);
+				promotedAnything = true;
+			}
+		}
+		return promotedAnything;
+	}
+	
 }

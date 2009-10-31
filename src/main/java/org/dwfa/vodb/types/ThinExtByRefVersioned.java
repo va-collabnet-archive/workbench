@@ -2,14 +2,18 @@ package org.dwfa.vodb.types;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -401,4 +405,26 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 		addTuples(returnTuples, addUncommitted, returnConflictResolvedLatestState);
 		return returnTuples;
 	}
+
+	public int getNid() {
+		return memberId;
+	}
+	
+	   public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+		   Set<I_Position> positions = new HashSet<I_Position>();
+		   positions.add(viewPosition);
+		   List<I_ThinExtByRefTuple> matchingTuples = new ArrayList<I_ThinExtByRefTuple>();
+		   addTuples(allowedStatus, positions,
+		         matchingTuples, false);
+		   for (I_Path promotionPath: pomotionPaths) {
+			   for (I_ThinExtByRefTuple it: matchingTuples) {
+				   I_ThinExtByRefPart promotionPart = it.getPart().duplicate();
+				   promotionPart.setVersion(Integer.MAX_VALUE);
+				   promotionPart.setPathId(promotionPath.getConceptId());
+				   it.addVersion(promotionPart);
+			   }
+		   }
+		   return matchingTuples.size() > 0;
+	   }
+
 }

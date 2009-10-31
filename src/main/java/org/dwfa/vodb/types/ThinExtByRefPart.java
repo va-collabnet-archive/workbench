@@ -3,6 +3,7 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.util.Date;
 
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.log.AceLog;
@@ -120,6 +121,14 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
    public I_ThinExtByRefPart duplicatePart() {
 	   return duplicate();
    }
+   
+	public I_ThinExtByRefPart makePromotionPart(I_Path promotionPath) {
+		I_ThinExtByRefPart promotionPart = duplicate();
+		promotionPart.setVersion(Integer.MAX_VALUE);
+		promotionPart.setPathId(promotionPath.getConceptId());
+		return promotionPart;
+	}
+
 }
 
 
