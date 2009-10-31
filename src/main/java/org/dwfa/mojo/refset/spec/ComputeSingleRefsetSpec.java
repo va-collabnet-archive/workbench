@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -65,10 +66,10 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
         try {
             long startTime = new Date().getTime();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-            Iterator<I_GetConceptData> conceptIterator = termFactory.getConceptIterator();
+            I_ConfigAceFrame configFrame = termFactory.getActiveAceFrameConfig();
             int conceptsProcessed = 0;
             I_GetConceptData currentConcept;
-            int conceptsToProcess = termFactory.getConceptCount();
+
             List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
             Set<Integer> newMembers = new HashSet<Integer>();
             Set<Integer> retiredMembers = new HashSet<Integer>();
@@ -88,9 +89,15 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
             }
 
             // Step 1: create the query object, based on the refset spec
+            Iterator<I_GetConceptData> iterator = termFactory.getConceptIterator();
+            HashSet<Integer> allConcepts = new HashSet<Integer>();
+            while (iterator.hasNext()) {
+                allConcepts.add(iterator.next().getConceptId());
+            }
             RefsetSpecQuery query =
-                    RefsetQueryFactory.createQuery(termFactory.getActiveAceFrameConfig(), termFactory, refsetSpec,
-                        refset);
+                    RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset, allConcepts);
+            RefsetSpecQuery possibleQuery =
+                    RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset, allConcepts);
             SpecMemberRefsetHelper memberRefsetHelper =
                     new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
@@ -114,8 +121,13 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
                     filterNonCurrentRefsetMembers(allRefsetMembers, memberRefsetHelper, refset.getConceptId(),
                         normalMemberConcept.getConceptId());
 
-            while (conceptIterator.hasNext()) {
-                currentConcept = conceptIterator.next();
+            // Compute the possible concepts to iterate over here...
+            Set<Integer> possibleConcepts = possibleQuery.getPossibleConcepts(configFrame);
+            possibleConcepts.addAll(currentRefsetMemberIds);
+            int conceptsToProcess = possibleConcepts.size();
+
+            for (int nid : possibleConcepts) {
+                currentConcept = termFactory.getConcept(nid);
                 conceptsProcessed++;
 
                 boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());
