@@ -1107,5 +1107,9 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 	public void replaceMergePath(I_Path oldPath, I_Path newPath) {
 		frameConfig.replaceMergePath(oldPath, newPath);
 	}
+
+	public void setSelectedPreferencesTab(String tabName) {
+		frameConfig.setSelectedPreferencesTab(tabName);
+	}
 	
 }

@@ -1187,4 +1187,8 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 	public void replaceMergePath(I_Path oldPath, I_Path newPath) {
 		baseFrame.replaceMergePath(oldPath, newPath);
 	}
+
+	public void setSelectedPreferencesTab(String tabName) {
+		baseFrame.setSelectedPreferencesTab(tabName);
+	}
 }

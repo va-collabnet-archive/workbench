@@ -1929,6 +1929,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     boolean svnPositionSet = false;
     private JButton showProgressButton;
     private ActivityPanel topActivityListener;
+	private JTabbedPane preferencesTab;
 
     private void setInitialSvnPosition() {
         if (svnPositionSet == false) {
@@ -1948,19 +1949,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private void makeConfigPalette() throws Exception {
         JLayeredPane layers = getRootPane().getLayeredPane();
         preferencesPalette = new CdePalette(new BorderLayout(), new RightPalettePoint());
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("View", makeViewConfig());
-        tabs.addTab("Edit", makeEditConfig());
-        tabs.addTab("Path", new SelectPathAndPositionPanelWithCombo(false, "for view", aceFrameConfig,
+        preferencesTab = new JTabbedPane();
+        preferencesTab.addTab("View", makeViewConfig());
+        preferencesTab.addTab("Edit", makeEditConfig());
+        preferencesTab.addTab("Path", new SelectPathAndPositionPanelWithCombo(false, "for view", aceFrameConfig,
             new PropertySetListenerGlue("removeViewPosition", "addViewPosition", "replaceViewPosition",
                 "getViewPositionSet", I_Position.class, aceFrameConfig)));
-        tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
-        tabs.addTab("RefSet", makeRefsetConfig());
-        tabs.addTab("Component Panel", makeComponentConfig());
-        tabs.addTab("Classifier", makeClassifierConfig());
+        preferencesTab.addTab("New Path", new CreatePathPanel(aceFrameConfig));
+        preferencesTab.addTab("RefSet", makeRefsetConfig());
+        preferencesTab.addTab("Component Panel", makeComponentConfig());
+        preferencesTab.addTab("Classifier", makeClassifierConfig());
 
         layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
-        preferencesPalette.add(tabs, BorderLayout.CENTER);
+        preferencesPalette.add(preferencesTab, BorderLayout.CENTER);
         preferencesPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 
         int width = 600;
@@ -3611,5 +3612,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
 	public RefsetSpecEditor getRefsetSpecEditor() {
 		return refsetSpecPanel.getRefsetSpecEditor();
+	}
+
+	public void setSelectedPreferencesTab(String tabName) {
+		for (int i = 0; i < preferencesTab.getTabCount(); i++) {
+			if (preferencesTab.getTitleAt(i).toLowerCase().equals(tabName.toLowerCase())) {
+				preferencesTab.setSelectedIndex(i);
+				break;
+			}
+		}
+		
 	}
 }

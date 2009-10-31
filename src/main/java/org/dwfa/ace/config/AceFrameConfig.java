@@ -2996,4 +2996,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		this.searchWithDescTypeFilter = searchWithDescTypeFilter;
 		this.changeSupport.firePropertyChange("searchWithDescTypeFilter", old, searchWithDescTypeFilter);
 	}
+
+	public void setSelectedPreferencesTab(String tabName) {
+		aceFrame.getCdePanel().setSelectedPreferencesTab(tabName);
+	}
+	
+	
 }
