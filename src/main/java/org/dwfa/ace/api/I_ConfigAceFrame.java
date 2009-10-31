@@ -312,6 +312,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion);
 
     public void setShowPreferences(boolean shown);
+    public void setSelectedPreferencesTab(String tabName);
 
     public void setShowHistory(boolean shown);
 
