@@ -29,7 +29,7 @@ import org.dwfa.util.bean.Spec;
 
 
 @BeanList(specs = {
-		@Spec(directory = "tasks/refset/instruct", type = BeanType.TASK_BEAN) })
+		@Spec(directory = "tasks/refset/promote", type = BeanType.TASK_BEAN) })
 public class PromoteRefset extends AbstractTask {
 	private static final long serialVersionUID = 1;
 
