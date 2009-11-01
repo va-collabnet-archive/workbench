@@ -328,8 +328,12 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
 	}
 
 	private Set<I_Position> getDeveloperOrigins(I_ConfigAceFrame creatorConfig)
-			throws TerminologyException, IOException {
+			throws TerminologyException, IOException, TaskFailedException {
 		I_GetConceptData classifierInputPathConcept = creatorConfig.getClassifierInputPath();
+		if (classifierInputPathConcept == null) {
+			throw new TaskFailedException("classifier input path is null..." +
+					"You must set the classifier input path prior to running the new user process...");
+		}
 		I_Path classifierInputPath = LocalVersionedTerminology.get().getPath(classifierInputPathConcept.getUids());
 		Set<I_Position> inputSet = new HashSet<I_Position>(classifierInputPath.getOrigins());
 		return inputSet;
