@@ -122,7 +122,7 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#merge(org.dwfa.vodb.types.ThinConVersioned)
 	 */
-	public boolean merge(I_ConceptAttributeVersioned jarCon) {
+	public boolean promote(I_ConceptAttributeVersioned jarCon) {
 		HashSet<I_ConceptAttributePart> versionSet = new HashSet<I_ConceptAttributePart>(
 				versions);
 		boolean changed = false;

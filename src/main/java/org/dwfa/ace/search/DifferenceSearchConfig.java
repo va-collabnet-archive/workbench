@@ -1092,20 +1092,20 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 		frameConfig.setSearchWithDescTypeFilter(filter);
 	}
 
-	public void addMergePath(I_Path p) {
-		frameConfig.addMergePath(p);
+	public void addPromotionPath(I_Path p) {
+		frameConfig.addPromotionPath(p);
 	}
 
-	public Set<I_Path> getMergePathSet() {
-		return frameConfig.getMergePathSet();
+	public Set<I_Path> getPromotionPathSet() {
+		return frameConfig.getPromotionPathSet();
 	}
 
-	public void removeMergePath(I_Path p) {
-		frameConfig.removeMergePath(p);
+	public void removePromotionPath(I_Path p) {
+		frameConfig.removePromotionPath(p);
 	}
 
-	public void replaceMergePath(I_Path oldPath, I_Path newPath) {
-		frameConfig.replaceMergePath(oldPath, newPath);
+	public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
+		frameConfig.replacePromotionPathSet(oldPath, newPath);
 	}
 
 	public void setSelectedPreferencesTab(String tabName) {

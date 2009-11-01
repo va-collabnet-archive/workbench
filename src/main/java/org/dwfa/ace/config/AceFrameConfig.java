@@ -305,7 +305,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private boolean searchWithDescTypeFilter = false;
     
     // 44
-    private Set<I_Path> mergePathSet = new HashSet<I_Path>();
+    private Set<I_Path> promotionPathSet = new HashSet<I_Path>();
 
     
     // transient
@@ -522,7 +522,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         out.writeBoolean(searchWithDescTypeFilter);
         
         //44
-        Path.writePathSet(out, mergePathSet);
+        Path.writePathSet(out, promotionPathSet);
 
     }
 
@@ -950,9 +950,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             
             if (objDataVersion >= 44) {
-                mergePathSet = Path.readPathSet(in);
+                promotionPathSet = Path.readPathSet(in);
             } else {
-            	mergePathSet = new HashSet<I_Path>();
+            	promotionPathSet = new HashSet<I_Path>();
             }
             
         } else {
@@ -1253,8 +1253,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#addEditingPath(org.dwfa.vodb.types
      * .Path)
      */
-    public void addMergePath(I_Path p) {
-        mergePathSet.add(p);
+    public void addPromotionPath(I_Path p) {
+        promotionPathSet.add(p);
     }
 
     /*
@@ -1264,8 +1264,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#removeEditingPath(org.dwfa.vodb.
      * types.Path)
      */
-    public void removeMergePath(I_Path p) {
-    	mergePathSet.remove(p);
+    public void removePromotionPath(I_Path p) {
+    	promotionPathSet.remove(p);
     }
 
     /*
@@ -1275,9 +1275,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#replaceEditingPath(org.dwfa.vodb
      * .types.Path, org.dwfa.vodb.types.Path)
      */
-    public void replaceMergePath(I_Path oldPath, I_Path newPath) {
-        this.mergePathSet.remove(oldPath);
-        this.mergePathSet.add(newPath);
+    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
+        this.promotionPathSet.remove(oldPath);
+        this.promotionPathSet.add(newPath);
     }
 
     /*
@@ -1285,8 +1285,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * 
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditingPathSet()
      */
-    public Set<I_Path> getMergePathSet() {
-        return mergePathSet;
+    public Set<I_Path> getPromotionPathSet() {
+        return promotionPathSet;
     }
 
     /*

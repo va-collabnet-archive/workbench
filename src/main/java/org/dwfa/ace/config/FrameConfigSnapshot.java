@@ -1172,20 +1172,20 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 		baseFrame.setSearchWithDescTypeFilter(filter);
 	}
 
-	public void addMergePath(I_Path p) {
-		baseFrame.addMergePath(p);
+	public void addPromotionPath(I_Path p) {
+		baseFrame.addPromotionPath(p);
 	}
 
-	public Set<I_Path> getMergePathSet() {
-		return baseFrame.getMergePathSet();
+	public Set<I_Path> getPromotionPathSet() {
+		return baseFrame.getPromotionPathSet();
 	}
 
-	public void removeMergePath(I_Path p) {
-		baseFrame.removeMergePath(p);
+	public void removePromotionPath(I_Path p) {
+		baseFrame.removePromotionPath(p);
 	}
 
-	public void replaceMergePath(I_Path oldPath, I_Path newPath) {
-		baseFrame.replaceMergePath(oldPath, newPath);
+	public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
+		baseFrame.replacePromotionPathSet(oldPath, newPath);
 	}
 
 	public void setSelectedPreferencesTab(String tabName) {
