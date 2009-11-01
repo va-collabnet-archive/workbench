@@ -70,10 +70,10 @@ public class PromoteRefset extends AbstractTask {
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(profilePropName);
 			Set<I_Position> viewPositionSet = config.getViewPositionSet();
-			Set<I_Path> mergePaths = config.getMergePathSet();
-			if (viewPositionSet.size() != 1 || mergePaths.size() != 1) {
-				throw new TaskFailedException("There must be only one view position, and one merge path: viewPaths " +
-						viewPositionSet + " mergePaths: " + mergePaths);
+			Set<I_Path> promotionPaths = config.getPromotionPathSet();
+			if (viewPositionSet.size() != 1 || promotionPaths.size() != 1) {
+				throw new TaskFailedException("There must be only one view position, and one promotion path: viewPaths " +
+						viewPositionSet + " promotionPaths: " + promotionPaths);
 			}
 			I_GetConceptData refsetToPromote = config.getRefsetInSpecEditor();
 			if (refsetToPromote == null) {
@@ -83,23 +83,23 @@ public class PromoteRefset extends AbstractTask {
 			I_TermFactory tf = LocalVersionedTerminology.get();
 			
 			I_Position viewPosition = viewPositionSet.iterator().next();
-			promoteRefset(config, viewPosition, mergePaths, tf,
+			promoteRefset(config, viewPosition, promotionPaths, tf,
 					refsetToPromote);
 			
 			for (I_GetConceptData refsetIdentity: RefsetHelper.getSpecificationRefsetForRefset(refsetToPromote, config)) {
-				promoteRefset(config, viewPosition, mergePaths, tf,
+				promoteRefset(config, viewPosition, promotionPaths, tf,
 						refsetIdentity);
 			}
 			for (I_GetConceptData refsetIdentity: RefsetHelper.getPromotionRefsetForRefset(refsetToPromote, config)) {
-				promoteRefset(config, viewPosition, mergePaths, tf,
+				promoteRefset(config, viewPosition, promotionPaths, tf,
 						refsetIdentity);
 			}
 			for (I_GetConceptData refsetIdentity: RefsetHelper.getMarkedParentRefsetForRefset(refsetToPromote, config)) {
-				promoteRefset(config, viewPosition, mergePaths, tf,
+				promoteRefset(config, viewPosition, promotionPaths, tf,
 						refsetIdentity);
 			}
 			for (I_GetConceptData refsetIdentity: RefsetHelper.getCommentsRefsetForRefset(refsetToPromote, config)) {
-				promoteRefset(config, viewPosition, mergePaths, tf,
+				promoteRefset(config, viewPosition, promotionPaths, tf,
 						refsetIdentity);
 			}
 			
@@ -110,11 +110,11 @@ public class PromoteRefset extends AbstractTask {
 	}
 
 	private void promoteRefset(I_ConfigAceFrame config,
-			I_Position viewPosition, Set<I_Path> mergePaths,
+			I_Position viewPosition, Set<I_Path> promotionPaths,
 			I_TermFactory tf, I_GetConceptData refsetIdentity)
 			throws TerminologyException, IOException {
-		refsetIdentity.promote(viewPosition, mergePaths, config.getAllowedStatus());
-		promoteMembers(config, viewPosition, mergePaths, 
+		refsetIdentity.promote(viewPosition, promotionPaths, config.getAllowedStatus());
+		promoteMembers(config, viewPosition, promotionPaths, 
 				tf.getRefsetExtensionMembers(refsetIdentity.getConceptId()));
 	}
 

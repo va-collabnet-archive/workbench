@@ -63,7 +63,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
     private JCheckBox selectPositionCheckBox;
 
     private JCheckBox editOnPathCheckBox;
-    private JCheckBox mergeOnPathCheckBox;
+    private JCheckBox promoteToPathCheckBox;
 
     private SimpleDateFormat dateFormatter;
 
@@ -82,7 +82,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
 	private Font monoSpaceFont;
 
 	private PropertySetListenerGlue editGlue;
-	private PropertySetListenerGlue mergeGlue;
+	private PropertySetListenerGlue promoteGlue;
 
 	private PropertySetListenerGlue selectGlue;
 
@@ -210,15 +210,15 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
         this.selectPositionCheckBox.setSelected(false);
         this.editOnPathCheckBox = new JCheckBox("Edit on this path");
         this.editOnPathCheckBox.setSelected(aceConfig.getEditingPathSet().contains(path));
-        this.mergeOnPathCheckBox = new JCheckBox("Merge on this path");
-        this.mergeOnPathCheckBox.setSelected(aceConfig.getMergePathSet().contains(path));
+        this.promoteToPathCheckBox = new JCheckBox("Promote to this path");
+        this.promoteToPathCheckBox.setSelected(aceConfig.getPromotionPathSet().contains(path));
         
         this.selectGlue = selectGlue;
         this.editGlue = new PropertySetListenerGlue("removeEditingPath",
         	    "addEditingPath", "replaceEditingPath", "getEditingPathSet",
                 I_Path.class, aceConfig);
-        this.mergeGlue = new PropertySetListenerGlue("removeMergePath",
-        	    "addMergePath", "replaceMergePath", "getMergePathSet",
+        this.promoteGlue = new PropertySetListenerGlue("removePromotionPath",
+        	    "addPromotionPath", "replacePromotionPathSet", "getPromotionPathSet",
                 I_Path.class, aceConfig);
         colorPath = new JCheckBox("color path");
         if (aceConfig.getColorForPath(path.getConceptId()) != null) {
@@ -284,9 +284,9 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                 this.editOnPathCheckBox.addItemListener(this);
                 sliderPanel.add(this.editOnPathCheckBox, c);
                 c.gridx = c.gridx + c.gridwidth;
-                this.mergeOnPathCheckBox.setSelected(aceConfig.getMergePathSet().contains(path));
-                this.mergeOnPathCheckBox.addItemListener(this);
-                sliderPanel.add(this.mergeOnPathCheckBox, c);
+                this.promoteToPathCheckBox.setSelected(aceConfig.getPromotionPathSet().contains(path));
+                this.promoteToPathCheckBox.addItemListener(this);
+                sliderPanel.add(this.promoteToPathCheckBox, c);
                 c.gridx = c.gridx - c.gridwidth;
                 c.gridy++;
             }
@@ -562,11 +562,11 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                 } else if (e.getStateChange() == ItemEvent.SELECTED) {
                     this.editGlue.addObj(this.path);
                 }
-            } else if (e.getSource() == this.mergeOnPathCheckBox) {
+            } else if (e.getSource() == this.promoteToPathCheckBox) {
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    this.mergeGlue.removeObj(this.path);
+                    this.promoteGlue.removeObj(this.path);
                 } else if (e.getStateChange() == ItemEvent.SELECTED) {
-                    this.mergeGlue.addObj(this.path);
+                    this.promoteGlue.addObj(this.path);
                 }
             } else if (e.getSource() == this.selectPositionCheckBox) {
                 if (this.selectGlue != null) {

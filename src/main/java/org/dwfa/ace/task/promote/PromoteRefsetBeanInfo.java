@@ -16,7 +16,7 @@ public class PromoteRefsetBeanInfo extends SimpleBeanInfo {
             profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
             profilePropName.setShortDescription("The property that will contain the profile this task"+ 
-            		" to determine the refset, the merge path for promotion, and the source (edit) path.");
+            		" to determine the refset, the path for promotion, and the source (edit) path.");
 
 			PropertyDescriptor rv[] = { profilePropName };
 			return rv;

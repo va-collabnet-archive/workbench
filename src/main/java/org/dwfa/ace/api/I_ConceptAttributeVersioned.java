@@ -22,7 +22,7 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
 
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
-	public boolean merge(I_ConceptAttributeVersioned jarCon);
+	public boolean promote(I_ConceptAttributeVersioned jarCon);
 
 	public Set<TimePathId> getTimePathSet();
 

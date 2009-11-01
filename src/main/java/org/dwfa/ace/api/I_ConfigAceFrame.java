@@ -118,10 +118,10 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void replaceEditingPath(I_Path oldPath, I_Path newPath);
     public Set<I_Path> getEditingPathSet();
 
-    public void addMergePath(I_Path p);
-    public void removeMergePath(I_Path p);
-    public void replaceMergePath(I_Path oldPath, I_Path newPath);
-    public Set<I_Path> getMergePathSet();
+    public void addPromotionPath(I_Path p);
+    public void removePromotionPath(I_Path p);
+    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath);
+    public Set<I_Path> getPromotionPathSet();
 
     public void addViewPosition(I_Position p);
 
