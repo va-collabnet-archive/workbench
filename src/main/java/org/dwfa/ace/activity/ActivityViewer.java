@@ -322,12 +322,14 @@ public class ActivityViewer {
 		Set<I_ShowActivity> activeActivityListeners = new HashSet<I_ShowActivity>();
 		for (I_ShowActivity a: viewer.activitiesList) {
 			if (a.getAceFrameConfig() != null) {
-				a.removeShowActivityListener(a.getAceFrameConfig().getTopActivityListener());
-				ActionListener[] stopListeners = a.getAceFrameConfig().getTopActivityListener()
-						.getStopButton().getActionListeners();
-				for (ActionListener l: stopListeners) {
-					a.getAceFrameConfig().getTopActivityListener()
-					.getStopButton().removeActionListener(l);
+				if (a.getAceFrameConfig().getTopActivityListener() != null) {
+					a.removeShowActivityListener(a.getAceFrameConfig().getTopActivityListener());
+					ActionListener[] stopListeners = a.getAceFrameConfig().getTopActivityListener()
+							.getStopButton().getActionListeners();
+					for (ActionListener l: stopListeners) {
+						a.getAceFrameConfig().getTopActivityListener()
+						.getStopButton().removeActionListener(l);
+					}
 				}
 			}
 		}

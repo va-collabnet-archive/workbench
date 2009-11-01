@@ -12,6 +12,7 @@ import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.grant.GrantPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.profile.EditOnPromotePath;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -103,7 +104,7 @@ public class SetWorkflowDetailsSheetToGrantPanel extends AbstractTask {
 	        int height = 500;
 	        workflowDetailsSheet.setSize(width, height);
 	        workflowDetailsSheet.setLayout(new GridLayout(1, 1));
-			workflowDetailsSheet.add(new GrantPanel(config, commitConfig));
+			workflowDetailsSheet.add(new GrantPanel(config, new EditOnPromotePath(commitConfig)));
 		} catch (Exception e) {
 			ex = e;
 		}

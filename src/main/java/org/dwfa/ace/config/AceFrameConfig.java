@@ -2980,7 +2980,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	}
 
 	public I_ShowActivity getTopActivityListener() {
-		return aceFrame.getCdePanel().getTopActivityListener();
+		if (aceFrame == null) {
+			return null;
+		} else {
+			return aceFrame.getCdePanel().getTopActivityListener();
+		}
 	}
 
     public void fireUpdateHierarchyView() {
