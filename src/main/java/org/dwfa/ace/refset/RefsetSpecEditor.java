@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -908,12 +909,22 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
     }
 
     public void setTermComponent(final I_AmTermComponent termComponent) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                label.setTermComponent(termComponent);
-            }
-        });
-    }
+    	if (SwingUtilities.isEventDispatchThread()) {
+            label.setTermComponent(termComponent);
+    	} else {
+    	       try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+				        public void run() {
+				            label.setTermComponent(termComponent);
+				        }
+				    });
+			} catch (InterruptedException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (InvocationTargetException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+    	}
+     }
 
     public I_GetConceptData getHierarchySelection() {
         throw new UnsupportedOperationException();
@@ -1256,13 +1267,11 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
     }
 
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
-    	if (refsetSpecConcept == null) {
-    		I_GetConceptData refsetConcept = (I_GetConceptData) getLabel().getTermComponent();
-    		if (refsetConcept != null) {
-    			Set<I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept, ace.getAceFrameConfig());
-    			if (specs.size() > 0) {
-    				refsetSpecConcept = specs.iterator().next();
-    			}
+    	I_GetConceptData refsetConcept = (I_GetConceptData) getLabel().getTermComponent();
+    	if (refsetConcept != null) {
+    		Set<I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept, ace.getAceFrameConfig());
+    		if (specs.size() > 0) {
+    			refsetSpecConcept = specs.iterator().next();
     		}
     	}
         return refsetSpecConcept;
