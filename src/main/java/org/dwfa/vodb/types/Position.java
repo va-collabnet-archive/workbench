@@ -18,6 +18,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -202,7 +203,13 @@ public class Position implements I_Position {
 		int version = in.readInt();
 		int pathConceptId;
 		try {
-			pathConceptId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+			List<UUID> pathIdList= (List<UUID>) in.readObject();
+			if (AceConfig.getVodb().hasId(pathIdList)) {
+				pathConceptId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+			} else {
+				pathConceptId = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid();
+			}
+			
 		} catch (TerminologyException e) {
 			IOException newEx = new IOException(e.getLocalizedMessage());
 			newEx.initCause(e);
