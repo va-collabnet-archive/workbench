@@ -336,11 +336,13 @@ public class ActivityViewer {
 		for (I_ShowActivity a : viewer.activitiesList) {
 			if (a.getAceFrameConfig() != null) {
 				I_ShowActivity frameActivity = a.getAceFrameConfig().getTopActivityListener();
-		    	if (activeActivityListeners.contains(frameActivity) == false) {
-		    		a.addShowActivityListener(frameActivity);
-		    		activeActivityListeners.add(frameActivity);
-		     		frameActivity.syncWith(a);
-		    	}
+				if (frameActivity != null) {
+			    	if (activeActivityListeners.contains(frameActivity) == false) {
+			    		a.addShowActivityListener(frameActivity);
+			    		activeActivityListeners.add(frameActivity);
+				     	frameActivity.syncWith(a);
+			    	}
+				}
 			}
 		}
 	}
