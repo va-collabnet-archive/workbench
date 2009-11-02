@@ -161,7 +161,6 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
             }
             returnCondition = Condition.CONTINUE;
         } catch (Exception e) {
-            e.printStackTrace();
             ex = e;
         }
     }

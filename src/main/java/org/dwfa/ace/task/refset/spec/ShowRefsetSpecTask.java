@@ -61,6 +61,9 @@ public class ShowRefsetSpecTask extends AbstractTask {
             } else {
                 uuid = (UUID) obj;
             }
+            if (uuid == null) {
+            	throw new TaskFailedException("refset uuid is null");
+            }
             if (uuid != null) {
                 I_GetConceptData refset = termFactory.getConcept(new UUID[] { uuid });
 
@@ -68,23 +71,13 @@ public class ShowRefsetSpecTask extends AbstractTask {
                 termFactory.getActiveAceFrameConfig().setRefsetInSpecEditor(refset);
                 termFactory.getActiveAceFrameConfig().setShowQueueViewer(false);
                 termFactory.getActiveAceFrameConfig().showRefsetSpecPanel();
-
-                int count = 0;
-                while (termFactory.getActiveAceFrameConfig().getRefsetInSpecEditor() == null && count < 10) {
-                    Thread.sleep(1000);
-                    count++;
-                }
-                while (termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor() == null && count < 10) {
-                    Thread.sleep(1000);
-                    count++;
-                }
             } else {
                 termFactory.getActiveAceFrameConfig().setShowQueueViewer(false);
                 termFactory.getActiveAceFrameConfig().showRefsetSpecPanel();
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new TaskFailedException(e);
         }
 
         return Condition.CONTINUE;

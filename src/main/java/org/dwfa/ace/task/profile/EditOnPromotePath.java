@@ -357,7 +357,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 		return config.getRefsetPreferencesMap();
 	}
 
-	public I_GetConceptData getRefsetSpecInSpecEditor() {
+	public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
 		return config.getRefsetSpecInSpecEditor();
 	}
 

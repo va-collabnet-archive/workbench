@@ -486,7 +486,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setRefsetInSpecEditor(I_GetConceptData refset);
 
-    public I_GetConceptData getRefsetSpecInSpecEditor();
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException;
 
     public JTree getTreeInSpecEditor();
 
