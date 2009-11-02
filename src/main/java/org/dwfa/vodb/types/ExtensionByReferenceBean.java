@@ -125,6 +125,11 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 		} else if (ref != null) {
 			ExtensionByReferenceBean ebr = ref.get();
 			if (ebr != null) {
+				for (I_ThinExtByRefPart part: extension.getVersions()) {
+					if (ebr.extension.getVersions().contains(part) == false) {
+						ebr.extension.addVersion(part);
+					}
+				}
 				return ebr;
 			} else {
 				synchronized (ebrBeans) {

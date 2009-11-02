@@ -1527,6 +1527,9 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 	    	  I_IdVersioned idv = LocalVersionedTerminology.get().getId(id);
 	    	  if (idv.promote(viewPosition, pomotionPaths, allowedStatus)) {
 	    		  promotedAnything = true;
+	    		  if (uncommittedIds == null) {
+	    			  uncommittedIds = new IntSet();
+	    		  }
 	    		  uncommittedIds.add(idv.getNid());
 	    	  }
 	      }

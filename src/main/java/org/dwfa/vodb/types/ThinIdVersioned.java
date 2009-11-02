@@ -199,6 +199,9 @@ public class ThinIdVersioned implements I_IdVersioned {
 	   positions.add(viewPosition);
 	   List<I_IdTuple> matchingTuples = new ArrayList<I_IdTuple>();
 	   addTuples(allowedStatus, positions, matchingTuples);
+	   if (matchingTuples.size() == 0) {
+		   matchingTuples.add(new ThinIdTuple(this, versions.get(0)));
+	   }
 	   for (I_Path promotionPath: pomotionPaths) {
 		   for (I_IdTuple it: matchingTuples) {
 			   I_IdPart promotionPart = it.getPart().duplicate();

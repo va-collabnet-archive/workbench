@@ -48,6 +48,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -107,6 +108,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
@@ -175,7 +177,36 @@ import com.sleepycat.je.DatabaseException;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
 
-    private List<TermComponentDataCheckSelectionListener> dataCheckListeners =
+    public class TestTupleCalculator implements ActionListener {
+
+    	AceConfig aceConfig;
+		public TestTupleCalculator(Configuration config, JFrame aceFrame,
+				AceConfig aceConfig) {
+			this.aceConfig = aceConfig;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			I_TermFactory tf = LocalVersionedTerminology.get();
+			;
+			try {
+				I_GetConceptData refsetConcept = tf.getConcept(UUID.fromString("6fd32c1f-8096-40a1-9053-1cc204bc61e3"));
+				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+			} catch (TerminologyException e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			} catch (IOException e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			}
+
+		}
+
+	}
+
+	private List<TermComponentDataCheckSelectionListener> dataCheckListeners =
             new ArrayList<TermComponentDataCheckSelectionListener>();
 
     public void addDataCheckListener(TermComponentDataCheckSelectionListener l) {
@@ -1583,6 +1614,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
              */
             menuItem = new JMenuItem("Import Java Changeset...");
             menuItem.addActionListener(new ImportJavaChangeset(config, aceFrame, aceConfig));
+            fileMenu.add(menuItem);
+            fileMenu.addSeparator();
+            menuItem = new JMenuItem("Test Tuple Calculator...");
+            menuItem.addActionListener(new TestTupleCalculator(config, aceFrame, aceConfig));
             fileMenu.add(menuItem);
             fileMenu.addSeparator();
             /*
