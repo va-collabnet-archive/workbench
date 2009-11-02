@@ -280,80 +280,85 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
 
         private void layoutAlerts() {
-            if (editMode) {
-                if (dataCheckListPanel == null) {
-                    getDataCheckListScroller();
-                }
-                for (Component component : dataCheckListPanel.getComponents()) {
-                    dataCheckListPanel.remove(component);
-                }
+        	SwingUtilities.invokeLater(new Runnable() {
+				
+				public void run() {
+		            if (editMode) {
+		                if (dataCheckListPanel == null) {
+		                    getDataCheckListScroller();
+		                }
+		                for (Component component : dataCheckListPanel.getComponents()) {
+		                    dataCheckListPanel.remove(component);
+		                }
 
-                dataCheckListPanel.setLayout(new GridBagLayout());
+		                dataCheckListPanel.setLayout(new GridBagLayout());
 
-                GridBagConstraints c = new GridBagConstraints();
-                c.gridx = 0;
-                c.gridy = 0;
-                c.gridheight = 1;
-                c.gridwidth = 1;
-                c.anchor = GridBagConstraints.NORTHWEST;
-                c.fill = GridBagConstraints.HORIZONTAL;
-                c.weightx = 1;
-                c.weighty = 0;
+		                GridBagConstraints c = new GridBagConstraints();
+		                c.gridx = 0;
+		                c.gridy = 0;
+		                c.gridheight = 1;
+		                c.gridwidth = 1;
+		                c.anchor = GridBagConstraints.NORTHWEST;
+		                c.fill = GridBagConstraints.HORIZONTAL;
+		                c.weightx = 1;
+		                c.weighty = 0;
 
-                int dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
-                int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
-                if (dataCheckListModel.size() > 0) {
+		                int dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+		                int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
+		                if (dataCheckListModel.size() > 0) {
 
-                    for (AlertToDataConstraintFailure alert : dataCheckListModel) {
-                        setupAlert(alert);
-                        dataCheckListPanel.add(alert.getRendererComponent(), c);
-                        c.gridy++;
-                    }
+		                    for (AlertToDataConstraintFailure alert : dataCheckListModel) {
+		                        setupAlert(alert);
+		                        dataCheckListPanel.add(alert.getRendererComponent(), c);
+		                        c.gridy++;
+		                    }
 
-                    c.weighty = 1;
-                    c.gridy++;
-                    dataCheckListPanel.add(new JPanel(), c);
-                    if (dataCheckIndex == -1) {
-                        leftTabs.addTab(dataCheckTabLabel, getDataCheckListScroller());
-                        dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
-                    }
+		                    c.weighty = 1;
+		                    c.gridy++;
+		                    dataCheckListPanel.add(new JPanel(), c);
+		                    if (dataCheckIndex == -1) {
+		                        leftTabs.addTab(dataCheckTabLabel, getDataCheckListScroller());
+		                        dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+		                    }
 
-                    leftTabs.setSelectedIndex(dataCheckIndex);
-                    if (dataCheckPanel == null) {
-                        try {
-                            dataCheckPanel =
-                                    new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK, ACE.this,
-                                        LINK_TYPE.DATA_CHECK_LINK, conceptTabs, Integer.MAX_VALUE);
-                            conceptPanels.add(dataCheckPanel);
-                        } catch (DatabaseException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (IOException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (ClassNotFoundException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (NoSuchAlgorithmException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        }
-                    }
-                    conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
-                        "Data Checks Linked");
+		                    leftTabs.setSelectedIndex(dataCheckIndex);
+		                    if (dataCheckPanel == null) {
+		                        try {
+		                            dataCheckPanel =
+		                                    new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK, ACE.this,
+		                                        LINK_TYPE.DATA_CHECK_LINK, conceptTabs, Integer.MAX_VALUE);
+		                            conceptPanels.add(dataCheckPanel);
+		                        } catch (DatabaseException e) {
+		                            AceLog.getAppLog().alertAndLogException(e);
+		                        } catch (IOException e) {
+		                            AceLog.getAppLog().alertAndLogException(e);
+		                        } catch (ClassNotFoundException e) {
+		                            AceLog.getAppLog().alertAndLogException(e);
+		                        } catch (NoSuchAlgorithmException e) {
+		                            AceLog.getAppLog().alertAndLogException(e);
+		                        }
+		                    }
+		                    conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
+		                        "Data Checks Linked");
 
-                } else {
-                    leftTabs.setSelectedIndex(taxonomyIndex);
-                    if (dataCheckIndex != -1) {
-                        leftTabs.removeTabAt(dataCheckIndex);
-                    }
-                    if (dataCheckPanel != null) {
-                        c.weighty = 1;
-                        c.gridy++;
-                        dataCheckListPanel.add(new JPanel(), c);
-                        if (conceptTabs.indexOfComponent(dataCheckPanel) >= 0) {
-                            conceptTabs.remove(dataCheckPanel);
-                            dataCheckPanel.setTermComponent(null);
-                        }
-                    }
-                }
-            }
+		                } else {
+		                    leftTabs.setSelectedIndex(taxonomyIndex);
+		                    if (dataCheckIndex != -1) {
+		                        leftTabs.removeTabAt(dataCheckIndex);
+		                    }
+		                    if (dataCheckPanel != null) {
+		                        c.weighty = 1;
+		                        c.gridy++;
+		                        dataCheckListPanel.add(new JPanel(), c);
+		                        if (conceptTabs.indexOfComponent(dataCheckPanel) >= 0) {
+		                            conceptTabs.remove(dataCheckPanel);
+		                            dataCheckPanel.setTermComponent(null);
+		                        }
+		                    }
+		                }
+		            }
+				}
+			});
         }
 
         private void setupAlert(AlertToDataConstraintFailure alert) {
@@ -638,46 +643,71 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
-    public static void updateAlerts(I_ConfigAceFrame frameConfig) {
-        if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
-            ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame().getCdePanel();
-            aceInstance.getDataCheckListScroller();
-            aceInstance.getUncommittedListModel().clear();
-
-            for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
-                aceInstance.getUncommittedListModel().addAll(alerts);
-            }
-            if (aceInstance.getUncommittedListModel().size() > 0) {
-                for (int i = 0; i < aceInstance.leftTabs.getTabCount(); i++) {
-                    if (aceInstance.leftTabs.getTitleAt(i).equals(dataCheckTabLabel)) {
-                        aceInstance.leftTabs.setSelectedIndex(i);
-                        break;
-                    }
-                }
-                // show data checks tab...
-            } else {
-                for (TermComponentDataCheckSelectionListener l : aceInstance.dataCheckListeners) {
-                    l.setSelection(null);
-                }
-                // hide data checks tab...
-            }
-        }
+    public static void updateAlerts(final I_ConfigAceFrame frameConfig) {
+    	SwingUtilities.invokeLater(new Runnable() {
+			
+			public void run() {
+		        doUpdate(frameConfig);
+			}
+		});
     }
 
-    public static void removeUncommitted(I_Transact to) {
+	private static void doUpdate(I_ConfigAceFrame frameConfig) {
+		try {
+			if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
+			    ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame().getCdePanel();
+			    aceInstance.getDataCheckListScroller();
+			    aceInstance.getUncommittedListModel().clear();
+
+			    for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
+			        aceInstance.getUncommittedListModel().addAll(alerts);
+			    }
+			    if (aceInstance.getUncommittedListModel().size() > 0) {
+			        for (int i = 0; i < aceInstance.leftTabs.getTabCount(); i++) {
+			            if (aceInstance.leftTabs.getTitleAt(i).equals(dataCheckTabLabel)) {
+			                aceInstance.leftTabs.setSelectedIndex(i);
+			                break;
+			            }
+			        }
+			        // show data checks tab...
+			    } else {
+			        for (TermComponentDataCheckSelectionListener l : aceInstance.dataCheckListeners) {
+			            l.setSelection(null);
+			        }
+			        // hide data checks tab...
+			    }
+			}
+		} catch (Exception e) {
+			AceLog.getAppLog().warning(e.toString());
+		}
+	}
+
+    public static void removeUncommitted(final I_Transact to) {
         uncommitted.remove(to);
         if (aceConfig != null) {
-            for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-                if (ConceptBean.class.isAssignableFrom(to.getClass())) {
-                    frameConfig.removeUncommitted((I_GetConceptData) to);
-                    updateAlerts(frameConfig);
-                }
-                if (uncommitted.size() == 0) {
-                    frameConfig.setCommitEnabled(false);
-                }
-            }
+        	SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+		            removeUncommittedUpdateFrame(to);
+				}
+			});
         }
     }
+
+	private static void removeUncommittedUpdateFrame(I_Transact to) {
+		for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+		    try {
+				if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+				    frameConfig.removeUncommitted((I_GetConceptData) to);
+				    updateAlerts(frameConfig);
+				}
+				if (uncommitted.size() == 0) {
+				    frameConfig.setCommitEnabled(false);
+				}
+			} catch (Exception e) {
+				AceLog.getAppLog().warning(e.toString());
+			}
+		}
+	}
 
     private static Set<I_WriteChangeSet> csWriters = new HashSet<I_WriteChangeSet>();
 
