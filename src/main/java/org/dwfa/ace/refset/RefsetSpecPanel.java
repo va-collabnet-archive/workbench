@@ -4,6 +4,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.IntSet;
 
@@ -413,7 +415,7 @@ public class RefsetSpecPanel extends JPanel {
         return editor.getTreeInSpecEditor();
     }
 
-    public I_GetConceptData getRefsetSpecInSpecEditor() {
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         return editor.getRefsetSpecInSpecEditor();
     }
 

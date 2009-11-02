@@ -2729,7 +2729,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return aceFrame.getCdePanel().getTreeInSpecEditor();
     }
 
-    public I_GetConceptData getRefsetSpecInSpecEditor() {
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
     }
 

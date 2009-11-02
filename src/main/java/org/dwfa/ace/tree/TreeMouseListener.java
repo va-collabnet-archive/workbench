@@ -27,6 +27,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.RefsetCommentPopupListener;
 import org.dwfa.ace.search.QueryBean;
 import org.dwfa.ace.search.SimilarConceptQuery;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
 
 public class TreeMouseListener implements MouseListener {
@@ -112,10 +113,12 @@ public class TreeMouseListener implements MouseListener {
 			AceLog.getAppLog().alertAndLogException(e1);
 		} catch (ClassNotFoundException e1) {
 			AceLog.getAppLog().alertAndLogException(e1);
+		} catch (TerminologyException e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 	}
 
-	private JPopupMenu makePopup(MouseEvent e, I_GetConceptData selectedConcept) throws FileNotFoundException, IOException, ClassNotFoundException {
+	private JPopupMenu makePopup(MouseEvent e, I_GetConceptData selectedConcept) throws FileNotFoundException, IOException, ClassNotFoundException, TerminologyException {
 			JPopupMenu popup = new JPopupMenu();
 			JMenuItem noActionItem = new JMenuItem("");
 			popup.add(noActionItem);

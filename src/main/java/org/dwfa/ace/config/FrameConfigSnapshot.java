@@ -175,7 +175,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setClassifierOutputPath(outputPath);
     }
 
-    public I_GetConceptData getRefsetSpecInSpecEditor() {
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         return baseFrame.getRefsetSpecInSpecEditor();
     }
 

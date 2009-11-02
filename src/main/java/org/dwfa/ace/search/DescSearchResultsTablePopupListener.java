@@ -29,6 +29,7 @@ import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.types.ConceptBean;
 
@@ -66,7 +67,9 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
                 AceLog.getAppLog().alertAndLogException(e1);
             } catch (ClassNotFoundException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
-            }
+            } catch (TerminologyException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+			}
             e.consume();
         }
     }
@@ -81,11 +84,13 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
                 AceLog.getAppLog().alertAndLogException(e1);
             } catch (ClassNotFoundException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
-            }
+            } catch (TerminologyException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+			}
         }
     }
 
-    private void handlePopup(MouseEvent e) throws FileNotFoundException, IOException, ClassNotFoundException {
+    private void handlePopup(MouseEvent e) throws FileNotFoundException, IOException, ClassNotFoundException, TerminologyException {
         descTable = (JTable) e.getSource();
         if (descTable.getCellRect(descTable.getSelectedRow(), descTable.getSelectedColumn(), true).contains(
             e.getPoint())) {

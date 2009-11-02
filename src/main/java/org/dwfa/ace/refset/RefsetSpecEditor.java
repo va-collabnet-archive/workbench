@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
@@ -70,6 +71,7 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
+import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -1253,7 +1255,16 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
         return specTree;
     }
 
-    public I_GetConceptData getRefsetSpecInSpecEditor() {
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
+    	if (refsetSpecConcept == null) {
+    		I_GetConceptData refsetConcept = (I_GetConceptData) getLabel().getTermComponent();
+    		if (refsetConcept != null) {
+    			Set<I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept, ace.getAceFrameConfig());
+    			if (specs.size() > 0) {
+    				refsetSpecConcept = specs.iterator().next();
+    			}
+    		}
+    	}
         return refsetSpecConcept;
     }
 

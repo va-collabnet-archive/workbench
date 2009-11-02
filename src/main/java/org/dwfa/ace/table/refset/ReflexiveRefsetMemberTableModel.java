@@ -16,6 +16,7 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
@@ -177,8 +178,14 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel  {
 			getProgress().getProgressBar().setValue(0);
 			getProgress().getProgressBar().setIndeterminate(true);
 		}
-		if (host.getConfig().getRefsetSpecInSpecEditor() == null) {
-			this.tableComponentId = Integer.MIN_VALUE;
+		try {
+			if (host.getConfig().getRefsetSpecInSpecEditor() == null) {
+				this.tableComponentId = Integer.MIN_VALUE;
+			}
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		fireTableDataChanged();
 	}
