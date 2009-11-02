@@ -968,7 +968,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         if (obj == null) {
             return null;
         } else {
-            return LocalVersionedTerminology.get().getConcept((List<UUID>) obj);
+        	if (LocalVersionedTerminology.get().hasId((List<UUID>) obj)) {
+                return LocalVersionedTerminology.get().getConcept((List<UUID>) obj);
+        	}
+            return null;
         }
     }
 
