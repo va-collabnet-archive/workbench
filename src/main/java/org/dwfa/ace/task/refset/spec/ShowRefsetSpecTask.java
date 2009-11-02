@@ -20,7 +20,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Shows the refset spec in the refset spec panel.
+ * Shows the refset spec panel. An optional refset spec can be specified to show in the panel.
  * 
  * @author Chrissy Hill
  * 
@@ -61,9 +61,7 @@ public class ShowRefsetSpecTask extends AbstractTask {
             } else {
                 uuid = (UUID) obj;
             }
-            if (uuid == null) {
-            	throw new TaskFailedException("refset uuid is null");
-            }
+
             if (uuid != null) {
                 I_GetConceptData refset = termFactory.getConcept(new UUID[] { uuid });
 
