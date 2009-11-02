@@ -205,7 +205,7 @@ public class Position implements I_Position {
 		try {
 			List<UUID> pathIdList= (List<UUID>) in.readObject();
 			if (AceConfig.getVodb().hasId(pathIdList)) {
-				pathConceptId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+				pathConceptId = AceConfig.getVodb().uuidToNative(pathIdList);
 			} else {
 				pathConceptId = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid();
 			}
