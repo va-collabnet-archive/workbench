@@ -89,6 +89,8 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
 			final I_Work worker) throws TaskFailedException {
 		try {
 			I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.readProperty(newProfilePropName);
+			newConfig.getViewPositionSet().clear();
+			newConfig.getEditingPathSet().clear();
 			I_ConfigAceFrame creatorConfig = (I_ConfigAceFrame) process.readProperty(creatorProfilePropName);
 			I_TermFactory tf = LocalVersionedTerminology.get();
 
