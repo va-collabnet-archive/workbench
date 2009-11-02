@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
@@ -220,14 +222,23 @@ public class Position implements I_Position {
 		Set<I_Position> positions = Collections.synchronizedSet(new HashSet<I_Position>(size));
 		for (int i = 0; i < size; i++) {
          try {
-            positions.add(readPosition(in));
+        	I_Position position = readPosition(in);
+        	I_GetConceptData pathConcept = LocalVersionedTerminology.get().getConcept(position.getPath().getConceptId());
+        	I_Path path = LocalVersionedTerminology.get().getPath(pathConcept.getUids());
+            positions.add(LocalVersionedTerminology.get().newPosition(path, position.getVersion()));
          } catch (IOException ex) {
             if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
                AceLog.getAppLog().alertAndLogException(ex.getCause());
             } else {
                throw ex;
             }
-         }
+         } catch (TerminologyException ex) {
+             if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
+                 AceLog.getAppLog().alertAndLogException(ex.getCause());
+              } else {
+                 throw new IOException(ex);
+              }
+		}
 		}
 		return positions;
 	}
