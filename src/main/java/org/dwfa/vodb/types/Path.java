@@ -265,7 +265,13 @@ public class Path implements I_Transact, I_Path {
    public static I_Path readPath(ObjectInputStream in) throws IOException, ClassNotFoundException  {
       int pathId;
       try {
-         pathId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+			List<UUID> pathIdList= (List<UUID>) in.readObject();
+			if (AceConfig.getVodb().hasId(pathIdList)) {
+				pathId = AceConfig.getVodb().uuidToNative(pathIdList);
+			} else {
+				pathId = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid();
+			}
+			
       } catch (TerminologyException e) {
          IOException newEx = new IOException();
          newEx.initCause(e);
