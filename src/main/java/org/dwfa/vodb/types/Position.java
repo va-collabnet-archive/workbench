@@ -186,7 +186,11 @@ public class Position implements I_Position {
 	public static void writePosition(ObjectOutputStream out, I_Position p) throws IOException {
 		out.writeInt(p.getVersion());
 		try {
-			out.writeObject(AceConfig.getVodb().nativeToUuid(p.getPath().getConceptId()));
+			if (AceConfig.getVodb().getId(p.getPath().getConceptId()) != null) {
+				out.writeObject(AceConfig.getVodb().nativeToUuid(p.getPath().getConceptId()));
+			} else {
+				out.writeObject(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+			}
 		} catch (DatabaseException e) {
 			IOException newEx = new IOException();
 			newEx.initCause(e);
