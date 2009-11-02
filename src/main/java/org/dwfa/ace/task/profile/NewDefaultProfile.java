@@ -205,6 +205,7 @@ public class NewDefaultProfile extends NewProfile {
 		addIfNotNull(allowedStatus, Concept.RESOLVED_IN_DUAL_AND_PROCESSED, tf);
 		addIfNotNull(allowedStatus, Concept.CONFLICTING, tf);
 		addIfNotNull(allowedStatus, Concept.CONSTANT, tf);
+		addIfNotNull(allowedStatus, Concept.READY_TO_PROMOTE, tf);
 		activeConfig.setAllowedStatus(allowedStatus);
 
 		I_IntSet destRelTypes = tf.newIntSet();
