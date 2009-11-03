@@ -38,7 +38,7 @@ import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.StatsConfig;
 
-public class ConceptAttributeBdb implements I_StoreConceptAttributes {
+public abstract class ConceptAttributeBdb implements I_StoreConceptAttributes {
 
 	private static ThinConVersionedBinding conBinding = new ThinConVersionedBinding();
 

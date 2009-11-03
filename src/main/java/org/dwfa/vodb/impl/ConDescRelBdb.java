@@ -41,6 +41,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.DatabaseSetupConfig;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -55,6 +56,9 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.IdentifierSet;
+import org.dwfa.ace.api.IdentifierSetReadOnly;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
@@ -1169,31 +1173,88 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		concCursor.close();
 	}
 	
-	private static int[] conceptNids;
+	public IdentifierSet getConceptIdSet() throws IOException {
+		try {
+			IdentifierSet cidSet = new IdentifierSet(identifierDb.getMaxId() - Integer.MIN_VALUE);
+			refreshConceptNids();
+			for (int nid: conceptNids) {
+				cidSet.setMember(nid);
+			}
+			return cidSet;
+		} catch (DatabaseException e) {
+			throw new IOException(e);
+		}
+	}
 
+	public IdentifierSet getEmptyIdSet() throws IOException {
+		try {
+			return new IdentifierSet(identifierDb.getMaxId() - Integer.MIN_VALUE);
+		} catch (DatabaseException e) {
+			throw new IOException(e);
+		}
+	}
+
+	public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids) throws IOException {
+		IdentifierSet newSet = getEmptyIdSet();
+		for (int nid: ids) {
+			newSet.setMember(nid);
+		}
+		return newSet;
+	}
+
+	public I_RepresentIdSet getIdSetfromTermCollection(
+			Collection<? extends I_AmTermComponent> components) throws IOException {
+		IdentifierSet newSet = getEmptyIdSet();
+		for (I_AmTermComponent component: components) {
+			newSet.setMember(component.getNid());
+		}
+		return newSet;
+	}
+
+	public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
+		try {
+			refreshConceptNids();
+			return idSet;
+		} catch (DatabaseException e) {
+			throw new IOException(e);
+		}
+	}
+
+	
+	private static int[] conceptNids;
+	private static IdentifierSetReadOnly idSet;
+
+	private void refreshConceptNids() throws DatabaseException, IOException {
+		if (conceptNids == null || getConceptCount() != conceptNids.length) {
+			IdentifierSet tempIdSet = getEmptyIdSet();
+			conceptNids = new int[getConceptCount()];
+			Cursor concCursor = conDescRelDb.openCursor(null, null);
+			DatabaseEntry foundKey = new DatabaseEntry();
+			DatabaseEntry foundData = new DatabaseEntry();
+			for (int i = 0; i < conceptNids.length; i++) {
+				if (concCursor.getNext(foundKey, foundData,
+						LockMode.DEFAULT) != OperationStatus.SUCCESS) {
+					AceLog.getAppLog().alertAndLogException(
+							new Exception("premature end of concept cursor: " + i));
+				}
+				conceptNids[i] = (Integer) intBinder.entryToObject(foundKey);
+				tempIdSet.setMember(conceptNids[i]);
+			}
+			idSet = new IdentifierSetReadOnly(tempIdSet);
+		}
+	}
 	private class ConceptIdArrayIterator implements Iterator<I_GetConceptData> {
 		
 		int index = 0;
 		Cursor concCursor;
-		private ConceptIdArrayIterator() throws DatabaseException {
+		int[] iteratorNids;
+		private ConceptIdArrayIterator() throws DatabaseException, IOException {
 			super();
-			if (conceptNids == null || getConceptCount() != conceptNids.length) {
-				conceptNids = new int[getConceptCount()];
-				concCursor = conDescRelDb.openCursor(null, null);
-				DatabaseEntry foundKey = new DatabaseEntry();
-				DatabaseEntry foundData = new DatabaseEntry();
-				for (int i = 0; i < conceptNids.length; i++) {
-					if (concCursor.getNext(foundKey, foundData,
-							LockMode.DEFAULT) != OperationStatus.SUCCESS) {
-						AceLog.getAppLog().alertAndLogException(
-								new Exception("premature end of concept cursor: " + i));
-					}
-					conceptNids[i] = (Integer) intBinder.entryToObject(foundKey);
-				}
-			}
+			refreshConceptNids();
+			iteratorNids = conceptNids.clone();
 		}
 		public boolean hasNext() {
-		    if (index >= conceptNids.length) {
+		    if (index >= iteratorNids.length) {
 		        if (concCursor != null) {
 		            try {
 		                concCursor.close();
@@ -1202,17 +1263,18 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	                }
 	            }
 	        }
-	        return index < conceptNids.length;
+	        return index < iteratorNids.length;
 		}
 		public I_GetConceptData next() {
 			index++;
-			return ConceptBean.get(conceptNids[index-1]);
+			return ConceptBean.get(iteratorNids[index-1]);
 		}
 		public void remove() {
 			throw new UnsupportedOperationException("Remove is not supported. ");
 		}
 		
 	}
+	
 	
 	private class ConceptIterator implements Iterator<I_GetConceptData> {
 
@@ -2121,6 +2183,17 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 
 	public int getConceptCount() throws DatabaseException {
 		return (int) conDescRelDb.count();
+	}
+
+	public I_IntSet getConceptNids() throws IOException {
+		if (conceptNids != null) {
+			try {
+				new ConceptIdArrayIterator();
+			} catch (DatabaseException e) {
+				throw new IOException(e);
+			}
+		}
+		return new IntSet(conceptNids);
 	}
 
 }

@@ -31,6 +31,7 @@ import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
 import org.dwfa.ace.api.DatabaseSetupConfig;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceDb;
@@ -57,10 +58,12 @@ import org.dwfa.ace.api.I_ProcessPaths;
 import org.dwfa.ace.api.I_ProcessRelationships;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_SupportClassifier;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -101,7 +104,6 @@ import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.SuppressDataChecks;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.tapi.TerminologyRuntimeException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.bind.ThinExtBinder;
@@ -1851,6 +1853,34 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 			JComponent thisComponent) {
 		return new TerminologyTransferHandler(thisComponent);
 	}
+
+	public I_IntSet getConceptNids() throws IOException {
+		return bdbEnv.getConceptNids();
+	}
+
+	public I_RepresentIdSet getConceptIdSet() throws IOException {
+		return bdbEnv.getConceptIdSet();
+	}
+
+	public I_RepresentIdSet getEmptyIdSet() throws IOException {
+		return bdbEnv.getEmptyIdSet();
+	}
+
+	public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids)
+			throws IOException {
+		return bdbEnv.getIdSetFromIntCollection(ids);
+	}
+
+	public I_RepresentIdSet getIdSetfromTermCollection(
+			Collection<? extends I_AmTermComponent> components)
+			throws IOException {
+		return bdbEnv.getIdSetfromTermCollection(components);
+	}
+
+	public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
+		return bdbEnv.getReadOnlyConceptIdSet();
+	}
     
+	
     
 }

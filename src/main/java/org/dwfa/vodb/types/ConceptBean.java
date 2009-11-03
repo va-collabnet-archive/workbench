@@ -40,7 +40,9 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
@@ -1467,23 +1469,27 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 		cbeans = new HashMap<Integer, Reference<ConceptBean>>();
 	}
 
-	public Collection<Integer> getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
-		Set<Integer> possibleKindOfConcepts = new HashSet<Integer>();
-		possibleKindOfConcepts.add(this.conceptId);
+	public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
+		I_RepresentIdSet possibleKindOfConcepts = LocalVersionedTerminology.get().getEmptyIdSet();
+		getPossibleKindOfConcepts(config, possibleKindOfConcepts);
+		return possibleKindOfConcepts;
+	}
+
+	private void getPossibleKindOfConcepts(I_ConfigAceFrame config, I_RepresentIdSet possibleKindOfConcepts) throws IOException {
+		possibleKindOfConcepts.setMember(this.conceptId);
 		I_IntSet relTypes = config.getDestRelTypes();
 		for (I_RelVersioned destRel: getDestRels()) {
 			for (I_RelPart part: destRel.getVersions()) {
 				if (relTypes.contains(part.getTypeId())) {
-					if (possibleKindOfConcepts.contains(destRel.getC1Id()) == false) {
-						possibleKindOfConcepts.add(destRel.getC1Id());
+					if (possibleKindOfConcepts.isMember(destRel.getC1Id()) == false) {
+						possibleKindOfConcepts.setMember(destRel.getC1Id());
 						ConceptBean child = ConceptBean.get(destRel.getC1Id());
-						possibleKindOfConcepts.addAll(child.getPossibleKindOfConcepts(config));
+						child.getPossibleKindOfConcepts(config, possibleKindOfConcepts);
 						break;
 					}
 				}
 			}
 		}
-		return possibleKindOfConcepts;
 	}
 
 	public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths,

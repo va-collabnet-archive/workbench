@@ -18,6 +18,7 @@ import org.apache.commons.collections.primitives.IntList;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.DatabaseSetupConfig;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -28,6 +29,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -369,6 +372,9 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 
 	public Iterator<I_GetConceptData> getConceptIterator() throws IOException {
 		return conAttBdb.getConceptIterator();
+	}
+	public I_IntSet getConceptNids() throws IOException {
+		return conAttBdb.getConceptNids();
 	}
 
 	public boolean hasConcept(int conceptId) throws DatabaseException {
@@ -956,4 +962,26 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 			ParseException {
 		conAttBdb.searchConcepts(tracker, matches, latch, checkList, config);
 	}
+
+	public IdentifierSet getConceptIdSet() throws IOException {
+		return conAttBdb.getConceptIdSet();
+	}
+
+	public IdentifierSet getEmptyIdSet() throws IOException {
+		return conAttBdb.getEmptyIdSet();
+	}
+
+	public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids) throws IOException {
+		return conAttBdb.getIdSetFromIntCollection(ids);
+	}
+
+	public I_RepresentIdSet getIdSetfromTermCollection(
+			Collection<? extends I_AmTermComponent> components) throws IOException {
+		return conAttBdb.getIdSetfromTermCollection(components);
+	}
+
+	public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
+		return conAttBdb.getReadOnlyConceptIdSet();
+	}
+
 }

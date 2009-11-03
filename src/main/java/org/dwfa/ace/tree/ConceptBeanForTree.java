@@ -24,6 +24,8 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.utypes.UniversalAceBean;
@@ -351,7 +353,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 		return bean.getId(identifierScheme);
 	}
 
-	public Collection<Integer> getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
+	public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
 		return bean.getPossibleKindOfConcepts(config);
 	}
 
