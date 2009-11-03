@@ -163,7 +163,9 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 			   buff.append(" type: ");
 			   buff.append(LocalVersionedTerminology.get().getConcept(typeId).toString());
 			   buff.append(" versions: ");
-			   buff.append(versions);
+			   synchronized (versions) {
+				   buff.append(versions);
+			   }
 			   return buff.toString();
 		   } catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
