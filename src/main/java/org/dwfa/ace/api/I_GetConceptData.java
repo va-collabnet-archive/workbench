@@ -1,7 +1,6 @@
 package org.dwfa.ace.api;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -553,5 +552,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	 * @throws IOException 
 	 */
 	public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException;
+	
+	
+	public List<I_IdVersioned> getUncommittedIdVersioned();
 	
 }

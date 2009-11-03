@@ -205,7 +205,7 @@ public class LoadEDG extends AbstractTask {
 		csmid.setSourceId(fields[DESCRIPTION_EXTERNAL_CLINICAL_CSMID_FIELD]);
 		csmid.setVersion(Integer.MAX_VALUE);
 		}
-
+		concept.getUncommittedIdVersioned().add(descId);
 		tf.addUncommitted(concept);
 
 		// Add to refsets...
