@@ -1,7 +1,6 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +10,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -32,9 +32,8 @@ public class DescStatement extends RefsetSpecStatement {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public DescStatement(boolean useNotQualifier, I_GetConceptData queryType, I_GetConceptData queryDestination,
-            HashSet<Integer> allConcepts) {
-        super(useNotQualifier, queryType, queryDestination, allConcepts);
+    public DescStatement(boolean useNotQualifier, I_GetConceptData queryType, I_GetConceptData queryDestination) {
+        super(useNotQualifier, queryType, queryDestination);
     }
 
     public boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException {
@@ -73,9 +72,11 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public Set<Integer> getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException, IOException {
-        Set<Integer> possibleConcepts = new HashSet<Integer>();
-
+    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException, IOException {
+    	if (true) {
+            throw new UnsupportedOperationException();
+    	}
+    	I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         switch (tokenEnum) {
         case DESC_IS:
             break;
@@ -104,9 +105,6 @@ public class DescStatement extends RefsetSpecStatement {
         default:
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
-
-        // TODO
-        possibleConcepts.addAll(allConcepts);
         return possibleConcepts;
     }
 

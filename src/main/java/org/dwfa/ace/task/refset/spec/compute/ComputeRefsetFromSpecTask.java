@@ -17,10 +17,14 @@ import java.util.UUID;
 
 import javax.swing.JButton;
 
+import org.apache.lucene.search.DocIdSetIterator;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IterateIds;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
@@ -138,15 +142,10 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
 
             // Step 1: create the query object, based on the refset spec
-            Iterator<I_GetConceptData> iterator = termFactory.getConceptIterator();
-            HashSet<Integer> allConcepts = new HashSet<Integer>();
-            while (iterator.hasNext()) {
-                allConcepts.add(iterator.next().getConceptId());
-            }
             RefsetSpecQuery query =
-                    RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset, allConcepts);
+                    RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
             RefsetSpecQuery possibleQuery =
-                    RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset, allConcepts);
+                    RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset);
             SpecMemberRefsetHelper memberRefsetHelper =
                     new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
@@ -174,41 +173,45 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             // filtering out retired versions)
             List<I_ThinExtByRefVersioned> allRefsetMembers =
                     termFactory.getRefsetExtensionMembers(refset.getConceptId());
+            
             HashSet<Integer> currentRefsetMemberIds =
                     filterNonCurrentRefsetMembers(allRefsetMembers, memberRefsetHelper, refset.getConceptId(),
                         normalMemberConcept.getConceptId());
-
             // Compute the possible concepts to iterate over here...
-            Set<Integer> possibleConcepts = possibleQuery.getPossibleConcepts(configFrame);
-            possibleConcepts.addAll(currentRefsetMemberIds);
+            I_RepresentIdSet possibleConcepts = possibleQuery.getPossibleConcepts(configFrame);
+            possibleConcepts.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
 
-            computeRefsetActivityPanel.setMaximum(possibleConcepts.size());
+            computeRefsetActivityPanel.setMaximum(termFactory.getConceptCount());
             computeRefsetActivityPanel.setIndeterminate(false);
-            for (int nid : possibleConcepts) {
-                currentConcept = termFactory.getConcept(nid);
-                conceptsProcessed++;
+            
+            I_IterateIds nidIterator = possibleConcepts.iterator();
+            while (nidIterator.next()) {
+            	int nid = nidIterator.nid();
+            	if (possibleConcepts.isMember(nid)) {
+                    currentConcept = termFactory.getConcept(nid);
+                    conceptsProcessed++;
 
-                boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());
-                if (query.execute(currentConcept)) {
-                    if (!containsCurrentMember) {
-                        newMembers.add(currentConcept.getConceptId());
+                    boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());
+                    if (query.execute(currentConcept)) {
+                        if (!containsCurrentMember) {
+                            newMembers.add(currentConcept.getConceptId());
+                        }
+                    } else {
+                        if (containsCurrentMember) {
+                            retiredMembers.add(currentConcept.getConceptId());
+                        }
                     }
-                } else {
-                    if (containsCurrentMember) {
-                        retiredMembers.add(currentConcept.getConceptId());
+
+                    if (conceptsProcessed % 10000 == 0) {
+                        progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
+                        progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
+                        computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+                        computeRefsetActivityPanel.setValue(conceptsProcessed);
                     }
-                }
-
-                if (conceptsProcessed % 10000 == 0) {
-                    progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
-                    progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
-                    computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
-                    computeRefsetActivityPanel.setValue(conceptsProcessed);
-                }
-
-                if (cancelComputation) {
-                    break;
-                }
+                    if (cancelComputation) {
+                        break;
+                    }
+            	}
             }
 
             progressReportHtmlGenerator.setStep2Complete(true);

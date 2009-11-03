@@ -1,8 +1,6 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +9,8 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -32,9 +32,8 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public ConceptStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_GetConceptData queryConstraint,
-            HashSet<Integer> allConcepts) {
-        super(useNotQualifier, queryToken, queryConstraint, allConcepts);
+    public ConceptStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_GetConceptData queryConstraint) {
+        super(useNotQualifier, queryToken, queryConstraint);
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptId() == token.nid) {
                 tokenEnum = token;
@@ -46,8 +45,8 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
     }
 
-    public Set<Integer> getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException, IOException {
-        Set<Integer> possibleConcepts = new HashSet<Integer>();
+    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException, IOException {
+    	I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
 
         switch (tokenEnum) {
         case CONCEPT_CONTAINS_DESC_GROUPING:
@@ -56,37 +55,35 @@ public class ConceptStatement extends RefsetSpecStatement {
             throw new TerminologyException("Unimplemented query : contains rel grouping"); // unimplemented
         case CONCEPT_IS:
             if (isNegated()) {
-                possibleConcepts.addAll(allConcepts);
-                possibleConcepts.remove(queryConstraint.getConceptId());
+                possibleConcepts.and(termFactory.getConceptIdSet());
+                possibleConcepts.setNotMember(queryConstraint.getConceptId());
             } else {
-                possibleConcepts.add(queryConstraint.getConceptId());
+                possibleConcepts.setMember(queryConstraint.getConceptId());
             }
             break;
         case CONCEPT_IS_CHILD_OF:
         case CONCEPT_IS_DESCENDENT_OF:
         case CONCEPT_IS_KIND_OF:
-            Collection<Integer> results = queryConstraint.getPossibleKindOfConcepts(configFrame);
+        	I_RepresentIdSet results = queryConstraint.getPossibleKindOfConcepts(configFrame);
             if (isNegated()) {
-                possibleConcepts.addAll(allConcepts);
-                possibleConcepts.removeAll(results);
+            	// TODO
+                //possibleConcepts.and(termFactory.getConceptIdSet());
+                //possibleConcepts.removeAll(results);
             } else {
-                possibleConcepts.addAll(results);
+                possibleConcepts.or(results);
             }
             break;
         case CONCEPT_IS_MEMBER_OF:
-            HashSet<Integer> members = new HashSet<Integer>();
             List<I_ThinExtByRefVersioned> refsetMembers =
                     termFactory.getRefsetExtensionMembers(queryConstraint.getConceptId());
-            for (I_ThinExtByRefVersioned ext : refsetMembers) {
-                if (termFactory.hasConcept(ext.getComponentId())) {
-                    members.add(ext.getComponentId());
-                }
-            }
+            I_RepresentIdSet refsetMemberSet = termFactory.getIdSetfromTermCollection(refsetMembers);
+            refsetMemberSet.and(termFactory.getConceptIdSet());
             if (isNegated()) {
-                possibleConcepts.addAll(allConcepts);
-                possibleConcepts.removeAll(members);
+            	// TODO
+                //possibleConcepts.and(termFactory.getConceptIdSet());
+                //possibleConcepts.removeAll(results);
             } else {
-                possibleConcepts.addAll(members);
+                possibleConcepts.or(refsetMemberSet);
             }
             break;
         case CONCEPT_STATUS_IS:
@@ -94,28 +91,28 @@ public class ConceptStatement extends RefsetSpecStatement {
             // child/kind/descendent of
             // TODO have the query spec check for at least one concept is, or
             // concept is child/kind/descendent of
-            possibleConcepts.addAll(allConcepts);
+            possibleConcepts = termFactory.getConceptIdSet();
             break;
         case CONCEPT_STATUS_IS_CHILD_OF:
             // Assume there is at least one concept is, or concept is
             // child/kind/descendent of
             // TODO have the query spec check for at least one concept is, or
             // concept is child/kind/descendent of
-            possibleConcepts.addAll(allConcepts);
+            possibleConcepts = termFactory.getConceptIdSet();
             break;
         case CONCEPT_STATUS_IS_DESCENDENT_OF:
             // Assume there is at least one concept is, or concept is
             // child/kind/descendent of
             // TODO have the query spec check for at least one concept is, or
             // concept is child/kind/descendent of
-            possibleConcepts.addAll(allConcepts);
+            possibleConcepts = termFactory.getConceptIdSet();
             break;
         case CONCEPT_STATUS_IS_KIND_OF:
             // Assume there is at least one concept is, or concept is
             // child/kind/descendent of
             // TODO have the query spec check for at least one concept is, or
             // concept is child/kind/descendent of
-            possibleConcepts.addAll(allConcepts);
+            possibleConcepts = termFactory.getConceptIdSet();
             break;
         default:
             throw new RuntimeException("Can't handle queryToken: " + queryToken);

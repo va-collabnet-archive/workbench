@@ -2,7 +2,6 @@ package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +10,7 @@ import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -114,8 +114,6 @@ public abstract class RefsetSpecStatement {
 
     protected I_TermFactory termFactory;
 
-    protected Set<Integer> allConcepts;
-
     /**
      * Constructor for refset spec statement.
      * 
@@ -123,14 +121,12 @@ public abstract class RefsetSpecStatement {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, I_GetConceptData constraint,
-            HashSet<Integer> allConcepts) {
+    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, I_GetConceptData constraint) {
 
         this.useNotQualifier = useNotQualifier;
         this.queryToken = groupingToken;
         this.queryConstraint = constraint;
         termFactory = LocalVersionedTerminology.get();
-        this.allConcepts = allConcepts;
     }
 
     public boolean isNegated() {
@@ -236,7 +232,7 @@ public abstract class RefsetSpecStatement {
 
     }
 
-    public abstract Set<Integer> getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException,
+    public abstract I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException,
             IOException;
 
     /**

@@ -14,6 +14,7 @@ import javax.swing.TransferHandler;
 
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
+import org.apache.lucene.util.OpenBitSet;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
@@ -33,7 +34,9 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
+import org.dwfa.tapi.SuppressDataChecks;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 
@@ -264,7 +267,49 @@ public interface I_TermFactory {
 
     void iterateConcepts(I_ProcessConcepts procesor) throws Exception;
 
-    Iterator<I_GetConceptData> getConceptIterator() throws IOException;
+    public Iterator<I_GetConceptData> getConceptIterator() throws IOException;
+    
+    /**
+     * 
+     * @return a set of all the concept native identifiers in the database.
+     * @throws IOException
+     */
+    public I_IntSet getConceptNids() throws IOException;
+    
+    /**
+     * 
+     * @return a read-only bit set, with all concept identifiers set to true. 
+     * @throws IOException
+     */
+    public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException;
+    
+    /**
+     * 
+     * @return a mutable bit set, with all concept identifiers set to true. 
+     * @throws IOException
+     */
+    public I_RepresentIdSet getConceptIdSet() throws IOException;
+    
+    /**
+     * 
+     * @return a bit set, sized to hold all current identifiers, all set to false.
+     * @throws IOException
+     */
+    public I_RepresentIdSet getEmptyIdSet() throws IOException;
+
+    /**
+     * 
+     * @return a bit set, sized to hold all current identifiers, members of ids set to true.
+     * @throws IOException
+     */
+    public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids) throws IOException;
+
+    /**
+     * 
+     * @return a bit set, sized to hold all current identifiers, members of ids set to true.
+     * @throws IOException
+     */
+    public I_RepresentIdSet getIdSetfromTermCollection(Collection<? extends I_AmTermComponent> components) throws IOException;
 
     /**
      * @deprecated iterateConcepts instead

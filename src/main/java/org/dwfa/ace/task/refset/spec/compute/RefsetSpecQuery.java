@@ -10,8 +10,11 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
@@ -59,7 +62,7 @@ public class RefsetSpecQuery {
             return nid;
         }
 
-        public boolean isTruth() {
+        public boolean getTruth() {
             return truth;
         }
     };
@@ -69,9 +72,8 @@ public class RefsetSpecQuery {
     private I_TermFactory termFactory;
 
     private int totalStatementCount;
-    private HashSet<Integer> allConcepts;
 
-    public RefsetSpecQuery(I_GetConceptData groupingConcept, HashSet<Integer> allConcepts) throws TerminologyException,
+    public RefsetSpecQuery(I_GetConceptData groupingConcept) throws TerminologyException,
             IOException {
 
         // create query object (statements + any sub-queries)
@@ -82,7 +84,6 @@ public class RefsetSpecQuery {
         termFactory = LocalVersionedTerminology.get();
 
         totalStatementCount = 0;
-        this.allConcepts = allConcepts;
     }
 
     private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept) throws TerminologyException, IOException {
@@ -100,7 +101,7 @@ public class RefsetSpecQuery {
     }
 
     public RefsetSpecQuery addSubquery(I_GetConceptData groupingConcept) throws TerminologyException, IOException {
-        RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept, allConcepts);
+        RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept);
         subqueries.add(subquery);
         return subquery;
     }
@@ -108,27 +109,28 @@ public class RefsetSpecQuery {
     public RefsetSpecStatement addRelStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
             I_GetConceptData constraint) {
         RefsetSpecStatement statement =
-                new RelationshipStatement(useNotQualifier, groupingToken, constraint, allConcepts);
+                new RelationshipStatement(useNotQualifier, groupingToken, constraint);
         statements.add(statement);
         return statement;
     }
 
     public RefsetSpecStatement addConceptStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
             I_GetConceptData constraint) {
-        RefsetSpecStatement statement = new ConceptStatement(useNotQualifier, groupingToken, constraint, allConcepts);
+        RefsetSpecStatement statement = new ConceptStatement(useNotQualifier, groupingToken, constraint);
         statements.add(statement);
         return statement;
     }
 
     public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
             I_GetConceptData constraint) {
-        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint, allConcepts);
+        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint);
         statements.add(statement);
         return statement;
     }
 
-    public Set<Integer> getPossibleConcepts(I_ConfigAceFrame config) throws TerminologyException, IOException {
-        Set<Integer> possibleConcepts = new HashSet<Integer>();
+    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame config) throws TerminologyException, IOException {
+    	long startTime = System.currentTimeMillis();
+    	I_RepresentIdSet possibleConcepts = null;
         // process all statements and subqueries
         switch (groupingType) {
         case AND:
@@ -137,29 +139,45 @@ public class RefsetSpecQuery {
             }
 
             for (RefsetSpecStatement statement : statements) {
-                // if (!statement.isNegated()) {
-                possibleConcepts.addAll(statement.getPossibleConcepts(config));
-                // }
+                if (!statement.isNegated()) {
+                	if (possibleConcepts == null) {
+                		possibleConcepts = statement.getPossibleConcepts(config);
+                	} else {
+                		possibleConcepts.and(statement.getPossibleConcepts(config));
+                	}               	
+                }
             }
 
             for (RefsetSpecQuery subquery : subqueries) {
-                possibleConcepts.addAll(subquery.getPossibleConcepts(config));
+                if (possibleConcepts == null) {
+                	possibleConcepts = subquery.getPossibleConcepts(config);
+                } else {
+                	possibleConcepts.and(subquery.getPossibleConcepts(config));
+                }               	
             }
             break;
+            
         case OR:
-
             if (statements.size() == 0 && subqueries.size() == 0) {
                 throw new TerminologyException("Spec is invalid - dangling OR.");
             }
 
             for (RefsetSpecStatement statement : statements) {
-                // if (!statement.isNegated()) {
-                possibleConcepts.addAll(statement.getPossibleConcepts(config));
-                // }
+                if (!statement.isNegated()) {
+                	if (possibleConcepts == null) {
+                		possibleConcepts = statement.getPossibleConcepts(config);
+                	} else {
+                		possibleConcepts.or(statement.getPossibleConcepts(config));
+                	}               	
+                }
             }
 
             for (RefsetSpecQuery subquery : subqueries) {
-                possibleConcepts.addAll(subquery.getPossibleConcepts(config));
+                if (possibleConcepts == null) {
+                	possibleConcepts = subquery.getPossibleConcepts(config);
+                } else {
+                	possibleConcepts.or(subquery.getPossibleConcepts(config));
+                }               	
             }
             break;
         case CONCEPT_CONTAINS_DESC:
@@ -170,6 +188,8 @@ public class RefsetSpecQuery {
         default:
             throw new TerminologyException("Unknown grouping type.");
         }
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        AceLog.getAppLog().info(this + " possibleConceptTime: " + elapsedTime);
         return possibleConcepts;
     }
 

@@ -10,6 +10,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -31,8 +32,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
     public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken,
-            I_GetConceptData queryConstraint, HashSet<Integer> allConcepts) {
-        super(useNotQualifier, queryToken, queryConstraint, allConcepts);
+            I_GetConceptData queryConstraint) {
+        super(useNotQualifier, queryToken, queryConstraint);
     }
 
     public boolean execute(I_RelTuple relTuple) throws IOException, TerminologyException {
@@ -165,7 +166,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public Set<Integer> getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException, IOException {
+    public IdentifierSet getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException, IOException {
         throw new UnsupportedOperationException();
     }
 
