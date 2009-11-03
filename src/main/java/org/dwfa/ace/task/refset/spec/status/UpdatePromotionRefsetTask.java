@@ -46,6 +46,10 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     private I_TermFactory termFactory;
     private I_GetConceptData currentStatusConcept;
     private I_GetConceptData retiredStatusConcept;
+    private I_GetConceptData unreviewedStatusConcept;
+    private I_GetConceptData promotedStatusConcept;
+    private I_GetConceptData readyToPromoteStatusConcept;
+    private I_GetConceptData activeStatusConcept;
     private I_GetConceptData promotionConcept;
     private I_GetConceptData memberRefsetConcept;
     private I_GetConceptData unreviewedAdditionStatus;
@@ -105,6 +109,12 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             termFactory = LocalVersionedTerminology.get();
             currentStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             retiredStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+            unreviewedStatusConcept =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
+            readyToPromoteStatusConcept =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.getUids());
+            promotedStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROMOTED.getUids());
+            activeStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
 
             UUID refsetSpecUuid = (UUID) process.readProperty(refsetSpecUuidPropName);
             if (refsetSpecUuid == null) {
@@ -172,7 +182,11 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             if (latestMemberPart == null) {
                 throw new Exception("Member extension exists with no parts.");
             } else {
-                if (latestMemberPart.getStatusId() == currentStatusConcept.getConceptId()) {
+                if (latestMemberPart.getStatusId() == currentStatusConcept.getConceptId()
+                    || latestMemberPart.getStatusId() == unreviewedStatusConcept.getConceptId()
+                    || latestMemberPart.getStatusId() == readyToPromoteStatusConcept.getConceptId()
+                    || latestMemberPart.getStatusId() == promotedStatusConcept.getConceptId()
+                    || latestMemberPart.getStatusId() == activeStatusConcept.getConceptId()) {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed addition
