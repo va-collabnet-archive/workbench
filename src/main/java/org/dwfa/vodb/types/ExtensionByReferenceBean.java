@@ -111,7 +111,9 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 					"ExtensionByReferenceBean already exists for: " + memberId);
 		}
 		ebrBean = make(memberId, extension);
-		newExtensions.add(ebrBean);
+		synchronized (newExtensions) {
+			newExtensions.add(ebrBean);
+		}
 		return ebrBean;
 	}
 
@@ -155,9 +157,11 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 	public static Collection<I_GetExtensionData> getNewExtensions(
 			int componentId) throws IOException {
 		List<I_GetExtensionData> returnValues = new ArrayList<I_GetExtensionData>();
-		for (I_GetExtensionData newEbr : newExtensions) {
-			if (newEbr.getExtension().getComponentId() == componentId) {
-				returnValues.add(newEbr);
+		synchronized (newExtensions) {
+			for (I_GetExtensionData newEbr : newExtensions) {
+				if (newEbr.getExtension().getComponentId() == componentId) {
+					returnValues.add(newEbr);
+				}
 			}
 		}
 		return returnValues;
@@ -171,9 +175,11 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 	}
 	public static I_ThinExtByRefVersioned getNewExtensionMember(
 			int memberId) throws IOException {
-		for (I_GetExtensionData newEbr : newExtensions) {
-			if (newEbr.getExtension().getMemberId() == memberId) {
-				return newEbr.getExtension();
+		synchronized (newExtensions) {
+			for (I_GetExtensionData newEbr : newExtensions) {
+				if (newEbr.getExtension().getMemberId() == memberId) {
+					return newEbr.getExtension();
+				}
 			}
 		}
 		return null;
@@ -182,10 +188,12 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 	public static Collection<I_ThinExtByRefVersioned> getNewThinExtensionsForRefset(
 			int refsetId) throws IOException {
 		List<I_ThinExtByRefVersioned> returnValues = new ArrayList<I_ThinExtByRefVersioned>();
+		synchronized (newExtensions) {
 		for (I_GetExtensionData newEbr : newExtensions) {
 			if (newEbr.getExtension().getRefsetId() == refsetId) {
 				returnValues.add(newEbr.getExtension());
 			}
+		}
 		}
 		return returnValues;
 	}
@@ -217,7 +225,9 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 	}
 
 	public void abort() throws IOException {
-		newExtensions.remove(this);
+		synchronized (newExtensions) {
+			newExtensions.remove(this);
+		}
 		ebrBeans.remove(this.memberId);
 	}
 
@@ -256,7 +266,9 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 		if (AceLog.getEditLog().isLoggable(Level.FINE)) {
 			AceLog.getEditLog().fine(buff.toString());
 		}
+		synchronized (newExtensions) {
 		newExtensions.remove(this);
+		}
 		firstCommit = false;
 	}
 
