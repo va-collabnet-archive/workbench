@@ -171,6 +171,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 	public I_ConceptAttributeVersioned uncommittedConceptAttributes = null;
 
 	public I_IntSet uncommittedIds = null;
+	
+	public List<I_IdVersioned> uncommittedIdVersioned = null;
 
 	private List<UUID> uids = null;
 
@@ -783,6 +785,25 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 				}
 				uncommittedIds = null;
 			}
+			if (uncommittedIdVersioned != null) {
+				boolean delete = true;
+				for (I_IdVersioned idv: uncommittedIdVersioned) {
+					for (ListIterator<I_IdPart> itr = idv.getVersions().listIterator(); itr.hasNext();) {
+						I_IdPart p = itr.next();
+						if (p.getVersion() == Integer.MAX_VALUE) {
+							itr.remove();
+						} else {
+							delete = false;
+						}
+					}
+					if (delete) {
+						AceConfig.getVodb().deleteId(idv);
+					} else {
+						AceConfig.getVodb().writeId(idv);
+					}
+				}
+				uncommittedIdVersioned = null;
+			}
 
 			// remove uncommitted parts...
 			if (conceptAttributes != null) {
@@ -1168,6 +1189,16 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			}
 		}
 
+		if (uncommittedIdVersioned != null) {
+			for (I_IdVersioned edv: uncommittedIdVersioned) {
+				for (I_IdPart part: edv.getVersions()) {
+					if (part.getVersion() == Integer.MAX_VALUE) {
+						return true;
+					}
+				}
+			}
+			
+		}
 		return false;
 	}
 	
@@ -1540,6 +1571,13 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 	    	  }
 	      }
 		return promotedAnything;
+	}
+
+	public List<I_IdVersioned> getUncommittedIdVersioned() {
+		if (uncommittedIdVersioned == null) {
+			uncommittedIdVersioned = new ArrayList<I_IdVersioned>();
+		}
+		return uncommittedIdVersioned;
 	}
 
 }

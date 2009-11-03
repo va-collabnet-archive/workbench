@@ -17,12 +17,14 @@ import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinIdVersioned implements I_IdVersioned {
@@ -212,4 +214,4 @@ public class ThinIdVersioned implements I_IdVersioned {
 	   }
 	   return matchingTuples.size() > 0;
    }
-}
+ }

@@ -1417,6 +1417,39 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	public void commit(ConceptBean bean, int version, Set<TimePathId> values)
 			throws DatabaseException, IOException {
 		boolean changed = false;
+
+		if (bean.uncommittedIdVersioned != null) {
+			for (I_IdVersioned idv : bean.uncommittedIdVersioned) {
+				for (I_IdPart p : idv.getVersions()) {
+					if (p.getVersion() == Integer.MAX_VALUE) {
+						p.setVersion(version);
+						values.add(new TimePathId(version, p.getPathId()));
+						for (I_DescriptionVersioned desc: bean.getDescriptions()) {
+							if (desc.getDescId() == idv.getNativeId()) {
+								Document doc = new Document();
+								doc.add(new Field("dnid", Integer.toString(desc.getDescId()),
+										Field.Store.YES, Field.Index.UN_TOKENIZED));
+								doc.add(new Field("cnid", Integer.toString(desc.getConceptId()),
+										Field.Store.YES, Field.Index.UN_TOKENIZED));
+								addIdsToIndex(doc, identifierDb.getId(desc.getDescId()));
+								addIdsToIndex(doc, identifierDb.getId(desc.getConceptId()));
+								IndexWriter writer = new IndexWriter(luceneDir,
+										new StandardAnalyzer(), false);
+								writer.addDocument(doc);
+								writer.close();
+							}
+						}
+					}
+				}
+				identifierDb.writeId(idv);
+				if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+					AceLog.getEditLog().fine("Committing: " + idv);
+				}
+			}
+			bean.uncommittedIdVersioned = null;
+		}
+
+		
 		if (bean.conceptAttributes != null) {
 			for (I_ConceptAttributePart p : bean.conceptAttributes
 					.getVersions()) {
@@ -1604,8 +1637,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 							+ " hits");
 			return saHits;
 		}
-		AceLog
-				.getAppLog()
+		AceLog.getAppLog()
 				.info(
 						"StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
 		q = new QueryParser("desc", new WhitespaceAnalyzer()).parse(query);

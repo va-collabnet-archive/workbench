@@ -365,5 +365,9 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 	public int getNid() {
 		return bean.getNid();
 	}
+
+	public List<I_IdVersioned> getUncommittedIdVersioned() {
+		return bean.getUncommittedIdVersioned();
+	}
 		
 }

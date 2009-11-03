@@ -660,6 +660,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
 				}
 			}
 		}
+		
 	}
 
 	public void setupBean(ConceptBean cb) throws IOException {
