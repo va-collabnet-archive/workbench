@@ -23,8 +23,10 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.mojo.refset.spec.RefsetInclusionSpec;
+import org.dwfa.mojo.refset.spec.RefsetPurposeToSubsetTypeMap;
 import org.dwfa.mojo.refset.writers.MemberRefsetHandler;
 import org.dwfa.tapi.TerminologyException;
 
@@ -315,13 +317,32 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             }
             subsetIndexFileWriter.write(refsetType.getRefsetHandler().getRefsetSctID(tf, refsetId) + FILE_DELIMITER
                 + subOriginalId + FILE_DELIMITER + "UNKNOWN" + FILE_DELIMITER
-                + referenceSetExport.getPreferredTerm(tf.getConcept(refsetId)) + FILE_DELIMITER + "UNKNOWN"
-                + FILE_DELIMITER + languageCode + FILE_DELIMITER + "UNKNOWN" + FILE_DELIMITER + "UNKNOWN");
+                + referenceSetExport.getPreferredTerm(tf.getConcept(refsetId)) + FILE_DELIMITER
+                + getSubsetTypeFromRefsetPurpose(refsetId) + FILE_DELIMITER + languageCode + FILE_DELIMITER + "UNKNOWN"
+                + FILE_DELIMITER + "UNKNOWN");
             subsetIndexFileWriter.newLine();
         }
 
         subsetMemberFileWriter.write(refsetType.getRefsetHandler().formatRefsetAsSubset(tf, thinExtByRefPart, memberId,
             refsetId, componentId, true));
         subsetMemberFileWriter.newLine();
+    }
+
+    private String getSubsetTypeFromRefsetPurpose(int refsetId) {
+        try {
+            I_GetConceptData refsetMemberConcept = tf.getConcept(refsetId);
+            RefsetSpec refsetSpec = new RefsetSpec(refsetMemberConcept, true);
+            I_GetConceptData refsetPurpose = refsetSpec.getRefsetPurposeConcept();
+            int subsetTypeId = RefsetPurposeToSubsetTypeMap.convert(refsetPurpose);
+
+            if (subsetTypeId == -1) {
+                return "UNKNOWN";
+            } else {
+                return "" + subsetTypeId;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "UNKNOWN";
+        }
     }
 }
