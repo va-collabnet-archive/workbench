@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -14,6 +13,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IterateIds;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -89,15 +90,9 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
             }
 
             // Step 1: create the query object, based on the refset spec
-            Iterator<I_GetConceptData> iterator = termFactory.getConceptIterator();
-            HashSet<Integer> allConcepts = new HashSet<Integer>();
-            while (iterator.hasNext()) {
-                allConcepts.add(iterator.next().getConceptId());
-            }
-            RefsetSpecQuery query =
-                    RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset, allConcepts);
+            RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
             RefsetSpecQuery possibleQuery =
-                    RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset, allConcepts);
+                    RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset);
             SpecMemberRefsetHelper memberRefsetHelper =
                     new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
@@ -122,29 +117,33 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
                         normalMemberConcept.getConceptId());
 
             // Compute the possible concepts to iterate over here...
-            Set<Integer> possibleConcepts = possibleQuery.getPossibleConcepts(configFrame);
-            possibleConcepts.addAll(currentRefsetMemberIds);
-            int conceptsToProcess = possibleConcepts.size();
+            I_RepresentIdSet possibleConcepts = possibleQuery.getPossibleConcepts(configFrame);
+            possibleConcepts.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
 
-            for (int nid : possibleConcepts) {
-                currentConcept = termFactory.getConcept(nid);
-                conceptsProcessed++;
+            I_IterateIds nidIterator = possibleConcepts.iterator();
+            while (nidIterator.next()) {
+                int nid = nidIterator.nid();
+                if (possibleConcepts.isMember(nid)) {
+                    currentConcept = termFactory.getConcept(nid);
+                    conceptsProcessed++;
 
-                boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());
-                if (query.execute(currentConcept)) {
-                    if (!containsCurrentMember) {
-                        newMembers.add(currentConcept.getConceptId());
+                    boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());
+                    if (query.execute(currentConcept)) {
+                        if (!containsCurrentMember) {
+                            newMembers.add(currentConcept.getConceptId());
+                        }
+                    } else {
+                        if (containsCurrentMember) {
+                            retiredMembers.add(currentConcept.getConceptId());
+                        }
                     }
-                } else {
-                    if (containsCurrentMember) {
-                        retiredMembers.add(currentConcept.getConceptId());
-                    }
-                }
 
-                if (conceptsProcessed % 10000 == 0) {
-                    getLog().info("Concepts processed: " + conceptsProcessed + " / " + conceptsToProcess);
-                    getLog().info("New members: " + newMembers.size());
-                    getLog().info("Retired members: " + retiredMembers.size());
+                    if (conceptsProcessed % 10000 == 0) {
+                        getLog().info(
+                            "Concepts processed: " + conceptsProcessed + " / " + termFactory.getConceptCount());
+                        getLog().info("New members: " + newMembers.size());
+                        getLog().info("Retired members: " + retiredMembers.size());
+                    }
                 }
             }
 
