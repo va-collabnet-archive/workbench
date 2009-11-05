@@ -31,6 +31,7 @@ public class RefsetSpec {
      * @param memberRefsetInputted
      */
     public RefsetSpec(I_GetConceptData concept, boolean memberRefsetInputted) {
+        termFactory = LocalVersionedTerminology.get();
         if (memberRefsetInputted) {
             try {
                 I_GetConceptData specifiesRefsetRel =
@@ -42,7 +43,6 @@ public class RefsetSpec {
             }
         } else {
             this.spec = concept;
-            termFactory = LocalVersionedTerminology.get();
         }
     }
 
