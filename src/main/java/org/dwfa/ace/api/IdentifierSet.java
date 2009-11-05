@@ -27,7 +27,7 @@ public class IdentifierSet implements I_RepresentIdSet  {
 	 * @see org.dwfa.ace.api.I_RepresentIdSet#isMember(int)
 	 */
 	public boolean isMember(int nid) {
-		return bitSet.fastGet(nid - offset);
+		return bitSet.fastGet(nid + offset);
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.api.I_RepresentIdSet#setMember(int)
@@ -39,7 +39,7 @@ public class IdentifierSet implements I_RepresentIdSet  {
 	 * @see org.dwfa.ace.api.I_RepresentIdSet#setNotMember(int)
 	 */
 	public void setNotMember(int nid) {
-		bitSet.fastClear(nid - offset);
+		bitSet.fastClear(nid + offset);
 	}
 
 	/* (non-Javadoc)
@@ -83,6 +83,5 @@ public class IdentifierSet implements I_RepresentIdSet  {
 		public boolean skipTo(int target) throws IOException {
 			return docIterator.skipTo(target - Integer.MIN_VALUE);
 		}
-		
 	}
 }
