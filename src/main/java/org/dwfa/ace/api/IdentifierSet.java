@@ -8,7 +8,7 @@ import org.apache.lucene.util.OpenBitSet;
 public class IdentifierSet implements I_RepresentIdSet  {
 
 	protected OpenBitSet bitSet;
-	private int offset = 0 - Integer.MIN_VALUE;
+	private int offset = Integer.MIN_VALUE;
 	
 	public IdentifierSet(OpenBitSet bitSet) {
 		super();
@@ -77,7 +77,7 @@ public class IdentifierSet implements I_RepresentIdSet  {
 		}
 
 		public int nid() {
-			return docIterator.doc() - offset;
+			return docIterator.doc() + offset;
 		}
 
 		public boolean skipTo(int target) throws IOException {
