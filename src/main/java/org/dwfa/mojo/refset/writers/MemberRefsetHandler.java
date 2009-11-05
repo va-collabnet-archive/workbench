@@ -3,6 +3,7 @@ package org.dwfa.mojo.refset.writers;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -32,6 +33,7 @@ import org.dwfa.maven.transform.UuidSnomedMapHandler;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.id.Type5UuidFactory;
 
 public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtByRefPart> {
 
@@ -185,7 +187,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
      * @throws TerminologyException
      * @throws IOException
      */
-    public String formatRefsetAsSubset(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetNid,
+    public String formatRefsetAsSubset(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, String subsetId,
             int componentNid, boolean sctId) throws TerminologyException, IOException {
 
         try {
@@ -201,10 +203,11 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
                     statusInt = 0;
                 }
 
-                String refsetId = toId(tf, refsetNid, sctId);
+                // String refsetId = toId(tf, refsetNid, sctId);
                 String componentId = toId(tf, componentNid, sctId);
 
-                return refsetId + FILE_DELIMITER + componentId + FILE_DELIMITER + statusInt;
+                // return refsetId + FILE_DELIMITER + componentId + FILE_DELIMITER + statusInt;
+                return subsetId + FILE_DELIMITER + componentId + FILE_DELIMITER + statusInt;
             } else {
                 throw new Exception("Part is not of type concept ext " + part);
             }
@@ -283,7 +286,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
             // check if there's an existing snomed ID to use first
             String snomedId = getSnomedIntegerId(tf, componentId);
             if (snomedId != null) {
-                return snomedId;
+                return snomedId; // TODO need to add to map?
             } else {
                 return Long.toString(getSctGenerator().getWithGeneration(tf.getUids(componentId).iterator().next(),
                     TYPE.CONCEPT));
@@ -291,6 +294,22 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         } else { // uuid
             return tf.getUids(componentId).iterator().next().toString();
         }
+    }
+
+    public String generateNewSctId(int refsetId, int subsetVersion) throws TerminologyException, IOException {
+        UUID refsetUuid = tf.getUids(refsetId).iterator().next();
+
+        // generate a new UUID from refset ID + subset version
+        UUID versionedRefsetUuid;
+        try {
+            versionedRefsetUuid = Type5UuidFactory.get(refsetUuid, subsetVersion + "");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getLocalizedMessage());
+        }
+
+        // use this new UUID in the SCT generator
+        return Long.toString(getSctGenerator().getWithGeneration(versionedRefsetUuid, TYPE.CONCEPT));
     }
 
     public String getSnomedIntegerId(I_TermFactory tf, int componentId) throws TerminologyException, IOException {

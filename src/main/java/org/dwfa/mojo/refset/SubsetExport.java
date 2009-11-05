@@ -1,7 +1,9 @@
 package org.dwfa.mojo.refset;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -9,6 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -55,6 +59,15 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
      * @required
      */
     File subsetOutputDirectory;
+
+    /**
+     * Defines the directory to which the subset members are stored between releases. This is used to determine the
+     * subset ID and subset version to assign.
+     * 
+     * @parameter
+     * @required
+     */
+    File subsetInputDirectory;
 
     /**
      * Directory where the read/write SCTID maps are stored
@@ -107,6 +120,9 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
     private ReferenceSetExport referenceSetExport = new ReferenceSetExport();
 
     private RefsetInclusionSpec currentSpec;
+    private TreeSet<UUID> memberUuids;
+
+    private long currentSubsetId;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -160,6 +176,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
         List<I_ThinExtByRefVersioned> extensions = tf.getRefsetExtensionMembers(refsetId);
         TreeMap<Long, I_ThinExtByRefTuple> treeMap = new TreeMap<Long, I_ThinExtByRefTuple>();
+        memberUuids = new TreeSet<UUID>();
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
             for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses, positions,
@@ -189,6 +206,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                                 + memberId);
                     }
                     treeMap.put(memberId, thinExtByRefTuple);
+                    memberUuids.add(tf.getUids(thinExtByRefTuple.getComponentId()).iterator().next());
                 } catch (NumberFormatException e) {
                     getLog().warn(
                         "Refset " + tf.getConcept(refsetId).getInitialText()
@@ -198,17 +216,21 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             }
         }
         Iterator<Long> iterator = treeMap.keySet().iterator();
+        RefsetType refsetType = refsetTypeMap.get(refsetId);
+        String subsetVersion = getSubsetVersion(refsetId, refsetType);
+        String subsetType = getSubsetTypeFromRefsetPurpose(refsetId);
+        String subsetId = "" + getSubsetId();
         while (iterator.hasNext()) {
             Long key = iterator.next();
             I_ThinExtByRefTuple ext = treeMap.get(key);
-
-            export(ext);
+            export(ext, subsetVersion, subsetId, subsetType);
         }
     }
 
-    private void export(I_ThinExtByRefTuple thinExtByRefTuple) throws Exception {
+    private void export(I_ThinExtByRefTuple thinExtByRefTuple, String subsetVersion, String subsetId, String subsetType)
+            throws Exception {
         export(thinExtByRefTuple.getPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
-            thinExtByRefTuple.getComponentId());
+            thinExtByRefTuple.getComponentId(), subsetVersion, subsetId, subsetType);
     }
 
     boolean testSpecification(I_GetConceptData concept) throws Exception {
@@ -238,9 +260,12 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
         return testSpecification(tf.getConcept(id));
     }
 
-    private void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId)
-            throws Exception {
+    private void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId,
+            String subsetVersion, String subsetId, String subsetType) throws Exception {
         RefsetType refsetType = refsetTypeMap.get(refsetId);
+        String realmId = currentSpec.realmId;
+        String contextId = currentSpec.contextId;
+
         if (refsetType == null) {
             try {
                 refsetType = RefsetType.findByExtension(thinExtByRefPart);
@@ -315,16 +340,14 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             if (subOriginalId == null) {
                 subOriginalId = "UNKNOWN";
             }
-            subsetIndexFileWriter.write(refsetType.getRefsetHandler().getRefsetSctID(tf, refsetId) + FILE_DELIMITER
-                + subOriginalId + FILE_DELIMITER + "UNKNOWN" + FILE_DELIMITER
-                + referenceSetExport.getPreferredTerm(tf.getConcept(refsetId)) + FILE_DELIMITER
-                + getSubsetTypeFromRefsetPurpose(refsetId) + FILE_DELIMITER + languageCode + FILE_DELIMITER + "UNKNOWN"
-                + FILE_DELIMITER + "UNKNOWN");
+            subsetIndexFileWriter.write(subsetId + FILE_DELIMITER + subOriginalId + FILE_DELIMITER + subsetVersion
+                + FILE_DELIMITER + referenceSetExport.getPreferredTerm(tf.getConcept(refsetId)) + FILE_DELIMITER
+                + subsetType + FILE_DELIMITER + languageCode + FILE_DELIMITER + realmId + FILE_DELIMITER + contextId);
             subsetIndexFileWriter.newLine();
         }
 
         subsetMemberFileWriter.write(refsetType.getRefsetHandler().formatRefsetAsSubset(tf, thinExtByRefPart, memberId,
-            refsetId, componentId, true));
+            subsetId, componentId, true));
         subsetMemberFileWriter.newLine();
     }
 
@@ -333,16 +356,100 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             I_GetConceptData refsetMemberConcept = tf.getConcept(refsetId);
             RefsetSpec refsetSpec = new RefsetSpec(refsetMemberConcept, true);
             I_GetConceptData refsetPurpose = refsetSpec.getRefsetPurposeConcept();
-            int subsetTypeId = RefsetPurposeToSubsetTypeMap.convert(refsetPurpose);
+            if (refsetPurpose != null) {
+                int subsetTypeId = RefsetPurposeToSubsetTypeMap.convert(refsetPurpose);
 
-            if (subsetTypeId == -1) {
-                return "UNKNOWN";
+                if (subsetTypeId == -1) {
+                    return "UNKNOWN";
+                } else {
+                    return "" + subsetTypeId;
+                }
             } else {
-                return "" + subsetTypeId;
+                return "UNKNOWN";
             }
         } catch (Exception e) {
             e.printStackTrace();
             return "UNKNOWN";
         }
+    }
+
+    private String getSubsetVersion(int refsetId, RefsetType refsetType) {
+        try {
+            UUID refsetUuid = tf.getUids(refsetId).iterator().next();
+            File storedSubsetMemberFile = new File(subsetInputDirectory, refsetUuid.toString() + ".txt");
+
+            if (storedSubsetMemberFile.exists()) {
+                BufferedReader storedSubsetMemberFileReader =
+                        new BufferedReader(new FileReader(storedSubsetMemberFile));
+                long storedSubsetId = Long.parseLong(storedSubsetMemberFileReader.readLine());
+                int storedSubsetVersion = Integer.parseInt(storedSubsetMemberFileReader.readLine());
+                TreeSet<UUID> previousMemberUuids = new TreeSet<UUID>();
+                String currentLine = storedSubsetMemberFileReader.readLine();
+                while (currentLine != null) {
+                    try {
+                        previousMemberUuids.add(UUID.fromString(currentLine));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    currentLine = storedSubsetMemberFileReader.readLine();
+                }
+                storedSubsetMemberFileReader.close();
+                if (previousMemberUuids.equals(memberUuids)) {
+                    setSubsetId(storedSubsetId);
+                    return "" + storedSubsetVersion;
+                } else {
+                    int subsetVersion = storedSubsetVersion + 1;
+                    long subsetId =
+                            Long.parseLong(refsetType.getRefsetHandler().generateNewSctId(refsetId, subsetVersion));
+                    setSubsetId(subsetId);
+                    updateStoredSubsetMemberFile(storedSubsetMemberFile, subsetId, subsetVersion);
+                    return "" + subsetVersion;
+                }
+            } else {
+                // the subset hasn't be released before. Use the SNOMED ID attached to the refset concept as the subset
+                // ID. Generate the member file for use in the next release.
+                try {
+
+                    long subsetId = Long.parseLong(refsetType.getRefsetHandler().toId(tf, refsetId, true));
+
+                    setSubsetId(subsetId);
+                    updateStoredSubsetMemberFile(storedSubsetMemberFile, subsetId, currentSpec.subsetVersion);
+                    return "" + currentSpec.subsetVersion;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "UNKNOWN";
+        }
+        return "UNKNOWN";
+    }
+
+    private void updateStoredSubsetMemberFile(File storedSubsetMemberFile, long subsetId, int subsetVersion)
+            throws IOException {
+        if (!storedSubsetMemberFile.exists()) {
+            storedSubsetMemberFile.createNewFile();
+        }
+        BufferedWriter storedSubsetMemberFileWriter = new BufferedWriter(new FileWriter(storedSubsetMemberFile, false));
+        storedSubsetMemberFileWriter.write("" + subsetId);
+        storedSubsetMemberFileWriter.newLine();
+        storedSubsetMemberFileWriter.write("" + subsetVersion);
+        storedSubsetMemberFileWriter.newLine();
+        for (UUID memberUuid : memberUuids) {
+            storedSubsetMemberFileWriter.write(memberUuid.toString());
+            storedSubsetMemberFileWriter.newLine();
+        }
+        storedSubsetMemberFileWriter.flush();
+        storedSubsetMemberFileWriter.close();
+    }
+
+    private long getSubsetId() {
+        return currentSubsetId;
+    }
+
+    private void setSubsetId(long subsetId) {
+        currentSubsetId = subsetId;
     }
 }
