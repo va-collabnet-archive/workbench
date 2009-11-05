@@ -64,7 +64,7 @@ public class IdentifierSet implements I_RepresentIdSet  {
 		return new NidIterator(bitSet.iterator());
 	}
 
-	private static class NidIterator implements I_IterateIds {
+	private class NidIterator implements I_IterateIds {
 		private DocIdSetIterator docIterator;
 		
 		private NidIterator(DocIdSetIterator docIterator) {
@@ -77,11 +77,11 @@ public class IdentifierSet implements I_RepresentIdSet  {
 		}
 
 		public int nid() {
-			return docIterator.doc() + Integer.MIN_VALUE;
+			return docIterator.doc() - offset;
 		}
 
 		public boolean skipTo(int target) throws IOException {
-			return docIterator.skipTo(target - Integer.MIN_VALUE);
+			return docIterator.skipTo(target + offset);
 		}
 	}
 }
