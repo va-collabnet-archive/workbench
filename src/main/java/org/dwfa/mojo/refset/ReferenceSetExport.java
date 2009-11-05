@@ -40,9 +40,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.spec.ConceptSpec;
 
 /**
- *
+ * 
  * This mojo exports reference sets from an ACE database
- *
+ * 
  * @goal refset-export
  * @author Dion McMurtrie
  */
@@ -51,7 +51,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Whether to use RF2 for the export. If not, the alternate release format
      * will be used (this is also the default).
-     *
+     * 
      * @parameter
      */
     boolean useRF2 = false;
@@ -60,7 +60,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * RF2 Descriptor - this is required if useRF2 is set to true. This
      * describes the module, namespace, content sub type and country information
      * required to export in RF2.
-     *
+     * 
      * @parameter
      */
     RF2Descriptor rf2Descriptor;
@@ -71,12 +71,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * be exported. Only members relating to components that will be exported
      * will in turn be exported.
      * <p>
-     * For example if you have a reference set identified by concept A, and
-     * members B, C and D. If the export spec does not include exporting concept
-     * A then none of the reference set will be exported. However if the export
-     * spec does include A, but not C then the reference set will be exported
-     * except it will only have members B and D - C will be omitted.
-     *
+     * For example if you have a reference set identified by concept A, and members B, C and D. If the export spec does
+     * not include exporting concept A then none of the reference set will be exported. However if the export spec does
+     * include A, but not C then the reference set will be exported except it will only have members B and D - C will be
+     * omitted.
+     * 
      * @parameter
      * @required
      */
@@ -84,7 +83,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Defines the directory to which the UUID based reference sets are exported
-     *
+     * 
      * @parameter
      * @required
      */
@@ -93,7 +92,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Defines the directory to which the SCTID based reference sets are
      * exported
-     *
+     * 
      * @parameter
      * @required
      */
@@ -101,7 +100,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Directory where the fixed SCTID map is located
-     *
+     * 
      * @parameter
      * @required
      */
@@ -109,7 +108,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Directory where the read/write SCTID maps are stored
-     *
+     * 
      * @parameter
      * @required
      */
@@ -118,7 +117,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Release version used to embed in the refset file names - if not specified
      * then the "path version" reference set is used to determine the version
-     *
+     * 
      * @parameter
      */
     String releaseVersion;
@@ -212,9 +211,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Gets the latest attribute for the concept.
-     *
+     * 
      * Attributes are filtered by the <code>allowedStatuses</code> and <code>positions</code> lists.
-     *
+     * 
      * @param concept the concept to get the latest attribute for.
      * @return latest I_ConceptAttributePart may be null.
      * @throws IOException looking up I_ConceptAttributePart
@@ -290,9 +289,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Gets the latest extension for the concept and refset id.
-     *
+     * 
      * Extension are filtered by the <code>allowedStatuses</code> and <code>positions</code> lists.
-     *
+     * 
      * @param componentId refset member concept
      * @param relationshipRefinabilityExtension refset.
      * @return I_ThinExtByRefTuple the latest extension, may be null
@@ -318,9 +317,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Exports the refset to file.
-     *
+     * 
      * @param thinExtByRefTuple The concept extension to write to file.
-     *
+     * 
      * @throws Exception on DB or file error.
      */
     private void exportRefsets(int componentId) throws TerminologyException, Exception {
@@ -342,15 +341,14 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Exports the refset to file.
-     *
+     * 
      * @param thinExtByRefPart The concept extension to write to file.
      * @param memberId the id for this refset member record.
      * @param refsetId the refset id
      * @param componentId the referenced component
      * @throws Exception on DB errors or file write errors.
      */
-    void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId)
-            throws Exception {
+    void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId) throws Exception {
         RefsetType refsetType = refsetTypeMap.get(refsetId);
         if (refsetType == null) {
             try {
@@ -440,7 +438,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Gets the release version for the path concept.
-     *
+     * 
      * @param refsetConcept path refset concept.
      * @return String release preferred term.
      * @throws Exception DB error
@@ -492,7 +490,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Gets the latest version for this extension.
-     *
+     * 
      * @param extension I_ThinExtByRefVersioned
      * @return I_ThinExtByRefPart latest version. may be null
      */
@@ -508,7 +506,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Does the concept match the <code>exportSpecifications</code>
-     *
+     * 
      * @param concept I_GetConceptData
      * @return true if a matching concept.
      * @throws Exception DB error
@@ -525,7 +523,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Does the concept match the <code>exportSpecifications</code>
-     *
+     * 
      * @param id concept it
      * @return true if a matching concept.
      * @throws TerminologyException DB error
@@ -538,7 +536,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Is the path id in the list of <code>positions</code>
-     *
+     * 
      * @param pathId int
      * @return true if pathId in <code>positions</code> list
      */
@@ -553,7 +551,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Gets the concepts preferred term filtered by <code>statusSet</code> sorted by <code>TYPE_B4_LANG</code>
-     *
+     * 
      * @param conceptData I_GetConceptData to get the preferred term for
      * @return String preferred term
      * @throws Exception DB error
@@ -565,6 +563,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         I_IntSet statusSet = tf.newIntSet();
         statusSet.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
         statusSet.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+        statusSet.add(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid());
+        statusSet.add(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.localize().getNid());
+        statusSet.add(ArchitectonicAuxiliary.Concept.PROMOTED.localize().getNid());
 
         I_DescriptionTuple descTuple =
                 conceptData.getDescTuple(descTypeList, null, statusSet, positions, LANGUAGE_SORT_PREF.TYPE_B4_LANG);

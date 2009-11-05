@@ -18,7 +18,7 @@ public class RefsetPurposeToSubsetTypeMap {
     protected enum SUBSET_TYPE {
         LANGUAGE_SUBSET(1, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
         REALM_CONCEPT_SUBSET(2, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
-        REALM_DESC_SUBSET(3, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
+        REALM_DESC_SUBSET(3, RefsetAuxiliary.Concept.ANNOTATION_PURPOSE),
         REALM_REL_SUBSET(4, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
         CONTEXT_CONCEPT_SUBSET(5, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
         CONTEXT_DESC_SUBSET(6, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
