@@ -128,6 +128,13 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 		promotionPart.setPathId(promotionPath.getConceptId());
 		return promotionPart;
 	}
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
 
 }
 

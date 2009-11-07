@@ -139,4 +139,12 @@ public class ThinIdPart implements I_IdPart {
 		this.idStatus = statusId;
 	}
 
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
+
 }

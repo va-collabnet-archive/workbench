@@ -183,4 +183,12 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 	public int getFixedPartId() {
 		return core.getTermComponentId();
 	}
+
+	public int getPositionId() {
+		return part.getPositionId();
+	}
+
+	public void setPositionId(int pid) {
+		part.setPositionId(pid);
+	}
 }

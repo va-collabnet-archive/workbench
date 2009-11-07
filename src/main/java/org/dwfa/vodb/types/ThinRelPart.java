@@ -211,5 +211,12 @@ public class ThinRelPart implements I_RelPart {
 	public void setTypeId(int type) {		
 		setRelTypeId(type);
 	}
-	
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
+
 }

@@ -190,5 +190,12 @@ public class ThinDescPartWithCoreDelegate implements I_DescriptionPart {
 		return newPart;
 	}
 	
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
 	
 }

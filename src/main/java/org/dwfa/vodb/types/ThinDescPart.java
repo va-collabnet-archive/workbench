@@ -198,5 +198,13 @@ public class ThinDescPart implements I_DescriptionPart {
 		newPart.lang = lang;
 		return newPart;
 	}
-	
+
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
+
 }

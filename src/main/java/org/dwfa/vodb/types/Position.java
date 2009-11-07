@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -283,4 +284,14 @@ public class Position implements I_Position {
 		return buff.toString();
 		
 	}
+
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public Collection<I_Position> getAllOrigins() {
+		throw new UnsupportedOperationException();
+	}
+	
+	
 }

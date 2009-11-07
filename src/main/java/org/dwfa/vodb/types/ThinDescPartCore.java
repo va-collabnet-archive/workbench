@@ -187,5 +187,12 @@ public class ThinDescPartCore implements I_AmPart {
 		return newPart;
 	}
 	
-	
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
+
 }

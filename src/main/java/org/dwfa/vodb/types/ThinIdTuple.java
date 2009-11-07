@@ -138,4 +138,13 @@ public class ThinIdTuple implements I_IdTuple {
 	public int getFixedPartId() {
 		return core.getTermComponentId();
 	}
+	
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
+
 }

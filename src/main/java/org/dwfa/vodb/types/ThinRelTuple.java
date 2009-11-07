@@ -195,4 +195,13 @@ public class ThinRelTuple implements I_RelTuple {
 	public int getFixedPartId() {
 		return fixedPart.getTermComponentId();
 	}
+	
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
+
 }

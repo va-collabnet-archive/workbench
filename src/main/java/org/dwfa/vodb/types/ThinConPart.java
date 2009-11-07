@@ -123,4 +123,12 @@ public class ThinConPart implements I_ConceptAttributePart {
 	public void setStatusId(int statusId) {
 		setConceptStatus(statusId);
 	}
+
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
 }

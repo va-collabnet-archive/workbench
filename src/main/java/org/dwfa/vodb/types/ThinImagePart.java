@@ -137,6 +137,13 @@ public class ThinImagePart implements I_ImagePart {
 		return new ThinImagePart(this);
 	}
 	
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
 	
 
 }

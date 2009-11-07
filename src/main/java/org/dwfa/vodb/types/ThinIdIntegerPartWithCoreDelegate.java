@@ -131,4 +131,13 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 	public void setStatusId(int statusId) {
 		setIdStatus(statusId);
 	}
+	
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
+
 }
