@@ -84,4 +84,8 @@ public class IdentifierSet implements I_RepresentIdSet  {
 			return docIterator.skipTo(target + offset);
 		}
 	}
+	
+	public int size() {
+		return (int) bitSet.cardinality();
+	}
 }

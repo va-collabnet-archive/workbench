@@ -1,6 +1,5 @@
 package org.dwfa.ace.api;
 
-import org.apache.lucene.search.DocIdSetIterator;
 
 public interface I_RepresentIdSet {
 
@@ -15,5 +14,7 @@ public interface I_RepresentIdSet {
 	public void or(I_RepresentIdSet other);
 	
 	public I_IterateIds iterator();
+	
+	public int size();
 
 }
