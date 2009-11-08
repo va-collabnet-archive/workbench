@@ -99,4 +99,12 @@ public class MockTuple implements I_AmTuple {
 				+ version + ",value='" + value + "'}";
 	}
 
+	public int getPositionId() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setPositionId(int pid) {
+		throw new UnsupportedOperationException();
+	}
+
 }

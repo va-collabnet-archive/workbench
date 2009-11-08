@@ -42,7 +42,6 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;

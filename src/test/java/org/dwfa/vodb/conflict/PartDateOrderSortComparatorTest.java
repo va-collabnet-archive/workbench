@@ -60,6 +60,14 @@ public class PartDateOrderSortComparatorTest {
 			throw new UnsupportedOperationException();
 		}
 
+		public int getPositionId() {
+			throw new UnsupportedOperationException();
+		}
+
+		public void setPositionId(int pid) {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 
 	private TestPart newestTestPart;
