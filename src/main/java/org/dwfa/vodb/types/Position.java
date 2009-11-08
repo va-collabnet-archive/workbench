@@ -292,6 +292,10 @@ public class Position implements I_Position {
 	public Collection<I_Position> getAllOrigins() {
 		throw new UnsupportedOperationException();
 	}
+
+	public long getTime() {
+		return ThinVersionHelper.convert(version);
+	}
 	
 	
 }
