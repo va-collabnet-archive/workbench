@@ -439,42 +439,51 @@ public abstract class ProcessSources {
         st.whitespaceChars('\t', '\t');
         st.eolIsSignificant(true);
         int descriptions = 0;
-        String deBugDesc = "";
+        
+        String debugS = null;
 
         skipLineOne(st, descriptionLatch);
         int tokenType = st.nextToken();
 try{
         while (tokenType != StreamTokenizer.TT_EOF) {
+        	debugS = "";
             // DESCRIPTIONID
+        	debugS = st.sval;
             Object descriptionId = getId(st);
-            deBugDesc= st.sval;
 
             // DESCRIPTIONSTATUS
             tokenType = st.nextToken();
-
+            debugS = debugS+","+st.sval;
             Object status = getStatus(st);
             // CONCEPTID
             tokenType = st.nextToken();
+            debugS = debugS+","+st.sval;
             Object conceptId = getId(st);
             // TERM
             tokenType = st.nextToken();
+            debugS = debugS+","+st.sval;
             String text = st.sval;
             // INITIALCAPITALSTATUS
             tokenType = st.nextToken();
+            debugS = debugS+","+st.sval;
             boolean capSignificant = parseBoolean(st);
 
             // DESCRIPTIONTYPE
             tokenType = st.nextToken();
+            debugS = debugS+","+st.sval;
             Object typeInt = getDescType(st);
 
             // LANGUAGECODE
             tokenType = st.nextToken();
+            debugS = debugS+","+st.sval;
             String lang = st.sval;
 
             tokenType = st.nextToken();
+            debugS = debugS+","+st.sval;
             Date statusDate = getDate(st);
 
             tokenType = st.nextToken();
+            debugS = debugS+","+st.sval;
             Object pathId = getId(st);
             pathUuid.add((UUID) pathId);
 
@@ -492,10 +501,9 @@ try{
             // Beginning of loop
             tokenType = st.nextToken();
         }
-}
-catch(Exception e){
-	getLog().info("Exception in processAceFormatDescriptions current Desc_UUID being processed = "+deBugDesc);
-	throw new Exception(e);
+}catch(Exception E){
+	getLog().severe("processAceFormatDescriptions Error throw: debugS = "+debugS);
+	throw new Exception(E);
 }
         getLog()
                 .info("Process time: " + (System.currentTimeMillis() - start) + " Parsed descriptions: " + descriptions);
