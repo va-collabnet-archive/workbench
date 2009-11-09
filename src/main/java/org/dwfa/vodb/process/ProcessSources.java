@@ -439,13 +439,15 @@ public abstract class ProcessSources {
         st.whitespaceChars('\t', '\t');
         st.eolIsSignificant(true);
         int descriptions = 0;
+        String deBugDesc = "";
 
         skipLineOne(st, descriptionLatch);
         int tokenType = st.nextToken();
-
+try{
         while (tokenType != StreamTokenizer.TT_EOF) {
             // DESCRIPTIONID
             Object descriptionId = getId(st);
+            deBugDesc= st.sval;
 
             // DESCRIPTIONSTATUS
             tokenType = st.nextToken();
@@ -490,6 +492,11 @@ public abstract class ProcessSources {
             // Beginning of loop
             tokenType = st.nextToken();
         }
+}
+catch(Exception e){
+	getLog().info("Exception in processAceFormatDescriptions current Desc_UUID being processed = "+deBugDesc);
+	throw new Exception(e);
+}
         getLog()
                 .info("Process time: " + (System.currentTimeMillis() - start) + " Parsed descriptions: " + descriptions);
     }
