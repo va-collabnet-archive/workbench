@@ -415,11 +415,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public boolean hasExtension(int memberId) throws IOException {
-        try {
-            return bdbEnv.hasExtension(memberId);
-        } catch (DatabaseException e) {
-            throw new ToIoException(e);
-        }
+        return bdbEnv.hasExtension(memberId);
     }
 
     public boolean hasConcept(int conceptId) throws IOException {
@@ -463,7 +459,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return bdbEnv.getAllExtensionsForComponent(componentId);
     }
 
-    public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws DatabaseException {
+    public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws IOException {
         return bdbEnv.getExtensionsForRefset(refsetId);
     }
 
@@ -658,11 +654,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public void writeExt(I_ThinExtByRefVersioned ext) throws IOException {
-        try {
-            bdbEnv.writeExt(ext);
-        } catch (DatabaseException e) {
-            throw new ToIoException(e);
-        }
+        bdbEnv.writeExt(ext);
     }
 
     public void writeDescription(I_DescriptionVersioned desc) throws IOException {

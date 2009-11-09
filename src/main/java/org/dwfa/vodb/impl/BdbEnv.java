@@ -646,8 +646,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		return extensionBdb.getExtensionsForComponent(componentId);
 	}
 
-	public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId)
-			throws DatabaseException {
+	public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws IOException {
 		return extensionBdb.getExtensionsForRefset(refsetId);
 	}
 
@@ -656,7 +655,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		return extensionBdb.getRefsetExtensionMembers(refsetId);
 	}
 
-	public boolean hasExtension(int memberId) throws DatabaseException {
+	public boolean hasExtension(int memberId) throws IOException {
 		return extensionBdb.hasExtension(memberId);
 	}
 
@@ -665,8 +664,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 		extensionBdb.iterateExtByRefEntries(processor);
 	}
 
-	public void writeExt(I_ThinExtByRefVersioned ext) throws DatabaseException,
-			IOException {
+	public void writeExt(I_ThinExtByRefVersioned ext) throws IOException {
 		extensionBdb.writeExt(ext);
 	}
 
