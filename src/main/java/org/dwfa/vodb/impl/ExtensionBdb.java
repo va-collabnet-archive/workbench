@@ -133,7 +133,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 		Cursor extCursor = extensionDb.openCursor(null, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
 		DatabaseEntry foundData = processor.getDataEntry();
-		while (extCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		while (extCursor.getNext(foundKey, foundData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
 			try {
 				processor.processEbr(foundKey, foundData);
 			} catch (Exception e) {
@@ -154,7 +154,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 			Cursor extCursor = extensionDb.openCursor(null, null);
 			DatabaseEntry foundKey = new DatabaseEntry();
 			DatabaseEntry foundData = new DatabaseEntry();
-			while (extCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			while (extCursor.getNext(foundKey, foundData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
 				try {
 					I_ThinExtByRefVersioned extension = (I_ThinExtByRefVersioned) extBinder
 							.entryToObject(foundData);
@@ -194,7 +194,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 		SecondaryCursor mySecCursor = refsetToExtMap.openSecondaryCursor(
 				null, null);
 		OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey,
-				foundData, LockMode.DEFAULT);
+				foundData, LockMode.READ_UNCOMMITTED);
 		List<ExtensionByReferenceBean> matches = new ArrayList<ExtensionByReferenceBean>();
 		while (retVal == OperationStatus.SUCCESS) {
 			I_ThinExtByRefVersioned extFromComponentId = (I_ThinExtByRefVersioned) extBinder
@@ -206,7 +206,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 				break;
 			}
 			retVal = mySecCursor.getNext(secondaryKey, foundData,
-					LockMode.DEFAULT);
+					LockMode.READ_UNCOMMITTED);
 		}
 		mySecCursor.close();
 		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -241,7 +241,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 			SecondaryCursor mySecCursor = componentToExtMap
 					.openSecondaryCursor(null, null);
 			OperationStatus retVal = mySecCursor.getSearchKeyRange(
-					secondaryKey, foundData, LockMode.DEFAULT);
+					secondaryKey, foundData, LockMode.READ_UNCOMMITTED);
 			List<I_ThinExtByRefVersioned> matches = new ArrayList<I_ThinExtByRefVersioned>();
 			int count = 0;
 			int rejected = 0;
@@ -265,7 +265,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 					break;
 				}
 				retVal = mySecCursor.getNext(secondaryKey, foundData,
-						LockMode.DEFAULT);
+						LockMode.READ_UNCOMMITTED);
 			}
 			mySecCursor.close();
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -308,7 +308,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 			SecondaryCursor mySecCursor = componentToExtMap
 					.openSecondaryCursor(null, null);
 			OperationStatus retVal = mySecCursor.getSearchKeyRange(
-					secondaryKey, foundData, LockMode.DEFAULT);
+					secondaryKey, foundData, LockMode.READ_UNCOMMITTED);
 			List<I_GetExtensionData> matches = new ArrayList<I_GetExtensionData>();
 			int count = 0;
 			int rejected = 0;
@@ -325,7 +325,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 					break;
 				}
 				retVal = mySecCursor.getNext(secondaryKey, foundData,
-						LockMode.DEFAULT);
+						LockMode.READ_UNCOMMITTED);
 			}
 			mySecCursor.close();
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -349,7 +349,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 		DatabaseEntry extValue = new DatabaseEntry();
 		intBinder.objectToEntry(memberId, extKey);
 		try {
-			if (extensionDb.get(BdbEnv.transaction, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (extensionDb.get(BdbEnv.transaction, extKey, extValue, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
 				return (I_ThinExtByRefVersioned) extBinder
 						.entryToObject(extValue);
 			}
@@ -369,7 +369,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 		DatabaseEntry extKey = new DatabaseEntry();
 		DatabaseEntry extValue = new DatabaseEntry();
 		intBinder.objectToEntry(memberId, extKey);
-		if (extensionDb.get(BdbEnv.transaction, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+		if (extensionDb.get(BdbEnv.transaction, extKey, extValue, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
 			return true;
 		}
 		return false;
