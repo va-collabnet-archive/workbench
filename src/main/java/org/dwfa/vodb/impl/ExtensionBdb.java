@@ -130,7 +130,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 	 */
 	public void iterateExtByRefEntries(I_ProcessExtByRefEntries processor)
 			throws Exception {
-		Cursor extCursor = extensionDb.openCursor(null, null);
+		Cursor extCursor = extensionDb.openCursor(BdbEnv.transaction, null);
 		DatabaseEntry foundKey = processor.getKeyEntry();
 		DatabaseEntry foundData = processor.getDataEntry();
 		while (extCursor.getNext(foundKey, foundData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
@@ -151,7 +151,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 			throws IOException {
 		try {
 			List<I_ThinExtByRefVersioned> returnList = new ArrayList<I_ThinExtByRefVersioned>();
-			Cursor extCursor = extensionDb.openCursor(null, null);
+			Cursor extCursor = extensionDb.openCursor(BdbEnv.transaction, null);
 			DatabaseEntry foundKey = new DatabaseEntry();
 			DatabaseEntry foundData = new DatabaseEntry();
 			while (extCursor.getNext(foundKey, foundData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
@@ -239,7 +239,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 			DatabaseEntry foundData = new DatabaseEntry();
 
 			SecondaryCursor mySecCursor = componentToExtMap
-					.openSecondaryCursor(null, null);
+					.openSecondaryCursor(BdbEnv.transaction, null);
 			OperationStatus retVal = mySecCursor.getSearchKeyRange(
 					secondaryKey, foundData, LockMode.READ_UNCOMMITTED);
 			List<I_ThinExtByRefVersioned> matches = new ArrayList<I_ThinExtByRefVersioned>();
@@ -306,7 +306,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 			DatabaseEntry foundData = new DatabaseEntry();
 
 			SecondaryCursor mySecCursor = componentToExtMap
-					.openSecondaryCursor(null, null);
+					.openSecondaryCursor(BdbEnv.transaction, null);
 			OperationStatus retVal = mySecCursor.getSearchKeyRange(
 					secondaryKey, foundData, LockMode.READ_UNCOMMITTED);
 			List<I_GetExtensionData> matches = new ArrayList<I_GetExtensionData>();
