@@ -1680,8 +1680,14 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 	public UUID getObjectID() {
 		return this.getProcessID().getUuid();
 	}
+	
+	public Object readProperty(String propertyLabel) throws IntrospectionException, IllegalAccessException,
+	InvocationTargetException {
+		return getProperty(propertyLabel);
+	}
 
-	public Object readProperty(String propertyLabel)
+
+	public Object getProperty(String propertyLabel)
 			throws IntrospectionException, IllegalAccessException,
 			InvocationTargetException {
 		try {

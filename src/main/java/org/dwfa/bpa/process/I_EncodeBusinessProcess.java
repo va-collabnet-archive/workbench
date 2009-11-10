@@ -350,8 +350,21 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      * @throws InvocationTargetException
+     * @deprecated use getProperty
      */
     public Object readProperty(String propertyLabel)
+            throws IntrospectionException, IllegalArgumentException, IllegalAccessException, InvocationTargetException;
+    /**
+     * Get a property specified by the property label. 
+     * 
+     * @param propertyLabel The label that specifies the property to read
+     * @return The current value of of the specified property. 
+     * @throws IntrospectionException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public Object getProperty(String propertyLabel)
             throws IntrospectionException, IllegalArgumentException, IllegalAccessException, InvocationTargetException;
     public void setProperty(String propertyLabel, Object value)
             throws IntrospectionException, IllegalAccessException, InvocationTargetException;
