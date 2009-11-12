@@ -580,8 +580,8 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         t.getVersioned().addVersion(newPart);
     }
 
-    private void processRelationship(List<I_RelVersioned> sourceRels) throws Exception {
-        for (I_RelVersioned relVersioned : sourceRels) {
+    private void processRelationship(List<? extends I_RelVersioned> list) throws Exception {
+        for (I_RelVersioned relVersioned : list) {
             processRelationship(relVersioned);
             for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(relVersioned.getRelId())) {
                 processExtensionByReference(extension);

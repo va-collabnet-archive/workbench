@@ -405,8 +405,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 		getLog().info("concept image part copied " + t);
 	}
 
-	private void processRelationship(List<I_RelVersioned> sourceRels) throws Exception {
-		for (I_RelVersioned relVersioned : sourceRels) {
+	private void processRelationship(List<? extends I_RelVersioned> list) throws Exception {
+		for (I_RelVersioned relVersioned : list) {
 			processRelationship(relVersioned);
 		}
 	}
