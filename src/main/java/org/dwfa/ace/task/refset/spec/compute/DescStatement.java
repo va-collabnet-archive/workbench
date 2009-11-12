@@ -72,11 +72,12 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException, IOException {
-    	if (true) {
+    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
+            throws TerminologyException, IOException {
+        if (true) {
             throw new UnsupportedOperationException();
-    	}
-    	I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
+        }
+        I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         switch (tokenEnum) {
         case DESC_IS:
             break;

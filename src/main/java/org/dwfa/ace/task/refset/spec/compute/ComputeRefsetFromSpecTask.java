@@ -10,21 +10,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JButton;
 
-import org.apache.lucene.search.DocIdSetIterator;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
@@ -142,10 +139,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
 
             // Step 1: create the query object, based on the refset spec
-            RefsetSpecQuery query =
-                    RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
-            RefsetSpecQuery possibleQuery =
-                    RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset);
+            RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
+            // RefsetSpecQuery possibleQuery =
+            // RefsetQueryFactory.createPossibleQuery(configFrame, termFactory, refsetSpec, refset);
             SpecMemberRefsetHelper memberRefsetHelper =
                     new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
@@ -173,21 +169,23 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             // filtering out retired versions)
             List<I_ThinExtByRefVersioned> allRefsetMembers =
                     termFactory.getRefsetExtensionMembers(refset.getConceptId());
-            
+
             HashSet<Integer> currentRefsetMemberIds =
                     filterNonCurrentRefsetMembers(allRefsetMembers, memberRefsetHelper, refset.getConceptId(),
                         normalMemberConcept.getConceptId());
             // Compute the possible concepts to iterate over here...
-            I_RepresentIdSet possibleConcepts = possibleQuery.getPossibleConcepts(configFrame);
+            I_RepresentIdSet possibleConcepts = query.getPossibleConcepts(configFrame, null);
             possibleConcepts.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
+
+            getLogger().info("************* Search space: " + possibleConcepts.size() + " concepts *******");
 
             computeRefsetActivityPanel.setMaximum(termFactory.getConceptCount());
             computeRefsetActivityPanel.setIndeterminate(false);
-            
+
             I_IterateIds nidIterator = possibleConcepts.iterator();
             while (nidIterator.next()) {
-            	int nid = nidIterator.nid();
-            	if (possibleConcepts.isMember(nid)) {
+                int nid = nidIterator.nid();
+                if (possibleConcepts.isMember(nid)) {
                     currentConcept = termFactory.getConcept(nid);
                     conceptsProcessed++;
 
@@ -211,7 +209,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     if (cancelComputation) {
                         break;
                     }
-            	}
+                }
             }
 
             progressReportHtmlGenerator.setStep2Complete(true);

@@ -27,7 +27,7 @@ import org.dwfa.tapi.TerminologyException;
  * @author Chrissy Hill
  * 
  */
-public abstract class RefsetSpecStatement {
+public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     protected enum QUERY_TOKENS {
         CONCEPT_IS(RefsetAuxiliary.Concept.CONCEPT_IS),
@@ -232,8 +232,8 @@ public abstract class RefsetSpecStatement {
 
     }
 
-    public abstract I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException,
-            IOException;
+    public abstract I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentSet)
+            throws TerminologyException, IOException;
 
     /**
      * Negates the statement by inverting the current associated negation.

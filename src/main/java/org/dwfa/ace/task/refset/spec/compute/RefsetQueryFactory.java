@@ -29,8 +29,8 @@ public class RefsetQueryFactory {
     private final static int CONCEPT = 3;
 
     public static RefsetSpecQuery createQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
-            I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException,
-            TerminologyException, ParseException {
+            I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
+            ParseException {
 
         // create tree object that corresponds to the database's refset spec
         List<I_ThinExtByRefVersioned> extensions =
@@ -72,8 +72,8 @@ public class RefsetQueryFactory {
      * @throws ParseException
      */
     public static RefsetSpecQuery createPossibleQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
-            I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException,
-            TerminologyException, ParseException {
+            I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
+            ParseException {
 
         // create tree object that corresponds to the database's refset spec
         List<I_ThinExtByRefVersioned> extensions =
@@ -248,6 +248,8 @@ public class RefsetQueryFactory {
                     currExt.getTuples(configFrame.getAllowedStatus(), null, addUncommitted,
                         returnConflictResolvedLatestState);
             if (extensions.size() > 0) {
+                System.out.println("************************Extensions size: " + extensions.size());
+                System.out.println("Extensions : " + extensions);
                 I_ThinExtByRefPart thinPart = extensions.get(0).getPart();
 
                 if (thinPart instanceof I_ThinExtByRefPartConceptConceptConcept) {

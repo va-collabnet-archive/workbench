@@ -1,7 +1,6 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -10,6 +9,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -31,8 +31,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken,
-            I_GetConceptData queryConstraint) {
+    public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_GetConceptData queryConstraint) {
         super(useNotQualifier, queryToken, queryConstraint);
     }
 
@@ -166,7 +165,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public IdentifierSet getPossibleConcepts(I_ConfigAceFrame configFrame) throws TerminologyException, IOException {
+    public IdentifierSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
+            throws TerminologyException, IOException {
         throw new UnsupportedOperationException();
     }
 

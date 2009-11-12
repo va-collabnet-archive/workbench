@@ -110,17 +110,34 @@ public class SpecRefsetHelper {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusId() == currentStatusId) {
-                    if (latestPart instanceof I_ThinExtByRefPartConcept) {
-                        int partValue = ((I_ThinExtByRefPartConcept) latestPart).getC1id();
-                        if (partValue == memberTypeId) {
-                            return true;
+                for (Integer currentStatus : getCurrentStatusIds()) {
+                    if (latestPart.getStatusId() == currentStatus) {
+                        if (latestPart instanceof I_ThinExtByRefPartConcept) {
+                            int partValue = ((I_ThinExtByRefPartConcept) latestPart).getC1id();
+                            if (partValue == memberTypeId) {
+                                return true;
+                            }
                         }
                     }
                 }
             }
         }
         return false;
+    }
+
+    protected Set<Integer> getCurrentStatusIds() {
+        Set<Integer> statuses = new HashSet<Integer>();
+
+        try {
+            statuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.PROMOTED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statuses;
     }
 
     public boolean hasCurrentConceptConceptRefsetExtension(int refsetId, int conceptId, int c1Id, int c2Id, int statusId)
