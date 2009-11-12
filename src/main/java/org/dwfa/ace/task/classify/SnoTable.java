@@ -353,7 +353,7 @@ public class SnoTable {
             List<I_Position> posList) {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
         try {
-            List<I_RelVersioned> relList = cBean.getSourceRels();
+            List<? extends I_RelVersioned> relList = cBean.getSourceRels();
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;
@@ -500,7 +500,7 @@ public class SnoTable {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
 
         try {
-            List<I_RelVersioned> relList = cBean.getSourceRels();
+            List<? extends I_RelVersioned> relList = cBean.getSourceRels();
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;

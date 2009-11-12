@@ -13,9 +13,9 @@ public interface I_RelVersioned extends I_AmTermComponent {
 
 	public boolean addVersionNoRedundancyCheck(I_RelPart rel);
 
-	public List<I_RelPart> getVersions();
+	public List<? extends I_RelPart> getVersions();
 	
-	public List<I_RelPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+	public List<? extends I_RelPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
 	public int versionCount();
 

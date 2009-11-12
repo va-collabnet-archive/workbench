@@ -181,9 +181,9 @@ public class ClassifyCurrent extends AbstractTask {
 	}
 
 	private void processRels(final I_SnorocketFactory rocket,
-			final List<I_RelVersioned> sourceRels) {
-		if (null != sourceRels) {
-			for (I_RelVersioned rel : sourceRels) {
+			final List<? extends I_RelVersioned> list) {
+		if (null != list) {
+			for (I_RelVersioned rel : list) {
 				final I_RelTuple lastTuple = rel.getLastTuple();
 				if (definingCharacteristic == lastTuple.getCharacteristicId()
 						|| statedCharacteristic == lastTuple

@@ -489,7 +489,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	 *         of status.
 	 * @throws IOException
 	 */
-	public List<I_RelVersioned> getSourceRels() throws IOException;
+	public List<? extends I_RelVersioned> getSourceRels() throws IOException;
 
 	public String getInitialText() throws IOException;
 

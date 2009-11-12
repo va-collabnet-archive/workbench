@@ -1038,13 +1038,13 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			for (int c1 : focusCase1OutNid) {
 				I_GetConceptData relSource;
 				relSource = tf.getConcept(c1);
-				List<I_RelVersioned> lrv = relSource.getSourceRels();
+				List<? extends I_RelVersioned> lrv = relSource.getSourceRels();
 				for (I_RelVersioned rv : lrv) {
 
 					Integer iR = rv.getRelId();
 					Integer iA = rv.getC1Id();
 					Integer iB = rv.getC2Id();
-					List<I_RelPart> parts = rv.getVersions();
+					List<? extends I_RelPart> parts = rv.getVersions();
 					for (I_RelPart p : parts) {
 						x++;
 						Integer i1 = p.getTypeId();
@@ -1066,7 +1066,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			s.append("\r\n:::");
 			for (int c1Nid : focusCase1OutNid) {
 				I_GetConceptData sourceRel = tf.getConcept(c1Nid);
-				List<I_RelVersioned> lsr = sourceRel.getSourceRels();
+				List<? extends I_RelVersioned> lsr = sourceRel.getSourceRels();
 				for (I_RelVersioned rv : lsr) {
 
 					Integer iR = rv.getRelId();

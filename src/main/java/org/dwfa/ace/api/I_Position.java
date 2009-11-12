@@ -24,8 +24,6 @@ public interface I_Position {
 
 	public boolean equals(int version, int pathId);
 
-	public int getPositionId();
-	
 	public Collection<I_Position> getAllOrigins();
 
 }
