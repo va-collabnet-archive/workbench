@@ -63,7 +63,6 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_SupportClassifier;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
-import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
