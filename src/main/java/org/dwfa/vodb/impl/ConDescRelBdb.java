@@ -1212,35 +1212,44 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 	}
 
 	public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
-		try {
-			refreshConceptNids();
-			return idSet;
-		} catch (DatabaseException e) {
-			throw new IOException(e);
-		}
+		refreshConceptNids();
+		return idSet;
 	}
 
 	
 	private static int[] conceptNids;
 	private static IdentifierSetReadOnly idSet;
 
-	private void refreshConceptNids() throws DatabaseException, IOException {
-		if (conceptNids == null || getConceptCount() != conceptNids.length) {
-			IdentifierSet tempIdSet = getEmptyIdSet();
-			conceptNids = new int[getConceptCount()];
-			Cursor concCursor = conDescRelDb.openCursor(null, null);
-			DatabaseEntry foundKey = new DatabaseEntry();
-			DatabaseEntry foundData = new DatabaseEntry();
-			for (int i = 0; i < conceptNids.length; i++) {
-				if (concCursor.getNext(foundKey, foundData,
-						LockMode.DEFAULT) != OperationStatus.SUCCESS) {
-					AceLog.getAppLog().alertAndLogException(
-							new Exception("premature end of concept cursor: " + i));
+	private void refreshConceptNids() throws IOException {
+		Cursor concCursor = null;
+		try {
+			if (conceptNids == null || getConceptCount() != conceptNids.length) {
+				IdentifierSet tempIdSet = getEmptyIdSet();
+				conceptNids = new int[getConceptCount()];
+				concCursor = conDescRelDb.openCursor(null, null);
+				DatabaseEntry foundKey = new DatabaseEntry();
+				DatabaseEntry foundData = new DatabaseEntry();
+				for (int i = 0; i < conceptNids.length; i++) {
+					if (concCursor.getNext(foundKey, foundData,
+							LockMode.DEFAULT) != OperationStatus.SUCCESS) {
+						AceLog.getAppLog().alertAndLogException(
+								new Exception("premature end of concept cursor: " + i));
+					}
+					conceptNids[i] = (Integer) intBinder.entryToObject(foundKey);
+					tempIdSet.setMember(conceptNids[i]);
 				}
-				conceptNids[i] = (Integer) intBinder.entryToObject(foundKey);
-				tempIdSet.setMember(conceptNids[i]);
+				idSet = new IdentifierSetReadOnly(tempIdSet);
 			}
-			idSet = new IdentifierSetReadOnly(tempIdSet);
+		} catch (DatabaseException ex) {
+			throw new IOException(ex);
+		} finally {
+			if (concCursor != null) {
+				try {
+					concCursor.close();
+				} catch (DatabaseException e) {
+					throw new IOException(e);
+				}
+			}
 		}
 	}
 	private class ConceptIdArrayIterator implements Iterator<I_GetConceptData> {
@@ -1309,14 +1318,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					concCursor.close();
 				}
 			} catch (Exception ex) {
-				try {
-					concCursor.close();
-				} catch (DatabaseException e) {
-					AceLog.getAppLog().alertAndLogException(ex);
-				}
 				AceLog.getAppLog().alertAndLogException(ex);
 				hasNext = false;
-			}
+			} 
 		}
 
 		public boolean hasNext() {
@@ -1339,7 +1343,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		protected void finalize() throws Throwable {
 			concCursor.close();
 		}
-
 	}
 
 	private class DescriptionIterator implements
