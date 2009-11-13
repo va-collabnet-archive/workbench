@@ -618,6 +618,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
               new I_ConceptualizeUniversally[] { ID_SOURCE }),
         UNSPECIFIED_UUID(PrimordialId.ACE_AUX_ENCODING_ID, new String[] {"generated UUID"}, null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        T5_FROM_DATA_UUID("Data Generated Type 5 UUID", null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
         OID("OID", null,
               new I_ConceptualizeUniversally[] { ID_SOURCE }),
         UNSPECIFIED_STRING("unspecified string", null,
