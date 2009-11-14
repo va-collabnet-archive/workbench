@@ -13,9 +13,9 @@ public interface I_RelVersioned extends I_AmTermComponent {
 
 	public boolean addVersionNoRedundancyCheck(I_RelPart rel);
 
-	public List<? extends I_RelPart> getVersions();
+	public List<I_RelPart> getVersions();
 	
-	public List<? extends I_RelPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+	public List<I_RelPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
 	public int versionCount();
 
@@ -127,8 +127,6 @@ public interface I_RelVersioned extends I_AmTermComponent {
 			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
 
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
-
-	public boolean merge(I_RelVersioned jarRel);
 
 	public Set<TimePathId> getTimePathSet();
 
