@@ -144,6 +144,8 @@ public class DatePicker extends JPanel {
      */
     public void setSelectedDate(Calendar selectedDate) {
         calendarPanel.setSelectedDate(selectedDate);
+        // update the text field display with the new date. 
+        this.setText(); 
     }
 
     /**
