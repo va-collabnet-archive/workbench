@@ -113,6 +113,7 @@ public class JiniManager implements I_LookupServices {
 		return sdm.equals(obj);
 	}
 
+	
 	/**
 	 * @return
 	 */
@@ -352,5 +353,10 @@ public class JiniManager implements I_LookupServices {
 
 	public static void setLocalOnly(boolean localOnly) {
 		JiniManager.localOnly = localOnly;
+	}
+
+	@Override
+	public int hashCode() {
+		return sdm.hashCode();
 	}
 }
