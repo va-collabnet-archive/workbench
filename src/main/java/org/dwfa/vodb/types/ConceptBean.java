@@ -203,8 +203,10 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			conceptAttributes = AceConfig.getVodb().getConceptAttributes(
 					conceptId);
 		}
-		if (conceptAttributes == null && uncommittedConceptAttributes != null) {
-			return uncommittedConceptAttributes;
+		if (conceptAttributes == null) {
+			if (uncommittedConceptAttributes != null) {
+				return uncommittedConceptAttributes;
+			}
 		}
 		return conceptAttributes;
 	}
@@ -248,8 +250,11 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			I_IntSet allowedStatus, Set<I_Position> positionSet,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
 		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
-		getConceptAttributes().addTuples(allowedStatus, positionSet,
+		I_ConceptAttributeVersioned attr = getConceptAttributes();
+		if (attr != null) {
+			getConceptAttributes().addTuples(allowedStatus, positionSet,
 					returnTuples, addUncommitted, returnConflictResolvedLatestState);
+		}
 		return returnTuples;
 	}
 	
