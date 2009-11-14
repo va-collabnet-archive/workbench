@@ -2,6 +2,7 @@ package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.util.HashFunction;
 
 public class ThinIdPart implements I_IdPart {
 	private int pathId;

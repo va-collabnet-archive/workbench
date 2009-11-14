@@ -5,6 +5,7 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.util.HashFunction;
 
 public class ThinConTuple implements I_ConceptAttributeTuple {
 	I_ConceptAttributeVersioned core;

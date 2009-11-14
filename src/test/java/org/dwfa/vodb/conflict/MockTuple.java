@@ -11,6 +11,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 
 public class MockTuple implements I_AmTuple {
 
@@ -89,10 +90,18 @@ public class MockTuple implements I_AmTuple {
 	public boolean equals(Object o) {
 		if (o instanceof MockTuple) {
 			MockTuple testTuple = ((MockTuple) o);
-			return value.equals(testTuple.value) && id == testTuple.id && pathId == testTuple.pathId && version == testTuple.version;
+			return value.equals(testTuple.value) && id == testTuple.id && 
+				pathId == testTuple.pathId && version == testTuple.version;
 		}
 		throw new UnsupportedOperationException();
 	}
+	
+	@Override
+	public int hashCode() {
+		return HashFunction.hashCode(new int[] {id, pathId, version});
+	}
+
+	
 	
 	public String toString() {
 		return "TestTuple{id=" + id + ",pathid=" + pathId + ",version="

@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.util.HashFunction;
 
 public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
 	private ThinIdPartCore core;

@@ -9,8 +9,6 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_Path;
@@ -36,6 +34,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPartMeasurement;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartScopedLanguage;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartString;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;

@@ -4,7 +4,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.vodb.types.HashFunction;
+import org.dwfa.util.HashFunction;
 
 public class TreeIdPath {
 	/**

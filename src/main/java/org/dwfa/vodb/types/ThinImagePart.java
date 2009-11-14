@@ -3,6 +3,7 @@ package org.dwfa.vodb.types;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.util.HashFunction;
 
 public class ThinImagePart implements I_ImagePart {
 	private int pathId;
