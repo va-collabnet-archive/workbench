@@ -172,18 +172,22 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 						AceLog.getAppLog().log(Level.WARNING, ex.getLocalizedMessage(), ex);
 					}
 				} else {
-					switch (extType) {
-					case CONCEPT_CONCEPT:
-						this.setText("Branching clause is Primoridal or Extinct");
-						break;
-					case CONCEPT_CONCEPT_CONCEPT:
-						this.setText("Structural clause is Primoridal or Extinct");
-						break;
-					case CONCEPT_CONCEPT_STRING:
-						this.setText("Text clause is Primoridal or Extinct");
-						break;
-					default:
-						this.setText("Can't handle extinct type: " + extType);
+					if (extType != null) {
+						switch (extType) {
+						case CONCEPT_CONCEPT:
+							this.setText("Branching clause is Primoridal or Extinct");
+							break;
+						case CONCEPT_CONCEPT_CONCEPT:
+							this.setText("Structural clause is Primoridal or Extinct");
+							break;
+						case CONCEPT_CONCEPT_STRING:
+							this.setText("Text clause is Primoridal or Extinct");
+							break;
+						default:
+							this.setText("Can't handle extinct type: " + extType);
+						}
+					} else {
+						this.setText("Clause is Primoridal or Extinct");
 					}
 
 				}
