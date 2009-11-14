@@ -342,23 +342,6 @@ public class ThinRelVersioned implements I_RelVersioned {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.vodb.types.I_RelVersioned#merge(org.dwfa.vodb.types.ThinRelVersioned)
-	 */
-	public boolean merge(I_RelVersioned jarRel) {
-		HashSet<I_RelPart> versionSet = new HashSet<I_RelPart>(versions);
-		boolean changed = false;
-		for (I_RelPart jarPart : jarRel.getVersions()) {
-			if (!versionSet.contains(jarPart)) {
-				changed = true;
-				versions.add(jarPart);
-			}
-		}
-		return changed;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.dwfa.vodb.types.I_RelVersioned#getTimePathSet()
 	 */
 	public Set<TimePathId> getTimePathSet() {
@@ -442,5 +425,22 @@ public class ThinRelVersioned implements I_RelVersioned {
 		   }
 		   return matchingTuples.size() > 0;
 	   }
+	   
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.dwfa.vodb.types.I_RelVersioned#merge(org.dwfa.vodb.types.ThinRelVersioned)
+		 */
+		public boolean merge(I_RelVersioned jarRel) {
+			HashSet<I_RelPart> versionSet = new HashSet<I_RelPart>(versions);
+			boolean changed = false;
+			for (I_RelPart jarPart : jarRel.getVersions()) {
+				if (!versionSet.contains(jarPart)) {
+					changed = true;
+					versions.add(jarPart);
+				}
+			}
+			return changed;
+		}
 
 }

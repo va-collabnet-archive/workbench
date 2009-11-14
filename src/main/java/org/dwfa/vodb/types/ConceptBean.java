@@ -833,7 +833,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
 			if (sourceRels != null) {
 				for (I_RelVersioned srcRel : sourceRels) {
-					for (ListIterator<I_RelPart> partItr = srcRel.getVersions()
+					for (ListIterator<? extends I_RelPart> partItr = srcRel.getVersions()
 							.listIterator(); partItr.hasNext();) {
 						I_RelPart part = partItr.next();
 						if (part.getVersion() == Integer.MAX_VALUE) {

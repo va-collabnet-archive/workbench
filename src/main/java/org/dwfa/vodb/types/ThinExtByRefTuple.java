@@ -157,10 +157,4 @@ I_ThinExtByRefVersioned core;
 		addVersion(promotionPart);
 		return true;
 	}
-	public int getPositionId() {
-		return part.getPositionId();
-	}
-	public void setPositionId(int pid) {
-		part.setPositionId(pid);
-	}
 }
