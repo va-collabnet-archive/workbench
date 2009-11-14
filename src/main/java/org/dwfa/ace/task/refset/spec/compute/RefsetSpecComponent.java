@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -35,4 +37,7 @@ public abstract class RefsetSpecComponent {
     }
 
     public abstract boolean execute(I_AmTermComponent component) throws IOException, TerminologyException;
+
+    public abstract I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame config,
+            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException;
 }

@@ -36,7 +36,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private ArrayList<RefsetSpecStatement> statements;
     private ArrayList<RefsetSpecComponent> allComponents;
 
-    private enum GROUPING_TYPE {
+    public enum GROUPING_TYPE {
         OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true),
         AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true),
         CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true),
@@ -72,12 +72,15 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private I_TermFactory termFactory;
 
     private int totalStatementCount;
-    private RefsetSpecComponentComparator comparator;
+    private RefsetSpecCalculationOrderComparator executionOrderComparator;
+    private RefsetSpecExecutionOrderComparator calculationOrderComparator;
 
     public RefsetSpecQuery(I_GetConceptData groupingConcept) throws TerminologyException, IOException {
 
         // create query object (statements + any sub-queries)
-        comparator = new RefsetSpecComponentComparator();
+        executionOrderComparator = new RefsetSpecCalculationOrderComparator();
+        calculationOrderComparator = new RefsetSpecExecutionOrderComparator();
+
         subqueries = new ArrayList<RefsetSpecQuery>();
         statements = new ArrayList<RefsetSpecStatement>();
         allComponents = new ArrayList<RefsetSpecComponent>();
@@ -120,7 +123,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     public RefsetSpecStatement addConceptStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
             I_GetConceptData constraint) {
         RefsetSpecStatement statement = new ConceptStatement(useNotQualifier, groupingToken, constraint);
-        boolean addResult = statements.add(statement);
+        statements.add(statement);
         allComponents.add(statement);
         return statement;
     }
@@ -135,6 +138,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
+
+        Collections.sort(allComponents, calculationOrderComparator);
+
         long startTime = System.currentTimeMillis();
         AceLog.getAppLog().info(">> Start of " + this.toString());
         I_RepresentIdSet possibleConcepts = null;
@@ -145,21 +151,14 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 throw new TerminologyException("Spec is invalid - dangling AND.");
             }
 
-            for (RefsetSpecStatement statement : statements) {
+            for (RefsetSpecComponent component : allComponents) {
                 if (possibleConcepts == null) {
-                    possibleConcepts = statement.getPossibleConcepts(config, parentPossibleConcepts);
+                    possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
-                    possibleConcepts.and(statement.getPossibleConcepts(config, parentPossibleConcepts));
+                    possibleConcepts.and(component.getPossibleConcepts(config, possibleConcepts));
                 }
             }
 
-            for (RefsetSpecQuery subquery : subqueries) {
-                if (possibleConcepts == null) {
-                    possibleConcepts = subquery.getPossibleConcepts(config, parentPossibleConcepts);
-                } else {
-                    possibleConcepts.and(subquery.getPossibleConcepts(config, parentPossibleConcepts));
-                }
-            }
             break;
 
         case OR:
@@ -167,22 +166,14 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 throw new TerminologyException("Spec is invalid - dangling OR.");
             }
 
-            for (RefsetSpecStatement statement : statements) {
+            for (RefsetSpecComponent component : allComponents) {
                 if (possibleConcepts == null) {
-                    possibleConcepts = statement.getPossibleConcepts(config, parentPossibleConcepts);
+                    possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
-                    possibleConcepts.or(statement.getPossibleConcepts(config, parentPossibleConcepts));
-                }
-
-            }
-
-            for (RefsetSpecQuery subquery : subqueries) {
-                if (possibleConcepts == null) {
-                    possibleConcepts = subquery.getPossibleConcepts(config, parentPossibleConcepts);
-                } else {
-                    possibleConcepts.or(subquery.getPossibleConcepts(config, parentPossibleConcepts));
+                    possibleConcepts.or(component.getPossibleConcepts(config, parentPossibleConcepts));
                 }
             }
+
             break;
         case CONCEPT_CONTAINS_DESC:
         case CONCEPT_CONTAINS_REL:
@@ -217,7 +208,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
      */
     public boolean execute(I_AmTermComponent component) throws IOException, TerminologyException {
 
-        Collections.sort(allComponents, comparator);
+        Collections.sort(allComponents, executionOrderComparator);
 
         // process all statements and subqueries
         switch (groupingType) {
@@ -307,6 +298,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         default:
             throw new TerminologyException("Unknown grouping type.");
         }
+
     }
 
     /**
@@ -368,5 +360,13 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public void setTotalStatementCount(int totalStatementCount) {
         this.totalStatementCount = totalStatementCount;
+    }
+
+    public GROUPING_TYPE getGroupingType() {
+        return groupingType;
+    }
+
+    public void setGroupingType(GROUPING_TYPE groupingType) {
+        this.groupingType = groupingType;
     }
 }

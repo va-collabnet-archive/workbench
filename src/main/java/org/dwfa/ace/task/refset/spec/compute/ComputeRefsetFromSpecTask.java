@@ -24,6 +24,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.spec.SpecMemberRefsetHelper;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -190,6 +191,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     conceptsProcessed++;
 
                     boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());
+
                     if (query.execute(currentConcept)) {
                         if (!containsCurrentMember) {
                             newMembers.add(currentConcept.getConceptId());
@@ -229,6 +231,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 throw new TaskFailedException("User cancelled refset computation.");
             }
 
+            long createComponentsStartTime = System.currentTimeMillis();
+            AceLog.getAppLog().info(">> Start of component creation (new members, retire old, marked parents).");
             // Step 3 : create new member refsets
             for (Integer memberId : newMembers) {
                 memberRefsetHelper.newRefsetExtension(refset.getConceptId(), memberId, normalMemberConcept
@@ -268,6 +272,11 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     }
                 }
             }
+            long elapsedTime = System.currentTimeMillis() - createComponentsStartTime;
+            long minutes = elapsedTime / 60000;
+            long seconds = (elapsedTime % 60000) / 1000;
+            AceLog.getAppLog().info("Finished component creation : " + minutes + " minutes, " + seconds + " seconds.");
+
             progressReportHtmlGenerator.setStep5Complete(true);
             computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
 

@@ -7,10 +7,8 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -232,13 +230,18 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     }
 
-    public abstract I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentSet)
-            throws TerminologyException, IOException;
-
     /**
      * Negates the statement by inverting the current associated negation.
      */
     public void negateStatement() {
         useNotQualifier = !useNotQualifier;
+    }
+
+    public QUERY_TOKENS getTokenEnum() {
+        return tokenEnum;
+    }
+
+    public void setTokenEnum(QUERY_TOKENS tokenEnum) {
+        this.tokenEnum = tokenEnum;
     }
 }
