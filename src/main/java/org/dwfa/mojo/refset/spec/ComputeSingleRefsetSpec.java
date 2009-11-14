@@ -117,7 +117,7 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
                         normalMemberConcept.getConceptId());
 
             // Compute the possible concepts to iterate over here...
-            I_RepresentIdSet possibleConcepts = possibleQuery.getPossibleConcepts(configFrame);
+            I_RepresentIdSet possibleConcepts = possibleQuery.getPossibleConcepts(configFrame, null);
             possibleConcepts.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
 
             I_IterateIds nidIterator = possibleConcepts.iterator();
