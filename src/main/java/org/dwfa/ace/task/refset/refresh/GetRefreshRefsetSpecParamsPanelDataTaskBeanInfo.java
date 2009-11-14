@@ -7,18 +7,35 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
+/**
+ * The GetRefreshRefsetSpecParamsPanelDataTaskBeanInfo class describes the visible elements of the 
+ * Workflow task GetRefreshRefsetSpecParamsPanelDataTask so that it can be displayed in the 
+ * Process Builder. 
+ * 
+ * @author  Perry Reid
+ * @version 1.0, November 2009 
+ */
 public class GetRefreshRefsetSpecParamsPanelDataTaskBeanInfo extends SimpleBeanInfo {
 
-    /**
-    *
-    */
-    public GetRefreshRefsetSpecParamsPanelDataTaskBeanInfo() {
+     public GetRefreshRefsetSpecParamsPanelDataTaskBeanInfo() {
         super();
     }
 
+	/**
+	 * Returns a list of property descriptors for this task.   
+	 * @return  	Returns a PropertyDescriptor array containing the properties of this task  
+	 * @exception  	Error Thrown when an exception happens during Introspection
+	 */
     public PropertyDescriptor[] getPropertyDescriptors() {
 
         try {
+
+            PropertyDescriptor profilePropName =
+                new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
+            profilePropName.setBound(true);
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the working profile.");
 
             PropertyDescriptor nextUserTermEntryPropName;
             nextUserTermEntryPropName =
@@ -42,16 +59,36 @@ public class GetRefreshRefsetSpecParamsPanelDataTaskBeanInfo extends SimpleBeanI
             refsetUuidPropName.setDisplayName("<html><font color='green'>member refset UUID prop:");
             refsetUuidPropName.setShortDescription("The property to put the member refset UUID into.");
 
+            PropertyDescriptor editorUuidPropName;
+            editorUuidPropName = new PropertyDescriptor("editorUuidPropName", getBeanDescriptor().getBeanClass());
+            editorUuidPropName.setBound(true);
+            editorUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            editorUuidPropName.setDisplayName("<html><font color='green'>editor UUID prop name:");
+            editorUuidPropName.setShortDescription("The property to put the editor UUID into.");
+
+            PropertyDescriptor ownerUuidPropName;
+            ownerUuidPropName = new PropertyDescriptor("ownerUuidPropName", getBeanDescriptor().getBeanClass());
+            ownerUuidPropName.setBound(true);
+            ownerUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            ownerUuidPropName.setDisplayName("<html><font color='green'>owner uuid prop name:");
+            ownerUuidPropName.setShortDescription("The property to put the owner uuid into.");
+
+
             PropertyDescriptor rv[] =
-                    { nextUserTermEntryPropName, commentsPropName, refsetUuidPropName };
+                    { profilePropName, nextUserTermEntryPropName, commentsPropName, 
+            		  refsetUuidPropName, editorUuidPropName, ownerUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
         }
     }
 
-    /**
+    /** 
+     * Return the descriptor for this JavaBean which contains a reference to the JavaBean 
+	 * that implements this task as well as the display name of the task along with 
+	 * formating information.
      * @see java.beans.BeanInfo#getBeanDescriptor()
+	 * @return	Returns the BeanDescriptor for this task      
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(GetRefreshRefsetSpecParamsPanelDataTask.class);

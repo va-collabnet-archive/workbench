@@ -117,6 +117,13 @@ public class PanelSnomedVersion extends JPanel {
 		return positionSet;
 	}
 
+	public void setPositionSet(Set<I_Position> newPositions) {
+		positionListModel.clear();
+		positionSet.clear(); 
+		positionListModel.addAll(newPositions);
+		positionSet.addAll(newPositions);
+	}
+
 	
 
 }

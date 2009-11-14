@@ -29,6 +29,7 @@ import javax.swing.JTextArea;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -44,16 +45,20 @@ import org.dwfa.tapi.TerminologyException;
  * 6) request attachments (file chooser)
  * 
  * @author Perry Reid
+ * @version 1.0, November 2009 
  * 
  */
-public class PanelRefreshRefsetSpecParams extends JPanel {
+public class PanelRefsetAndParameters extends JPanel {
 
-    /**
-     *
+    /* -----------------------
+     * Properties 
+     * -----------------------
      */
+	// Serialization Properties 
     private static final long serialVersionUID = 1L;
 
     // components
+    private JLabel refsetNameLabel;
     private JLabel editorLabel;
     private JLabel commentsLabel;
     private JLabel deadlineLabel;
@@ -62,19 +67,24 @@ public class PanelRefreshRefsetSpecParams extends JPanel {
     private JButton openFileChooserButton;
     private JComboBox refsetNameComboBox;
     private JComboBox editorComboBox;
-    private JComboBox priorityComboBox;
-    private JTextArea commentsTextField;
+	private JComboBox priorityComboBox;
+ 	private JTextArea commentsTextField;
     private DatePicker deadlinePicker;
     private JScrollPane commentsScrollPane;
 
     private HashSet<File> attachments = new HashSet<File>();
     private Set<I_GetConceptData> refsets;
-    private JPanel wfPanel;
+    private JPanel wfPanel; 
 
-    public PanelRefreshRefsetSpecParams(Set<I_GetConceptData> refsets, JPanel wfPanel) {
+    
+    /**
+     * 
+     * @param refsets
+     */
+    public PanelRefsetAndParameters(Set<I_GetConceptData> refsets, JPanel wfPanel) {
         super();
-        this.wfPanel = wfPanel;
         this.refsets = refsets;
+        this.wfPanel = wfPanel;
         init();
     }
 
@@ -87,6 +97,7 @@ public class PanelRefreshRefsetSpecParams extends JPanel {
     private void setDefaultValues() {
 
         // labels
+        refsetNameLabel = new JLabel("Refset name (required):");
         editorLabel = new JLabel("Editor (required):");
         commentsLabel = new JLabel("Comments (optional):");
         deadlineLabel = new JLabel("Deadline (required):");
@@ -123,6 +134,27 @@ public class PanelRefreshRefsetSpecParams extends JPanel {
         this.removeAll();
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
+        // refset name label & box
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        this.add(refsetNameLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        if (refsets.size() == 0) {
+            this.add(new JLabel("No available refsets."), gridBagConstraints);
+        } else {
+            this.add(refsetNameComboBox, gridBagConstraints);
+        }
+
+        
         // editor
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -243,15 +275,16 @@ public class PanelRefreshRefsetSpecParams extends JPanel {
 
             fileCount++;
         }
+//        this.repaint();
 
         // column filler
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 7 + fileCount;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        this.add(Box.createGlue(), gridBagConstraints);
+//        gridBagConstraints = new  GridBagConstraints();
+//        gridBagConstraints.gridx = 5;
+//        gridBagConstraints.gridy = 7 + fileCount;
+//        gridBagConstraints.weighty = 1.0;
+//        gridBagConstraints.weightx = 1.0;
+//        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+//        this.add(Box.createGlue(), gridBagConstraints);
 
         this.setPreferredSize(new Dimension(0, 0));
         this.setMaximumSize(new Dimension(0, 0));
@@ -271,7 +304,8 @@ public class PanelRefreshRefsetSpecParams extends JPanel {
         wfPanel.setMaximumSize(null);
         wfPanel.setMinimumSize(null);
         wfPanel.repaint();
-
+    
+    
     }
 
     class RefsetListener implements ActionListener {
@@ -320,6 +354,7 @@ public class PanelRefreshRefsetSpecParams extends JPanel {
         return false;
     }
 
+    
     class CheckBoxListener implements ItemListener {
         File file;
 
@@ -335,11 +370,10 @@ public class PanelRefreshRefsetSpecParams extends JPanel {
         }
     }
 
+    
     class ButtonListener implements ActionListener {
-
         public ButtonListener() {
         }
-
         public void actionPerformed(ActionEvent e) {
 
             if (e.getActionCommand().equals("Attach a file")) {
@@ -355,6 +389,63 @@ public class PanelRefreshRefsetSpecParams extends JPanel {
         }
     }
 
+    
+    
+    public HashSet<File> getAttachments() {
+        return attachments;
+    }
+
+    
+	//-----------------------
+	// Refset 
+	//-----------------------
+    public I_GetConceptData getRefset() {
+        if (refsets.size() == 0) {
+            return null;
+        } else {
+            return (I_GetConceptData) refsetNameComboBox.getSelectedItem();
+        }
+    }
+	public void setRefset(I_GetConceptData newRefset) {
+		this.refsetNameComboBox.setSelectedItem(newRefset);
+	}
+
+   
+	//-----------------------
+	// Editor 
+	//-----------------------
+     public I_GetConceptData getEditor() {
+         return (I_GetConceptData) editorComboBox.getSelectedItem();
+     }
+
+	public void setEditor(I_GetConceptData newEditor) {
+		this.editorComboBox.setSelectedItem(newEditor);
+	}
+
+	//-----------------------
+	// Priority
+	//-----------------------
+    public String getPriority() {
+        return (String) priorityComboBox.getSelectedItem();
+    }
+    
+    public void setPriority(String newPriority) {
+        priorityComboBox.setSelectedItem(newPriority);
+    }
+    
+	//-----------------------
+	// Deadline
+	//-----------------------
+    public Calendar getDeadline() {
+        return (Calendar) deadlinePicker.getSelectedDate(); 
+    } 
+    public void setDeadline(Calendar newDeadline) {
+    	deadlinePicker.setSelectedDate(newDeadline);
+    }
+    
+	//-----------------------
+	// Comments
+	//-----------------------
     public String getComments() {
         String result = commentsTextField.getText();
         if (result == null) {
@@ -366,27 +457,9 @@ public class PanelRefreshRefsetSpecParams extends JPanel {
         }
     }
 
-    public HashSet<File> getAttachments() {
-        return attachments;
+    public void setComments(String newComments) {
+        commentsTextField.setText(newComments);
     }
 
-    public I_GetConceptData getRefset() {
-        if (refsets.size() == 0) {
-            return null;
-        } else {
-            return (I_GetConceptData) refsetNameComboBox.getSelectedItem();
-        }
-    }
 
-    public I_GetConceptData getEditor() {
-        return (I_GetConceptData) editorComboBox.getSelectedItem();
-    }
-
-    public Calendar getDeadline() {
-        return deadlinePicker.getSelectedDate();
-    }
-
-    public String getPriority() {
-        return (String) priorityComboBox.getSelectedItem();
-    }
 }

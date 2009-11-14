@@ -2,12 +2,17 @@ package org.dwfa.ace.task.refset.refresh;
 
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -15,6 +20,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
 import org.dwfa.bpa.process.Condition;
@@ -27,53 +35,94 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Shows the Refset Version panel in the WF Details panel.
+ * This task prepares the Workflow Details Sheet to display the PanelRefsetVersion
+ * panel where the user will be asked to select the version of the refset to refresh.   
  * 
  * @author Perry Reid
- * 
+ * @version 1.0, November 2009 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/wf", type = BeanType.TASK_BEAN) })
 public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 
+    /* -----------------------
+     * Properties 
+     * -----------------------
+     */
+	// Serialization Properties 
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
+	// Task Attribute Properties     
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
+ 	private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
+
+	// Other Properties 
     private transient Exception ex = null;
 
-    /**
-     * 
-     * @param out
-     * @throws IOException
+ 
+	/* -----------------------
+     * Serialization Methods
+     * -----------------------
      */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
+		out.writeObject(positionSetPropName);
+		out.writeObject(refsetUuidPropName);
 	}
-	/**
-	 * 
-	 * @param in
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 */
-	 private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 	     int objDataVersion = in.readInt();
 	     if (objDataVersion <= dataVersion) {
-	         if (objDataVersion >= 1) {
-	        	 // Read version 1 data fields...
+	    	 if (objDataVersion >= 1) {
+	    		 // Read version 1 data fields
 	        	 profilePropName = (String) in.readObject();
-	         } else {
-	             // Set version 1 default values...
-	         }
+	        	 positionSetPropName = (String) in.readObject();
+	        	 refsetUuidPropName = (String) in.readObject();
+	    	 } else {
+	    		 // Set version 1 default values
+	    		 profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	    		 positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
+	    		 refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
+
+	    	 }
 	         // Initialize transient properties...
+	         ex = null;
+
 	     } else {
 	         throw new IOException("Can't handle dataversion: " + objDataVersion);
 	     }
 	 }  
 
+
 	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
+	 * Handles actions required by the task after normal task completion (such as moving a 
+	 * process to another user's input queue).   
+	 * @return  	void
+	 * @param   	process	The currently executing Workflow process
+	 * @param 		worker	The worker currently executing this task 
+	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
+	 * @see 		org.dwfa.bpa.process.I_DefineTask#complete(
+	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      		org.dwfa.bpa.process.I_Work)
+	 */
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do
+    }
+
+
+
+	/**
+	 * Performs the primary action of the task, which in this case is to gather and 
+	 * validate data that has been entered by the user on the Workflow Details Sheet.
+	 * @return  	The exit condition of the task
+	 * @param   	process	The currently executing Workflow process
+	 * @param 		worker	The worker currently executing this task 
+	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
+	 * @see 		org.dwfa.bpa.process.I_DefineTask#evaluate(
+	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      		org.dwfa.bpa.process.I_Work)
 	 */
 	public Condition evaluate(final I_EncodeBusinessProcess process,
 			final I_Work worker) throws TaskFailedException {
@@ -101,35 +150,81 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 		return Condition.CONTINUE;
 	}
 
+
 	private void doRun(final I_EncodeBusinessProcess process,
 			final I_Work worker) {
 		I_ConfigAceFrame config;
 		try {
-			config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+			config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+
+			// Clear the Workflow Details Sheet 
 			ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
 			clear.setProfilePropName(getProfilePropName());
 			clear.evaluate(process, worker);
-			JPanel wfSheet = config.getWorkflowDetailsSheet();
+			
+			// Create a new panel to add to the Workflow Details Sheet
+			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 	        int width = 475;
 	        int height = 625;
-	        wfSheet.setSize(width, height);
-	        wfSheet.setLayout(new BorderLayout());
-            wfSheet.add(new PanelRefsetVersion(config), BorderLayout.NORTH);
+	        workflowDetailsSheet.setSize(width, height);
+	        workflowDetailsSheet.setLayout(new BorderLayout());
+	        PanelRefsetVersion newPanel = new PanelRefsetVersion(config); 
+	        
 
+
+	        /*----------------------------------------------------------------------------------
+	         *  Initialize the fields on this panel with the previously entered values (if any).
+	         * ----------------------------------------------------------------------------------
+	         */
+	        // Position Set Field Initialization 	        
+			try {
+				Set<I_Position> previousPositions = null;
+		        if (isKeyDefined(process, positionSetPropName.substring(3))) {
+		        	previousPositions = (Set<I_Position>) process.getProperty(positionSetPropName);
+		        	if (previousPositions != null ) {
+		        		newPanel.setPositionSet(previousPositions); 
+		        	}	  
+		        }
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IntrospectionException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+			
+			
+			// Set the Refset Label based on the name of the selected refset
+			UUID selectedRefsetUUID = null; 
+			String selectedRefsetText; 
+	        if (isKeyDefined(process, refsetUuidPropName.substring(3))) {
+	        	selectedRefsetUUID = (UUID) process.getProperty(refsetUuidPropName);
+	        	if (selectedRefsetUUID != null ) {
+
+		    		I_GetConceptData selectedRefset = (I_GetConceptData) AceTaskUtil.getConceptFromObject(selectedRefsetUUID);
+		    		selectedRefsetText = "SELECTED REFSET: " + selectedRefset.getInitialText(); 
+
+	        	} else {
+	        		selectedRefsetText = "NO REFSET SELECTED";
+	        	}
+	    		newPanel.setSelectedRefsetLabel(selectedRefsetText);
+	        }
+
+	        
+	        /*----------------------------------------------------------------------------------
+	         *  Add the initialized panel to the Workflow Details Sheet
+	         * ----------------------------------------------------------------------------------
+	         */
+	        workflowDetailsSheet.add(newPanel, BorderLayout.NORTH);
+	        workflowDetailsSheet.repaint();
+	        
 		} catch (Exception e) {
 			ex = e;
 		}
 	}
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
-	 */
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do
-
-	}
 	/**
 	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
 	 */
@@ -138,7 +233,7 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 	}
 
 	/**
-	 * 
+	 *  This method returns the name of the Working Profile property name  
 	 * @return
 	 */
 	public String getProfilePropName() {
@@ -146,13 +241,38 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 	}
 
 	/**
-	 * 
+	 *  This method sets the name of the Working Profile property name  
 	 * @param profilePropName
 	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
 
+	public String getPositionSetPropName() {
+		return positionSetPropName;
+	}
 
+	public void setPositionSetPropName(String positionSetPropName) {
+		this.positionSetPropName = positionSetPropName;
+	}
+
+	public String getRefsetUuidPropName() {
+		return refsetUuidPropName;
+	}
+
+	public void setRefsetUuidPropName(String refsetUuidPropName) {
+		this.refsetUuidPropName = refsetUuidPropName;
+	}
+
+	public boolean isKeyDefined(I_EncodeBusinessProcess process, String keyName) {
+		String propertyName = new String(); 
+		if (keyName.startsWith("A: ")) {
+			propertyName = keyName.substring(3);
+		} else {
+			propertyName = keyName;
+		}		
+		Collection<String> listOfKeys = process.getAttachmentKeys(); 
+		return listOfKeys.contains(propertyName);
+	}
 
 }

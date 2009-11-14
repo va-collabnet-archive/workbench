@@ -1,6 +1,8 @@
 package org.dwfa.ace.task.refset.refresh;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -13,6 +15,7 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -36,6 +39,8 @@ public class PanelRefsetVersion extends JPanel {
 	private JList positionList;
 	private ArrayListModel<I_Position> positionListModel;
 	private SelectPathAndPositionPanelWithCombo pppwc;
+	private JLabel selectedRefsetLabel; 
+
 	
 
 	public class DeleteAction extends AbstractAction {
@@ -66,13 +71,30 @@ public class PanelRefsetVersion extends JPanel {
 		super(new GridBagLayout());
 		
 		GridBagConstraints gbc = new GridBagConstraints();
+
+       	Font sansSerifFont = new Font(Font.SANS_SERIF, Font.BOLD, 14);
+		
+		// Add the Selected Refset as a reminder  
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		// Get the name of the selected Refset 
+		selectedRefsetLabel = new JLabel("NO REFSET SELECTED");
+		selectedRefsetLabel.setFont(sansSerifFont); 
+		selectedRefsetLabel.setForeground(Color.blue);
+		add(selectedRefsetLabel, gbc);
 		
 		// Add the path and positions 
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridx = 0;
-		gbc.gridy = 0;
+		gbc.gridy = 1;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -117,6 +139,21 @@ public class PanelRefsetVersion extends JPanel {
 		return positionSet;
 	}
 
+	public void setPositionSet(Set<I_Position> newPositions) {
+		positionListModel.clear();
+		positionSet.clear(); 
+		positionListModel.addAll(newPositions);
+		positionSet.addAll(newPositions);
+	}
+
+	public String getSelectedRefsetLabel() {
+		return this.selectedRefsetLabel.getText();
+	}
 	
+	public void setSelectedRefsetLabel(String refsetName) {
+		this.selectedRefsetLabel.setText(refsetName);
+	}
+
+
 
 }
