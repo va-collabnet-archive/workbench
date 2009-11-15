@@ -1690,6 +1690,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 	public Object getProperty(String propertyLabel)
 			throws IntrospectionException, IllegalAccessException,
 			InvocationTargetException {
+		propertyLabel = propertyLabel.replaceAll("\\<.*?>","");
 		try {
 			BeanInfo info = this.getAllPropertiesBeanInfo();
 			for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
@@ -1718,6 +1719,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess,
 	public void setProperty(String propertyLabel, Object value)
 			throws IntrospectionException, IllegalAccessException,
 			InvocationTargetException {
+		propertyLabel = propertyLabel.replaceAll("\\<.*?>","");
 		try {
 			BeanInfo info = this.getAllPropertiesBeanInfo();
 			for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
