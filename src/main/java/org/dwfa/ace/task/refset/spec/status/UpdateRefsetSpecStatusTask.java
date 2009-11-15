@@ -213,17 +213,12 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
 
                 for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
                     I_ThinExtByRefPart newPart = latestPart.duplicate();
-
-                    // I_ThinExtByRefPart newPart =
-                    // termFactory.newConceptExtensionPart();
-
                     newPart.setPathId(editPath.getConceptId());
                     newPart.setStatusId(statusConcept.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);
                     extension.addVersion(newPart);
 
                     termFactory.addUncommittedNoChecks(extension);
-                    // termFactory.commit();
                 }
             }
         }
