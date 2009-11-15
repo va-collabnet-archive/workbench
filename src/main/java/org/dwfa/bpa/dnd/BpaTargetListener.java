@@ -204,7 +204,7 @@ public class BpaTargetListener implements DropTargetListener {
         // created the DragGestureRecognizer
         int sa = ev.getSourceActions();
 
-        // we're saying that these actions are necessary      
+        // we're saying that these actions are necessary
         if ((sa & this.targetComponent.getAcceptableActions()) == 0) {
             return false;
         }
