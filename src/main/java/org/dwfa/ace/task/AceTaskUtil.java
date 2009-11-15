@@ -2,8 +2,11 @@ package org.dwfa.ace.task;
 
 import java.beans.IntrospectionException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -27,7 +30,21 @@ public class AceTaskUtil {
 		} else if (Collection.class.isAssignableFrom(obj.getClass())) {
 			Collection<UUID> collection = (Collection<UUID>) obj;
 			concept = LocalVersionedTerminology.get().getConcept(collection);
+		} else if (Array.class.isAssignableFrom(obj.getClass())) {
+			Array array = (Array) obj;
+			if (Array.getLength(array) > 0) {
+				Object arrayObj = Array.get(array, 0);
+				if (UUID.class.isAssignableFrom(arrayObj.getClass())) {
+					List<UUID> uuidList = new ArrayList<UUID>();
+					for (int i = 0; i < Array.getLength(array); i++) {
+						uuidList.add((UUID) Array.get(array, i));
+					}
+					
+					return LocalVersionedTerminology.get().getConcept(uuidList);
+				}
+			}
 		}
+		
 		return concept;
 	}
 
