@@ -125,8 +125,23 @@ public class SpecRefsetHelper {
         return false;
     }
 
-    protected Set<Integer> getCurrentStatusIds() {
+    public Set<Integer> getCurrentStatusIds() {
         Set<Integer> statuses = new HashSet<Integer>();
+
+        try {
+            statuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.PROMOTED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statuses;
+    }
+
+    public I_IntSet getCurrentStatusIntSet() {
+        I_IntSet statuses = termFactory.newIntSet();
 
         try {
             statuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
@@ -516,7 +531,7 @@ public class SpecRefsetHelper {
                 statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
             }
 
-            int extTypeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid();
+            int extTypeId = RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid();
 
             // check subject is not already a member
             if (hasCurrentStringRefsetExtension(refsetId, componentId, extString, termFactory.getConcept(
@@ -586,7 +601,7 @@ public class SpecRefsetHelper {
                 statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
             }
 
-            int extTypeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid();
+            int extTypeId = RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.localize().getNid();
 
             // check subject is not already a member
             if (hasCurrentConceptStringRefsetExtension(refsetId, componentId, c1Id, extString, termFactory.getConcept(
@@ -731,19 +746,24 @@ public class SpecRefsetHelper {
 
         // create a new extension (with a part for each path the user is
         // editing)
-        int newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
 
-        I_ThinExtByRefVersioned newExtension =
-                termFactory.newExtensionNoChecks(refsetId, newMemberId, componentId, extTypeId);
+        int newMemberId = Integer.MAX_VALUE;
+        if (!termFactory.hasId(memberUuid)) {
+            newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
+        } else {
+            newMemberId = termFactory.getId(memberUuid).getNativeId();
+        }
+
+        I_ThinExtByRefVersioned newExtension = termFactory.newExtension(refsetId, newMemberId, componentId, extTypeId);
 
         for (I_Path editPath : paths) {
 
-            I_ThinExtByRefPartConcept extension = termFactory.newConceptExtensionPart();
+            I_ThinExtByRefPartConcept extension = termFactory.newExtensionPart(I_ThinExtByRefPartConcept.class);
 
             extension.setPathId(editPath.getConceptId());
             extension.setStatusId(termFactory.getConcept(new UUID[] { statusUuid }).getConceptId());
-            extension.setVersion(effectiveTime);
-            extension.setConceptId(conceptId);
+            extension.setVersion(Integer.MAX_VALUE);
+            extension.setC1id(conceptId);
 
             newExtension.addVersion(extension);
         }
