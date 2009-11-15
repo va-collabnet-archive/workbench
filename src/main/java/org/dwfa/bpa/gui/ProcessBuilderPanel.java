@@ -1135,12 +1135,13 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener,
 		public void actionPerformed(ActionEvent evt) {
 			JComboBox cb = (JComboBox) evt.getSource();
 			Object action = cb.getSelectedItem();
-			if (action.equals(PanelType.tasks)) {
-				this.changeToTask.actionPerformed(evt);
-			} else if (action.equals(PanelType.properties)) {
-				this.changeToProp.actionPerformed(evt);
+			if (action != null) {
+				if (action.equals(PanelType.tasks)) {
+					this.changeToTask.actionPerformed(evt);
+				} else if (action.equals(PanelType.properties)) {
+					this.changeToProp.actionPerformed(evt);
+				}
 			}
-
 		}
 	}
 
