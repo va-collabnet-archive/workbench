@@ -63,6 +63,8 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
     private boolean includeCommentExtensions;
     private boolean includePromotionExtensions;
 
+    private int retiredStatusId;
+
     private transient Exception ex = null;
     private transient Condition returnCondition = Condition.ITEM_COMPLETE;
 
@@ -128,10 +130,11 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
 
         try {
 
-            // TODO if old status=retired, dont update to new status?
             termFactory = LocalVersionedTerminology.get();
 
-            UUID refsetSpecUuid = (UUID) process.readProperty(refsetSpecUuidPropName);
+            retiredStatusId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
+
+            UUID refsetSpecUuid = (UUID) process.getProperty(refsetSpecUuidPropName);
             I_GetConceptData statusConcept = termFactory.getConcept(statusTermEntry.getIds());
             I_GetConceptData refsetSpecConcept = termFactory.getConcept(new UUID[] { refsetSpecUuid });
             RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept);
@@ -197,54 +200,32 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
         List<I_ThinExtByRefVersioned> extensions =
                 termFactory.getRefsetExtensionMembers(extensionConcept.getConceptId());
 
-        System.out.println("************** Changing ext status:" + extensions.size() + " "
-            + extensionConcept.getInitialText() + " to status " + statusConcept.getInitialText());
         for (I_ThinExtByRefVersioned extension : extensions) {
             // get the latest version
             I_ThinExtByRefPart latestPart = null;
-            System.out.println("extensions prior: " + extension.getVersions().size());
             for (I_ThinExtByRefPart part : extension.getVersions()) {
                 if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                     latestPart = part;
                 }
             }
 
-            if (latestPart != null) {
-                System.out.println(">>>>>>>>>>>>>>>>>>>> New part");
+            if (latestPart != null && latestPart.getStatusId() != retiredStatusId) {
 
-                // for (I_Path editPath :
-                // termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                // I_ThinExtByRefPart newPart = latestPart.duplicate();
-                try {
+                for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
+                    I_ThinExtByRefPart newPart = latestPart.duplicate();
+
                     // I_ThinExtByRefPart newPart =
                     // termFactory.newConceptExtensionPart();
-                    I_ThinExtByRefPart newPart = latestPart.duplicate();
-                    System.out.println("Part path: " + termFactory.getConcept(newPart.getPathId()).getInitialText());
-                    System.out
-                        .println("Part status: " + termFactory.getConcept(newPart.getStatusId()).getInitialText());
-                    System.out.println("Part commit time: " + newPart.getVersion());
-                    System.out.println("Ext Component: "
-                        + termFactory.getConcept(extension.getComponentId()).getInitialText());
-                    System.out.println("Ext Refset: "
-                        + termFactory.getConcept(extension.getRefsetId()).getInitialText());
 
-                    // newPart.setPathId(editPath.getConceptId());
+                    newPart.setPathId(editPath.getConceptId());
                     newPart.setStatusId(statusConcept.getConceptId());
-                    // newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
                     newPart.setVersion(Integer.MAX_VALUE);
                     extension.addVersion(newPart);
-                } catch (Exception e) {
-                    e.printStackTrace();
+
+                    termFactory.addUncommittedNoChecks(extension);
+                    // termFactory.commit();
                 }
-                // }
-
-                termFactory.addUncommittedNoChecks(extension);
-                termFactory.commit();
-            } else {
-                System.out.println(">>>>>>>>>>>>>>>>>>>> latest part null");
             }
-
-            System.out.println("***************extensions after: " + extension.getVersions().size());
         }
     }
 
@@ -255,10 +236,12 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             for (I_DescriptionVersioned descVersioned : descs) {
                 for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
                     I_DescriptionPart newPart = descVersioned.getLastTuple().getPart().duplicate();
-                    newPart.setStatusId(statusConcept.getConceptId());
-                    newPart.setVersion(Integer.MAX_VALUE);
-                    newPart.setPathId(editPath.getConceptId());
-                    descVersioned.addVersion(newPart);
+                    if (newPart.getStatusId() != retiredStatusId) {
+                        newPart.setStatusId(statusConcept.getConceptId());
+                        newPart.setVersion(Integer.MAX_VALUE);
+                        newPart.setPathId(editPath.getConceptId());
+                        descVersioned.addVersion(newPart);
+                    }
                 }
             }
             termFactory.addUncommittedNoChecks(currentConcept);
@@ -272,10 +255,12 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             for (I_RelVersioned relVersioned : rels) {
                 for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
                     I_RelPart newPart = relVersioned.getLastTuple().getPart().duplicate();
-                    newPart.setStatusId(statusConcept.getConceptId());
-                    newPart.setVersion(Integer.MAX_VALUE);
-                    newPart.setPathId(editPath.getConceptId());
-                    relVersioned.addVersion(newPart);
+                    if (newPart.getStatusId() != retiredStatusId) {
+                        newPart.setStatusId(statusConcept.getConceptId());
+                        newPart.setVersion(Integer.MAX_VALUE);
+                        newPart.setPathId(editPath.getConceptId());
+                        relVersioned.addVersion(newPart);
+                    }
                 }
             }
             termFactory.addUncommittedNoChecks(currentConcept);
@@ -295,10 +280,12 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
                 } else {
                     part = termFactory.newConceptAttributePart();
                 }
-                part.setStatusId(statusConcept.getConceptId());
-                part.setVersion(Integer.MAX_VALUE);
-                part.setPathId(editPath.getConceptId());
-                v.addVersion(part);
+                if (part.getStatusId() != retiredStatusId) {
+                    part.setStatusId(statusConcept.getConceptId());
+                    part.setVersion(Integer.MAX_VALUE);
+                    part.setPathId(editPath.getConceptId());
+                    v.addVersion(part);
+                }
             }
             termFactory.addUncommittedNoChecks(currentConcept);
         }
