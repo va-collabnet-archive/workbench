@@ -32,7 +32,7 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 
-public class ConceptBeanForTree implements I_GetConceptDataForTree {
+public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree>{
 	ConceptBean bean;
 	int relId;
 	int parentDepth;
@@ -368,6 +368,11 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
 
 	public List<I_IdVersioned> getUncommittedIdVersioned() {
 		return bean.getUncommittedIdVersioned();
+	}
+
+	@Override
+	public int compareTo(ConceptBeanForTree o) {
+		return bean.getConceptId() - o.bean.getConceptId();
 	}
 		
 }
