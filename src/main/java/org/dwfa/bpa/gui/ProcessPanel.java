@@ -853,6 +853,10 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
 			String message;
 			if (renderer != null) {
 				message = renderer.getMessage();
+				if (message == null || message.length() == 0) {
+					message = "<html>" + this.process.getName() +
+						" has a null message.";
+				}
 			} else {
 				message = "<html>" + this.process.getName()
 						+ " has no message renderer.";
