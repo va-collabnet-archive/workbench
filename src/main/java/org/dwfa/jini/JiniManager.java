@@ -112,6 +112,13 @@ public class JiniManager implements I_LookupServices {
 	public boolean equals(Object obj) {
 		return sdm.equals(obj);
 	}
+	@Override
+	public int hashCode() {
+		if (sdm == null) {
+			return super.hashCode();
+		}
+		return sdm.hashCode();
+	}
 
 	
 	/**
@@ -355,8 +362,4 @@ public class JiniManager implements I_LookupServices {
 		JiniManager.localOnly = localOnly;
 	}
 
-	@Override
-	public int hashCode() {
-		return sdm.hashCode();
-	}
 }
