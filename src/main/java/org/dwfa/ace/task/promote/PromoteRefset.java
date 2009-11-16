@@ -81,18 +81,18 @@ public class PromoteRefset extends AbstractTask {
             I_Position viewPosition = viewPositionSet.iterator().next();
             promoteRefset(config, viewPosition, promotionPaths, tf, refsetToPromote);
 
-            for (I_GetConceptData refsetIdentity : RefsetHelper
+            for (I_GetConceptData memberRefsetIdentity : RefsetHelper
                 .getSpecificationRefsetForRefset(refsetToPromote, config)) {
-                promoteRefset(config, viewPosition, promotionPaths, tf, refsetIdentity);
+                promoteRefset(config, viewPosition, promotionPaths, tf, memberRefsetIdentity);
             }
-            for (I_GetConceptData refsetIdentity : RefsetHelper.getPromotionRefsetForRefset(refsetToPromote, config)) {
-                promoteRefset(config, viewPosition, promotionPaths, tf, refsetIdentity);
+            for (I_GetConceptData promotionRefsetIdentity : RefsetHelper.getPromotionRefsetForRefset(refsetToPromote, config)) {
+                promoteRefset(config, viewPosition, promotionPaths, tf, promotionRefsetIdentity);
             }
-            for (I_GetConceptData refsetIdentity : RefsetHelper.getMarkedParentRefsetForRefset(refsetToPromote, config)) {
-                promoteRefset(config, viewPosition, promotionPaths, tf, refsetIdentity);
+            for (I_GetConceptData markedParentRefsetIdentity : RefsetHelper.getMarkedParentRefsetForRefset(refsetToPromote, config)) {
+                promoteRefset(config, viewPosition, promotionPaths, tf, markedParentRefsetIdentity);
             }
-            for (I_GetConceptData refsetIdentity : RefsetHelper.getCommentsRefsetForRefset(refsetToPromote, config)) {
-                promoteRefset(config, viewPosition, promotionPaths, tf, refsetIdentity);
+            for (I_GetConceptData commentsRefsetIdentity : RefsetHelper.getCommentsRefsetForRefset(refsetToPromote, config)) {
+                promoteRefset(config, viewPosition, promotionPaths, tf, commentsRefsetIdentity);
             }
 
         } catch (Exception e) {
