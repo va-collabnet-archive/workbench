@@ -43,6 +43,7 @@ import org.dwfa.util.bean.Spec;
  * descriptions (FSN and PT for each concept)
  * relationships (member refset -> refset identity, remaining concepts ->
  * supporting refset)
+ * This task also sets the destination inbox.
  * 
  * Required input to this task is the name of the refset being created.
  * 
