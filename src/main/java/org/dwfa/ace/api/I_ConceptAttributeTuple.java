@@ -7,8 +7,6 @@ public interface I_ConceptAttributeTuple extends I_AmTuple {
 
 	public abstract int getConceptStatus();
 
-	public abstract boolean hasNewData(I_ConceptAttributePart another);
-
 	public abstract boolean isDefined();
 
 	public abstract void setDefined(boolean defined);

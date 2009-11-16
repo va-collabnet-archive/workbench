@@ -7,8 +7,6 @@ public interface I_ImagePart extends I_AmTypedPart {
 
 	public void setTextDescription(String name);
 
-	public boolean hasNewData(I_ImagePart another);
-
 	public I_ImagePart duplicate();
 
 }

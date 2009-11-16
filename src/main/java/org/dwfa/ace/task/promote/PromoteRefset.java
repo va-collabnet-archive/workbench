@@ -63,7 +63,7 @@ public class PromoteRefset extends AbstractTask {
      */
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(profilePropName);
+            I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(profilePropName);
             Set<I_Position> viewPositionSet = config.getViewPositionSet();
             Set<I_Path> promotionPaths = config.getPromotionPathSet();
             if (viewPositionSet.size() != 1 || promotionPaths.size() != 1) {

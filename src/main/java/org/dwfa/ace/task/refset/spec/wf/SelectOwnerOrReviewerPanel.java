@@ -68,8 +68,10 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
         this.setLayout(new GridBagLayout());
         int y = 0;
         HashSet<UUID> uniqueReviewerUuids = new HashSet<UUID>();
-        for (UUID reviewerUuid : reviewerUuids) {
-            uniqueReviewerUuids.add(reviewerUuid);
+        if (reviewerUuids != null) {
+            for (UUID reviewerUuid : reviewerUuids) {
+                uniqueReviewerUuids.add(reviewerUuid);
+            }
         }
         uniqueReviewerUuids.remove(owner.getUids().iterator().next());
         if (uniqueReviewerUuids.size() == 0) {
