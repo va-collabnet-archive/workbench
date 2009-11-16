@@ -20,6 +20,14 @@ public class GetRequestForChangePanelDataTaskBeanInfo extends SimpleBeanInfo {
 
         try {
 
+            PropertyDescriptor refsetSpecUuidPropName;
+            refsetSpecUuidPropName =
+                    new PropertyDescriptor("refsetSpecUuidPropName", getBeanDescriptor().getBeanClass());
+            refsetSpecUuidPropName.setBound(true);
+            refsetSpecUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetSpecUuidPropName.setDisplayName("<html><font color='green'>specification refset UUID prop:");
+            refsetSpecUuidPropName.setShortDescription("The property to put the specification refset UUID into.");
+
             PropertyDescriptor nextUserTermEntryPropName;
             nextUserTermEntryPropName =
                     new PropertyDescriptor("nextUserTermEntryPropName", getBeanDescriptor().getBeanClass());
@@ -51,7 +59,9 @@ public class GetRequestForChangePanelDataTaskBeanInfo extends SimpleBeanInfo {
             originalRequestPropName.setShortDescription("The property to put the original request into.");
 
             PropertyDescriptor rv[] =
-                    { nextUserTermEntryPropName, commentsPropName, refsetUuidPropName, originalRequestPropName };
+                    { nextUserTermEntryPropName, commentsPropName, 
+            		  refsetUuidPropName, originalRequestPropName, 
+            		  refsetSpecUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

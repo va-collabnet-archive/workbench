@@ -17,6 +17,8 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.refset.RefsetUtilImpl;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpecWizardTask;
 import org.dwfa.bpa.process.Condition;
@@ -42,10 +44,11 @@ import org.dwfa.util.bean.Spec;
 public class GetRequestForChangePanelDataTask extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
     private String nextUserTermEntryPropName = ProcessAttachmentKeys.NEXT_USER.getAttachmentKey();
     private String commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
+    private String refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
     private String originalRequestPropName = ProcessAttachmentKeys.SEARCH_ALL.getAttachmentKey();
 
     private I_TermFactory termFactory;
@@ -56,15 +59,21 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
         out.writeObject(commentsPropName);
         out.writeObject(refsetUuidPropName);
         out.writeObject(originalRequestPropName);
+        out.writeObject(refsetSpecUuidPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
+        if (objDataVersion <= dataVersion) {
             nextUserTermEntryPropName = (String) in.readObject();
             commentsPropName = (String) in.readObject();
             refsetUuidPropName = (String) in.readObject();
             originalRequestPropName = (String) in.readObject();
+            if (objDataVersion >= 2) {
+            	refsetSpecUuidPropName = (String) in.readObject();
+            } else {
+            	refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -164,6 +173,8 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                     process.setDeadline(deadline.getTime());
 
                     process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
+                    process.setProperty(refsetSpecUuidPropName, 
+                    		RefsetHelper.getSpecificationRefsetForRefset(refset, config).iterator().next().getUids().iterator().next());
                     process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { config
                         .getDbConfig().getUserConcept().getUids().iterator().next() });
                     process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { editor
