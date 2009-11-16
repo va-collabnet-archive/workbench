@@ -203,6 +203,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                     if (editor != null) {
                         RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();
                         String inboxAddress = wizard.getInbox(editor);
+                        process.setDestination(inboxAddress);
                         process.setProperty(nextUserTermEntryPropName, inboxAddress);
                         process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { editor
                             .getUids().iterator().next() });

@@ -74,6 +74,7 @@ public class SetTodoAddressFromUuidTask extends AbstractTask {
                 return Condition.ITEM_CANCELED;
             }
 
+            process.setDestination(inboxAddress.replace("inbox", "todo"));
             process.setProperty(nextUserTermEntryPropName, inboxAddress.replace("inbox", "todo"));
 
             return Condition.ITEM_COMPLETE;

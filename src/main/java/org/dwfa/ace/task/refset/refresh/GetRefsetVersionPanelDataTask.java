@@ -70,11 +70,7 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
                 // Read version 1 data fields
 				profilePropName = (String) in.readObject();
 				positionSetPropName = (String) in.readObject();
-            } else {
-                // Set version 1 default values
-				profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-				positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
-            }
+            } 
 			// Initialize transient properties...
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);

@@ -73,7 +73,7 @@ public class SetInboxAddressFromUuidTask extends AbstractTask {
                     JOptionPane.ERROR_MESSAGE);
                 return Condition.ITEM_CANCELED;
             }
-
+            process.setDestination(inboxAddress);
             process.setProperty(nextUserTermEntryPropName, inboxAddress);
 
             return Condition.ITEM_COMPLETE;

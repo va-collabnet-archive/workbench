@@ -97,7 +97,7 @@ public class GetSelectedOwnerOrReviewerTask extends AbstractTask {
                             JOptionPane.ERROR_MESSAGE);
                         return Condition.ITEM_CANCELED;
                     }
-
+                    process.setDestination(inboxAddress);
                     process.setProperty(nextUserTermEntryPropName, inboxAddress);
 
                     process.setProperty(ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey(),

@@ -244,7 +244,6 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 			
 			// Priority Field Initialization 	        
 	        Priority previousPriority = process.getPriority();
- 
 	        if (previousPriority == Priority.HIGHEST) {
         	    newPanel.setPriority("Highest"); 
 	        } else if (previousPriority == Priority.HIGH) {

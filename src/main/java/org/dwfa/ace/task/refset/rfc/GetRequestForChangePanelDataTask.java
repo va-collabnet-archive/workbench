@@ -134,6 +134,7 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                                     + editor, "", JOptionPane.ERROR_MESSAGE);
                             return Condition.ITEM_CANCELED;
                         }
+                        process.setDestination(inboxAddress);
                     } else {
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "You must select an editor. ", "", JOptionPane.ERROR_MESSAGE);
