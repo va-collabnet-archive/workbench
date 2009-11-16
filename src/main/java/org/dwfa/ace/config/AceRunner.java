@@ -114,7 +114,7 @@ public class AceRunner {
 			setupLookAndFeel();
 			setupSwingExpansionTimerLogging();
 			setupIpChangeListener();
-			setBerkeleyDbAsTransactional();
+			//setBerkeleyDbAsTransactional();
 
 			File acePropertiesFile = new File("config", "ace.properties");
 			boolean acePropertiesFileExists = acePropertiesFile.exists();
