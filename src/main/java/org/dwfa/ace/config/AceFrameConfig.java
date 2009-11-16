@@ -654,8 +654,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 termTreeDividerLoc = DEFAULT_TREE_TERM_DIV_LOC;
             }
             if (objDataVersion >= 12) {
+            	List<UUID> uuidList = (List<UUID>) in.readObject();
                 try {
-                    List<UUID> uuidList = (List<UUID>) in.readObject();
                     if (uuidList != null) {
                         try {
                             hierarchySelection = ConceptBean.get(AceConfig.getVodb().uuidToNative(uuidList));
@@ -664,9 +664,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                         }
                     }
                 } catch (Exception e) {
-                    IOException newEx = new IOException();
-                    newEx.initCause(e);
-                    throw newEx;
+                	if (uuidList != null) {
+                		AceLog.getAppLog().severe("Exception processing hierarchy selection with uuid list: "
+                				+ uuidList);
+                	}
+                    AceLog.getAppLog().alertAndLogException(e);
+                    hierarchySelection = null;
                 }
             }
             if (objDataVersion >= 13) {

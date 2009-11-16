@@ -823,7 +823,16 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 							} catch (IndexOutOfBoundsException e) {
 								throw new RuntimeException(e);
 							} catch (DatabaseException e) {
-								throw new RuntimeException(e);
+								descMapFuture.get();
+								StringBuffer buff = new StringBuffer();
+								buff.append(e.getLocalizedMessage());
+								for (short i = 0; i < descMap.nextId; i++) {
+									buff.append("\n  desc[");
+									buff.append(i);
+									buff.append("]: ");
+									buff.append(descMap.getText(i));
+								}
+								throw new RuntimeException(buff.toString(), e);
 							}
 							conceptAttributes.addVersion(conAttrPart);
 						}
@@ -864,8 +873,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 					}
 
 					int descCount = ti.readShort();
-					conceptBean.descriptions = new ArrayList<I_DescriptionVersioned>(
-							descCount);
+					conceptBean.descriptions = new ArrayList<I_DescriptionVersioned>(descCount);
 					descMapFuture.get();
 					for (int x = 0; x < descCount; x++) {
 						int descId = ti.readInt();
