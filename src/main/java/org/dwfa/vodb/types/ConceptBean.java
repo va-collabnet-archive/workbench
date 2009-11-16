@@ -1534,43 +1534,47 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 			  promotedAnything = true;
 		  }
 		  
-		  if (conceptAttributes.promote(viewPosition, pomotionPaths, allowedStatus)) {
+	      I_IntSet idsToPromote = LocalVersionedTerminology.get().newIntSet();
+
+	      if (conceptAttributes.promote(viewPosition, pomotionPaths, allowedStatus)) {
+		      idsToPromote.add(conceptAttributes.getNid());
 			  promotedAnything = true;
 		  }
 		  
-	      I_IntSet idsToCopy = LocalVersionedTerminology.get().newIntSet();
 	      
-		  if (conceptAttributes.promote(viewPosition, pomotionPaths, allowedStatus)) {
-			  promotedAnything = true;
-		  }
-
 		  for (I_DescriptionVersioned dv: getDescriptions()) {
+		      idsToPromote.add(dv.getNid());
 			  if (dv.promote(viewPosition, pomotionPaths, allowedStatus)) {
-			         idsToCopy.add(dv.getNid());
 			         promotedAnything = true;
 			  }
 	      }
 		  
 	      for (I_RelVersioned rv: getSourceRels()) {
+		      idsToPromote.add(rv.getNid());
 	    	  if (rv.promote(viewPosition, pomotionPaths, allowedStatus)) {
-			         idsToCopy.add(rv.getNid());
 			         promotedAnything = true;
 	    	  }
 	      }
 	      
 	      for (I_ImageVersioned img: getImages()) {
+		      idsToPromote.add(img.getNid());
 	    	  if (img.promote(viewPosition, pomotionPaths, allowedStatus)) {
-			         idsToCopy.add(img.getNid());
+			         idsToPromote.add(img.getNid());
 			         promotedAnything = true;
 	    	  }
 	      }
-	      for (int id: idsToCopy.getSetValues()) {
+	      
+	      for (int id: idsToPromote.getSetValues()) {
 	    	  I_IdVersioned idv = LocalVersionedTerminology.get().getId(id);
 	    	  if (idv.promote(viewPosition, pomotionPaths, allowedStatus)) {
 	    		  promotedAnything = true;
 	    		  if (uncommittedIds == null) {
 	    			  uncommittedIds = new IntSet();
 	    		  }
+	    		  if (uncommittedIdVersioned == null) {
+	    			  uncommittedIdVersioned = new ArrayList<I_IdVersioned>();
+	    		  }
+	    		  uncommittedIdVersioned.add(idv);
 	    		  uncommittedIds.add(idv.getNid());
 	    	  }
 	      }

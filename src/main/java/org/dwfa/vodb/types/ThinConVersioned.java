@@ -116,7 +116,7 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#merge(org.dwfa.vodb.types.ThinConVersioned)
 	 */
-	public boolean promote(I_ConceptAttributeVersioned jarCon) {
+	public boolean merge(I_ConceptAttributeVersioned jarCon) {
 		HashSet<I_ConceptAttributePart> versionSet = new HashSet<I_ConceptAttributePart>(
 				versions);
 		boolean changed = false;
@@ -266,16 +266,19 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 
 	public boolean promote(I_Position viewPosition, Set<I_Path> promotionPaths,
 			I_IntSet allowedStatus) {
+		int viewPathId = viewPosition.getPath().getConceptId();
 		Set<I_Position> viewPositionSet = new HashSet<I_Position>();
 		viewPositionSet.add(viewPosition);
 		boolean promotedAnything = false;
 		for (I_Path promotionPath: promotionPaths) {
 			for (I_ConceptAttributeTuple tuple: getTuples(allowedStatus, viewPositionSet)) {
-				I_ConceptAttributePart promotionPart = tuple.getPart().duplicate();
-				promotionPart.setVersion(Integer.MAX_VALUE);
-				promotionPart.setPathId(promotionPath.getConceptId());
-				addVersion(promotionPart);
-				promotedAnything = true;
+				if (tuple.getPart().getPathId() == viewPathId) {
+					I_ConceptAttributePart promotionPart = tuple.getPart().duplicate();
+					promotionPart.setVersion(Integer.MAX_VALUE);
+					promotionPart.setPathId(promotionPath.getConceptId());
+					addVersion(promotionPart);
+					promotedAnything = true;
+				}
 			}
 		}
 		return promotedAnything;

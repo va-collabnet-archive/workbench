@@ -404,20 +404,25 @@ public class ThinRelVersioned implements I_RelVersioned {
 		return relId;
 	}
 	   public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+		   int viewPathId = viewPosition.getPath().getConceptId();
 		   Set<I_Position> positions = new HashSet<I_Position>();
 		   positions.add(viewPosition);
 		   List<I_RelTuple> matchingTuples = new ArrayList<I_RelTuple>();
 		   addTuples(allowedStatus, null, positions,
 		         matchingTuples, false);
+		   boolean promotedAnything = false;
 		   for (I_Path promotionPath: pomotionPaths) {
 			   for (I_RelTuple rt: matchingTuples) {
-				   I_RelPart promotionPart = rt.getPart().duplicate();
-				   promotionPart.setVersion(Integer.MAX_VALUE);
-				   promotionPart.setPathId(promotionPath.getConceptId());
-				   rt.getRelVersioned().addVersion(promotionPart);
+				   if (rt.getPathId() == viewPathId) {
+					   I_RelPart promotionPart = rt.getPart().duplicate();
+					   promotionPart.setVersion(Integer.MAX_VALUE);
+					   promotionPart.setPathId(promotionPath.getConceptId());
+					   rt.getRelVersioned().addVersion(promotionPart);
+					   promotedAnything = true;
+				   }
 			   }
 		   }
-		   return matchingTuples.size() > 0;
+		   return promotedAnything;
 	   }
 	   
 		/*

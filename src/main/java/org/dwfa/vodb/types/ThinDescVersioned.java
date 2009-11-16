@@ -327,19 +327,24 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
    }
 
    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+	   int viewPathId = viewPosition.getPath().getConceptId();
 	   Set<I_Position> positions = new HashSet<I_Position>();
 	   positions.add(viewPosition);
 	   List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
 	   addTuples(allowedStatus, null, positions,
 	         matchingTuples, false);
+	   boolean promotedAnything = false;
 	   for (I_Path promotionPath: pomotionPaths) {
 		   for (I_DescriptionTuple dt: matchingTuples) {
-			   I_DescriptionPart promotionPart = dt.getPart().duplicate();
-			   promotionPart.setVersion(Integer.MAX_VALUE);
-			   promotionPart.setPathId(promotionPath.getConceptId());
-			   dt.getDescVersioned().addVersion(promotionPart);
+			   if (dt.getPathId() == viewPathId) {
+				   I_DescriptionPart promotionPart = dt.getPart().duplicate();
+				   promotionPart.setVersion(Integer.MAX_VALUE);
+				   promotionPart.setPathId(promotionPath.getConceptId());
+				   dt.getDescVersioned().addVersion(promotionPart);
+				   promotedAnything = true;
+			   }
 		   }
 	   }
-	   return matchingTuples.size() > 0;
+	   return promotedAnything;
    }
 }

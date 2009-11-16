@@ -218,20 +218,25 @@ public class ThinImageVersioned implements I_ImageVersioned {
 	}
 
 	   public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+		   int viewPathId = viewPosition.getPath().getConceptId();
 		   Set<I_Position> positions = new HashSet<I_Position>();
 		   positions.add(viewPosition);
 		   List<I_ImageTuple> matchingTuples = new ArrayList<I_ImageTuple>();
 		   addTuples(allowedStatus, null, positions,
 		         matchingTuples);
+		   boolean promotedAnything = false;
 		   for (I_Path promotionPath: pomotionPaths) {
 			   for (I_ImageTuple it: matchingTuples) {
-				   I_ImagePart promotionPart = it.getPart().duplicate();
-				   promotionPart.setVersion(Integer.MAX_VALUE);
-				   promotionPart.setPathId(promotionPath.getConceptId());
-				   it.getVersioned().addVersion(promotionPart);
+				   if (it.getPathId() == viewPathId) {
+					   I_ImagePart promotionPart = it.getPart().duplicate();
+					   promotionPart.setVersion(Integer.MAX_VALUE);
+					   promotionPart.setPathId(promotionPath.getConceptId());
+					   it.getVersioned().addVersion(promotionPart);
+					   promotedAnything = true;
+				   }
 			   }
 		   }
-		   return matchingTuples.size() > 0;
+		   return promotedAnything;
 	   }
 
 

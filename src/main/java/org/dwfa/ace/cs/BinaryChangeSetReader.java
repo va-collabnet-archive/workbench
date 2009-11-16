@@ -602,7 +602,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 				ThinConVersioned oldVersioned = (ThinConVersioned) getVodb()
 						.getConceptAttributes(thinAttributes.getConId());
 				if (oldVersioned != null) {
-					oldVersioned.promote(thinAttributes);
+					oldVersioned.merge(thinAttributes);
 					AceLog.getEditLog().fine(
 							"Merging attributes with existing (should have been null): \n"
 									+ thinAttributes + "\n\n" + oldVersioned);

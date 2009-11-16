@@ -72,7 +72,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 		}
 	}
 
-	public class ThinIdCoreVersionedBinding extends TupleBinding {
+	public class ThinIdCoreVersionedBinding extends TupleBinding<I_IdVersioned> {
 
 		private static final byte INTEGER_ID = 1;
 		private static final byte LONG_ID = 2;
@@ -92,26 +92,34 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 					throw new RuntimeException(e);
 				}
 				byte idType = ti.readByte();
+				I_IdPart idPart;
 				switch (idType) {
 				case INTEGER_ID:
-					versioned.addVersion(new ThinIdIntegerPartWithCoreDelegate(ti.readInt(), core));
+					idPart = new ThinIdIntegerPartWithCoreDelegate(ti.readInt(), core);
+					assert versioned.getVersions().contains(idPart) == false;
+					versioned.addVersion(idPart);
 					break;
 				case LONG_ID:
-					versioned.addVersion(new ThinIdLongPartWithCoreDelegate(ti.readLong(), core));
+					idPart = new ThinIdLongPartWithCoreDelegate(ti.readLong(), core);
+					assert versioned.getVersions().contains(idPart) == false;
+					versioned.addVersion(idPart);
 					break;
 				case UUID_ID:
-					versioned.addVersion(new ThinIdUuidPartWithCoreDelegate(ti.readLong(), ti.readLong(), core));
+					idPart = new ThinIdUuidPartWithCoreDelegate(ti.readLong(), ti.readLong(), core);
+					assert versioned.getVersions().contains(idPart) == false;
+					versioned.addVersion(idPart);
 					break;
 				case STRING_ID:
-					versioned.addVersion(new ThinIdPartWithCoreDelegate(ti.readString(), core));
+					idPart = new ThinIdPartWithCoreDelegate(ti.readString(), core);
+					assert versioned.getVersions().contains(idPart) == false;
+					versioned.addVersion(idPart);
 					break;
 				}
 			}
 			return versioned;
 		}
 
-		public void objectToEntry(Object obj, TupleOutput to) {
-			I_IdVersioned versioned = (I_IdVersioned) obj;
+		public void objectToEntry(I_IdVersioned versioned, TupleOutput to) {
 			to.writeShort(versioned.getVersions().size());
 			for (I_IdPart id : versioned.getVersions()) {
 				try {
@@ -152,7 +160,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
 	private ThinIdCoreVersionedBinding idBinding = new ThinIdCoreVersionedBinding();
 
-	private TupleBinding intBinder = TupleBinding
+	private TupleBinding<Integer> intBinder = TupleBinding
 			.getPrimitiveBinding(Integer.class);
 
 	private Semaphore idPutSemaphore = new Semaphore(1);
@@ -426,7 +434,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 			// AceLog.getLog().info("Last id: " + lastId + " NewId: " +
 			// newId.getNativeId());
 			ThinIdPart idPart = new ThinIdPart();
-			idPart.setIdStatus(getCurrentStatusNid());
+			idPart.setStatusId(getCurrentStatusNid());
 			idPart.setPathId(pathId);
 			idPart.setSource(source);
 			idPart.setSourceId(uid);
@@ -460,7 +468,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 				// newId.getNativeId());
 				ThinIdPart idPart = new ThinIdPart();
 				for (UUID uid : uids) {
-					idPart.setIdStatus(getCurrentStatusNid());
+					idPart.setStatusId(getCurrentStatusNid());
 					idPart.setPathId(idPath.getConceptId());
 					idPart.setSource(source);
 					idPart.setSourceId(uid);
@@ -493,19 +501,18 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 			// create a new one...
 			try {
 				I_IdVersioned newId = new ThinIdVersioned(
-						nidGenerator.nextId(), 0);
-				// AceLog.getLog().info("Last id: " + lastId + " NewId: " +
-				// newId.getNativeId());
+						nidGenerator.nextId(), idPaths.size());
+				AceLog.getAppLog().info(" NewId: " + newId.getNativeId() + ", paths: " + idPaths);
 				ThinIdPart idPart = new ThinIdPart();
 				for (I_Path p : idPaths) {
-					idPart.setIdStatus(getCurrentStatusNid());
+					idPart.setStatusId(getCurrentStatusNid());
 					idPart.setPathId(p.getConceptId());
 					idPart.setSource(source);
 					idPart.setSourceId(uid);
 					idPart.setVersion(version);
+					AceLog.getAppLog().info(" adding version: " + idPart);
 					newId.addVersion(idPart);
 				}
-
 				writeId(newId);
 				return newId.getNativeId();
 			} catch (DatabaseException e2) {
@@ -610,18 +617,6 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 		return uuidToNativeWithGeneration(uids, source, idPath, version);
 	}
 
-	// TODO remove these after sufficient releases have gone by to ensure that
-	// the additional uids are no longer in use.
-	public static UUID originalStatedUuid = UUID
-			.fromString("3fde38f6-e079-3cdc-a819-eda3ec74732d");
-	public static UUID originalInferredUuid = UUID
-			.fromString("d8fb4fb0-18c3-3352-9431-4919193f85bc");
-
-	public static UUID additionalStatedUuid = UUID
-			.fromString("7cf285d6-a3b7-11dc-8314-0800200c9a66");
-	public static UUID additionalInferredUuid = UUID
-			.fromString("1ebef994-a3b8-11dc-8314-0800200c9a66");
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -649,20 +644,6 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 		Integer nid = uuidNidMapCache.get(uid);
 		if (nid != null) {
 			return nid;
-		}
-
-		if (uid.equals(originalStatedUuid) || uid.equals(additionalStatedUuid)) {
-			uuidNidMapCache.put(uid, PrimordialId.STATED_CHARACTERISTIC_ID
-					.getNativeId(Integer.MIN_VALUE));
-			return PrimordialId.STATED_CHARACTERISTIC_ID
-					.getNativeId(Integer.MIN_VALUE);
-		}
-		if (uid.equals(originalInferredUuid)
-				|| uid.equals(additionalInferredUuid)) {
-			uuidNidMapCache.put(uid, PrimordialId.INFERRED_CHARACTERISTIC_ID
-					.getNativeId(Integer.MIN_VALUE));
-			return PrimordialId.INFERRED_CHARACTERISTIC_ID
-					.getNativeId(Integer.MIN_VALUE);
 		}
 		DatabaseEntry idKey = new DatabaseEntry();
 		DatabaseEntry idValue = new DatabaseEntry();
@@ -704,17 +685,6 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 	public ThinIdVersioned getId(UUID uid) throws TerminologyException,
 			IOException {
 		ThinIdVersioned returnValue = getIdCore(uid);
-		if (returnValue == null) {
-			if (uid.equals(originalStatedUuid)) {
-				returnValue = getIdCore(additionalStatedUuid);
-			} else if (uid.equals(additionalStatedUuid)) {
-				returnValue = getIdCore(originalStatedUuid);
-			} else if (uid.equals(originalInferredUuid)) {
-				returnValue = getIdCore(additionalInferredUuid);
-			} else if (uid.equals(additionalInferredUuid)) {
-				returnValue = getIdCore(originalInferredUuid);
-			}
-		}
 		return returnValue;
 	}
 
@@ -784,6 +754,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 					if (p.getVersion() == Integer.MAX_VALUE) {
 						I_IdPart newPart = p.duplicate();
 						newPart.setVersion(version);
+						assert partsToAdd.contains(newPart) == false;
 						partsToAdd.add(newPart);
 						partsToRemove.add(p);
 						values.add(new TimePathId(version, p.getPathId()));

@@ -12,19 +12,15 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
-import org.dwfa.ace.api.I_ImagePart;
-import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
-import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinIdVersioned implements I_IdVersioned {
@@ -77,6 +73,7 @@ public class ThinIdVersioned implements I_IdVersioned {
 	 * @see org.dwfa.vodb.types.I_IdVersioned#addVersion(org.dwfa.vodb.types.I_IdPart)
 	 */
 	public boolean addVersion(I_IdPart srcId) {
+		assert versions.contains(srcId) == false;
 		return versions.add(srcId);
 	}
 	
@@ -84,12 +81,7 @@ public class ThinIdVersioned implements I_IdVersioned {
 	 * @see org.dwfa.vodb.types.I_IdVersioned#hasVersion(org.dwfa.vodb.types.I_IdPart)
 	 */
 	public boolean hasVersion(I_IdPart newPart) {
-		for (I_IdPart p: versions) {
-			if (p.equals(newPart)) {
-				return true;
-			}
-		}
-		return false;
+		return versions.contains(newPart);
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_IdVersioned#toString()
@@ -190,6 +182,7 @@ public class ThinIdVersioned implements I_IdVersioned {
 	}
 
    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+	   int viewPathId = viewPosition.getPath().getConceptId();
 	   Set<I_Position> positions = new HashSet<I_Position>();
 	   positions.add(viewPosition);
 	   List<I_IdTuple> matchingTuples = new ArrayList<I_IdTuple>();
@@ -197,14 +190,20 @@ public class ThinIdVersioned implements I_IdVersioned {
 	   if (matchingTuples.size() == 0) {
 		   matchingTuples.add(new ThinIdTuple(this, versions.get(0)));
 	   }
+	   boolean promotedAnything = false;
 	   for (I_Path promotionPath: pomotionPaths) {
 		   for (I_IdTuple it: matchingTuples) {
-			   I_IdPart promotionPart = it.getPart().duplicate();
-			   promotionPart.setVersion(Integer.MAX_VALUE);
-			   promotionPart.setPathId(promotionPath.getConceptId());
-			   it.getIdVersioned().addVersion(promotionPart);
+			   if (it.getPathId() == viewPathId) {
+				   I_IdPart promotionPart = it.getPart().duplicate();
+				   promotionPart.setVersion(Integer.MAX_VALUE);
+				   promotionPart.setPathId(promotionPath.getConceptId());
+				   if (versions.contains(promotionPart) == false) {
+					   it.getIdVersioned().addVersion(promotionPart);
+					   promotedAnything = true;
+				   }
+			   }
 		   }
 	   }
-	   return matchingTuples.size() > 0;
+	   return promotedAnything;
    }
  }
