@@ -29,16 +29,23 @@ import org.dwfa.util.bean.Spec;
 public class ShowRefsetSpecTask extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 1;
-    private I_TermFactory termFactory;
+    private static final int dataVersion = 2;
+
+    private String refsetUuidPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
+        out.writeObject(refsetUuidPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
+        if (objDataVersion <= dataVersion) {
+        	if (objDataVersion < 2) {
+        		refsetUuidPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
+        	} else {
+        		refsetUuidPropName = (String) in.readObject();
+        	}
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -52,9 +59,9 @@ public class ShowRefsetSpecTask extends AbstractTask {
 
         try {
 
-            termFactory = LocalVersionedTerminology.get();
+        	I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            Object obj = process.readProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey());
+            Object obj = process.getProperty(refsetUuidPropName);
             UUID uuid = null;
             if (obj == null) {
                 uuid = null;
@@ -88,4 +95,12 @@ public class ShowRefsetSpecTask extends AbstractTask {
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }
+
+	public String getRefsetUuidPropName() {
+		return refsetUuidPropName;
+	}
+
+	public void setRefsetUuidPropName(String refsetUuidPropName) {
+		this.refsetUuidPropName = refsetUuidPropName;
+	}
 }
