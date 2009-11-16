@@ -80,7 +80,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         // Nothing to do
     }
 
-    public Condition computeRefset(I_ConfigAceFrame configFrame, I_GetConceptData refset) throws Exception {
+    public Condition computeRefset(I_ConfigAceFrame configFrame, I_GetConceptData refset, boolean showActivityPanel)
+            throws Exception {
 
         long startTime = new Date().getTime();
         termFactory = LocalVersionedTerminology.get();
@@ -94,19 +95,26 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         Set<Integer> retiredMembers = new HashSet<Integer>();
 
         // initialise the progress panel
-        I_ShowActivity computeRefsetActivityPanel = termFactory.newActivityPanel(true, configFrame);
-        computeRefsetActivityPanel.setStringPainted(true);
-        computeRefsetActivityPanel.setValue(0);
-        computeRefsetActivityPanel.setIndeterminate(true);
-        ProgressReport progressReportHtmlGenerator = new ProgressReport();
-        progressReportHtmlGenerator.setDatabaseCount(conceptsToProcess);
-        progressReportHtmlGenerator.setStartTime(startTime);
+        I_ShowActivity computeRefsetActivityPanel = null;
+        ProgressReport progressReportHtmlGenerator = null;
+        if (showActivityPanel) {
+            computeRefsetActivityPanel = termFactory.newActivityPanel(true, configFrame);
+            computeRefsetActivityPanel.setStringPainted(true);
+            computeRefsetActivityPanel.setValue(0);
+            computeRefsetActivityPanel.setIndeterminate(true);
+            progressReportHtmlGenerator = new ProgressReport();
+            progressReportHtmlGenerator.setDatabaseCount(conceptsToProcess);
+            progressReportHtmlGenerator.setStartTime(startTime);
+        }
 
         if (refset == null) {
-            progressReportHtmlGenerator.setComplete(true);
-            computeRefsetActivityPanel.complete();
+            if (showActivityPanel) {
+                progressReportHtmlGenerator.setComplete(true);
+                computeRefsetActivityPanel.complete();
+                computeRefsetActivityPanel.setProgressInfoLower("Refset is null.");
+            }
+
             getLogger().info("Refset is null.");
-            computeRefsetActivityPanel.setProgressInfoLower("Refset is null.");
             throw new TaskFailedException("Refset is null.");
         }
 
@@ -115,32 +123,35 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         // verify a valid refset spec construction
         if (refsetSpec == null) {
-            progressReportHtmlGenerator.setComplete(true);
-            computeRefsetActivityPanel.complete();
+            if (showActivityPanel) {
+                progressReportHtmlGenerator.setComplete(true);
+                computeRefsetActivityPanel.complete();
+                computeRefsetActivityPanel.setProgressInfoLower("Refset spec is null.");
+            }
+
             getLogger().info("Refset spec is null.");
-            computeRefsetActivityPanel.setProgressInfoLower("Refset spec is null.");
             throw new TaskFailedException("Refset spec is null.");
         }
 
-        computeRefsetActivityPanel.setProgressInfoUpper("Computing refset " + ": " + refset.getInitialText());
-
-        // set up cancel button on activity viewer panel
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 2;
-        c.gridy = 0;
-        c.gridheight = 1;
-        c.weightx = 0;
-        c.weighty = 0;
-        c.anchor = GridBagConstraints.EAST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        JButton cancelButton = computeRefsetActivityPanel.getStopButton();
-        if (cancelButton == null) {
-            cancelButton = new JButton("Cancel");
-            computeRefsetActivityPanel.getViewPanel().add(cancelButton, c);
+        if (showActivityPanel) {
+            computeRefsetActivityPanel.setProgressInfoUpper("Computing refset " + ": " + refset.getInitialText());
+            // set up cancel button on activity viewer panel
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 2;
+            c.gridy = 0;
+            c.gridheight = 1;
+            c.weightx = 0;
+            c.weighty = 0;
+            c.anchor = GridBagConstraints.EAST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            JButton cancelButton = computeRefsetActivityPanel.getStopButton();
+            if (cancelButton == null) {
+                cancelButton = new JButton("Cancel");
+                computeRefsetActivityPanel.getViewPanel().add(cancelButton, c);
+            }
+            cancelButton.addActionListener(new ButtonListener(this));
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
         }
-        cancelButton.addActionListener(new ButtonListener(this));
-
-        computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
 
         // Step 1: create the query object, based on the refset spec
         RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
@@ -149,18 +160,23 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         // check validity of query
         if (query.getTotalStatementCount() == 0) {
-            progressReportHtmlGenerator.setComplete(true);
-            computeRefsetActivityPanel.complete();
+            if (showActivityPanel) {
+                progressReportHtmlGenerator.setComplete(true);
+                computeRefsetActivityPanel.complete();
+                computeRefsetActivityPanel.setProgressInfoLower("Refset spec is empty - skipping execution.");
+            }
+
             getLogger().info("Refset spec is empty - skipping execution.");
-            computeRefsetActivityPanel.setProgressInfoLower("Refset spec is empty - skipping execution.");
             throw new TaskFailedException("Refset spec is empty - skipping execution.");
         }
         if (!query.isValidQuery()) {
-            progressReportHtmlGenerator.setComplete(true);
-            computeRefsetActivityPanel.complete();
+            if (showActivityPanel) {
+                progressReportHtmlGenerator.setComplete(true);
+                computeRefsetActivityPanel.complete();
+                computeRefsetActivityPanel
+                    .setProgressInfoLower("Refset spec has dangling AND/OR. These must have sub-statements.");
+            }
             getLogger().info("Refset spec has dangling AND/OR. These must have sub-statements.");
-            computeRefsetActivityPanel
-                .setProgressInfoLower("Refset spec has dangling AND/OR. These must have sub-statements.");
             throw new TaskFailedException("Refset spec has dangling AND/OR. These must have sub-statements.");
         }
 
@@ -169,7 +185,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         Set<Integer> nestedRefsets = query.getNestedRefsets();
         for (Integer nestedRefsetId : nestedRefsets) {
             try {
-                computeRefset(configFrame, termFactory.getConcept(nestedRefsetId));
+                computeRefset(configFrame, termFactory.getConcept(nestedRefsetId), showActivityPanel);
             } catch (TaskFailedException e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Error computing dependant refset: "
@@ -181,8 +197,10 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         getLogger().info("Start execution of refset spec : " + refsetSpec.getInitialText());
 
-        progressReportHtmlGenerator.setStep1Complete(true);
-        computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+        if (showActivityPanel) {
+            progressReportHtmlGenerator.setStep1Complete(true);
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+        }
 
         // create a list of all the current refset members (this requires
         // filtering out retired versions)
@@ -197,8 +215,10 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         getLogger().info("************* Search space: " + possibleConcepts.size() + " concepts *******");
 
-        computeRefsetActivityPanel.setMaximum(termFactory.getConceptCount());
-        computeRefsetActivityPanel.setIndeterminate(false);
+        if (showActivityPanel) {
+            computeRefsetActivityPanel.setMaximum(termFactory.getConceptCount());
+            computeRefsetActivityPanel.setIndeterminate(false);
+        }
 
         I_IterateIds nidIterator = possibleConcepts.iterator();
         while (nidIterator.next()) {
@@ -220,10 +240,13 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 }
 
                 if (conceptsProcessed % 10000 == 0) {
-                    progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
-                    progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
-                    computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
-                    computeRefsetActivityPanel.setValue(conceptsProcessed);
+                    if (showActivityPanel) {
+                        progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
+                        progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
+                        computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+                        computeRefsetActivityPanel.setValue(conceptsProcessed);
+                    }
+
                     getLogger()
                         .info("Concepts processed: " + conceptsProcessed + " / " + termFactory.getConceptCount());
                     getLogger().info("New members: " + newMembers.size());
@@ -235,20 +258,24 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             }
         }
 
-        progressReportHtmlGenerator.setStep2Complete(true);
-        progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
-        progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
-        computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
-        computeRefsetActivityPanel.setIndeterminate(true);
-        computeRefsetActivityPanel.setStringPainted(false);
+        if (showActivityPanel) {
+            progressReportHtmlGenerator.setStep2Complete(true);
+            progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
+            progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+            computeRefsetActivityPanel.setIndeterminate(true);
+            computeRefsetActivityPanel.setStringPainted(false);
+        }
 
         if (cancelComputation) {
             termFactory.cancel();
-            cancelButton.setEnabled(false);
-            cancelButton.setVisible(false);
-            progressReportHtmlGenerator.setComplete(true);
-            computeRefsetActivityPanel.complete();
-            computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
+            if (showActivityPanel) {
+                computeRefsetActivityPanel.getStopButton().setEnabled(false);
+                computeRefsetActivityPanel.getStopButton().setVisible(false);
+                progressReportHtmlGenerator.setComplete(true);
+                computeRefsetActivityPanel.complete();
+                computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
+            }
             throw new TaskFailedException("User cancelled refset computation.");
         }
 
@@ -262,8 +289,11 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 break;
             }
         }
-        progressReportHtmlGenerator.setStep3Complete(true);
-        computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+
+        if (showActivityPanel) {
+            progressReportHtmlGenerator.setStep3Complete(true);
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+        }
 
         // Step 4: retire old member refsets
         getLogger().info("Retiring old member refsets.");
@@ -274,8 +304,11 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 break;
             }
         }
-        progressReportHtmlGenerator.setStep4Complete(true);
-        computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+
+        if (showActivityPanel) {
+            progressReportHtmlGenerator.setStep4Complete(true);
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+        }
 
         // Step 5 : add / remove marked parent refsets
         if (termFactory.hasId(markedParentsUuid)) {
@@ -301,8 +334,10 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         getLogger().info("Finished component creation : " + minutes + " minutes, " + seconds + " seconds.");
 
-        progressReportHtmlGenerator.setStep5Complete(true);
-        computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+        if (showActivityPanel) {
+            progressReportHtmlGenerator.setStep5Complete(true);
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+        }
 
         long endTime = new Date().getTime();
         long totalMinutes = (endTime - startTime) / 60000;
@@ -317,19 +352,23 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         getLogger().info("Total execution time: " + executionTimeString);
         getLogger().info(">>>>>> COMPLETE <<<<<<");
 
-        progressReportHtmlGenerator.setMembersCount(newMembers.size());
-        progressReportHtmlGenerator.setNonMembersCleanedCount(retiredMembers.size());
-        progressReportHtmlGenerator.setEndTime(new Date().getTime());
-        progressReportHtmlGenerator.setComplete(true);
-        computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
-        computeRefsetActivityPanel.complete();
-        cancelButton.setEnabled(false);
-        cancelButton.setVisible(false);
+        if (showActivityPanel) {
+            progressReportHtmlGenerator.setMembersCount(newMembers.size());
+            progressReportHtmlGenerator.setNonMembersCleanedCount(retiredMembers.size());
+            progressReportHtmlGenerator.setEndTime(new Date().getTime());
+            progressReportHtmlGenerator.setComplete(true);
+            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+            computeRefsetActivityPanel.complete();
+            computeRefsetActivityPanel.getStopButton().setEnabled(false);
+            computeRefsetActivityPanel.getStopButton().setVisible(false);
+        }
 
         if (cancelComputation) {
             termFactory.cancel();
-            progressReportHtmlGenerator.setComplete(true);
-            computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
+            if (showActivityPanel) {
+                progressReportHtmlGenerator.setComplete(true);
+                computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
+            }
             throw new TaskFailedException("User cancelled refset computation.");
         }
 
@@ -341,7 +380,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             I_ConfigAceFrame configFrame =
                     (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
-            computeRefset(configFrame, refset);
+            boolean showActivityPanel = true;
+            computeRefset(configFrame, refset, showActivityPanel);
             return Condition.CONTINUE;
         } catch (Exception ex) {
             ex.printStackTrace();
