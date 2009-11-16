@@ -52,16 +52,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
     * @see org.dwfa.vodb.types.I_DescriptionVersioned#addVersion(org.dwfa.vodb.types.I_DescriptionPart)
     */
    public boolean addVersion(I_DescriptionPart newPart) {
-      int index = versions.size() - 1;
-      if (index == -1) {
-         return versions.add(newPart);
-      } else if (index >= 0) {
-         I_DescriptionPart prevDesc = versions.get(index);
-         if (prevDesc.hasNewData(newPart)) {
-            return versions.add(newPart);
-         }
-      }
-      return false;
+     return versions.add(newPart);
    }
 
    /*

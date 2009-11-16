@@ -103,7 +103,7 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
 	 */
 	public boolean hasNewData(I_IdPart another) {
 		return ((this.getPathId() != another.getPathId()) ||
-				(this.getIdStatus() != another.getStatusId()) ||
+				(this.getStatusId() != another.getStatusId()) ||
 				(this.getSource() != another.getSource()) ||
 				getSourceId().equals(another.getSourceId()) == false);
 	}

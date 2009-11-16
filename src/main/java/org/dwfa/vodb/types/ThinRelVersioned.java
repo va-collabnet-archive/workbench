@@ -62,13 +62,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 	 * @see org.dwfa.vodb.types.I_RelVersioned#addVersion(org.dwfa.vodb.types.I_RelPart)
 	 */
 	public boolean addVersion(I_RelPart rel) {
-		int index = versions.size() - 1;
-		if (index == -1) {
-			return versions.add(rel);
-		} else if ((index >= 0) && (versions.get(index).hasNewData(rel))) {
-			return versions.add(rel);
-		}
-		return false;
+		return versions.add(rel);
 	}
 
 	/*

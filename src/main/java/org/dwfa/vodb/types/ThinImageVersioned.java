@@ -86,20 +86,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#addVersion(org.dwfa.vodb.types.ThinImagePart)
 	 */
 	public boolean addVersion(I_ImagePart part) {
-		int index = versions.size() - 1;
-		if (index == -1) {
-			return versions.add(part);
-		} else if (index >= 0) {
-			I_ImagePart prevPart = versions.get(index);
-			if (prevPart.hasNewData(part)) {
-				if (prevPart.getTextDescription().equals(
-						part.getTextDescription())) {
-					part.setTextDescription(prevPart.getTextDescription());
-				}
-				return versions.add(part);
-			}
-		}
-		return false;
+		return versions.add(part);
 	}
 
 	/*

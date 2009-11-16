@@ -77,14 +77,7 @@ public class ThinIdVersioned implements I_IdVersioned {
 	 * @see org.dwfa.vodb.types.I_IdVersioned#addVersion(org.dwfa.vodb.types.I_IdPart)
 	 */
 	public boolean addVersion(I_IdPart srcId) {
-		int index = versions.size() - 1;
-		if (index == -1) {
-			return versions.add(srcId);
-		} else if ((index >= 0)
-				&& (versions.get(index).hasNewData(srcId))) {
-			return versions.add(srcId);
-		}
-		return false;
+		return versions.add(srcId);
 	}
 	
 	/* (non-Javadoc)

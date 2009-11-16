@@ -51,13 +51,7 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#addVersion(org.dwfa.vodb.types.ThinConPart)
 	 */
 	public boolean addVersion(I_ConceptAttributePart part) {
-		int index = versions.size() - 1;
-		if (index == -1) {
-			return versions.add(part);
-		} else if ((index >= 0) && (versions.get(index).hasNewData(part))) {
-			return versions.add(part);
-		}
-		return false;
+		return versions.add(part);
 	}
 
 	/*
