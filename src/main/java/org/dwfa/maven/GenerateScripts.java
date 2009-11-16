@@ -250,6 +250,7 @@ public class GenerateScripts extends AbstractMojo {
 
 			// write debug options
 			if(debug) {
+				writeLine(fw, "-ea");
 				writeLine(fw, "-Xdebug");
 				writeLine(fw, "-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
 			}
