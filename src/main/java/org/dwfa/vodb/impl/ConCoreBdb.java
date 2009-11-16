@@ -52,29 +52,28 @@ public class ConCoreBdb implements I_StoreInBdb {
 		}
 	}
 
-	private static class ThinConPartVersionedBinding extends TupleBinding {
+	private static class ThinConPartVersionedBinding extends TupleBinding<I_ConceptAttributePart> {
 
 		public ThinConPart entryToObject(TupleInput ti) {
 			ThinConPart con = new ThinConPart();
 			con.setPathId(ti.readInt());
 			con.setVersion(ti.readInt());
-			con.setConceptStatus(ti.readInt());
+			con.setStatusId(ti.readInt());
 			con.setDefined(ti.readBoolean());
 			return con;
 		}
 
-		public void objectToEntry(Object obj, TupleOutput to) {
-			I_ConceptAttributePart con = (I_ConceptAttributePart) obj;
+		public void objectToEntry(I_ConceptAttributePart con, TupleOutput to) {
 			to.writeInt(con.getPathId());
 			to.writeInt(con.getVersion());
-			to.writeInt(con.getConceptStatus());
+			to.writeInt(con.getStatusId());
 			to.writeBoolean(con.isDefined());
 		}
 
 	}
 
 	private ThinConPartVersionedBinding conPartBinding = new ThinConPartVersionedBinding();
-	private TupleBinding intBinder = TupleBinding
+	private TupleBinding<Integer> intBinder = TupleBinding
 			.getPrimitiveBinding(Integer.class);
 
 	private Database conPartDb;

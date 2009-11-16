@@ -2240,5 +2240,4 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 		}
 		return new IntSet(conceptNids);
 	}
-
 }

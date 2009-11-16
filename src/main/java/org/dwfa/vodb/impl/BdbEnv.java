@@ -330,10 +330,12 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 	public void sync() throws DatabaseException {
 		if (VodbEnv.isDeferredWrite()) {
 			if (env.getConfig().getReadOnly()) {
+				AceLog.getAppLog().info("Read only environment requires no sync.");
 				return;
 			}
 			if (!env.getConfig().getReadOnly()) {
 				for (I_StoreInBdb store : databases) {
+					AceLog.getAppLog().info("Syncing: " + store.toString());
 					store.sync();
 				}
 				env.sync();
@@ -343,12 +345,14 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes,
 			CheckpointConfig check = new CheckpointConfig();
 			check.setForce(true);
 			if (env != null) {
+				AceLog.getAppLog().info("Starting checkpoint.");
 				env.checkpoint(check);				
+				AceLog.getAppLog().info("Finished checkpoint.");
 			}
 		}
-
 	}
 
+	
 	public Map<String, String> getProperties() throws IOException {
 		return metaBdb.getProperties();
 	}
