@@ -826,6 +826,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes,
 								descMapFuture.get();
 								StringBuffer buff = new StringBuffer();
 								buff.append(e.getLocalizedMessage());
+								buff.append("desc map size: ");
+								buff.append(descMap.nextId);
 								for (short i = 0; i < descMap.nextId; i++) {
 									buff.append("\n  desc[");
 									buff.append(i);

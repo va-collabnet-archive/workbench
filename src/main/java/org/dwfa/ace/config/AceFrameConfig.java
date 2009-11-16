@@ -830,7 +830,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     IntList il = IntList.readIntListIgnoreMapErrors(in);
                     List<I_GetConceptData> tabHistoryList = new LinkedList<I_GetConceptData>();
                     for (int nid : il.getListArray()) {
-                        tabHistoryList.add(ConceptBean.get(nid));
+                        try {
+							tabHistoryList.add(ConceptBean.get(nid));
+						} catch (Exception e) {
+							AceLog.getAppLog().alertAndLogException(e);
+						}
                     }
                     tabHistoryMap.put(mapId, tabHistoryList);
                 }
