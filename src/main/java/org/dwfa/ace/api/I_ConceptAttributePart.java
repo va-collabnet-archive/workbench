@@ -20,4 +20,6 @@ public interface I_ConceptAttributePart extends I_AmPart {
 
 	public I_ConceptAttributePart duplicate();
 
+	public boolean hasNewData(I_ConceptAttributePart another);
+
 }
