@@ -234,4 +234,12 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
         this.originalRequestPropName = originalRequestPropName;
     }
 
+	public String getRefsetSpecUuidPropName() {
+		return refsetSpecUuidPropName;
+	}
+
+	public void setRefsetSpecUuidPropName(String refsetSpecUuidPropName) {
+		this.refsetSpecUuidPropName = refsetSpecUuidPropName;
+	}
+
 }
