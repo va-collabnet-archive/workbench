@@ -3,7 +3,9 @@ package org.dwfa.ace.task.refset.spec.compute;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -356,6 +358,25 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
         }
         return true;
+    }
+
+    public Set<Integer> getNestedRefsets() {
+        Set<Integer> results = new HashSet<Integer>();
+        for (RefsetSpecStatement statement : statements) {
+            switch (statement.getTokenEnum()) {
+            case CONCEPT_IS_MEMBER_OF:
+            case DESC_IS_MEMBER_OF:
+            case REL_IS_MEMBER_OF:
+                results.add(statement.queryConstraint.getConceptId());
+                break;
+            default:
+                break;
+            }
+        }
+        for (RefsetSpecQuery query : subqueries) {
+            results.addAll(query.getNestedRefsets());
+        }
+        return results;
     }
 
     public void setTotalStatementCount(int totalStatementCount) {
