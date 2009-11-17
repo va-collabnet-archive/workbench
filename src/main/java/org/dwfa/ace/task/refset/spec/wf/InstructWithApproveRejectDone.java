@@ -151,11 +151,12 @@ public class InstructWithApproveRejectDone extends AbstractTask {
                     if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptId(), approveId)) {
                         // nothing to do
                     } else {
-                        // refsetHelper.retireConceptExtension(refsetId, concept.getConceptId());
                         refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptId(), approveId);
                         temporaryList.remove(concept);
                     }
                 }
+
+                termFactory.commit();
 
                 model.clear();
                 for (I_GetConceptData c : temporaryList) {
@@ -205,11 +206,12 @@ public class InstructWithApproveRejectDone extends AbstractTask {
                     if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptId(), rejectId)) {
                         // nothing to do
                     } else {
-                        // refsetHelper.retireConceptExtension(refsetId, concept.getConceptId());
                         refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptId(), rejectId);
                         temporaryList.remove(concept);
                     }
                 }
+
+                termFactory.commit();
 
                 model.clear();
                 for (I_GetConceptData c : temporaryList) {
@@ -293,13 +295,7 @@ public class InstructWithApproveRejectDone extends AbstractTask {
         workflowPanel.add(workflowBox);
         workflowPanel.validate();
         workflowPanel.setVisible(true);
-        Container cont = workflowPanel;
-        /*
-         * while (cont != null) {
-         * cont.validate();
-         * cont = cont.getParent();
-         * }
-         */
+
         workflowPanel.setPreferredSize(new Dimension(0, 0));
         workflowPanel.setMaximumSize(new Dimension(0, 0));
         workflowPanel.setMinimumSize(new Dimension(0, 0));

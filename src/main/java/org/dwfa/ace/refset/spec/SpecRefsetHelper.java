@@ -1169,7 +1169,6 @@ public class SpecRefsetHelper {
                         clone.setC1id(c1Id);
                         extension.addVersion(clone);
                         termFactory.addUncommittedNoChecks(extension);
-                        termFactory.commit();
                         return true;
                     }
                 }
@@ -1209,7 +1208,6 @@ public class SpecRefsetHelper {
                             clone.setVersion(Integer.MAX_VALUE);
                             extension.addVersion(clone);
                             termFactory.addUncommittedNoChecks(extension);
-                            termFactory.commit();
                             return true;
                         }
                     }
