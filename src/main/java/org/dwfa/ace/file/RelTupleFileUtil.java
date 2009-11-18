@@ -228,7 +228,8 @@ public class RelTupleFileUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage = "Exception of unknown cause thrown while importing rel tuple";
+            String errorMessage =
+                    "Exception of unknown cause thrown while importing rel tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

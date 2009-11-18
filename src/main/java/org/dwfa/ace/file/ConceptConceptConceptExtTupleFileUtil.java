@@ -165,7 +165,9 @@ public class ConceptConceptConceptExtTupleFileUtil {
                     termFactory.getId(c2Uuid).getNativeId(), termFactory.getId(c3Uuid).getNativeId(), memberUuid,
                     pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
-                String errorMessage = "Exception thrown while creating new concept-concept-concept refset extension";
+                String errorMessage =
+                        "Exception thrown while creating new concept-concept-concept refset extension : "
+                            + e.getLocalizedMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();

@@ -109,7 +109,7 @@ public class IDTupleFileUtil {
 
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage = "Exception of unknown cause thrown while importing ID tuple";
+            String errorMessage = "Exception while importing ID tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
