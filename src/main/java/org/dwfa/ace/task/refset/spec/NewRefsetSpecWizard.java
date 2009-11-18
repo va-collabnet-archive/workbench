@@ -179,6 +179,8 @@ public class NewRefsetSpecWizard {
                     nextButton.setEnabled(true);
                     backButton.setEnabled(true);
                     cancelButton.setEnabled(true);
+                    NewRefsetSpecForm2 form2 = (NewRefsetSpecForm2) getCurrentPanel();
+                    form2.layoutComponents();
                 }
             } else if (currentPanel.equals("panel2")) {
                 NewRefsetSpecForm2 form2 = (NewRefsetSpecForm2) getCurrentPanel();

@@ -93,6 +93,10 @@ public class NewRefsetSpecForm2 extends JPanel {
         priorityComboBox = new JComboBox(new String[] { "Highest", "High", "Normal", "Low", "Lowest" });
         addReviewerButton = new JButton("Add reviewer");
 
+        setUpComboBoxes();
+    }
+
+    private void setUpComboBoxes() {
         NewRefsetSpecForm1 form1 = (NewRefsetSpecForm1) wizard.getPanelFromString("panel1");
         String parentString = form1.getSelectedParent();
 
@@ -148,10 +152,12 @@ public class NewRefsetSpecForm2 extends JPanel {
         addReviewerButton.addActionListener(new ButtonListener());
     }
 
-    private void layoutComponents() {
+    public void layoutComponents() {
 
         this.setLayout(new GridBagLayout());
         this.removeAll();
+
+        setUpComboBoxes();
 
         // requestor
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
