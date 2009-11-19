@@ -197,18 +197,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 						FileIO.getNormalizedRelativePath(changeSetFile),
 						Long.toString(changeSetFile.length()));
 			} catch (Exception e) {
-				if (firstException) {
-					AceLog.getEditLog().alertAndLog(
-							Level.SEVERE,
-							"Exception. Ignoring component, and continuing import. Examine log for future exceptions. ",
-									e);
-					firstException = false;
-				} else {
-					AceLog.getEditLog().log(
-							Level.SEVERE,
-							"Exception. Ignoring component, and continuing import. Examine log for future exceptions. ",
-									e);
-				}
+				throw new IOException(e);
 			} 
 		}
 		try {

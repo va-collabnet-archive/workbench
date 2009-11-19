@@ -3161,13 +3161,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 commitHistoryTableModel.removeElement(commitHistoryTableModel.getSize() - 1);
             }
         } else if (evt.getPropertyName().equals("commitEnabled")) {
-            commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
-            if (aceFrameConfig.isCommitEnabled()) {
-                commitButton.setText("<html><b><font color='green'>commit</font></b>");
-            } else {
-                commitButton.setText("commit");
-            }
-            cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
+        	if (commitButton != null) {
+                commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
+                if (aceFrameConfig.isCommitEnabled()) {
+                    commitButton.setText("<html><b><font color='green'>commit</font></b>");
+                } else {
+                    commitButton.setText("commit");
+                }
+        	}
+        	if (cancelButton != null) {
+                cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
+        	}
         } else if (evt.getPropertyName().equals("lastViewed")) {
             viewerHistoryTableModel.addElement(0, (ConceptBean) evt.getNewValue());
             while (viewerHistoryTableModel.getSize() > maxHistoryListSize) {
