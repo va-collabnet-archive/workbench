@@ -93,6 +93,7 @@ public class AceRunner {
 	public File aceConfigFile;
 	public Properties aceProperties;
 	public Boolean initializeFromSubversion = false;
+	public String[] svnUpdateOnStart = null;
 
 	public AceRunner(String[] args, LifeCycle lc) {
 		try {
@@ -143,6 +144,8 @@ public class AceRunner {
 						"config/config.ace"));
 				initializeFromSubversion = (Boolean) jiniConfig.getEntry(this.getClass()
 						.getName(), "initFromSubversion", Boolean.class, Boolean.FALSE);
+				svnUpdateOnStart = (String[]) jiniConfig.getEntry(this.getClass()
+						.getName(), "svnUpdateOnStart", String[].class, null);
 			} else {
 				aceConfigFile = new File("config/config.ace");
 			}
@@ -150,10 +153,9 @@ public class AceRunner {
 
 			SvnPrompter prompter = new SvnPrompter();
 			File profileDir = new File("profiles");
-			if (profileDir.exists() == false && initializeFromSubversion) {
+			if ((profileDir.exists() == false && initializeFromSubversion) || (svnUpdateOnStart != null)) {
 				new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(
-						new File("config", "ace.properties"),
-						true);
+						new File("config", "ace.properties"));
 			} else if (profileDir.exists()) {
 				ArrayList<File> profileLoc = new ArrayList<File>();
 				profileLoc.add(profileDir);

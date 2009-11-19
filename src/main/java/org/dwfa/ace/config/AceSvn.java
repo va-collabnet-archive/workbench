@@ -49,6 +49,7 @@ class AceSvn {
 	private String[] csImportOnStart = null;
 	private List<File> changeLocations = new ArrayList<File>();
 	private Class jiniClass;
+	private static boolean connectToSubversion = false;
 
 	public AceSvn(Class jiniClassToSet, Configuration jiniConfigToSet) throws ConfigurationException {
 		jiniClass = jiniClassToSet;
@@ -125,12 +126,14 @@ class AceSvn {
 		if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
 				|| (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
 				|| (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
-			boolean connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane
-					.showConfirmDialog(
-							LogWithAlerts.getActiveFrame(null),
-							"Would you like to connect over the network to Subversion?",
-							"Confirm network operation",
-							JOptionPane.YES_NO_OPTION));
+			if (connectToSubversion == false) {
+				connectToSubversion  = (JOptionPane.YES_OPTION == JOptionPane
+						.showConfirmDialog(
+								LogWithAlerts.getActiveFrame(null),
+								"Would you like to connect over the network to Subversion?",
+								"Confirm network operation",
+								JOptionPane.YES_NO_OPTION));
+			}
 			if (connectToSubversion) {
 				if (svnCheckoutProfileOnStart != null
 						&& svnCheckoutProfileOnStart.length() > 0) {
@@ -266,8 +269,10 @@ class AceSvn {
 			boolean depthIsSticky = false;
 			boolean ignoreExternals = false;
 			boolean allowUnverObstructions = false;
+			AceLog.getAppLog().info("Starting svn update for: " + path);
 			Svn.getSvnClient().update(path, revision, depth, depthIsSticky,
 					ignoreExternals, allowUnverObstructions);
+			AceLog.getAppLog().info("Finished svn update for: " + path);
 			changeLocations.add(new File(path));
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
