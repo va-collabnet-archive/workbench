@@ -107,8 +107,10 @@ class AceSvn {
 				aceProperties.storeToXML(
 						new FileOutputStream(acePropertiesFile), null);
 			} else {
-				throw new TaskFailedException(
-						"User did not want to connect to Subversion.");
+				if (new File("profiles").exists() == false) {
+					throw new TaskFailedException(
+					"User did not want to connect to Subversion.");
+				}
 			}
 		} else if (changeLocations.size() > 0) {
 			doStealthChangeSetImport(changeLocations);			
@@ -158,8 +160,10 @@ class AceSvn {
 				aceProperties.storeToXML(
 						new FileOutputStream(acePropertiesFile), null);
 			} else {
-				throw new TaskFailedException(
-						"User did not want to connect to Subversion.");
+				if (new File("profiles").exists() == false) {
+					throw new TaskFailedException(
+					"User did not want to connect to Subversion.");
+				}
 			}
 		} else if (changeLocations.size() > 0) {
 			doStealthChangeSetImport(changeLocations);			
