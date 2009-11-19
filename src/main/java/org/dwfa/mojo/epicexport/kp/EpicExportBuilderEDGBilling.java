@@ -35,7 +35,7 @@ public class EpicExportBuilderEDGBilling extends AbstractEpicExportBuilder imple
 				writer.newRecord();
 				writeItem("2");
 				writeItem("40");
-				writeItemIfChanged("2000");
+				writeItem("2000");
 				writeItemIfChanged("207");
 				writer.saveRecord();
 				
