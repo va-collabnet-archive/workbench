@@ -41,7 +41,6 @@ public class SpecRefsetHelper {
 
     protected I_TermFactory termFactory;
 
-    protected int currentStatusId;
     protected int retiredStatusId;
     protected int conceptTypeId;
 
@@ -56,7 +55,6 @@ public class SpecRefsetHelper {
 
     public SpecRefsetHelper() throws Exception {
         termFactory = LocalVersionedTerminology.get();
-        currentStatusId = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
         retiredStatusId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
         unspecifiedUuid = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid();
         conceptTypeId = RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();
@@ -88,8 +86,10 @@ public class SpecRefsetHelper {
             }
 
             // confirm its the right extension value and its status is current
-            if (latestPart != null && latestPart.getStatusId() == currentStatusId) {
-                return latestPart;
+            for (Integer currentStatus : getCurrentStatusIds()) {
+                if (latestPart != null && latestPart.getStatusId() == currentStatus) {
+                    return latestPart;
+                }
             }
         }
         return null;
@@ -420,7 +420,7 @@ public class SpecRefsetHelper {
             I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
 
             conceptExtension.setPathId(editPath.getConceptId());
-            conceptExtension.setStatusId(currentStatusId);
+            conceptExtension.setStatusId(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
             conceptExtension.setVersion(Integer.MAX_VALUE);
             conceptExtension.setC1id(memberTypeId);
 
@@ -456,7 +456,9 @@ public class SpecRefsetHelper {
                 memberUuid = UUID.randomUUID();
             }
             if (statusUuid == null) {
-                statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
+                statusUuid =
+                        termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()).getUids()
+                            .iterator().next();
             }
 
             int extTypeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid();
@@ -528,7 +530,9 @@ public class SpecRefsetHelper {
                 memberUuid = UUID.randomUUID();
             }
             if (statusUuid == null) {
-                statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
+                statusUuid =
+                        termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()).getUids()
+                            .iterator().next();
             }
 
             int extTypeId = RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid();
@@ -598,7 +602,9 @@ public class SpecRefsetHelper {
                 memberUuid = UUID.randomUUID();
             }
             if (statusUuid == null) {
-                statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
+                statusUuid =
+                        termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()).getUids()
+                            .iterator().next();
             }
 
             int extTypeId = RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.localize().getNid();
@@ -670,7 +676,9 @@ public class SpecRefsetHelper {
             memberUuid = UUID.randomUUID();
         }
         if (statusUuid == null) {
-            statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
+            statusUuid =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()).getUids()
+                        .iterator().next();
         }
 
         int extTypeId = RefsetAuxiliary.Concept.INT_EXTENSION.localize().getNid();
@@ -730,7 +738,9 @@ public class SpecRefsetHelper {
             memberUuid = UUID.randomUUID();
         }
         if (statusUuid == null) {
-            statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
+            statusUuid =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()).getUids()
+                        .iterator().next();
         }
 
         int extTypeId = RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();
@@ -797,7 +807,9 @@ public class SpecRefsetHelper {
             memberUuid = UUID.randomUUID();
         }
         if (statusUuid == null) {
-            statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
+            statusUuid =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()).getUids()
+                        .iterator().next();
         }
 
         // check subject is not already a member
@@ -873,7 +885,9 @@ public class SpecRefsetHelper {
             memberUuid = UUID.randomUUID();
         }
         if (statusUuid == null) {
-            statusUuid = termFactory.getConcept(currentStatusId).getUids().iterator().next();
+            statusUuid =
+                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()).getUids()
+                        .iterator().next();
         }
 
         // create a new extension (with a part for each path the user is
@@ -938,23 +952,30 @@ public class SpecRefsetHelper {
                     }
                 }
 
-                // confirm its the right extension value and its status is
-                // current
-                if (latestPart.getStatusId() == currentStatusId) {
-                    if (latestPart instanceof I_ThinExtByRefPartConcept) {
-                        int partValue = ((I_ThinExtByRefPartConcept) latestPart).getC1id();
-                        if (partValue == memberTypeId) {
-                            // found a member to retire
+                // confirm its the right extension value and its status is one of the possible current status IDs
+                for (Integer statusId : getCurrentStatusIds()) {
+                    if (latestPart.getStatusId() == statusId) {
+                        if (latestPart instanceof I_ThinExtByRefPartConcept) {
+                            int partValue = ((I_ThinExtByRefPartConcept) latestPart).getC1id();
+                            if (partValue == memberTypeId) {
+                                // found a member to retire
+                                for (I_Path editPath : getEditPaths()) {
 
-                            I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                            clone.setStatusId(retiredStatusId);
-                            clone.setVersion(Integer.MAX_VALUE);
-                            extension.addVersion(clone);
-                            termFactory.addUncommittedNoChecks(extension);
-                            return true;
+                                    I_ThinExtByRefPartConcept clone =
+                                            (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                                    clone.setStatusId(retiredStatusId);
+                                    clone.setPathId(editPath.getConceptId());
+                                    clone.setVersion(Integer.MAX_VALUE);
+                                    extension.addVersion(clone);
+                                    termFactory.addUncommittedNoChecks(extension);
+
+                                }
+                                return true;
+                            }
                         }
                     }
                 }
+
             }
         }
         return false;
@@ -1141,8 +1162,10 @@ public class SpecRefsetHelper {
         this.conceptTypeId = conceptTypeId;
     }
 
-    public boolean newConceptExtensionPart(int refsetId, int componentId, int c1Id) {
-        return newConceptExtensionPart(refsetId, componentId, c1Id, currentStatusId);
+    public boolean newConceptExtensionPart(int refsetId, int componentId, int c1Id) throws IOException,
+            TerminologyException {
+        return newConceptExtensionPart(refsetId, componentId, c1Id, ArchitectonicAuxiliary.Concept.CURRENT.localize()
+            .getNid());
     }
 
     public boolean newConceptExtensionPart(int refsetId, int componentId, int c1Id, int statusId) {
@@ -1163,12 +1186,15 @@ public class SpecRefsetHelper {
 
                     if (latestPart instanceof I_ThinExtByRefPartConcept) {
                         // found a member to retire
-                        I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                        clone.setStatusId(statusId);
-                        clone.setVersion(Integer.MAX_VALUE);
-                        clone.setC1id(c1Id);
-                        extension.addVersion(clone);
-                        termFactory.addUncommittedNoChecks(extension);
+                        for (I_Path editPath : getEditPaths()) {
+                            I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                            clone.setStatusId(statusId);
+                            clone.setVersion(Integer.MAX_VALUE);
+                            clone.setC1id(c1Id);
+                            clone.setPathId(editPath.getConceptId());
+                            extension.addVersion(clone);
+                            termFactory.addUncommittedNoChecks(extension);
+                        }
                         return true;
                     }
                 }
@@ -1200,15 +1226,21 @@ public class SpecRefsetHelper {
 
                     // confirm its the right extension value and its status is
                     // current
-                    if (latestPart.getStatusId() == currentStatusId) {
-                        if (latestPart instanceof I_ThinExtByRefPartConcept) {
-                            // found a member to retire
-                            I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                            clone.setStatusId(retiredStatusId);
-                            clone.setVersion(Integer.MAX_VALUE);
-                            extension.addVersion(clone);
-                            termFactory.addUncommittedNoChecks(extension);
-                            return true;
+                    for (Integer currentId : getCurrentStatusIds()) {
+                        if (latestPart.getStatusId() == currentId) {
+                            if (latestPart instanceof I_ThinExtByRefPartConcept) {
+                                // found a member to retire
+                                for (I_Path editPath : getEditPaths()) {
+                                    I_ThinExtByRefPartConcept clone =
+                                            (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                                    clone.setStatusId(retiredStatusId);
+                                    clone.setVersion(Integer.MAX_VALUE);
+                                    clone.setPathId(editPath.getConceptId());
+                                    extension.addVersion(clone);
+                                    termFactory.addUncommittedNoChecks(extension);
+                                }
+                                return true;
+                            }
                         }
                     }
                 }
@@ -1258,13 +1290,13 @@ public class SpecRefsetHelper {
     private I_ThinExtByRefPart getLatestCurrentPart(I_ThinExtByRefVersioned memberExtension)
             throws TerminologyException, IOException {
         I_ThinExtByRefPart latestPart = null;
-        I_GetConceptData currentStatusConcept =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
         for (I_ThinExtByRefPart part : memberExtension.getVersions()) {
             if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
-                if (part.getStatusId() == currentStatusConcept.getConceptId()) {
-                    latestPart = part;
+                for (Integer currentStatus : getCurrentStatusIds()) {
+                    if (part.getStatusId() == currentStatus) {
+                        latestPart = part;
+                    }
                 }
             }
         }
