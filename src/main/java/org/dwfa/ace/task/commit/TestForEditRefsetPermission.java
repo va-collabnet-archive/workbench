@@ -188,7 +188,12 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
-        List<I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        Set<I_Position> allPositions = getPositions(termFactory);
+        I_IntSet activeStatuses = getActiveStatus(termFactory);
+
+        List<I_RelTuple> relationships =
+                concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true, true);
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {
                 latestVersion = rel.getVersion();
