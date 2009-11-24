@@ -108,8 +108,25 @@ public class NewRefsetSpecForm2 extends JPanel {
             reviewers = getPermissibleReviewers(parentString);
         }
 
+        int editorIndex = -1;
+        if (editorComboBox != null) {
+            editorIndex = editorComboBox.getSelectedIndex();
+        }
+
+        int reviewerIndex = -1;
+        if (reviewerComboBox != null) {
+            reviewerIndex = reviewerComboBox.getSelectedIndex();
+        }
+
         editorComboBox = new JComboBox(editors.toArray());
         reviewerComboBox = new JComboBox(reviewers.toArray());
+
+        if (reviewerIndex != -1) {
+            reviewerComboBox.setSelectedIndex(reviewerIndex);
+        }
+        if (editorIndex != -1) {
+            editorComboBox.setSelectedIndex(editorIndex);
+        }
     }
 
     private Set<String> getPermissibleEditors(String refsetString) {
