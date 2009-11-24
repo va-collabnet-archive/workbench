@@ -506,6 +506,12 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
                     OPTIONAL("optional (active status type)",
                              new I_ConceptualizeUniversally[] { ACTIVE }),
+                    DEVELOPMENTAL("optional (active status type)",
+                                     new I_ConceptualizeUniversally[] { ACTIVE }),
+                    EXPERIMENTAL("optional (active status type)",
+                                             new I_ConceptualizeUniversally[] { ACTIVE }),
+                    FROM_SNOMED("optional (active status type)",
+                                                     new I_ConceptualizeUniversally[] { ACTIVE }),
 
 
                             REASSIGNED("reassigned (active status type)",
@@ -618,6 +624,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                         new I_ConceptualizeUniversally[] { ID_SOURCE }),
         CTV3_ID("CTV3_ID",
               new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        CTV2_ID("CTV2_ID",
+              new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        CT4B_ID("CT4Byte_ID",
+              new I_ConceptualizeUniversally[] { ID_SOURCE }),
         UNSPECIFIED_UUID(PrimordialId.ACE_AUX_ENCODING_ID, new String[] {"generated UUID"}, null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
         T5_FROM_DATA_UUID("Data Generated Type 5 UUID", null,
@@ -634,21 +644,23 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
         RX_NORM("RX Norm ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
-        READ_V3("Read V3 ID", null,
-                new I_ConceptualizeUniversally[] { ID_SOURCE }),  
+        /*  
         READ_V3_TERM("Read V3 Term ID", null,
         		new I_ConceptualizeUniversally[] { ID_SOURCE }),
         READ_V3_TERM_SYN("Read V3 Term Synonym ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),        		
-        READ_V2("Read V2 ID", null,
-                new I_ConceptualizeUniversally[] { ID_SOURCE }), 
+         
         READ_V2_TERM("Read V2 Term ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
         READ_V2_TERM_SYN("Read V2 Term Synonym ID", null,
                  new I_ConceptualizeUniversally[] { ID_SOURCE }),        
-        READ_4B("Read 4Byte ID", null,
-                new I_ConceptualizeUniversally[] { ID_SOURCE }),                    
-                
+            */ 
+                READ_V3("Read V3 ID", null,
+                        new I_ConceptualizeUniversally[] { ID_SOURCE }),
+                READ_V2("Read V2 ID", null,
+                        new I_ConceptualizeUniversally[] { ID_SOURCE }),
+                READ_4B("Read 4Byte ID", null,
+                        new I_ConceptualizeUniversally[] { ID_SOURCE }),       
         CPT("CPT ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE });
        ;
