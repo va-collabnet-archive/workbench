@@ -2,7 +2,9 @@ package org.dwfa.ace.task.refset.refresh;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.GridLayout;
 import java.beans.IntrospectionException;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -24,6 +26,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.path.SelectPositionSetPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.TestForCreateNewRefsetPermission;
 import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
@@ -67,13 +70,18 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     private String commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
     private String ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
-
+    private String fileAttachmentsPropName = ProcessAttachmentKeys.FILE_ATTACHMENTS.getAttachmentKey();
+        
 	// Other Properties 
     private transient Exception ex = null;
     private I_TermFactory termFactory;
     private I_ConfigAceFrame config;
 
     
+    /* -----------------------
+     * Serialization Methods
+     * -----------------------
+     */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(profilePropName);
@@ -82,6 +90,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         out.writeObject(refsetUuidPropName);
         out.writeObject(editorUuidPropName);
         out.writeObject(ownerUuidPropName);
+        out.writeObject(fileAttachmentsPropName);
     }
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
@@ -95,15 +104,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
                 refsetUuidPropName = (String) in.readObject();
             	editorUuidPropName = (String) in.readObject();
             	ownerUuidPropName = (String) in.readObject();
-            } else {
-            	 // Set version 1 default values
-            	profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();  
-            	nextUserTermEntryPropName = ProcessAttachmentKeys.NEXT_USER.getAttachmentKey();
-            	refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
-            	commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
-            	editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
-            	ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
-            }
+            	fileAttachmentsPropName = (String) in.readObject();
+           } 
             // Initialize transient properties...
             ex = null;
            
@@ -170,11 +172,15 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 
     private void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
 
-        try {
+    	try {
+ 
             termFactory = LocalVersionedTerminology.get();
-            config = (I_ConfigAceFrame) termFactory.getActiveAceFrameConfig();
 
-            Set<I_GetConceptData> refsets = getValidRefsets();
+			// Get current Profile / Configuration from the process property  
+    		config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+
+    		// Get a list of valid Refset Specs 
+            Set<I_GetConceptData> refsetSpecs = getValidRefsetSpecs();
             
 			// Clear the Workflow Details Sheet 
 			ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
@@ -184,29 +190,27 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 			// Create a new panel to add to the Workflow Details Sheet
             JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 	        int width = 475;
-	        int height = 625;
+	        int height = 590;
 	        workflowDetailsSheet.setSize(width, height);
-	        workflowDetailsSheet.setLayout(new BorderLayout());
-	        PanelRefsetAndParameters newPanel = new PanelRefsetAndParameters(refsets, workflowDetailsSheet); 
+	        workflowDetailsSheet.setLayout(new GridLayout(1, 1));
+	        PanelRefsetAndParameters newPanel = new PanelRefsetAndParameters(refsetSpecs); 
 	        
-	        /*----------------------------------------------------------------------------------
-	         *  Initialize the fields on this panel with the previously entered values (if any).
-	         * ----------------------------------------------------------------------------------
-	         */
-	        String targetKey; 
-			// Refset Field Initialization 	        
+	        // ----------------------------------------------------------------------------------
+	        //  Initialize the fields on this panel with the previously entered values (if any).
+	        // ----------------------------------------------------------------------------------
+	        
+	        // Refset - Field Initialization 	        
 			try {
-		        I_GetConceptData previousRefset = null;
-		        //skip over the "A: " prefix 
-		        
-		        if (isKeyDefined(process, refsetUuidPropName.substring(3))) { 
-		        	UUID refsetUUID = (UUID) process.getProperty(refsetUuidPropName);
-		        	previousRefset = (I_GetConceptData) AceTaskUtil.getConceptFromObject(refsetUUID); 
+		        I_GetConceptData previousRefsetSpec = null;
+	        	UUID refsetSpecUUID = (UUID) process.getProperty(refsetUuidPropName);
+	        	previousRefsetSpec = (I_GetConceptData) AceTaskUtil.getConceptFromObject(refsetSpecUUID); 
 
-			        if (previousRefset != null ) {
-			        	newPanel.setRefset(previousRefset); 
-			        }	      
-		        }
+		        if (previousRefsetSpec != null ) {
+		        	newPanel.setRefset(previousRefsetSpec); 
+		        }	      
+			} catch (NullPointerException e) {
+				//TODO  Just ignore the NPE for now - remove this when you add the 
+				//      isPropertyDefined class back in.  
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			} catch (IntrospectionException e) {
@@ -218,19 +222,24 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 			}
 	        
 	        
-	        // Editor Field Initialization 	        
+	        // Editor - Field Initialization 	        
 			try {
 		        I_GetConceptData previousEditor = null;
-		        if (isKeyDefined(process, editorUuidPropName.substring(3))) {
-		        	UUID[] editorsUUID = (UUID[]) process.getProperty(editorUuidPropName);
-		        	UUID firstEditorUUID = (UUID) editorsUUID[0];
-		        	//TODO This should work! 
-		    		// previousEditor = (I_GetConceptData) AceTaskUtil.getConceptFromObject(editorsUUID); 
-		        	previousEditor = (I_GetConceptData) AceTaskUtil.getConceptFromObject(firstEditorUUID); 
+//		        if (isKeyDefined(process, editorUuidPropName)) {
+		        	// Retrieve the UUID for the editor 
+		        	UUID editorUUID = (UUID) process.getProperty(editorUuidPropName);
+		        	
+		        	// Translate the UUID back into an I_GetConceptData object 
+		        	previousEditor = (I_GetConceptData) AceTaskUtil.getConceptFromObject(editorUUID); 
 			        if (previousEditor != null ) {
+			        
+			        	// set the ComboBox to point to the selected editor  
 			        	newPanel.setEditor(previousEditor); 
 			        }	      
-		        }
+//		        }
+			} catch (NullPointerException e) {
+				//TODO  Just ignore the NPE for now - remove this when you add the 
+				//      isPropertyDefined class back in.  
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			} catch (IntrospectionException e) {
@@ -242,7 +251,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 			}
 
 			
-			// Priority Field Initialization 	        
+			// Priority - Field Initialization 	        
 	        Priority previousPriority = process.getPriority();
 	        if (previousPriority == Priority.HIGHEST) {
         	    newPanel.setPriority("Highest"); 
@@ -259,51 +268,52 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 	        	newPanel.setPriority("Normal"); 
 	        }
 
-	        // Deadline Field Initialization 	  
-	        Date previousDeadlineDate = (Date) process.getDeadline(); 
-	        Calendar previousDeadline = Calendar.getInstance();
-	        previousDeadline.setTime(previousDeadlineDate);
- 	        newPanel.setDeadline(previousDeadline);
+	        
+	        // Deadline - Field Initialization 
+	        Date previousDeadlineDate = null; 
+	        previousDeadlineDate = (Date) process.getDeadline(); 
+	        if (previousDeadlineDate != null) {
+		        Calendar previousDeadline = Calendar.getInstance();
+		        previousDeadline.setTime(previousDeadlineDate);
+	 	        newPanel.setDeadline(previousDeadline);
+	        }
+	        
 
-	        // Comments Field Initialization 	  
+	        // Comments - Field Initialization 	  
 	        String previousComments = null;
-			try {
-		        if (isKeyDefined(process, commentsPropName)) {
-					previousComments = (String) process.getProperty(commentsPropName);
-			        if (previousComments != null) {
-		        	   newPanel.setComments(previousComments); 
-			        }
+//	        if (isKeyDefined(process, commentsPropName)) {
+				previousComments = (String) process.getProperty(commentsPropName);
+		        if (previousComments != null) {
+	        	   newPanel.setComments(previousComments); 
 		        }
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IntrospectionException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
+//	        }
 
-	        // File Attachments Field Initialization 	        
-	        // TODO
+	        
+	        // File Attachments - Field Initialization 	        	        
+			HashSet<File> previousFileAttachments = null;
+//	        if (isKeyDefined(process, fileAttachmentsPropName)) { 
+	        	previousFileAttachments = (HashSet<File>) process.getProperty(fileAttachmentsPropName);
+		        if (previousFileAttachments != null ) {
+		        	newPanel.setAttachments(previousFileAttachments); 
+		        }	      
+//	        }
 	        
 			
 	        /*----------------------------------------------------------------------------------
 	         *  Add the initialized panel to the Workflow Details Sheet
 	         * ----------------------------------------------------------------------------------
 	         */
-	        workflowDetailsSheet.add(newPanel, BorderLayout.NORTH);
-	        workflowDetailsSheet.repaint();
-
+	        workflowDetailsSheet.add(newPanel);
         } catch (Exception e) {
             ex = e;
         }
     }
 
-    private Set<I_GetConceptData> getValidRefsets() throws Exception {
-        Set<I_GetConceptData> refsets = new HashSet<I_GetConceptData>();
+    private Set<I_GetConceptData> getValidRefsetSpecs() throws Exception {
+        Set<I_GetConceptData> refsetSpecs = new HashSet<I_GetConceptData>();
 
         I_GetConceptData owner = config.getDbConfig().getUserConcept();
+        //TODO Replace this test with a TestForRefreshRefsetPermission 
         TestForCreateNewRefsetPermission permissionTest = new TestForCreateNewRefsetPermission();
         Set<I_GetConceptData> permissibleRefsetParents = new HashSet<I_GetConceptData>();
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(owner));
@@ -316,12 +326,12 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
             Set<I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, true, true);
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
-                    refsets.add(child);
+                	refsetSpecs.add(child);
                 }
             }
         }
 
-        return refsets;
+        return refsetSpecs;
     }
 
     private boolean isRefset(I_GetConceptData child) throws TerminologyException, IOException {
@@ -344,20 +354,31 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         return AbstractTask.CONTINUE_CONDITION;
     }
 
+//    /**
+//     * Determines if the key provided is already defined as a property in the current process 
+//     * 
+//     * @param process
+//     * @param keyName
+//     * @return boolean
+//     */
+//    public boolean isKeyDefined(I_EncodeBusinessProcess process, String keyName) {
+//		String propertyName = new String(); 
+//		if (keyName.startsWith("A: ")) {
+//			propertyName = keyName.substring(3);
+//		} else {
+//			propertyName = keyName;
+//		}		
+//		Collection<String> listOfKeys = process.getAttachmentKeys(); 
+//		return listOfKeys.contains(propertyName);
+//	}
 
-	
-	/**
-	 *  This method returns the name of the Working Profile property name  
-	 * @return
+	/* ---------------------------------------------------------
+	 * Getters and Setters for Property Names
+	 * ---------------------------------------------------------
 	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
-
-	/**
-	 *  This method sets the name of the Working Profile property name  
-	 * @param profilePropName
-	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
@@ -391,16 +412,12 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 	public void setOwnerUuidPropName(String ownerUuidPropName) {
 		this.ownerUuidPropName = ownerUuidPropName;
 	}
-
-
-	public boolean isKeyDefined(I_EncodeBusinessProcess process, String keyName) {
-		String propertyName = new String(); 
-		if (keyName.startsWith("A: ")) {
-			propertyName = keyName.substring(3);
-		} else {
-			propertyName = keyName;
-		}		
-		Collection<String> listOfKeys = process.getAttachmentKeys(); 
-		return listOfKeys.contains(propertyName);
+	public String getFileAttachmentsPropName() {
+		return fileAttachmentsPropName;
 	}
+	public void setFileAttachmentsPropName(String fileAttachmentsPropName) {
+		this.fileAttachmentsPropName = fileAttachmentsPropName;
+	}
+
+
 }

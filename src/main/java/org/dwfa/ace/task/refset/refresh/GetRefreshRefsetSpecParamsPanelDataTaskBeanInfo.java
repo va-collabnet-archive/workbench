@@ -30,53 +30,62 @@ public class GetRefreshRefsetSpecParamsPanelDataTaskBeanInfo extends SimpleBeanI
 
         try {
 
+        	// The color "green" = denotes an [IN] property 
+        	// The color "blue"  = denotes an [OUT] property 
             PropertyDescriptor profilePropName =
                 new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
             profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName.setShortDescription("The property that contains the working profile.");
+            profilePropName.setShortDescription("[IN] The property that contains the working profile.");
 
             PropertyDescriptor nextUserTermEntryPropName;
             nextUserTermEntryPropName =
                     new PropertyDescriptor("nextUserTermEntryPropName", getBeanDescriptor().getBeanClass());
             nextUserTermEntryPropName.setBound(true);
             nextUserTermEntryPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            nextUserTermEntryPropName.setDisplayName("<html><font color='green'>next person:");
-            nextUserTermEntryPropName.setShortDescription("The next person the BP will go to.");
+            nextUserTermEntryPropName.setDisplayName("<html><font color='blue'>next person:");
+            nextUserTermEntryPropName.setShortDescription("[OUT] The next person the BP will go to.");
 
             PropertyDescriptor commentsPropName;
             commentsPropName = new PropertyDescriptor("commentsPropName", getBeanDescriptor().getBeanClass());
             commentsPropName.setBound(true);
             commentsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            commentsPropName.setDisplayName("<html><font color='green'>comments prop name:");
-            commentsPropName.setShortDescription("The property to put the comments into.");
+            commentsPropName.setDisplayName("<html><font color='blue'>comments prop name:");
+            commentsPropName.setShortDescription("[OUT] The property to put the comments into.");
 
             PropertyDescriptor refsetUuidPropName;
             refsetUuidPropName = new PropertyDescriptor("refsetUuidPropName", getBeanDescriptor().getBeanClass());
             refsetUuidPropName.setBound(true);
             refsetUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            refsetUuidPropName.setDisplayName("<html><font color='green'>member refset UUID prop:");
-            refsetUuidPropName.setShortDescription("The property to put the member refset UUID into.");
+            refsetUuidPropName.setDisplayName("<html><font color='blue'>member refset UUID prop:");
+            refsetUuidPropName.setShortDescription("[OUT] The property to put the member refset UUID into.");
 
             PropertyDescriptor editorUuidPropName;
             editorUuidPropName = new PropertyDescriptor("editorUuidPropName", getBeanDescriptor().getBeanClass());
             editorUuidPropName.setBound(true);
             editorUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            editorUuidPropName.setDisplayName("<html><font color='green'>editor UUID prop name:");
-            editorUuidPropName.setShortDescription("The property to put the editor UUID into.");
+            editorUuidPropName.setDisplayName("<html><font color='blue'>editor UUID prop name:");
+            editorUuidPropName.setShortDescription("[OUT] The property to put the editor UUID into.");
 
             PropertyDescriptor ownerUuidPropName;
             ownerUuidPropName = new PropertyDescriptor("ownerUuidPropName", getBeanDescriptor().getBeanClass());
             ownerUuidPropName.setBound(true);
             ownerUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            ownerUuidPropName.setDisplayName("<html><font color='green'>owner uuid prop name:");
-            ownerUuidPropName.setShortDescription("The property to put the owner uuid into.");
+            ownerUuidPropName.setDisplayName("<html><font color='blue'>owner UUID prop name:");
+            ownerUuidPropName.setShortDescription("[OUT] The property to put the owner uuid into.");
+
+            PropertyDescriptor fileAttachmentsPropName;
+            fileAttachmentsPropName = new PropertyDescriptor("fileAttachmentsPropName", getBeanDescriptor().getBeanClass());
+            fileAttachmentsPropName.setBound(true);
+            fileAttachmentsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            fileAttachmentsPropName.setDisplayName("<html><font color='blue'>file attachments prop name:");
+            fileAttachmentsPropName.setShortDescription("[OUT] The property to put the file attachments into.");
 
 
             PropertyDescriptor rv[] =
                     { profilePropName, nextUserTermEntryPropName, commentsPropName, 
-            		  refsetUuidPropName, editorUuidPropName, ownerUuidPropName };
+            		  refsetUuidPropName, editorUuidPropName, ownerUuidPropName, fileAttachmentsPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

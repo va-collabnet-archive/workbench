@@ -29,17 +29,20 @@ import org.dwfa.tapi.TerminologyException;
 
 import org.dwfa.ace.path.*;
 
+/**
+ * Panel to collect the version of the Refset 
+ * 
+ * @author Perry Reid
+ * @version 1, November 2009
+ */
 public class PanelRefsetVersion extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private Set<I_Position> positionSet = new HashSet<I_Position>();
 	private JList positionList;
 	private ArrayListModel<I_Position> positionListModel;
 	private SelectPathAndPositionPanelWithCombo pppwc;
-	private JLabel selectedRefsetLabel; 
+	private JLabel selectedRefsetSpecLabel; 
 
 	
 
@@ -74,7 +77,7 @@ public class PanelRefsetVersion extends JPanel {
 
        	Font sansSerifFont = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 		
-		// Add the Selected Refset as a reminder  
+		// Add the Selected Refset label   
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.anchor = GridBagConstraints.WEST;
@@ -82,19 +85,30 @@ public class PanelRefsetVersion extends JPanel {
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
+		add(new JLabel("Selected Refset Spec:"), gbc);
+
+		// Add the Selected Refset as a reminder 
+		// (The real value will be set by another task)
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		// Get the name of the selected Refset 
-		selectedRefsetLabel = new JLabel("NO REFSET SELECTED");
-		selectedRefsetLabel.setFont(sansSerifFont); 
-		selectedRefsetLabel.setForeground(Color.blue);
-		add(selectedRefsetLabel, gbc);
+		selectedRefsetSpecLabel = new JLabel("   NO REFSET SPEC SELECTED");
+		selectedRefsetSpecLabel.setFont(sansSerifFont); 
+		selectedRefsetSpecLabel.setForeground(Color.blue);
+		add(selectedRefsetSpecLabel, gbc);
 		
 		// Add the path and positions 
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -146,12 +160,12 @@ public class PanelRefsetVersion extends JPanel {
 		positionSet.addAll(newPositions);
 	}
 
-	public String getSelectedRefsetLabel() {
-		return this.selectedRefsetLabel.getText();
+	public String getSelectedRefsetSpecLabel() {
+		return this.selectedRefsetSpecLabel.getText();
 	}
 	
-	public void setSelectedRefsetLabel(String refsetName) {
-		this.selectedRefsetLabel.setText(refsetName);
+	public void setSelectedRefsetSpecLabel(String refsetName) {
+		this.selectedRefsetSpecLabel.setText("   " + refsetName);
 	}
 
 

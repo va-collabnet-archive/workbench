@@ -1,8 +1,11 @@
 package org.dwfa.ace.task.refset.refresh;
 
 import java.beans.BeanDescriptor;
+import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
+
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * The RefreshRefsetSpecCompareTaskBeanInfo class describes the visible elements of the 
@@ -23,19 +26,81 @@ public class RefreshRefsetSpecCompareTaskBeanInfo extends SimpleBeanInfo {
         super();
     }
 
-    public PropertyDescriptor[] getPropertyDescriptors() {
 
-        PropertyDescriptor rv[] = {};
-        return rv;
+	/**
+	 * Returns a list of property descriptors for this task.   
+	 * @return  	Returns a PropertyDescriptor array containing the properties of this task  
+	 * @exception  	Error Thrown when an exception happens during Introspection
+	 */
+    public PropertyDescriptor[] getPropertyDescriptors() {
+        try {  
+
+        	// The color "green" = denotes an [IN] property 
+        	// The color "blue"  = denotes an [OUT] property 
+            PropertyDescriptor profilePropName =
+                new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
+            profilePropName.setBound(true);
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("[IN] The property that contains the current profile.");
+            
+            PropertyDescriptor refsetPositionSetPropName =
+                new PropertyDescriptor("refsetPositionSetPropName", getBeanDescriptor().getBeanClass());
+            refsetPositionSetPropName.setBound(true);
+            refsetPositionSetPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetPositionSetPropName.setDisplayName("<html><font color='green'>refset position set prop:");
+            refsetPositionSetPropName.setShortDescription("[IN] The property that contains the Refset position set.");
+
+            PropertyDescriptor refsetUuidPropName;
+            refsetUuidPropName = new PropertyDescriptor("refsetUuidPropName", getBeanDescriptor().getBeanClass());
+            refsetUuidPropName.setBound(true);
+            refsetUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetUuidPropName.setDisplayName("<html><font color='green'>member refset UUID prop:");
+            refsetUuidPropName.setShortDescription("[IN] The property that contains the Refset UUID.");
+            
+            PropertyDescriptor snomedPositionSetPropName =
+                new PropertyDescriptor("snomedPositionSetPropName", getBeanDescriptor().getBeanClass());
+            snomedPositionSetPropName.setBound(true);
+            snomedPositionSetPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            snomedPositionSetPropName.setDisplayName("<html><font color='green'>SNOMED position set prop:");
+            snomedPositionSetPropName.setShortDescription("[IN] The property that contains the SNOMED position set.");
+
+            PropertyDescriptor uuidListListPropName =
+                new PropertyDescriptor("uuidListListPropName", getBeanDescriptor().getBeanClass());
+            uuidListListPropName.setBound(true);
+            uuidListListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListListPropName.setDisplayName("<html><font color='blue'>List of changes:");
+            uuidListListPropName.setShortDescription("[OUT] The property that will contain the list of observed changes.");
+
+            PropertyDescriptor changeMapPropName =
+                new PropertyDescriptor("changeMapPropName", getBeanDescriptor().getBeanClass());
+            changeMapPropName.setBound(true);
+            changeMapPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            changeMapPropName.setDisplayName("<html><font color='blue'>Map of changes:");
+            changeMapPropName.setShortDescription("[OUT] The property that will contain the map of old and new values.");
+
+
+            PropertyDescriptor rv[] =
+               { profilePropName, refsetPositionSetPropName, refsetUuidPropName, snomedPositionSetPropName, 
+            		uuidListListPropName, changeMapPropName  };
+
+            return rv;
+        } catch (IntrospectionException e) {
+             throw new Error(e.toString());
+        }
     }
 
-    /**
+    /** 
+     * Return the descriptor for this JavaBean which contains a reference to the JavaBean 
+	 * that implements this task as well as the display name of the task along with 
+	 * formating information.
      * @see java.beans.BeanInfo#getBeanDescriptor()
+	 * @return	Returns the BeanDescriptor for this task      
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(RefreshRefsetSpecCompareTask.class);
         bd.setDisplayName("<html><font color='green'><center>"
-        		+ "Compare<br>Refset to SNOMED<br>and List Differences");
+        		+ "Compare Refset to SNOMED<br>and List Differences");
         return bd;
     }
 

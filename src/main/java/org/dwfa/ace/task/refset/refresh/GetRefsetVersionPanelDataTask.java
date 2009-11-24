@@ -125,7 +125,7 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
                     // -----------------------------------------
 					if (positionSet == null || positionSet.isEmpty() ) {
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), 
-                        		"You must select a version for this refset. ",
+                        		"You must select a version for this Refset Spec. ",
                                 "", JOptionPane.ERROR_MESSAGE);
                         return Condition.ITEM_CANCELED;
 					} else {

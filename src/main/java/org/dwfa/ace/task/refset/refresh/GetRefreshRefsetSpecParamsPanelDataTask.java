@@ -60,6 +60,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
     private String commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
     private String ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
+    private String fileAttachmentsPropName = ProcessAttachmentKeys.FILE_ATTACHMENTS.getAttachmentKey();
     		
 	// Other Properties 
     private I_TermFactory termFactory;
@@ -77,6 +78,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
         out.writeObject(refsetUuidPropName);
         out.writeObject(editorUuidPropName);
         out.writeObject(ownerUuidPropName);
+        out.writeObject(fileAttachmentsPropName);
     }
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
@@ -90,19 +92,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                 refsetUuidPropName = (String) in.readObject();
             	editorUuidPropName = (String) in.readObject();
             	ownerUuidPropName = (String) in.readObject();
-            } else {
-            	 // Set version 1 default values
-            	profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();  
-            	nextUserTermEntryPropName = ProcessAttachmentKeys.NEXT_USER.getAttachmentKey();
-            	refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
-            	commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
-            	editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
-            	ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
-            }
-            if (objDataVersion >= 2) {
-               // Read version 2 data fields...
-            } else {
-            	// Set version 2 Default values... 
+            	fileAttachmentsPropName = (String) in.readObject();
             }
             // Initialize transient properties 
             
@@ -151,47 +141,109 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                 if (PanelRefsetAndParameters.class.isAssignableFrom(c.getClass())) {
                 	PanelRefsetAndParameters panel = (PanelRefsetAndParameters) c;
                 	
-                    // ---------------------------------------------
                     // Retrieve values from the panel / environment
-                    // ---------------------------------------------
+
                     I_GetConceptData refset = panel.getRefset();
                     I_GetConceptData editor = panel.getEditor();
                     String comments = panel.getComments();
                     Calendar deadline = panel.getDeadline();
                     String priority = panel.getPriority();
-                    HashSet<File> attachments = panel.getAttachments();
+                    HashSet<File> fileAttachments = panel.getAttachments();
                     I_GetConceptData owner = config.getDbConfig().getUserConcept();
 
                     // -----------------------------------------
-                    // Verify required fields are present and 
-                    // use the values retrieved from this panel 
+                    // VERIFY ALL REQUIRED FIELDS AND STORE
+                    // THE ENTERED DATA INTO PROPERTY KEYS
                     // -----------------------------------------
                     
+                    // -----------------------------------------
+                    // Refset Field is required 
+                    // -----------------------------------------
+                   if (refset == null) {
+                   		// Warn the user that Refset is required. 
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "You must select a refset. ",
+                            "", JOptionPane.ERROR_MESSAGE);
+                        return Condition.ITEM_CANCELED;
+                    } else {
+                    	// Set the Refset property 
+                        process.setSubject("Refresh Refset : " + refset.getInitialText());
+                        process.setName("Refresh Refset : " + refset.getInitialText());
+                        process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
+                    }
+                    
+                    
+                    // -----------------------------------------
+                    // Editor Field is required! 
+                    // -----------------------------------------
+                    if (editor == null) {
+                    	// Warn the user that Editor is required. 
+                    	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    			"You must select an editor. ", "", JOptionPane.ERROR_MESSAGE);
+                    	return Condition.ITEM_CANCELED;                         
+                    } else {
+                       	// Set the Editor property 
+                    	process.setProperty(editorUuidPropName, editor.getUids().iterator().next() );
+                        
+                        // Set the WF's Next User based on selected Editor 
+                        RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();                    
+                        String inboxAddress = wizard.getInbox(editor);
+                        if (inboxAddress == null) {
+                            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                                "Refresh Refset process cannot continue... The selected editor has no assigned inbox : "
+                                    + editor, "", JOptionPane.ERROR_MESSAGE);
+                            return Condition.ITEM_CANCELED;
+                        } else {
+                            process.setDestination(inboxAddress);
+                            process.setProperty(nextUserTermEntryPropName, inboxAddress);                       
+                        }     
+                    }
+
+
+                    // -----------------------------------------
+                    // Deadline Field is required 
+                    // -----------------------------------------
+                    if (deadline == null) {
+                    	// Warn the user that Editor is required. 
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "You must select a deadline. ", "", JOptionPane.ERROR_MESSAGE);
+                        return Condition.ITEM_CANCELED;
+                    } else {
+                       	// Set the Deadline property 
+                       process.setDeadline(deadline.getTime());                   	
+                    }
+
+                    
+                    // -----------------------------------------
                     // Priority Field is required! 
-                    Priority p;
+                    // -----------------------------------------
+                    Priority newPriority;
                     if (priority == null) {
+                    	// Warn the user that Priority is required! 
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "You must select a priority. ", "", JOptionPane.ERROR_MESSAGE);
                         return Condition.ITEM_CANCELED;
-                    }
-                    if (priority.equals("Highest")) {
-                        p = Priority.HIGHEST;
-                    } else if (priority.equals("High")) {
-                        p = Priority.HIGH;
-                    } else if (priority.equals("Normal")) {
-                        p = Priority.NORMAL;
-                    } else if (priority.equals("Low")) {
-                        p = Priority.LOW;
-                    } else if (priority.equals("Lowest")) {
-                        p = Priority.LOWEST;
                     } else {
-                        p = null;
+                    	// Set the priority based on the value selected 
+                        if (priority.equals("Highest")) {
+                        	newPriority = Priority.HIGHEST;
+                        } else if (priority.equals("High")) {
+                        	newPriority = Priority.HIGH;
+                        } else if (priority.equals("Normal")) {
+                        	newPriority = Priority.NORMAL;
+                        } else if (priority.equals("Low")) {
+                        	newPriority = Priority.LOW;
+                        } else if (priority.equals("Lowest")) {
+                        	newPriority = Priority.LOWEST;
+                        } else {
+                        	newPriority = null;
+                        }
+                        process.setPriority(newPriority);
                     }
-                    process.setPriority(p);
 
-                    
 
+                    // -----------------------------------------
                     // Comments
+                    // -----------------------------------------
                     if (comments != null) {
                         process.setProperty(commentsPropName, comments);
                     } else {
@@ -199,72 +251,45 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                     }
 
                     
-                    // Editor Field is required! 
-                    if (editor != null) {
-                        RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();
-                        String inboxAddress = wizard.getInbox(editor);
-                        process.setDestination(inboxAddress);
-                        process.setProperty(nextUserTermEntryPropName, inboxAddress);
-                        process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { editor
-                            .getUids().iterator().next() });
-                        process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { owner
-                            .getUids().iterator().next() });
-                        if (inboxAddress == null) {
-                            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                "Refresh Refset wizard cannot be completed. The selected editor has no assigned inbox : "
-                                    + editor, "", JOptionPane.ERROR_MESSAGE);
-                            return Condition.ITEM_CANCELED;
-                        }
-                        process.setProperty(editorUuidPropName, 
-                        		new UUID[] { editor.getUids().iterator().next() });
-                    } else {
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "You must select an editor. ", "", JOptionPane.ERROR_MESSAGE);
-                        return Condition.ITEM_CANCELED;
-                    }
-
-
+                    // -----------------------------------------
                     // Originator
+                    // -----------------------------------------
                     process.setOriginator(config.getUsername());
-
                     
+                   
+                    // -----------------------------------------
                     // Owner
-                    process.setProperty(ownerUuidPropName, 
-                    		new UUID[] { config.getDbConfig().getUserConcept().getUids().iterator().next() });
+                    // -----------------------------------------
+                    process.setProperty(ownerUuidPropName, owner.getUids().iterator().next() );
 
                     
-                    // Refset Field is required 
-                    if (refset == null) {
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "You must select a refset. ",
-                            "", JOptionPane.ERROR_MESSAGE);
-                        return Condition.ITEM_CANCELED;
-                    }
-                    process.setSubject("Refresh Refset : " + refset.getInitialText());
-                    process.setName("Refresh Refset : " + refset.getInitialText());
-                    process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
-                    
-                    
-                    // Deadline Field is required 
-                    if (deadline == null) {
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "You must select a deadline. ", "", JOptionPane.ERROR_MESSAGE);
-                        return Condition.ITEM_CANCELED;
-                    }
-                    process.setDeadline(deadline.getTime());
-
-                    
+                    // -----------------------------------------
                     // File attachments 
-                    for (File file : attachments) {
-                        process.writeAttachment(file.getName(), new FileContent(file));
-                    }
+                    // -----------------------------------------
+                    process.setProperty(fileAttachmentsPropName, fileAttachments);
+                   
+                    
+//                    if (fileAttachments == null || fileAttachments.isEmpty()) {
+//                       	// remove the key from the process. 
+//                        process.takeAttachment(fileAttachmentsPropName);
+//                    } else {
+//                    	// Store the attachments in the Key
+//                        process.setProperty(fileAttachmentsPropName, fileAttachments);
+//                    }
 
-                    
-                    
+                    // Under normal conditions this is where we should return from 
                     return Condition.ITEM_COMPLETE;
 
                 }
             }
-            return Condition.ITEM_COMPLETE;
+            
+            // If we got here we could not find the PanelRefsetAndParameters panel 
+            // so warn the user and cancel the task. 
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    "Could not locate the 'PanelRefsetAndParameters' panel. \n " + 
+                    "Canceling the task. ", "", JOptionPane.ERROR_MESSAGE);           
+            return Condition.ITEM_CANCELED;
+            
         } catch (Exception e) {
             e.printStackTrace();
             throw new TaskFailedException(e.getMessage());
@@ -288,10 +313,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
     public Collection<Condition> getConditions() {
         return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
     }
-
-    
-    
-    
+   
     public String getNextUserTermEntryPropName() {
         return nextUserTermEntryPropName;
     }
@@ -327,6 +349,12 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
 	}
 	public void setOwnerUuidPropName(String ownerUuidPropName) {
 		this.ownerUuidPropName = ownerUuidPropName;
+	}
+	public String getFileAttachmentsPropName() {
+		return fileAttachmentsPropName;
+	}
+	public void setFileAttachmentsPropName(String fileAttachmentsPropName) {
+		this.fileAttachmentsPropName = fileAttachmentsPropName;
 	}
 
 

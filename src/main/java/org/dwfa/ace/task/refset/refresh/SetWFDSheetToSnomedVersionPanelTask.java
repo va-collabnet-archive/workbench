@@ -156,7 +156,7 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 			// Create a new panel to add to the Workflow Details Sheet
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 	        int width = 475;
-	        int height = 625;
+	        int height = 590;
 	        workflowDetailsSheet.setSize(width, height);
 	        workflowDetailsSheet.setLayout(new BorderLayout());
 	        PanelSnomedVersion newPanel = new PanelSnomedVersion(config); 
@@ -169,12 +169,15 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 	        // Position Set Field Initialization 	        
 			try {
 				Set<I_Position> previousPositions = null;
-		        if (isKeyDefined(process, positionSetPropName.substring(3))) {
+//		        if (isKeyDefined(process, positionSetPropName.substring(3))) {
 		        	previousPositions = (Set<I_Position>) process.getProperty(positionSetPropName);
 		        	if (previousPositions != null ) {
 		        		newPanel.setPositionSet(previousPositions); 
 		        	}	  
-		        }
+//		        }
+			} catch (NullPointerException e) {
+				//TODO  Just ignore the NPE for now - remove this when you add the 
+				//      isPropertyDefined class back in.  
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			} catch (IntrospectionException e) {
@@ -228,16 +231,16 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 		this.positionSetPropName = positionSetPropName;
 	}
 
-	public boolean isKeyDefined(I_EncodeBusinessProcess process, String keyName) {	
-		String propertyName = new String(); 
-		if (keyName.startsWith("A: ")) {
-			propertyName = keyName.substring(3);
-		} else {
-			propertyName = keyName;
-		}		
-		Collection<String> listOfKeys = process.getAttachmentKeys(); 
-		return listOfKeys.contains(propertyName);
-	}
+//	public boolean isKeyDefined(I_EncodeBusinessProcess process, String keyName) {	
+//		String propertyName = new String(); 
+//		if (keyName.startsWith("A: ")) {
+//			propertyName = keyName.substring(3);
+//		} else {
+//			propertyName = keyName;
+//		}		
+//		Collection<String> listOfKeys = process.getAttachmentKeys(); 
+//		return listOfKeys.contains(propertyName);
+//	}
 
 
 }
