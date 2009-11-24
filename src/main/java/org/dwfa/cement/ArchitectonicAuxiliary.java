@@ -420,7 +420,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     MODIFY_REFSET_METADATA_PERMISSION("Modify existing refset metadata permission",
                           new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP, ADMIN_ROLE, AUTHOR_ROLE, OWNER_ROLE }),
                     EDIT_REFSET("Edit refset permission",
-                          new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP, ADMIN_ROLE, REVIEWER_ROLE, AUTHOR_ROLE }),
+                          new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP, ADMIN_ROLE, AUTHOR_ROLE }),
                     IMPORT_BRANCHED_REFSET_PERMISSION("Import refset from another branch permission",
                           new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP, ADMIN_ROLE }),
                     DEPRECATE_REFSET_PERMISSION("Deprecate refset permission",
