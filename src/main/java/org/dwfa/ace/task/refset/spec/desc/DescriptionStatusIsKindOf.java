@@ -13,34 +13,34 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * Task for adding a "description status is kind of" structural query to a refset spec.
+ * 
  * @author Chrissy Hill
- *
+ * 
  */
-@BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/refset/spec/desc", type = BeanType.TASK_BEAN) })
 public class DescriptionStatusIsKindOf extends AddStructuralQueryToRefsetSpec {
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			//
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            //
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	protected int getStructuralQueryTokenId() throws IOException, TerminologyException {
-		return RefsetAuxiliary.Concept.DESC_STATUS_IS_KIND_OF.localize().getNid();
-	}
+    protected int getStructuralQueryTokenId() throws IOException, TerminologyException {
+        return RefsetAuxiliary.Concept.DESC_STATUS_IS_KIND_OF.localize().getNid();
+    }
 
 }

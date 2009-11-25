@@ -1,4 +1,4 @@
-package org.dwfa.ace.task.refset.spec.rel;
+package org.dwfa.ace.task.refset.spec.desc;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,13 +12,13 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Task for adding a "relationship type is" structural query to a refset spec.
+ * Task for adding a "description status is child of" structural query to a refset spec.
  * 
  * @author Chrissy Hill
  * 
  */
-@BeanList(specs = { @Spec(directory = "tasks/refset/spec/rel", type = BeanType.TASK_BEAN) })
-public class RelationshipTypeIs extends AddStructuralQueryToRefsetSpec {
+@BeanList(specs = { @Spec(directory = "tasks/refset/spec/desc", type = BeanType.TASK_BEAN) })
+public class DescriptionStatusIsChildOf extends AddStructuralQueryToRefsetSpec {
     /**
 	 * 
 	 */
@@ -40,7 +40,7 @@ public class RelationshipTypeIs extends AddStructuralQueryToRefsetSpec {
     }
 
     protected int getStructuralQueryTokenId() throws IOException, TerminologyException {
-        return RefsetAuxiliary.Concept.REL_TYPE_IS.localize().getNid();
+        return RefsetAuxiliary.Concept.DESC_STATUS_IS_CHILD_OF.localize().getNid();
     }
 
 }

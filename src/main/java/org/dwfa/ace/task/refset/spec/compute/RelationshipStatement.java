@@ -1,6 +1,8 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -10,9 +12,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
-import org.dwfa.ace.api.IdentifierSet;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 /**
@@ -35,76 +36,77 @@ public class RelationshipStatement extends RefsetSpecStatement {
         super(useNotQualifier, queryToken, queryConstraint);
     }
 
-    public boolean execute(I_RelTuple relTuple) throws IOException, TerminologyException {
-
-        return false;
-    }
-
     public boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException {
 
         I_RelVersioned relVersioned = (I_RelVersioned) component;
         I_RelTuple relTuple = relVersioned.getLastTuple();
-
-        if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF.getUids()))) {
-            return relationshipIsMemberOf(relTuple);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REL_STATUS_IS.getUids()))) {
-            return componentStatusIs(relTuple);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REL_STATUS_IS_KIND_OF.getUids()))) {
-            return componentStatusIsKindOf(relTuple);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REL_TYPE_IS.getUids()))) {
-            return relationshipTypeIs(relTuple);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REL_TYPE_IS_KIND_OF.getUids()))) {
-            return relationshipTypeIsKindOf(relTuple);
-        } else if (queryToken.equals(termFactory
-            .getConcept(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS.getUids()))) {
-            return relationshipLogicalQuantifierIs(relTuple);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_KIND_OF
-            .getUids()))) {
-            return relationshipLogicalQuantifierIsKindOf(relTuple);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS.getUids()))) {
-            return relationshipCharacteristicIs(relTuple);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_KIND_OF
-            .getUids()))) {
-            return relationshipCharacteristicIsKindOf(relTuple);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REL_REFINABILITY_IS.getUids()))) {
-            return relationshipRefinabilityIs(relTuple);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_KIND_OF
-            .getUids()))) {
-            return relationshipRefinabilityIsKindOf(relTuple);
-        } else {
-            throw new TerminologyException("Unknown desc query type : " + queryToken.getInitialText());
+        switch (tokenEnum) {
+        case REL_IS:
+            return relIs(relTuple);
+        case REL_RESTRICTION_IS:
+            return relRestrictionIs(relTuple);
+        case REL_IS_MEMBER_OF:
+            return relIsMemberOf(relTuple);
+        case REL_STATUS_IS:
+            return relStatusIs(relTuple);
+        case REL_STATUS_IS_KIND_OF:
+            return relStatusIsKindOf(relTuple);
+        case REL_STATUS_IS_CHILD_OF:
+            return relStatusIsChildOf(relTuple);
+        case REL_STATUS_IS_DESCENDENT_OF:
+            return relStatusIsDescendentOf(relTuple);
+        case REL_TYPE_IS:
+            return relTypeIs(relTuple);
+        case REL_TYPE_IS_KIND_OF:
+            return relTypeIsKindOf(relTuple);
+        case REL_TYPE_IS_CHILD_OF:
+            return relTypeIsChildOf(relTuple);
+        case REL_TYPE_IS_DESCENDENT_OF:
+            return relTypeIsDescendentOf(relTuple);
+        case REL_LOGICAL_QUANTIFIER_IS:
+            return relLogicalQuantifierIs(relTuple);
+        case REL_LOGICAL_QUANTIFIER_IS_KIND_OF:
+            return relLogicalQuantifierIsKindOf(relTuple);
+        case REL_LOGICAL_QUANTIFIER_IS_CHILD_OF:
+            return relLogicalQuantifierIsChildOf(relTuple);
+        case REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF:
+            return relLogicalQuantifierIsDescendentOf(relTuple);
+        case REL_CHARACTERISTIC_IS:
+            return relCharIs(relTuple);
+        case REL_CHARACTERISTIC_IS_KIND_OF:
+            return relCharIsKindOf(relTuple);
+        case REL_CHARACTERISTIC_IS_CHILD_OF:
+            return relCharIsChildOf(relTuple);
+        case REL_CHARACTERISTIC_IS_DESCENDENT_OF:
+            return relCharIsDescendentOf(relTuple);
+        case REL_REFINABILITY_IS:
+            return relRefinabilityIs(relTuple);
+        case REL_REFINABILITY_IS_KIND_OF:
+            return relRefinabilityIsKindOf(relTuple);
+        case REL_REFINABILITY_IS_CHILD_OF:
+            return relRefinabilityIsChildOf(relTuple);
+        case REL_REFINABILITY_IS_DESCENDENT_OF:
+            return relRefinabilityIsDescendentOf(relTuple);
+        default:
+            throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
     }
 
-    private boolean relationshipIsMemberOf(I_RelTuple rel) throws IOException, TerminologyException {
-        return componentIsMemberOf(rel.getRelId());
+    private boolean relRefinabilityIsDescendentOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+        return relRefinabilityIsDescendentOf(queryConstraint, relTuple);
     }
 
-    private boolean relationshipTypeIs(I_RelTuple rel) {
-        return relationshipTypeIs(queryConstraint, rel);
-    }
-
-    private boolean relationshipTypeIs(I_GetConceptData relType, I_RelTuple rel) {
-        return rel.getTypeId() == relType.getConceptId();
-    }
-
-    private boolean relationshipTypeIsKindOf(I_RelTuple rel) throws IOException, TerminologyException {
-
-        if (relationshipTypeIs(rel)) {
-            return true;
-        }
-
+    private boolean relRefinabilityIsDescendentOf(I_GetConceptData requiredRefinability, I_RelTuple relTuple)
+            throws TerminologyException, IOException {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-        // get list of all children of input concept
-        Set<I_GetConceptData> childDescTypes =
-                queryConstraint.getDestRelOrigins(termFactory.getActiveAceFrameConfig().getAllowedStatus(),
-                    allowedTypes, null, true, true);
+        Set<I_GetConceptData> children = requiredRefinability.getDestRelOrigins(null, allowedTypes, null, true, true);
 
-        // call relationshipTypeIs on each
-        for (I_GetConceptData childDescType : childDescTypes) {
-            if (relationshipTypeIs(childDescType, rel)) {
+        for (I_GetConceptData child : children) {
+            if (relRefinabilityIs(child, relTuple)) {
+                return true;
+            } else if (relRefinabilityIsDescendentOf(child, relTuple)) {
                 return true;
             }
         }
@@ -112,39 +114,14 @@ public class RelationshipStatement extends RefsetSpecStatement {
         return false;
     }
 
-    private boolean relationshipLogicalQuantifierIs(I_RelTuple rel) throws TerminologyException {
-        throw new TerminologyException("Unimplemented.");
-    }
-
-    private boolean relationshipLogicalQuantifierIsKindOf(I_RelTuple rel) throws TerminologyException {
-        throw new TerminologyException("Unimplemented.");
-    }
-
-    private boolean relationshipCharacteristicIs(I_RelTuple rel) {
-        return relationshipCharacteristicIs(queryConstraint, rel);
-    }
-
-    private boolean relationshipCharacteristicIs(I_GetConceptData charType, I_RelTuple rel) {
-        return rel.getCharacteristicId() == charType.getConceptId();
-    }
-
-    private boolean relationshipCharacteristicIsKindOf(I_RelTuple rel) throws TerminologyException, IOException {
-
-        if (relationshipCharacteristicIs(rel)) {
-            return true;
-        }
-
+    private boolean relRefinabilityIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-        // get list of all children of input concept
-        Set<I_GetConceptData> childDescTypes =
-                queryConstraint.getDestRelOrigins(termFactory.getActiveAceFrameConfig().getAllowedStatus(),
-                    allowedTypes, null, true, true);
+        Set<I_GetConceptData> children = queryConstraint.getDestRelOrigins(null, allowedTypes, null, true, true);
 
-        // call relationshipCharIs on each
-        for (I_GetConceptData childDescType : childDescTypes) {
-            if (relationshipCharacteristicIs(childDescType, rel)) {
+        for (I_GetConceptData child : children) {
+            if (relRefinabilityIs(child, relTuple)) {
                 return true;
             }
         }
@@ -152,22 +129,271 @@ public class RelationshipStatement extends RefsetSpecStatement {
         return false;
     }
 
-    private boolean relationshipRefinabilityIs(I_RelTuple rel) {
-        return relationshipRefinabilityIs(queryConstraint, rel);
+    private boolean relRefinabilityIsKindOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+        if (relRefinabilityIs(relTuple)) {
+            return true;
+        }
+
+        return relRefinabilityIsDescendentOf(queryConstraint, relTuple);
+
     }
 
-    private boolean relationshipRefinabilityIs(I_GetConceptData refinability, I_RelTuple rel) {
-        return rel.getRefinabilityId() == refinability.getConceptId();
+    private boolean relRefinabilityIs(I_RelTuple relTuple) {
+        return relRefinabilityIs(queryConstraint, relTuple);
     }
 
-    private boolean relationshipRefinabilityIsKindOf(I_RelTuple rel) {
+    private boolean relRefinabilityIs(I_GetConceptData requiredRefinability, I_RelTuple relTuple) {
+        return relTuple.getRefinabilityId() == requiredRefinability.getConceptId();
+    }
+
+    private boolean relCharIsDescendentOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+        return relCharIsDescendentOf(queryConstraint, relTuple);
+    }
+
+    private boolean relCharIsDescendentOf(I_GetConceptData requiredCharType, I_RelTuple relTuple) throws IOException,
+            TerminologyException {
+
+        I_IntSet allowedTypes = termFactory.newIntSet();
+        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+
+        Set<I_GetConceptData> children = requiredCharType.getDestRelOrigins(null, allowedTypes, null, true, true);
+
+        for (I_GetConceptData child : children) {
+            if (relCharIs(child, relTuple)) {
+                return true;
+            } else if (relCharIsDescendentOf(child, relTuple)) {
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    private boolean relCharIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+        I_IntSet allowedTypes = termFactory.newIntSet();
+        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+
+        Set<I_GetConceptData> children = queryConstraint.getDestRelOrigins(null, allowedTypes, null, true, true);
+
+        for (I_GetConceptData child : children) {
+            if (relCharIs(child, relTuple)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean relCharIsKindOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+
+        if (relCharIs(relTuple)) {
+            return true;
+        }
+
+        return relCharIsDescendentOf(queryConstraint, relTuple);
+
+    }
+
+    private boolean relCharIs(I_RelTuple relTuple) {
+        return relCharIs(queryConstraint, relTuple);
+    }
+
+    private boolean relCharIs(I_GetConceptData requiredCharType, I_RelTuple relTuple) {
+        return relTuple.getCharacteristicId() == requiredCharType.getConceptId();
+    }
+
+    private boolean relIsMemberOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+        return componentIsMemberOf(relTuple.getRelId());
+    }
+
+    private boolean relTypeIs(I_RelTuple relTuple) {
+        return relTypeIs(queryConstraint, relTuple);
+    }
+
+    private boolean relTypeIs(I_GetConceptData requiredRelType, I_RelTuple relTuple) {
+        return relTuple.getTypeId() == requiredRelType.getConceptId();
+    }
+
+    private boolean relTypeIsKindOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+
+        if (relTypeIs(relTuple)) {
+            return true;
+        }
+
+        return relTypeIsDescendentOf(relTuple);
+    }
+
+    private boolean relTypeIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+        I_IntSet allowedTypes = termFactory.newIntSet();
+        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+
+        Set<I_GetConceptData> children = queryConstraint.getDestRelOrigins(null, allowedTypes, null, true, true);
+
+        for (I_GetConceptData child : children) {
+            if (relTypeIs(child, relTuple)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean relTypeIsDescendentOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+        return relTypeIsDescendentOf(queryConstraint, relTuple);
+    }
+
+    private boolean relTypeIsDescendentOf(I_GetConceptData requiredRelType, I_RelTuple relTuple) throws IOException,
+            TerminologyException {
+        I_IntSet allowedTypes = termFactory.newIntSet();
+        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+
+        Set<I_GetConceptData> children = requiredRelType.getDestRelOrigins(null, allowedTypes, null, true, true);
+
+        for (I_GetConceptData child : children) {
+            if (relTypeIs(child, relTuple)) {
+                return true;
+            } else if (relTypeIsDescendentOf(child, relTuple)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean relStatusIsDescendentOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+        return relStatusIsDescendentOf(queryConstraint, relTuple);
+    }
+
+    private boolean relStatusIsDescendentOf(I_GetConceptData requiredStatus, I_RelTuple relTuple)
+            throws TerminologyException, IOException {
+        I_IntSet allowedTypes = termFactory.newIntSet();
+        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+
+        Set<I_GetConceptData> children = requiredStatus.getDestRelOrigins(null, allowedTypes, null, true, true);
+
+        for (I_GetConceptData child : children) {
+            if (relStatusIs(child, relTuple)) {
+                return true;
+            } else if (relStatusIsDescendentOf(child, relTuple)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean relStatusIsChildOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+        I_IntSet allowedTypes = termFactory.newIntSet();
+        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+
+        Set<I_GetConceptData> children = queryConstraint.getDestRelOrigins(null, allowedTypes, null, true, true);
+
+        for (I_GetConceptData child : children) {
+            if (relStatusIs(child, relTuple)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean relStatusIsKindOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+        if (relStatusIs(relTuple)) {
+            return true;
+        }
+
+        return relStatusIsDescendentOf(relTuple);
+    }
+
+    private boolean relStatusIs(I_RelTuple relTuple) {
+        return relStatusIs(queryConstraint, relTuple);
+    }
+
+    private boolean relStatusIs(I_GetConceptData requiredStatus, I_RelTuple relTuple) {
+        return componentStatusIs(requiredStatus, relTuple);
+    }
+
+    private boolean relIs(I_RelTuple relTuple) throws IOException, TerminologyException {
+        throw new TerminologyException("Unimplemented query : rel is"); // unimplemented TODO
+    }
+
+    private boolean relRestrictionIs(I_RelTuple relTuple) throws IOException, TerminologyException {
+        throw new TerminologyException("Unimplemented query : rel restriction is"); // unimplemented TODO
+    }
+
+    private boolean relLogicalQuantifierIsDescendentOf(I_RelTuple relTuple) throws TerminologyException {
+        throw new TerminologyException("Unimplemented query : rel logical quantifier is descendent"); // unimplemented
+        // TODO
+    }
+
+    private boolean relLogicalQuantifierIsChildOf(I_RelTuple relTuple) throws TerminologyException {
+        throw new TerminologyException("Unimplemented query : rel logical quantifier is child of"); // unimplemented
+        // TODO
+    }
+
+    private boolean relLogicalQuantifierIsKindOf(I_RelTuple relTuple) throws TerminologyException {
+        throw new TerminologyException("Unimplemented query : rel logical quantifier is kind of"); // unimplemented TODO
+    }
+
+    private boolean relLogicalQuantifierIs(I_RelTuple relTuple) throws TerminologyException {
+        throw new TerminologyException("Unimplemented query : rel logical quantifier is"); // unimplemented TODO
     }
 
     @Override
-    public IdentifierSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
+    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
-        throw new UnsupportedOperationException();
+        I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
+        if (parentPossibleConcepts == null) {
+            parentPossibleConcepts = termFactory.getConceptIdSet();
+        }
+
+        switch (tokenEnum) {
+        case REL_IS_MEMBER_OF:
+            List<I_ThinExtByRefVersioned> refsetExtensions =
+                    termFactory.getRefsetExtensionMembers(queryConstraint.getConceptId());
+            Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
+            for (I_ThinExtByRefVersioned ext : refsetExtensions) {
+                refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
+            }
+            I_RepresentIdSet refsetMemberSet = termFactory.getIdSetfromTermCollection(refsetMembers);
+            if (isNegated()) {
+                possibleConcepts.or(parentPossibleConcepts);
+                // possibleConcepts = termFactory.getConceptIdSet();
+                // possibleConcepts.removeAll(refsetMemberSet);
+            } else {
+                possibleConcepts.or(refsetMemberSet);
+            }
+
+            break;
+        case REL_IS:
+        case REL_RESTRICTION_IS:
+        case REL_STATUS_IS:
+        case REL_STATUS_IS_KIND_OF:
+        case REL_STATUS_IS_CHILD_OF:
+        case REL_STATUS_IS_DESCENDENT_OF:
+        case REL_TYPE_IS:
+        case REL_TYPE_IS_KIND_OF:
+        case REL_TYPE_IS_CHILD_OF:
+        case REL_TYPE_IS_DESCENDENT_OF:
+        case REL_LOGICAL_QUANTIFIER_IS:
+        case REL_LOGICAL_QUANTIFIER_IS_KIND_OF:
+        case REL_LOGICAL_QUANTIFIER_IS_CHILD_OF:
+        case REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF:
+        case REL_CHARACTERISTIC_IS:
+        case REL_CHARACTERISTIC_IS_KIND_OF:
+        case REL_CHARACTERISTIC_IS_CHILD_OF:
+        case REL_CHARACTERISTIC_IS_DESCENDENT_OF:
+        case REL_REFINABILITY_IS:
+        case REL_REFINABILITY_IS_KIND_OF:
+        case REL_REFINABILITY_IS_CHILD_OF:
+        case REL_REFINABILITY_IS_DESCENDENT_OF:
+            possibleConcepts.or(parentPossibleConcepts);
+            break;
+        default:
+            throw new RuntimeException("Can't handle queryToken: " + queryToken);
+        }
+        setPossibleConceptsCount(possibleConcepts.size());
+        return possibleConcepts;
     }
 
 }

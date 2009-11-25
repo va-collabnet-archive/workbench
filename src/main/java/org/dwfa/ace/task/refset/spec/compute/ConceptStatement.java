@@ -11,7 +11,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RepresentIdSet;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -53,10 +52,12 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
 
         switch (tokenEnum) {
-        case CONCEPT_CONTAINS_DESC_GROUPING:
-            throw new TerminologyException("Unimplemented query : contains desc grouping"); // unimplemented
-        case CONCEPT_CONTAINS_REL_GROUPING:
-            throw new TerminologyException("Unimplemented query : contains rel grouping"); // unimplemented
+        /*
+         * case CONCEPT_CONTAINS_DESC_GROUPING:
+         * throw new TerminologyException("Unimplemented query : contains desc grouping"); // unimplemented
+         * case CONCEPT_CONTAINS_REL_GROUPING:
+         * throw new TerminologyException("Unimplemented query : contains rel grouping"); // unimplemented
+         */
         case CONCEPT_IS:
             if (isNegated()) {
                 // possibleConcepts = termFactory.getConceptIdSet();
@@ -113,10 +114,6 @@ public class ConceptStatement extends RefsetSpecStatement {
         I_GetConceptData concept = (I_GetConceptData) component;
 
         switch (tokenEnum) {
-        case CONCEPT_CONTAINS_DESC_GROUPING:
-            return conceptContainsDescGrouping(concept);
-        case CONCEPT_CONTAINS_REL_GROUPING:
-            return conceptContainsRelGrouping(concept);
         case CONCEPT_IS:
             return conceptIs(concept);
         case CONCEPT_IS_CHILD_OF:
@@ -172,47 +169,7 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptIsMemberOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
-
-        // get all extensions for this concept
-        List<I_ThinExtByRefVersioned> extensions =
-                termFactory.getAllExtensionsForComponent(conceptBeingTested.getConceptId());
-        System.out
-            .println("Number of extensions: " + extensions.size() + " for " + conceptBeingTested.getInitialText());
-
-        for (I_ThinExtByRefVersioned ext : extensions) {
-            if (ext.getRefsetId() == queryConstraint.getConceptId()) {
-                // check they are of the specified refset
-
-                List<? extends I_ThinExtByRefPart> parts = ext.getVersions();
-
-                I_ThinExtByRefPart latestPart = null;
-                int latestPartVersion = Integer.MIN_VALUE;
-
-                // get latest part & check that it is current
-                for (I_ThinExtByRefPart part : parts) {
-                    if (part.getVersion() > latestPartVersion) {
-                        latestPartVersion = part.getVersion();
-                        latestPart = part;
-                    }
-                }
-
-                for (Integer currentStatusId : getCurrentStatusIds()) {
-                    if (latestPart.getStatusId() == currentStatusId) {
-                        return true;
-                    }
-                }
-
-            }
-        }
-        return false;
-    }
-
-    private boolean conceptContainsRelGrouping(I_GetConceptData conceptBeingTested) throws TerminologyException {
-        throw new TerminologyException("Unimplemented query : contains rel grouping"); // unimplemented
-    }
-
-    private boolean conceptContainsDescGrouping(I_GetConceptData conceptBeingTested) throws TerminologyException {
-        throw new TerminologyException("Unimplemented query : contains desc grouping"); // unimplemented
+        return componentIsMemberOf(conceptBeingTested.getConceptId());
     }
 
     /**

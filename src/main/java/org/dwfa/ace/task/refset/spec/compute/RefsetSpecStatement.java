@@ -172,6 +172,13 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         return isComponentStatus(queryConstraint, tuples);
     }
 
+    protected boolean componentStatusIs(I_GetConceptData requiredStatus, I_AmTuple tuple) {
+        List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
+        tuples.add(tuple);
+
+        return isComponentStatus(requiredStatus, tuples);
+    }
+
     protected boolean componentStatusIsKindOf(I_AmTuple tuple) throws IOException, TerminologyException {
 
         List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
@@ -199,6 +206,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         return false;
     }
 
+    // ** checked
     protected boolean componentIsMemberOf(int componentId) throws IOException, TerminologyException {
         // get all extensions for this concept
         List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(componentId);
@@ -219,9 +227,10 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
                     }
                 }
 
-                if (latestPart.getStatusId() == termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId()) {
-                    return true;
+                for (Integer currentStatusId : getCurrentStatusIds()) {
+                    if (latestPart.getStatusId() == currentStatusId) {
+                        return true;
+                    }
                 }
             }
         }

@@ -12,13 +12,13 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Task for adding a "relationship type is" structural query to a refset spec.
+ * Task for adding a "relationship status is child of" structural query to a refset spec.
  * 
  * @author Chrissy Hill
  * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/rel", type = BeanType.TASK_BEAN) })
-public class RelationshipTypeIs extends AddStructuralQueryToRefsetSpec {
+public class RelationshipStatusIsChildOf extends AddStructuralQueryToRefsetSpec {
     /**
 	 * 
 	 */
@@ -40,7 +40,7 @@ public class RelationshipTypeIs extends AddStructuralQueryToRefsetSpec {
     }
 
     protected int getStructuralQueryTokenId() throws IOException, TerminologyException {
-        return RefsetAuxiliary.Concept.REL_TYPE_IS.localize().getNid();
+        return RefsetAuxiliary.Concept.REL_STATUS_IS_CHILD_OF.localize().getNid();
     }
 
 }

@@ -12,6 +12,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -178,10 +179,32 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
             break;
         case CONCEPT_CONTAINS_DESC:
+        case NOT_CONCEPT_CONTAINS_DESC:
+            if (statements.size() == 0 && subqueries.size() == 0) {
+                throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
+            }
+            for (RefsetSpecComponent component : allComponents) {
+                if (possibleConcepts == null) {
+                    possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
+                } else {
+                    possibleConcepts.or(component.getPossibleConcepts(config, parentPossibleConcepts));
+                }
+            }
         case CONCEPT_CONTAINS_REL:
         case NOT_CONCEPT_CONTAINS_REL:
-        case NOT_CONCEPT_CONTAINS_DESC:
-            throw new TerminologyException("Unsupported operation exception. Optimization not complete");
+            if (statements.size() == 0 && subqueries.size() == 0) {
+                throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
+            }
+
+            for (RefsetSpecComponent component : allComponents) {
+                if (possibleConcepts == null) {
+                    possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
+                } else {
+                    possibleConcepts.or(component.getPossibleConcepts(config, parentPossibleConcepts));
+                }
+            }
+
+            break;
         default:
             throw new TerminologyException("Unknown grouping type.");
         }
@@ -221,85 +244,120 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
             for (RefsetSpecComponent specComponent : allComponents) {
                 if (!specComponent.execute(component)) {
-                    // can exit the AND early, as at least one statement is
-                    // returning false
+                    // can exit the AND early, as at least one statement is returning false
                     return false;
                 }
             }
 
-            // all queries and statements have returned true, therefore AND
-            // will return true
+            // all queries and statements have returned true, therefore AND will return true
             return true;
         case OR:
-
             if (statements.size() == 0 && subqueries.size() == 0) {
                 throw new TerminologyException("Spec is invalid - dangling OR.");
             }
 
             for (RefsetSpecComponent specComponent : allComponents) {
                 if (specComponent.execute(component)) {
-                    // exit the OR statement early, as at least one
-                    // statement has returned true
+                    // exit the OR statement early, as at least one statement has returned true
                     return true;
                 }
             }
 
-            // no queries or statements have returned true, therefore the OR
-            // will return false
+            // no queries or statements have returned true, therefore the OR will return false
             return false;
         case CONCEPT_CONTAINS_DESC:
-
-            // for this concept. get all relationships.
-            // execute all statements and queries on each relationship.
-            I_GetConceptData concept = (I_GetConceptData) component;
-            List<I_DescriptionTuple> descriptionTuples =
-                    concept.getDescriptionTuples(termFactory.getActiveAceFrameConfig().getAllowedStatus(), null,
-                        termFactory.getActiveAceFrameConfig().getViewPositionSet(), true);
-
-            for (I_DescriptionTuple tuple : descriptionTuples) {
-                I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
-                boolean valid = false;
-
-                for (RefsetSpecStatement statement : statements) {
-                    if (!statement.execute(descVersioned)) {
-                        // can exit the AND early, as at least one statement
-                        // is returning false
-                        valid = false;
-                        break;
-                    } else {
-                        valid = true;
-                    }
-                }
-
-                for (RefsetSpecQuery subquery : subqueries) {
-                    if (!subquery.execute(descVersioned)) {
-                        // can exit the AND early, as at least one query is
-                        // returning false
-                        valid = false;
-                        break;
-                    } else {
-                        valid = true;
-                    }
-                }
-
-                if (valid) { // this description meets criteria
-                    return true;
-                }
-            }
-
-            return false; // no descriptions met criteria
-        case CONCEPT_CONTAINS_REL:
-            // TODO
-            return true;
-        case NOT_CONCEPT_CONTAINS_REL:
-            // TODO
-            return true;
+            return executeConceptContainsDesc(component);
         case NOT_CONCEPT_CONTAINS_DESC:
-            // TODO
-            return true;
+            return !executeConceptContainsDesc(component);
+        case CONCEPT_CONTAINS_REL:
+            return executeConceptContainsRel(component);
+        case NOT_CONCEPT_CONTAINS_REL:
+            return !executeConceptContainsRel(component);
         default:
             throw new TerminologyException("Unknown grouping type.");
         }
+
+    }
+
+    private boolean executeConceptContainsDesc(I_AmTermComponent component) throws TerminologyException, IOException {
+        if (statements.size() == 0 && subqueries.size() == 0) {
+            throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
+        }
+
+        I_GetConceptData descriptionConcept = (I_GetConceptData) component;
+        List<I_DescriptionTuple> descriptionTuples =
+                descriptionConcept.getDescriptionTuples(null, null, termFactory.getActiveAceFrameConfig()
+                    .getViewPositionSet(), true);
+
+        for (I_DescriptionTuple tuple : descriptionTuples) {
+            I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
+            boolean valid = false;
+
+            for (RefsetSpecStatement statement : statements) {
+                if (!statement.execute(descVersioned)) {
+                    // can exit the execution early, as at least one statement is returning false
+                    valid = false;
+                    break;
+                } else {
+                    valid = true;
+                }
+            }
+
+            for (RefsetSpecQuery subquery : subqueries) {
+                if (!subquery.execute(descVersioned)) {
+                    // can exit the execution early, as at least one query is returning false
+                    valid = false;
+                    break;
+                } else {
+                    valid = true;
+                }
+            }
+
+            if (valid) { // this description meets criteria
+                return true;
+            }
+        }
+
+        return false; // no descriptions met criteria
+    }
+
+    private boolean executeConceptContainsRel(I_AmTermComponent component) throws TerminologyException, IOException {
+        if (statements.size() == 0 && subqueries.size() == 0) {
+            throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
+        }
+
+        I_GetConceptData relQueryConcept = (I_GetConceptData) component;
+        List<I_RelVersioned> relTuples = relQueryConcept.getSourceRels();
+
+        for (I_RelVersioned versionedTuple : relTuples) {
+            boolean valid = false;
+
+            for (RefsetSpecStatement statement : statements) {
+                if (!statement.execute(versionedTuple)) {
+                    // can exit the execution early, as at least one statement is returning false
+                    valid = false;
+                    break;
+                } else {
+                    valid = true;
+                }
+            }
+
+            for (RefsetSpecQuery subquery : subqueries) {
+                if (!subquery.execute(versionedTuple)) {
+                    // can exit the execution early, as at least one query is returning false
+                    valid = false;
+                    break;
+                } else {
+                    valid = true;
+                }
+            }
+
+            if (valid) { // this relationship meets criteria
+                return true;
+            }
+        }
+
+        return false; // no relationships met criteria
 
     }
 
