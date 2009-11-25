@@ -34,6 +34,15 @@ public class RelationshipStatement extends RefsetSpecStatement {
      */
     public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_GetConceptData queryConstraint) {
         super(useNotQualifier, queryToken, queryConstraint);
+        for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
+            if (queryToken.getConceptId() == token.nid) {
+                tokenEnum = token;
+                break;
+            }
+        }
+        if (tokenEnum == null) {
+            throw new RuntimeException("Unknown query type : " + queryToken);
+        }
     }
 
     public boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException {
