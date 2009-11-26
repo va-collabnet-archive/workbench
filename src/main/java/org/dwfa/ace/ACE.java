@@ -595,6 +595,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                             }
                         }
                     }
+                    return;
                 }
             } catch (IOException e) {
                 AceLog.getEditLog().alertAndLogException(e);
@@ -606,6 +607,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 if (uncommittedBean.isUncommitted() == false && uncommittedBean.isExtensionUncommitted() == false) {
                     dataCheckMap.remove(uncommittedBean);
                     removeUncommitted(to);
+                    return;
                 }
             } catch (IOException e) {
                 AceLog.getEditLog().alertAndLogException(e);
@@ -682,6 +684,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public static void removeUncommitted(final I_Transact to) {
         uncommitted.remove(to);
+        if (uncommitted.size() == 0) {
+        	dataCheckMap.clear();
+        }
         if (aceConfig != null) {
         	SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -3165,6 +3170,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     commitButton.setText("<html><b><font color='green'>commit</font></b>");
                 } else {
                     commitButton.setText("commit");
+                    dataCheckListModel.clear();
                 }
         	}
         	if (cancelButton != null) {
