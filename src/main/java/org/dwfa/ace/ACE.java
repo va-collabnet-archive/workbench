@@ -547,6 +547,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private static List<I_TestDataConstraints> creationTests = new ArrayList<I_TestDataConstraints>();
 
     public static void addUncommittedNoChecks(I_Transact to) {
+    	if (to == null) {
+    		return;
+    	}
         if (commitInProgress) {
             try {
                 to.abort();
@@ -560,6 +563,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public static synchronized void addUncommitted(I_Transact to) {
+    	if (to == null) {
+    		return;
+    	}
         if (commitInProgress) {
             try {
                 to.abort();
@@ -3184,9 +3190,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         } else if (evt.getPropertyName().equals("uncommitted")) {
             uncommittedTableModel.clear();
             for (I_Transact t : uncommitted) {
-                if (ConceptBean.class.isAssignableFrom(t.getClass())) {
-                    uncommittedTableModel.addElement((ConceptBean) t);
-                }
+            	if (t != null) {
+                    if (ConceptBean.class.isAssignableFrom(t.getClass())) {
+                        uncommittedTableModel.addElement((ConceptBean) t);
+                    }
+            	}
             }
         } else if (evt.getPropertyName().equals("imported")) {
             importHistoryTableModel.clear();
