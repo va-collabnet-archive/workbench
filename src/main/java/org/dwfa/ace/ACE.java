@@ -595,7 +595,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                             }
                         }
                     }
-                    return;
                 }
             } catch (IOException e) {
                 AceLog.getEditLog().alertAndLogException(e);
@@ -607,7 +606,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 if (uncommittedBean.isUncommitted() == false && uncommittedBean.isExtensionUncommitted() == false) {
                     dataCheckMap.remove(uncommittedBean);
                     removeUncommitted(to);
-                    return;
                 }
             } catch (IOException e) {
                 AceLog.getEditLog().alertAndLogException(e);
