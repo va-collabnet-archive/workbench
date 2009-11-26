@@ -44,7 +44,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * The request for change panel that allows user to input:
+ * The Refresh Refset panel that allows user to input:
  * 1) refset name (from pulldown menu)
  * 2) editor (from pulldown menu)
  * 3) comments (text field)

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -18,9 +19,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
+import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -162,19 +167,29 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 	        PanelSnomedVersion newPanel = new PanelSnomedVersion(config); 
 	        
  
-	        /*----------------------------------------------------------------------------------
+	        /*-----------------------------------------------------------------------------------
 	         *  Initialize the fields on this panel with the previously entered values (if any).
 	         * ----------------------------------------------------------------------------------
 	         */
 	        // Position Set Field Initialization 	        
 			try {
-				Set<I_Position> previousPositions = null;
-//		        if (isKeyDefined(process, positionSetPropName.substring(3))) {
-		        	previousPositions = (Set<I_Position>) process.getProperty(positionSetPropName);
-		        	if (previousPositions != null ) {
-		        		newPanel.setPositionSet(previousPositions); 
-		        	}	  
-//		        }
+				Set<I_Position> previousPositions = new HashSet<I_Position>();
+		        I_TermFactory tf = LocalVersionedTerminology.get();
+				
+				// Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
+				Set<UniversalAcePosition> universalPositions = 
+					(Set<UniversalAcePosition>) process.getProperty(positionSetPropName);
+				        
+		        for (UniversalAcePosition univPos: universalPositions) {
+		           I_Path path = tf.getPath(univPos.getPathId());
+		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+		           previousPositions.add(thinPos);
+		        }
+
+		        if (previousPositions.size() > 0 ) {
+		        	newPanel.setPositionSet(previousPositions); 
+		        }	  
+		        
 			} catch (NullPointerException e) {
 				//TODO  Just ignore the NPE for now - remove this when you add the 
 				//      isPropertyDefined class back in.  
@@ -187,14 +202,14 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 			} catch (InvocationTargetException e) {
 				e.printStackTrace();
 			}
-
+	        
 	        
 	        /*----------------------------------------------------------------------------------
 	         *  Add the initialized panel to the Workflow Details Sheet
 	         * ----------------------------------------------------------------------------------
 	         */
 	        workflowDetailsSheet.add(newPanel, BorderLayout.NORTH);
-	        workflowDetailsSheet.repaint();
+	        workflowDetailsSheet.validate();
 	        
 		} catch (Exception e) {
 			ex = e;
@@ -230,17 +245,6 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 	public void setPositionSetPropName(String positionSetPropName) {
 		this.positionSetPropName = positionSetPropName;
 	}
-
-//	public boolean isKeyDefined(I_EncodeBusinessProcess process, String keyName) {	
-//		String propertyName = new String(); 
-//		if (keyName.startsWith("A: ")) {
-//			propertyName = keyName.substring(3);
-//		} else {
-//			propertyName = keyName;
-//		}		
-//		Collection<String> listOfKeys = process.getAttachmentKeys(); 
-//		return listOfKeys.contains(propertyName);
-//	}
 
 
 }

@@ -5,26 +5,39 @@ import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 import org.dwfa.ace.task.refset.refresh.PanelRefsetVersion;
+import org.dwfa.ace.utypes.UniversalAcePath;
+import org.dwfa.ace.utypes.UniversalAcePosition;
 
 /**
  * This task collects the Refset Spec Version data entered on the 
@@ -51,6 +64,7 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 	private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
 	
+    private I_TermFactory termFactory;
 
     /* -----------------------
      * Serialization Methods
@@ -106,6 +120,10 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
 	 */
 	public Condition evaluate(final I_EncodeBusinessProcess process,
 			final I_Work worker) throws TaskFailedException {
+		
+		// Set up local variables  
+        termFactory = LocalVersionedTerminology.get();
+
 		try {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
@@ -129,7 +147,27 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
                                 "", JOptionPane.ERROR_MESSAGE);
                         return Condition.ITEM_CANCELED;
 					} else {
-						process.setProperty(positionSetPropName, positionSet);
+
+						//change all I_Positions to UniversalAcePositions 
+						Set<UniversalAcePosition> universalPositions = new HashSet<UniversalAcePosition>();
+						
+						for (I_Position position : positionSet) {
+						    try {
+						         I_GetConceptData pathConcept = termFactory.getConcept(position.getPath().getConceptId());
+						        
+						         universalPositions.add(new UniversalAcePosition(termFactory.getUids(pathConcept.getConceptId()), 
+						                        termFactory.convertToThickVersion(position.getVersion())));
+						  
+						    } catch (TerminologyException e) {
+						        // TODO Auto-generated catch block
+						        e.printStackTrace();
+						    } catch (IOException e) {
+						        // TODO Auto-generated catch block
+						        e.printStackTrace();
+						    } 
+						}
+						
+						process.setProperty(positionSetPropName, universalPositions);
 						return Condition.ITEM_COMPLETE;
 					}
 				}

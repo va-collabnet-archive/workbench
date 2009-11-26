@@ -141,8 +141,9 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                 if (PanelRefsetAndParameters.class.isAssignableFrom(c.getClass())) {
                 	PanelRefsetAndParameters panel = (PanelRefsetAndParameters) c;
                 	
+                    // ---------------------------------------------
                     // Retrieve values from the panel / environment
-
+                    // ---------------------------------------------
                     I_GetConceptData refset = panel.getRefset();
                     I_GetConceptData editor = panel.getEditor();
                     String comments = panel.getComments();
@@ -151,13 +152,12 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                     HashSet<File> fileAttachments = panel.getAttachments();
                     I_GetConceptData owner = config.getDbConfig().getUserConcept();
 
-                    // -----------------------------------------
-                    // VERIFY ALL REQUIRED FIELDS AND STORE
-                    // THE ENTERED DATA INTO PROPERTY KEYS
-                    // -----------------------------------------
+                    // -------------------------------------------------------------------------
+                    // VERIFY ALL REQUIRED FIELDS AND STORE THE ENTERED DATA INTO PROPERTY KEYS
+                    // -------------------------------------------------------------------------
                     
                     // -----------------------------------------
-                    // Refset Field is required 
+                    // Refset Field is required!
                     // -----------------------------------------
                    if (refset == null) {
                    		// Warn the user that Refset is required. 
@@ -268,15 +268,6 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                     // -----------------------------------------
                     process.setProperty(fileAttachmentsPropName, fileAttachments);
                    
-                    
-//                    if (fileAttachments == null || fileAttachments.isEmpty()) {
-//                       	// remove the key from the process. 
-//                        process.takeAttachment(fileAttachmentsPropName);
-//                    } else {
-//                    	// Store the attachments in the Key
-//                        process.setProperty(fileAttachmentsPropName, fileAttachments);
-//                    }
-
                     // Under normal conditions this is where we should return from 
                     return Condition.ITEM_COMPLETE;
 

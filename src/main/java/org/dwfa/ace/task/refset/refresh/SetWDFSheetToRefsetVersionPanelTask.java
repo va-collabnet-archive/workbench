@@ -21,10 +21,14 @@ import javax.swing.border.EtchedBorder;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
+import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -178,13 +182,22 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 	         */
 	        // Position Set Field Initialization 	        
 			try {
-				Set<I_Position> previousPositions = null;
-//		        if (isKeyDefined(process, positionSetPropName.substring(3))) {
-		        	previousPositions = (Set<I_Position>) process.getProperty(positionSetPropName);
-		        	if (previousPositions != null ) {
-		        		newPanel.setPositionSet(previousPositions); 
-		        	}	  
-//		        }
+				Set<I_Position> previousPositions = new HashSet<I_Position>();
+		        I_TermFactory tf = LocalVersionedTerminology.get();
+				
+				// Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
+				Set<UniversalAcePosition> universalPositions = 
+					(Set<UniversalAcePosition>) process.getProperty(positionSetPropName);
+		        for (UniversalAcePosition univPos: universalPositions) {
+		           I_Path path = tf.getPath(univPos.getPathId());
+		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+		           previousPositions.add(thinPos);
+		        }
+
+		        if (previousPositions.size() > 0 ) {
+		        	newPanel.setPositionSet(previousPositions); 
+		        }	  
+
 			} catch (NullPointerException e) {
 				//TODO  Just ignore the NPE for now - remove this when you add the 
 				//      isPropertyDefined class back in.  
@@ -202,18 +215,16 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 			// Set the Refset Label based on the name of the selected refset
 			UUID selectedRefsetUUID = null; 
 			String selectedRefsetText; 
-//	        if (isKeyDefined(process, refsetUuidPropName.substring(3))) {
-	        	selectedRefsetUUID = (UUID) process.getProperty(refsetUuidPropName);
-	        	if (selectedRefsetUUID != null ) {
+        	selectedRefsetUUID = (UUID) process.getProperty(refsetUuidPropName);
+        	if (selectedRefsetUUID != null ) {
 
-		    		I_GetConceptData selectedRefset = (I_GetConceptData) AceTaskUtil.getConceptFromObject(selectedRefsetUUID);
-		    		selectedRefsetText = " " + selectedRefset.getInitialText(); 
+	    		I_GetConceptData selectedRefset = (I_GetConceptData) AceTaskUtil.getConceptFromObject(selectedRefsetUUID);
+	    		selectedRefsetText = " " + selectedRefset.getInitialText(); 
 
-	        	} else {
-	        		selectedRefsetText = "NO REFSET SELECTED";
-	        	}
-	    		newPanel.setSelectedRefsetSpecLabel(selectedRefsetText);
-//	        }
+        	} else {
+        		selectedRefsetText = "NO REFSET SELECTED";
+        	}
+    		newPanel.setSelectedRefsetSpecLabel(selectedRefsetText);
 
 	        
 	        /*----------------------------------------------------------------------------------
@@ -221,7 +232,7 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 	         * ----------------------------------------------------------------------------------
 	         */
 	        workflowDetailsSheet.add(newPanel, BorderLayout.NORTH);
-	        workflowDetailsSheet.repaint();
+	        workflowDetailsSheet.validate();
 	        
 		} catch (Exception e) {
 			ex = e;
@@ -266,16 +277,5 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 	public void setRefsetUuidPropName(String refsetUuidPropName) {
 		this.refsetUuidPropName = refsetUuidPropName;
 	}
-
-//	public boolean isKeyDefined(I_EncodeBusinessProcess process, String keyName) {
-//		String propertyName = new String(); 
-//		if (keyName.startsWith("A: ")) {
-//			propertyName = keyName.substring(3);
-//		} else {
-//			propertyName = keyName;
-//		}		
-//		Collection<String> listOfKeys = process.getAttachmentKeys(); 
-//		return listOfKeys.contains(propertyName);
-//	}
 
 }

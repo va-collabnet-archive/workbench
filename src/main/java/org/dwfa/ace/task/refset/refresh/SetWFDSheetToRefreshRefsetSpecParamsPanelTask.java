@@ -1,14 +1,14 @@
 package org.dwfa.ace.task.refset.refresh;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridLayout;
 import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -26,7 +26,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.path.SelectPositionSetPanel;
+import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.TestForCreateNewRefsetPermission;
 import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
@@ -38,11 +38,11 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.dwfa.ace.task.AceTaskUtil;
 
 /**
  * This task prepares the Workflow Details Sheet to display the PanelRefsetAndParameters
@@ -230,9 +230,11 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 		        	UUID editorUUID = (UUID) process.getProperty(editorUuidPropName);
 		        	
 		        	// Translate the UUID back into an I_GetConceptData object 
+		        	System.out.println("Conveting UUID[] to I_GetConceptData");
 		        	previousEditor = (I_GetConceptData) AceTaskUtil.getConceptFromObject(editorUUID); 
 			        if (previousEditor != null ) {
-			        
+			        	System.out.println("previousEditor=" + previousEditor.getInitialText());
+
 			        	// set the ComboBox to point to the selected editor  
 			        	newPanel.setEditor(previousEditor); 
 			        }	      
@@ -354,6 +356,10 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         return AbstractTask.CONTINUE_CONDITION;
     }
 
+    
+
+    
+    
 //    /**
 //     * Determines if the key provided is already defined as a property in the current process 
 //     * 

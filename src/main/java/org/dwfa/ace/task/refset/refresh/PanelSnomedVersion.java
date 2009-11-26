@@ -26,11 +26,16 @@ import org.dwfa.tapi.TerminologyException;
 
 import org.dwfa.ace.path.*;
 
+/**
+ * The PanelSnomedVersion class displays a list of paths and lets the user 
+ * select the version of SNOMED to use for the refresh process 
+ * 
+ * @author wpr
+ * @version 1, November 2009
+ * 
+ */
 public class PanelSnomedVersion extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private Set<I_Position> positionSet = new HashSet<I_Position>();
 	private JList positionList;

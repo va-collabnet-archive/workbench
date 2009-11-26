@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,12 +18,14 @@ import javax.swing.JOptionPane;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -164,8 +167,28 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
     		config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
  	        UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
 	        I_GetConceptData refsetSpecConcept = (I_GetConceptData) AceTaskUtil.getConceptFromObject(refsetSpecUuid); 
-	        Set<I_Position> refsetPositionSet = (Set<I_Position>) process.getProperty(refsetPositionSetPropName);
-	        Set<I_Position> snomedPositionSet = (Set<I_Position>) process.getProperty(snomedPositionSetPropName);
+	        
+	        // Get the Refset Position (must convert from UniversalAcePosition type) 
+			// Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
+			Set<I_Position> refsetPositionSet = new HashSet<I_Position>();			
+			Set<UniversalAcePosition> universalRefsetPositions = 
+				(Set<UniversalAcePosition>) process.getProperty(refsetPositionSetPropName);			        
+	        for (UniversalAcePosition univPos: universalRefsetPositions) {
+	           I_Path path = termFactory.getPath(univPos.getPathId());
+	           I_Position thinPos = termFactory.newPosition(path, termFactory.convertToThinVersion(univPos.getTime()));
+	           refsetPositionSet.add(thinPos);
+	        }
+
+	        // Get the SNOMED Position (must convert from UniversalAcePosition type) 
+			// Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
+			Set<I_Position> snomedPositionSet = new HashSet<I_Position>();			
+			Set<UniversalAcePosition> universalSnomedPositions = 
+				(Set<UniversalAcePosition>) process.getProperty(snomedPositionSetPropName);			        
+	        for (UniversalAcePosition univPos: universalSnomedPositions) {
+	           I_Path path = termFactory.getPath(univPos.getPathId());
+	           I_Position thinPos = termFactory.newPosition(path, termFactory.convertToThinVersion(univPos.getTime()));
+	           snomedPositionSet.add(thinPos);
+	        }
 
 	        // DEBUG:  Echo out the retrieved values 
 	        System.out.println("PARAMETERS PASSED IN THROUGH KEYS");
@@ -179,15 +202,20 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	         * Define some local variables to support the queries
 	         * ---------------------------------------------------
 	         */
-//    		List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
-//    	    Map<List<UUID>, I_GetConceptData> changesMap = new HashMap<List<UUID>, I_GetConceptData>();
-
-    	    List<I_GetConceptData> changesList = new ArrayList<I_GetConceptData>();
-    	    Map<I_GetConceptData, I_GetConceptData> changesMap = new HashMap<I_GetConceptData, I_GetConceptData>();
-	        I_IntSet allowedTypes; 
-	        I_IntSet allowedStatus; 
+	        // The changesList will be used to loop through and launch a review process 
+	        // for each entry it contains 
+    	    List<List<UUID>> changesList = new ArrayList<List<UUID>>();
+    	    
+    	    // The changesMap maps the changed concept to the new concept - each concept is 
+    	    // represented as a list of UUIDs
+    	    Map<List<UUID>, List<UUID>> changesMap = new HashMap<List<UUID>, List<UUID>>();
+    	    
+    	    // The allowedTypes and allowedStatus are used in the queries 
+	        I_IntSet allowedTypes = null; 
+	        I_IntSet allowedStatus = null; 
+	        
 	        // Define the status: "Not Current" 
-	        // NOTE: The status "Not Current" means a member of the set of not current status 
+	        //       The status "Not Current" means a member of the set of not current status 
 	        //       values. Since there is no single value, you need to test for membership  
 	        //       in the set of all the children of inactive: 
 	        I_IntSet notCurrentStatus = termFactory.newIntSet();
@@ -230,19 +258,19 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 			// If no records are found 
 			if (refsetSpec_A_SourceRelTargets == null || refsetSpec_A_SourceRelTargets.size() == 0) {
 	    		// Display a Debug message 
-	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-	    				"Query 'A' found no records to be refreshed for refset: \n" + 
-	    				refsetSpecConcept.getInitialText(),
-	    				"DEBUG Message",
-	    				JOptionPane.INFORMATION_MESSAGE);
+//	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+//	    				"Query 'A' found no records to be refreshed for refset: \n" + 
+//	    				refsetSpecConcept.getInitialText(),
+//	    				"DEBUG Message",
+//	    				JOptionPane.INFORMATION_MESSAGE);
 	    		// Cancel the task 
 	    		RefreshRefsetSpecCompareTask.this.setCondition(Condition.ITEM_CANCELED);
 	        } else {
 		        //TODO Remove Debug Messages... 
-		        System.out.println("QUERY A - getSourceRelTargets()");
-		        System.out.println("==============================="); 
-		        System.out.println("   NUMBER FOUND = " + refsetSpec_A_SourceRelTargets.size());
-		        System.out.println("   INCLUDE:");
+//		        System.out.println("QUERY A - getSourceRelTargets()");
+//		        System.out.println("==============================="); 
+//		        System.out.println("   NUMBER FOUND = " + refsetSpec_A_SourceRelTargets.size());
+//		        System.out.println("   INCLUDE:");
 		        if (refsetSpec_A_SourceRelTargets.size() < 1000) {
 			        for (I_GetConceptData concept : refsetSpec_A_SourceRelTargets) {
 				        System.out.println("      " + concept.toString());
@@ -252,19 +280,16 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 		        // Add the results of the query to the List and the Map
 		        for (I_GetConceptData oldConcept : refsetSpec_A_SourceRelTargets) {
 		    	    
-		        	// Remember the oldConcept is a list for future reference 
-		        	changesList.add(oldConcept);
+		        	// Add the oldConcept to the changesList for future reference 
+		        	changesList.add((List<UUID>) oldConcept.getUids());
 		    	    
 		    	    // Search SNOMED for changes to this concept 
-		    	    //TODO 
+		    	    //TODO Search SNOMED! 
 		        	I_GetConceptData newConcept = null;  
 		        	
 		    	    // Put the oldConcept and the newConcept into the changesMap 
-		    	    changesMap.put(oldConcept, newConcept);  
+		    	    changesMap.put((List<UUID>) oldConcept.getUids(), (List<UUID>) newConcept.getUids());  
 
-//		        	List<UUID> uuidList = new ArrayList<UUID>();
-//	    			uuidList = (List<UUID>) concept.getUids();
-//	        		uuidListOfLists.add(uuidList);
 		        }	        	
 
 		        // Set task completion status 
@@ -294,19 +319,19 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 			// If no records are found for Query B... 
 			if (refsetSpec_B_SourceRelTargets == null || refsetSpec_B_SourceRelTargets.size() == 0) {
 	    		// Display a Debug message 
-	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-	    				"Query 'B' found no records to be refreshed for refset: \n" + 
-	    				refsetSpecConcept.getInitialText(),
-	    				"DEBUG Message",
-	    				JOptionPane.INFORMATION_MESSAGE);
+//	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+//	    				"Query 'B' found no records to be refreshed for refset: \n" + 
+//	    				refsetSpecConcept.getInitialText(),
+//	    				"DEBUG Message",
+//	    				JOptionPane.INFORMATION_MESSAGE);
 	    		// Cancel the task 
 	    		RefreshRefsetSpecCompareTask.this.setCondition(Condition.ITEM_CANCELED);
 	        } else {
 		        //TODO Remove Debug Messages... 
-		        System.out.println("QUERY B - getSourceRelTargets()");
-		        System.out.println("==============================="); 
-		        System.out.println("   NUMBER FOUND = " + refsetSpec_B_SourceRelTargets.size());
-		        System.out.println("   INCLUDE:");
+//		        System.out.println("QUERY B - getSourceRelTargets()");
+//		        System.out.println("==============================="); 
+//		        System.out.println("   NUMBER FOUND = " + refsetSpec_B_SourceRelTargets.size());
+//		        System.out.println("   INCLUDE:");
 		        if (refsetSpec_B_SourceRelTargets.size() < 1000) {
 			        for (I_GetConceptData concept : refsetSpec_B_SourceRelTargets) {
 				        System.out.println("      " + concept.toString());
@@ -315,26 +340,18 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 
 		        // Add the results of the query to the List and the Map
 		        for (I_GetConceptData oldConcept : refsetSpec_B_SourceRelTargets) {
-		    	    
-		        	// Remember the oldConcept is a list for future reference 
-		        	changesList.add(oldConcept);
+
+		        	// Add the oldConcept to the changesList for future reference 
+		        	changesList.add((List<UUID>) oldConcept.getUids());
 		    	    
 		    	    // Search SNOMED for changes to this concept 
-		    	    //TODO 
+		    	    //TODO Search SNOMED! 
 		        	I_GetConceptData newConcept = null;  
 		        	
 		    	    // Put the oldConcept and the newConcept into the changesMap 
-		    	    changesMap.put(oldConcept, newConcept);  
+		    	    changesMap.put((List<UUID>) oldConcept.getUids(), (List<UUID>) newConcept.getUids());  
 
-		        }	        	
-
-		        
-//		        // Add the results of the query to the List
-//		        for (I_GetConceptData concept : refsetSpec_B_SourceRelTargets) {
-//	    			List<UUID> uuidList = new ArrayList<UUID>();
-//	    			uuidList = (List<UUID>) concept.getUids();
-//	        		uuidListOfLists.add(uuidList);
-//		        }	        	
+		        }	        	       	
 
 		        // Set task completion status 
 	    		RefreshRefsetSpecCompareTask.this.setCondition(Condition.ITEM_COMPLETE);
@@ -362,20 +379,20 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 			if (refsetSpec_C_SourceRelTargets == null || refsetSpec_C_SourceRelTargets.size() == 0) {
 	    		
 				// Display a Debug message 
-	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-	    				"Query 'C' found no records to be refreshed for refset: \n" + 
-	    				refsetSpecConcept.getInitialText(),
-	    				"DEBUG Message",
-	    				JOptionPane.INFORMATION_MESSAGE);
+//	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+//	    				"Query 'C' found no records to be refreshed for refset: \n" + 
+//	    				refsetSpecConcept.getInitialText(),
+//	    				"DEBUG Message",
+//	    				JOptionPane.INFORMATION_MESSAGE);
 	    		
 	    		// Cancel the task 
 	    		RefreshRefsetSpecCompareTask.this.setCondition(Condition.ITEM_CANCELED);
 	        } else {
 		        //TODO Remove Debug Messages... 
-		        System.out.println("QUERY C - getSourceRelTargets()");
-		        System.out.println("==============================="); 
-		        System.out.println("   NUMBER FOUND = " + refsetSpec_C_SourceRelTargets.size());
-		        System.out.println("   INCLUDE:");
+//		        System.out.println("QUERY C - getSourceRelTargets()");
+//		        System.out.println("==============================="); 
+//		        System.out.println("   NUMBER FOUND = " + refsetSpec_C_SourceRelTargets.size());
+//		        System.out.println("   INCLUDE:");
 		        if (refsetSpec_C_SourceRelTargets.size() < 1000) {
 			        for (I_GetConceptData concept : refsetSpec_C_SourceRelTargets) {
 				        System.out.println("      " + concept.toString());
@@ -385,24 +402,17 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 		        // Add the results of the query to the List and the Map
 		        for (I_GetConceptData oldConcept : refsetSpec_C_SourceRelTargets) {
 		    	    
-		        	// Remember the oldConcept is a list for future reference 
-		        	changesList.add(oldConcept);
+		        	// Add the oldConcept to the changesList for future reference 
+		        	changesList.add((List<UUID>) oldConcept.getUids());
 		    	    
 		    	    // Search SNOMED for changes to this concept 
-		    	    //TODO 
+		    	    //TODO Search SNOMED!  
 		        	I_GetConceptData newConcept = null;  
 		        	
 		    	    // Put the oldConcept and the newConcept into the changesMap 
-		    	    changesMap.put(oldConcept, newConcept);  
+		    	    changesMap.put((List<UUID>) oldConcept.getUids(), (List<UUID>) newConcept.getUids());  
 
 		        }	        	
-
-//		        // Add the results of the query to the List
-//		        for (I_GetConceptData concept : refsetSpec_C_SourceRelTargets) {
-//	    			List<UUID> uuidList = new ArrayList<UUID>();
-//	    			uuidList = (List<UUID>) concept.getUids();
-//	        		uuidListOfLists.add(uuidList);
-//		        }	        	
 
 		        // Set task completion status 
 	    		RefreshRefsetSpecCompareTask.this.setCondition(Condition.ITEM_COMPLETE);
@@ -419,9 +429,10 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
     		
     		if (inTestMode) {
     			
-        	    changesList = new ArrayList<I_GetConceptData>();
-        	    changesMap = new HashMap<I_GetConceptData, I_GetConceptData>();
-
+    			// Clear the changesList and the changesMap 
+        	    changesList = new ArrayList<List<UUID>>();
+        	    changesMap = new HashMap<List<UUID>, List<UUID>>();
+     
 	     		// for testing purposes (until the queries above are working)... 
     			// simply populate the property with a list of valid concepts         	
 	    		String uuidTempList[] = { 
@@ -429,37 +440,22 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	    				"373d2be5-6c33-3607-baec-80f1b18e28e8", 
 	    				"b6f7ab2f-7b18-385f-a1f7-905a1a5bb60f" };
 	    		for (String uuidStr: uuidTempList){ 	
-	    			UUID uuid = UUID.fromString(uuidStr);
-	    			I_GetConceptData oldConcept = (I_GetConceptData) AceTaskUtil.getConceptFromObject(uuid);
-
-	    			// Remember the oldConcept is a list for future reference
-	    			changesList.add(oldConcept);
-	    			
-	    			// Put the oldConcept and the newConcept into the changesMap
-	    			I_GetConceptData newConcept = null; 
-	    			changesMap.put(oldConcept, newConcept); 
+	    			List<UUID> uuidList = new ArrayList<UUID>();
+	    			uuidList.add(UUID.fromString(uuidStr));
+		        	
+	    			// Add the concept to the changesList for future reference 
+		        	changesList.add(uuidList);
+		    	    
+		        	I_GetConceptData newConcept = null;  
+		        	
+		    	    // For testing purposed just used the same old and new concepts 
+		    	    changesMap.put(uuidList, uuidList);  
 	    			
 	    		}
-    			
-    			
-//        		// Reinitialize the list 
-//    			List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
-// 			
-//	     		// for testing purposes (until the queries above are working)... 
-//    			// simply populate the property with a list of valid UUIDs         	
-//	    		String uuidTempList[] = { 
-//	    				"ba1c7007-0c89-31d5-87e0-31d35d557e62", 
-//	    				"373d2be5-6c33-3607-baec-80f1b18e28e8", 
-//	    				"b6f7ab2f-7b18-385f-a1f7-905a1a5bb60f" };
-//	    		for (String uuidStr: uuidTempList){ 	
-//	    			List<UUID> uuidList = new ArrayList<UUID>();
-//	    			UUID uuid = UUID.fromString(uuidStr);
-//	    			uuidList.add(uuid);
-//	        		uuidListOfLists.add(uuidList);
-//	    		}
+   
 	    		// Display a Debug message 
 	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-	    				"RefreshRefsetSpecCompareTask.evaluate():" + 
+	    				"TEST MODE:\n" + 
 	    				"Placed a list of test UUIDs in the key: " + getUuidListListPropName(),
 	    				"DEBUG Message",
 	    				JOptionPane.INFORMATION_MESSAGE);
