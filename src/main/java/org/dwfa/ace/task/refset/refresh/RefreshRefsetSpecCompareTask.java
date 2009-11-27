@@ -23,6 +23,10 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.utypes.UniversalAcePosition;
@@ -33,6 +37,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.I_ConceptEnumeration;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.I_DescribeConceptUniversally;
@@ -233,6 +238,115 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.localize().getNid());
 	        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.EXTINCT.localize().getNid());
        
+	        // Define the status: "Current" 
+	        //       The status "Current" means a member of the set of current status 
+	        //       values. Since there is no single value, you need to test for membership  
+	        //       in the set of all the children of active: 
+	        I_IntSet currentStatus = termFactory.newIntSet();
+	        currentStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+	        currentStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+	        // etc...
+	        
+	        
+	        int refsetSpecNid = termFactory.uuidToNative(refsetSpecUuid);
+	        Collection<I_ThinExtByRefVersioned> possibleSpecs = termFactory.getAllExtensionsForComponent(refsetSpecNid);
+
+	        //TODO Remove DEBUG statements! 
+	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
+	        			+ "\n	Finding clauses in this Refset Spec that need to be refreshed."
+	        			+ "\n	possibleSpecs = termFactory.getAllExtensionsForComponent(refsetSpecNid);"
+	        			+ "\n		refsetSpecNid=" + refsetSpecNid
+	        			+ "\n		possibleSpecs=" + possibleSpecs.size());
+	        
+	        for (I_ThinExtByRefVersioned ext: possibleSpecs) {
+	        	if (ext.getRefsetId() == refsetSpecNid) {
+	        		// we are now knowing it is a spec.
+	        		
+	    	        //TODO Remove DEBUG statements! 
+	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
+		        			+ "\n	we are now knowing it is a spec since: (ext.getRefsetId() == refsetSpecNid)"); 
+
+	    	        // Retrieves tuples matching the specified allowedStatuses and positions - tuples are 
+	        		// returned in the supplied specTuples List parameter
+	        		allowedStatus = currentStatus; 
+	        		boolean addUncommitted = false;
+	        		boolean returnConflictResolvedLatestState = false;
+	        		List<I_ThinExtByRefTuple> specTuples = new ArrayList<I_ThinExtByRefTuple>();
+	        		ext.addTuples(allowedStatus, refsetPositionSet, specTuples, addUncommitted, returnConflictResolvedLatestState);
+
+	    	        //TODO Remove DEBUG statements! 
+	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
+	    	        		+ "\n	Retrieving all the tuples for this RefsetSpec that are current..." 
+	    	        		+ "\n		specTuples=" + specTuples.size()); 
+
+
+	        		// Search the results of the previous query for tuples of the type CONCEPT_CONCEPT_CONCEPT_EXTENSION or 
+	        		// CONCEPT_CONCEPT_EXTENSION
+	        		int conceptConceptConceptNid = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid();
+	        		int conceptConceptNid = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid();
+	        		for (I_ThinExtByRefTuple tuple: specTuples) {
+	        			if (tuple.getTypeId() == conceptConceptConceptNid) {
+	        				
+	    	    	        //TODO Remove DEBUG statements! 
+	    	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
+	    	    	        		+ "\n	Found a tuple of type: CONCEPT_CONCEPT_CONCEPT_EXTENSION" ); 
+	        				
+	        				// Break down the tuple into it's component parts and check to see if any of 
+	        				// those parts need to be refreshed from the selected version of SNOMED. 
+	        				I_ThinExtByRefPartConceptConceptConcept ccPart = (I_ThinExtByRefPartConceptConceptConcept) tuple.getPart();
+	        				I_GetConceptData part1 = termFactory.getConcept(ccPart.getC1id());
+	        				I_GetConceptData part2 = termFactory.getConcept(ccPart.getC2id());
+	        				I_GetConceptData part3 = termFactory.getConcept(ccPart.getC3id());
+		
+	        				if (part1.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet).size() > 0) {
+	        					// Need to refresh this one...
+		    	    	        //TODO Remove DEBUG statements! 
+		    	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
+		    	    	        		+ "\n	Need to refresh part 1: " + part1.getInitialText()); 
+
+	        				}
+	        				if (part2.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet).size() > 0) {
+	        					// Need to refresh this one...
+		    	    	        //TODO Remove DEBUG statements! 
+		    	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
+		    	    	        		+ "\n	Need to refresh part 2: " + part1.getInitialText()); 
+	        				}
+	        				if (part3.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet).size() > 0) {
+	        					// Need to refresh this one...
+		    	    	        //TODO Remove DEBUG statements! 
+		    	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
+		    	    	        		+ "\n	Need to refresh part 3: " + part1.getInitialText()); 
+	        				}
+	        				
+	        				
+	        			} else if (tuple.getTypeId() == conceptConceptNid) {
+
+	    	    	        //TODO Remove DEBUG statements! 
+	    	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
+	    	    	        		+ "\n	Found a tuple of type: CONCEPT_CONCEPT_EXTENSION" ); 
+	        				
+	        				// Break down the tuple into it's component parts and check to see if any of 
+	        				// those parts need to be refreshed from the selected version of SNOMED. 
+	        				I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) tuple.getPart();
+	        				I_GetConceptData part1 = termFactory.getConcept(ccPart.getC1id());
+	        				I_GetConceptData part2 = termFactory.getConcept(ccPart.getC2id());
+		
+	        				if (part1.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet).size() > 0) {
+	        					// Need to refresh this one...
+		    	    	        //TODO Remove DEBUG statements! 
+		    	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
+		    	    	        		+ "\n	Need to refresh part 1: " + part1.getInitialText()); 
+	        				}
+	        				if (part2.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet).size() > 0) {
+	        					// Need to refresh this one...
+		    	    	        //TODO Remove DEBUG statements! 
+		    	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
+		    	    	        		+ "\n	Need to refresh part 2: " + part1.getInitialText()); 
+	        				}
+	        			}
+	        		}
+	        	}
+	        }
 	        
 	        
 	        /* ---------------------------------------------------------------------------
@@ -258,19 +372,19 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 			// If no records are found 
 			if (refsetSpec_A_SourceRelTargets == null || refsetSpec_A_SourceRelTargets.size() == 0) {
 	    		// Display a Debug message 
-//	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-//	    				"Query 'A' found no records to be refreshed for refset: \n" + 
-//	    				refsetSpecConcept.getInitialText(),
-//	    				"DEBUG Message",
-//	    				JOptionPane.INFORMATION_MESSAGE);
+	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+	    				"Query 'A' found no records to be refreshed for refset: \n" + 
+	    				refsetSpecConcept.getInitialText(),
+	    				"DEBUG Message",
+	    				JOptionPane.INFORMATION_MESSAGE);
 	    		// Cancel the task 
 	    		RefreshRefsetSpecCompareTask.this.setCondition(Condition.ITEM_CANCELED);
 	        } else {
 		        //TODO Remove Debug Messages... 
-//		        System.out.println("QUERY A - getSourceRelTargets()");
-//		        System.out.println("==============================="); 
-//		        System.out.println("   NUMBER FOUND = " + refsetSpec_A_SourceRelTargets.size());
-//		        System.out.println("   INCLUDE:");
+		        System.out.println("QUERY A - getSourceRelTargets()");
+		        System.out.println("==============================="); 
+		        System.out.println("   NUMBER FOUND = " + refsetSpec_A_SourceRelTargets.size());
+		        System.out.println("   INCLUDE:");
 		        if (refsetSpec_A_SourceRelTargets.size() < 1000) {
 			        for (I_GetConceptData concept : refsetSpec_A_SourceRelTargets) {
 				        System.out.println("      " + concept.toString());
@@ -319,19 +433,19 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 			// If no records are found for Query B... 
 			if (refsetSpec_B_SourceRelTargets == null || refsetSpec_B_SourceRelTargets.size() == 0) {
 	    		// Display a Debug message 
-//	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-//	    				"Query 'B' found no records to be refreshed for refset: \n" + 
-//	    				refsetSpecConcept.getInitialText(),
-//	    				"DEBUG Message",
-//	    				JOptionPane.INFORMATION_MESSAGE);
+	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+	    				"Query 'B' found no records to be refreshed for refset: \n" + 
+	    				refsetSpecConcept.getInitialText(),
+	    				"DEBUG Message",
+	    				JOptionPane.INFORMATION_MESSAGE);
 	    		// Cancel the task 
 	    		RefreshRefsetSpecCompareTask.this.setCondition(Condition.ITEM_CANCELED);
 	        } else {
 		        //TODO Remove Debug Messages... 
-//		        System.out.println("QUERY B - getSourceRelTargets()");
-//		        System.out.println("==============================="); 
-//		        System.out.println("   NUMBER FOUND = " + refsetSpec_B_SourceRelTargets.size());
-//		        System.out.println("   INCLUDE:");
+		        System.out.println("QUERY B - getSourceRelTargets()");
+		        System.out.println("==============================="); 
+		        System.out.println("   NUMBER FOUND = " + refsetSpec_B_SourceRelTargets.size());
+		        System.out.println("   INCLUDE:");
 		        if (refsetSpec_B_SourceRelTargets.size() < 1000) {
 			        for (I_GetConceptData concept : refsetSpec_B_SourceRelTargets) {
 				        System.out.println("      " + concept.toString());
@@ -379,20 +493,20 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 			if (refsetSpec_C_SourceRelTargets == null || refsetSpec_C_SourceRelTargets.size() == 0) {
 	    		
 				// Display a Debug message 
-//	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-//	    				"Query 'C' found no records to be refreshed for refset: \n" + 
-//	    				refsetSpecConcept.getInitialText(),
-//	    				"DEBUG Message",
-//	    				JOptionPane.INFORMATION_MESSAGE);
+	    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+	    				"Query 'C' found no records to be refreshed for refset: \n" + 
+	    				refsetSpecConcept.getInitialText(),
+	    				"DEBUG Message",
+	    				JOptionPane.INFORMATION_MESSAGE);
 	    		
 	    		// Cancel the task 
 	    		RefreshRefsetSpecCompareTask.this.setCondition(Condition.ITEM_CANCELED);
 	        } else {
 		        //TODO Remove Debug Messages... 
-//		        System.out.println("QUERY C - getSourceRelTargets()");
-//		        System.out.println("==============================="); 
-//		        System.out.println("   NUMBER FOUND = " + refsetSpec_C_SourceRelTargets.size());
-//		        System.out.println("   INCLUDE:");
+		        System.out.println("QUERY C - getSourceRelTargets()");
+		        System.out.println("==============================="); 
+		        System.out.println("   NUMBER FOUND = " + refsetSpec_C_SourceRelTargets.size());
+		        System.out.println("   INCLUDE:");
 		        if (refsetSpec_C_SourceRelTargets.size() < 1000) {
 			        for (I_GetConceptData concept : refsetSpec_C_SourceRelTargets) {
 				        System.out.println("      " + concept.toString());
