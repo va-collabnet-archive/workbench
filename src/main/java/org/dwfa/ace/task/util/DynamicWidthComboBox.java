@@ -14,6 +14,7 @@ import javax.swing.plaf.basic.ComboPopup;
  * This class extends JComboBox by allowing the popup size to be configured dynamically. By default the width of the
  * popup is the same size as the JComboBox. However, in this implementation the width of the popup is calculated based
  * on the combo box contents - the width is set to that of the largest item contained in the drop-down list.
+ * Based on code : http://forums.sun.com/thread.jspa?threadID=5386868
  * 
  * @author Christine Hill
  * 
