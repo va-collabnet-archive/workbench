@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
+import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -63,8 +64,8 @@ public class RequestForChangePanel extends JPanel {
     private JLabel priorityLabel;
     private JLabel fileAttachmentLabel;
     private JButton openFileChooserButton;
-    private JComboBox refsetNameComboBox;
-    private JComboBox editorComboBox;
+    private DynamicWidthComboBox refsetNameComboBox;
+    private DynamicWidthComboBox editorComboBox;
     private JComboBox priorityComboBox;
     private JTextArea originalRequestTextField;
     private JTextArea commentsTextField;
@@ -102,8 +103,14 @@ public class RequestForChangePanel extends JPanel {
 
         // buttons and boxes
         openFileChooserButton = new JButton("Attach a file");
-        refsetNameComboBox = new JComboBox(refsets.toArray());
-        editorComboBox = new JComboBox();
+        refsetNameComboBox = new DynamicWidthComboBox(refsets.toArray());
+        refsetNameComboBox.setMaximumSize(new Dimension(200, 25));
+        refsetNameComboBox.setMinimumSize(new Dimension(200, 25));
+        refsetNameComboBox.setPreferredSize(new Dimension(200, 25));
+        editorComboBox = new DynamicWidthComboBox();
+        editorComboBox.setMaximumSize(new Dimension(200, 25));
+        editorComboBox.setMinimumSize(new Dimension(200, 25));
+        editorComboBox.setPreferredSize(new Dimension(200, 25));
         priorityComboBox = new JComboBox(new String[] { "Highest", "High", "Normal", "Low", "Lowest" });
 
         // date picker
@@ -172,11 +179,14 @@ public class RequestForChangePanel extends JPanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         try {
-            editorComboBox = new JComboBox(getValidEditors().toArray());
+            editorComboBox = new DynamicWidthComboBox(getValidEditors().toArray());
         } catch (Exception e) {
-            editorComboBox = new JComboBox();
+            editorComboBox = new DynamicWidthComboBox();
             e.printStackTrace();
         }
+        editorComboBox.setMaximumSize(new Dimension(200, 25));
+        editorComboBox.setMinimumSize(new Dimension(200, 25));
+        editorComboBox.setPreferredSize(new Dimension(200, 25));
         this.add(editorComboBox, gridBagConstraints);
 
         // original request
