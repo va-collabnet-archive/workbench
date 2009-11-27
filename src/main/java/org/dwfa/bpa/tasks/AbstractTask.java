@@ -81,6 +81,7 @@ public abstract class AbstractTask  implements I_DefineTask {
     private static final Condition[] prevContinueCancelArray = { Condition.PREVIOUS, Condition.CONTINUE, 
     	Condition.ITEM_CANCELED };
     private static final Condition[] continueCancelArray = { Condition.CONTINUE, Condition.ITEM_CANCELED };
+    private static final Condition[] prevTrueFalseArray = { Condition.PREVIOUS, Condition.TRUE, Condition.FALSE };
 
     public static final List<Condition> CONTINUE_CONDITION = Collections.unmodifiableList(Arrays
             .asList(contiueConditionArray));
@@ -105,6 +106,8 @@ public abstract class AbstractTask  implements I_DefineTask {
 
     public static final List<Condition> CONTINUE_CANCEL = Collections.unmodifiableList(Arrays
             .asList(continueCancelArray));
+    
+    public static final List<Condition> PREVIOUS_TRUE_FALSE = Collections.unmodifiableList(Arrays.asList(prevTrueFalseArray));
 
     private static final long serialVersionUID = 1;
 
