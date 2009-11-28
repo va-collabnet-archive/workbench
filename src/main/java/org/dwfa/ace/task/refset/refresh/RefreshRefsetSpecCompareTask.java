@@ -237,6 +237,8 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	        			+ "\n		refsetSpecNid=" + refsetSpecNid
 	        			+ "\n		possibleSpecs=" + possibleSpecs.size());
 	        
+	        
+	        
 	        for (I_ThinExtByRefVersioned ext: possibleSpecs) {
 	        	if (ext.getRefsetId() == refsetSpecNid) {
 	        		// we are now knowing it is a spec.
@@ -257,7 +259,6 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
 	    	        		+ "\n	Retrieving all the tuples for this RefsetSpec that are current..." 
 	    	        		+ "\n		specTuples=" + specTuples.size()); 
-
 
 	        		// Search the results of the previous query for tuples of the type CONCEPT_CONCEPT_CONCEPT_EXTENSION or 
 	        		// CONCEPT_CONCEPT_EXTENSION
@@ -300,6 +301,8 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 		    	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
 		    	    	        		+ "\n	Need to refresh part 3: " + part1.getInitialText()); 
 	        				}
+	        				
+	        				// Add to tuple to changesList
 	        				if (hasRetiredConcept) {
                                 changesList.add(termFactory.getUids(tuple.getMemberId()));
 	        				}
@@ -335,16 +338,23 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
                             if (hasRetiredConcept) {
                                 changesList.add(termFactory.getUids(tuple.getMemberId()));
                             }
-	        			}
-	        		}
-	        	}
-	        }
+	        			} // End If
+	        		} // End For 
+	        	} // End If
+	        } // End For 
 	            		
         	/* -------------------------------------------------------------
         	 *  Store the list of differences in the uuidListListPropName
         	 *  ------------------------------------------------------------
         	 */
-    		process.setProperty(this.uuidListListPropName, changesList);
+	        if (changesList == null || changesList.size() == 0) {
+		        // Nothing to process...  Cancel the task so we can warn the user.  
+	    		RefreshRefsetSpecCompareTask.this.setCondition(Condition.ITEM_CANCELED);
+	        } else {
+		        // Set task completion status to ITEM_COMPLETE   
+	    		RefreshRefsetSpecCompareTask.this.setCondition(Condition.ITEM_COMPLETE);
+	    		process.setProperty(this.uuidListListPropName, changesList);
+	        }
 
     		return getCondition();
     		
