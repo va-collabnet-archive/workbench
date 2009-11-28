@@ -72,17 +72,9 @@ public class RefreshRefsetSpecCompareTaskBeanInfo extends SimpleBeanInfo {
             uuidListListPropName.setDisplayName("<html><font color='blue'>List of changes:");
             uuidListListPropName.setShortDescription("[OUT] The property that will contain the list of observed changes.");
 
-            PropertyDescriptor changeMapPropName =
-                new PropertyDescriptor("changeMapPropName", getBeanDescriptor().getBeanClass());
-            changeMapPropName.setBound(true);
-            changeMapPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            changeMapPropName.setDisplayName("<html><font color='blue'>Map of changes:");
-            changeMapPropName.setShortDescription("[OUT] The property that will contain the map of old and new values.");
-
-
             PropertyDescriptor rv[] =
                { profilePropName, refsetPositionSetPropName, refsetUuidPropName, snomedPositionSetPropName, 
-            		uuidListListPropName, changeMapPropName  };
+            		uuidListListPropName  };
 
             return rv;
         } catch (IntrospectionException e) {
