@@ -48,6 +48,7 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
         out.writeObject(refsetPositionSetPropName);
         out.writeObject(snomedPositionSetPropName);
         out.writeObject(conceptToReplaceUuidPropName);
+        out.writeObject(clauseToUpdateMemberUuidPropName);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
@@ -59,6 +60,7 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             refsetPositionSetPropName = (String) in.readObject();
             snomedPositionSetPropName = (String) in.readObject();
             conceptToReplaceUuidPropName = (String) in.readObject();
+            clauseToUpdateMemberUuidPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }

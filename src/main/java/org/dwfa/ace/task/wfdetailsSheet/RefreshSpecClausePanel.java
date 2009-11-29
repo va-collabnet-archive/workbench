@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +52,8 @@ public class RefreshSpecClausePanel  extends JPanel implements ActionListener {
     private SrcRelTableModel srcRelTableModel;
 
     private JTableWithDragImage relTable;
+    
+    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public RefreshSpecClausePanel(I_GetConceptData refsetSpec,
             Set<I_Position> refsetSpecVersionSet, Set<I_Position> sourceTerminologyVersionSet,
@@ -257,7 +260,7 @@ public class RefreshSpecClausePanel  extends JPanel implements ActionListener {
 
         @Override
         public void addPropertyChangeListener(String property, PropertyChangeListener l) {
-            throw new UnsupportedOperationException();
+            pcs.addPropertyChangeListener(property, l);
         }
 
         @Override
@@ -272,7 +275,7 @@ public class RefreshSpecClausePanel  extends JPanel implements ActionListener {
 
         @Override
         public void removePropertyChangeListener(String property, PropertyChangeListener l) {
-            throw new UnsupportedOperationException();
+            pcs.removePropertyChangeListener(property, l);
         }
 
         @Override
