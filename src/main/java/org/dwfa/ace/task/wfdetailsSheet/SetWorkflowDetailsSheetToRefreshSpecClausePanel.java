@@ -34,7 +34,8 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String refsetPositionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
-    private String snomedPositionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
+
+	private String snomedPositionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
     private String conceptToReplaceUuidPropName = ProcessAttachmentKeys.CONCEPT_TO_REPLACE_UUID.getAttachmentKey();
     private String clauseToUpdateMemberUuidPropName = ProcessAttachmentKeys.REFSET_MEMBER_UUID.getAttachmentKey();
     
@@ -171,5 +172,44 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
         return AbstractTask.CONTINUE_CONDITION;
     }
     
+    public String getRefsetUuidPropName() {
+		return refsetUuidPropName;
+	}
 
+	public void setRefsetUuidPropName(String refsetUuidPropName) {
+		this.refsetUuidPropName = refsetUuidPropName;
+	}
+
+	public String getRefsetPositionSetPropName() {
+		return refsetPositionSetPropName;
+	}
+
+	public void setRefsetPositionSetPropName(String refsetPositionSetPropName) {
+		this.refsetPositionSetPropName = refsetPositionSetPropName;
+	}
+
+	public String getSnomedPositionSetPropName() {
+		return snomedPositionSetPropName;
+	}
+
+	public void setSnomedPositionSetPropName(String snomedPositionSetPropName) {
+		this.snomedPositionSetPropName = snomedPositionSetPropName;
+	}
+
+	public String getConceptToReplaceUuidPropName() {
+		return conceptToReplaceUuidPropName;
+	}
+
+	public void setConceptToReplaceUuidPropName(String conceptToReplaceUuidPropName) {
+		this.conceptToReplaceUuidPropName = conceptToReplaceUuidPropName;
+	}
+
+	public String getClauseToUpdateMemberUuidPropName() {
+		return clauseToUpdateMemberUuidPropName;
+	}
+
+	public void setClauseToUpdateMemberUuidPropName(
+			String clauseToUpdateMemberUuidPropName) {
+		this.clauseToUpdateMemberUuidPropName = clauseToUpdateMemberUuidPropName;
+	}
 }
