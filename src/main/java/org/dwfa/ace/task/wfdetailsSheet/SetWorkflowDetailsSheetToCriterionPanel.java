@@ -92,7 +92,7 @@ public class SetWorkflowDetailsSheetToCriterionPanel extends AbstractTask {
 	private void doRun(final I_EncodeBusinessProcess process,
 			final I_Work worker) {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+			I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
 			ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
 			clear.setProfilePropName(getProfilePropName());
 			clear.evaluate(process, worker);

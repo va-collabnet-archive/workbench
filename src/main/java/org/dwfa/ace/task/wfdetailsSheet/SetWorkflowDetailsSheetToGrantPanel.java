@@ -94,8 +94,8 @@ public class SetWorkflowDetailsSheetToGrantPanel extends AbstractTask {
 	private void doRun(final I_EncodeBusinessProcess process,
 			final I_Work worker) {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
-			I_ConfigAceFrame commitConfig = (I_ConfigAceFrame) process.readProperty(commitProfilePropName);
+			I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+			I_ConfigAceFrame commitConfig = (I_ConfigAceFrame) process.getProperty(commitProfilePropName);
 			ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
 			clear.setProfilePropName(getProfilePropName());
 			clear.evaluate(process, worker);

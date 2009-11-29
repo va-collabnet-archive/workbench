@@ -236,21 +236,5 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-            <id>oracleReleases</id>
-            <name>Oracle Released Java Packages</name>
-            <url>http://download.oracle.com/maven </url>
-            <layout>default</layout>
-        </repository>
     </repositories>
 </project>
