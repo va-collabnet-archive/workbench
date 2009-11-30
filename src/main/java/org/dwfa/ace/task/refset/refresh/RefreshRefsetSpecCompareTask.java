@@ -113,16 +113,7 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
                 uuidListListPropName = (String) in.readObject();
             	reviewCountPropName = (String) in.readObject();
                 reviewIndexPropName = (String) in.readObject();
-//                if (objDataVersion == 1) {
-//                    // read and ignore the old changeMapPropName
-//                    in.readObject();
-//                }  
             } 
-//            if (objDataVersion >= 3) {
-//                // Read version 3 data fields...
-//            	reviewCountPropName = (String) in.readObject();
-//                reviewIndexPropName = (String) in.readObject();
-//             } 
 
             // Initialize transient properties...
             
@@ -247,10 +238,8 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	        //       The status "Current" means a member of the set of current status 
 	        //       values. Since there is no single value, you need to test for membership  
 	        //       in the set of all the children of active: 
-	        I_IntSet currentStatus = termFactory.newIntSet();
-	        currentStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-	        currentStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-	        // etc...
+	        I_IntSet currentStatus = config.getAllowedStatus(); 
+
 	        
 	        
 	        int refsetSpecNid = refsetSpecConcept.getNid();
