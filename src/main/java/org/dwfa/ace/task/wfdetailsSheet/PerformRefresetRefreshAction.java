@@ -64,7 +64,7 @@ public class PerformRefresetRefreshAction extends AbstractTask {
 			for (Component c: workflowDetailsSheet.getComponents()) {
 				if (RefreshSpecClausePanel.class.isAssignableFrom(c.getClass())) {
 					RefreshSpecClausePanel refreshPanel = (RefreshSpecClausePanel) c;
-					refreshPanel.performRefreshAction();
+					refreshPanel.performRefreshAction(config);
 					return Condition.CONTINUE;
 				}
 			}
@@ -75,6 +75,8 @@ public class PerformRefresetRefreshAction extends AbstractTask {
 		} catch (IntrospectionException e) {
 			throw new TaskFailedException(e);
 		} catch (IllegalAccessException e) {
+			throw new TaskFailedException(e);
+		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		} 
 		throw new TaskFailedException("Cannot find RefreshSpecClausePanel.");
