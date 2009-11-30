@@ -72,9 +72,23 @@ public class RefreshRefsetSpecCompareTaskBeanInfo extends SimpleBeanInfo {
             uuidListListPropName.setDisplayName("<html><font color='blue'>List of changes:");
             uuidListListPropName.setShortDescription("[OUT] The property that will contain the list of observed changes.");
 
+            PropertyDescriptor reviewCountPropName =
+                new PropertyDescriptor("reviewCountPropName", getBeanDescriptor().getBeanClass());
+            reviewCountPropName.setBound(true);
+            reviewCountPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            reviewCountPropName.setDisplayName("<html><font color='blue'>review count prop:");
+            reviewCountPropName.setShortDescription("[OUT] The property that will contain the number of items to be reviewed.");
+
+            PropertyDescriptor reviewIndexPropName =
+                new PropertyDescriptor("reviewIndexPropName", getBeanDescriptor().getBeanClass());
+            reviewIndexPropName.setBound(true);
+            reviewIndexPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            reviewIndexPropName.setDisplayName("<html><font color='blue'>review index prop:");
+            reviewIndexPropName.setShortDescription("[OUT] The property that will contain the index of the item currently being reviewed.");
+
             PropertyDescriptor rv[] =
                { profilePropName, refsetPositionSetPropName, refsetUuidPropName, snomedPositionSetPropName, 
-            		uuidListListPropName  };
+            		uuidListListPropName, reviewCountPropName, reviewIndexPropName };
 
             return rv;
         } catch (IntrospectionException e) {

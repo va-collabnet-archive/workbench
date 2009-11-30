@@ -423,18 +423,17 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
 	        	+ "</STYLE> " 
 	        	+ "<body bgcolor='rgb(255, 255, 220)'> "
 	        	+ "<h2>Refresh Refset Spec Summary</h2>" 
-	        	+ "<p>Please review the following settings for this "
-	        	+ "business process before we continue: </p>" 
+	        	+ "<p>The following parameters have been specified for this "
+	        	+ "business: </p>" 
 	        	+ "<ul>" 
 	           	+ "  <li><strong>Refset Spec: </strong>" + refsetSpecName + "</li>"
 	        	+ "  <li><strong>Refset Spec Version: </strong>" + resetSpecVersionName + "</li>"
 	        	+ "  <li><strong>SNOMED Version: </strong>" + snomedVersionName + "</li>"
 	        	+ "  <li><strong>Owner: </strong>" + ownerName + "</li>"
 	        	+ "  <li><strong>Editor: </strong>" + editorName + "</li>"
-	        	+ "  <li><strong>Next User: </strong>" + nextUserName + "</li>"
 	        	+ "  <li><strong>Process Priority: </strong>" + processPriorityText + "</li>"
 	        	+ "  <li><strong>Process Deadline: </strong>" + processDeadlineText + "</li>"
-	        	+ "  <li><strong>Comments: </strong>" + commentsText + "</li>"
+	        	+ "  <li><strong>Owner's Comments: </strong>" + commentsText + "</li>"
 	        	+ "  <li><strong>Attached Files: </strong></li>" 
         		+ "      <ul>"); 
 	    	
@@ -447,10 +446,6 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
 	    	}
 	    	summaryMessage = summaryMessage.concat("</ul>" 
 	        	+ "</ul>"
-				+ "<p>If you wish to continue, click the 'Continue' button at the top. If you wish "
-				+ "to cancel this process, press the 'Cancel' button at the top. You can also place this "
-				+ "process back into your ToDo queue to deal with it later by pressing the ToDo button "
-				+ "at the top of the display.</p>"
 				+ "</body></html>");
 
 	    	System.out.println("DEBUG: Summary Message=" + summaryMessage);

@@ -43,7 +43,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTaskBeanInfo extends Simpl
                     new PropertyDescriptor("nextUserTermEntryPropName", getBeanDescriptor().getBeanClass());
             nextUserTermEntryPropName.setBound(true);
             nextUserTermEntryPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            nextUserTermEntryPropName.setDisplayName("<html><font color='green'>next person:");
+            nextUserTermEntryPropName.setDisplayName("<html><font color='green'>editor inbox prop name:");
             nextUserTermEntryPropName.setShortDescription("[IN] The next person the BP will go to.");
 
             PropertyDescriptor commentsPropName;

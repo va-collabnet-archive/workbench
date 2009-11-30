@@ -64,8 +64,8 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTaskBeanInfo extends SimpleBe
                     new PropertyDescriptor("nextUserTermEntryPropName", getBeanDescriptor().getBeanClass());
             nextUserTermEntryPropName.setBound(true);
             nextUserTermEntryPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            nextUserTermEntryPropName.setDisplayName("<html><font color='green'>next person:");
-            nextUserTermEntryPropName.setShortDescription("[IN] The next person the BP will go to.");
+            nextUserTermEntryPropName.setDisplayName("<html><font color='green'>editor inbox address:");
+            nextUserTermEntryPropName.setShortDescription("[IN] The property that contains the editor's inbox address.");
 
             PropertyDescriptor refsetSpecVersionPropName =
                 new PropertyDescriptor("refsetSpecVersionPropName", getBeanDescriptor().getBeanClass());

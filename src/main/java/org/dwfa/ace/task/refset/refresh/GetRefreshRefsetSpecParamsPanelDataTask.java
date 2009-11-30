@@ -51,7 +51,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
      */
 	// Serialization Properties 
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
     
 	// Task Attribute Properties         
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();  
@@ -61,6 +61,9 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
     private String ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
     private String fileAttachmentsPropName = ProcessAttachmentKeys.FILE_ATTACHMENTS.getAttachmentKey();
+    private String ownerInboxPropName = ProcessAttachmentKeys.DESTINATION_ADR.getAttachmentKey();
+    
+    
     		
 	// Other Properties 
     private I_TermFactory termFactory;
@@ -79,6 +82,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
         out.writeObject(editorUuidPropName);
         out.writeObject(ownerUuidPropName);
         out.writeObject(fileAttachmentsPropName);
+        out.writeObject(ownerInboxPropName);
     }
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
@@ -93,6 +97,9 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
             	editorUuidPropName = (String) in.readObject();
             	ownerUuidPropName = (String) in.readObject();
             	fileAttachmentsPropName = (String) in.readObject();
+            }
+            if (objDataVersion >= 2) {
+            	ownerInboxPropName = (String) in.readObject();
             }
             // Initialize transient properties 
             
@@ -262,6 +269,18 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                     // -----------------------------------------
                     process.setProperty(ownerUuidPropName, owner.getUids().iterator().next() );
 
+                    // Set the Owner's Inbox for future reference 
+                    RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();                    
+                    String ownerInboxAddress = wizard.getInbox(owner);
+                    if (ownerInboxAddress == null) {
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "Refresh Refset process cannot continue... The Owner has no assigned inbox : "
+                                + owner, "", JOptionPane.ERROR_MESSAGE);
+                        return Condition.ITEM_CANCELED;
+                    } else {
+                        process.setProperty(ownerInboxPropName, ownerInboxAddress);                       
+                    }     
+
                     
                     // -----------------------------------------
                     // File attachments 
@@ -346,6 +365,12 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
 	}
 	public void setFileAttachmentsPropName(String fileAttachmentsPropName) {
 		this.fileAttachmentsPropName = fileAttachmentsPropName;
+	}
+	public String getOwnerInboxPropName() {
+		return ownerInboxPropName;
+	}
+	public void setOwnerInboxPropName(String ownerInboxPropName) {
+		this.ownerInboxPropName = ownerInboxPropName;
 	}
 
 

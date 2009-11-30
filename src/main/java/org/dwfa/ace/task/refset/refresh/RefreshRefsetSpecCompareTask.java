@@ -55,7 +55,7 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
      */
 	// Serialization Properties 
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
 
     // Concept Constants:  (taken from: SNOMED CT Concept -> Linkage concept -> 
     // 				Attribute -> Concept history attribute) 
@@ -77,6 +77,8 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	private String refsetPositionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
 	private String snomedPositionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
 	private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
+	private String reviewCountPropName = "A: REVIEW_COUNT"; 
+	private String reviewIndexPropName = "A: REVIEW_INDEX"; 
 
 	// Other Properties 
     private Condition condition;
@@ -94,6 +96,8 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
         out.writeObject(refsetPositionSetPropName);
         out.writeObject(snomedPositionSetPropName);
         out.writeObject(uuidListListPropName);
+        out.writeObject(reviewCountPropName);
+        out.writeObject(reviewIndexPropName);
     }
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
@@ -109,7 +113,14 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
                     // read and ignore the old changeMapPropName
                     in.readObject();
                 }
+                
              } 
+            if (objDataVersion >= 3) {
+                // Read version 3 data fields...
+            	reviewCountPropName = (String) in.readObject();
+                reviewIndexPropName = (String) in.readObject();
+             } 
+
             // Initialize transient properties...
             
         } else {
@@ -406,4 +417,17 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	public void setUuidListListPropName(String uuidListListPropName) {
 		this.uuidListListPropName = uuidListListPropName;
 	}
+	public String getReviewCountPropName() {
+		return reviewCountPropName;
+	}
+	public void setReviewCountPropName(String reviewCountPropName) {
+		this.reviewCountPropName = reviewCountPropName;
+	}
+	public String getReviewIndexPropName() {
+		return reviewIndexPropName;
+	}
+	public void setReviewIndexPropName(String reviewIndexPropName) {
+		this.reviewIndexPropName = reviewIndexPropName;
+	}
+	
 }
