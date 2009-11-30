@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.RelationshipTableRenderer;
 import org.dwfa.ace.table.SrcRelTableModel;
@@ -46,6 +48,7 @@ import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 
@@ -84,14 +87,14 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 			Set<I_Position> refsetSpecVersionSet,
 			Set<I_Position> sourceTerminologyVersionSet,
 			I_GetConceptData conceptUnderReview,
-			List<Collection<UUID>> clauseToUpdate, I_ConfigAceFrame frameConfig) {
+			List<Collection<UUID>> clausesToUpdate, I_ConfigAceFrame frameConfig) throws IOException, TerminologyException {
 		super();
 		replacementConceptLabel = new TermComponentLabel(frameConfig);
 		this.refsetSpec = refsetSpec;
 		this.refsetSpecVersionSet = refsetSpecVersionSet;
 		this.sourceTerminologyVersionSet = sourceTerminologyVersionSet;
 		this.conceptUnderReview = conceptUnderReview;
-		this.clausesToUpdate = clauseToUpdate;
+		this.clausesToUpdate = clausesToUpdate;
 		this.frameConfig = frameConfig;
 		updateOptions.setSelectedItem(REPLACE_OPTION);
 
@@ -128,7 +131,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 		return fields.toArray(new REL_FIELD[fields.size()]);
 	}
 
-	private void layoutRefreshSpecClausePanel() {
+	private void layoutRefreshSpecClausePanel() throws IOException, TerminologyException {
 		this.removeAll();
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -163,6 +166,49 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 		gbc.weightx = 0;
 		gbc.anchor = GridBagConstraints.EAST;
 
+		
+		
+		add(new JLabel("clause to update:"), gbc);
+
+		gbc.gridx++;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1;
+		
+		StringBuffer buff = new StringBuffer();
+		
+		I_TermFactory tf = LocalVersionedTerminology.get();
+		Collection<UUID> clauseIds = clausesToUpdate.get(0);
+		I_ThinExtByRefVersioned member = tf.getExtension(LocalVersionedTerminology.get()
+				.uuidToNative(clauseIds));
+
+		List<I_ThinExtByRefTuple> tuples = member.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSet(), false, false);
+		
+		I_ThinExtByRefTuple tuple = tuples.iterator().next();
+		if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
+			I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) tuple.getPart();
+			buff.append(tf.getConcept(ccPart.getC1id()).toString());
+			buff.append(" ");
+			buff.append(tf.getConcept(ccPart.getC2id()).toString());
+		} else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
+			I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) tuple.getPart();
+			buff.append(tf.getConcept(cccPart.getC1id()).toString());
+			buff.append(" ");
+			buff.append(tf.getConcept(cccPart.getC2id()).toString());
+			buff.append(" ");
+			buff.append(tf.getConcept(cccPart.getC3id()).toString());
+		}
+		add(new JLabel(buff.toString()), gbc);
+
+
+		gbc.gridy++;
+		gbc.gridx = 0;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.weightx = 0;
+		gbc.anchor = GridBagConstraints.EAST;
+
+		
+		
 		add(new JLabel("specification version:"), gbc);
 
 		gbc.gridx++;
@@ -285,7 +331,13 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
 			@Override
 			public void run() {
-				layoutRefreshSpecClausePanel();
+				try {
+					layoutRefreshSpecClausePanel();
+				} catch (IOException e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				} catch (TerminologyException e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				}
 			}
 		});
 	}
