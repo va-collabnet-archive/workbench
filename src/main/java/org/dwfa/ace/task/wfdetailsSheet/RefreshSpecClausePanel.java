@@ -26,12 +26,15 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.table.JTableWithDragImage;
@@ -39,10 +42,12 @@ import org.dwfa.ace.table.RelationshipTableRenderer;
 import org.dwfa.ace.table.SrcRelTableModel;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.vodb.types.IntSet;
+import org.dwfa.vodb.types.Position;
 
 public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
@@ -262,13 +267,14 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 		gbc.gridheight = 2;
 		gbc.anchor = GridBagConstraints.EAST;
 
-		add(new JScrollPane(editorComments), gbc);
-
+		if (updateOptions.equals(SKIP_OPTION) == false) {
+			add(new JScrollPane(editorComments), gbc);
+		}
 		if (getRootPane() != null) {
-			getRootPane().repaint();
+			getRootPane().validate();
 		}
 		if (this.getParent() != null) {
-			this.getParent().doLayout();
+			this.getParent().validate();
 			this.getParent().repaint();
 		}
 	}
@@ -365,6 +371,12 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 		int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
 		IntSet currentSet = new IntSet();
 		currentSet.add(currentNid);
+		boolean writeComment = editorComments.getText().length() > 3;
+		I_ThinExtByRefVersioned comment = null;
+		I_IdVersioned commentId = null;
+        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
+		I_GetConceptData commentRefset = refsetSpecHelper.getCommentsRefsetConcept();
+
 		if (updateOptions.getSelectedItem().equals(REPLACE_OPTION)) {
 			Collection<UUID> clauseIds = clausesToUpdate.remove(0);
 			I_ThinExtByRefVersioned member = tf.getExtension(tf
@@ -372,12 +384,13 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 			List<I_ThinExtByRefTuple> tuples = new ArrayList<I_ThinExtByRefTuple>();
 			member.addTuples(config.getAllowedStatus(), config
 					.getViewPositionSet(), tuples, false);
-			for (I_Position p : config.getViewPositionSet()) {
+			for (I_Path p : config.getEditingPathSet()) {
 				for (I_ThinExtByRefTuple tuple : tuples) {
 					I_ThinExtByRefPart newPart = tuple.getPart().duplicate();
 					if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
 						I_ThinExtByRefPartConceptConcept newCCPart = (I_ThinExtByRefPartConceptConcept) newPart;
 						newCCPart.setStatusId(currentNid);
+						newCCPart.setPathId(p.getConceptId());
 						newCCPart.setVersion(Integer.MAX_VALUE);
 						tuple.getCore().addVersion(newCCPart);
 						if (newCCPart.getC1id() == conceptUnderReview.getConceptId()) {
@@ -391,6 +404,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 						I_ThinExtByRefPartConceptConceptConcept newCCCPart = (I_ThinExtByRefPartConceptConceptConcept) newPart;
 						newCCCPart.setStatusId(currentNid);
 						newCCCPart.setVersion(Integer.MAX_VALUE);
+						newCCCPart.setPathId(p.getConceptId());
 						tuple.getCore().addVersion(newCCCPart);
 						if (newCCCPart.getC1id() == conceptUnderReview.getConceptId()) {
 							newCCCPart.setC1id(replacementConceptLabel.getTermComponent().getNid());
@@ -403,8 +417,37 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 						}
 					}
 				}
+				if (writeComment) {
+					UUID memberUuid = UUID.randomUUID();
+					Collection<UUID> memberUuids = new ArrayList<UUID>();
+					memberUuids.add(memberUuid);
+					int commentNid = tf.uuidToNativeWithGeneration(memberUuids, 
+							ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), 
+							p, 
+							Integer.MAX_VALUE);
+					commentId = tf.getId(commentNid);
+					commentRefset.getUncommittedIdVersioned().add(commentId);
+					comment = tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, member.getComponentId(), 
+							RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
+					I_ThinExtByRefPartString commentExtPart = tf.newExtensionPart(I_ThinExtByRefPartString.class);
+					commentExtPart.setStringValue(editorComments.getText());
+					comment.addVersion(commentExtPart);
+					commentExtPart.setPathId(p.getConceptId());
+					commentExtPart.setStatusId(currentNid);
+					commentExtPart.setVersion(Integer.MAX_VALUE);
+					tf.addUncommitted(comment);
+					tf.addUncommitted(commentRefset);
+					//
+				}
 				tf.commit();
-				member.promote(p, config.getPromotionPathSet(), currentSet);
+				member.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+				if (comment != null) {
+					comment.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+					commentId.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+					tf.addUncommitted(comment);
+					commentRefset.getUncommittedIdVersioned().add(commentId);
+					tf.addUncommitted(commentRefset);
+				}
 			}
 			// Do replacement here...
 		} else if (updateOptions.getSelectedItem().equals(RETIRE_OPTION)) {
@@ -419,7 +462,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 			List<I_ThinExtByRefTuple> tuples = new ArrayList<I_ThinExtByRefTuple>();
 			member.addTuples(config.getAllowedStatus(), config
 					.getViewPositionSet(), tuples, false);
-			for (I_Position p : config.getViewPositionSet()) {
+			for (I_Path p : config.getEditingPathSet()) {
 				for (I_ThinExtByRefTuple tuple : tuples) {
 					I_ThinExtByRefPart newPart = tuple.getPart().duplicate();
 					newPart.setVersion(Integer.MAX_VALUE);
@@ -427,8 +470,37 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 					tuple.getCore().addVersion(newPart);
 					tf.addUncommitted(tuple.getCore());
 				}
+				if (writeComment) {
+					UUID memberUuid = UUID.randomUUID();
+					Collection<UUID> memberUuids = new ArrayList<UUID>();
+					memberUuids.add(memberUuid);
+					int commentNid = tf.uuidToNativeWithGeneration(memberUuids, 
+							ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), 
+							p, 
+							Integer.MAX_VALUE);
+					commentId = tf.getId(commentNid);
+					commentRefset.getUncommittedIdVersioned().add(commentId);
+					comment = tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, member.getComponentId(), 
+							RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
+					I_ThinExtByRefPartString commentExtPart = tf.newExtensionPart(I_ThinExtByRefPartString.class);
+					commentExtPart.setStringValue(editorComments.getText());
+					comment.addVersion(commentExtPart);
+					commentExtPart.setPathId(p.getConceptId());
+					commentExtPart.setStatusId(currentNid);
+					commentExtPart.setVersion(Integer.MAX_VALUE);
+					tf.addUncommitted(comment);
+					tf.addUncommitted(commentRefset);
+					//
+				}
 				tf.commit();
-				member.promote(p, config.getPromotionPathSet(), retiredSet);
+				member.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+				if (comment != null) {
+					comment.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+					commentId.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+					tf.addUncommitted(comment);
+					commentRefset.getUncommittedIdVersioned().add(commentId);
+					tf.addUncommitted(commentRefset);
+				}
 			}
 
 		} else if (updateOptions.getSelectedItem().equals(SKIP_OPTION)) {
