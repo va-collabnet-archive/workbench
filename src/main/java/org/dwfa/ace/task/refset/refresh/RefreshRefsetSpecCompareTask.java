@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -21,6 +22,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.refset.RefsetHelper;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.utypes.UniversalAcePosition;
@@ -55,7 +57,7 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
      */
 	// Serialization Properties 
 	private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 3;
+    private static final int dataVersion = 1;
 
     // Concept Constants:  (taken from: SNOMED CT Concept -> Linkage concept -> 
     // 				Attribute -> Concept history attribute) 
@@ -109,17 +111,18 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
             	refsetPositionSetPropName = (String) in.readObject();
                 snomedPositionSetPropName = (String) in.readObject();
                 uuidListListPropName = (String) in.readObject();
-                if (objDataVersion == 1) {
-                    // read and ignore the old changeMapPropName
-                    in.readObject();
-                }
-                
-             } 
-            if (objDataVersion >= 3) {
-                // Read version 3 data fields...
             	reviewCountPropName = (String) in.readObject();
                 reviewIndexPropName = (String) in.readObject();
-             } 
+//                if (objDataVersion == 1) {
+//                    // read and ignore the old changeMapPropName
+//                    in.readObject();
+//                }  
+            } 
+//            if (objDataVersion >= 3) {
+//                // Read version 3 data fields...
+//            	reviewCountPropName = (String) in.readObject();
+//                reviewIndexPropName = (String) in.readObject();
+//             } 
 
             // Initialize transient properties...
             
@@ -164,9 +167,21 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
     		 *  Get Values from process Keys 
     		 *  -------------------------------------------
     		 */
+    		
+			I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+
     		termFactory = LocalVersionedTerminology.get();
- 	        UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
-	        I_GetConceptData refsetSpecConcept = (I_GetConceptData) AceTaskUtil.getConceptFromObject(refsetSpecUuid); 
+ 	        UUID refsetUuid = (UUID) process.getProperty(refsetUuidPropName);
+	        I_GetConceptData refsetConcept = (I_GetConceptData) AceTaskUtil.getConceptFromObject(refsetUuid); 
+	        
+	        I_GetConceptData refsetSpecConcept = null;
+	    	if (refsetConcept != null) {
+	    		Set<I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept, config);
+	    		if (specs.size() > 0) {
+	    			refsetSpecConcept = specs.iterator().next();
+	    		}
+	    	}
+	        assert refsetSpecConcept != null;
 	        
 	        // Get the Refset Position (must convert from UniversalAcePosition type) 
 			// Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
@@ -238,7 +253,7 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	        // etc...
 	        
 	        
-	        int refsetSpecNid = termFactory.uuidToNative(refsetSpecUuid);
+	        int refsetSpecNid = refsetSpecConcept.getNid();
 	        Collection<I_ThinExtByRefVersioned> possibleSpecs = termFactory.getRefsetExtensionMembers(refsetSpecNid);
 
 	        //TODO Remove DEBUG statements! 
