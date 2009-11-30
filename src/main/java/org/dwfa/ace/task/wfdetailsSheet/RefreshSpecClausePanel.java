@@ -7,14 +7,18 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.TermComponentLabel;
@@ -24,8 +28,10 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.table.JTableWithDragImage;
+import org.dwfa.ace.table.RelationshipTableRenderer;
 import org.dwfa.ace.table.SrcRelTableModel;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
+import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.bpa.util.TableSorter;
 
 public class RefreshSpecClausePanel  extends JPanel implements ActionListener {
@@ -37,8 +43,9 @@ public class RefreshSpecClausePanel  extends JPanel implements ActionListener {
     
     private static final String REPLACE_OPTION = "replace concept with:";
     private static final String RETIRE_OPTION = "retire spec clause";
+    private static final String SKIP_OPTION = "skip clause and place at end of list";
     
-    private JComboBox updateOptions = new JComboBox(new String[] { REPLACE_OPTION, RETIRE_OPTION });
+    private JComboBox updateOptions = new JComboBox(new String[] { REPLACE_OPTION, RETIRE_OPTION, SKIP_OPTION });
     private JTextArea editorComments = new JTextArea();
     private TermComponentLabel replacementConceptLabel;
     
@@ -47,31 +54,34 @@ public class RefreshSpecClausePanel  extends JPanel implements ActionListener {
     private Set<I_Position> sourceTerminologyVersionSet;
     private I_GetConceptData conceptUnderReview;
     private I_ConfigAceFrame frameConfig;
-    private UUID clauseToUpdate;
+    private List<Collection<UUID>> clausesToUpdate;
 
     private SrcRelTableModel srcRelTableModel;
 
     private JTableWithDragImage relTable;
     
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    
+    private HostProxy host = new HostProxy();
 
     public RefreshSpecClausePanel(I_GetConceptData refsetSpec,
             Set<I_Position> refsetSpecVersionSet, Set<I_Position> sourceTerminologyVersionSet,
-            I_GetConceptData conceptUnderReview, UUID clauseToUpdate, I_ConfigAceFrame frameConfig) {
+            I_GetConceptData conceptUnderReview, List<Collection<UUID>> clauseToUpdate, I_ConfigAceFrame frameConfig) {
         super();
         replacementConceptLabel = new TermComponentLabel(frameConfig);
-        this.updateOptions.addActionListener(this);
         this.refsetSpec = refsetSpec;
         this.refsetSpecVersionSet = refsetSpecVersionSet;
         this.sourceTerminologyVersionSet = sourceTerminologyVersionSet;
         this.conceptUnderReview = conceptUnderReview;
-        this.clauseToUpdate = clauseToUpdate;
+        this.clausesToUpdate = clauseToUpdate;
         this.frameConfig = frameConfig;
         updateOptions.setSelectedItem(REPLACE_OPTION);
         
-        srcRelTableModel = new SrcRelTableModel(new HostProxy(), getSrcRelColumns(), frameConfig);
+        srcRelTableModel = new SrcRelTableModel(host, getSrcRelColumns(), frameConfig);
         TableSorter relSortingTable = new TableSorter(srcRelTableModel);
         relTable = new JTableWithDragImage(relSortingTable);
+        RelationshipTableRenderer renderer = new RelationshipTableRenderer();
+        relTable.setDefaultRenderer(StringWithRelTuple.class, renderer);
         relSortingTable.setTableHeader(relTable.getTableHeader());
         relSortingTable
                 .getTableHeader()
@@ -87,7 +97,9 @@ public class RefreshSpecClausePanel  extends JPanel implements ActionListener {
             column.setMinWidth(columnDesc.getMin());
         }
 
-        layoutPanel();
+        layoutRefreshSpecClausePanel();
+        this.updateOptions.addActionListener(this);
+        host.setTermComponent(conceptUnderReview);
     }
 
     private REL_FIELD[] getSrcRelColumns() {
@@ -97,118 +109,163 @@ public class RefreshSpecClausePanel  extends JPanel implements ActionListener {
         return fields.toArray(new REL_FIELD[fields.size()]);
     }
 
-    private void layoutPanel() {
+    private void layoutRefreshSpecClausePanel() {
+    	this.removeAll();
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+
         gbc.weighty = 0;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
+        
         add(new JLabel("refset spec:"), gbc);
+        
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1;
+        
         TermComponentLabel refsetSpecLabel = new TermComponentLabel(frameConfig);
-        refsetSpecLabel.setFrozen(true);
+        refsetSpecLabel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
         refsetSpecLabel.setTermComponent(refsetSpec);
+        refsetSpecLabel.setFrozen(true);
         add(refsetSpecLabel, gbc);
+        
         gbc.gridy++;
         gbc.gridx = 0;
-        
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
+        
         add(new JLabel("specification version:"), gbc);
+        
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1;
+        
         add(new JLabel(refsetSpecVersionSet.toString()), gbc);
+        
         gbc.gridy++;
         gbc.gridx = 0;
-
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
+        
         add(new JLabel("terminology version:"), gbc);
+        
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1;
+        
         add(new JLabel(sourceTerminologyVersionSet.toString()), gbc);
+        
         gbc.gridy++;
         gbc.gridx = 0;
-
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        add(new JLabel("refset spec:"), gbc);
+        
+        add(new JLabel("concept under review:"), gbc);
+        
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1;
+        
         TermComponentLabel conceptUnderReviewLabel = new TermComponentLabel(frameConfig);
-        conceptUnderReviewLabel.setFrozen(true);
+        conceptUnderReviewLabel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
         conceptUnderReviewLabel.setTermComponent(conceptUnderReview);
+        conceptUnderReviewLabel.setFrozen(true);
         add(conceptUnderReviewLabel, gbc);
+        
         gbc.gridy++;
         gbc.gridx = 0;
-        
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.WEST;
+        
         add(new JLabel("Concept relations:"), gbc);
+        
         gbc.gridy++;
         gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(new JScrollPane(relTable), gbc);
         
+        gbc.gridy++;
+        gbc.gridx = 0;
         gbc.fill = GridBagConstraints.NONE;
+        gbc.weighty = 0;
         gbc.weightx = 0;
         gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.WEST;
+        
         add(updateOptions, gbc);
-        gbc.gridy++;
-        gbc.gridx = 0;
+        
         
         if (updateOptions.getSelectedItem().equals(REPLACE_OPTION)) {
             
-            
+            gbc.gridy++;
+            gbc.gridx = 0;
             gbc.fill = GridBagConstraints.NONE;
             gbc.weightx = 0;
             gbc.gridwidth = 1;
             gbc.anchor = GridBagConstraints.EAST;
+            
             add(new JLabel("Concept replacement:"), gbc);
+            
             gbc.gridy++;
-            gbc.gridx = 0;
-
             gbc.gridx = 0;
             gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.weightx = 1;
             gbc.gridwidth = 2;
             gbc.anchor = GridBagConstraints.EAST;
+            
             add(replacementConceptLabel, gbc);
-            gbc.gridy++;
-        }
+            
+         }
         
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridy++;
+        gbc.gridx = 0;
+
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1;
         gbc.weighty = 1;
         gbc.gridwidth = 2;
         gbc.gridheight = 2;
         gbc.anchor = GridBagConstraints.EAST;
-        add(editorComments, gbc);
         
+        add(new JScrollPane(editorComments), gbc);
+        
+        if (getRootPane() != null) {
+            getRootPane().repaint();
+        }
+        if (this.getParent() != null) {
+            this.getParent().doLayout();
+            this.getParent().repaint();          
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        layoutPanel();
+    	SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+		        layoutRefreshSpecClausePanel();
+			}
+		});
     }
     
     private class HostProxy implements I_HostConceptPlugins {
@@ -280,9 +337,21 @@ public class RefreshSpecClausePanel  extends JPanel implements ActionListener {
 
         @Override
         public void setTermComponent(I_AmTermComponent termComponent) {
-            throw new UnsupportedOperationException();
+            conceptUnderReview = (I_GetConceptData) termComponent;
+            pcs.firePropertyChange("termComponent", null, termComponent);
         }
-        
+    }
+    
+    public void performRefreshAction() {
+        if (updateOptions.getSelectedItem().equals(REPLACE_OPTION)) {
+        	clausesToUpdate.remove(0);
+        	// Do replacement here...
+        } else if (updateOptions.getSelectedItem().equals(RETIRE_OPTION)) {
+        	clausesToUpdate.remove(0);
+        	// Do retire here...
+        } else if (updateOptions.getSelectedItem().equals(SKIP_OPTION)) {
+        	clausesToUpdate.add(clausesToUpdate.remove(0));
+        }	
     }
 
 }

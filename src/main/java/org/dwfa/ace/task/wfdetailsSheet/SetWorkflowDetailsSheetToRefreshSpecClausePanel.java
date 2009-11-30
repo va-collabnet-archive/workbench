@@ -1,9 +1,11 @@
 package org.dwfa.ace.task.wfdetailsSheet;
 
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,7 +39,7 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
 
 	private String snomedPositionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
     private String conceptToReplaceUuidPropName = ProcessAttachmentKeys.CONCEPT_TO_REPLACE_UUID.getAttachmentKey();
-    private String clauseToUpdateMemberUuidPropName = ProcessAttachmentKeys.REFSET_MEMBER_UUID.getAttachmentKey();
+    private String clausesToUpdateMemberUuidPropName = ProcessAttachmentKeys.REFSET_MEMBER_UUID.getAttachmentKey();
     
     private transient Exception ex = null;
 
@@ -48,7 +50,7 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
         out.writeObject(refsetPositionSetPropName);
         out.writeObject(snomedPositionSetPropName);
         out.writeObject(conceptToReplaceUuidPropName);
-        out.writeObject(clauseToUpdateMemberUuidPropName);
+        out.writeObject(clausesToUpdateMemberUuidPropName);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
@@ -60,7 +62,7 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             refsetPositionSetPropName = (String) in.readObject();
             snomedPositionSetPropName = (String) in.readObject();
             conceptToReplaceUuidPropName = (String) in.readObject();
-            clauseToUpdateMemberUuidPropName = (String) in.readObject();
+            clausesToUpdateMemberUuidPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -116,8 +118,9 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             clear.evaluate(process, worker);
             JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
             int width = 750;
-            int height = 150;
+            int height = 300;
             workflowDetailsSheet.setSize(width, height);
+            workflowDetailsSheet.setLayout(new GridLayout(1,1));
 
             
            UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
@@ -125,7 +128,7 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
            Set<I_Position> sourceTerminologyVersionSet = (Set<I_Position>) process.getProperty(snomedPositionSetPropName);
            UUID conceptUnderReviewUuid = (UUID) process.getProperty(conceptToReplaceUuidPropName);
            I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-           UUID clauseToUpdate = (UUID) process.getProperty(clauseToUpdateMemberUuidPropName);
+           List<Collection<UUID>> clauseToUpdate = (List<Collection<UUID>>) process.getProperty(clausesToUpdateMemberUuidPropName);
            
            // Block to facilitate testing...
            if (refsetSpecUuid == null) {
@@ -206,12 +209,12 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
 		this.conceptToReplaceUuidPropName = conceptToReplaceUuidPropName;
 	}
 
-	public String getClauseToUpdateMemberUuidPropName() {
-		return clauseToUpdateMemberUuidPropName;
+	public String getClausesToUpdateMemberUuidPropName() {
+		return clausesToUpdateMemberUuidPropName;
 	}
 
-	public void setClauseToUpdateMemberUuidPropName(
+	public void setClausesToUpdateMemberUuidPropName(
 			String clauseToUpdateMemberUuidPropName) {
-		this.clauseToUpdateMemberUuidPropName = clauseToUpdateMemberUuidPropName;
+		this.clausesToUpdateMemberUuidPropName = clauseToUpdateMemberUuidPropName;
 	}
 }

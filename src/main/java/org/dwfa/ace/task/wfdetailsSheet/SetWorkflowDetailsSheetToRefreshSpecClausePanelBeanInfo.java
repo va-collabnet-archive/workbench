@@ -41,11 +41,11 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanelBeanInfo extends Sim
              conceptToReplaceUuidPropName.setShortDescription("The property that contains the UUID of the concept to replace.");
 
              PropertyDescriptor clauseToUpdateMemberUuidPropName =
-                 new PropertyDescriptor("clauseToUpdateMemberUuidPropName", getBeanDescriptor().getBeanClass());
+                 new PropertyDescriptor("clausesToUpdateMemberUuidPropName", getBeanDescriptor().getBeanClass());
              clauseToUpdateMemberUuidPropName.setBound(true);
              clauseToUpdateMemberUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-             clauseToUpdateMemberUuidPropName.setDisplayName("<html><font color='green'>clause uuid prop:");
-             clauseToUpdateMemberUuidPropName.setShortDescription("The property that contains the member id of the clause being updated.");
+             clauseToUpdateMemberUuidPropName.setDisplayName("<html><font color='green'>clauses prop:");
+             clauseToUpdateMemberUuidPropName.setShortDescription("The property that contains the List<Collectin<UUID>> of member uuids of the clauses being updated.");
 
              PropertyDescriptor profilePropName =
                  new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
