@@ -530,28 +530,33 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 							p, 
 							Integer.MAX_VALUE);
 					commentId = tf.getId(commentNid);
-					commentRefset.getUncommittedIdVersioned().add(commentId);
-					comment = tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, member.getComponentId(), 
-							RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
-					I_ThinExtByRefPartString commentExtPart = tf.newExtensionPart(I_ThinExtByRefPartString.class);
-					commentExtPart.setStringValue(editorComments.getText());
-					comment.addVersion(commentExtPart);
-					commentExtPart.setPathId(p.getConceptId());
-					commentExtPart.setStatusId(currentNid);
-					commentExtPart.setVersion(Integer.MAX_VALUE);
-					tf.addUncommitted(comment);
-					tf.addUncommitted(commentRefset);
+					if (commentRefset != null && commentId != null) {
+						commentRefset.getUncommittedIdVersioned().add(commentId);
+						comment = tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, member.getComponentId(), 
+								RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
+						I_ThinExtByRefPartString commentExtPart = tf.newExtensionPart(I_ThinExtByRefPartString.class);
+						commentExtPart.setStringValue(editorComments.getText());
+						comment.addVersion(commentExtPart);
+						commentExtPart.setPathId(p.getConceptId());
+						commentExtPart.setStatusId(currentNid);
+						commentExtPart.setVersion(Integer.MAX_VALUE);
+						tf.addUncommitted(comment);
+						tf.addUncommitted(commentRefset);
+					}
 					//
 				}
 				tf.commit();
 				member.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
 				if (comment != null) {
 					comment.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
-					commentId.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
 					tf.addUncommitted(comment);
-					commentRefset.getUncommittedIdVersioned().add(commentId);
-					tf.addUncommitted(commentRefset);
+					if (commentId != null) {
+						commentId.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+						commentRefset.getUncommittedIdVersioned().add(commentId);
+						tf.addUncommitted(commentRefset);
+					}
 				}
+				tf.commit();
 			}
 			// Do replacement here...
 		} else if (updateOptions.getSelectedItem().equals(RETIRE_OPTION)) {
@@ -600,11 +605,14 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 				member.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
 				if (comment != null) {
 					comment.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
-					commentId.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
 					tf.addUncommitted(comment);
-					commentRefset.getUncommittedIdVersioned().add(commentId);
-					tf.addUncommitted(commentRefset);
+					if (commentId != null) {
+						commentId.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+						commentRefset.getUncommittedIdVersioned().add(commentId);
+						tf.addUncommitted(commentRefset);
+					}
 				}
+				tf.commit();
 			}
 
 		} else if (updateOptions.getSelectedItem().equals(SKIP_OPTION)) {
