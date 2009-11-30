@@ -69,7 +69,7 @@ public class GetPositionSetFromWorkflowDetailsPanel extends AbstractTask {
 	public Condition evaluate(final I_EncodeBusinessProcess process,
 			final I_Work worker) throws TaskFailedException {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+			I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 			for (Component c: workflowDetailsSheet.getComponents()) {
 				if (SelectPositionSetPanel.class.isAssignableFrom(c.getClass())) {
