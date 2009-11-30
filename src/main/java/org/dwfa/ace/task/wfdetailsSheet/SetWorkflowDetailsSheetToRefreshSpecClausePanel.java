@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -14,9 +15,12 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -120,12 +124,25 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             int height = 300;
             workflowDetailsSheet.setSize(width, height);
             workflowDetailsSheet.setLayout(new GridLayout(1,1));
-
+            I_TermFactory tf = LocalVersionedTerminology.get();
             
            UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
-           Set<I_Position> refsetSpecVersionSet = (Set<I_Position>) process.getProperty(refsetPositionSetPropName);
-           Set<I_Position> sourceTerminologyVersionSet = (Set<I_Position>) process.getProperty(snomedPositionSetPropName);
-           
+           Set<UniversalAcePosition> universalRefsetSpecVersionSet = (Set<UniversalAcePosition>) process.getProperty(refsetPositionSetPropName);
+           Set<I_Position> refsetSpecVersionSet = new HashSet<I_Position>();
+	        for (UniversalAcePosition univPos: universalRefsetSpecVersionSet) {
+		           I_Path path = tf.getPath(univPos.getPathId());
+		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+		           refsetSpecVersionSet.add(thinPos);
+		        }
+
+	        Set<UniversalAcePosition> universalSourceTerminologyVersionSet = (Set<UniversalAcePosition>) process.getProperty(snomedPositionSetPropName);
+           Set<I_Position> sourceTerminologyVersionSet = new HashSet<I_Position>();
+	        for (UniversalAcePosition univPos: universalSourceTerminologyVersionSet) {
+		           I_Path path = tf.getPath(univPos.getPathId());
+		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+		           sourceTerminologyVersionSet.add(thinPos);
+		        }
+
            
            I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
            List<Collection<UUID>> clausesToUpdate = (List<Collection<UUID>>) process.getProperty(clausesToUpdateMemberUuidPropName);
