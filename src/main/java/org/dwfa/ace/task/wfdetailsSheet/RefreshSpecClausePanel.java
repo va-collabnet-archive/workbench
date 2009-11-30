@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
@@ -86,17 +87,68 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 	public RefreshSpecClausePanel(I_GetConceptData refsetSpec,
 			Set<I_Position> refsetSpecVersionSet,
 			Set<I_Position> sourceTerminologyVersionSet,
-			I_GetConceptData conceptUnderReview,
-			List<Collection<UUID>> clausesToUpdate, I_ConfigAceFrame frameConfig) throws IOException, TerminologyException {
+			List<Collection<UUID>> clausesToUpdate, 
+			I_ConfigAceFrame frameConfig) throws IOException, TerminologyException {
 		super();
 		replacementConceptLabel = new TermComponentLabel(frameConfig);
 		this.refsetSpec = refsetSpec;
 		this.refsetSpecVersionSet = refsetSpecVersionSet;
 		this.sourceTerminologyVersionSet = sourceTerminologyVersionSet;
-		this.conceptUnderReview = conceptUnderReview;
 		this.clausesToUpdate = clausesToUpdate;
 		this.frameConfig = frameConfig;
 		updateOptions.setSelectedItem(REPLACE_OPTION);
+		Collection<UUID> clauseIds = clausesToUpdate.get(0);
+        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_IntSet notCurrentStatus = tf.newIntSet();
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.CONFLICTING.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.NOT_YET_CREATED.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.RETIRED_MISSPELLED.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.DUPLICATE.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.OUTDATED.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.AMBIGUOUS.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.ERRONEOUS.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.INAPPROPRIATE.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.IMPLIED_RELATIONSHIP.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.EXTINCT.localize().getNid());
+
+		I_ThinExtByRefVersioned member = tf.getExtension(LocalVersionedTerminology.get()
+				.uuidToNative(clauseIds));
+		List<I_ThinExtByRefTuple> tuples = member.getTuples(frameConfig.getAllowedStatus(), refsetSpecVersionSet, false, false);
+		for (I_ThinExtByRefTuple tuple: tuples) {
+			if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
+				I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) tuple.getPart();
+				I_GetConceptData part1 = tf.getConcept(ccPart.getC1id());
+				I_GetConceptData part2 = tf.getConcept(ccPart.getC2id());
+
+				if (part1.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet).size() > 0) {
+					this.conceptUnderReview = part1; 
+				}
+				if (part2.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet).size() > 0) {
+					this.conceptUnderReview = part2; 
+				}
+				break;
+			} else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
+				I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) tuple.getPart();
+				I_GetConceptData part1 = tf.getConcept(cccPart.getC1id());
+				I_GetConceptData part2 = tf.getConcept(cccPart.getC2id());
+				I_GetConceptData part3 = tf.getConcept(cccPart.getC3id());
+
+				boolean hasRetiredConcept = false;
+				if (part1.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet).size() > 0) {
+					this.conceptUnderReview = part1; 
+				}
+				if (part2.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet).size() > 0) {
+					this.conceptUnderReview = part2; 
+				}
+				if (part3.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet).size() > 0) {
+					this.conceptUnderReview = part3; 
+				}
+				break;
+			}
+		}
 
 		srcRelTableModel = new SrcRelTableModel(host, getSrcRelColumns(),
 				frameConfig);

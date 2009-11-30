@@ -33,13 +33,6 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanelBeanInfo extends Sim
              snomedPositionSetPropName.setDisplayName("<html><font color='green'>SNOMED position set prop:");
              snomedPositionSetPropName.setShortDescription("The property that contains the SNOMED position set.");
 
-             PropertyDescriptor conceptToReplaceUuidPropName =
-                 new PropertyDescriptor("conceptToReplaceUuidPropName", getBeanDescriptor().getBeanClass());
-             conceptToReplaceUuidPropName.setBound(true);
-             conceptToReplaceUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-             conceptToReplaceUuidPropName.setDisplayName("<html><font color='green'>concept to replace UUID prop:");
-             conceptToReplaceUuidPropName.setShortDescription("The property that contains the UUID of the concept to replace.");
-
              PropertyDescriptor clauseToUpdateMemberUuidPropName =
                  new PropertyDescriptor("clausesToUpdateMemberUuidPropName", getBeanDescriptor().getBeanClass());
              clauseToUpdateMemberUuidPropName.setBound(true);
@@ -56,7 +49,6 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanelBeanInfo extends Sim
 
             PropertyDescriptor rv[] =
                 { refsetUuidPropName, refsetPositionSetPropName, snomedPositionSetPropName, 
-                    conceptToReplaceUuidPropName, 
                     clauseToUpdateMemberUuidPropName, profilePropName };
             return rv;
         } catch (IntrospectionException e) {

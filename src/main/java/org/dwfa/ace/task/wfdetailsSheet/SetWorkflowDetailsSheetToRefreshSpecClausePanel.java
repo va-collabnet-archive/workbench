@@ -22,7 +22,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -31,14 +30,13 @@ import org.dwfa.util.bean.Spec;
 public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTask {
     private static final long serialVersionUID = 1;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String refsetPositionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
 
 	private String snomedPositionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
-    private String conceptToReplaceUuidPropName = ProcessAttachmentKeys.CONCEPT_TO_REPLACE_UUID.getAttachmentKey();
     private String clausesToUpdateMemberUuidPropName = ProcessAttachmentKeys.REFSET_MEMBER_UUID.getAttachmentKey();
     
     private transient Exception ex = null;
@@ -49,7 +47,6 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
         out.writeObject(refsetUuidPropName);
         out.writeObject(refsetPositionSetPropName);
         out.writeObject(snomedPositionSetPropName);
-        out.writeObject(conceptToReplaceUuidPropName);
         out.writeObject(clausesToUpdateMemberUuidPropName);
     }
 
@@ -61,7 +58,9 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             refsetUuidPropName = (String) in.readObject();
             refsetPositionSetPropName = (String) in.readObject();
             snomedPositionSetPropName = (String) in.readObject();
-            conceptToReplaceUuidPropName = (String) in.readObject();
+            if (objDataVersion == 1) {
+                in.readObject();
+            }
             clausesToUpdateMemberUuidPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -126,35 +125,17 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
            UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
            Set<I_Position> refsetSpecVersionSet = (Set<I_Position>) process.getProperty(refsetPositionSetPropName);
            Set<I_Position> sourceTerminologyVersionSet = (Set<I_Position>) process.getProperty(snomedPositionSetPropName);
-           UUID conceptUnderReviewUuid = (UUID) process.getProperty(conceptToReplaceUuidPropName);
-           I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-           List<Collection<UUID>> clauseToUpdate = (List<Collection<UUID>>) process.getProperty(clausesToUpdateMemberUuidPropName);
            
-           // Block to facilitate testing...
-           if (refsetSpecUuid == null) {
-               refsetSpecUuid = RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids().iterator().next();
-           }
-           if (refsetSpecVersionSet == null) {
-               refsetSpecVersionSet = frameConfig.getViewPositionSet();
-           }
-           if (sourceTerminologyVersionSet == null) {
-               sourceTerminologyVersionSet = frameConfig.getViewPositionSet();
-           }
-           if (conceptUnderReviewUuid == null) {
-               // uuid for abnormal cortisol...
-               conceptUnderReviewUuid = UUID.fromString("fdfb42fb-abe0-360a-bd8e-faae06d2dd06");
-           }
-           if (clauseToUpdate == null) {
-               
-           }
+           
+           I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+           List<Collection<UUID>> clausesToUpdate = (List<Collection<UUID>>) process.getProperty(clausesToUpdateMemberUuidPropName);
 
+           
            I_GetConceptData refsetSpec = LocalVersionedTerminology.get().getConcept(refsetSpecUuid);
-           I_GetConceptData conceptUnderReview = LocalVersionedTerminology.get().getConcept(conceptUnderReviewUuid);
-            workflowDetailsSheet.add(new RefreshSpecClausePanel(refsetSpec,
+           workflowDetailsSheet.add(new RefreshSpecClausePanel(refsetSpec,
                                                                 refsetSpecVersionSet, 
                                                                 sourceTerminologyVersionSet,
-                                                                conceptUnderReview, 
-                                                                clauseToUpdate,
+                                                                clausesToUpdate,
                                                                 frameConfig));
         } catch (Exception e) {
             ex = e;
@@ -199,14 +180,6 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
 
 	public void setSnomedPositionSetPropName(String snomedPositionSetPropName) {
 		this.snomedPositionSetPropName = snomedPositionSetPropName;
-	}
-
-	public String getConceptToReplaceUuidPropName() {
-		return conceptToReplaceUuidPropName;
-	}
-
-	public void setConceptToReplaceUuidPropName(String conceptToReplaceUuidPropName) {
-		this.conceptToReplaceUuidPropName = conceptToReplaceUuidPropName;
 	}
 
 	public String getClausesToUpdateMemberUuidPropName() {
