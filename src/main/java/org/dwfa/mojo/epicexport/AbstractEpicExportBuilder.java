@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.UUID;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 
 /**
@@ -21,6 +23,7 @@ public abstract class AbstractEpicExportBuilder {
 	EpicLoadFileFactory exportFactory;
 	EpicExportManager exportManager;
 	String masterfile;
+	I_GetConceptData parentConcept;
 	List<EpicItem> epicItems = new ArrayList<EpicItem>();
 	private I_EpicExportRecordWriter writer;
 	private String[] exportIfTheseItemsChanged;
@@ -44,6 +47,22 @@ public abstract class AbstractEpicExportBuilder {
 
 	public void setWriter(I_EpicExportRecordWriter writer) {
 		this.writer = writer;
+	}
+
+	public I_GetConceptData getParentConcept() {
+		return parentConcept;
+	}
+
+	public void setParentConcept(I_GetConceptData parentConcept) {
+		this.parentConcept = parentConcept;
+	}
+	
+	public String getParentUUID() throws IOException {
+		String ret = null;
+		for (UUID u: this.parentConcept.getUids()) {
+			ret = u.toString();
+		}
+		return ret;
 	}
 
 	/**

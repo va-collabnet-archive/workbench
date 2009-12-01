@@ -3,6 +3,7 @@ package org.dwfa.mojo.epicexport;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.mojo.epicexport.AbstractEpicExportBuilder.EpicItem;
 import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 
@@ -59,6 +60,10 @@ public interface I_EpicLoadFileBuilder {
 	public String getMasterfile();
 
 	public void setMasterfile(String masterfile); 
+	
+	public I_GetConceptData getParentConcept();
+	
+	public void setParentConcept(I_GetConceptData parentConcept);
 
 	/**
 	 * If an item has no value set, will populate the the file with the value of another

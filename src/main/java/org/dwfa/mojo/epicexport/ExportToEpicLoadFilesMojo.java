@@ -114,7 +114,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
      /**
       * The name of the drop
       * 
-      * @paremeter
+      * @parameter
       * @required
       */
      private String dropName;
@@ -209,6 +209,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		}
 
 		public void close() throws Exception {
+getLog().info("CLOSING");			
 			this.exportManager.close();
 		}
 		
@@ -233,8 +234,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	        	if (termFactory.hasConcept(thinExtByRefVersioned.getRefsetId())) {
 	                for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(statusValues,
 	                    positions, false, false)) {
-	                	getLog().info("getTypeid()=" + thinExtByRefVersioned.getTypeId());
-                	
 	                	export(thinExtByRefTuple, concept);
 	                }
 	        	}else {
@@ -247,7 +246,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    }
 
 	    void export(I_ThinExtByRefTuple thinExtByRefTuple, I_GetConceptData parentConcept) throws Exception {
-	    	getLog().info("thinExtByRefTuple = " + thinExtByRefTuple);	 
 	        export(thinExtByRefTuple.getPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
 	            thinExtByRefTuple.getComponentId(), parentConcept, getPreviousVersion(thinExtByRefTuple));
 	    }
@@ -264,19 +262,16 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	List<? extends I_ThinExtByRefPart> versions = thinExtByRefTuple.getVersions();
 	    	
 	    	I_ThinExtByRefPart newestOldVersion  = null;
-	    	int max = 0;
+	    	//getLog().info("Looking for version " + this.startingVersion);
 	    	for (Iterator<? extends I_ThinExtByRefPart> i = versions.iterator(); i.hasNext(); ) {
 	    		I_ThinExtByRefPart v = i.next();
-	    		getLog().info("Found version " + v.getVersion());
-	    		getLog().info("Looking for version " + this.startingVersion); 
+	    		//getLog().info("Checking version " + v.getVersion());
 	    		if (v.getVersion() <= this.startingVersion) {
 		    		if (newestOldVersion == null) {
 		    			newestOldVersion = v;
-		    			max = v.getVersion();
+		    			//getLog().info("Using version " + v.getVersion());
 		    		}
-		    			
-		    		if (v.getVersion() > max){
-		    			max = v.getVersion();
+		    		else if (v.getVersion() > newestOldVersion.getVersion()){
 		    			newestOldVersion = v;
 		    		}
 	    		}
@@ -295,9 +290,10 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    public void exportRefset(String refsetName, I_GetConceptData concept, 
 	    		I_ThinExtByRefPart thinExtByRefPart, I_GetConceptData parentConcept,
 	    		I_ThinExtByRefPart previousVersion) throws Exception {
-	    	getLog().info("** exportRefset: refsetName=" + refsetName);
 	    	this.setCurrentItem(null, null);
 	    	String stringValue = null;
+	    	String previousStringValue = null;
+	    	
 	    	//TODO: Re-factor into separate class, allow pattern matching, store and read from pom.xml
 	    	if(refsetName.equals("EDG Billing Item 207")) {
 	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "207");
@@ -308,6 +304,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	else if(refsetName.equals("EDG Billing Item 2")) {
 	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "2");
 	    		stringValue = getDisplayName(parentConcept);
+	    		previousStringValue = getPreviousDisplayName(parentConcept); 
 	    	}
 	    	else if(refsetName.equals("EDG Billing Item 40")) {
 	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "40");
@@ -330,15 +327,32 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	else if(refsetName.equals("EDG Clinical Item 40")) {
 	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "40");
 	    	}
+	    	else if(refsetName.equals("EDG Clinical Item 80")) {
+	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "80");
+	    	}
+	    	else if(refsetName.equals("EDG Clinical Item 91")) {
+	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "91");
+	    	}
+	    	else if(refsetName.equals("EDG Clinical Item 100")) {
+	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "100");
+	    	}
+	    	else if(refsetName.equals("EDG Clinical Item 207")) {
+	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "207");
+	    	}
+	    	else if(refsetName.equals("EDG Clinical Item 7000")) {
+	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "7000");
+	    	}
 	    	else if(refsetName.equals("EDG Clinical Item 7010")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "7010");
+		    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "7010");
 	    	}
 	    	
 	    	if (this.currentItem != null) {
 	    		if (stringValue == null)
 	    			stringValue = getValueAsString(thinExtByRefPart);
 	    		I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(this.currentMasterFile);
-	    		String previousStringValue = getValueAsString(previousVersion);
+	    		exportWriter.setParentConcept(parentConcept);
+	    		if (previousStringValue == null)
+	    			previousStringValue = getValueAsString(previousVersion);
 	    		getLog().info("Exporting item " + this.currentItem + " with a value of " + stringValue +
 	    				" and a previous value of " + previousStringValue);
 	    		
@@ -395,6 +409,29 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	
 	    	return ret;
 	    }
+
+	    public String getPreviousDisplayName(I_GetConceptData conceptData) throws Exception {
+	    	String ret = null;
+	
+	    	List<I_DescriptionVersioned> descs = conceptData.getDescriptions();
+	    	I_DescriptionTuple newestOldTuple = null;
+	    	for (Iterator<I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
+	    		I_DescriptionVersioned d = i.next();
+	    		for (I_DescriptionTuple dt : d.getTuples()) {
+	    			if (dt.getVersion() < this.startingVersion)
+	    				if (newestOldTuple == null) {
+	    					newestOldTuple = dt;
+	    				}
+	    				else if (dt.getVersion() > newestOldTuple.getVersion()) {
+	    					newestOldTuple = dt;
+	    				}
+	    		}
+	    	}
+	    	if (newestOldTuple != null)
+	    		ret = newestOldTuple.getPart().getText();
+	    	return ret;
+	    }
+
     }
 
 

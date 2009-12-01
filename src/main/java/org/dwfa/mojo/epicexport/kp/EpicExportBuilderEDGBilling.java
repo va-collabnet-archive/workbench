@@ -34,6 +34,7 @@ public class EpicExportBuilderEDGBilling extends AbstractEpicExportBuilder imple
 					writer.writeLine("#HELLO WORLD");
 				writer.newRecord();
 				writeItem("2");
+				writeLiteralItem("35" , this.getParentUUID());
 				writeItem("40");
 				writeItem("2000");
 				writeItemIfChanged("207");
