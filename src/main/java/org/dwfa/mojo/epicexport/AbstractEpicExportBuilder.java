@@ -224,6 +224,20 @@ public abstract class AbstractEpicExportBuilder {
 		this.exportIfTheseItemsChanged = exportIfTheseItemsChanged;
 	}
 
+	public boolean itemIsPopulated(String epicItemNumber) {
+		return getFirstItem(epicItemNumber) != null;
+	}
+	
+	public boolean allItemsArePopulated(String[] itemList) {
+		boolean ret = true;
+		for (String i: itemList) {
+			ret = ret && this.itemIsPopulated(i);
+			if (!ret)
+				break;
+		}
+		return ret;
+	}
+
 	public boolean anyItemsHaveChanges(String[] itemList) {
 		boolean ret = false;
 		for (String i: itemList) {
