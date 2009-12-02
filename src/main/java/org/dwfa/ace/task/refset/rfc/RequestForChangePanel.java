@@ -123,12 +123,16 @@ public class RequestForChangePanel extends JPanel {
         originalRequestTextField.setWrapStyleWord(true);
         originalRequestScrollPane = new JScrollPane(originalRequestTextField);
         originalRequestScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        originalRequestScrollPane.setMaximumSize(new Dimension(200, 50));
+        originalRequestScrollPane.setMinimumSize(new Dimension(200, 50));
         originalRequestScrollPane.setPreferredSize(new Dimension(200, 50));
         commentsTextField = new JTextArea();
         commentsTextField.setLineWrap(true);
         commentsTextField.setWrapStyleWord(true);
         commentsScrollPane = new JScrollPane(commentsTextField);
         commentsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        commentsScrollPane.setMaximumSize(new Dimension(200, 50));
+        commentsScrollPane.setMinimumSize(new Dimension(200, 50));
         commentsScrollPane.setPreferredSize(new Dimension(200, 50));
     }
 
