@@ -10,8 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import javax.swing.JOptionPane;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -37,7 +35,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -119,15 +116,13 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                 throw new TerminologyException("Refset spec UUID was not specified.");
             }
 
-            File outputFile = new File(outputFileName);
-
             // initialise the progress panel
             activityPanel.setIndeterminate(true);
             activityPanel.setProgressInfoUpper("Exporting refset spec : "
                 + configFrame.getRefsetSpecInSpecEditor().getInitialText());
             activityPanel.setProgressInfoLower("<html><font color='black'> In progress.");
 
-            exportRefset(outputFile, LocalVersionedTerminology.get().getConcept(new UUID[] { uuid }));
+            exportRefset(outputFileName, LocalVersionedTerminology.get().getConcept(new UUID[] { uuid }));
 
             activityPanel.setProgressInfoUpper("Exporting refset spec : "
                 + configFrame.getRefsetSpecInSpecEditor().getInitialText());
@@ -145,7 +140,9 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         }
     }
 
-    private void exportRefset(File outputFile, I_GetConceptData refsetSpec) throws Exception {
+    private void exportRefset(String fileNameWithTxt, I_GetConceptData refsetSpec) throws Exception {
+        String fileNameNoTxt = fileNameWithTxt.replaceAll(".txt", "");
+        File outputFile = new File(fileNameNoTxt + ".txt");
 
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
@@ -160,41 +157,11 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         List<I_ThinExtByRefVersioned> extensions =
                 LocalVersionedTerminology.get().getRefsetExtensionMembers(memberRefset.getConceptId());
 
-        exportFileWriter.write("Concept name");
-        exportFileWriter.write(delimiter);
-        exportFileWriter.write("SCT ID");
-        exportFileWriter.write(delimiter);
-        exportFileWriter.write("Comments");
-        exportFileWriter.newLine();
+        writeHeader(exportFileWriter);
 
         SpecRefsetHelper helper = new SpecRefsetHelper();
-        int count = 0;
-        for (I_ThinExtByRefVersioned ext : extensions) {
-
-            List<I_ThinExtByRefTuple> tuples =
-                    ext.getTuples(helper.getCurrentStatusIntSet(), null, addUncommitted,
-                        returnConflictResolvedLatestState);
-
-            for (I_ThinExtByRefTuple thinExtByRefTuple : tuples) {
-                if (thinExtByRefTuple.getPart() instanceof I_ThinExtByRefPartConcept) {
-                    if (thinExtByRefTuple.getRefsetId() == memberRefset.getConceptId()) {
-                        I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
-                        if (part.getC1id() == termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids())
-                            .getConceptId()) {
-                            count++;
-                        }
-                    }
-                }
-
-            }
-        }
-
-        if (count > maxLineCount) {
-            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                "Maximum number of refset members has been exceeded (maximum = " + maxLineCount + ", currently "
-                    + count + " members).", "", JOptionPane.ERROR_MESSAGE);
-            returnCondition = Condition.ITEM_CANCELED;
-        }
+        int lineCount = 1; // header
+        int fileNumber = 0;
 
         for (I_ThinExtByRefVersioned ext : extensions) {
 
@@ -208,6 +175,16 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                         I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
                         if (part.getC1id() == termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids())
                             .getConceptId()) {
+                            lineCount++;
+                            if (lineCount > maxLineCount) {
+                                fileNumber++;
+                                lineCount = 2; // header + this record
+                                outputFile = new File(fileNameNoTxt + "-" + fileNumber + ".txt");
+                                exportFileWriter.flush();
+                                exportFileWriter.close();
+                                exportFileWriter = new BufferedWriter(new FileWriter(outputFile, false));
+                                writeHeader(exportFileWriter);
+                            }
                             // write to file
                             String description =
                                     getDescription(descriptionTypeTermEntry, thinExtByRefTuple.getComponentId());
@@ -233,6 +210,15 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         exportFileWriter.flush();
         exportFileWriter.close();
 
+    }
+
+    private void writeHeader(BufferedWriter exportFileWriter) throws IOException {
+        exportFileWriter.write("Concept name");
+        exportFileWriter.write(delimiter);
+        exportFileWriter.write("SCT ID");
+        exportFileWriter.write(delimiter);
+        exportFileWriter.write("Comments");
+        exportFileWriter.newLine();
     }
 
     private String getSctId(int componentId) throws TerminologyException, IOException {
