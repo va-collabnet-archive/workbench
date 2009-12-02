@@ -24,6 +24,8 @@ import org.dwfa.tapi.TerminologyException;
  */
 public class ConceptStatement extends RefsetSpecStatement {
 
+    I_GetConceptData queryConstraintConcept;
+
     /**
      * Constructor for refset spec statement.
      * 
@@ -42,35 +44,31 @@ public class ConceptStatement extends RefsetSpecStatement {
         if (tokenEnum == null) {
             throw new RuntimeException("Unknown query type : " + queryToken);
         }
+        queryConstraintConcept = (I_GetConceptData) queryConstraint;
     }
 
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
+        queryConstraint = (I_GetConceptData) queryConstraint;
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
             parentPossibleConcepts = termFactory.getConceptIdSet();
         }
 
         switch (tokenEnum) {
-        /*
-         * case CONCEPT_CONTAINS_DESC_GROUPING:
-         * throw new TerminologyException("Unimplemented query : contains desc grouping"); // unimplemented
-         * case CONCEPT_CONTAINS_REL_GROUPING:
-         * throw new TerminologyException("Unimplemented query : contains rel grouping"); // unimplemented
-         */
         case CONCEPT_IS:
             if (isNegated()) {
                 // possibleConcepts = termFactory.getConceptIdSet();
                 possibleConcepts.or(parentPossibleConcepts);
-                possibleConcepts.setNotMember(queryConstraint.getConceptId());
+                possibleConcepts.setNotMember(queryConstraintConcept.getConceptId());
             } else {
-                possibleConcepts.setMember(queryConstraint.getConceptId());
+                possibleConcepts.setMember(queryConstraintConcept.getConceptId());
             }
             break;
         case CONCEPT_IS_CHILD_OF:
         case CONCEPT_IS_DESCENDENT_OF:
         case CONCEPT_IS_KIND_OF:
-            I_RepresentIdSet results = queryConstraint.getPossibleKindOfConcepts(configFrame);
+            I_RepresentIdSet results = queryConstraintConcept.getPossibleKindOfConcepts(configFrame);
             if (isNegated()) {
                 // possibleConcepts = termFactory.getConceptIdSet();
                 possibleConcepts.or(parentPossibleConcepts);
@@ -81,7 +79,7 @@ public class ConceptStatement extends RefsetSpecStatement {
             break;
         case CONCEPT_IS_MEMBER_OF:
             List<I_ThinExtByRefVersioned> refsetExtensions =
-                    termFactory.getRefsetExtensionMembers(queryConstraint.getConceptId());
+                    termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ThinExtByRefVersioned ext : refsetExtensions) {
                 refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
@@ -150,7 +148,7 @@ public class ConceptStatement extends RefsetSpecStatement {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-        Set<I_GetConceptData> children = queryConstraint.getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<I_GetConceptData> children = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
 
         for (I_GetConceptData child : children) {
             if (conceptBeingTested.equals(child)) {
@@ -193,7 +191,7 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
-        return queryConstraint.isParentOf(conceptBeingTested, true);
+        return queryConstraintConcept.isParentOf(conceptBeingTested, true);
     }
 
     /**
@@ -207,7 +205,7 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptIsKindOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
-        return queryConstraint.isParentOfOrEqualTo(conceptBeingTested, true);
+        return queryConstraintConcept.isParentOfOrEqualTo(conceptBeingTested, true);
     }
 
     /**
@@ -220,7 +218,7 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptStatusIs(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
-        return conceptStatusIs(conceptBeingTested, queryConstraint);
+        return conceptStatusIs(conceptBeingTested, queryConstraintConcept);
     }
 
     /**
@@ -288,7 +286,8 @@ public class ConceptStatement extends RefsetSpecStatement {
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
         // get list of all children of input concept
-        Set<I_GetConceptData> childStatuses = queryConstraint.getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<I_GetConceptData> childStatuses =
+                queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
 
         // call conceptStatusIs on each
         for (I_GetConceptData childStatus : childStatuses) {
@@ -313,7 +312,7 @@ public class ConceptStatement extends RefsetSpecStatement {
     private boolean conceptStatusIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException,
             TerminologyException {
 
-        return conceptStatusIsDescendantOf(conceptBeingTested, queryConstraint);
+        return conceptStatusIsDescendantOf(conceptBeingTested, queryConstraintConcept);
     }
 
     /**

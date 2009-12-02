@@ -103,12 +103,12 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     protected I_GetConceptData queryToken;
 
     /**
-     * The concept to which the query type is applied.
+     * The component to which the query type is applied.
      * e.g. if query type is "concept is" and query destination is
      * "paracetamol",
      * then the statement would be "concept is":"paracetamol".
      */
-    protected I_GetConceptData queryConstraint;
+    protected I_AmTermComponent queryConstraint;
 
     protected I_TermFactory termFactory;
 
@@ -169,7 +169,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
         tuples.add(tuple);
 
-        return isComponentStatus(queryConstraint, tuples);
+        return isComponentStatus((I_GetConceptData) queryConstraint, tuples);
     }
 
     protected boolean componentStatusIs(I_GetConceptData requiredStatus, I_AmTuple tuple) {
@@ -184,7 +184,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
         tuples.add(tuple);
 
-        if (isComponentStatus(queryConstraint, tuples)) {
+        if (isComponentStatus((I_GetConceptData) queryConstraint, tuples)) {
             return true;
         }
 
@@ -193,8 +193,8 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
         // get list of all children of input concept
         Set<I_GetConceptData> childStatuses =
-                queryConstraint.getDestRelOrigins(termFactory.getActiveAceFrameConfig().getAllowedStatus(),
-                    allowedTypes, null, true, true);
+                ((I_GetConceptData) queryConstraint).getDestRelOrigins(termFactory.getActiveAceFrameConfig()
+                    .getAllowedStatus(), allowedTypes, null, true, true);
 
         // call conceptStatusIs on each
         for (I_GetConceptData childStatus : childStatuses) {
@@ -212,7 +212,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(componentId);
 
         for (I_ThinExtByRefVersioned ext : extensions) {
-            if (ext.getRefsetId() == queryConstraint.getConceptId()) { // check
+            if (ext.getRefsetId() == ((I_GetConceptData) queryConstraint).getConceptId()) { // check
 
                 List<? extends I_ThinExtByRefPart> parts = ext.getVersions();
 

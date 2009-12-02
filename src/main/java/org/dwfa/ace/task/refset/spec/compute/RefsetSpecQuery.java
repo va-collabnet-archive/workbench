@@ -425,7 +425,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             case CONCEPT_IS_MEMBER_OF:
             case DESC_IS_MEMBER_OF:
             case REL_IS_MEMBER_OF:
-                results.add(statement.queryConstraint.getConceptId());
+                results.add(statement.queryConstraint.getNid()); // TODO check
                 break;
             default:
                 break;
