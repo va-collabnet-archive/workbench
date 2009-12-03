@@ -9,8 +9,9 @@ public class LoadClassifyWriteBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(LoadClassifyWrite.class);
-        bd.setDisplayName("<html><font color='green'><center>Load &amp; Classify");
+        // :EDIT:MEC: color & text change
+        // bd.setDisplayName("<html><font color='green'><center>Load &amp; Classify");
+        bd.setDisplayName("<html><font color='#B3B3B3'><center>LoadClassifyWrite");
         return bd;
     }
-
 }

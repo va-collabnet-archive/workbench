@@ -9,7 +9,9 @@ public class FasterLoadBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(FasterLoad.class);
-        bd.setDisplayName("<html><font color='green'><center>Faster Load");
+        // :EDIT:MEC: color & text change
+        // bd.setDisplayName("<html><font color='green'><center>Faster Load");
+        bd.setDisplayName("<html><font color='#B3B3B3'><center>FasterLoad");
         return bd;
     }
 

@@ -3,15 +3,26 @@ package org.dwfa.ace.task.classify;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 public interface I_SnorocketFactory {
 
     void setIsa(int id);
     
+    // :ADDED:PHASE_2:
+    void addRoleNeverGrouped(int id);
+
+    // :ADDED:PHASE_2:
+    void addRoleRoot(int id, boolean inclusive);
+
     void addConcept(int conceptId, boolean fullyDefined);
+
     
     void addRelationship(int conceptId1, int roleId, int conceptId2, int group);
 
+    // :ADDED:PHASE_2:
+    void addRoleComposition(int[] lhsIds, int rhsId);
+    
     void classify();
 
     void getResults(I_Callback callback);
@@ -20,6 +31,14 @@ public interface I_SnorocketFactory {
         void addRelationship(int conceptId1, int roleId, int conceptId2, int group);
     }
 
+    // :ADDED:PHASE_2:
+    public void getEquivConcepts(I_EquivalentCallback callback);
+    
+    // :ADDED:PHASE_2:
+    interface I_EquivalentCallback {
+        void equivalent(Collection<String> equivalentConcepts);
+    }
+    
     /*
      * Alternate potential API to allow for batch transfer of data
      * 

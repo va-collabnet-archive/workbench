@@ -23,171 +23,231 @@ import org.dwfa.tapi.TerminologyException;
 
 class ClassifierUtil {
 
-    final private Logger logger;
-    final private I_SnorocketFactory rocket;
+	final private Logger logger;
+	final private I_SnorocketFactory rocket;
 
-    final private int rootNid;
-    final private int isaId;
-    final private I_IntSet allowedPaths;
-    final private I_IntSet activeStatus;
-    final private I_IntSet statedForms;
+	final private int rootNid;
+	final private int isaId;
+	final private I_IntSet allowedPaths;
+	final private I_IntSet activeStatus;
+	final private I_IntSet statedForms;
 
-    ClassifierUtil(final Logger logger, final I_SnorocketFactory rocket) throws TerminologyException, IOException {
-        this.logger = logger;
-        this.rocket = rocket;
+	// :EDIT:MEC:
+	int countAddConcept;
+	int countAddRel;
+	int countStatusNotCurrent;
+	// :EDIT:MEC:
 
-        final I_TermFactory termFactory = LocalVersionedTerminology.get();
-        
-        rootNid = termFactory.uuidToNative(SNOMED.Concept.ROOT.getUids());
-        isaId = termFactory.uuidToNative(SNOMED.Concept.IS_A.getUids());
+	ClassifierUtil(final Logger logger, final I_SnorocketFactory rocket)
+			throws TerminologyException, IOException {
+		this.logger = logger;
+		this.rocket = rocket;
+		// :EDIT:MEC:
+		countAddConcept = 0;
+		countAddRel = 0;
+		countStatusNotCurrent = 0;
+		// :EDIT:MEC:
 
-        final I_ConfigAceFrame frameConfig = termFactory.getActiveAceFrameConfig();
+		final I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-        allowedPaths = termFactory.newIntSet();
-        for (I_Position p : frameConfig.getViewPositionSet()) {
-            addPathIds(allowedPaths, p);
-        }
+		rootNid = termFactory.uuidToNative(SNOMED.Concept.ROOT.getUids());
+		isaId = termFactory.uuidToNative(SNOMED.Concept.IS_A.getUids());
 
-        activeStatus = frameConfig.getAllowedStatus();
+		final I_ConfigAceFrame frameConfig = termFactory
+				.getActiveAceFrameConfig();
 
-        statedForms = termFactory.newIntSet();
-        addConceptToSet(statedForms, termFactory, ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP);
-        addConceptToSet(statedForms, termFactory, ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC);
-        addConceptToSet(statedForms, termFactory, ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP);
-        addConceptToSet(statedForms, termFactory, ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP);
-    }
+		allowedPaths = termFactory.newIntSet();
+		for (I_Position p : frameConfig.getViewPositionSet()) {
+			addPathIds(allowedPaths, p);
+		}
 
-    private void addConceptToSet(I_IntSet set, I_TermFactory tf, Concept relationship) throws TerminologyException, IOException {
-        set.add(tf.uuidToNative(relationship.getUids()));
-    }
-    
-    private void addPathIds(final I_IntSet paths, final I_Position p) {
-        paths.add(p.getPath().getConceptId());
-        for (I_Position origin : p.getPath().getOrigins()) {
-            addPathIds(paths, origin);
-        }
-    }
+		activeStatus = frameConfig.getAllowedStatus();
 
-    /**
-     * If the concept is a SNOMED concept, pass it and all active stated relationships to classifier.
-     * 
-     * A concept is considered to be a SNOMED concept if it's the root concept or
-     * it has an active SNOMED ISA relationship.
-     * 
-     * @param concept
-     * @param includeUncommitted
-     * @throws IOException
-     */
-    void processConcept(final I_GetConceptData concept, final boolean includeUncommitted) throws IOException {
-        if (concept.getConceptId() == rootNid) {
-            rocket.addConcept(concept.getConceptId(), false);
-        } else {
-            final I_ConceptAttributePart latestAttributePart = getLatestAttribute(concept, includeUncommitted);
-            
-            if (latestAttributePart != null && activeStatus.contains(latestAttributePart.getConceptStatus())) {
-                final List<Relationship> statedRels = collectStatedRelationships(concept, includeUncommitted);
+		statedForms = termFactory.newIntSet();
+		addConceptToSet(statedForms, termFactory,
+				ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP);
+		addConceptToSet(statedForms, termFactory,
+				ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC);
+		addConceptToSet(statedForms, termFactory,
+				ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP);
+		addConceptToSet(statedForms, termFactory,
+				ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP);
+	}
 
-                if (null != statedRels) {
-                    rocket.addConcept(concept.getConceptId(), latestAttributePart.isDefined());
+	private void addConceptToSet(I_IntSet set, I_TermFactory tf,
+			Concept relationship) throws TerminologyException, IOException {
+		set.add(tf.uuidToNative(relationship.getUids()));
+	}
 
-                    for (Relationship rel: statedRels) {
-                        rocket.addRelationship(rel.cId1, rel.relId, rel.cId2, rel.group);
-                    }
-                }
-            }
-        }
-    }
+	private void addPathIds(final I_IntSet paths, final I_Position p) {
+		paths.add(p.getPath().getConceptId());
+		for (I_Position origin : p.getPath().getOrigins()) {
+			addPathIds(paths, origin);
+		}
+	}
 
-    private List<Relationship> collectStatedRelationships(final I_GetConceptData concept, final boolean includeUncommitted) throws IOException {
-        final List<I_RelVersioned> sourceRels = new ArrayList<I_RelVersioned>();
-        final List<Relationship> statedRels = new ArrayList<Relationship>();
+	/**
+	 * If the concept is a SNOMED concept, pass it and all active stated
+	 * relationships to classifier.
+	 * 
+	 * A concept is considered to be a SNOMED concept if it's the root concept
+	 * or it has an active SNOMED ISA relationship.
+	 * 
+	 * @param concept
+	 * @param includeUncommitted
+	 * @throws IOException
+	 */
+	void processConcept(final I_GetConceptData concept,
+			final boolean includeUncommitted) throws IOException {
+		if (concept.getConceptId() == rootNid) {
+			rocket.addConcept(concept.getConceptId(), false);
+			// :EDIT:MEC: !!!
+			logger.info("!!! ROOT Concept # " + rootNid);
+			// :EDIT:MEC:
+		} else {
+			final I_ConceptAttributePart latestAttributePart = getLatestAttribute(
+					concept, includeUncommitted);
 
-        boolean isSnomedConcept = false;
-        
-        if (includeUncommitted) {
-            sourceRels.addAll(concept.getUncommittedSourceRels());
-        }
-        sourceRels.addAll(concept.getSourceRels());
-        
-        for (I_RelVersioned rel: sourceRels) {
-            final I_RelPart latestRel = getLatestRel(concept, rel);
-            
-            if (null != latestRel && activeStatus.contains(latestRel.getStatusId())) {
-                // check the relationship to see if there is a proper SNOMED is-a.
-                if (latestRel.getRelTypeId() == isaId) {
-                    isSnomedConcept = true;
-                }
+			if (latestAttributePart != null
+					&& activeStatus.contains(latestAttributePart
+							.getStatusId())) {
+				final List<Relationship> statedRels = collectStatedRelationships(
+						concept, includeUncommitted);
 
-                if (statedForms.contains(latestRel.getCharacteristicId())) {
-                    final Relationship relationship =
-                        new Relationship(rel.getC1Id(), latestRel.getRelTypeId(), rel.getC2Id(), latestRel.getGroup());
-                    statedRels.add(relationship);
-                }
-            }
-        }
-        
-        return isSnomedConcept ? statedRels : null;
-    }
+				if (null != statedRels) {
+					rocket.addConcept(concept.getConceptId(),
+							latestAttributePart.isDefined());
+					// :EDIT:MEC: !!!
+					if (++countAddConcept % 100000 == 0) {
+						logger.info("!!! processed concept " + countAddConcept);
+					}
+					// :EDIT:MEC:
 
-    private I_ConceptAttributePart getLatestAttribute(final I_GetConceptData concept, final boolean includeUncommitted) throws IOException {
-        final List<I_ConceptAttributePart> parts = new ArrayList<I_ConceptAttributePart>();
-        
-        I_ConceptAttributePart latestAttributePart = null;
-        
-        if (includeUncommitted) {
-            final I_ConceptAttributeVersioned uncommittedConceptAttributes = concept.getUncommittedConceptAttributes();
-            if (null != uncommittedConceptAttributes) {
-                parts.addAll(uncommittedConceptAttributes.getVersions());
-            }
-        }
-        
-        parts.addAll(concept.getConceptAttributes().getVersions());
-        
-        for (I_ConceptAttributePart attributePart : parts) {
-            if (allowedPaths.contains(attributePart.getPathId())) {
-                if (latestAttributePart == null || latestAttributePart.getVersion() < attributePart.getVersion()) {
-                    latestAttributePart = attributePart;
-                } else if (latestAttributePart.getVersion() == attributePart.getVersion()) {
-                    if (getLogger().isLoggable(Level.FINE)) {
-                        getLogger().log(Level.FINE, "has multiple entries with same version: " + attributePart + " for " + concept);
-                    }
-                }
-            }
-        }
-        return latestAttributePart;
-    }
+					for (Relationship rel : statedRels) {
+						rocket.addRelationship(rel.cId1, rel.relId, rel.cId2,
+								rel.group);
+						// :EDIT:MEC: !!!
+						if (++countAddRel % 100000 == 0) {
+							logger.info("!!! processed RELATIONSHIP "
+									+ countAddRel);
+						}
+						// :EDIT:MEC:
+					}
+				}
+			}
+		}
+	}
 
-    private I_RelPart getLatestRel(final I_GetConceptData concept, final I_RelVersioned rel) {
-        I_RelPart latestPart = null;
-        for (final I_RelPart part : rel.getVersions()) {
-            if (allowedPaths.contains(part.getPathId())) {
-                if (latestPart == null || latestPart.getVersion() < part.getVersion()) {
-                    latestPart = part;
-                } else if (latestPart.getVersion() == part.getVersion()) {
-                    if (getLogger().isLoggable(Level.FINE)) {
-                        getLogger().log(Level.FINE, "has multiple entries with same version: " + rel + " for " + concept);
-                    }
-                }
-            }
-        }
-        return latestPart;
-    }
+	private List<Relationship> collectStatedRelationships(
+			final I_GetConceptData concept, final boolean includeUncommitted)
+			throws IOException {
+		final List<I_RelVersioned> sourceRels = new ArrayList<I_RelVersioned>();
+		final List<Relationship> statedRels = new ArrayList<Relationship>();
 
-    private Logger getLogger() {
-        return logger;
-    }
-    
-    static private class Relationship {
-        final int cId1;
-        final int relId;
-        final int cId2;
-        final int group;
-        
-        public Relationship(final int cId1, final int relId, final int cId2, final int group) {
-            this.cId1 = cId1;
-            this.relId = relId;
-            this.cId2 = cId2;
-            this.group = group;
-        }
-    }
+		boolean isSnomedConcept = false;
+
+		if (includeUncommitted) {
+			sourceRels.addAll(concept.getUncommittedSourceRels());
+		}
+		sourceRels.addAll(concept.getSourceRels());
+
+		for (I_RelVersioned rel : sourceRels) {
+			final I_RelPart latestRel = getLatestRel(concept, rel);
+
+			if (null != latestRel
+					&& activeStatus.contains(latestRel.getStatusId())) {
+				// check the relationship to see if there is a proper SNOMED
+				// is-a.
+				if (latestRel.getTypeId() == isaId) {
+					isSnomedConcept = true;
+				}
+
+				if (statedForms.contains(latestRel.getCharacteristicId())) {
+					final Relationship relationship = new Relationship(rel
+							.getC1Id(), latestRel.getTypeId(),
+							rel.getC2Id(), latestRel.getGroup());
+					statedRels.add(relationship);
+				}
+			}
+		}
+
+		return isSnomedConcept ? statedRels : null;
+	}
+
+	private I_ConceptAttributePart getLatestAttribute(
+			final I_GetConceptData concept, final boolean includeUncommitted)
+			throws IOException {
+		final List<I_ConceptAttributePart> parts = new ArrayList<I_ConceptAttributePart>();
+
+		I_ConceptAttributePart latestAttributePart = null;
+
+		if (includeUncommitted) {
+			final I_ConceptAttributeVersioned uncommittedConceptAttributes = concept
+					.getUncommittedConceptAttributes();
+			if (null != uncommittedConceptAttributes) {
+				parts.addAll(uncommittedConceptAttributes.getVersions());
+			}
+		}
+
+		parts.addAll(concept.getConceptAttributes().getVersions());
+
+		for (I_ConceptAttributePart attributePart : parts) {
+			if (allowedPaths.contains(attributePart.getPathId())) {
+				if (latestAttributePart == null
+						|| latestAttributePart.getVersion() < attributePart
+								.getVersion()) {
+					latestAttributePart = attributePart;
+				} else if (latestAttributePart.getVersion() == attributePart
+						.getVersion()) {
+					if (getLogger().isLoggable(Level.FINE)) {
+						getLogger().log(
+								Level.FINE,
+								"has multiple entries with same version: "
+										+ attributePart + " for " + concept);
+					}
+				}
+			}
+		}
+		return latestAttributePart;
+	}
+
+	private I_RelPart getLatestRel(final I_GetConceptData concept,
+			final I_RelVersioned rel) {
+		I_RelPart latestPart = null;
+		for (final I_RelPart part : rel.getVersions()) {
+			if (allowedPaths.contains(part.getPathId())) {
+				if (latestPart == null
+						|| latestPart.getVersion() < part.getVersion()) {
+					latestPart = part;
+				} else if (latestPart.getVersion() == part.getVersion()) {
+					if (getLogger().isLoggable(Level.FINE)) {
+						getLogger().log(
+								Level.FINE,
+								"has multiple entries with same version: "
+										+ rel + " for " + concept);
+					}
+				}
+			}
+		}
+		return latestPart;
+	}
+
+	private Logger getLogger() {
+		return logger;
+	}
+
+	static private class Relationship {
+		final int cId1;
+		final int relId;
+		final int cId2;
+		final int group;
+
+		public Relationship(final int cId1, final int relId, final int cId2,
+				final int group) {
+			this.cId1 = cId1;
+			this.relId = relId;
+			this.cId2 = cId2;
+			this.group = group;
+		}
+	}
 }

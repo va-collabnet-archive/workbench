@@ -498,6 +498,9 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_GetConceptData getClassificationRoot();
 
     public void setClassificationRoot(I_GetConceptData classificationRoot);
+    
+    public I_GetConceptData getClassificationRoleRoot();
+    public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot);
 
     public I_GetConceptData getClassifierIsaType();
 

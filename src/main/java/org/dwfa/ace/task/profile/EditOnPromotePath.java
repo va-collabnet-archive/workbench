@@ -151,6 +151,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 		return config.getChildrenExpandedNodes();
 	}
 
+    public I_GetConceptData getClassificationRoleRoot() {
+        return config.getClassificationRoleRoot();
+    }
+
 	public I_GetConceptData getClassificationRoot() {
 		return config.getClassificationRoot();
 	}
@@ -646,6 +650,11 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 		config.setBuilderToggleVisible(visible);
 	}
 
+    public void setClassificationRoleRoot(
+            I_GetConceptData classificationRoleRoot) {
+        config.setClassificationRoot(classificationRoleRoot);
+    }
+	
 	public void setClassificationRoot(I_GetConceptData classificationRoot) {
 		config.setClassificationRoot(classificationRoot);
 	}

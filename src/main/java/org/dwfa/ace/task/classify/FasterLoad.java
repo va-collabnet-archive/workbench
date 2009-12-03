@@ -102,6 +102,26 @@ public class FasterLoad extends AbstractTask {
             // TODO Auto-generated method stub
             return null;
         }
+
+        public void addRoleComposition(int[] lhsIds, int rhsId) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void addRoleRoot(int id, boolean inclusive) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void addRoleNeverGrouped(int id) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void getEquivConcepts(I_EquivalentCallback callback) {
+            // TODO Auto-generated method stub
+            
+        }
         
     }
     
