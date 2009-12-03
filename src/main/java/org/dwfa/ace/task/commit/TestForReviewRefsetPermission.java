@@ -23,9 +23,6 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
 public class TestForReviewRefsetPermission extends AbstractExtensionTest {
 
     private static final long serialVersionUID = 1;
@@ -87,7 +84,7 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
             I_GetConceptData specifiesRefsetRel =
                     termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             I_GetConceptData memberRefset = getLatestRelationshipTarget(refsetSpec, specifiesRefsetRel);
-            if (memberRefset == null) { // not a refset spec being edited
+            if (memberRefset == null) { // not a refset spec being reviewed
                 return alertList;
             }
 
@@ -99,7 +96,7 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
 
             if (!foundMatch) {
                 alertList.add(new AlertToDataConstraintFailure(alertType,
-                    "<html>User does not have permission to edit<br>this refset.", memberRefset));
+                    "<html>User does not have permission to review<br>this refset.", memberRefset));
             }
 
             return alertList;
