@@ -209,7 +209,6 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
 
         exportFileWriter.flush();
         exportFileWriter.close();
-
     }
 
     private void writeHeader(BufferedWriter exportFileWriter) throws IOException {
