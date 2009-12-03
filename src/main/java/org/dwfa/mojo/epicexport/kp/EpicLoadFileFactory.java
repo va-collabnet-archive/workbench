@@ -20,7 +20,7 @@ public class EpicLoadFileFactory {
 		I_EpicLoadFileBuilder ret;
 		if (masterfile.equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL))
 			ret = new EpicExportBuilderEDGClinical(this, em);
-		if (masterfile.equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING))
+		else if (masterfile.equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING))
 			ret = new EpicExportBuilderEDGBilling(this, em);
 		else
 			throw new Exception("Unhandled masterfile: " + masterfile);

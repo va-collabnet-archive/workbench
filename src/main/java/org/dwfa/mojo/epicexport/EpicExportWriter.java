@@ -136,7 +136,10 @@ public class EpicExportWriter implements I_EpicExportRecordWriter {
 		}
 
 		public String toExportLine() {
-			return itemNumber.concat(",\"").concat(value.toString()).concat("\"");
+			if (value == null)
+				return "";
+			else
+				return itemNumber.concat(",\"").concat(value.toString()).concat("\"");
 		}
 		
 		public int compareTo(EpicItem x) {

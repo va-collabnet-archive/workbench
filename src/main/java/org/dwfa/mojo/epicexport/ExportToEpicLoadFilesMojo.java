@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -21,7 +22,9 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LineageHelper;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -164,7 +167,9 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			ExportIterator expItr = new ExportIterator(outputDirectory, dropName, deltaStartDate);
 			
 			
-			I_GetConceptData concept = termFactory.getConcept(UUID.fromString("a7130b8c-e6c1-57d8-986a-0d88552c12e4"));
+			// I_GetConceptData concept = termFactory.getConcept(UUID.fromString("a7130b8c-e6c1-57d8-986a-0d88552c12e4"));
+			I_GetConceptData concept = termFactory.getConcept(UUID.fromString("528a6294-a8be-5443-ac3d-e87195f88191"));
+			
 			expItr.processConcept(concept);
 			
 			
@@ -230,6 +235,7 @@ getLog().info("CLOSING");
 
 	    private void exportRefsetsForConcept(I_GetConceptData concept) throws TerminologyException, Exception {
 	        List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(concept.getConceptId());
+      
 	        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
 	        	if (termFactory.hasConcept(thinExtByRefVersioned.getRefsetId())) {
 	                for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(statusValues,
@@ -240,22 +246,23 @@ getLog().info("CLOSING");
 	        		throw new Exception("No concept for ID " + thinExtByRefVersioned.getRefsetId());
 	        	}
 	        }
+	        
 	        I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(this.currentMasterFile);
 	        exportWriter.writeRecord(this.dropName);
 	        exportWriter.newExportRecord();
 	    }
 
 	    void export(I_ThinExtByRefTuple thinExtByRefTuple, I_GetConceptData parentConcept) throws Exception {
-	        export(thinExtByRefTuple.getPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
+	        export(thinExtByRefTuple, thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
 	            thinExtByRefTuple.getComponentId(), parentConcept, getPreviousVersion(thinExtByRefTuple));
 	    }
 
-	    void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId, 
+	    void export(I_ThinExtByRefTuple thinExtByRefPart, Integer memberId, int refsetId, int componentId, 
 	    		I_GetConceptData parentConcept, I_ThinExtByRefPart previousVersion) throws Exception {
     	
-            I_GetConceptData refsetConcept = termFactory.getConcept(refsetId);
-            String refsetName = refsetConcept.getInitialText();
-	       exportRefset(refsetName, refsetConcept, thinExtByRefPart, parentConcept, previousVersion);
+	    	I_GetConceptData refsetConcept = termFactory.getConcept(refsetId);
+	    	String refsetName = refsetConcept.getInitialText();
+	    	exportRefset(refsetName, refsetConcept, thinExtByRefPart, parentConcept, previousVersion);
 	    }
 
 	    private I_ThinExtByRefPart getPreviousVersion(I_ThinExtByRefTuple thinExtByRefTuple) throws Exception {
@@ -288,12 +295,14 @@ getLog().info("CLOSING");
 	    }
 	    
 	    public void exportRefset(String refsetName, I_GetConceptData concept, 
-	    		I_ThinExtByRefPart thinExtByRefPart, I_GetConceptData parentConcept,
+	    		I_ThinExtByRefTuple thinExtByRefPart, I_GetConceptData parentConcept,
 	    		I_ThinExtByRefPart previousVersion) throws Exception {
 	    	this.setCurrentItem(null, null);
 	    	String stringValue = null;
 	    	String previousStringValue = null;
-	    	
+	    	String dot1 = null;
+	    	String dot11 = null;
+getLog().info(refsetName);	    	
 	    	//TODO: Re-factor into separate class, allow pattern matching, store and read from pom.xml
 	    	if(refsetName.equals("EDG Billing Item 207")) {
 	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "207");
@@ -303,7 +312,7 @@ getLog().info("CLOSING");
 	    	}
 	    	else if(refsetName.equals("EDG Billing Item 2")) {
 	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "2");
-	    		stringValue = getDisplayName(parentConcept);
+	    		stringValue = getDisplayName(parentConcept); 
 	    		previousStringValue = getPreviousDisplayName(parentConcept); 
 	    	}
 	    	else if(refsetName.equals("EDG Billing Item 40")) {
@@ -315,8 +324,23 @@ getLog().info("CLOSING");
 	    	else if(refsetName.equals("EDG Clinical Item 11")) {
 	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "11");
 	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 2")) {
+	    	else if(refsetName.equals("EDG Clinical Item 2 National")) {
 	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2");
+	    		// I_DescriptionVersioned desc = LocalVersionedTerminology.get().getDescription(thinExtByRefPart.getComponentId(), parentConcept.getConceptId());
+	    		// stringValue = desc.toString();
+	    		// previousStringValue = desc.toString();
+	    		stringValue = "no work";
+	    		previousStringValue = stringValue;
+System.out.println("parentConcept=" + getDisplayName(parentConcept));
+System.out.println("concept=" + getDisplayName(concept));
+System.out.println("parentConceptTEST=" + getDisplayNameTEST(parentConcept));
+System.out.println("conceptTEST=" + getDisplayNameTEST(concept));
+System.out.println("xx parentConcept=" + xxgetDisplayName(parentConcept));
+System.out.println("xx concept=" + xxgetDisplayName(concept));
+System.out.println(parentConcept);
+System.out.println(concept);
+
+
 	    	}
 	    	else if(refsetName.equals("EDG Clinical Item 200")) {
 	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "200");
@@ -357,6 +381,16 @@ getLog().info("CLOSING");
 	    				" and a previous value of " + previousStringValue);
 	    		
 	    		exportWriter.sendItemForExport(this.currentItem, stringValue, previousStringValue);
+	    		/* Special post handling, such writing id when we encounter a display name */
+	    		if(refsetName.equals("EDG Clinical Item 2 National")) {
+					dot11 = getIdForConcept(parentConcept, "e3dadc2a-196d-5525-879a-3037af99607d");
+					dot1 = getIdForConcept(parentConcept, "e49a55a7-319d-5744-b8a9-9b7cc86fd1c6");
+					this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "11");
+	    			exportWriter.sendItemForExport(this.currentItem, dot11, dot11);
+	    			this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "1");
+	    			exportWriter.sendItemForExport(this.currentItem, dot1, dot1);
+	    		}
+	    		
 	    	}
 	    }
 	    
@@ -418,6 +452,7 @@ getLog().info("CLOSING");
 	    	for (Iterator<I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
 	    		I_DescriptionVersioned d = i.next();
 	    		for (I_DescriptionTuple dt : d.getTuples()) {
+System.out.println(dt.getPart().getText());	    			
 	    			if (dt.getVersion() < this.startingVersion)
 	    				if (newestOldTuple == null) {
 	    					newestOldTuple = dt;
@@ -431,7 +466,41 @@ getLog().info("CLOSING");
 	    		ret = newestOldTuple.getPart().getText();
 	    	return ret;
 	    }
+	    
+	    
+	    public String getDisplayNameTEST(I_GetConceptData conceptData) throws Exception {
+	    	
+	    	String ret = null;
+	
+	    	LineageHelper lh = new LineageHelper();
+	    	Set<I_GetConceptData> parents = lh.getAllAncestors(conceptData);
+	    	for (Iterator<I_GetConceptData> i = parents.iterator(); i.hasNext();) {
+	    		I_GetConceptData p = i.next();
+	    		ret = getDisplayName(p);
+	    		getLog().info(ret);
+	    	}
+	    	
+	    	return ret;
+	    }
 
+	    
+	    public String getIdForConcept(I_GetConceptData concept, String idTypeUUID) throws Exception {
+	    	String ret = null;
+			I_GetConceptData idSourceConcept = termFactory.getConcept(new UUID[] { UUID
+					.fromString(idTypeUUID) }); 
+
+			int idSourceNid = idSourceConcept.getConceptId();
+			boolean foundIdSource = false;
+			for (I_IdPart part : concept.getId().getVersions()) {
+				if (part.getSource() == idSourceNid) {
+					foundIdSource = true;
+					ret = part.getSourceId().toString();
+					break;
+				}
+			}
+
+			return ret;
+	    }
     }
 
 

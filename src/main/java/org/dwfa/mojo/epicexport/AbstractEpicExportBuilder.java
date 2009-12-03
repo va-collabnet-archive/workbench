@@ -225,7 +225,7 @@ public abstract class AbstractEpicExportBuilder {
 	}
 
 	public boolean itemIsPopulated(String epicItemNumber) {
-		return getFirstItem(epicItemNumber) != null;
+		return !(getFirstItem(epicItemNumber) == null);
 	}
 	
 	public boolean allItemsArePopulated(String[] itemList) {
@@ -233,7 +233,7 @@ public abstract class AbstractEpicExportBuilder {
 		for (String i: itemList) {
 			ret = ret && this.itemIsPopulated(i);
 			if (!ret)
-				break;
+				System.out.println("WARNING: Missing item " + i);
 		}
 		return ret;
 	}
@@ -293,7 +293,11 @@ public abstract class AbstractEpicExportBuilder {
 		 * @return true if there is a difference
 		 */
 		public boolean hasChanges() {
-			if (previousValue == null && value != null)
+			if (previousValue == null && value == null)
+				return false;
+			else if (previousValue == null && value != null)
+				return true;
+			else if (previousValue != null && value == null)
 				return true;
 			else
 				return !value.equals(previousValue);
