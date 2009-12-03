@@ -113,7 +113,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 44;
+    private static final int dataVersion = 45; // keep current with objDataVersion logic
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -306,6 +306,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     
     // 44
     private Set<I_Path> promotionPathSet = new HashSet<I_Path>();
+
+    // 45
+    private I_GetConceptData classificationRoleRoot;    
 
     
     // transient
@@ -523,6 +526,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         
         //44
         Path.writePathSet(out, promotionPathSet);
+        
+        // 45
+        try {
+            writeConceptAsId(classificationRoleRoot, out);
+        } catch (DatabaseException e) {
+            IOException newEx = new IOException();
+            newEx.initCause(e);
+            throw newEx;
+        }
+
 
     }
 
@@ -831,7 +844,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     List<I_GetConceptData> tabHistoryList = new LinkedList<I_GetConceptData>();
                     for (int nid : il.getListArray()) {
                         try {
-							tabHistoryList.add(ConceptBean.get(nid));
+                        tabHistoryList.add(ConceptBean.get(nid));
 						} catch (Exception e) {
 							AceLog.getAppLog().alertAndLogException(e);
 						}
@@ -962,6 +975,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             	promotionPathSet = new HashSet<I_Path>();
             }
             
+            if (objDataVersion >= 45) {
+                try {
+                    classificationRoleRoot = readConceptFromSerializedUuids(in);
+                } catch (TerminologyException e) {
+                    IOException newEx = new IOException();
+                    newEx.initCause(e);
+                    throw newEx;
+                }
+            } else {
+                classificationRoleRoot = null;
+            }
+
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -2743,6 +2768,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
     }
 
+    public I_GetConceptData getClassificationRoleRoot() {
+        return classificationRoleRoot;
+    }
+
     public I_GetConceptData getClassificationRoot() {
         return classificationRoot;
     }
@@ -2759,6 +2788,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return classifierOutputPathConcept;
     }
 
+    public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot) {
+        Object old = this.classificationRoleRoot;
+        this.classificationRoleRoot = classificationRoleRoot;
+        changeSupport.firePropertyChange("classificationRoleRoot", old, classificationRoleRoot);
+    }
+    
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         Object old = this.classificationRoot;
         this.classificationRoot = classificationRoot;

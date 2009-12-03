@@ -143,6 +143,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         this.baseFrame = baseFrame;
     }
 
+    public I_GetConceptData getClassificationRoleRoot() {
+        return baseFrame.getClassificationRoleRoot();
+    }
+    
     public I_GetConceptData getClassificationRoot() {
         return baseFrame.getClassificationRoot();
     }
@@ -159,6 +163,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getClassifierOutputPath();
     }
 
+    public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot) {
+        baseFrame.setClassificationRoleRoot(classificationRoleRoot);
+    }
+    
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         baseFrame.setClassificationRoot(classificationRoot);
     }

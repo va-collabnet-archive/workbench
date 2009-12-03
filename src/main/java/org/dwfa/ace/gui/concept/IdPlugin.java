@@ -45,7 +45,7 @@ public class IdPlugin extends AbstractPlugin {
 	private transient boolean showBorder = true;
 	
 	//@TODO find a way to handle this field dynamically, like pressing the shift key...
-	private static boolean showNids = false;
+	private static boolean showNids = true;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);

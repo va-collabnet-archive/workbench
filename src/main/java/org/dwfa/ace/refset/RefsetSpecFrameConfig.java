@@ -216,6 +216,10 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return childrenExpandedNodes;
     }
 
+    public I_GetConceptData getClassificationRoleRoot() {
+        return frameConfig.getClassificationRoleRoot();
+    }
+    
     public I_GetConceptData getClassificationRoot() {
         return frameConfig.getClassificationRoot();
     }
@@ -702,6 +706,10 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setBuilderToggleVisible(visible);
     }
 
+    public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot) {
+        frameConfig.setClassificationRoleRoot(classificationRoleRoot);
+    }
+    
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         frameConfig.setClassificationRoot(classificationRoot);
     }

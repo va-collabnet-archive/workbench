@@ -29,6 +29,8 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.classifier.DiffTableModel;
+import org.dwfa.ace.classifier.EquivTableModel;
 import org.dwfa.ace.list.TerminologyIntList;
 import org.dwfa.ace.list.TerminologyIntListModel;
 import org.dwfa.ace.list.TerminologyList;
@@ -205,7 +207,33 @@ public class TerminologyTransferHandler extends TransferHandler {
 						    JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
-			} else {
+			} else if (DiffTableModel.class.isAssignableFrom(tableModel
+                    .getClass())) {
+
+                AceLog.getAppLog().info(
+                        "\r\n::: FOUND JTable type: "
+                                + tableModel.getClass().toString());
+                DiffTableModel diffTableModel = (DiffTableModel) tableModel;
+                int nid = diffTableModel
+                        .getNidAt(termTable.getSelectedRow(), 0);
+                if (nid == Integer.MIN_VALUE)
+                    return null;
+                return new ConceptTransferable(ConceptBean.get(nid));
+
+            } else if (EquivTableModel.class.isAssignableFrom(tableModel
+                    .getClass())) {
+
+                AceLog.getAppLog().info(
+                        "\r\n::: FOUND JTable type: "
+                                + tableModel.getClass().toString());
+                EquivTableModel equivTableModel = (EquivTableModel) tableModel;
+                int nid = equivTableModel.getNidAt(termTable.getSelectedRow(),
+                        0);
+                if (nid == Integer.MIN_VALUE)
+                    return null;
+                return new ConceptTransferable(ConceptBean.get(nid));
+
+            } else {
 				throw new UnsupportedOperationException("JTable type: "
 						+ tableModel.getClass().toString());
 			}

@@ -147,6 +147,10 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 		return frameConfig.getChildrenExpandedNodes();
 	}
 
+    public I_GetConceptData getClassificationRoleRoot() {
+        return frameConfig.getClassificationRoleRoot();
+    }
+
 	public I_GetConceptData getClassificationRoot() {
 		return frameConfig.getClassificationRoot();
 	}
@@ -618,6 +622,11 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 		frameConfig.setBuilderToggleVisible(visible);
 	}
 
+    public void setClassificationRoleRoot(
+            I_GetConceptData classificationRoleRoot) {
+        frameConfig.setClassificationRoot(classificationRoleRoot);
+    }
+    
 	public void setClassificationRoot(I_GetConceptData classificationRoot) {
 		frameConfig.setClassificationRoot(classificationRoot);
 	}
