@@ -1,6 +1,7 @@
 package org.dwfa.ace.task.refset.rfc;
 
 import java.awt.Component;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -104,6 +105,12 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
             for (int i = 0; i < components.length; i++) {
                 wfSheet.remove(components[i]);
             }
+
+            int width = 475;
+            int height = 475;
+
+            wfSheet.setSize(width, height);
+            wfSheet.setLayout(new GridLayout(1, 1));
 
             wfSheet.add(new RequestForChangePanel(refsets, wfSheet));
             wfSheet.repaint();
