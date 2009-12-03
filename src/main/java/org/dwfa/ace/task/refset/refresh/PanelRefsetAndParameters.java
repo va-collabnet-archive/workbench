@@ -38,6 +38,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
+import org.dwfa.ace.task.commit.TestForReviewRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
 import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -68,12 +69,14 @@ public class PanelRefsetAndParameters extends JPanel {
     // components
     private JLabel refsetSpecLabel;
     private JLabel editorLabel;
+    private JLabel reviewerLabel;
     private JLabel commentsLabel;
     private JLabel deadlineLabel;
     private JLabel priorityLabel;
     private JButton openFileChooserButton;
     private JComboBox refsetSpecComboBox;
     private JComboBox editorComboBox;
+    private JComboBox reviewerComboBox;
 	private JComboBox priorityComboBox;
  	private JTextArea commentsTextField;
     private DatePicker deadlinePicker;
@@ -85,6 +88,7 @@ public class PanelRefsetAndParameters extends JPanel {
 
     private Set<I_GetConceptData> refsets;
     private Set<I_GetConceptData> editors;
+    private Set<I_GetConceptData> reviewers;
 
     
     /**
@@ -102,6 +106,7 @@ public class PanelRefsetAndParameters extends JPanel {
         // labels
         refsetSpecLabel     = new JLabel("Refset Spec (required):");
         editorLabel         = new JLabel("Editor (required):");
+        editorLabel         = new JLabel("Reviewer (required):");
         deadlineLabel       = new JLabel("Deadline (required):");
         priorityLabel       = new JLabel("Priority (required):");
         commentsLabel       = new JLabel("Comments (optional):");
@@ -111,6 +116,7 @@ public class PanelRefsetAndParameters extends JPanel {
         openFileChooserButton 	= new JButton("Attach a file...");
         refsetSpecComboBox 		= new JComboBox(refsets.toArray());
         editorComboBox 			= new JComboBox();
+        reviewerComboBox 		= new JComboBox();
         priorityComboBox 		= new JComboBox(new String[] { "Highest", "High", "Normal", "Low", "Lowest" });
 
         // date picker
@@ -198,10 +204,43 @@ public class PanelRefsetAndParameters extends JPanel {
 	    }
 
 
-        // deadline
+        // reviewer
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new Insets(5, 10, 5, 5); // padding
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        this.add(reviewerLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5); // padding
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        
+        
+        reviewers = null; 
+        try {
+        	reviewers = getValidReviewers();
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
+	    if (reviewers == null || reviewers.size() == 0 ) {
+	    	this.add(new JLabel("No available reviewers."), gridBagConstraints);
+	    } else {
+	    	// Populate the reviewerComboBox with the list of valid reviewers 
+	    	reviewerComboBox = new JComboBox(reviewers.toArray());
+	    	this.add(reviewerComboBox, gridBagConstraints);
+	    }
+
+
+        // deadline
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.insets = new Insets(5, 10, 5, 5); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
@@ -209,7 +248,7 @@ public class PanelRefsetAndParameters extends JPanel {
 	
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5); // padding
@@ -221,7 +260,7 @@ public class PanelRefsetAndParameters extends JPanel {
         // priority
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.insets = new Insets(5, 10, 5, 5); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
@@ -229,7 +268,7 @@ public class PanelRefsetAndParameters extends JPanel {
 	
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5); // padding
         gridBagConstraints.weighty = 0.0;
@@ -240,7 +279,7 @@ public class PanelRefsetAndParameters extends JPanel {
 		// comments
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
+		gridBagConstraints.gridy = 5;
 		gridBagConstraints.insets = new Insets(5, 10, 5, 5); // padding
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -248,7 +287,7 @@ public class PanelRefsetAndParameters extends JPanel {
 		
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 4;
+		gridBagConstraints.gridy = 5;
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		gridBagConstraints.insets = new Insets(5, 5, 5, 5); // padding
 		gridBagConstraints.weightx = 1.0;
@@ -260,7 +299,7 @@ public class PanelRefsetAndParameters extends JPanel {
         // file attachments
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 5, 0, 5); // padding
         gridBagConstraints.weighty = 0.0;
@@ -270,8 +309,7 @@ public class PanelRefsetAndParameters extends JPanel {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 3; 
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 1;
@@ -289,7 +327,7 @@ public class PanelRefsetAndParameters extends JPanel {
 		attachmentScroller.setBorder(BorderFactory.createTitledBorder("Attachments (optional):"));
 		add(attachmentScroller, gridBagConstraints);
 
-		// Tell the panel to o lay out its subcomponents again. It should be invoked 
+		// Using validate(), Tell the panel to o lay out its subcomponents again. It should be invoked 
 		// when this container's subcomponents are modified after the container has been displayed.
 		this.validate();
 
@@ -309,20 +347,49 @@ public class PanelRefsetAndParameters extends JPanel {
     
     private Set<I_GetConceptData> getValidEditors() throws Exception {
         I_GetConceptData selectedRefset = getRefset();
-        Set<I_GetConceptData> editors = new HashSet<I_GetConceptData>();
+        Set<I_GetConceptData> validEditors = new HashSet<I_GetConceptData>();
         if (selectedRefset != null) {
             for (I_GetConceptData user : getAllUsers()) {
-                if (hasPermission(user, selectedRefset)) {
-                    editors.add(user);
+                if (hasEditorPermission(user, selectedRefset)) {
+                	validEditors.add(user);
                 }
             }
         }
-        return editors;
+        return validEditors;
     }
 
     
-    private boolean hasPermission(I_GetConceptData user, I_GetConceptData selectedRefset) throws Exception {
+    private Set<I_GetConceptData> getValidReviewers() throws Exception {
+        I_GetConceptData selectedRefset = getRefset();
+        Set<I_GetConceptData> validReviewers = new HashSet<I_GetConceptData>();
+        if (selectedRefset != null) {
+            for (I_GetConceptData user : getAllUsers()) {
+                if (hasReviewerPermission(user, selectedRefset)) {
+                	validReviewers.add(user);
+                }
+            }
+        }
+        return validReviewers;
+    }
+
+    
+    private boolean hasEditorPermission(I_GetConceptData user, I_GetConceptData selectedRefset) throws Exception {
         TestForEditRefsetPermission permissionTest = new TestForEditRefsetPermission();
+        Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
+        parents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(user));
+        parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
+
+        for (I_GetConceptData parent : parents) {
+            if (parent.isParentOfOrEqualTo(selectedRefset, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
+    private boolean hasReviewerPermission(I_GetConceptData user, I_GetConceptData selectedRefset) throws Exception {
+    	TestForReviewRefsetPermission permissionTest = new TestForReviewRefsetPermission();
         Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
         parents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(user));
         parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
@@ -410,10 +477,24 @@ public class PanelRefsetAndParameters extends JPanel {
          return selectedEditor;
      }
 
-	public void setEditor(I_GetConceptData newEditor) {
-		this.editorComboBox.setSelectedItem(newEditor);
-	}
+     public void setEditor(I_GetConceptData newEditor) {
+    	 this.editorComboBox.setSelectedItem(newEditor);
+     }
+     
+     
+ 	//-----------------------
+ 	// Reviewer 
+ 	//-----------------------
+      public I_GetConceptData getReviewer() {
+     	 I_GetConceptData selectedReviewer = (I_GetConceptData) reviewerComboBox.getSelectedItem();
+          return selectedReviewer;
+      }
 
+      public void setReviewer(I_GetConceptData newReviewer) {
+     	 this.reviewerComboBox.setSelectedItem(newReviewer);
+      }
+      
+      
 	//-----------------------
 	// Deadline
 	//-----------------------

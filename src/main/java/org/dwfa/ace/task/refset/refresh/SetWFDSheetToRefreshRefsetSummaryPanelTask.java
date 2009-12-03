@@ -66,16 +66,16 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
     private static final int dataVersion = 1;
 
 	// Task Attribute Properties     
-	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();  
+	private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();  
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
 	private String ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
-    private String nextUserTermEntryPropName = ProcessAttachmentKeys.NEXT_USER.getAttachmentKey();
-	private String refsetSpecVersionPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
-	private String snomedVersionPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
+    private String editorInboxPropName = ProcessAttachmentKeys.EDITOR_INBOX.getAttachmentKey();
+	private String refsetSpecVersionPropName = ProcessAttachmentKeys.REFSET_VERSION.getAttachmentKey();
+	private String snomedVersionPropName = ProcessAttachmentKeys.SNOMED_VERSION.getAttachmentKey();
     private String commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private String fileAttachmentsPropName = ProcessAttachmentKeys.FILE_ATTACHMENTS.getAttachmentKey();
-	private String changeMapPropName = ProcessAttachmentKeys.CON_CON_MAP.getAttachmentKey();
+	private String editorCommentsPropName = ProcessAttachmentKeys.EDITOR_COMMENTS.getAttachmentKey();
 	         
 	// Other Properties 
     private transient Exception ex = null;
@@ -93,12 +93,12 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
         out.writeObject(refsetUuidPropName);
         out.writeObject(ownerUuidPropName);
         out.writeObject(editorUuidPropName);
-        out.writeObject(nextUserTermEntryPropName);
+        out.writeObject(editorInboxPropName);
         out.writeObject(refsetSpecVersionPropName);
         out.writeObject(snomedVersionPropName);
         out.writeObject(commentsPropName);
         out.writeObject(fileAttachmentsPropName);
-        out.writeObject(changeMapPropName);
+        out.writeObject(editorCommentsPropName);
     }
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
@@ -110,12 +110,12 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
                 refsetUuidPropName = (String) in.readObject();
             	ownerUuidPropName = (String) in.readObject();
             	editorUuidPropName = (String) in.readObject();
-                nextUserTermEntryPropName = (String) in.readObject();
+            	editorInboxPropName = (String) in.readObject();
                 refsetSpecVersionPropName = (String) in.readObject();
                 snomedVersionPropName = (String) in.readObject();
                 commentsPropName = (String) in.readObject();
             	fileAttachmentsPropName = (String) in.readObject();
-            	changeMapPropName = (String) in.readObject();
+            	editorCommentsPropName = (String) in.readObject();
           } 
             // Initialize transient properties...
             ex = null;
@@ -360,7 +360,7 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
 			}
 
 	        // Next User - Field Initialization 	        
-        	nextUserName = (String) process.getProperty(nextUserTermEntryPropName);
+        	nextUserName = (String) process.getProperty(editorInboxPropName);
 
 			
 			// Priority - Field Initialization 	        
@@ -486,11 +486,11 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
-	public String getNextUserTermEntryPropName() {
-		return nextUserTermEntryPropName;
+	public String getEditorInboxPropName() {
+		return editorInboxPropName;
 	}
-	public void setNextUserTermEntryPropName(String nextUserTermEntryPropName) {
-		this.nextUserTermEntryPropName = nextUserTermEntryPropName;
+	public void setEditorInboxPropName(String editorInboxPropName) {
+		this.editorInboxPropName = editorInboxPropName;
 	}
 	public String getRefsetUuidPropName() {
 		return refsetUuidPropName;
@@ -534,12 +534,13 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
 	public void setSnomedVersionPropName(String snomedVersionPropName) {
 		this.snomedVersionPropName = snomedVersionPropName;
 	}
-	public String getChangeMapPropName() {
-		return changeMapPropName;
+	public String getEditorCommentsPropName() {
+		return editorCommentsPropName;
 	}
-	public void setChangeMapPropName(String changeMapPropName) {
-		this.changeMapPropName = changeMapPropName;
+	public void setEditorCommentsPropName(String editorCommentsPropName) {
+		this.editorCommentsPropName = editorCommentsPropName;
 	}
+
 
 
 }

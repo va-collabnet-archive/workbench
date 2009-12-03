@@ -38,13 +38,13 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTaskBeanInfo extends Simpl
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
             profilePropName.setShortDescription("[IN] The property that contains the working profile.");
 
-            PropertyDescriptor nextUserTermEntryPropName;
-            nextUserTermEntryPropName =
-                    new PropertyDescriptor("nextUserTermEntryPropName", getBeanDescriptor().getBeanClass());
-            nextUserTermEntryPropName.setBound(true);
-            nextUserTermEntryPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            nextUserTermEntryPropName.setDisplayName("<html><font color='green'>editor inbox prop name:");
-            nextUserTermEntryPropName.setShortDescription("[IN] The next person the BP will go to.");
+            PropertyDescriptor editorInboxPropName;
+            editorInboxPropName =
+                    new PropertyDescriptor("editorInboxPropName", getBeanDescriptor().getBeanClass());
+            editorInboxPropName.setBound(true);
+            editorInboxPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            editorInboxPropName.setDisplayName("<html><font color='green'>editor inbox prop name:");
+            editorInboxPropName.setShortDescription("[IN] The next person the BP will go to.");
 
             PropertyDescriptor commentsPropName;
             commentsPropName = new PropertyDescriptor("commentsPropName", getBeanDescriptor().getBeanClass());
@@ -83,7 +83,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTaskBeanInfo extends Simpl
 
 
             PropertyDescriptor rv[] =
-                    { profilePropName, nextUserTermEntryPropName, commentsPropName, 
+                    { profilePropName, editorInboxPropName, commentsPropName, 
             		  refsetUuidPropName, editorUuidPropName, ownerUuidPropName, fileAttachmentsPropName };
             
             return rv;

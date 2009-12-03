@@ -51,18 +51,20 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
      */
 	// Serialization Properties 
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
     
 	// Task Attribute Properties         
-	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();  
-	private String nextUserTermEntryPropName = ProcessAttachmentKeys.NEXT_USER.getAttachmentKey();
+	private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();  
+	private String editorInboxPropName = ProcessAttachmentKeys.EDITOR_INBOX.getAttachmentKey();
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
     private String ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
     private String fileAttachmentsPropName = ProcessAttachmentKeys.FILE_ATTACHMENTS.getAttachmentKey();
-    private String ownerInboxPropName = ProcessAttachmentKeys.DESTINATION_ADR.getAttachmentKey();
-    
+    private String ownerInboxPropName = ProcessAttachmentKeys.OWNER_INBOX.getAttachmentKey();
+    private String reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
+    private String reviewerInboxPropName = ProcessAttachmentKeys.REVIEWER_INBOX.getAttachmentKey();
+
     
     		
 	// Other Properties 
@@ -76,13 +78,15 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(profilePropName);
-        out.writeObject(nextUserTermEntryPropName);
+        out.writeObject(editorInboxPropName);
         out.writeObject(commentsPropName);
         out.writeObject(refsetUuidPropName);
         out.writeObject(editorUuidPropName);
         out.writeObject(ownerUuidPropName);
         out.writeObject(fileAttachmentsPropName);
         out.writeObject(ownerInboxPropName);
+        out.writeObject(reviewerUuidPropName);
+        out.writeObject(reviewerInboxPropName);
     }
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
@@ -91,7 +95,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
             if (objDataVersion >= 1) {
                 // Read version 1 data fields...
             	profilePropName = (String) in.readObject();
-                nextUserTermEntryPropName = (String) in.readObject();
+            	editorInboxPropName = (String) in.readObject();
                 commentsPropName = (String) in.readObject();
                 refsetUuidPropName = (String) in.readObject();
             	editorUuidPropName = (String) in.readObject();
@@ -100,6 +104,10 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
             }
             if (objDataVersion >= 2) {
             	ownerInboxPropName = (String) in.readObject();
+            }
+            if (objDataVersion >= 3) {
+               	reviewerUuidPropName = (String) in.readObject();
+               	reviewerInboxPropName = (String) in.readObject();
             }
             // Initialize transient properties 
             
@@ -153,6 +161,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                     // ---------------------------------------------
                     I_GetConceptData refset = panel.getRefset();
                     I_GetConceptData editor = panel.getEditor();
+                    I_GetConceptData reviewer = panel.getReviewer();
                     String comments = panel.getComments();
                     Calendar deadline = panel.getDeadline();
                     String priority = panel.getPriority();
@@ -201,7 +210,33 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                             return Condition.ITEM_CANCELED;
                         } else {
                             process.setDestination(inboxAddress);
-                            process.setProperty(nextUserTermEntryPropName, inboxAddress);                       
+                            process.setProperty(editorInboxPropName, inboxAddress);                       
+                        }     
+                    }
+
+
+                    // -----------------------------------------
+                    // Reviewer Field is required! 
+                    // -----------------------------------------
+                    if (reviewer == null) {
+                    	// Warn the user that Reviewer is required. 
+                    	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    			"You must select an reviewer. ", "", JOptionPane.ERROR_MESSAGE);
+                    	return Condition.ITEM_CANCELED;                         
+                    } else {
+                       	// Set the Reviewer property 
+                    	process.setProperty(reviewerUuidPropName, reviewer.getUids().iterator().next() );
+                        
+                        // Set the WF's Next User based on selected Editor 
+                        RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();                    
+                        String inboxAddress = wizard.getInbox(reviewer);
+                        if (inboxAddress == null) {
+                            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                                "Refresh Refset process cannot continue... The selected reviewer has no assigned inbox: "
+                                    + reviewer, "", JOptionPane.ERROR_MESSAGE);
+                            return Condition.ITEM_CANCELED;
+                        } else {
+                            process.setProperty(editorInboxPropName, inboxAddress);                       
                         }     
                     }
 
@@ -324,12 +359,12 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
         return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
     }
    
-    public String getNextUserTermEntryPropName() {
-        return nextUserTermEntryPropName;
-    }
-    public void setNextUserTermEntryPropName(String nextUserTermEntryPropName) {
-        this.nextUserTermEntryPropName = nextUserTermEntryPropName;
-    }
+    public String getEditorInboxPropName() {
+		return editorInboxPropName;
+	}
+	public void setEditorInboxPropName(String editorInboxPropName) {
+		this.editorInboxPropName = editorInboxPropName;
+	}
     public String getCommentsPropName() {
         return commentsPropName;
     }

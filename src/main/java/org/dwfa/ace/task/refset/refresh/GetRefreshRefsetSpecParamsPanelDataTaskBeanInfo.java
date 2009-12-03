@@ -39,13 +39,13 @@ public class GetRefreshRefsetSpecParamsPanelDataTaskBeanInfo extends SimpleBeanI
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
             profilePropName.setShortDescription("[IN] The property that contains the working profile.");
 
-            PropertyDescriptor nextUserTermEntryPropName;
-            nextUserTermEntryPropName =
-                    new PropertyDescriptor("nextUserTermEntryPropName", getBeanDescriptor().getBeanClass());
-            nextUserTermEntryPropName.setBound(true);
-            nextUserTermEntryPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            nextUserTermEntryPropName.setDisplayName("<html><font color='blue'>editor inbox prop name:");
-            nextUserTermEntryPropName.setShortDescription("[OUT] The property to put the editor's inbox address into.");
+            PropertyDescriptor editorInboxPropName;
+            editorInboxPropName =
+                    new PropertyDescriptor("editorInboxPropName", getBeanDescriptor().getBeanClass());
+            editorInboxPropName.setBound(true);
+            editorInboxPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            editorInboxPropName.setDisplayName("<html><font color='blue'>editor inbox prop name:");
+            editorInboxPropName.setShortDescription("[OUT] The property to put the editor's inbox address into.");
 
             PropertyDescriptor commentsPropName;
             commentsPropName = new PropertyDescriptor("commentsPropName", getBeanDescriptor().getBeanClass());
@@ -91,8 +91,8 @@ public class GetRefreshRefsetSpecParamsPanelDataTaskBeanInfo extends SimpleBeanI
 
 
             PropertyDescriptor rv[] =
-                    { profilePropName, nextUserTermEntryPropName, commentsPropName, 
-            		  refsetUuidPropName, editorUuidPropName, ownerUuidPropName, fileAttachmentsPropName, ownerInboxPropName};
+                    { profilePropName, editorInboxPropName, commentsPropName, refsetUuidPropName, 
+            		editorUuidPropName, ownerUuidPropName, fileAttachmentsPropName, ownerInboxPropName};
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

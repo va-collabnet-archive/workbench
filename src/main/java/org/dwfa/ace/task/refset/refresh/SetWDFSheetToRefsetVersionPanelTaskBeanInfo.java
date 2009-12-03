@@ -38,12 +38,12 @@ public class SetWDFSheetToRefsetVersionPanelTaskBeanInfo extends SimpleBeanInfo 
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
             profilePropName.setShortDescription("[IN] The property that will contain the current profile.");
             
-            PropertyDescriptor positionSetPropName =
-                new PropertyDescriptor("positionSetPropName", getBeanDescriptor().getBeanClass());
-            positionSetPropName.setBound(true);
-            positionSetPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            positionSetPropName.setDisplayName("<html><font color='blue'>Refset position set prop:");
-            positionSetPropName.setShortDescription("[OUT] The property that will contain the Refset position set.");
+            PropertyDescriptor refsetVersionPropName =
+                new PropertyDescriptor("refsetVersionPropName", getBeanDescriptor().getBeanClass());
+            refsetVersionPropName.setBound(true);
+            refsetVersionPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetVersionPropName.setDisplayName("<html><font color='blue'>Refset position set prop:");
+            refsetVersionPropName.setShortDescription("[OUT] The property that will contain the Refset version.");
 
             PropertyDescriptor refsetUuidPropName;
             refsetUuidPropName = new PropertyDescriptor("refsetUuidPropName", getBeanDescriptor().getBeanClass());
@@ -53,7 +53,7 @@ public class SetWDFSheetToRefsetVersionPanelTaskBeanInfo extends SimpleBeanInfo 
             refsetUuidPropName.setShortDescription("[IN] The property to put the member refset UUID into.");
 
            PropertyDescriptor rv[] =
-               { profilePropName, positionSetPropName, refsetUuidPropName };
+               { profilePropName, refsetVersionPropName, refsetUuidPropName };
 
             return rv;
         } catch (IntrospectionException e) {

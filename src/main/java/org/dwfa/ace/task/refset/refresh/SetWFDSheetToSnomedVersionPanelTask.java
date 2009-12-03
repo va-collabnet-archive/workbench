@@ -55,8 +55,8 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
     private static final int dataVersion = 2;
 
 	// Task Attribute Properties     
-	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-	private String positionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
+	private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
+	private String snomedVersionPropName = ProcessAttachmentKeys.SNOMED_VERSION.getAttachmentKey();
 
 	// Other Properties 
     private transient Exception ex = null;
@@ -68,7 +68,7 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
-		out.writeObject(positionSetPropName);
+		out.writeObject(snomedVersionPropName);
 	}
 
 	 private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -77,12 +77,8 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 	    	 if (objDataVersion >= 1) {
 	    		 // Read version 1 data fields
 	    		 profilePropName = (String) in.readObject();
-	    		 positionSetPropName = (String) in.readObject();
-	    	 } else {
-	    		 // Set version 1 default values
-	        	 profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-	        	 positionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
-	    	 }
+	    		 snomedVersionPropName = (String) in.readObject();
+	    	 } 
 	         // Initialize transient properties...
 	         ex = null;
 	     } else {
@@ -178,7 +174,7 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 				
 				// Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
 				Set<UniversalAcePosition> universalPositions = 
-					(Set<UniversalAcePosition>) process.getProperty(positionSetPropName);
+					(Set<UniversalAcePosition>) process.getProperty(snomedVersionPropName);
 				        
 		        for (UniversalAcePosition univPos: universalPositions) {
 		           I_Path path = tf.getPath(univPos.getPathId());
@@ -239,11 +235,12 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 		this.profilePropName = profilePropName;
 	}
 
-	public String getPositionSetPropName() {
-		return positionSetPropName;
+	public String getSnomedVersionPropName() {
+		return snomedVersionPropName;
 	}
-	public void setPositionSetPropName(String positionSetPropName) {
-		this.positionSetPropName = positionSetPropName;
+
+	public void setSnomedVersionPropName(String snomedVersionPropName) {
+		this.snomedVersionPropName = snomedVersionPropName;
 	}
 
 

@@ -57,8 +57,8 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
     private static final int dataVersion = 1;
 
 	// Task Attribute Properties     
-	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-	private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
+	private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
+	private String refsetVersionPropName = ProcessAttachmentKeys.REFSET_VERSION.getAttachmentKey();
  	private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
 
 	// Other Properties 
@@ -72,7 +72,7 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
-		out.writeObject(positionSetPropName);
+		out.writeObject(refsetVersionPropName);
 		out.writeObject(refsetUuidPropName);
 	}
 
@@ -82,15 +82,9 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 	    	 if (objDataVersion >= 1) {
 	    		 // Read version 1 data fields
 	        	 profilePropName = (String) in.readObject();
-	        	 positionSetPropName = (String) in.readObject();
+	        	 refsetVersionPropName = (String) in.readObject();
 	        	 refsetUuidPropName = (String) in.readObject();
-	    	 } else {
-	    		 // Set version 1 default values
-	    		 profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-	    		 positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
-	    		 refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
-
-	    	 }
+	    	 } 
 	         // Initialize transient properties...
 	         ex = null;
 
@@ -187,7 +181,7 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 				
 				// Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
 				Set<UniversalAcePosition> universalPositions = 
-					(Set<UniversalAcePosition>) process.getProperty(positionSetPropName);
+					(Set<UniversalAcePosition>) process.getProperty(refsetVersionPropName);
 		        for (UniversalAcePosition univPos: universalPositions) {
 		           I_Path path = tf.getPath(univPos.getPathId());
 		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
@@ -262,12 +256,12 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
 		this.profilePropName = profilePropName;
 	}
 
-	public String getPositionSetPropName() {
-		return positionSetPropName;
+	public String getRefsetVersionPropName() {
+		return refsetVersionPropName;
 	}
 
-	public void setPositionSetPropName(String positionSetPropName) {
-		this.positionSetPropName = positionSetPropName;
+	public void setRefsetVersionPropName(String refsetVersionPropName) {
+		this.refsetVersionPropName = refsetVersionPropName;
 	}
 
 	public String getRefsetUuidPropName() {

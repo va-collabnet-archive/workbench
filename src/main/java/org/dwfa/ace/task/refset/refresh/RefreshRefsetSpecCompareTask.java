@@ -79,8 +79,9 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	private String refsetPositionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
 	private String snomedPositionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
 	private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
-	private String reviewCountPropName = "A: REVIEW_COUNT"; 
-	private String reviewIndexPropName = "A: REVIEW_INDEX"; 
+	private String reviewCountPropName = ProcessAttachmentKeys.REVIEW_COUNT.getAttachmentKey();
+	private String reviewIndexPropName = ProcessAttachmentKeys.REVIEW_INDEX.getAttachmentKey();
+
 
 	// Other Properties 
     private Condition condition;

@@ -64,8 +64,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     private static final int dataVersion = 1;
 
 	// Task Attribute Properties     
-	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();  
-    private String nextUserTermEntryPropName = ProcessAttachmentKeys.NEXT_USER.getAttachmentKey();
+	private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();  
+    private String editorInboxPropName = ProcessAttachmentKeys.EDITOR_INBOX.getAttachmentKey();
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
@@ -85,7 +85,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(profilePropName);
-        out.writeObject(nextUserTermEntryPropName);
+        out.writeObject(editorInboxPropName);
         out.writeObject(commentsPropName);
         out.writeObject(refsetUuidPropName);
         out.writeObject(editorUuidPropName);
@@ -99,7 +99,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
             if (objDataVersion >= 1) {
                 // Read version 1 data fields...
             	profilePropName = (String) in.readObject();
-                nextUserTermEntryPropName = (String) in.readObject();
+            	editorInboxPropName = (String) in.readObject();
                 commentsPropName = (String) in.readObject();
                 refsetUuidPropName = (String) in.readObject();
             	editorUuidPropName = (String) in.readObject();
@@ -388,11 +388,11 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
-	public String getNextUserTermEntryPropName() {
-		return nextUserTermEntryPropName;
+	public String getEditorInboxPropName() {
+		return editorInboxPropName;
 	}
-	public void setNextUserTermEntryPropName(String nextUserTermEntryPropName) {
-		this.nextUserTermEntryPropName = nextUserTermEntryPropName;
+	public void setEditorInboxPropName(String editorInboxPropName) {
+		this.editorInboxPropName = editorInboxPropName;
 	}
 	public String getRefsetUuidPropName() {
 		return refsetUuidPropName;

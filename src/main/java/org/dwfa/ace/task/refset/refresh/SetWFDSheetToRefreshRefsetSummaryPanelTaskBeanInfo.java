@@ -95,25 +95,18 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTaskBeanInfo extends SimpleBe
             fileAttachmentsPropName.setDisplayName("<html><font color='green'>file attachments prop name:");
             fileAttachmentsPropName.setShortDescription("[IN] The property that contains the file attachments.");   
             
-            PropertyDescriptor changeMapPropName =
-                new PropertyDescriptor("changeMapPropName", getBeanDescriptor().getBeanClass());
-            changeMapPropName.setBound(true);
-            changeMapPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            changeMapPropName.setDisplayName("<html><font color='green'>Map of changes:");
-            changeMapPropName.setShortDescription("[IN] The property that contains the map of changes to this refset.");
+            PropertyDescriptor editorCommentsPropName =
+                new PropertyDescriptor("editorCommentsPropName", getBeanDescriptor().getBeanClass());
+            editorCommentsPropName.setBound(true);
+            editorCommentsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            editorCommentsPropName.setDisplayName("<html><font color='green'>editor comments prop name:");
+            editorCommentsPropName.setShortDescription("[IN] The property that contains the editor's comments.");
 
 
             PropertyDescriptor rv[] =
-                    { profilePropName, 
-            		refsetUuidPropName, 
-            		ownerUuidPropName, 
-            		editorUuidPropName, 
-            		nextUserTermEntryPropName, 
-            		refsetSpecVersionPropName, 
-            		snomedVersionPropName, 
-            		commentsPropName, 
-            		fileAttachmentsPropName,
-            		changeMapPropName};
+                    { profilePropName, refsetUuidPropName, ownerUuidPropName, editorUuidPropName, 
+            		nextUserTermEntryPropName, refsetSpecVersionPropName, snomedVersionPropName, commentsPropName, 
+            		fileAttachmentsPropName, editorCommentsPropName};
             
             return rv;
         } catch (IntrospectionException e) {

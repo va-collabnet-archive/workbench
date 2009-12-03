@@ -38,15 +38,15 @@ public class SetWFDSheetToSnomedVersionPanelTaskBeanInfo extends SimpleBeanInfo 
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
             profilePropName.setShortDescription("[IN] The property that will contain the current profile.");
             
-            PropertyDescriptor positionSetPropName =
-                new PropertyDescriptor("positionSetPropName", getBeanDescriptor().getBeanClass());
-            positionSetPropName.setBound(true);
-            positionSetPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            positionSetPropName.setDisplayName("<html><font color='blue'>SNOMED position set prop:");
-            positionSetPropName.setShortDescription("[OUT] The property that will contain the Refset position set.");
+            PropertyDescriptor snomedVersionPropName =
+                new PropertyDescriptor("snomedVersionPropName", getBeanDescriptor().getBeanClass());
+            snomedVersionPropName.setBound(true);
+            snomedVersionPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            snomedVersionPropName.setDisplayName("<html><font color='blue'>SNOMED position set prop:");
+            snomedVersionPropName.setShortDescription("[OUT] The property that will contain the SNOMED version.");
 
            PropertyDescriptor rv[] =
-               { profilePropName, positionSetPropName };
+               { profilePropName, snomedVersionPropName };
 
             return rv;
         } catch (IntrospectionException e) {
