@@ -77,13 +77,13 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
 	 */
 	private File kpDir;
 	private int synchRecordsProcessed = 0;
-	private int conceptsMatched       = 0;
-	private int cidValuesMatched      = 0;
-	private int dot1ValuesMatched     = 0;
-	private int cidValuesMisMatched   = 0;
-	private int dot1ValuesMisMatched  = 0;
-	private int cidValuesSynched      = 0;
-	private int dot1ValuesSynched     = 0;
+	private int conceptsMatched = 0;
+	private int cidValuesMatched = 0;
+	private int dot1ValuesMatched = 0;
+	private int cidValuesMisMatched = 0;
+	private int dot1ValuesMisMatched = 0;
+	private int cidValuesSynched = 0;
+	private int dot1ValuesSynched = 0;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
@@ -97,7 +97,7 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
 			while (r.ready()) {
 				String line = r.readLine();
 				if (line.length() > 0) {
-					processRow(termFactory, line);
+					processRowConceptUUID(termFactory, line);
 					synchRecordsProcessed++;
 				}
 			}
@@ -112,7 +112,7 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
 			getLog().info("dot1ValuesMisMatched:  " + dot1ValuesMisMatched);
 			getLog().info("cidValuesSynched:      " + cidValuesSynched);
 			getLog().info("dot1ValuesSynched:     " + dot1ValuesSynched);
-		
+
 		} catch (FileNotFoundException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		} catch (IOException e) {
@@ -122,8 +122,9 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
 		}
 	}
 
-	private void processRow(I_TermFactory tf, String line) throws IOException,
-			NoSuchAlgorithmException, UnsupportedEncodingException {
+	private void processRowConceptUUID(I_TermFactory tf, String line)
+			throws IOException, NoSuchAlgorithmException,
+			UnsupportedEncodingException {
 
 		String[] parts = line.split("\t"); // split the tab delimited line
 
@@ -140,12 +141,25 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
 			I_GetConceptData concept = tf.getConcept(new UUID[] { UUID
 					.fromString(concept_id) });
 			conceptsMatched++;
-			
+
+			/*
+			 * I_GetConceptData cidSourceConcept = tf.getConcept(new UUID[] {
+			 * UUID .fromString("bf3e7556-38cb-5395-970d-f11851c9f41e") }); //
+			 * EDG // Billing // Item // 11 I_GetConceptData dot1SourceConcept =
+			 * tf .getConcept(new UUID[] { UUID
+			 * .fromString("af8be384-dc60-5b56-9ad8-bc1e4b5dfbae") }); // EDG //
+			 * Billing // Dot1 I_GetConceptData kpPath = tf.getConcept(new
+			 * UUID[] { UUID .fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a")
+			 * }); // KP // Extension // Path
+			 */
+
 			I_GetConceptData cidSourceConcept = tf.getConcept(new UUID[] { UUID
-					.fromString("bf3e7556-38cb-5395-970d-f11851c9f41e") }); // EDG Billing Item 11
+					.fromString("e3dadc2a-196d-5525-879a-3037af99607d") }); // EDG Clinical Item 11 - e3dadc2a-196d-5525-879a-3037af99607d
+			
 			I_GetConceptData dot1SourceConcept = tf
 					.getConcept(new UUID[] { UUID
-							.fromString("af8be384-dc60-5b56-9ad8-bc1e4b5dfbae") }); // EDG Billing Dot1
+							.fromString("e49a55a7-319d-5744-b8a9-9b7cc86fd1c6") }); // EDG Clinical Dot1 - e49a55a7-319d-5744-b8a9-9b7cc86fd1c6
+			
 			I_GetConceptData kpPath = tf.getConcept(new UUID[] { UUID
 					.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a") }); // KP Extension Path
 
@@ -160,7 +174,10 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
 					if (part.getSourceId().equals(cid)) {
 						cidValuesMatched++;
 					} else {
-						getLog().warn("CID value in synch file [" + cid + "] does not match database record [" + concept_id + "]");
+						getLog().warn(
+								"CID value in synch file [" + cid
+										+ "] does not match database record ["
+										+ concept_id + "]");
 						cidValuesMisMatched++;
 					}
 					if (foundCidSource && foundDot1Source) {
@@ -173,7 +190,10 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
 					if (part.getSourceId().equals(dot1)) {
 						dot1ValuesMatched++;
 					} else {
-						getLog().warn("Dot1 value in synch file [" + dot1 + "] does not match database record [" + concept_id + "]");
+						getLog().warn(
+								"Dot1 value in synch file [" + dot1
+										+ "] does not match database record ["
+										+ concept_id + "]");
 						dot1ValuesMisMatched++;
 					}
 					if (foundCidSource && foundDot1Source) {
@@ -207,7 +227,7 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
 				tf.addUncommitted(concept);
 				cidValuesSynched++;
 			}
-			
+
 		} catch (TerminologyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
