@@ -187,8 +187,9 @@ public class RefsetSpecWizardTask extends AbstractTask {
 
                             process.setOriginator(config.getUsername());
                             String editorInbox = getInbox(editor);
-                            process.setSubject(refsetName + " creation request");
-                            process.setName("Create refset");
+                            process.setSubject(refsetName);
+                            process.setName("Creation Request");
+                           
                             if (editorInbox == null) {
                                 RefsetSpecWizardTask.this.setCondition(Condition.ITEM_CANCELED);
                                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
