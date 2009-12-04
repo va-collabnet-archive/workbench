@@ -3181,16 +3181,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             }
         } else if (evt.getPropertyName().equals("commitEnabled")) {
         	if (commitButton != null) {
-            commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
-            if (aceFrameConfig.isCommitEnabled()) {
-                commitButton.setText("<html><b><font color='green'>commit</font></b>");
-            } else {
-                commitButton.setText("commit");
-                    dataCheckListModel.clear();
-            }
+        		commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
+        		if (aceFrameConfig.isCommitEnabled()) {
+        			commitButton.setText("<html><b><font color='green'>commit</font></b>");
+        		} else {
+        			commitButton.setText("commit");
+        			if (dataCheckListModel != null) {
+        				dataCheckListModel.clear();                	
+        			}
+        		}
         	}
         	if (cancelButton != null) {
-            cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
+        		cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
         	}
         } else if (evt.getPropertyName().equals("lastViewed")) {
             viewerHistoryTableModel.addElement(0, (ConceptBean) evt.getNewValue());
@@ -3198,14 +3200,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 viewerHistoryTableModel.removeElement(viewerHistoryTableModel.getSize() - 1);
             }
         } else if (evt.getPropertyName().equals("uncommitted")) {
-            uncommittedTableModel.clear();
-            for (I_Transact t : uncommitted) {
-            	if (t != null) {
-                if (ConceptBean.class.isAssignableFrom(t.getClass())) {
-                    uncommittedTableModel.addElement((ConceptBean) t);
+        	if (uncommittedTableModel != null) {
+                uncommittedTableModel.clear();
+                for (I_Transact t : uncommitted) {
+                	if (t != null) {
+                		if (ConceptBean.class.isAssignableFrom(t.getClass())) {
+                			uncommittedTableModel.addElement((ConceptBean) t);
+                		}
+                	}
                 }
-            }
-            }
+        	}
         } else if (evt.getPropertyName().equals("imported")) {
             importHistoryTableModel.clear();
             for (I_Transact t : imported) {
