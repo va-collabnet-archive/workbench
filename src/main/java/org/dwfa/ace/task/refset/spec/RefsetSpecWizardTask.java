@@ -45,6 +45,7 @@ import org.dwfa.util.bean.Spec;
  * 
  * @author Chrissy Hill
  * 
+ * 
  */
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
@@ -187,8 +188,8 @@ public class RefsetSpecWizardTask extends AbstractTask {
 
                             process.setOriginator(config.getUsername());
                             String editorInbox = getInbox(editor);
-                            process.setSubject(refsetName);
-                            process.setName("Creation Request");
+                            process.setName(refsetName);
+                            process.setSubject("Creation Request");
                            
                             if (editorInbox == null) {
                                 RefsetSpecWizardTask.this.setCondition(Condition.ITEM_CANCELED);
