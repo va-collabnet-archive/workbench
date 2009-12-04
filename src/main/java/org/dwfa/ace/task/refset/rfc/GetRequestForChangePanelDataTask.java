@@ -161,8 +161,8 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                             "", JOptionPane.ERROR_MESSAGE);
                         return Condition.ITEM_CANCELED;
                     }
-                    process.setSubject("Request for change : " + refset.getInitialText());
-                    process.setName("Request for change : " + refset.getInitialText());
+                    process.setSubject("Request a change for refset");
+                    process.setName(refset.getInitialText());
                     process.setPriority(p);
 
                     if (deadline == null) {
