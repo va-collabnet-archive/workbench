@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo;
 
 import java.io.BufferedWriter;
@@ -36,114 +52,114 @@ import org.dwfa.mojo.refset.ExportSpecification;
  */
 public class ExportDatabase extends AbstractMojo {
 
-	/**
-	 * Date format to use in output files
-	 * If not specified the Path Version Reference Set will be used to determine the release version.
-	 *
-	 * @parameter
-	 */
-	private String releaseDate;
-
-	/**
-	 * Location of the directory to output data files to.
-	 *
-	 * @parameter expression="${project.build.directory}"
-	 * @required
-	 */
-	private String outputDirectory;
-
-	/**
-	 * File name for concept table data output file
-	 *
-	 * @parameter expression="ids.txt"
-	 */
-	private String idsDataFileName;
-
-	/**
-	 * File name for concept table data output file
-	 *
-	 * @parameter expression="concepts.txt"
-	 */
-	private String conceptDataFileName;
-
-	/**
-	 * File name for relationship table data output file
-	 *
-	 * @parameter expression="relationships.txt"
-	 */
-	private String relationshipsDataFileName;
-
-	/**
-	 * File name for description table data output file
-	 *
-	 * @parameter expression="descriptions.txt"
-	 */
-	private String descriptionsDataFileName;
-
-	/**
-	 * File name for description table data output file
-	 *
-	 * @parameter expression="errorLog.txt"
-	 */
-	private String errorLogFileName;
+    /**
+     * Date format to use in output files
+     * If not specified the Path Version Reference Set will be used to determine the release version.
+     *
+     * @parameter
+     */
+    private String releaseDate;
 
     /**
-	 * Whether to validate the positions
-	 *
-	 * @parameter expression=true
-	 */
-	private boolean validatePositions;
+     * Location of the directory to output data files to.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private String outputDirectory;
 
     /**
-	 * The set of specifications used to determine if a concept should be
-	 * exported.
-	 *
-	 * @parameter
-	 * @required
-	 */
-	private ExportSpecification[] specs;
+     * File name for concept table data output file
+     *
+     * @parameter expression="ids.txt"
+     */
+    private String idsDataFileName;
 
-	/**
-	 * Positions to export data.
-	 *
-	 * @parameter
-	 * @required
-	 */
-	private PositionDescriptor[] positionsForExport;
+    /**
+     * File name for concept table data output file
+     *
+     * @parameter expression="concepts.txt"
+     */
+    private String conceptDataFileName;
 
-	/**
-	 * Status values to include in export
-	 *
-	 * @parameter
-	 * @required
-	 */
-	private ConceptDescriptor[] statusValuesForExport;
+    /**
+     * File name for relationship table data output file
+     *
+     * @parameter expression="relationships.txt"
+     */
+    private String relationshipsDataFileName;
+
+    /**
+     * File name for description table data output file
+     *
+     * @parameter expression="descriptions.txt"
+     */
+    private String descriptionsDataFileName;
+
+    /**
+     * File name for description table data output file
+     *
+     * @parameter expression="errorLog.txt"
+     */
+    private String errorLogFileName;
+
+    /**
+     * Whether to validate the positions
+     *
+     * @parameter expression=true
+     */
+    private boolean validatePositions;
+
+    /**
+     * The set of specifications used to determine if a concept should be
+     * exported.
+     *
+     * @parameter
+     * @required
+     */
+    private ExportSpecification[] specs;
+
+    /**
+     * Positions to export data.
+     *
+     * @parameter
+     * @required
+     */
+    private PositionDescriptor[] positionsForExport;
+
+    /**
+     * Status values to include in export
+     *
+     * @parameter
+     * @required
+     */
+    private ConceptDescriptor[] statusValuesForExport;
 
     /**
      * @parameter default-value="${project.build.directory}"
      * @required
      * @readonly
      */
-     private File buildDirectory;
+    private File buildDirectory;
 
-     /**
-      * Location of the build directory.
-      *
-      * @parameter expression="${project.build.directory}"
-      * @required
-      */
-     private File targetDirectory;
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
 
-     /**
-      * Indicates if the concepts, descriptions and relationships exported must be a cohesive
-      * self supporting set (true), or if the resulting export may contain references to entities
-      * not represented in the export (false).
-      *
-      * @parameter expression=true
-      */
-	private boolean exportCohesiveSet;
+    /**
+     * Indicates if the concepts, descriptions and relationships exported must be a cohesive
+     * self supporting set (true), or if the resulting export may contain references to entities
+     * not represented in the export (false).
+     *
+     * @parameter expression=true
+     */
+    private boolean exportCohesiveSet;
 
-     public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 
 			if (MojoUtil.alreadyRun(getLog(), outputDirectory
@@ -219,5 +235,4 @@ public class ExportDatabase extends AbstractMojo {
 		}
 
 	}// End method execute
-
 }// End class ExportDatabase

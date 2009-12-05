@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo;
 
 import java.io.File;
@@ -21,7 +37,6 @@ import org.dwfa.maven.MojoUtil;
  * @requiresDependencyResolution compile
  */
 
-
 public class BinaryChangeSetReadAll extends AbstractMojo {
     /**
      * The change set directory
@@ -35,7 +50,8 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
      *
      * @parameter
      */
-    private String[] validators = new String[]{ComponentValidator.class.getName()};
+    private String[] validators =
+            new String[] { ComponentValidator.class.getName() };
 
     /**
      * Whether to validate the change set first or not. Default value is true;
@@ -53,8 +69,9 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDir,
-                    this.getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass()
+                .getCanonicalName()
+                + changeSetDir, this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -77,7 +94,8 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
         importAllChangeSetsTask.setValidators(validatorString);
         importAllChangeSetsTask.setRootDirStr(changeSetDir);
         try {
-            importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(getLog()));
+            importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(
+                getLog()));
         } catch (TaskFailedException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }

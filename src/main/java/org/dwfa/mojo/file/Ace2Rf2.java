@@ -1,6 +1,22 @@
 /**
- * Apache License.
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * Apache License.
+ * 
  * Mojo to convert Ace file to rf2 file.
  */
 package org.dwfa.mojo.file;
@@ -110,28 +126,32 @@ public class Ace2Rf2 extends AbstractMojo {
     /**
      * For converting uuids to sctid for concepts.
      */
-    private I_ReadAndTransform uuidToSctIdConcept = new UuidToSctConIdWithGeneration();
+    private I_ReadAndTransform uuidToSctIdConcept =
+            new UuidToSctConIdWithGeneration();
 
     /**
      * For converting uuids to sctid for descriptions.
      */
-    private I_ReadAndTransform uuidToSctIdDescription = new UuidToSctDescIdWithGeneration();
+    private I_ReadAndTransform uuidToSctIdDescription =
+            new UuidToSctDescIdWithGeneration();
 
     /**
      * For converting uuids to sctid for relationship.
      */
-    private I_ReadAndTransform uuidToSctIdRelationship = new UuidToSctRelIdWithGeneration();
+    private I_ReadAndTransform uuidToSctIdRelationship =
+            new UuidToSctRelIdWithGeneration();
 
     /**
      * Converts case sensitivity to a uuid.
      */
-    private I_ReadAndTransform caseSensitivityToUuidTransform = new CaseSensitivityToUuidTransform();
+    private I_ReadAndTransform caseSensitivityToUuidTransform =
+            new CaseSensitivityToUuidTransform();
 
     /**
      * RF2 date format.
      */
-    private SimpleDateFormat rf2DateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
-
+    private SimpleDateFormat rf2DateFormat =
+            new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
 
     /**
      * Convert ace file to rf2.
@@ -139,7 +159,7 @@ public class Ace2Rf2 extends AbstractMojo {
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
-        try{
+        try {
             ((UuidToSctIdWithGeneration) uuidToSctIdConcept).setupImpl(
                 new File(buildDirectory), new File(sourceDirectory));
             ((UuidToSctIdWithGeneration) uuidToSctIdDescription).setupImpl(
@@ -147,7 +167,9 @@ public class Ace2Rf2 extends AbstractMojo {
             ((UuidToSctIdWithGeneration) uuidToSctIdRelationship).setupImpl(
                 new File(buildDirectory), new File(sourceDirectory));
         } catch (IOException e) {
-            logger.severe("ERROR: error accessing build and/or source directories " + e.getMessage());
+            logger
+                .severe("ERROR: error accessing build and/or source directories "
+                    + e.getMessage());
             throw new MojoExecutionException(e.getMessage());
         }
 
@@ -222,8 +244,8 @@ public class Ace2Rf2 extends AbstractMojo {
      *
      * @throws MojoExecutionException on write errors.
      */
-    private void writeIdentifierRow(Rf2IdentifierWriter rf2IdentifierWriter, Rf2IdentifierRow rf2IdentifierRow)
-            throws MojoExecutionException {
+    private void writeIdentifierRow(Rf2IdentifierWriter rf2IdentifierWriter,
+            Rf2IdentifierRow rf2IdentifierRow) throws MojoExecutionException {
         try {
             rf2IdentifierWriter.write(rf2IdentifierRow);
         } catch (IOException e) {
@@ -296,8 +318,8 @@ public class Ace2Rf2 extends AbstractMojo {
      *
      * @throws MojoExecutionException on write errors.
      */
-    private void writeConceptsRow(Rf2ConceptWriter rf2ConceptWriter, Rf2ConceptRow rf2ConceptRow)
-            throws MojoExecutionException {
+    private void writeConceptsRow(Rf2ConceptWriter rf2ConceptWriter,
+            Rf2ConceptRow rf2ConceptRow) throws MojoExecutionException {
         try {
             rf2ConceptWriter.write(rf2ConceptRow);
         } catch (IOException e) {
@@ -461,8 +483,10 @@ public class Ace2Rf2 extends AbstractMojo {
      *
      * @throws MojoExecutionException on write errors.
      */
-    private void writeRelationshipRow(Rf2RelationshipWriter rf2RelationshipWriter,
-            Rf2RelationshipRow rf2RelationshipRow) throws MojoExecutionException {
+    private void writeRelationshipRow(
+            Rf2RelationshipWriter rf2RelationshipWriter,
+            Rf2RelationshipRow rf2RelationshipRow)
+            throws MojoExecutionException {
         try {
             rf2RelationshipWriter.write(rf2RelationshipRow);
         } catch (IOException e) {
@@ -483,7 +507,8 @@ public class Ace2Rf2 extends AbstractMojo {
     private String getRF2ActiveFlag(final String uuidStatus) {
         String activateFlag = "0";
 
-        if (ArchitectonicAuxiliary.Concept.ACTIVE.getUids().iterator().next().toString().equals(uuidStatus)) {
+        if (ArchitectonicAuxiliary.Concept.ACTIVE.getUids().iterator().next()
+            .toString().equals(uuidStatus)) {
             activateFlag = "1";
         }
 

@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo.refset.scrub;
 
 import org.dwfa.ace.api.I_TermFactory;
@@ -18,25 +34,29 @@ import java.util.Iterator;
  */
 public class MemberSpecScrubber implements ConceptExtHandler {
 
-	/**
-	 * Specifies the valid concept extension concept values (refset membership types)
-	 * @parameter
-	 */
-	protected ConceptDescriptor[] validTypeConcepts;
+    /**
+     * Specifies the valid concept extension concept values (refset membership types)
+     * @parameter
+     */
+    protected ConceptDescriptor[] validTypeConcepts;
 
-	protected I_TermFactory termFactory;
+    protected I_TermFactory termFactory;
 
-	private int currentStatusId;
-	private int retiredStatusId;
-	
-	public MemberSpecScrubber() throws Exception {
-		termFactory = LocalVersionedTerminology.get();        			
-		currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
-		retiredStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
+    private int currentStatusId;
+    private int retiredStatusId;
 
-	}
-	
-	public void process(ConceptExtFinder conceptExtensions) {
+    public MemberSpecScrubber() throws Exception {
+        termFactory = LocalVersionedTerminology.get();
+        currentStatusId =
+                termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
+                    .getUids().iterator().next());
+        retiredStatusId =
+                termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
+                    .getUids().iterator().next());
+
+    }
+
+    public void process(ConceptExtFinder conceptExtensions) {
 		try {
 			Iterator<I_ThinExtByRefVersioned> iterator = conceptExtensions.iterator();
 			while  (iterator.hasNext()) {
@@ -47,8 +67,8 @@ public class MemberSpecScrubber implements ConceptExtHandler {
 			throw new RuntimeException("Unable to complete the scrub.", e);
 		}
 	}
-	
-	private void processExtension(I_ThinExtByRefVersioned conceptExtension) throws Exception {
+
+    private void processExtension(I_ThinExtByRefVersioned conceptExtension) throws Exception {
 		
 		// Get all the "current" parts
 		ArrayList<I_ThinExtByRefPartConcept> subjects = new ArrayList<I_ThinExtByRefPartConcept>();

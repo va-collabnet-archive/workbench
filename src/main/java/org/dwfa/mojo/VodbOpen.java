@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -47,7 +63,6 @@ public class VodbOpen extends AbstractMojo {
      */
     String useExistingDb;
 
-
     /**
      * This parameter specifies whether to rerun this mojo even if it has run before.
      * @parameter default-value=false
@@ -71,15 +86,15 @@ public class VodbOpen extends AbstractMojo {
         System.setProperty("java.awt.headless", "true");
         getLog().info("useExistingDb: " + useExistingDb);
         try {
-            if (useExistingDb != null && Boolean.getBoolean(useExistingDb) &&
-            		LocalVersionedTerminology.get() != null) {
+            if (useExistingDb != null && Boolean.getBoolean(useExistingDb)
+                && LocalVersionedTerminology.get() != null) {
                 return;
             }
 
             if (!forceRerun) {
                 try {
-                    if (MojoUtil.alreadyRun(getLog(), vodbDirectory.getCanonicalPath(),
-                            this.getClass(), targetDirectory)) {
+                    if (MojoUtil.alreadyRun(getLog(), vodbDirectory
+                        .getCanonicalPath(), this.getClass(), targetDirectory)) {
                         return;
                     }
                 } catch (NoSuchAlgorithmException e) {
@@ -91,7 +106,8 @@ public class VodbOpen extends AbstractMojo {
                 dbSetupConfig = new DatabaseSetupConfig();
             }
             getLog().info("vodb dir: " + vodbDirectory);
-            LocalVersionedTerminology.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
+            LocalVersionedTerminology.createFactory(vodbDirectory, readOnly,
+                cacheSize, dbSetupConfig);
         } catch (InstantiationException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IllegalAccessException e) {

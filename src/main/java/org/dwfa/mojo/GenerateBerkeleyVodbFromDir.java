@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo;
 
 import java.io.File;
@@ -27,50 +43,53 @@ import org.dwfa.maven.MojoUtil;
 
 public class GenerateBerkeleyVodbFromDir extends AbstractMojo {
 
-   /**
-    * Location of the data directory.
-    * 
-    * @parameter expression="${project.build.directory}/generated-resources/ace/"
-    * @required
-    */
-   File dataDirectory;
+    /**
+     * Location of the data directory.
+     * 
+     * @parameter expression="${project.build.directory}/generated-resources/ace/"
+     * @required
+     */
+    File dataDirectory;
 
-   private String[] allowedGoals = new String[] { "install","deploy" };
+    private String[] allowedGoals = new String[] { "install", "deploy" };
 
-   /**
-    * The maven session
-    * 
-    * @parameter expression="${session}"
-    * @required
-    */
-   private MavenSession session;
-   
-   /**
-    * The encoding of the input files. The default is "UTF-8";
-    * @parameter
-    */
-   private String fileEncoding = "UTF8";
+    /**
+     * The maven session
+     * 
+     * @parameter expression="${session}"
+     * @required
+     */
+    private MavenSession session;
 
-   /**
-    * Location of the build directory.
-    *
-    * @parameter expression="${project.build.directory}"
-    * @required
-    */
-   private File targetDirectory;
+    /**
+     * The encoding of the input files. The default is "UTF-8";
+     * @parameter
+     */
+    private String fileEncoding = "UTF8";
 
-   public void execute() throws MojoExecutionException {
-      if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
-         try {
-            if (MojoUtil.alreadyRun(getLog(), dataDirectory.getCanonicalPath(), 
-            		this.getClass(), targetDirectory)) {
-               return;
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
+
+    public void execute() throws MojoExecutionException {
+        if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
+            try {
+                if (MojoUtil.alreadyRun(getLog(), dataDirectory
+                    .getCanonicalPath(), this.getClass(), targetDirectory)) {
+                    return;
+                }
+                LocalVersionedTerminology.get().loadFromDirectory(
+                    dataDirectory, fileEncoding);
+            } catch (Exception ex) {
+                throw new MojoExecutionException(
+                    "Error processing dependency. Reason: " + ex.getMessage(),
+                    ex);
             }
-            LocalVersionedTerminology.get().loadFromDirectory(dataDirectory, fileEncoding);
-         } catch (Exception ex) {
-            throw new MojoExecutionException("Error processing dependency. Reason: " + ex.getMessage(), ex);
-         }
-      }
-   }
+        }
+    }
 
 }

@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo;
 
 import java.io.BufferedWriter;
@@ -317,36 +333,35 @@ public class VodbMonitorBranches extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-            I_TermFactory termFactory = LocalVersionedTerminology.get();
-            try {
-                MonitorComponents componentMonitor = new MonitorComponents();
-                termFactory.iterateConcepts(componentMonitor);
-                if (componentMonitor.getConflicts() > 0) {
-                    outputHtmlDirectory.mkdirs();
-                    BufferedWriter htmlWriter = new BufferedWriter(
-                            new BufferedWriter(new FileWriter(
-                                    outputHtmlDirectory
-                                    + File.separator
-                                    + outputHtmlFileName)));
-                    htmlWriter.append("Monitored "
-                            + componentMonitor.getConceptCount() + " components.");
-                    htmlWriter.append("<br>");
-                    htmlWriter.append("Number of agreed changes: "
-                            + componentMonitor.getAgreedChanges());
-                    htmlWriter.append("<br>");
-                    htmlWriter.append("Number of conflicts: "
-                            + componentMonitor.getConflicts());
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        try {
+            MonitorComponents componentMonitor = new MonitorComponents();
+            termFactory.iterateConcepts(componentMonitor);
+            if (componentMonitor.getConflicts() > 0) {
+                outputHtmlDirectory.mkdirs();
+                BufferedWriter htmlWriter =
+                        new BufferedWriter(new BufferedWriter(new FileWriter(
+                            outputHtmlDirectory + File.separator
+                                + outputHtmlFileName)));
+                htmlWriter.append("Monitored "
+                    + componentMonitor.getConceptCount() + " components.");
+                htmlWriter.append("<br>");
+                htmlWriter.append("Number of agreed changes: "
+                    + componentMonitor.getAgreedChanges());
+                htmlWriter.append("<br>");
+                htmlWriter.append("Number of conflicts: "
+                    + componentMonitor.getConflicts());
 
-                    htmlWriter.close();
-                }
-
-                if (componentMonitor.getTextWriter() != null) {
-                    componentMonitor.getTextWriter().close();
-                }
-
-            } catch (Exception e) {
-                throw new MojoExecutionException(e.getLocalizedMessage(), e);
+                htmlWriter.close();
             }
+
+            if (componentMonitor.getTextWriter() != null) {
+                componentMonitor.getTextWriter().close();
+            }
+
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
     }
 
 }

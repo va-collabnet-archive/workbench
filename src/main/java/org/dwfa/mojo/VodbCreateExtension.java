@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo;
 
 import java.util.UUID;
@@ -18,8 +34,9 @@ import org.dwfa.cement.RefsetAuxiliary;
 
 /**
  * Creates an extension. To be used in testing VodbCalculateMemberSet class.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 
 /**
@@ -65,23 +82,25 @@ public class VodbCreateExtension extends AbstractMojo {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         try {
 
-
-            I_GetConceptData refSetPathConcept = refSetPathDescriptor.getVerifiedConcept();
+            I_GetConceptData refSetPathConcept =
+                    refSetPathDescriptor.getVerifiedConcept();
             memberSetPath = termFactory.getPath(refSetPathConcept.getUids());
 
             // execute calculate member set plugin
             ExtensionCreator extensionCreator =
-                new ExtensionCreator(refSetSpecDescriptor,
+                    new ExtensionCreator(refSetSpecDescriptor,
                         refSetTypeDescriptor);
 
             // iterate over each concept
             termFactory.iterateConcepts(extensionCreator);
 
-            String message = "Number of new extensions: "
-                            + extensionCreator.getExtensionCount();
+            String message =
+                    "Number of new extensions: "
+                        + extensionCreator.getExtensionCount();
             getLog().info(message);
 
-            System.out.println("Uncommitted end: " + termFactory.getUncommitted().size());
+            System.out.println("Uncommitted end: "
+                + termFactory.getUncommitted().size());
             termFactory.commit();
 
         } catch (Exception e) {
@@ -99,31 +118,51 @@ public class VodbCreateExtension extends AbstractMojo {
         private int typeId;
 
         public ExtensionCreator(ConceptDescriptor referenceSetDescriptor,
-                ConceptDescriptor typeConceptDescriptor)
-                throws Exception {
+                ConceptDescriptor typeConceptDescriptor) throws Exception {
             termFactory = LocalVersionedTerminology.get();
             extensionCount = 0;
-            I_GetConceptData refConcept = referenceSetDescriptor.getVerifiedConcept();
+            I_GetConceptData refConcept =
+                    referenceSetDescriptor.getVerifiedConcept();
             this.referenceSetId = refConcept.getConceptId();
-            I_GetConceptData typeConcept = typeConceptDescriptor.getVerifiedConcept();
+            I_GetConceptData typeConcept =
+                    typeConceptDescriptor.getVerifiedConcept();
             this.typeId = typeConcept.getConceptId();
         }
 
         public void processConcept(I_GetConceptData concept) throws Exception {
 
             int conceptId = concept.getConceptId();
-            int currentStatusId = termFactory.uuidToNative(
-                    ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
+            int currentStatusId =
+                    termFactory
+                        .uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
+                            .getUids().iterator().next());
 
-            int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
-                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
-                    termFactory.getPaths(), Integer.MAX_VALUE);
+            int memberId =
+                    termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
+                        ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
+                            .localize().getNid(), termFactory.getPaths(),
+                        Integer.MAX_VALUE);
 
-            int includeLineageId = termFactory.uuidToNative(RefsetAuxiliary.Concept.INCLUDE_LINEAGE.getUids().iterator().next());
-            int includeIndividualId = termFactory.uuidToNative(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids().iterator().next());
-            int excludeLineageId = termFactory.uuidToNative(RefsetAuxiliary.Concept.EXCLUDE_LINEAGE.getUids().iterator().next());
-            int excludeIndividualId = termFactory.uuidToNative(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids().iterator().next());
-            int conceptTypeId = termFactory.uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids().iterator().next());
+            int includeLineageId =
+                    termFactory
+                        .uuidToNative(RefsetAuxiliary.Concept.INCLUDE_LINEAGE
+                            .getUids().iterator().next());
+            int includeIndividualId =
+                    termFactory
+                        .uuidToNative(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL
+                            .getUids().iterator().next());
+            int excludeLineageId =
+                    termFactory
+                        .uuidToNative(RefsetAuxiliary.Concept.EXCLUDE_LINEAGE
+                            .getUids().iterator().next());
+            int excludeIndividualId =
+                    termFactory
+                        .uuidToNative(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL
+                            .getUids().iterator().next());
+            int conceptTypeId =
+                    termFactory
+                        .uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION
+                            .getUids().iterator().next());
 
             int i = 1 + (int) (Math.random() * 10);
             boolean skipExtension = false;
@@ -143,10 +182,11 @@ public class VodbCreateExtension extends AbstractMojo {
 
             if (!skipExtension) {
                 I_ThinExtByRefVersioned extension =
-                    termFactory.newExtension(referenceSetId, memberId, conceptId,
-                            conceptTypeId);
+                        termFactory.newExtension(referenceSetId, memberId,
+                            conceptId, conceptTypeId);
 
-                I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
+                I_ThinExtByRefPartConcept conceptExtension =
+                        termFactory.newConceptExtensionPart();
 
                 conceptExtension.setPathId(memberSetPath.getConceptId());
                 conceptExtension.setStatus(currentStatusId);

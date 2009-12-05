@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo;
 
 import java.io.File;
@@ -31,10 +47,10 @@ public class VodbCompress extends AbstractMojo {
     private int minUtilization = 90;
 
     /**
-    * @parameter expression="${mojoExecution}"
-    */
+     * @parameter expression="${mojoExecution}"
+     */
     private org.apache.maven.plugin.MojoExecution execution;
-    
+
     /**
      * Location of the build directory.
      *
@@ -45,21 +61,21 @@ public class VodbCompress extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-			if (MojoUtil.alreadyRun(getLog(), execution.getExecutionId(),
-					this.getClass(), targetDirectory)) {
-			    return;
-			}
-		} catch (NoSuchAlgorithmException e1) {
+            if (MojoUtil.alreadyRun(getLog(), execution.getExecutionId(), this
+                .getClass(), targetDirectory)) {
+                return;
+            }
+        } catch (NoSuchAlgorithmException e1) {
             throw new MojoExecutionException(e1.getLocalizedMessage(), e1);
-		} catch (IOException e1) {
+        } catch (IOException e1) {
             throw new MojoExecutionException(e1.getLocalizedMessage(), e1);
-		}
-		I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) LocalVersionedTerminology
-				.get();
-		try {
-			termFactoryImpl.compress(minUtilization);
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
-	}
+        }
+        I_ImplementTermFactory termFactoryImpl =
+                (I_ImplementTermFactory) LocalVersionedTerminology.get();
+        try {
+            termFactoryImpl.compress(minUtilization);
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
+    }
 }

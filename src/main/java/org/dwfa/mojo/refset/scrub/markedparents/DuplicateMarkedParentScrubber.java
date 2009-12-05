@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo.refset.scrub.markedparents;
 
 import org.dwfa.ace.api.I_TermFactory;
@@ -18,24 +34,26 @@ import java.util.TreeSet;
  */
 public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
 
-	/**
-	 * TODO: REMOVE.
+    /**
+     * TODO: REMOVE.
      * This is not used. This has been introduced to get around a maven problem of not allowing implementations
      * without parameters. Remove once this is sorted out.
-	 * @parameter
-	 */
-	private ConceptDescriptor[] validTypeConcepts;
+     * @parameter
+     */
+    private ConceptDescriptor[] validTypeConcepts;
 
-	private final I_TermFactory termFactory;
+    private final I_TermFactory termFactory;
 
-	private final int retiredStatusId;
+    private final int retiredStatusId;
 
-	public DuplicateMarkedParentScrubber() throws Exception {
-		termFactory = LocalVersionedTerminology.get();
-		retiredStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
-	}
+    public DuplicateMarkedParentScrubber() throws Exception {
+        termFactory = LocalVersionedTerminology.get();
+        retiredStatusId =
+                termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
+                    .getUids().iterator().next());
+    }
 
-	public void process(final ConceptExtFinder finder) {
+    public void process(final ConceptExtFinder finder) {
 		try {
             for (Object aFinder : finder) {
                 processExtension((I_ThinExtByRefVersioned) aFinder);
@@ -46,7 +64,7 @@ public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
 		}
 	}
 
-	private void processExtension(final I_ThinExtByRefVersioned member) throws Exception {
+    private void processExtension(final I_ThinExtByRefVersioned member) throws Exception {
         //sort by version, smallest to largest.
         SortedSet<I_ThinExtByRefPart> sortedVersions =  new TreeSet<I_ThinExtByRefPart>(new LatestVersionComparator());
         sortedVersions.addAll(member.getVersions());

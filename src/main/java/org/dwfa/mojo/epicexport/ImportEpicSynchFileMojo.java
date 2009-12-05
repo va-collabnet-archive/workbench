@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo.epicexport;
 
 import java.io.BufferedReader;
@@ -46,9 +62,10 @@ import org.dwfa.maven.MojoUtil;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
-import org.dwfa.mojo.refset.ExportSpecification; // import org.dwfa.mojo.refset.RefsetType;
-//import org.dwfa.mojo.vivisimo.IntSet;
-//import org.dwfa.mojo.vivisimo.GenerateVivisimoThesaurus.ExportIterator;
+import org.dwfa.mojo.refset.ExportSpecification; // import
+                                                 // org.dwfa.mojo.refset.RefsetType;
+// import org.dwfa.mojo.vivisimo.IntSet;
+// import org.dwfa.mojo.vivisimo.GenerateVivisimoThesaurus.ExportIterator;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 
@@ -69,60 +86,61 @@ import org.dwfa.vodb.types.IntSet;
  * @goal import-epic-synch-file
  */
 public class ImportEpicSynchFileMojo extends AbstractMojo {
-	/**
-	 * Location of the KP data directory to read from.
-	 * 
-	 * @parameter expression="src/main/synch"
-	 * @required
-	 */
-	private File kpDir;
-	private int synchRecordsProcessed = 0;
-	private int conceptsMatched = 0;
-	private int cidValuesMatched = 0;
-	private int dot1ValuesMatched = 0;
-	private int cidValuesMisMatched = 0;
-	private int dot1ValuesMisMatched = 0;
-	private int cidValuesSynched = 0;
-	private int dot1ValuesSynched = 0;
+    /**
+     * Location of the KP data directory to read from.
+     * 
+     * @parameter expression="src/main/synch"
+     * @required
+     */
+    private File kpDir;
+    private int synchRecordsProcessed = 0;
+    private int conceptsMatched = 0;
+    private int cidValuesMatched = 0;
+    private int dot1ValuesMatched = 0;
+    private int cidValuesMisMatched = 0;
+    private int dot1ValuesMisMatched = 0;
+    private int cidValuesSynched = 0;
+    private int dot1ValuesSynched = 0;
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		try {
-			getLog().info("KP dir: " + kpDir);
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        try {
+            getLog().info("KP dir: " + kpDir);
 
-			BufferedReader r = new BufferedReader(new FileReader(new File(
-					kpDir, "epic_synch.txt")));
+            BufferedReader r =
+                    new BufferedReader(new FileReader(new File(kpDir,
+                        "epic_synch.txt")));
 
-			I_TermFactory termFactory = LocalVersionedTerminology.get();
+            I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-			while (r.ready()) {
-				String line = r.readLine();
-				if (line.length() > 0) {
-					processRowConceptUUID(termFactory, line);
-					synchRecordsProcessed++;
-				}
-			}
+            while (r.ready()) {
+                String line = r.readLine();
+                if (line.length() > 0) {
+                    processRowConceptUUID(termFactory, line);
+                    synchRecordsProcessed++;
+                }
+            }
 
-			r.close();
+            r.close();
 
-			getLog().info("synchRecordsProcessed: " + synchRecordsProcessed);
-			getLog().info("conceptsMatched:       " + conceptsMatched);
-			getLog().info("cidValuesMatched:      " + cidValuesMatched);
-			getLog().info("dot1ValuesMatched:     " + dot1ValuesMatched);
-			getLog().info("cidValuesMisMatched:   " + cidValuesMisMatched);
-			getLog().info("dot1ValuesMisMatched:  " + dot1ValuesMisMatched);
-			getLog().info("cidValuesSynched:      " + cidValuesSynched);
-			getLog().info("dot1ValuesSynched:     " + dot1ValuesSynched);
+            getLog().info("synchRecordsProcessed: " + synchRecordsProcessed);
+            getLog().info("conceptsMatched:       " + conceptsMatched);
+            getLog().info("cidValuesMatched:      " + cidValuesMatched);
+            getLog().info("dot1ValuesMatched:     " + dot1ValuesMatched);
+            getLog().info("cidValuesMisMatched:   " + cidValuesMisMatched);
+            getLog().info("dot1ValuesMisMatched:  " + dot1ValuesMisMatched);
+            getLog().info("cidValuesSynched:      " + cidValuesSynched);
+            getLog().info("dot1ValuesSynched:     " + dot1ValuesSynched);
 
-		} catch (FileNotFoundException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		} catch (IOException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
+        } catch (FileNotFoundException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+    }
 
-	private void processRowConceptUUID(I_TermFactory tf, String line)
+    private void processRowConceptUUID(I_TermFactory tf, String line)
 			throws IOException, NoSuchAlgorithmException,
 			UnsupportedEncodingException {
 
