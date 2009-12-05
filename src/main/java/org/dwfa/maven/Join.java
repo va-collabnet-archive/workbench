@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.maven;
 
 import java.io.BufferedReader;
@@ -24,68 +40,68 @@ import org.apache.maven.plugin.MojoFailureException;
  */
 public class Join extends AbstractMojo {
 
-	/**
-	 * @parameter
-	 * @required
-	 */
-	private String inputFileOne;
+    /**
+     * @parameter
+     * @required
+     */
+    private String inputFileOne;
 
-	/**
-	 * Key column index starts at 0
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	private int fileOneKeyColumn;
+    /**
+     * Key column index starts at 0
+     * 
+     * @parameter
+     * @required
+     */
+    private int fileOneKeyColumn;
 
-	/**
-	 * @parameter
-	 * @required
-	 */
-	private String inputFileTwo;
+    /**
+     * @parameter
+     * @required
+     */
+    private String inputFileTwo;
 
-	/**
-	 * Key column index starts at 0
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	private int fileTwoKeyColumn;
+    /**
+     * Key column index starts at 0
+     * 
+     * @parameter
+     * @required
+     */
+    private int fileTwoKeyColumn;
 
-	/**
-	 * @parameter
-	 * @required
-	 */
-	private String outputFile;
+    /**
+     * @parameter
+     * @required
+     */
+    private String outputFile;
 
-	/**
-	 * @parameter
-	 */
-	private String columnDelimiter = "\t";
+    /**
+     * @parameter
+     */
+    private String columnDelimiter = "\t";
 
-	private static class ReadRecord {
-		String[] file1;
+    private static class ReadRecord {
+        String[] file1;
 
-		String[] file2;
+        String[] file2;
 
-		public String[] getFile1() {
-			return file1;
-		}
+        public String[] getFile1() {
+            return file1;
+        }
 
-		public void setFile1(String[] file1) {
-			this.file1 = file1;
-		}
+        public void setFile1(String[] file1) {
+            this.file1 = file1;
+        }
 
-		public String[] getFile2() {
-			return file2;
-		}
+        public String[] getFile2() {
+            return file2;
+        }
 
-		public void setFile2(String[] file2) {
-			this.file2 = file2;
-		}
-	}
+        public void setFile2(String[] file2) {
+            this.file2 = file2;
+        }
+    }
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
 		HashMap<String, ReadRecord> keyMap = new HashMap<String, ReadRecord>();
 		try {
 			BufferedReader fileOneReader = new BufferedReader(new FileReader(
@@ -147,52 +163,52 @@ public class Join extends AbstractMojo {
 
 	}
 
-	public String getColumnDelimiter() {
-		return columnDelimiter;
-	}
+    public String getColumnDelimiter() {
+        return columnDelimiter;
+    }
 
-	public void setColumnDelimiter(String columnDelimiter) {
-		this.columnDelimiter = columnDelimiter;
-	}
+    public void setColumnDelimiter(String columnDelimiter) {
+        this.columnDelimiter = columnDelimiter;
+    }
 
-	public int getFileOneKeyColumn() {
-		return fileOneKeyColumn;
-	}
+    public int getFileOneKeyColumn() {
+        return fileOneKeyColumn;
+    }
 
-	public void setFileOneKeyColumn(int fileOneKeyColumn) {
-		this.fileOneKeyColumn = fileOneKeyColumn;
-	}
+    public void setFileOneKeyColumn(int fileOneKeyColumn) {
+        this.fileOneKeyColumn = fileOneKeyColumn;
+    }
 
-	public int getFileTwoKeyColumn() {
-		return fileTwoKeyColumn;
-	}
+    public int getFileTwoKeyColumn() {
+        return fileTwoKeyColumn;
+    }
 
-	public void setFileTwoKeyColumn(int fileTwoKeyColumn) {
-		this.fileTwoKeyColumn = fileTwoKeyColumn;
-	}
+    public void setFileTwoKeyColumn(int fileTwoKeyColumn) {
+        this.fileTwoKeyColumn = fileTwoKeyColumn;
+    }
 
-	public String getInputFileOne() {
-		return inputFileOne;
-	}
+    public String getInputFileOne() {
+        return inputFileOne;
+    }
 
-	public void setInputFileOne(String inputFileOne) {
-		this.inputFileOne = inputFileOne;
-	}
+    public void setInputFileOne(String inputFileOne) {
+        this.inputFileOne = inputFileOne;
+    }
 
-	public String getInputFileTwo() {
-		return inputFileTwo;
-	}
+    public String getInputFileTwo() {
+        return inputFileTwo;
+    }
 
-	public void setInputFileTwo(String inputFileTwo) {
-		this.inputFileTwo = inputFileTwo;
-	}
+    public void setInputFileTwo(String inputFileTwo) {
+        this.inputFileTwo = inputFileTwo;
+    }
 
-	public String getOutputFile() {
-		return outputFile;
-	}
+    public String getOutputFile() {
+        return outputFile;
+    }
 
-	public void setOutputFile(String outputFile) {
-		this.outputFile = outputFile;
-	}
+    public void setOutputFile(String outputFile) {
+        this.outputFile = outputFile;
+    }
 
 }

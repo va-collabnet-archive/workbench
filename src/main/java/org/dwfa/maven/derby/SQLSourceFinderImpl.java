@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.maven.derby;
 
 import java.io.File;
@@ -10,7 +26,8 @@ public final class SQLSourceFinderImpl implements SQLSourceFinder {
 
     private static final String SQL_EXTENSION = ".sql";
 
-    public File[] find(final File targetDir, final String[] sources, final String[] sqlLocations) {
+    public File[] find(final File targetDir, final String[] sources,
+            final String[] sqlLocations) {
         if (hasSources(sources)) {
             return findBySources(targetDir, sources);
         }
@@ -59,7 +76,7 @@ public final class SQLSourceFinderImpl implements SQLSourceFinder {
     private static class SQLFileFilter implements FileFilter {
 
         public boolean accept(final File fileName) {
-             return fileName.getName().endsWith(SQL_EXTENSION);
+            return fileName.getName().endsWith(SQL_EXTENSION);
         }
     }
 }

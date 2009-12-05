@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.maven;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -15,7 +31,6 @@ import org.dwfa.maven.derby.SQLSourceFinderImpl;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 
 /**
  * Goal which executes derby sql commands to generate a
@@ -91,45 +106,52 @@ public class Derby extends AbstractMojo {
      */
     private boolean verbose = false;
 
-
     /**
-    * List of source roots containing non-test code.
-    * @parameter default-value="${project.compileSourceRoots}"
-    * @required
-    * @readonly
-    */
+     * List of source roots containing non-test code.
+     * @parameter default-value="${project.compileSourceRoots}"
+     * @required
+     * @readonly
+     */
     private List sourceRoots;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         String buildHashCode = generateHashForBuild();
         BuildMarker buildMarker = new BuildMarkerImpl(buildHashCode);
 
-        if(!buildMarker.isMarked()) {
+        if (!buildMarker.isMarked()) {
             try {
-                FileLocationConfigurer flc = new FileLocationConfigurerImpl(sourceDirectory, outputDirectory, dbName);
-                copySQLFilesToTarget(flc.getSqlSourceDir(), flc.getSqlTargetDir());
-                runScripts(flc.getSqlTargetDir(), flc.getDbDir(), createErrorLog(flc.getDbDir()));
+                FileLocationConfigurer flc =
+                        new FileLocationConfigurerImpl(sourceDirectory,
+                            outputDirectory, dbName);
+                copySQLFilesToTarget(flc.getSqlSourceDir(), flc
+                    .getSqlTargetDir());
+                runScripts(flc.getSqlTargetDir(), flc.getDbDir(),
+                    createErrorLog(flc.getDbDir()));
                 buildMarker.mark();
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
-            } 
+            }
         } else {
             getLog().warn("Skipping goal - executed previously.");
         }
     }
 
-    private void runScripts(final File sqlTargetDir, final File dbDir, final File dbErrLog) throws IOException {
-        DerbyClient derbyClient = new DerbyClientImpl(dbDir.getCanonicalPath(), dbErrLog.getCanonicalPath(),
-                getLog());
+    private void runScripts(final File sqlTargetDir, final File dbDir,
+            final File dbErrLog) throws IOException {
+        DerbyClient derbyClient =
+                new DerbyClientImpl(dbDir.getCanonicalPath(), dbErrLog
+                    .getCanonicalPath(), getLog());
         derbyClient.openConnection();
         runScripts(derbyClient, sqlTargetDir);
         derbyClient.closeConnection();
     }
 
-    private void copySQLFilesToTarget(final File sqlSrcDir, final File sqlTargetDir) {
+    private void copySQLFilesToTarget(final File sqlSrcDir,
+            final File sqlTargetDir) {
         if (sqlLocations.length == 0) {
-            new SQLFileTransformationCopierImpl(getLog(), outputDirectory, replaceForwardSlash).
-                    copySQLFilesToTarget(sqlSrcDir, sqlTargetDir);
+            new SQLFileTransformationCopierImpl(getLog(), outputDirectory,
+                replaceForwardSlash).copySQLFilesToTarget(sqlSrcDir,
+                sqlTargetDir);
         }
     }
 
@@ -142,22 +164,19 @@ public class Derby extends AbstractMojo {
     }
 
     private File[] findSources(final File sqlTargetDir) {
-        return new SQLSourceFinderImpl().find(sqlTargetDir, sources, sqlLocations);
+        return new SQLSourceFinderImpl().find(sqlTargetDir, sources,
+            sqlLocations);
     }
 
     private File createErrorLog(final File dbDir) throws IOException {
-        return new LogFileCreatorImpl().createLog(dbDir.getParentFile(), "derbyErr.log", version);
+        return new LogFileCreatorImpl().createLog(dbDir.getParentFile(),
+            "derbyErr.log", version);
     }
 
     private String generateHashForBuild() {
-        return new DerbyHashBuilder(getLog()).
-                withOutputDirectory(outputDirectory).
-                withSourceDirectory(sourceDirectory).
-                withVersion(version).
-                withDatabaseName(dbName).
-                withSourceRoots(sourceRoots).
-                withSources(sources).
-                withSQLLocations(sqlLocations).
-                build();
+        return new DerbyHashBuilder(getLog()).withOutputDirectory(
+            outputDirectory).withSourceDirectory(sourceDirectory).withVersion(
+            version).withDatabaseName(dbName).withSourceRoots(sourceRoots)
+            .withSources(sources).withSQLLocations(sqlLocations).build();
     }
 }

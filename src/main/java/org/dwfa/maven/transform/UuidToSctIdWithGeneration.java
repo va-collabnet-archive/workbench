@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.maven.transform;
 
 import java.io.File;
@@ -8,17 +24,22 @@ import org.dwfa.maven.I_ReadAndTransform;
 import org.dwfa.maven.Transform;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
-public abstract class UuidToSctIdWithGeneration extends AbstractTransform implements I_ReadAndTransform {
+public abstract class UuidToSctIdWithGeneration extends AbstractTransform
+        implements I_ReadAndTransform {
 
     private File sourceDirectory = null;
     static UuidSnomedMapHandler map;
 
     public void setupImpl(Transform transformer) throws IOException {
-        setupImpl(transformer.getBuildDirectory(), transformer.getSourceDirectory());
+        setupImpl(transformer.getBuildDirectory(), transformer
+            .getSourceDirectory());
     }
 
-    public void setupImpl(File buildDirectory, File sourceDirectoryToSet) throws IOException {
-        File idGeneratedDir = new File(new File(buildDirectory, "generated-resources"), "sct-uuid-maps");
+    public void setupImpl(File buildDirectory, File sourceDirectoryToSet)
+            throws IOException {
+        File idGeneratedDir =
+                new File(new File(buildDirectory, "generated-resources"),
+                    "sct-uuid-maps");
 
         if (sourceDirectory == null) {
             sourceDirectory = sourceDirectoryToSet;
@@ -27,7 +48,8 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
         initMap(idGeneratedDir, sourceDirectory);
     }
 
-    private static synchronized void initMap(File idGeneratedDir, File sourceDirectory) throws IOException {
+    private static synchronized void initMap(File idGeneratedDir,
+            File sourceDirectory) throws IOException {
         if (map == null) {
             map = new UuidSnomedMapHandler(idGeneratedDir, sourceDirectory);
         }
