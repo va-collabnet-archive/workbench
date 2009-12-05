@@ -1,7 +1,21 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /*
  * Created on May 5, 2005
- *
- * Copyright 2005 by Informatics, Inc. 
  */
 package org.dwfa.bpa.util;
 
@@ -40,14 +54,14 @@ import javax.swing.event.ListDataListener;
 import org.dwfa.app.I_ManageStandardAppFunctions;
 import org.dwfa.bpa.gui.action.BringWindowToFront;
 
-
-
 /**
  * @author kec
  *
  */
-public class FrameWithOpenFramesListener extends JFrame implements I_ManageStandardAppFunctions, ListDataListener, ActionListener  {
-    protected static Logger logger = Logger.getLogger(FrameWithOpenFramesListener.class.getName());
+public class FrameWithOpenFramesListener extends JFrame implements
+        I_ManageStandardAppFunctions, ListDataListener, ActionListener {
+    protected static Logger logger =
+            Logger.getLogger(FrameWithOpenFramesListener.class.getName());
     /**
      * 
      */
@@ -60,17 +74,16 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
          */
         public void actionPerformed(ActionEvent e) {
             try {
-            	    String userDir = System.getProperty("user.dir");
-                 PlatformWebBrowser.openURL(new URL("file://" + userDir + "/site/index.html"));
+                String userDir = System.getProperty("user.dir");
+                PlatformWebBrowser.openURL(new URL("file://" + userDir
+                    + "/site/index.html"));
 
-            
             } catch (Exception ex) {
-            	    ex.printStackTrace();   
+                ex.printStackTrace();
             }
         }
 
     }
-    
 
     protected JDialog aboutBox, prefs;
 
@@ -88,9 +101,11 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
 
     // Check that we are on Mac OS X. This is crucial to loading and using the
     // OSXAdapter class.
-    public static boolean MAC_OS_X = (System.getProperty("os.name")
-            .toLowerCase().startsWith("mac os x"));
-    public FrameWithOpenFramesListener(String title, String menuName, JComponent content) throws Exception {
+    public static boolean MAC_OS_X =
+            (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
+
+    public FrameWithOpenFramesListener(String title, String menuName,
+            JComponent content) throws Exception {
         super();
         this.setTitle(title);
         OpenFrames.addFrame(this);
@@ -110,6 +125,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.addWindowListener(new OpenFramesWindowListener(this, this));
     }
+
     public void macOSXRegistration() {
         if (MAC_OS_X) {
             try {
@@ -131,6 +147,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
             }
         }
     }
+
     /**
      *  
      */
@@ -138,15 +155,15 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
         aboutBox = AboutBox.getAboutBox(this);
         setupPrefs();
     }
-    
+
     /**
      *  
      */
     private void setupPrefs() {
         prefs = new JDialog(this, "Architectonic Preferences");
 
-        UIManager.LookAndFeelInfo[] lookAndFeels = UIManager
-                .getInstalledLookAndFeels();
+        UIManager.LookAndFeelInfo[] lookAndFeels =
+                UIManager.getInstalledLookAndFeels();
 
         //      Create the combo box, select item at index 4.
         //      Indices start at 0, so 4 specifies the pig.
@@ -161,9 +178,10 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
             public Component getListCellRendererComponent(JList list,
                     Object value, int index, boolean isSelected,
                     boolean cellHasFocus) {
-                UIManager.LookAndFeelInfo lafValue = (UIManager.LookAndFeelInfo) value;
+                UIManager.LookAndFeelInfo lafValue =
+                        (UIManager.LookAndFeelInfo) value;
                 super.getListCellRendererComponent(list, lafValue.getName(),
-                        index, isSelected, cellHasFocus);
+                    index, isSelected, cellHasFocus);
                 return this;
             }
 
@@ -174,11 +192,12 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
             public void actionPerformed(ActionEvent e) {
                 try {
                     JComboBox comboBox = (JComboBox) e.getSource();
-                    UIManager.LookAndFeelInfo lafInfo = (LookAndFeelInfo) comboBox
-                            .getSelectedItem();
+                    UIManager.LookAndFeelInfo lafInfo =
+                            (LookAndFeelInfo) comboBox.getSelectedItem();
                     UIManager.setLookAndFeel(lafInfo.getClassName());
 
-                    SwingUtilities.updateComponentTreeUI(FrameWithOpenFramesListener.this);
+                    SwingUtilities
+                        .updateComponentTreeUI(FrameWithOpenFramesListener.this);
 
                 } catch (ClassNotFoundException e1) {
                     logger.log(Level.SEVERE, e1.getMessage(), e1);
@@ -197,6 +216,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
         prefs.getContentPane().setLayout(new GridLayout(2, 1));
         prefs.getContentPane().add(lookAndFeelList);
     }
+
     public void addMenus(String menuName) {
         // Quit menu item is provided on Mac OS X.. only make it on other
         // platforms.
@@ -225,6 +245,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
 
         setJMenuBar(mainMenuBar);
     }
+
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == quitMI) {
             quit();
@@ -234,14 +255,15 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
             about();
         }
     }
+
     // General info dialog. The OSXAdapter calls this method when "About
     // OSXAdapter"
     // is selected from the application menu.
     public void about() {
-    	aboutBox = AboutBox.getAboutBox(this);
+        aboutBox = AboutBox.getAboutBox(this);
         aboutBox.pack();
         aboutBox.setLocation((int) this.getLocation().getX() + 22, (int) this
-                .getLocation().getY() + 22);
+            .getLocation().getY() + 22);
         aboutBox.setResizable(false);
         aboutBox.setVisible(true);
         aboutBox.toFront();
@@ -253,7 +275,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     public void preferences() {
         prefs.setSize(320, 240);
         prefs.setLocation((int) this.getLocation().getX() + 22, (int) this
-                .getLocation().getY() + 22);
+            .getLocation().getY() + 22);
         prefs.setResizable(false);
         prefs.setVisible(true);
     }
@@ -263,20 +285,19 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     // is selected from the application menu, Cmd-Q is pressed, or "Quit" is
     // selected from the Dock.
     public boolean quit() {
-        int option = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to quit?", "[b] Quit?",
-                JOptionPane.YES_NO_OPTION);
+        int option =
+                JOptionPane.showConfirmDialog(this,
+                    "Are you sure you want to quit?", "[b] Quit?",
+                    JOptionPane.YES_NO_OPTION);
         if (option == JOptionPane.YES_OPTION) {
-        	System.out.println("[b] Quit option selected...");
-        	if (MAC_OS_X) {
+            System.out.println("[b] Quit option selected...");
+            if (MAC_OS_X) {
                 return true;
-        	}
-        	System.exit(0);
-          }
+            }
+            System.exit(0);
+        }
         return false;
     }
-
-
 
     /**
      * @see javax.swing.event.ListDataListener#intervalAdded(javax.swing.event.ListDataEvent)
@@ -291,6 +312,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
     public final void intervalRemoved(ListDataEvent e) {
         this.contentsChanged(e);
     }
+
     private void addFramesToWindowMenu() {
         JMenu submenu = new JMenu("New");
         windowMenu.add(submenu);
@@ -311,6 +333,7 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
         }
         
     }
+
     /**
      * @see javax.swing.event.ListDataListener#contentsChanged(javax.swing.event.ListDataEvent)
      */
@@ -318,17 +341,21 @@ public class FrameWithOpenFramesListener extends JFrame implements I_ManageStand
         this.windowMenu.removeAll();
         addFramesToWindowMenu();
     }
-	public void openApplication() {
-		throw new UnsupportedOperationException();
-	}
-	public void openFile() {
-		throw new UnsupportedOperationException();
-	}
-	public void printFile() {
-		throw new UnsupportedOperationException();
-	}
-	public void reOpenApplication() {
-		throw new UnsupportedOperationException();
-	}
+
+    public void openApplication() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void openFile() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void printFile() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void reOpenApplication() {
+        throw new UnsupportedOperationException();
+    }
 
 }

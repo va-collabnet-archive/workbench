@@ -1,7 +1,21 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /*
  * Created on Apr 29, 2005
- *
- * Copyright 2005 by Informatics, Inc. 
  */
 package org.dwfa.bpa.util;
 
@@ -19,19 +33,22 @@ import javax.swing.JLabel;
  * @author kec
  *
  */
-public class AboutBox  {
+public class AboutBox {
     private static JDialog setupAbout(JFrame parent) {
-       
+
         String title = "About the Workflow Bundle";
-        
-        if (System.getProperty("org.dwfa.AboutBoxTitle") != null && System.getProperty("org.dwfa.AboutBoxTitle").length() > 3) {
-           title = removeQuotes(System.getProperty("org.dwfa.AboutBoxTitle"));
+
+        if (System.getProperty("org.dwfa.AboutBoxTitle") != null
+            && System.getProperty("org.dwfa.AboutBoxTitle").length() > 3) {
+            title = removeQuotes(System.getProperty("org.dwfa.AboutBoxTitle"));
         }
         JDialog aboutBox = new JDialog(parent, title);
-        
+
         String graphic = "/about-box.gif";
-        if (System.getProperty("org.dwfa.AboutBoxGraphic") != null && System.getProperty("org.dwfa.AboutBoxGraphic").length() > 3) {
-           graphic = removeQuotes(System.getProperty("org.dwfa.AboutBoxGraphic"));
+        if (System.getProperty("org.dwfa.AboutBoxGraphic") != null
+            && System.getProperty("org.dwfa.AboutBoxGraphic").length() > 3) {
+            graphic =
+                    removeQuotes(System.getProperty("org.dwfa.AboutBoxGraphic"));
         }
         URL aboutBoxUrl = aboutBox.getClass().getResource(graphic);
         Toolkit tk = aboutBox.getToolkit();
@@ -49,17 +66,17 @@ public class AboutBox  {
         return aboutBox;
     }
 
-   public static String removeQuotes(String str) {
-         if (str.startsWith("\"")) {
-           str = str.substring(1);
+    public static String removeQuotes(String str) {
+        if (str.startsWith("\"")) {
+            str = str.substring(1);
         }
         if (str.endsWith("\"")) {
-           str = str.substring(0, str.length() - 1);
+            str = str.substring(0, str.length() - 1);
         }
-      return str;
-   }
-    
+        return str;
+    }
+
     public static JDialog getAboutBox(JFrame parent) {
-         return setupAbout(parent);
+        return setupAbout(parent);
     }
 }

@@ -1,7 +1,21 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /*
  * Created on Apr 2, 2005
- *
- * Copyright 2005 by Informatics, Inc. 
  */
 package org.dwfa.bpa.util;
 
@@ -33,12 +47,9 @@ import javax.swing.UIManager;
 
 import org.dwfa.bpa.gui.render.LookAndFeelCellRenderer;
 
-
-
-
 /*
  * ListDialog.java is a 1.4 class meant to be used by programs such as
- * ListDialogRunner.  It requires no additional files.
+ * ListDialogRunner. It requires no additional files.
  */
 
 /**
@@ -46,18 +57,17 @@ import org.dwfa.bpa.gui.render.LookAndFeelCellRenderer;
  * list.  See ListDialogRunner.java for an example of using ListDialog.
  * The basics:
  * <pre>
-    String[] choices = {"A", "long", "array", "of", "strings"};
-    String selectedName = ListDialog.showDialog(
-                                componentInControllingFrame,
-                                locatorComponent,
-                                "A description of the list:",
-                                "Dialog Title",
-                                choices,
-                                choices[0]);
+ String[] choices = {"A", "long", "array", "of", "strings"};
+ String selectedName = ListDialog.showDialog(
+ componentInControllingFrame,
+ locatorComponent,
+ "A description of the list:",
+ "Dialog Title",
+ choices,
+ choices[0]);
  * </pre>
  */
-public class SelectObjectDialog extends JDialog
-                        implements ActionListener {
+public class SelectObjectDialog extends JDialog implements ActionListener {
     /**
      * 
      */
@@ -76,39 +86,27 @@ public class SelectObjectDialog extends JDialog
      * dialog should appear.
      */
     public static Object showDialog(Component frameComp,
-                                    Component locationComp,
-                                    String labelText,
-                                    String title,
-                                    Object[] possibleValues,
-                                    Object initialValue,
-                                    Object longValue) {
+            Component locationComp, String labelText, String title,
+            Object[] possibleValues, Object initialValue, Object longValue) {
         Frame frame = JOptionPane.getFrameForComponent(frameComp);
-        dialog = new SelectObjectDialog(frame,
-                                locationComp,
-                                labelText,
-                                title,
-                                possibleValues,
-                                initialValue,
-                                longValue);
+        dialog =
+                new SelectObjectDialog(frame, locationComp, labelText, title,
+                    possibleValues, initialValue, longValue);
         dialog.setVisible(true);
         return value;
     }
 
     private void setValue(Object newValue) {
-    		if (newValue == null) {
-    			newValue = list.getModel().getElementAt(0);
-    		}
-		value = newValue;
-		list.setSelectedValue(value, true);
+        if (newValue == null) {
+            newValue = list.getModel().getElementAt(0);
+        }
+        value = newValue;
+        list.setSelectedValue(value, true);
     }
 
-    private SelectObjectDialog(Frame frame,
-                       Component locationComp,
-                       String labelText,
-                       String title,
-                       Object[] data,
-                       Object initialValue,
-                       Object longValue) {
+    private SelectObjectDialog(Frame frame, Component locationComp,
+            String labelText, String title, Object[] data, Object initialValue,
+            Object longValue) {
         super(frame, title, true);
 
         //Create and initialize the buttons.
@@ -133,13 +131,12 @@ public class SelectObjectDialog extends JDialog
             //of the JScrollBar to a fixed value. You wouldn't get the nice
             //aligned scrolling, but it should work.
             public int getScrollableUnitIncrement(Rectangle visibleRect,
-                                                  int orientation,
-                                                  int direction) {
+                    int orientation, int direction) {
                 int row;
-                if (orientation == SwingConstants.VERTICAL &&
-                      direction < 0 && (row = getFirstVisibleIndex()) != -1) {
+                if (orientation == SwingConstants.VERTICAL && direction < 0
+                    && (row = getFirstVisibleIndex()) != -1) {
                     Rectangle r = getCellBounds(row, row);
-                    if ((r.y == visibleRect.y) && (row != 0))  {
+                    if ((r.y == visibleRect.y) && (row != 0)) {
                         Point loc = r.getLocation();
                         loc.y--;
                         int prevIndex = locationToIndex(loc);
@@ -151,14 +148,15 @@ public class SelectObjectDialog extends JDialog
                         return prevR.height;
                     }
                 }
-                return super.getScrollableUnitIncrement(
-                                visibleRect, orientation, direction);
+                return super.getScrollableUnitIncrement(visibleRect,
+                    orientation, direction);
             }
         };
         if (initialValue != null) {
-            if (UIManager.LookAndFeelInfo.class.isAssignableFrom(initialValue.getClass())) {
+            if (UIManager.LookAndFeelInfo.class.isAssignableFrom(initialValue
+                .getClass())) {
                 list.setCellRenderer(new LookAndFeelCellRenderer());
-            }            
+            }
         }
 
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -187,9 +185,9 @@ public class SelectObjectDialog extends JDialog
         JLabel label = new JLabel(labelText);
         label.setLabelFor(list);
         listPane.add(label);
-        listPane.add(Box.createRigidArea(new Dimension(0,5)));
+        listPane.add(Box.createRigidArea(new Dimension(0, 5)));
         listPane.add(listScroller);
-        listPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        listPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         //Lay out the buttons from left to right.
         JPanel buttonPane = new JPanel();
