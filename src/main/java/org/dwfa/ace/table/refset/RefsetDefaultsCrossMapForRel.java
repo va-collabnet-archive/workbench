@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.table.refset;
 
 import java.io.IOException;
@@ -12,20 +28,36 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
-public class RefsetDefaultsCrossMapForRel extends RefsetDefaults implements I_RefsetDefaultsCrossMapForRel {
+public class RefsetDefaultsCrossMapForRel extends RefsetDefaults implements
+        I_RefsetDefaultsCrossMapForRel {
 
-    public RefsetDefaultsCrossMapForRel() throws TerminologyException, IOException {
+    public RefsetDefaultsCrossMapForRel() throws TerminologyException,
+            IOException {
         super();
-        refineFlag = ConceptBean.get(RefsetAuxiliary.Concept.MANDATORY_REFINABILITY_FLAG.getUids());
+        refineFlag =
+                ConceptBean
+                    .get(RefsetAuxiliary.Concept.MANDATORY_REFINABILITY_FLAG
+                        .getUids());
         refineFlagPopupIds.add(refineFlag.getConceptId());
-        refineFlagPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.COMPLETE_REFINABILITY_FLAG.getUids()).getConceptId());
-        refineFlagPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.POSSIBLE_REFINABILITY_FLAG.getUids()).getConceptId());
-        
-        additionalCode = ConceptBean.get(RefsetAuxiliary.Concept.MANDATORY_ADDITIONAL_CODE_FLAG.getUids());
+        refineFlagPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.COMPLETE_REFINABILITY_FLAG.getUids())
+            .getConceptId());
+        refineFlagPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.POSSIBLE_REFINABILITY_FLAG.getUids())
+            .getConceptId());
+
+        additionalCode =
+                ConceptBean
+                    .get(RefsetAuxiliary.Concept.MANDATORY_ADDITIONAL_CODE_FLAG
+                        .getUids());
         additionalCodePopupIds.add(additionalCode.getConceptId());
-        additionalCodePopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.COMPLETE_ADDITIONAL_CODE_FLAG.getUids()).getConceptId());
-        additionalCodePopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.POSSIBLE_ADDITIONAL_CODE_FLAG.getUids()).getConceptId());
-        
+        additionalCodePopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.COMPLETE_ADDITIONAL_CODE_FLAG.getUids())
+            .getConceptId());
+        additionalCodePopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.POSSIBLE_ADDITIONAL_CODE_FLAG.getUids())
+            .getConceptId());
+
     }
 
     /**
@@ -34,46 +66,45 @@ public class RefsetDefaultsCrossMapForRel extends RefsetDefaults implements I_Re
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private I_GetConceptData refineFlag;
     private I_IntList refineFlagPopupIds = new IntList();
     private I_GetConceptData additionalCode;
     private I_IntList additionalCodePopupIds = new IntList();
     private int defaultElementNo = 0;
-    private Integer[] elementNoPopupItems = new Integer[] {1, 2, 3};
+    private Integer[] elementNoPopupItems = new Integer[] { 1, 2, 3 };
     private int defaultBlockNo = 0;
-    private Integer[] blockNoPopupItems = new Integer[] {1, 2, 3};
-
+    private Integer[] blockNoPopupItems = new Integer[] { 1, 2, 3 };
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-       out.writeInt(dataVersion);
-       out.writeObject(refineFlag.getUids());
-       IntList.writeIntList(out, refineFlagPopupIds);
-       out.writeObject(additionalCode.getUids());
-       IntList.writeIntList(out, additionalCodePopupIds);
+        out.writeInt(dataVersion);
+        out.writeObject(refineFlag.getUids());
+        IntList.writeIntList(out, refineFlagPopupIds);
+        out.writeObject(additionalCode.getUids());
+        IntList.writeIntList(out, additionalCodePopupIds);
 
-       
-       out.writeInt(defaultElementNo);
-       out.writeObject(elementNoPopupItems);
-       out.writeInt(defaultBlockNo);
-       out.writeObject(blockNoPopupItems);
+        out.writeInt(defaultElementNo);
+        out.writeObject(elementNoPopupItems);
+        out.writeInt(defaultBlockNo);
+        out.writeObject(blockNoPopupItems);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-       int objDataVersion = in.readInt();
-       if (objDataVersion == dataVersion) {
-           refineFlag = readConcept(in);
-           refineFlagPopupIds = IntList.readIntListIgnoreMapErrors(in);
-           additionalCode = readConcept(in);
-           additionalCodePopupIds = IntList.readIntListIgnoreMapErrors(in);
-           defaultElementNo = in.readInt();
-           elementNoPopupItems = (Integer[]) in.readObject();
-           defaultBlockNo = in.readInt();
-           blockNoPopupItems = (Integer[]) in.readObject();
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            refineFlag = readConcept(in);
+            refineFlagPopupIds = IntList.readIntListIgnoreMapErrors(in);
+            additionalCode = readConcept(in);
+            additionalCodePopupIds = IntList.readIntListIgnoreMapErrors(in);
+            defaultElementNo = in.readInt();
+            elementNoPopupItems = (Integer[]) in.readObject();
+            defaultBlockNo = in.readInt();
+            blockNoPopupItems = (Integer[]) in.readObject();
 
-       } else {
-          throw new IOException("Can't handle dataversion: " + objDataVersion);
-       }
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
     }
 
     /* (non-Javadoc)

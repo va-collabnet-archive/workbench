@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.table.refset;
 
 import java.io.IOException;
@@ -12,36 +28,82 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
-public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_RefsetDefaultsTemplateForRel {
+public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements
+        I_RefsetDefaultsTemplateForRel {
 
-    public RefsetDefaultsTemplateForRel() throws TerminologyException, IOException {
+    public RefsetDefaultsTemplateForRel() throws TerminologyException,
+            IOException {
         super();
-        valueType = ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_CODE_VALUE_TYPE.getUids());
+        valueType =
+                ConceptBean
+                    .get(RefsetAuxiliary.Concept.TEMPLATE_CODE_VALUE_TYPE
+                        .getUids());
         valueTypePopupIds.add(valueType.getConceptId());
-        valueTypePopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_NUMBER_VALUE_TYPE.getUids()).getConceptId());
-        valueTypePopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids()).getConceptId());
+        valueTypePopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_NUMBER_VALUE_TYPE.getUids())
+            .getConceptId());
+        valueTypePopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
+            .getConceptId());
 
-        semanticStatus = ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_FINAL_SEMANTIC_STATUS.getUids());
+        semanticStatus =
+                ConceptBean
+                    .get(RefsetAuxiliary.Concept.TEMPLATE_FINAL_SEMANTIC_STATUS
+                        .getUids());
         semanticStatusPopupIds.add(semanticStatus.getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids()).getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_REFINABLE_SEMANTIC_STATUS.getUids()).getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_NUMERIC_QUALIFIER_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_MANDATORY_TO_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_CHILD_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_QUALIFIER_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_UNSPECIFIED_SEMANTIC_STATUS.getUids()).getConceptId());
+        semanticStatusPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
+            .getConceptId());
+        semanticStatusPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_REFINABLE_SEMANTIC_STATUS
+                .getUids()).getConceptId());
+        semanticStatusPopupIds
+            .add(ConceptBean
+                .get(
+                    RefsetAuxiliary.Concept.TEMPLATE_NUMERIC_QUALIFIER_REFINE_SEMANTIC_STATUS
+                        .getUids()).getConceptId());
+        semanticStatusPopupIds
+            .add(ConceptBean
+                .get(
+                    RefsetAuxiliary.Concept.TEMPLATE_MANDATORY_TO_REFINE_SEMANTIC_STATUS
+                        .getUids()).getConceptId());
+        semanticStatusPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_CHILD_REFINE_SEMANTIC_STATUS
+                .getUids()).getConceptId());
+        semanticStatusPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_QUALIFIER_REFINE_SEMANTIC_STATUS
+                .getUids()).getConceptId());
+        semanticStatusPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_UNSPECIFIED_SEMANTIC_STATUS
+                .getUids()).getConceptId());
 
-        attributeDisplayStatus = ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_DISPLAYED.getUids());
-        attributeDisplayStatusPopupIds.add(attributeDisplayStatus.getConceptId());
-        attributeDisplayStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_HIDDEN.getUids()).getConceptId());
-        attributeDisplayStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_UNSPECIFIED.getUids()).getConceptId());
+        attributeDisplayStatus =
+                ConceptBean
+                    .get(RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_DISPLAYED
+                        .getUids());
+        attributeDisplayStatusPopupIds.add(attributeDisplayStatus
+            .getConceptId());
+        attributeDisplayStatusPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_HIDDEN.getUids())
+            .getConceptId());
+        attributeDisplayStatusPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_UNSPECIFIED.getUids())
+            .getConceptId());
 
-        characteristicStatus = ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_QUALIFIER.getUids());
+        characteristicStatus =
+                ConceptBean
+                    .get(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_QUALIFIER
+                        .getUids());
         characteristicStatusPopupIds.add(characteristicStatus.getConceptId());
-        characteristicStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_ATOM.getUids()).getConceptId());
-        characteristicStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_FACT.getUids()).getConceptId());
-        
+        characteristicStatusPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_ATOM.getUids())
+            .getConceptId());
+        characteristicStatusPopupIds.add(ConceptBean.get(
+            RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_FACT.getUids())
+            .getConceptId());
+
     }
+
     /**
      * 
      */
@@ -52,15 +114,19 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
     private I_GetConceptData valueType;
     private I_IntList valueTypePopupIds = new IntList();
     private int cardinality = 0;
-    private Integer[] cardinalityPopupItems = new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    private Integer[] cardinalityPopupItems =
+            new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     private I_GetConceptData semanticStatus;
     private I_IntList semanticStatusPopupIds = new IntList();
-    private int browseAttributeOrder= 99;
-    private Integer[] browseAttributeOrderPopupItems = new Integer[] {99, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    private int browseValueOrder=99;
-    private Integer[] browseValueOrderPopupItems = new Integer[] {99, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    private int notesScreenOrder= 0;
-    private Integer[] notesScreenOrderPopupItems = new Integer[] {99, 97, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    private int browseAttributeOrder = 99;
+    private Integer[] browseAttributeOrderPopupItems =
+            new Integer[] { 99, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    private int browseValueOrder = 99;
+    private Integer[] browseValueOrderPopupItems =
+            new Integer[] { 99, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    private int notesScreenOrder = 0;
+    private Integer[] notesScreenOrderPopupItems =
+            new Integer[] { 99, 97, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     private I_GetConceptData attributeDisplayStatus;
     private I_IntList attributeDisplayStatusPopupIds = new IntList();
     private I_GetConceptData characteristicStatus;
@@ -68,16 +134,16 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        
+
         out.writeObject(valueType.getUids());
         IntList.writeIntList(out, valueTypePopupIds);
-       
+
         out.writeInt(cardinality);
         out.writeObject(cardinalityPopupItems);
 
         out.writeObject(semanticStatus.getUids());
         IntList.writeIntList(out, semanticStatusPopupIds);
- 
+
         out.writeInt(browseAttributeOrder);
         out.writeObject(browseAttributeOrderPopupItems);
 
@@ -93,25 +159,25 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
         out.writeObject(characteristicStatus.getUids());
         IntList.writeIntList(out, characteristicStatusPopupIds);
 
+    }
 
-     }
-
-     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-            
+
             valueType = readConcept(in);
             valueTypePopupIds = IntList.readIntListIgnoreMapErrors(in);
-            
+
             cardinality = in.readInt();
             cardinalityPopupItems = (Integer[]) in.readObject();
-            
+
             semanticStatus = readConcept(in);
             semanticStatusPopupIds = IntList.readIntListIgnoreMapErrors(in);
-            
+
             browseAttributeOrder = in.readInt();
             browseAttributeOrderPopupItems = (Integer[]) in.readObject();
-            
+
             browseValueOrder = in.readInt();
             browseValueOrderPopupItems = (Integer[]) in.readObject();
 
@@ -119,15 +185,17 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
             notesScreenOrderPopupItems = (Integer[]) in.readObject();
 
             attributeDisplayStatus = readConcept(in);
-            attributeDisplayStatusPopupIds = IntList.readIntListIgnoreMapErrors(in);
-            
+            attributeDisplayStatusPopupIds =
+                    IntList.readIntListIgnoreMapErrors(in);
+
             characteristicStatus = readConcept(in);
-            characteristicStatusPopupIds = IntList.readIntListIgnoreMapErrors(in);
-            
+            characteristicStatusPopupIds =
+                    IntList.readIntListIgnoreMapErrors(in);
+
         } else {
-           throw new IOException("Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-     }
+    }
 
     /* (non-Javadoc)
      * @see org.dwfa.ace.table.refset.I_RefsetDefaultsTemplateForRel#getValueType()
@@ -237,7 +305,8 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
     /* (non-Javadoc)
      * @see org.dwfa.ace.table.refset.I_RefsetDefaultsTemplateForRel#setBrowseAttributeOrderPopupItems(java.lang.Integer[])
      */
-    public void setBrowseAttributeOrderPopupItems(Integer[] browseAttributeOrderPopupItems) {
+    public void setBrowseAttributeOrderPopupItems(
+            Integer[] browseAttributeOrderPopupItems) {
         this.browseAttributeOrderPopupItems = browseAttributeOrderPopupItems;
     }
 
@@ -265,7 +334,8 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
     /* (non-Javadoc)
      * @see org.dwfa.ace.table.refset.I_RefsetDefaultsTemplateForRel#setBrowseValueOrderPopupItems(java.lang.Integer[])
      */
-    public void setBrowseValueOrderPopupItems(Integer[] browseValueOrderPopupItems) {
+    public void setBrowseValueOrderPopupItems(
+            Integer[] browseValueOrderPopupItems) {
         this.browseValueOrderPopupItems = browseValueOrderPopupItems;
     }
 
@@ -293,7 +363,8 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
     /* (non-Javadoc)
      * @see org.dwfa.ace.table.refset.I_RefsetDefaultsTemplateForRel#setNotesScreenOrderPopupItems(java.lang.Integer[])
      */
-    public void setNotesScreenOrderPopupItems(Integer[] notesScreenOrderPopupItems) {
+    public void setNotesScreenOrderPopupItems(
+            Integer[] notesScreenOrderPopupItems) {
         this.notesScreenOrderPopupItems = notesScreenOrderPopupItems;
     }
 
@@ -307,7 +378,8 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
     /* (non-Javadoc)
      * @see org.dwfa.ace.table.refset.I_RefsetDefaultsTemplateForRel#setAttributeDisplayStatus(org.dwfa.ace.api.I_GetConceptData)
      */
-    public void setAttributeDisplayStatus(I_GetConceptData attributeDisplayStatus) {
+    public void setAttributeDisplayStatus(
+            I_GetConceptData attributeDisplayStatus) {
         this.attributeDisplayStatus = attributeDisplayStatus;
     }
 
@@ -321,7 +393,8 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
     /* (non-Javadoc)
      * @see org.dwfa.ace.table.refset.I_RefsetDefaultsTemplateForRel#setAttributeDisplayStatusPopupIds(org.dwfa.ace.api.I_IntList)
      */
-    public void setAttributeDisplayStatusPopupIds(I_IntList attributeDisplayStatusPopupIds) {
+    public void setAttributeDisplayStatusPopupIds(
+            I_IntList attributeDisplayStatusPopupIds) {
         this.attributeDisplayStatusPopupIds = attributeDisplayStatusPopupIds;
     }
 
@@ -349,7 +422,8 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
     /* (non-Javadoc)
      * @see org.dwfa.ace.table.refset.I_RefsetDefaultsTemplateForRel#setCharacteristicStatusPopupIds(org.dwfa.ace.api.I_IntList)
      */
-    public void setCharacteristicStatusPopupIds(I_IntList characteristicStatusPopupIds) {
+    public void setCharacteristicStatusPopupIds(
+            I_IntList characteristicStatusPopupIds) {
         this.characteristicStatusPopupIds = characteristicStatusPopupIds;
     }
 

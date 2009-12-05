@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.edit;
 
 import java.awt.event.ActionEvent;
@@ -36,11 +52,12 @@ import com.sleepycat.je.DatabaseException;
 
 public class AddImage extends AddComponent {
 
-	public AddImage(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
-		super(termContainer, config);
-	}
+    public AddImage(I_ContainTermComponent termContainer,
+            I_ConfigAceFrame config) {
+        super(termContainer, config);
+    }
 
-	protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config) throws Exception {
+    protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config) throws Exception {
 			final File imageFile = FileDialogUtil
 					.getExistingFile("Select image file to associate with concept", null, null, ((AceFrameConfig) config).getAceFrame());
 			ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
@@ -81,7 +98,7 @@ public class AddImage extends AddComponent {
 			termContainer.setTermComponent(cb);
 	}
 
-	public static void addStockImages(VodbEnv vodb) throws DatabaseException,
+    public static void addStockImages(VodbEnv vodb) throws DatabaseException,
 			IOException, TerminologyException {
                 
 		I_Path aceAuxPath = new Path(Integer.MIN_VALUE + 1,

@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.graph;
 
 /*
@@ -6,10 +22,7 @@ package org.dwfa.ace.graph;
  * 
  * This software is open-source under the BSD license; see either "license.txt"
  * or http://jung.sourceforge.net/license.txt for a description.
- * 
- * Copyright (c) 2008 Informatics, Inc. 
  */
-
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -139,26 +152,28 @@ import edu.uci.ics.jung.visualization.transform.MutableTransformer;
  * 
  * @author kec 2008
  */
-public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, HasShapeFunctions
-{
-    
-	protected float arrow_placement_tolerance = 1;
-    protected final static float[] dotting = {1.0f, 3.0f};
+public class AceGraphRenderer extends AbstractRenderer implements PickedInfo,
+        HasShapeFunctions {
+
+    protected float arrow_placement_tolerance = 1;
+    protected final static float[] dotting = { 1.0f, 3.0f };
     /**
      * A stroke for a dotted line: 1 pixel width, round caps, round joins, and an 
      * array of {1.0f, 3.0f}.
      */
-    public final static Stroke DOTTED = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, 
-            BasicStroke.JOIN_ROUND, 1.0f, dotting, 0f);
+    public final static Stroke DOTTED =
+            new BasicStroke(1.0f, BasicStroke.CAP_ROUND,
+                BasicStroke.JOIN_ROUND, 1.0f, dotting, 0f);
 
-    protected final static float[] dashing = {5.0f};
+    protected final static float[] dashing = { 5.0f };
     /**
      * A stroke for a dashed line: 1 pixel width, square caps, beveled joins, and an
      * array of {5.0f}.
      */
-    public final static Stroke DASHED = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE,
-            BasicStroke.JOIN_BEVEL, 1.0f, dashing, 0f);
-    
+    public final static Stroke DASHED =
+            new BasicStroke(1.0f, BasicStroke.CAP_SQUARE,
+                BasicStroke.JOIN_BEVEL, 1.0f, dashing, 0f);
+
     /**
      * Specifies the offset for the edge labels.
      */
@@ -170,71 +185,70 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * orientation problem noted in bug report #1450529.
      */
     protected static final int MAX_ITERATIONS = 10;
-    
+
     protected Predicate vertexIncludePredicate = TruePredicate.getInstance();
     protected VertexStrokeFunction vertexStrokeFunction =
-        new ConstantVertexStrokeFunction(1.0f);
-    protected VertexShapeFunction vertexShapeFunction = 
-        new EllipseVertexShapeFunction(
-                new ConstantVertexSizeFunction(20),
+            new ConstantVertexStrokeFunction(1.0f);
+    protected VertexShapeFunction vertexShapeFunction =
+            new EllipseVertexShapeFunction(new ConstantVertexSizeFunction(20),
                 new ConstantVertexAspectRatioFunction(1.0f));
-    protected VertexStringer vertexStringer = 
-        new ConstantVertexStringer(null);
+    protected VertexStringer vertexStringer = new ConstantVertexStringer(null);
     protected VertexIconFunction vertexIconFunction;
-    protected VertexFontFunction vertexFontFunction = 
-        new ConstantVertexFontFunction(new Font("Helvetica", Font.PLAIN, 12));
+    protected VertexFontFunction vertexFontFunction =
+            new ConstantVertexFontFunction(
+                new Font("Helvetica", Font.PLAIN, 12));
     protected boolean centerVertexLabel = false;
-    
+
     protected VertexPaintFunction vertexPaintFunction =
-        new PickableVertexPaintFunction(this, Color.BLACK, Color.RED, Color.ORANGE);
-    
-    protected EdgeStringer edgeStringer = 
-        new ConstantEdgeStringer(null);
-    protected EdgeStrokeFunction edgeStrokeFunction = 
-        new ConstantEdgeStrokeFunction(1.0f);
-    protected EdgeArrowFunction edgeArrowFunction = 
-        new DirectionalEdgeArrowFunction(10, 8, 4);    
-    protected Predicate edgeArrowPredicate = Graph.DIRECTED_EDGE; 
+            new PickableVertexPaintFunction(this, Color.BLACK, Color.RED,
+                Color.ORANGE);
+
+    protected EdgeStringer edgeStringer = new ConstantEdgeStringer(null);
+    protected EdgeStrokeFunction edgeStrokeFunction =
+            new ConstantEdgeStrokeFunction(1.0f);
+    protected EdgeArrowFunction edgeArrowFunction =
+            new DirectionalEdgeArrowFunction(10, 8, 4);
+    protected Predicate edgeArrowPredicate = Graph.DIRECTED_EDGE;
     protected Predicate edgeIncludePredicate = TruePredicate.getInstance();
     protected EdgeFontFunction edgeFontFunction =
-        new ConstantEdgeFontFunction(new Font("Helvetica", Font.PLAIN, 12));
-    protected NumberEdgeValue edgeLabelClosenessFunction = 
-        new ConstantDirectionalEdgeValue(0.5, 0.65);
-    protected EdgeShapeFunction edgeShapeFunction = 
-        new EdgeShape.QuadCurve();
+            new ConstantEdgeFontFunction(new Font("Helvetica", Font.PLAIN, 12));
+    protected NumberEdgeValue edgeLabelClosenessFunction =
+            new ConstantDirectionalEdgeValue(0.5, 0.65);
+    protected EdgeShapeFunction edgeShapeFunction = new EdgeShape.QuadCurve();
     protected EdgePaintFunction edgePaintFunction =
-        new ConstantEdgePaintFunction(Color.black, null);
-    protected ParallelEdgeIndexFunction parallelEdgeIndexFunction = 
-        ParallelEdgeIndexSingleton.getInstance();
-    protected MutableTransformer viewTransformer = new MutableAffineTransformer();
-    
+            new ConstantEdgePaintFunction(Color.black, null);
+    protected ParallelEdgeIndexFunction parallelEdgeIndexFunction =
+            ParallelEdgeIndexSingleton.getInstance();
+    protected MutableTransformer viewTransformer =
+            new MutableAffineTransformer();
+
     /**
      * the JComponent that this Renderer will display the graph on
      */
     protected JComponent screenDevice;
-    
+
     /**
      * The CellRendererPane is used here just as it is in JTree
      * and JTable, to allow a pluggable JLabel-based renderer for
      * Vertex and Edge label strings and icons.
      */
     protected CellRendererPane rendererPane = new CellRendererPane();
-    
+
     /**
      * A default GraphLabelRenderer - picked Vertex labels are
      * blue, picked edge labels are cyan
      */
-    protected GraphLabelRenderer graphLabelRenderer = 
-        new AceGraphLabelRenderer(Color.blue, Color.cyan);
-	private boolean vertexShapeRendered = false;
-    
-    protected final static EdgePredicate self_loop = SelfLoopEdgePredicate.getInstance();
-    
-    public AceGraphRenderer() 
-    {
+    protected GraphLabelRenderer graphLabelRenderer =
+            new AceGraphLabelRenderer(Color.blue, Color.cyan);
+    private boolean vertexShapeRendered = false;
+
+    protected final static EdgePredicate self_loop =
+            SelfLoopEdgePredicate.getInstance();
+
+    public AceGraphRenderer() {
         this.setEdgeShapeFunction(new EdgeShape.QuadCurve());
     }
-    
+
     /**
      * @return Returns the edgeArrowFunction.
      */
@@ -359,7 +373,7 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
         this.screenDevice = screenDevice;
         this.screenDevice.add(rendererPane);
     }
-    
+
     /**
      * Specifies the smallest (squared) distance that an arrowhead
      * must be moved in order for the placement code to decide that
@@ -368,7 +382,7 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
     public void setArrowPlacementTolerance(float tolerance) {
         this.arrow_placement_tolerance = tolerance;
     }
-    
+
     /**
      * Sets the <code>EdgeArrowFunction</code> that specifies the 
      * <code>Shape</code> of the arrowheads for each edge.
@@ -384,23 +398,24 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @see edu.uci.ics.jung.decorators.EdgeArrowFunction
      * @see ArrowFactory
      */
-    public void setEdgeArrowFunction(EdgeArrowFunction eaf)
-    {
+    public void setEdgeArrowFunction(EdgeArrowFunction eaf) {
         this.edgeArrowFunction = eaf;
     }
-    
+
     /**
      * @return Returns the graphLabelRenderer.
      */
     public GraphLabelRenderer getGraphLabelRenderer() {
         return graphLabelRenderer;
     }
+
     /**
      * @param graphLabelRenderer The graphLabelRenderer to set.
      */
     public void setGraphLabelRenderer(GraphLabelRenderer graphLabelRenderer) {
         this.graphLabelRenderer = graphLabelRenderer;
     }
+
     /**
      * Sets the <code>EdgeArrowPredicate</code> that specifies whether
      * arrowheads should be drawn for each edge.  If the predicate evaluates
@@ -409,8 +424,7 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * <br>Default: only directed edges have arrows (<code>Graph.DIRECTED_EDGE</code> instance)
      * @see EdgeArrowFunction
      */
-    public void setEdgeArrowPredicate(Predicate p)
-    {
+    public void setEdgeArrowPredicate(Predicate p) {
         this.edgeArrowPredicate = p;
     }
 
@@ -421,12 +435,10 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @see java.awt.Color
      * @deprecated Use setEdgePaintFunction instead
      */
-    public void setEdgeColorFunction(EdgeColorFunction ecf) 
-    {
-        this.edgePaintFunction = new EdgeColorToEdgePaintFunctionConverter( ecf );
+    public void setEdgeColorFunction(EdgeColorFunction ecf) {
+        this.edgePaintFunction = new EdgeColorToEdgePaintFunctionConverter(ecf);
     }
 
-    
     /**
      * Sets the <code>EdgeFontFunction</code> that specifies the font
      * to use for drawing each edge label.  This can be used (for example) to 
@@ -434,11 +446,10 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * <br>Default: 12-point Helvetica
      * @see EdgeFontFunction
      */
-    public void setEdgeFontFunction(EdgeFontFunction eff)
-    {
+    public void setEdgeFontFunction(EdgeFontFunction eff) {
         this.edgeFontFunction = eff;
     }
-    
+
     /**
      * Sets the <code>Predicate</code> that specifies whether each
      * edge should be drawn; only those edges for which this 
@@ -450,11 +461,10 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * <br>Default: all edges drawn (<code>TruePredicate</code> instance)
      * @see org.apache.commons.collections.Predicate
      */
-    public void setEdgeIncludePredicate(Predicate p)
-    {
+    public void setEdgeIncludePredicate(Predicate p) {
         this.edgeIncludePredicate = p;
     }
-    
+
     /**
      * Sets the <code>NumberEdgeValue</code> that specifies where to draw
      * the label for each edge.  A value of 0 draws the label on top of
@@ -467,8 +477,7 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * (<code>ConstantDirectionalEdgeValue</code>)
      * @see edu.uci.ics.jung.graph.decorators.NumberEdgeValue
      */
-    public void setEdgeLabelClosenessFunction(NumberEdgeValue nev)
-    {
+    public void setEdgeLabelClosenessFunction(NumberEdgeValue nev) {
         this.edgeLabelClosenessFunction = nev;
     }
 
@@ -477,17 +486,18 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      */
     public void setEdgePaintFunction(EdgePaintFunction impl) {
         edgePaintFunction = impl;
-        
+
     }
-    
+
     /**
      * setter for the EdgeShapeFunction
      * @param impl
      */
     public void setEdgeShapeFunction(EdgeShapeFunction impl) {
         edgeShapeFunction = impl;
-        if(edgeShapeFunction instanceof EdgeShape.ParallelRendering) {
-            ((EdgeShape.ParallelRendering)edgeShapeFunction).setParallelEdgeIndexFunction(this.parallelEdgeIndexFunction);
+        if (edgeShapeFunction instanceof EdgeShape.ParallelRendering) {
+            ((EdgeShape.ParallelRendering) edgeShapeFunction)
+                .setParallelEdgeIndexFunction(this.parallelEdgeIndexFunction);
         }
     }
 
@@ -497,6 +507,7 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
     public EdgeShapeFunction getEdgeShapeFunction() {
         return edgeShapeFunction;
     }
+
     /**
      * Sets the <code>EdgeStringer</code> that specifies the label to
      * draw for each edge.
@@ -504,11 +515,10 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * (<code>ConstantEdgeStringer</code>)
      * @see edu.uci.ics.jung.graph.decorators.EdgeStringer
      */
-    public void setEdgeStringer(EdgeStringer es)
-    {
+    public void setEdgeStringer(EdgeStringer es) {
         this.edgeStringer = es;
     }
-    
+
     /**
      * Sets the <code>EdgeStrokeFunction</code> that specifies the
      * <code>Stroke</code> to use when drawing each edge.
@@ -517,8 +527,7 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @see java.awt.Stroke
      * @see EdgeStrokeFunction
      */
-    public void setEdgeStrokeFunction(EdgeStrokeFunction esf)
-    {
+    public void setEdgeStrokeFunction(EdgeStrokeFunction esf) {
         this.edgeStrokeFunction = esf;
     }
 
@@ -529,34 +538,31 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @see VertexColorToVertexPaintConverter
      * @deprecated Use setVertexPaintFunction with a VertexPaintFunction if you can
      */
-    public void setVertexColorFunction(VertexColorFunction vcf) 
-    {
-        this.vertexPaintFunction = new VertexColorToVertexPaintConverter( vcf );
+    public void setVertexColorFunction(VertexColorFunction vcf) {
+        this.vertexPaintFunction = new VertexColorToVertexPaintConverter(vcf);
     }
 
     /**
-    * <p>Sets the <code>VertexPaintFunction</code> which specifies the 
-    * draw (border and text) and fill (interior) Paint for each vertex.</p>  
-    * <p>If users want the <code>VertexPaintFunction</code> implementation
-    * to highlight selected vertices, they should take this 
-    * PluggableRenderer instance as a constructor parameter, and call
-    * the <code>isPicked</code> method on it to identify selected vertices.</p>
-    * <p>Default: black borders, red foreground (selected vertex is orange).</p>
-	*/
-    public void setVertexPaintFunction( VertexPaintFunction vpf ) 
-    {
-    	this.vertexPaintFunction = vpf;
+     * <p>Sets the <code>VertexPaintFunction</code> which specifies the 
+     * draw (border and text) and fill (interior) Paint for each vertex.</p>  
+     * <p>If users want the <code>VertexPaintFunction</code> implementation
+     * to highlight selected vertices, they should take this 
+     * PluggableRenderer instance as a constructor parameter, and call
+     * the <code>isPicked</code> method on it to identify selected vertices.</p>
+     * <p>Default: black borders, red foreground (selected vertex is orange).</p>
+     */
+    public void setVertexPaintFunction(VertexPaintFunction vpf) {
+        this.vertexPaintFunction = vpf;
     }
-    
+
     /**
      * Returns the <code>VertexShapeFunction</code> currently being
      * used by this instance.
      */
-    public VertexShapeFunction getVertexShapeFunction() 
-    {
+    public VertexShapeFunction getVertexShapeFunction() {
         return vertexShapeFunction;
     }
-    
+
     /**
      * Sets the <code>VertexFontFunction</code> that specifies the font
      * to use for drawing each vertex label.  This can be used (for example) to 
@@ -564,8 +570,7 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * <br>Default: 12-point Helvetica
      * @see VertexFontFunction
      */
-    public void setVertexFontFunction(VertexFontFunction vff)
-    {
+    public void setVertexFontFunction(VertexFontFunction vff) {
         this.vertexFontFunction = vff;
     }
 
@@ -578,30 +583,27 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * <br>Default: all vertices drawn (<code>TruePredicate</code> instance)
      * @see org.apache.commons.collections.Predicate
      */
-    public void setVertexIncludePredicate(Predicate p)
-    {
+    public void setVertexIncludePredicate(Predicate p) {
         this.vertexIncludePredicate = p;
     }
-    
+
     /**
      * Specifies whether vertex labels are drawn centered on the vertex
      * position (<code>true</code>) or offset to one side (<code>false</code>).
      * <br>Default: offset
      */
-    public void setVertexLabelCentering(boolean b)
-    {
+    public void setVertexLabelCentering(boolean b) {
         centerVertexLabel = b;
     }
-    
+
     /**
      * 
      * @return whether the vertex labels should be centered in the vertex
      */
-    public boolean getVertexLabelCentering() 
-    {
+    public boolean getVertexLabelCentering() {
         return centerVertexLabel;
     }
-    
+
     /**
      * Sets the <code>VertexShapeFunction</code>, 
      * which specifies the <code>Shape</code> for each vertex.
@@ -615,11 +617,10 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @see java.awt.Shape
      * @see VertexShapeFunction
      */
-    public void setVertexShapeFunction(VertexShapeFunction vsf)
-    {
+    public void setVertexShapeFunction(VertexShapeFunction vsf) {
         this.vertexShapeFunction = vsf;
     }
-    
+
     /**
      * Sets the <code>VertexStringer</code> that specifies the label to
      * draw for each vertex.
@@ -627,8 +628,7 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * (<code>ConstantVertexStringer</code>)
      * @see edu.uci.ics.jung.graph.decorators.VertexStringer
      */
-    public void setVertexStringer(VertexStringer vs)
-    {
+    public void setVertexStringer(VertexStringer vs) {
         this.vertexStringer = vs;
     }
 
@@ -640,11 +640,9 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @see java.awt.Stroke
      * @see VertexStrokeFunction
      */
-    public void setVertexStrokeFunction(VertexStrokeFunction vsf)
-    {
+    public void setVertexStrokeFunction(VertexStrokeFunction vsf) {
         this.vertexStrokeFunction = vsf;
     }
-        
 
     /**
      * Paints <code>e</code>, whose endpoints are at <code>(x1,y1)</code>
@@ -661,26 +659,25 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * e.getEndpoints.getSecond().
      * 
      */
-    public void paintEdge(Graphics g, Edge e, int x1, int y1, int x2, int y2) 
-    {
+    public void paintEdge(Graphics g, Edge e, int x1, int y1, int x2, int y2) {
         if (!edgeIncludePredicate.evaluate(e))
             return;
-        
+
         // don't draw edge if either incident vertex is not drawn
         Pair endpoints = e.getEndpoints();
-        Vertex v1 = (Vertex)endpoints.getFirst();
-        Vertex v2 = (Vertex)endpoints.getSecond();
-        if (!vertexIncludePredicate.evaluate(v1) || 
-            !vertexIncludePredicate.evaluate(v2))
+        Vertex v1 = (Vertex) endpoints.getFirst();
+        Vertex v2 = (Vertex) endpoints.getSecond();
+        if (!vertexIncludePredicate.evaluate(v1)
+            || !vertexIncludePredicate.evaluate(v2))
             return;
-        
+
         Graphics2D g2d = (Graphics2D) g;
 
         Stroke new_stroke = edgeStrokeFunction.getStroke(e);
         Stroke old_stroke = g2d.getStroke();
         if (new_stroke != null)
             g2d.setStroke(new_stroke);
-        
+
         drawSimpleEdge(g2d, e, x1, y1, x2, y2);
 
         // restore paint and stroke
@@ -696,115 +693,134 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * is scaled in the x-direction so that its width is equal to the distance between
      * <code>(x1,y1)</code> and <code>(x2,y2)</code>.
      */
-    protected void drawSimpleEdge(Graphics2D g, Edge e, int x1, int y1, int x2, int y2)
-    {
+    protected void drawSimpleEdge(Graphics2D g, Edge e, int x1, int y1, int x2,
+            int y2) {
         Pair endpoints = e.getEndpoints();
-        Vertex v1 = (Vertex)endpoints.getFirst();
-        Vertex v2 = (Vertex)endpoints.getSecond();
+        Vertex v1 = (Vertex) endpoints.getFirst();
+        Vertex v2 = (Vertex) endpoints.getSecond();
         boolean isLoop = v1.equals(v2);
         Shape s2 = vertexShapeFunction.getShape(v2);
         Shape edgeShape = edgeShapeFunction.getShape(e);
-        
+
         boolean edgeHit = true;
         boolean arrowHit = true;
         Rectangle deviceRectangle = null;
-        if(screenDevice != null) {
+        if (screenDevice != null) {
             Dimension d = screenDevice.getSize();
-            if(d.width <= 0 || d.height <= 0) {
+            if (d.width <= 0 || d.height <= 0) {
                 d = screenDevice.getPreferredSize();
             }
-            deviceRectangle = new Rectangle(0,0,d.width,d.height);
+            deviceRectangle = new Rectangle(0, 0, d.width, d.height);
         }
 
         AffineTransform xform = AffineTransform.getTranslateInstance(x1, y1);
-        
-        if(isLoop) {
+
+        if (isLoop) {
             // this is a self-loop. scale it is larger than the vertex
             // it decorates and translate it so that its nadir is
             // at the center of the vertex.
             Rectangle2D s2Bounds = s2.getBounds2D();
-            xform.scale(s2Bounds.getWidth(),s2Bounds.getHeight());
-            xform.translate(0, -edgeShape.getBounds2D().getWidth()/2);
+            xform.scale(s2Bounds.getWidth(), s2Bounds.getHeight());
+            xform.translate(0, -edgeShape.getBounds2D().getWidth() / 2);
         } else {
             // this is a normal edge. Rotate it to the angle between
             // vertex endpoints, then scale it to the distance between
             // the vertices
-            float dx = x2-x1;
-            float dy = y2-y1;
+            float dx = x2 - x1;
+            float dy = y2 - y1;
             float thetaRadians = (float) Math.atan2(dy, dx);
             xform.rotate(thetaRadians);
-            float dist = (float) Math.sqrt(dx*dx + dy*dy);
+            float dist = (float) Math.sqrt(dx * dx + dy * dy);
             xform.scale(dist, 1.0);
         }
-        
+
         edgeShape = xform.createTransformedShape(edgeShape);
-        
+
         if (deviceRectangle == null) {
-        	edgeHit = false;
+            edgeHit = false;
         } else {
-            edgeHit = viewTransformer.transform(edgeShape).intersects(deviceRectangle);
+            edgeHit =
+                    viewTransformer.transform(edgeShape).intersects(
+                        deviceRectangle);
         }
 
-        if(edgeHit == true) {
-            
+        if (edgeHit == true) {
+
             Paint oldPaint = g.getPaint();
-            
+
             // get Paints for filling and drawing
             // (filling is done first so that drawing and label use same Paint)
-            Paint fill_paint = edgePaintFunction.getFillPaint(e); 
-            if (fill_paint != null)
-            {
+            Paint fill_paint = edgePaintFunction.getFillPaint(e);
+            if (fill_paint != null) {
                 g.setPaint(fill_paint);
                 g.fill(edgeShape);
             }
             Paint draw_paint = edgePaintFunction.getDrawPaint(e);
-            if (draw_paint != null)
-            {
+            if (draw_paint != null) {
                 g.setPaint(draw_paint);
                 g.draw(edgeShape);
             }
-            
-            float scalex = (float)g.getTransform().getScaleX();
-            float scaley = (float)g.getTransform().getScaleY();
+
+            float scalex = (float) g.getTransform().getScaleX();
+            float scaley = (float) g.getTransform().getScaleY();
             // see if arrows are too small to bother drawing
-            if(scalex < .3 || scaley < .3) return;
-            
+            if (scalex < .3 || scaley < .3)
+                return;
+
             if (edgeArrowPredicate.evaluate(e)) {
-                
-                Shape destVertexShape = 
-                    vertexShapeFunction.getShape((Vertex)e.getEndpoints().getSecond());
-                AffineTransform xf = AffineTransform.getTranslateInstance(x2, y2);
+
+                Shape destVertexShape =
+                        vertexShapeFunction.getShape((Vertex) e.getEndpoints()
+                            .getSecond());
+                AffineTransform xf =
+                        AffineTransform.getTranslateInstance(x2, y2);
                 destVertexShape = xf.createTransformedShape(destVertexShape);
-                
-                arrowHit = viewTransformer.transform(destVertexShape).intersects(deviceRectangle);
-                if(arrowHit) {
-                    
+
+                arrowHit =
+                        viewTransformer.transform(destVertexShape).intersects(
+                            deviceRectangle);
+                if (arrowHit) {
+
                     AffineTransform at;
                     if (edgeShape instanceof GeneralPath)
-                        at = getArrowTransform((GeneralPath)edgeShape, destVertexShape);
+                        at =
+                                getArrowTransform((GeneralPath) edgeShape,
+                                    destVertexShape);
                     else
-                        at = getArrowTransform(new GeneralPath(edgeShape), destVertexShape);
-                    if(at == null) return;
+                        at =
+                                getArrowTransform(new GeneralPath(edgeShape),
+                                    destVertexShape);
+                    if (at == null)
+                        return;
                     Shape arrow = edgeArrowFunction.getArrow(e);
                     arrow = at.createTransformedShape(arrow);
                     // note that arrows implicitly use the edge's draw paint
                     g.fill(arrow);
                 }
                 if (e instanceof UndirectedEdge) {
-                    Shape vertexShape = 
-                        vertexShapeFunction.getShape((Vertex)e.getEndpoints().getFirst());
+                    Shape vertexShape =
+                            vertexShapeFunction.getShape((Vertex) e
+                                .getEndpoints().getFirst());
                     xf = AffineTransform.getTranslateInstance(x1, y1);
                     vertexShape = xf.createTransformedShape(vertexShape);
-                    
-                    arrowHit = viewTransformer.transform(vertexShape).intersects(deviceRectangle);
-                    
-                    if(arrowHit) {
+
+                    arrowHit =
+                            viewTransformer.transform(vertexShape).intersects(
+                                deviceRectangle);
+
+                    if (arrowHit) {
                         AffineTransform at;
                         if (edgeShape instanceof GeneralPath)
-                            at = getReverseArrowTransform((GeneralPath)edgeShape, vertexShape, !isLoop);
+                            at =
+                                    getReverseArrowTransform(
+                                        (GeneralPath) edgeShape, vertexShape,
+                                        !isLoop);
                         else
-                            at = getReverseArrowTransform(new GeneralPath(edgeShape), vertexShape, !isLoop);
-                        if(at == null) return;
+                            at =
+                                    getReverseArrowTransform(new GeneralPath(
+                                        edgeShape), vertexShape, !isLoop);
+                        if (at == null)
+                            return;
                         Shape arrow = edgeArrowFunction.getArrow(e);
                         arrow = at.createTransformedShape(arrow);
                         g.fill(arrow);
@@ -818,36 +834,39 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
             if (label != null) {
                 labelEdge(g, e, label, x1, x2, y1, y2);
             }
-            
-            
+
             // restore old paint
             g.setPaint(oldPaint);
         }
     }
-    
+
     /**
      * Returns a transform to position the arrowhead on this edge shape at the
      * point where it intersects the passed vertex shape.
      */
-    public AffineTransform getArrowTransform(GeneralPath edgeShape, Shape vertexShape) {
+    public AffineTransform getArrowTransform(GeneralPath edgeShape,
+            Shape vertexShape) {
         float[] seg = new float[6];
-        Point2D p1=null;
-        Point2D p2=null;
+        Point2D p1 = null;
+        Point2D p2 = null;
         AffineTransform at = new AffineTransform();
         // when the PathIterator is done, switch to the line-subdivide
         // method to get the arrowhead closer.
-        for(PathIterator i=edgeShape.getPathIterator(null,1); !i.isDone(); i.next()) {
+        for (PathIterator i = edgeShape.getPathIterator(null, 1); !i.isDone(); i
+            .next()) {
             int ret = i.currentSegment(seg);
-            if(ret == PathIterator.SEG_MOVETO) {
-                p2 = new Point2D.Float(seg[0],seg[1]);
-            } else if(ret == PathIterator.SEG_LINETO) {
+            if (ret == PathIterator.SEG_MOVETO) {
+                p2 = new Point2D.Float(seg[0], seg[1]);
+            } else if (ret == PathIterator.SEG_LINETO) {
                 p1 = p2;
-                p2 = new Point2D.Float(seg[0],seg[1]);
-                if(vertexShape.contains(p2)) {
-                    at = getArrowTransform(new Line2D.Float(p1,p2),vertexShape);
+                p2 = new Point2D.Float(seg[0], seg[1]);
+                if (vertexShape.contains(p2)) {
+                    at =
+                            getArrowTransform(new Line2D.Float(p1, p2),
+                                vertexShape);
                     break;
                 }
-            } 
+            }
         }
         return at;
     }
@@ -856,10 +875,11 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * Returns a transform to position the arrowhead on this edge shape at the
      * point where it intersects the passed vertex shape.
      */
-    public AffineTransform getReverseArrowTransform(GeneralPath edgeShape, Shape vertexShape) {
+    public AffineTransform getReverseArrowTransform(GeneralPath edgeShape,
+            Shape vertexShape) {
         return getReverseArrowTransform(edgeShape, vertexShape, true);
     }
-            
+
     /**
      * <p>Returns a transform to position the arrowhead on this edge shape at the
      * point where it intersects the passed vertex shape.</p>
@@ -871,28 +891,31 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @param vertexShape
      * @param passedGo - used only for Loop edges
      */
-    public AffineTransform getReverseArrowTransform(GeneralPath edgeShape, Shape vertexShape,
-            boolean passedGo) {
+    public AffineTransform getReverseArrowTransform(GeneralPath edgeShape,
+            Shape vertexShape, boolean passedGo) {
         float[] seg = new float[6];
-        Point2D p1=null;
-        Point2D p2=null;
+        Point2D p1 = null;
+        Point2D p2 = null;
 
         AffineTransform at = new AffineTransform();
-        for(PathIterator i=edgeShape.getPathIterator(null,1); !i.isDone(); i.next()) {
+        for (PathIterator i = edgeShape.getPathIterator(null, 1); !i.isDone(); i
+            .next()) {
             int ret = i.currentSegment(seg);
-            if(ret == PathIterator.SEG_MOVETO) {
-                p2 = new Point2D.Float(seg[0],seg[1]);
-            } else if(ret == PathIterator.SEG_LINETO) {
+            if (ret == PathIterator.SEG_MOVETO) {
+                p2 = new Point2D.Float(seg[0], seg[1]);
+            } else if (ret == PathIterator.SEG_LINETO) {
                 p1 = p2;
-                p2 = new Point2D.Float(seg[0],seg[1]);
-                if(passedGo == false && vertexShape.contains(p2)) {
+                p2 = new Point2D.Float(seg[0], seg[1]);
+                if (passedGo == false && vertexShape.contains(p2)) {
                     passedGo = true;
-                 } else if(passedGo==true &&
-                        vertexShape.contains(p2)==false) {
-                     at = getReverseArrowTransform(new Line2D.Float(p1,p2),vertexShape);
+                } else if (passedGo == true
+                    && vertexShape.contains(p2) == false) {
+                    at =
+                            getReverseArrowTransform(new Line2D.Float(p1, p2),
+                                vertexShape);
                     break;
                 }
-            } 
+            }
         }
         return at;
     }
@@ -907,23 +930,24 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @return
      */
     public AffineTransform getArrowTransform(Line2D edgeShape, Shape vertexShape) {
-        float dx = (float) (edgeShape.getX1()-edgeShape.getX2());
-        float dy = (float) (edgeShape.getY1()-edgeShape.getY2());
+        float dx = (float) (edgeShape.getX1() - edgeShape.getX2());
+        float dy = (float) (edgeShape.getY1() - edgeShape.getY2());
         // iterate over the line until the edge shape will place the
         // arrowhead closer than 'arrowGap' to the vertex shape boundary
-        while((dx*dx+dy*dy) > arrow_placement_tolerance) {
+        while ((dx * dx + dy * dy) > arrow_placement_tolerance) {
             try {
                 edgeShape = getLastOutsideSegment(edgeShape, vertexShape);
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 System.err.println(e.toString());
                 return null;
             }
-            dx = (float) (edgeShape.getX1()-edgeShape.getX2());
-            dy = (float) (edgeShape.getY1()-edgeShape.getY2());
+            dx = (float) (edgeShape.getX1() - edgeShape.getX2());
+            dy = (float) (edgeShape.getY1() - edgeShape.getY2());
         }
-        double atheta = Math.atan2(dx,dy)+Math.PI/2;
-        AffineTransform at = 
-            AffineTransform.getTranslateInstance(edgeShape.getX1(), edgeShape.getY1());
+        double atheta = Math.atan2(dx, dy) + Math.PI / 2;
+        AffineTransform at =
+                AffineTransform.getTranslateInstance(edgeShape.getX1(),
+                    edgeShape.getY1());
         at.rotate(-atheta);
         return at;
     }
@@ -936,28 +960,31 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @param vertexShape
      * @return
      */
-    protected AffineTransform getReverseArrowTransform(Line2D edgeShape, Shape vertexShape) {
-        float dx = (float) (edgeShape.getX1()-edgeShape.getX2());
-        float dy = (float) (edgeShape.getY1()-edgeShape.getY2());
+    protected AffineTransform getReverseArrowTransform(Line2D edgeShape,
+            Shape vertexShape) {
+        float dx = (float) (edgeShape.getX1() - edgeShape.getX2());
+        float dy = (float) (edgeShape.getY1() - edgeShape.getY2());
         // iterate over the line until the edge shape will place the
         // arrowhead closer than 'arrowGap' to the vertex shape boundary
-        while((dx*dx+dy*dy) > arrow_placement_tolerance) {
+        while ((dx * dx + dy * dy) > arrow_placement_tolerance) {
             try {
                 edgeShape = getFirstOutsideSegment(edgeShape, vertexShape);
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 System.err.println(e.toString());
                 return null;
             }
-            dx = (float) (edgeShape.getX1()-edgeShape.getX2());
-            dy = (float) (edgeShape.getY1()-edgeShape.getY2());
+            dx = (float) (edgeShape.getX1() - edgeShape.getX2());
+            dy = (float) (edgeShape.getY1() - edgeShape.getY2());
         }
         // calculate the angle for the arrowhead
-        double atheta = Math.atan2(dx,dy)-Math.PI/2;
-        AffineTransform at = AffineTransform.getTranslateInstance(edgeShape.getX1(),edgeShape.getY1());
+        double atheta = Math.atan2(dx, dy) - Math.PI / 2;
+        AffineTransform at =
+                AffineTransform.getTranslateInstance(edgeShape.getX1(),
+                    edgeShape.getY1());
         at.rotate(-atheta);
         return at;
     }
-    
+
     /**
      * Passed Line's point2 must be inside the passed shape or
      * an IllegalArgumentException is thrown
@@ -967,9 +994,10 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @throws IllegalArgumentException if the passed line's point1 is not inside the shape
      */
     protected Line2D getLastOutsideSegment(Line2D line, Shape shape) {
-        if(shape.contains(line.getP2())==false) {
+        if (shape.contains(line.getP2()) == false) {
             String errorString =
-                "line end point: "+line.getP2()+" is not contained in shape: "+shape.getBounds2D();
+                    "line end point: " + line.getP2()
+                        + " is not contained in shape: " + shape.getBounds2D();
             throw new IllegalArgumentException(errorString);
             //return null;
         }
@@ -981,12 +1009,13 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
         do {
             subdivide(line, left, right);
             line = right;
-        } while(shape.contains(line.getP1())==false && iterations++ < MAX_ITERATIONS);
+        } while (shape.contains(line.getP1()) == false
+            && iterations++ < MAX_ITERATIONS);
         // now that right is completely inside shape,
         // return left, which must be partially outside
         return left;
     }
-   
+
     /**
      * Passed Line's point1 must be inside the passed shape or
      * an IllegalArgumentException is thrown
@@ -996,10 +1025,11 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @throws IllegalArgumentException if the passed line's point1 is not inside the shape
      */
     protected Line2D getFirstOutsideSegment(Line2D line, Shape shape) {
-        
-        if(shape.contains(line.getP1())==false) {
-            String errorString = 
-                "line start point: "+line.getP1()+" is not contained in shape: "+shape.getBounds2D();
+
+        if (shape.contains(line.getP1()) == false) {
+            String errorString =
+                    "line start point: " + line.getP1()
+                        + " is not contained in shape: " + shape.getBounds2D();
             throw new IllegalArgumentException(errorString);
         }
         Line2D left = new Line2D.Float();
@@ -1009,7 +1039,7 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
         do {
             subdivide(line, left, right);
             line = left;
-        } while(shape.contains(line.getP2())==false);
+        } while (shape.contains(line.getP2()) == false);
         // now that left is completely inside shape,
         // return right, which must be partially outside
         return right;
@@ -1022,16 +1052,14 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * @param left the left side, or null
      * @param right the right side, or null
      */
-    protected void subdivide(Line2D src,
-            Line2D left,
-            Line2D right) {
+    protected void subdivide(Line2D src, Line2D left, Line2D right) {
         double x1 = src.getX1();
         double y1 = src.getY1();
         double x2 = src.getX2();
         double y2 = src.getY2();
-        
-        double mx = x1 + (x2-x1)/2.0;
-        double my = y1 + (y2-y1)/2.0;
+
+        double mx = x1 + (x2 - x1) / 2.0;
+        double my = y1 + (y2 - y1) / 2.0;
         if (left != null) {
             left.setLine(x1, y1, mx, my);
         }
@@ -1040,17 +1068,17 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
         }
     }
 
-   public Component prepareRenderer(GraphLabelRenderer graphLabelRenderer, Object value, 
-           boolean isSelected, Vertex vertex) {
-       return graphLabelRenderer.getGraphLabelRendererComponent(screenDevice, value, 
-               vertexFontFunction.getFont(vertex), isSelected, vertex);
-   }
+    public Component prepareRenderer(GraphLabelRenderer graphLabelRenderer,
+            Object value, boolean isSelected, Vertex vertex) {
+        return graphLabelRenderer.getGraphLabelRendererComponent(screenDevice,
+            value, vertexFontFunction.getFont(vertex), isSelected, vertex);
+    }
 
-   public Component prepareRenderer(GraphLabelRenderer renderer, Object value, 
-           boolean isSelected, Edge edge) {
-       return graphLabelRenderer.getGraphLabelRendererComponent(screenDevice, value, 
-               edgeFontFunction.getFont(edge), isSelected, edge);
-   }
+    public Component prepareRenderer(GraphLabelRenderer renderer, Object value,
+            boolean isSelected, Edge edge) {
+        return graphLabelRenderer.getGraphLabelRendererComponent(screenDevice,
+            value, edgeFontFunction.getFont(edge), isSelected, edge);
+    }
 
     /**
      * Labels the specified non-self-loop edge with the specified label.
@@ -1060,58 +1088,59 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * label between the endpoints according to the coefficient returned
      * by this instance's edge label closeness function.
      */
-    protected void labelEdge(Graphics2D g2d, Edge e, String label, int x1, int x2, int y1, int y2) 
-    {
+    protected void labelEdge(Graphics2D g2d, Edge e, String label, int x1,
+            int x2, int y1, int y2) {
         int distX = x2 - x1;
         int distY = y2 - y1;
         double totalLength = Math.sqrt(distX * distX + distY * distY);
 
-        double closeness = edgeLabelClosenessFunction.getNumber(e).doubleValue();
+        double closeness =
+                edgeLabelClosenessFunction.getNumber(e).doubleValue();
 
         int posX = (int) (x1 + (closeness) * distX);
         int posY = (int) (y1 + (closeness) * distY);
 
         int xDisplacement = (int) (LABEL_OFFSET * (distY / totalLength));
         int yDisplacement = (int) (LABEL_OFFSET * (-distX / totalLength));
-        
-        Component component = prepareRenderer(graphLabelRenderer, label, isPicked(e), e);
-        
+
+        Component component =
+                prepareRenderer(graphLabelRenderer, label, isPicked(e), e);
+
         Dimension d = component.getPreferredSize();
 
         Shape edgeShape = edgeShapeFunction.getShape(e);
-        
+
         double parallelOffset = 1;
 
         parallelOffset += parallelEdgeIndexFunction.getIndex(e);
 
-        if(edgeShape instanceof Ellipse2D) {
+        if (edgeShape instanceof Ellipse2D) {
             parallelOffset += edgeShape.getBounds().getHeight();
             parallelOffset = -parallelOffset;
         }
-        
+
         parallelOffset *= d.height;
-        
+
         AffineTransform old = g2d.getTransform();
         AffineTransform xform = new AffineTransform(old);
-        xform.translate(posX+xDisplacement, posY+yDisplacement);
+        xform.translate(posX + xDisplacement, posY + yDisplacement);
         double dx = x2 - x1;
         double dy = y2 - y1;
-        if(graphLabelRenderer.isRotateEdgeLabels()) {
+        if (graphLabelRenderer.isRotateEdgeLabels()) {
             double theta = Math.atan2(dy, dx);
-            if(dx < 0) {
+            if (dx < 0) {
                 theta += Math.PI;
             }
             xform.rotate(theta);
         }
-        if(dx < 0) {
+        if (dx < 0) {
             parallelOffset = -parallelOffset;
         }
-        
-        xform.translate(-d.width/2, -(d.height/2-parallelOffset));
+
+        xform.translate(-d.width / 2, -(d.height / 2 - parallelOffset));
         g2d.setTransform(xform);
-        rendererPane.paintComponent(g2d, component, screenDevice, 
-                0, 0,
-                d.width, d.height, true);
+        rendererPane.paintComponent(g2d, component, screenDevice, 0, 0,
+            d.width, d.height, true);
         g2d.setTransform(old);
     }
 
@@ -1123,25 +1152,21 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * instance's <code>VertexColorFunction</code>.  Delegates drawing the
      * label (if any) for this vertex to <code>labelVertex</code>.
      */
-    public void paintVertex(Graphics g, Vertex v, int x, int y) 
-    {
+    public void paintVertex(Graphics g, Vertex v, int x, int y) {
         if (!vertexIncludePredicate.evaluate(v))
             return;
-        
+
         boolean vertexHit = true;
         Rectangle deviceRectangle = null;
-        Graphics2D g2d = (Graphics2D)g;
-        if(screenDevice != null) {
+        Graphics2D g2d = (Graphics2D) g;
+        if (screenDevice != null) {
             Dimension d = screenDevice.getSize();
-            if(d.width <= 0 || d.height <= 0) {
+            if (d.width <= 0 || d.height <= 0) {
                 d = screenDevice.getPreferredSize();
             }
-            deviceRectangle = new Rectangle(
-                    0,0,
-                    d.width,d.height);
+            deviceRectangle = new Rectangle(0, 0, d.width, d.height);
         }
-        
-        
+
         Stroke old_stroke = g2d.getStroke();
         Stroke new_stroke = vertexStrokeFunction.getStroke(v);
         if (new_stroke != null) {
@@ -1149,71 +1174,74 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
         }
         // get the shape to be rendered
         Shape s = vertexShapeFunction.getShape(v);
-        
+
         // create a transform that translates to the location of
         // the vertex to be rendered
-        AffineTransform xform = AffineTransform.getTranslateInstance(x,y);
+        AffineTransform xform = AffineTransform.getTranslateInstance(x, y);
         // transform the vertex shape with xtransform
         s = xform.createTransformedShape(s);
-        
+
         if (deviceRectangle == null) {
-        	vertexHit = false;
+            vertexHit = false;
         } else {
-            vertexHit = viewTransformer.transform(s).intersects(deviceRectangle);
+            vertexHit =
+                    viewTransformer.transform(s).intersects(deviceRectangle);
         }
-        
+
         if (vertexHit) {
 
-        	if (vertexShapeRendered) {
-    			if (vertexIconFunction != null) {
-    				paintIconForVertex(g2d, v, x, y);
-    			} else {
-    				paintShapeForVertex(g2d, v, s);
-    			}
-        	}
+            if (vertexShapeRendered) {
+                if (vertexIconFunction != null) {
+                    paintIconForVertex(g2d, v, x, y);
+                } else {
+                    paintShapeForVertex(g2d, v, s);
+                }
+            }
 
-			if (new_stroke != null) {
-				g2d.setStroke(old_stroke);
-			}
-			String label = vertexStringer.getLabel(v);
-			if (label != null) {
-				labelVertex(g, v, label, x, y);
-			}
-		}
+            if (new_stroke != null) {
+                g2d.setStroke(old_stroke);
+            }
+            String label = vertexStringer.getLabel(v);
+            if (label != null) {
+                labelVertex(g, v, label, x, y);
+            }
+        }
     }
-    
+
     public void paintShapeForVertex(Graphics2D g2d, Vertex v, Shape shape) {
         Paint oldPaint = g2d.getPaint();
         Paint fillPaint = vertexPaintFunction.getFillPaint(v);
-        if(fillPaint != null) {
+        if (fillPaint != null) {
             g2d.setPaint(fillPaint);
             g2d.fill(shape);
             g2d.setPaint(oldPaint);
         }
         Paint drawPaint = vertexPaintFunction.getDrawPaint(v);
-        if(drawPaint != null) {
+        if (drawPaint != null) {
             g2d.setPaint(drawPaint);
             g2d.draw(shape);
             g2d.setPaint(oldPaint);
         }
     }
-    
+
     /**
      * Paint <code>v</code>'s icon on <code>g</code> at <code>(x,y)</code>.
      */
     public void paintIconForVertex(Graphics g, Vertex v, int x, int y) {
         Icon icon = vertexIconFunction.getIcon(v);
-        if(icon == null) {
-            Shape s = AffineTransform.getTranslateInstance(x,y).
-            	createTransformedShape(getVertexShapeFunction().getShape(v));
-            paintShapeForVertex((Graphics2D)g, v, s);
+        if (icon == null) {
+            Shape s =
+                    AffineTransform.getTranslateInstance(x, y)
+                        .createTransformedShape(
+                            getVertexShapeFunction().getShape(v));
+            paintShapeForVertex((Graphics2D) g, v, s);
         } else {
-        	int xLoc = x - icon.getIconWidth()/2;
-        	int yLoc = y - icon.getIconHeight()/2;
-        	icon.paintIcon(screenDevice, g, xLoc, yLoc);
+            int xLoc = x - icon.getIconWidth() / 2;
+            int yLoc = y - icon.getIconHeight() / 2;
+            icon.paintIcon(screenDevice, g, xLoc, yLoc);
         }
     }
-    
+
     /**
      * Labels the specified vertex with the specified label.  
      * Uses the font specified by this instance's 
@@ -1222,43 +1250,39 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
      * is active, the label is centered on the position of the vertex; otherwise
      * the label is offset slightly.
      */
-    protected void labelVertex(Graphics g, Vertex v, String label, int x, int y)
-    {
-        Component component = prepareRenderer(graphLabelRenderer, label, isPicked(v), v);
+    protected void labelVertex(Graphics g, Vertex v, String label, int x, int y) {
+        Component component =
+                prepareRenderer(graphLabelRenderer, label, isPicked(v), v);
 
         Dimension d = component.getPreferredSize();
-        
+
         int h_offset;
         int v_offset;
-        if (centerVertexLabel)
-        {
+        if (centerVertexLabel) {
             h_offset = -d.width / 2;
             v_offset = -d.height / 2;
 
-        }
-        else
-        {
+        } else {
             Rectangle2D bounds = vertexShapeFunction.getShape(v).getBounds2D();
-            h_offset = (int)(bounds.getWidth() / 2) + 5;
-            v_offset = (int)(bounds.getHeight() / 2) + 5 -d.height;
+            h_offset = (int) (bounds.getWidth() / 2) + 5;
+            v_offset = (int) (bounds.getHeight() / 2) + 5 - d.height;
         }
-        
+
         component.setBackground(Color.white);
-        rendererPane.paintComponent(g, component, screenDevice, x+h_offset, y+v_offset,
-                d.width, d.height, true);
-        
+        rendererPane.paintComponent(g, component, screenDevice, x + h_offset, y
+            + v_offset, d.width, d.height, true);
+
     }
-    
+
     /**
      * @see AbstractRenderer#isPicked(Vertex)
      * @deprecated Use an independent PickedInfo instead of this version,
      * which relies on the Renderer to supply an instance.
      */
-    public boolean isPicked(ArchetypeVertex v)
-    {
+    public boolean isPicked(ArchetypeVertex v) {
         return super.isPicked(v);
     }
-    
+
     /**
      * @see AbstractRenderer#isPicked(Edge)
      * @deprecated Use an independent PickedInfo instead of this version,
@@ -1295,11 +1319,11 @@ public class AceGraphRenderer extends AbstractRenderer implements PickedInfo, Ha
         this.viewTransformer = viewTransformer;
     }
 
-	public boolean isVertexShapeRendered() {
-		return vertexShapeRendered;
-	}
+    public boolean isVertexShapeRendered() {
+        return vertexShapeRendered;
+    }
 
-	public void setVertexShapeRendered(boolean vertexShapeRendered) {
-		this.vertexShapeRendered = vertexShapeRendered;
-	}
+    public void setVertexShapeRendered(boolean vertexShapeRendered) {
+        this.vertexShapeRendered = vertexShapeRendered;
+    }
 }

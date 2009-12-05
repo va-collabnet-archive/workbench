@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.search;
 
 import java.awt.event.ActionEvent;
@@ -33,7 +49,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.types.ConceptBean;
 
-public class DescSearchResultsTablePopupListener implements MouseListener, ActionListener {
+public class DescSearchResultsTablePopupListener implements MouseListener,
+        ActionListener {
 
     private I_DescriptionTuple descTuple;
     private ConceptBean descConcept;
@@ -69,7 +86,7 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
                 AceLog.getAppLog().alertAndLogException(e1);
             } catch (TerminologyException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
-			}
+            }
             e.consume();
         }
     }
@@ -86,16 +103,18 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
                 AceLog.getAppLog().alertAndLogException(e1);
             } catch (TerminologyException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
-			}
+            }
         }
     }
 
-    private void handlePopup(MouseEvent e) throws FileNotFoundException, IOException, ClassNotFoundException, TerminologyException {
+    private void handlePopup(MouseEvent e) throws FileNotFoundException,
+            IOException, ClassNotFoundException, TerminologyException {
         descTable = (JTable) e.getSource();
-        if (descTable.getCellRect(descTable.getSelectedRow(), descTable.getSelectedColumn(), true).contains(
-            e.getPoint())) {
+        if (descTable.getCellRect(descTable.getSelectedRow(),
+            descTable.getSelectedColumn(), true).contains(e.getPoint())) {
             selectedRow = descTable.getSelectedRow();
-            StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
+            StringWithDescTuple swdt =
+                    (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
             descTuple = swdt.getTuple();
             descConcept = ConceptBean.get(descTuple.getConceptId());
 
@@ -103,17 +122,22 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
             JMenuItem menuItem = new JMenuItem(" ");
             popup.add(menuItem);
 
-            if (ace.getRefsetSpecInSpecEditor() != null && ace.refsetTabIsSelected()) {
+            if (ace.getRefsetSpecInSpecEditor() != null
+                && ace.refsetTabIsSelected()) {
                 JTree specTree = ace.getTreeInSpecEditor();
                 if (specTree.isVisible() && specTree.getSelectionCount() > 0) {
                     TreePath selPath = specTree.getSelectionPath();
                     if (selPath != null) {
-                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
-                        I_ThinExtByRefVersioned specPart = (I_ThinExtByRefVersioned) node.getUserObject();
+                        DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) selPath
+                                    .getLastPathComponent();
+                        I_ThinExtByRefVersioned specPart =
+                                (I_ThinExtByRefVersioned) node.getUserObject();
                         switch (ThinExtBinder.getExtensionType(specPart)) {
                         case CONCEPT_CONCEPT:
                             popup.addSeparator();
-                            addRefsetItems(popup, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart,
+                            addRefsetItems(popup, new File(AceFrame.pluginRoot,
+                                "refsetspec/branch-popup"), specPart,
                                 descConcept.getId().getUIDs().iterator().next());
                             break;
                         default:
@@ -124,7 +148,8 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
 
             popup.addSeparator();
 
-            addProcessItems(popup, new File(AceFrame.pluginRoot, "search-results"));
+            addProcessItems(popup, new File(AceFrame.pluginRoot,
+                "search-results"));
             popup.addSeparator();
             menuItem = new JMenuItem("Show in taxonomy");
             popup.add(menuItem);
@@ -154,17 +179,19 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
         }
     }
 
-    private void addRefsetItems(JPopupMenu popup, File directory, I_ThinExtByRefVersioned specPart, UUID conceptUuid)
+    private void addRefsetItems(JPopupMenu popup, File directory,
+            I_ThinExtByRefVersioned specPart, UUID conceptUuid)
             throws FileNotFoundException, IOException, ClassNotFoundException {
-        ProcessPopupUtil.addSubmenMenuItems(popup, directory, ace.getAceFrameConfig().getWorker(), conceptUuid);
+        ProcessPopupUtil.addSubmenMenuItems(popup, directory, ace
+            .getAceFrameConfig().getWorker(), conceptUuid);
     }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("Show in taxonomy")) {
             try {
                 AceFrameConfig frameConfig = (AceFrameConfig) config;
-                new ExpandPathToNodeStateListener(frameConfig.getAceFrame().getCdePanel().getTree(), config,
-                    descConcept);
+                new ExpandPathToNodeStateListener(frameConfig.getAceFrame()
+                    .getCdePanel().getTree(), config, descConcept);
                 config.setHierarchySelection(descConcept);
             } catch (IOException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
@@ -186,14 +213,16 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
             viewer.setTermComponent(descConcept);
         } else if (e.getActionCommand().equals("Add to list")) {
             JList conceptList = config.getBatchConceptList();
-            I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
+            I_ModelTerminologyList model =
+                    (I_ModelTerminologyList) conceptList.getModel();
             model.addElement(descConcept);
         }
     }
 
     private void addProcessItems(JPopupMenu popup, File directory) {
         try {
-            ProcessPopupUtil.addSubmenMenuItems(popup, directory, config.getWorker());
+            ProcessPopupUtil.addSubmenMenuItems(popup, directory, config
+                .getWorker());
         } catch (FileNotFoundException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (IOException e) {

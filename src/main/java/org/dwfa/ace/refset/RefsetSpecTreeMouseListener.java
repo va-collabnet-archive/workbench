@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.refset;
 
 import java.awt.event.ActionEvent;
@@ -43,97 +59,113 @@ import org.dwfa.vodb.types.IntSet;
 
 public class RefsetSpecTreeMouseListener implements MouseListener {
 
-	private I_ConfigAceFrame aceConfig;
-	private RefsetSpecEditor specEditor;
+    private I_ConfigAceFrame aceConfig;
+    private RefsetSpecEditor specEditor;
 
-	public RefsetSpecTreeMouseListener(I_ConfigAceFrame aceConfig, RefsetSpecEditor specEditor) {
-		super();
-		this.aceConfig = aceConfig;
-		this.specEditor = specEditor;
-	}
+    public RefsetSpecTreeMouseListener(I_ConfigAceFrame aceConfig,
+            RefsetSpecEditor specEditor) {
+        super();
+        this.aceConfig = aceConfig;
+        this.specEditor = specEditor;
+    }
 
-	public void mouseReleased(MouseEvent e) {
-		if (e.isPopupTrigger()) {
-			makeAndShowPopup(e);
-		}
-	}
+    public void mouseReleased(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            makeAndShowPopup(e);
+        }
+    }
 
-	public void mousePressed(MouseEvent e) {
-		if (e.isPopupTrigger()) {
-			makeAndShowPopup(e);
-		}
-	}
+    public void mousePressed(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            makeAndShowPopup(e);
+        }
+    }
 
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-	}
+    public void mouseClicked(MouseEvent e) {
+        // TODO Auto-generated method stub
+    }
 
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-	}
+    public void mouseEntered(MouseEvent e) {
+        // TODO Auto-generated method stub
+    }
 
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-	}
+    public void mouseExited(MouseEvent e) {
+        // TODO Auto-generated method stub
+    }
 
-	private void makeAndShowPopup(MouseEvent e) {
-		JPopupMenu popup = null;
-		if (e.isPopupTrigger()) {
-			try {
-				JTree tree = (JTree) e.getSource();
-				int rowForLocation = tree.getRowForLocation(e.getX(), e.getY());
-				int [] selectedRow = tree.getSelectionRows();
-				if (rowForLocation < 0 || selectedRow == null || selectedRow[0] != rowForLocation) {
-					tree.clearSelection();
-					popup = makePopup(e, new File(AceFrame.pluginRoot,
-							"refsetspec/spec-popup"), null);
-				} else {
-					TreePath selPath = tree.getPathForLocation(e.getX(), e
-							.getY());
-					if (selPath != null) {
-						if (rowForLocation != -1) {
-							DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath
-									.getLastPathComponent();
-							I_ThinExtByRefVersioned specPart = (I_ThinExtByRefVersioned) node
-									.getUserObject();
-							switch (ThinExtBinder.getExtensionType(specPart)) {
-							case CONCEPT_CONCEPT:
-								popup = makePopup(e, new File(AceFrame.pluginRoot,
-								"refsetspec/branch-popup"), specPart);
-								break;
-								
-							case CONCEPT_CONCEPT_CONCEPT:
-								popup = makePopup(e, new File(AceFrame.pluginRoot,
-								"refsetspec/structural-query-popup"), specPart);
-								break;
-								
-							case CONCEPT_CONCEPT_STRING:
-								popup = makePopup(e, new File(AceFrame.pluginRoot,
-								"refsetspec/text-query-popup"), specPart);
-								break;
-							default:
-								popup = null;
-							}
-						}
-					} else {
-						popup = makePopup(e, new File(AceFrame.pluginRoot,
-								"refsetspec/spec-popup"), null);
-					}
-				}
-				if (popup != null) {
-					popup.show(e.getComponent(), e.getX(), e.getY());
-				}
-			} catch (FileNotFoundException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			} catch (IOException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			} catch (ClassNotFoundException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			}
-		}
-	}
+    private void makeAndShowPopup(MouseEvent e) {
+        JPopupMenu popup = null;
+        if (e.isPopupTrigger()) {
+            try {
+                JTree tree = (JTree) e.getSource();
+                int rowForLocation = tree.getRowForLocation(e.getX(), e.getY());
+                int[] selectedRow = tree.getSelectionRows();
+                if (rowForLocation < 0 || selectedRow == null
+                    || selectedRow[0] != rowForLocation) {
+                    tree.clearSelection();
+                    popup =
+                            makePopup(e, new File(AceFrame.pluginRoot,
+                                "refsetspec/spec-popup"), null);
+                } else {
+                    TreePath selPath =
+                            tree.getPathForLocation(e.getX(), e.getY());
+                    if (selPath != null) {
+                        if (rowForLocation != -1) {
+                            DefaultMutableTreeNode node =
+                                    (DefaultMutableTreeNode) selPath
+                                        .getLastPathComponent();
+                            I_ThinExtByRefVersioned specPart =
+                                    (I_ThinExtByRefVersioned) node
+                                        .getUserObject();
+                            switch (ThinExtBinder.getExtensionType(specPart)) {
+                            case CONCEPT_CONCEPT:
+                                popup =
+                                        makePopup(e, new File(
+                                            AceFrame.pluginRoot,
+                                            "refsetspec/branch-popup"),
+                                            specPart);
+                                break;
 
-	private JPopupMenu makePopup(MouseEvent e, File directory, I_ThinExtByRefVersioned specPart)
+                            case CONCEPT_CONCEPT_CONCEPT:
+                                popup =
+                                        makePopup(
+                                            e,
+                                            new File(AceFrame.pluginRoot,
+                                                "refsetspec/structural-query-popup"),
+                                            specPart);
+                                break;
+
+                            case CONCEPT_CONCEPT_STRING:
+                                popup =
+                                        makePopup(e, new File(
+                                            AceFrame.pluginRoot,
+                                            "refsetspec/text-query-popup"),
+                                            specPart);
+                                break;
+                            default:
+                                popup = null;
+                            }
+                        }
+                    } else {
+                        popup =
+                                makePopup(e, new File(AceFrame.pluginRoot,
+                                    "refsetspec/spec-popup"), null);
+                    }
+                }
+                if (popup != null) {
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            } catch (FileNotFoundException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            } catch (IOException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            } catch (ClassNotFoundException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            }
+        }
+    }
+
+    private JPopupMenu makePopup(MouseEvent e, File directory, I_ThinExtByRefVersioned specPart)
 			throws FileNotFoundException, IOException, ClassNotFoundException {
 		JPopupMenu popup = new JPopupMenu();
 		JMenuItem noActionItem = new JMenuItem("");
@@ -183,18 +215,19 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 		
 		return popup;
 	}
-	
-	private class CommentSpecAction implements ActionListener {
-		private I_ThinExtByRefTuple thinExtByRefTuple;
-		private String prompt;
-		
-		private CommentSpecAction(I_ThinExtByRefTuple thinExtByRefTuple, String prompt) {
-			super();
-			this.thinExtByRefTuple = thinExtByRefTuple;
-			this.prompt = prompt;
-		}
 
-		public void actionPerformed(ActionEvent arg0) {
+    private class CommentSpecAction implements ActionListener {
+        private I_ThinExtByRefTuple thinExtByRefTuple;
+        private String prompt;
+
+        private CommentSpecAction(I_ThinExtByRefTuple thinExtByRefTuple,
+                String prompt) {
+            super();
+            this.thinExtByRefTuple = thinExtByRefTuple;
+            this.prompt = prompt;
+        }
+
+        public void actionPerformed(ActionEvent arg0) {
 			String commentText = (String)JOptionPane.showInputDialog(
 						aceConfig.getTreeInSpecEditor().getRootPane(),
 			                    "",
@@ -239,40 +272,44 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
-		}		
-	}
-	private class RetireSpecAction implements ActionListener {
-		private I_ThinExtByRefTuple thinExtByRefTuple;
-		
-		private RetireSpecAction(I_ThinExtByRefTuple thinExtByRefTuple) {
-			super();
-			this.thinExtByRefTuple = thinExtByRefTuple;
-		}
+		}    }
 
-		public void actionPerformed(ActionEvent arg0) {
-			I_ThinExtByRefPart newPart = thinExtByRefTuple.getPart().duplicate();
-			newPart.setVersion(Integer.MAX_VALUE);
-			try {
-				newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-			} catch (IOException e) {
-				throw new RuntimeException();
-			} catch (TerminologyException e) {
-				throw new RuntimeException();
-			}
-			thinExtByRefTuple.getCore().addVersion(newPart);
-			LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
-			specEditor.updateSpecTree(false);
-		}		
-	}
-	private class CancelChangeAction implements ActionListener {
-		private I_ThinExtByRefVersioned specPart;
-		
-		private CancelChangeAction(I_ThinExtByRefVersioned specPart) {
-			super();
-			this.specPart = specPart;
-		}
+    private class RetireSpecAction implements ActionListener {
+        private I_ThinExtByRefTuple thinExtByRefTuple;
 
-		public void actionPerformed(ActionEvent arg0) {
+        private RetireSpecAction(I_ThinExtByRefTuple thinExtByRefTuple) {
+            super();
+            this.thinExtByRefTuple = thinExtByRefTuple;
+        }
+
+        public void actionPerformed(ActionEvent arg0) {
+            I_ThinExtByRefPart newPart =
+                    thinExtByRefTuple.getPart().duplicate();
+            newPart.setVersion(Integer.MAX_VALUE);
+            try {
+                newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED
+                    .localize().getNid());
+            } catch (IOException e) {
+                throw new RuntimeException();
+            } catch (TerminologyException e) {
+                throw new RuntimeException();
+            }
+            thinExtByRefTuple.getCore().addVersion(newPart);
+            LocalVersionedTerminology.get().addUncommitted(
+                thinExtByRefTuple.getCore());
+            specEditor.updateSpecTree(false);
+        }
+    }
+
+    private class CancelChangeAction implements ActionListener {
+        private I_ThinExtByRefVersioned specPart;
+
+        private CancelChangeAction(I_ThinExtByRefVersioned specPart) {
+            super();
+            this.specPart = specPart;
+        }
+
+        public void actionPerformed(ActionEvent arg0) {
 			try {
 				List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
 				for (I_ThinExtByRefPart part : specPart.getVersions()) {
@@ -294,23 +331,25 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 			} catch (IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
-		}		
-	}
-	private class ChangeSpecAction implements ActionListener {
-		private I_ThinExtByRefTuple thinExtByRefTuple;
-		
-		private ChangeSpecAction(I_ThinExtByRefTuple thinExtByRefTuple) {
-			super();
-			this.thinExtByRefTuple = thinExtByRefTuple;
-		}
+		}    }
 
-		public void actionPerformed(ActionEvent arg0) {
-			I_ThinExtByRefPart newPart = thinExtByRefTuple.getPart().duplicate();
-			newPart.setVersion(Integer.MAX_VALUE);
-			thinExtByRefTuple.getCore().addVersion(newPart);
-			LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
-			specEditor.updateSpecTree(false);
-		}		
-	}
+    private class ChangeSpecAction implements ActionListener {
+        private I_ThinExtByRefTuple thinExtByRefTuple;
+
+        private ChangeSpecAction(I_ThinExtByRefTuple thinExtByRefTuple) {
+            super();
+            this.thinExtByRefTuple = thinExtByRefTuple;
+        }
+
+        public void actionPerformed(ActionEvent arg0) {
+            I_ThinExtByRefPart newPart =
+                    thinExtByRefTuple.getPart().duplicate();
+            newPart.setVersion(Integer.MAX_VALUE);
+            thinExtByRefTuple.getCore().addVersion(newPart);
+            LocalVersionedTerminology.get().addUncommitted(
+                thinExtByRefTuple.getCore());
+            specEditor.updateSpecTree(false);
+        }
+    }
 
 }

@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.vodb.impl;
 
 import java.io.ByteArrayOutputStream;
@@ -16,14 +32,13 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-
 public class StringCompressionTest {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
+    /**
+     * @param args
+     * @throws IOException 
+     */
+    public static void main(String[] args) throws IOException {
 		
 		File descFile = new File("/Users/kec/acews/ace-sub/ace-db/dev/src/main/resources/org/snomed/2006-07-31/sct_descriptions_20060731.txt");
 		FileReader descFileReader = new FileReader(descFile);
@@ -126,30 +141,33 @@ public class StringCompressionTest {
 		System.out.println("Compresseds size: " + bytes);
 	}
 
-	private static byte[] compressString(String str) throws IOException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ZipOutputStream zout = new ZipOutputStream(out);
-		zout.putNextEntry(new ZipEntry("0"));
-		zout.write(str.getBytes());
-		zout.closeEntry();
-		byte[] compressed = out.toByteArray();
-		zout.close();
-		return compressed;
-	}
-	// example at http://java.sun.com/j2se/1.5.0/docs/api/java/util/zip/Deflater.html
-	private static byte[] compressArray(byte[] toCompress, int level) throws IOException {
-		ByteArrayOutputStream compressedOut = new ByteArrayOutputStream();
-		DeflaterOutputStream dout = new DeflaterOutputStream(compressedOut, new Deflater(level));
-		dout.write(toCompress);
-		dout.close();
-		return compressedOut.toByteArray();
-	}	
-	
+    private static byte[] compressString(String str) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ZipOutputStream zout = new ZipOutputStream(out);
+        zout.putNextEntry(new ZipEntry("0"));
+        zout.write(str.getBytes());
+        zout.closeEntry();
+        byte[] compressed = out.toByteArray();
+        zout.close();
+        return compressed;
+    }
+
+    // example at http://java.sun.com/j2se/1.5.0/docs/api/java/util/zip/Deflater.html
+    private static byte[] compressArray(byte[] toCompress, int level)
+            throws IOException {
+        ByteArrayOutputStream compressedOut = new ByteArrayOutputStream();
+        DeflaterOutputStream dout =
+                new DeflaterOutputStream(compressedOut, new Deflater(level));
+        dout.write(toCompress);
+        dout.close();
+        return compressedOut.toByteArray();
+    }
+
 }
 /*
-Body structure, altered from its original anatomical structure
-Body structure, altered from its original anatomical structure (morphologic abnormality)
-Morphologically altered structure
-Morphologic change
-Morphologic alteration
-*/
+ Body structure, altered from its original anatomical structure
+ Body structure, altered from its original anatomical structure (morphologic abnormality)
+ Morphologically altered structure
+ Morphologic change
+ Morphologic alteration
+ */

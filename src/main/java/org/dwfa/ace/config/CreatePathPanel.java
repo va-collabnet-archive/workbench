@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.config;
 
 import java.awt.GridBagConstraints;
@@ -35,7 +51,7 @@ import org.dwfa.vodb.types.ThinDescVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
-public class CreatePathPanel extends JPanel  implements ActionListener {
+public class CreatePathPanel extends JPanel implements ActionListener {
     /**
      * 
      */
@@ -43,61 +59,65 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
     JTextField desc;
     SelectPathAndPositionPanelWithCombo sppp;
     TermComponentLabel parent;
+
     /**
      * @param config
      * @throws Exception 
      * @throws RemoteException
      * @throws QueryException
      */
-    public CreatePathPanel(I_ConfigAceFrame aceConfig) throws Exception  {
-      super(new GridBagLayout());
-      GridBagConstraints c = new GridBagConstraints();
-      c.fill = GridBagConstraints.HORIZONTAL;
-      c.anchor = GridBagConstraints.NORTHWEST;
-      c.gridwidth = 2;
-      c.weightx = 1;
-      c.weighty = 0;
-      c.gridx = 0;
-      c.gridy = 0;
-      
-      this.desc = new JTextField();
-      this.desc.setBorder(BorderFactory.createTitledBorder("Description for new path:"));
-      this.add(this.desc, c);
-      
-      c.gridy++;
-      parent = new TermComponentLabel(aceConfig);
-       JPanel parentHolder = new JPanel(new GridLayout(1,1));
-      parentHolder.add(parent);
-      parentHolder.setBorder(BorderFactory.createTitledBorder("Parent for path:"));
-     this.add(parentHolder, c);
-      
-      
-      JButton createButton = new JButton("create");
-      createButton.addActionListener(this);
-      c.fill = GridBagConstraints.NONE;
-      c.anchor = GridBagConstraints.NORTHEAST;
-      c.gridwidth = 1;
-      c.weightx = 0;
-      c.weighty = 0;
-      c.gridx = 1;
-      c.gridy++;
-      this.add(createButton, c);
-      /*
-      PropertySetListenerGlue browsingPositionGlue = new PropertySetListenerGlue(null, null, 
-              null, null, Position.class, config);
-              */
-      sppp = new SelectPathAndPositionPanelWithCombo(true, "as origin", aceConfig, null);
-      c.fill = GridBagConstraints.BOTH;
-      c.anchor = GridBagConstraints.NORTHWEST;
-      c.gridwidth = 2;
-      c.weightx = 1;
-      c.weighty = 1;
-      c.gridx = 0;
-      c.gridy++;
-      this.add(sppp, c);
-      
-      
+    public CreatePathPanel(I_ConfigAceFrame aceConfig) throws Exception {
+        super(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.gridwidth = 2;
+        c.weightx = 1;
+        c.weighty = 0;
+        c.gridx = 0;
+        c.gridy = 0;
+
+        this.desc = new JTextField();
+        this.desc.setBorder(BorderFactory
+            .createTitledBorder("Description for new path:"));
+        this.add(this.desc, c);
+
+        c.gridy++;
+        parent = new TermComponentLabel(aceConfig);
+        JPanel parentHolder = new JPanel(new GridLayout(1, 1));
+        parentHolder.add(parent);
+        parentHolder.setBorder(BorderFactory
+            .createTitledBorder("Parent for path:"));
+        this.add(parentHolder, c);
+
+        JButton createButton = new JButton("create");
+        createButton.addActionListener(this);
+        c.fill = GridBagConstraints.NONE;
+        c.anchor = GridBagConstraints.NORTHEAST;
+        c.gridwidth = 1;
+        c.weightx = 0;
+        c.weighty = 0;
+        c.gridx = 1;
+        c.gridy++;
+        this.add(createButton, c);
+        /*
+        PropertySetListenerGlue browsingPositionGlue = new PropertySetListenerGlue(null, null, 
+                null, null, Position.class, config);
+         */
+        sppp =
+                new SelectPathAndPositionPanelWithCombo(true, "as origin",
+                    aceConfig, null);
+        c.fill = GridBagConstraints.BOTH;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.gridwidth = 2;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridx = 0;
+        c.gridy++;
+        this.add(sppp, c);
+
     }
+
     /**
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
@@ -208,5 +228,4 @@ public class CreatePathPanel extends JPanel  implements ActionListener {
 			AceLog.getAppLog().alertAndLogException(ex);
         }
     }
- 
 }

@@ -1,14 +1,27 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /*
- * Copyright (c) 2003, the JUNG Project and the Regents of the University 
+ * Copyright (c) 2003, the JUNG Project and the Regents of the University
  * of California
  * All rights reserved.
- *
+ * 
  * This software is open-source under the BSD license; see either
  * "license.txt" or
  * http://jung.sourceforge.net/license.txt for a description.
- * 
- * Copyright (c) 2008, Informatics, Inc. 
- * 
  */
 /*
  * Created on Dec 4, 2003
@@ -42,58 +55,59 @@ import edu.uci.ics.jung.visualization.SpringLayout;
  * all made "protected".
  */
 
-public class AceGraphLayout  extends SpringLayout {
+public class AceGraphLayout extends SpringLayout {
 
-	protected static final String MINIMUMLEVELKEY = "DAGLayout.minimumLevel";
-	// Simpler than the "pair" technique.
-	static int graphHeight;
-	static int numRoots;
-	final double SPACEFACTOR = 1.3;
-	// How much space do we allow for additional floating at the bottom.
-	final double LEVELATTRACTIONRATE = 0.8;
+    protected static final String MINIMUMLEVELKEY = "DAGLayout.minimumLevel";
+    // Simpler than the "pair" technique.
+    static int graphHeight;
+    static int numRoots;
+    final double SPACEFACTOR = 1.3;
+    // How much space do we allow for additional floating at the bottom.
+    final double LEVELATTRACTIONRATE = 0.8;
 
-	/*
-	 * A bunch of parameters to help work out when to stop quivering.
-	 * 
-	 * If the MeanSquareVel(ocity) ever gets below the MSV_THRESHOLD, then we
-	 * will start a final cool-down phase of COOL_DOWN_INCREMENT increments. If
-	 * the MeanSquareVel ever exceeds the threshold, we will exit the cool down
-	 * phase, and continue looking for another opportunity.
-	 */
-	final double MSV_THRESHOLD = 10.0;
-	static double meanSquareVel;
-	static boolean stoppingIncrements = false;
-	static int incrementsLeft;
-	final int COOL_DOWN_INCREMENTS = 200;
-	/*
-	 * @param g
-	 */
-	public AceGraphLayout(Graph g) {
-		super(g);
-	}
+    /*
+     * A bunch of parameters to help work out when to stop quivering.
+     * 
+     * If the MeanSquareVel(ocity) ever gets below the MSV_THRESHOLD, then we
+     * will start a final cool-down phase of COOL_DOWN_INCREMENT increments. If
+     * the MeanSquareVel ever exceeds the threshold, we will exit the cool down
+     * phase, and continue looking for another opportunity.
+     */
+    final double MSV_THRESHOLD = 10.0;
+    static double meanSquareVel;
+    static boolean stoppingIncrements = false;
+    static int incrementsLeft;
+    final int COOL_DOWN_INCREMENTS = 200;
 
-	/*
-	 * Each vertex has a minimumLevel. Any vertex with no successors has
-	 * minimumLevel of zero. The minimumLevel of any vertex must be strictly
-	 * greater than the minimumLevel of its parents. (Vertex A is a parent of
-	 * Vertex B iff there is an edge from B to A.) Typically, a vertex will
-	 * have a minimumLevel which is one greater than the minimumLevel of its
-	 * parent's. However, if the vertex has two parents, its minimumLevel will
-	 * be one greater than the maximum of the parents'. We need to calculate
-	 * the minimumLevel for each vertex. When we layout the graph, vertices
-	 * cannot be drawn any higher than the minimumLevel. The graphHeight of a
-	 * graph is the greatest minimumLevel that is used. We will modify the
-	 * SpringLayout calculations so that nodes cannot move above their assigned
-	 * minimumLevel.
-	 */
+    /*
+     * @param g
+     */
+    public AceGraphLayout(Graph g) {
+        super(g);
+    }
 
-	/**
-	 * setRoot calculates the level of each vertex in the graph. Level 0 is
-	 * allocated to any vertex with no successors. Level n+1 is allocated to
-	 * any vertex whose successors' maximum level is n.
-	 */
+    /*
+     * Each vertex has a minimumLevel. Any vertex with no successors has
+     * minimumLevel of zero. The minimumLevel of any vertex must be strictly
+     * greater than the minimumLevel of its parents. (Vertex A is a parent of
+     * Vertex B iff there is an edge from B to A.) Typically, a vertex will
+     * have a minimumLevel which is one greater than the minimumLevel of its
+     * parent's. However, if the vertex has two parents, its minimumLevel will
+     * be one greater than the maximum of the parents'. We need to calculate
+     * the minimumLevel for each vertex. When we layout the graph, vertices
+     * cannot be drawn any higher than the minimumLevel. The graphHeight of a
+     * graph is the greatest minimumLevel that is used. We will modify the
+     * SpringLayout calculations so that nodes cannot move above their assigned
+     * minimumLevel.
+     */
 
-	public static void setRoot(Graph g) {
+    /**
+     * setRoot calculates the level of each vertex in the graph. Level 0 is
+     * allocated to any vertex with no successors. Level n+1 is allocated to
+     * any vertex whose successors' maximum level is n.
+     */
+
+    public static void setRoot(Graph g) {
 		numRoots = 0;
 		Set<?> verts = g.getVertices();
 		Iterator<?> iter = verts.iterator();
@@ -109,26 +123,26 @@ public class AceGraphLayout  extends SpringLayout {
 		}
 	}
 
-	/**
-	 * Set vertex v to be level 0.
-	 */
+    /**
+     * Set vertex v to be level 0.
+     */
 
-	public static void setRoot(Vertex v) {
-		v.setUserDatum(MINIMUMLEVELKEY, new Integer(0), UserData.REMOVE);
-		//
-		// Iterate through now, setting all the levels.
-		propagateMinimumLevel(v);
-	}
+    public static void setRoot(Vertex v) {
+        v.setUserDatum(MINIMUMLEVELKEY, new Integer(0), UserData.REMOVE);
+        //
+        // Iterate through now, setting all the levels.
+        propagateMinimumLevel(v);
+    }
 
-	/**
-	 * A recursive method for allocating the level for each vertex. Ensures
-	 * that all predecessors of v have a level which is at least one greater
-	 * than the level of v.
-	 * 
-	 * @param v
-	 */
+    /**
+     * A recursive method for allocating the level for each vertex. Ensures
+     * that all predecessors of v have a level which is at least one greater
+     * than the level of v.
+     * 
+     * @param v
+     */
 
-	public static void propagateMinimumLevel(Vertex v) {
+    public static void propagateMinimumLevel(Vertex v) {
 		int level = ((Integer) v.getUserDatum(MINIMUMLEVELKEY)).intValue();
 		Set<?> predecessors = v.getPredecessors();
 		Iterator<?> iter = predecessors.iterator();
@@ -152,30 +166,27 @@ public class AceGraphLayout  extends SpringLayout {
 		}
 	}
 
-	/**
-	 * Sets random locations for a vertex within the dimensions of the space.
-	 * This overrides the method in AbstractLayout
-	 * 
-	 * @param coord
-	 * @param d
-	 */
-	protected void initializeLocation(
-		Vertex v,
-		Coordinates coord,
-		Dimension d) {
-		//if (v.getUserDatum(MINIMUMLEVELKEY)==null) setRoot(getGraph());
-		int level = ((Integer) v.getUserDatum(MINIMUMLEVELKEY)).intValue();
-		int minY = (int) (level * d.getHeight() / (graphHeight * SPACEFACTOR));
-		double x = Math.random() * d.getWidth();
-		double y = Math.random() * (d.getHeight() - minY) + minY;
-		coord.setX(x);
-		coord.setY(y);
-	}
+    /**
+     * Sets random locations for a vertex within the dimensions of the space.
+     * This overrides the method in AbstractLayout
+     * 
+     * @param coord
+     * @param d
+     */
+    protected void initializeLocation(Vertex v, Coordinates coord, Dimension d) {
+        //if (v.getUserDatum(MINIMUMLEVELKEY)==null) setRoot(getGraph());
+        int level = ((Integer) v.getUserDatum(MINIMUMLEVELKEY)).intValue();
+        int minY = (int) (level * d.getHeight() / (graphHeight * SPACEFACTOR));
+        double x = Math.random() * d.getWidth();
+        double y = Math.random() * (d.getHeight() - minY) + minY;
+        coord.setX(x);
+        coord.setY(y);
+    }
 
-	/**
-	 * Had to override this one as well, to ensure that setRoot() is called.
-	 */
-	protected void initialize_local() {
+    /**
+     * Had to override this one as well, to ensure that setRoot() is called.
+     */
+    protected void initialize_local() {
 		for (Iterator<?> iter = getGraph().getEdges().iterator();
 			iter.hasNext();
 			) {
@@ -190,12 +201,12 @@ public class AceGraphLayout  extends SpringLayout {
 		setRoot(getGraph());
 	}
 
-	/**
-	 * Override the moveNodes() method from SpringLayout. The only change we
-	 * need to make is to make sure that nodes don't float higher than the minY
-	 * coordinate, as calculated by their minimumLevel.
-	 */
-	protected void moveNodes() {
+    /**
+     * Override the moveNodes() method from SpringLayout. The only change we
+     * need to make is to make sure that nodes don't float higher than the minY
+     * coordinate, as calculated by their minimumLevel.
+     */
+    protected void moveNodes() {
 		// Dimension d = currentSize;
 		double oldMSV = meanSquareVel;
 		meanSquareVel = 0;
@@ -279,34 +290,34 @@ public class AceGraphLayout  extends SpringLayout {
 		}
 	}
 
-	/**
-	 * Override incrementsAreDone so that we can eventually stop.
-	 */
-	public boolean incrementsAreDone() {
-		if (stoppingIncrements && incrementsLeft == 0)
-			return true;
-		else
-			return false;
-	}
+    /**
+     * Override incrementsAreDone so that we can eventually stop.
+     */
+    public boolean incrementsAreDone() {
+        if (stoppingIncrements && incrementsLeft == 0)
+            return true;
+        else
+            return false;
+    }
 
-	/**
-	 * Override forceMove so that if someone moves a node, we can re-layout
-	 * everything.
-	 */
-	public void forceMove(Vertex picked, int x, int y) {
-		Coordinates coord = getCoordinates(picked);
-		coord.setX(x);
-		coord.setY(y);
-		stoppingIncrements = false;
-	}
+    /**
+     * Override forceMove so that if someone moves a node, we can re-layout
+     * everything.
+     */
+    public void forceMove(Vertex picked, int x, int y) {
+        Coordinates coord = getCoordinates(picked);
+        coord.setX(x);
+        coord.setY(y);
+        stoppingIncrements = false;
+    }
 
-	/**
-	 * Overridden relaxEdges. This one reduces the effect of edges between
-	 * greatly different levels.
-	 *  
-	 */
+    /**
+     * Overridden relaxEdges. This one reduces the effect of edges between
+     * greatly different levels.
+     *  
+     */
 
-	protected void relaxEdges() {
+    protected void relaxEdges() {
 		for (Iterator<?> i = getVisibleEdges().iterator(); i.hasNext();) {
 			Edge e = (Edge) i.next();
 
@@ -364,6 +375,4 @@ public class AceGraphLayout  extends SpringLayout {
 			v2D.edgedy += -dy;
 		}
 	}
-
 }
-

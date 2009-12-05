@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace;
 
 import java.awt.FileDialog;
@@ -58,9 +74,9 @@ import com.sleepycat.je.DatabaseException;
 
 public class CollectionEditorContainer extends JPanel {
 
-	public class ImportListButtonListener implements ActionListener {
+    public class ImportListButtonListener implements ActionListener {
 
-		public void actionPerformed(ActionEvent arg0) {
+        public void actionPerformed(ActionEvent arg0) {
 			FileDialog dialog = new FileDialog(new Frame(),
 					"Open file: ");
 			dialog.setMode(FileDialog.LOAD);
@@ -77,178 +93,182 @@ public class CollectionEditorContainer extends JPanel {
 				}
 			}
 		}
+    }
 
-	}
+    public class ExportListButtonListener implements ActionListener {
 
-	public class ExportListButtonListener implements ActionListener {
+        private static final String EXTENSION = ".txt";
 
-		private static final String EXTENSION = ".txt";
+        public void actionPerformed(ActionEvent arg0) {
+            FileDialog dialog =
+                    new FileDialog(new Frame(), "Enter file name: ");
+            dialog.setMode(FileDialog.SAVE);
+            dialog.setDirectory(System.getProperty("user.dir"));
+            dialog.setVisible(true);
+            if (dialog.getFile() != null) {
+                if (dialog.getFile().toLowerCase().endsWith(EXTENSION) == false) {
+                    dialog.setFile(dialog.getFile() + EXTENSION);
+                }
 
-		public void actionPerformed(ActionEvent arg0) {
-			FileDialog dialog = new FileDialog(new Frame(),
-					"Enter file name: ");
-			dialog.setMode(FileDialog.SAVE);
-			dialog.setDirectory(System.getProperty("user.dir"));
-			dialog.setVisible(true);
-			if (dialog.getFile() != null) {
-				if (dialog.getFile().toLowerCase().endsWith(EXTENSION) == false) {
-					dialog.setFile(dialog.getFile() + EXTENSION);
-				}
-				
-				ConceptListWriter writer = new ConceptListWriter();
-				try {
-					writer.open(new File(dialog.getDirectory(), dialog.getFile()), false);
-					
-					ListModel model = list.getModel();
-	
-					for (int i = 0; i < model.getSize(); i++) {
-						writer.write((I_GetConceptData) model.getElementAt(i));
-					}
-					
-					writer.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-					
-					final JDialog alert = new JDialog();
-					JPanel panel = new JPanel(new GridLayout(2,1));
-					panel.add(new JLabel("Failed to write to file " + dialog.getFile() + " due to " + e.getLocalizedMessage()));
-					JButton button = new JButton("OK");
-					button.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0) {
-							alert.dispose();
-						}
-					});
-					
-					panel.add(button);
-					alert.add(panel);
-				}
-			}
-		}
-	}
+                ConceptListWriter writer = new ConceptListWriter();
+                try {
+                    writer.open(new File(dialog.getDirectory(), dialog
+                        .getFile()), false);
 
-	public class EraseListActionListener implements ActionListener {
+                    ListModel model = list.getModel();
 
-		public void actionPerformed(ActionEvent e) {
-			int option = JOptionPane.showConfirmDialog(
-					CollectionEditorContainer.this,
-					"Are you sure you want to erase the list?",
-					"Erase the list?", JOptionPane.YES_NO_OPTION);
-			if (option == JOptionPane.YES_OPTION) {
-				((TerminologyListModel) list.getModel()).clear();
-			}
-		}
+                    for (int i = 0; i < model.getSize(); i++) {
+                        writer.write((I_GetConceptData) model.getElementAt(i));
+                    }
 
-	}
+                    writer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
 
-	private class ShowComponentActionListener implements ActionListener {
+                    final JDialog alert = new JDialog();
+                    JPanel panel = new JPanel(new GridLayout(2, 1));
+                    panel.add(new JLabel("Failed to write to file "
+                        + dialog.getFile() + " due to "
+                        + e.getLocalizedMessage()));
+                    JButton button = new JButton("OK");
+                    button.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent arg0) {
+                            alert.dispose();
+                        }
+                    });
 
-		public void actionPerformed(ActionEvent e) {
-			if (showComponentView.isSelected()) {
-				showProcessBuilder.setSelected(false);
-				listSplit.setBottomComponent(conceptPanel);
-				if (lastDividerLocation > 0) {
-					listSplit.setDividerLocation(lastDividerLocation);
-				} else {
-					listSplit.setDividerLocation(0.30);
-				}
-			}
-			if (showOnlyList()) {
-				showListOnly();
-			}
-		}
+                    panel.add(button);
+                    alert.add(panel);
+                }
+            }
+        }
+    }
 
-	}
+    public class EraseListActionListener implements ActionListener {
 
-	private class ShowProcessBuilderActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            int option =
+                    JOptionPane.showConfirmDialog(
+                        CollectionEditorContainer.this,
+                        "Are you sure you want to erase the list?",
+                        "Erase the list?", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                ((TerminologyListModel) list.getModel()).clear();
+            }
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			if (showProcessBuilder.isSelected()) {
-				showComponentView.setSelected(false);
-				listSplit.setBottomComponent(processBuilder);
-				if (lastDividerLocation > 0) {
-					listSplit.setDividerLocation(lastDividerLocation);
-				} else {
-					listSplit.setDividerLocation(0.30);
-				}
-			}
-			if (showOnlyList()) {
-				showListOnly();
-			}
-		}
+    }
 
-	}
+    private class ShowComponentActionListener implements ActionListener {
 
-	private void showListOnly() {
-		int dividerLocation = listSplit.getDividerLocation();
-		if (dividerLocation != 3000) {
-			lastDividerLocation = dividerLocation;
-			listSplit.setBottomComponent(new JPanel());
-			listSplit.setDividerLocation(3000);
-		}
-	}
+        public void actionPerformed(ActionEvent e) {
+            if (showComponentView.isSelected()) {
+                showProcessBuilder.setSelected(false);
+                listSplit.setBottomComponent(conceptPanel);
+                if (lastDividerLocation > 0) {
+                    listSplit.setDividerLocation(lastDividerLocation);
+                } else {
+                    listSplit.setDividerLocation(0.30);
+                }
+            }
+            if (showOnlyList()) {
+                showListOnly();
+            }
+        }
 
-	private boolean showOnlyList() {
-		return showComponentView.isSelected() == false
-				&& showProcessBuilder.isSelected() == false;
-	}
+    }
 
-	int lastDividerLocation = -1;
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private JComponent processBuilder;
-	private JToggleButton showComponentView;
-	private JToggleButton showProcessBuilder;
-	private JSplitPane listSplit;
-	private ACE ace;
-	private ConceptPanel conceptPanel;
-	private ShowComponentActionListener showComponentActionListener;
-	private TerminologyList list;
+    private class ShowProcessBuilderActionListener implements ActionListener {
 
-	public I_ConfigAceFrame getConfig() {
-		return ace.getAceFrameConfig();
-	}
+        public void actionPerformed(ActionEvent e) {
+            if (showProcessBuilder.isSelected()) {
+                showComponentView.setSelected(false);
+                listSplit.setBottomComponent(processBuilder);
+                if (lastDividerLocation > 0) {
+                    listSplit.setDividerLocation(lastDividerLocation);
+                } else {
+                    listSplit.setDividerLocation(0.30);
+                }
+            }
+            if (showOnlyList()) {
+                showListOnly();
+            }
+        }
 
-	public CollectionEditorContainer(TerminologyList list, ACE ace,
-			JPanel descListProcessBuilderPanel) throws DatabaseException,
-			IOException, ClassNotFoundException, NoSuchAlgorithmException {
-		super(new GridBagLayout());
-		this.ace = ace;
-		this.list = list;
-		this.processBuilder = descListProcessBuilderPanel;
-		conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace, LINK_TYPE.LIST_LINK, true,
-				Integer.MIN_VALUE);
-		conceptPanel.setLinkedList(list);
-		conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-		c.weighty = 0;
-		c.gridheight = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		add(getListEditorTopPanel(), c);
-		c.gridy++;
-		c.weighty = 1;
-		c.fill = GridBagConstraints.BOTH;
-		add(getListSplit(list, ace), c);
-		showComponentView.setSelected(true);
-		showComponentActionListener.actionPerformed(new ActionEvent(
-				showComponentView, 0, "show"));
-	}
+    }
 
-	private JSplitPane getListSplit(JList list, ACE ace)
-			throws DatabaseException, IOException, ClassNotFoundException {
-		listSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		listSplit.setOneTouchExpandable(true);
-		listSplit.setTopComponent(new JScrollPane(list));
-		listSplit.setBottomComponent(conceptPanel);
-		listSplit.setDividerLocation(3000);
-		return listSplit;
-	}
+    private void showListOnly() {
+        int dividerLocation = listSplit.getDividerLocation();
+        if (dividerLocation != 3000) {
+            lastDividerLocation = dividerLocation;
+            listSplit.setBottomComponent(new JPanel());
+            listSplit.setDividerLocation(3000);
+        }
+    }
 
-	private JPanel getListEditorTopPanel() throws IOException,
+    private boolean showOnlyList() {
+        return showComponentView.isSelected() == false
+            && showProcessBuilder.isSelected() == false;
+    }
+
+    int lastDividerLocation = -1;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private JComponent processBuilder;
+    private JToggleButton showComponentView;
+    private JToggleButton showProcessBuilder;
+    private JSplitPane listSplit;
+    private ACE ace;
+    private ConceptPanel conceptPanel;
+    private ShowComponentActionListener showComponentActionListener;
+    private TerminologyList list;
+
+    public I_ConfigAceFrame getConfig() {
+        return ace.getAceFrameConfig();
+    }
+
+    public CollectionEditorContainer(TerminologyList list, ACE ace,
+            JPanel descListProcessBuilderPanel) throws DatabaseException,
+            IOException, ClassNotFoundException, NoSuchAlgorithmException {
+        super(new GridBagLayout());
+        this.ace = ace;
+        this.list = list;
+        this.processBuilder = descListProcessBuilderPanel;
+        conceptPanel =
+                new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace,
+                    LINK_TYPE.LIST_LINK, true, Integer.MIN_VALUE);
+        conceptPanel.setLinkedList(list);
+        conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 0;
+        c.gridheight = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        add(getListEditorTopPanel(), c);
+        c.gridy++;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
+        add(getListSplit(list, ace), c);
+        showComponentView.setSelected(true);
+        showComponentActionListener.actionPerformed(new ActionEvent(
+            showComponentView, 0, "show"));
+    }
+
+    private JSplitPane getListSplit(JList list, ACE ace)
+            throws DatabaseException, IOException, ClassNotFoundException {
+        listSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        listSplit.setOneTouchExpandable(true);
+        listSplit.setTopComponent(new JScrollPane(list));
+        listSplit.setBottomComponent(conceptPanel);
+        listSplit.setDividerLocation(3000);
+        return listSplit;
+    }
+
+    private JPanel getListEditorTopPanel() throws IOException,
 			ClassNotFoundException {
 		JPanel listEditorTopPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -368,16 +388,16 @@ public class CollectionEditorContainer extends JPanel {
 
 	}
 
-	private class PluginListener implements ActionListener {
-		File pluginProcessFile;
-		String exceptionMessage;
+    private class PluginListener implements ActionListener {
+        File pluginProcessFile;
+        String exceptionMessage;
 
-		private PluginListener(File pluginProcessFile) {
-			super();
-			this.pluginProcessFile = pluginProcessFile;
-		}
+        private PluginListener(File pluginProcessFile) {
+            super();
+            this.pluginProcessFile = pluginProcessFile;
+        }
 
-		public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
 			try {
 				FileInputStream fis = new FileInputStream(pluginProcessFile);
 				BufferedInputStream bis = new BufferedInputStream(fis);
@@ -461,11 +481,10 @@ public class CollectionEditorContainer extends JPanel {
 				AceLog.getAppLog().alertAndLogException(e1);
 			}
 		}
+    }
 
-	}
-
-	public ConceptPanel getConceptPanel() {
-		return conceptPanel;
-	}
+    public ConceptPanel getConceptPanel() {
+        return conceptPanel;
+    }
 
 }

@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.table.refset;
 
 import java.awt.Dimension;
@@ -21,15 +37,16 @@ import org.dwfa.bpa.util.TableSorter;
 
 public class ReflexiveRefsetUtil {
 
-
-    public static JPanel getExtensionPanel(String labelTxt, ReflexiveRefsetMemberTableModel refsetModel,
-        I_HostConceptPlugins host, boolean showRowAdd, boolean spaceForAdd) throws Exception {
+    public static JPanel getExtensionPanel(String labelTxt,
+            ReflexiveRefsetMemberTableModel refsetModel,
+            I_HostConceptPlugins host, boolean showRowAdd, boolean spaceForAdd)
+            throws Exception {
         JPanel relPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         if (labelTxt != null) {
             JLabel srcRelLabel = new JLabel("     " + labelTxt);
             if (spaceForAdd == false) {
-            	srcRelLabel = new JLabel(labelTxt);
+                srcRelLabel = new JLabel(labelTxt);
             }
             srcRelLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 0));
             c.anchor = GridBagConstraints.WEST;
@@ -60,7 +77,9 @@ public class ReflexiveRefsetUtil {
         c.weighty = 0.0;
         c.gridheight = 2;
         if (ACE.editMode && showRowAdd) {
-            JButton rowAddAfter = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/paperclip_add.png")));
+            JButton rowAddAfter =
+                    new JButton(new ImageIcon(ACE.class
+                        .getResource("/24x24/plain/paperclip_add.png")));
             relPanel.add(rowAddAfter, c);
             rowAddAfter.setEnabled(false);
             //refsetModel.setAddButton(rowAddAfter);
@@ -72,9 +91,9 @@ public class ReflexiveRefsetUtil {
             relPanel.add(filler, c);
         } else {
             JPanel filler = new JPanel();
-            filler.setMaximumSize(new Dimension(0,0));
-            filler.setMinimumSize(new Dimension(0,0));
-            filler.setPreferredSize(new Dimension(0,0));
+            filler.setMaximumSize(new Dimension(0, 0));
+            filler.setMinimumSize(new Dimension(0, 0));
+            filler.setPreferredSize(new Dimension(0, 0));
             relPanel.add(filler, c);
         }
         c.gridheight = 1;
@@ -82,10 +101,13 @@ public class ReflexiveRefsetUtil {
         c.gridwidth = 1;
 
         TableSorter refsetSortingTable = new TableSorter(refsetModel);
-        JTableWithDragImage extTable = new JTableWithDragImage(refsetSortingTable);
+        JTableWithDragImage extTable =
+                new JTableWithDragImage(refsetSortingTable);
         refsetSortingTable.setTableHeader(extTable.getTableHeader());
-        refsetSortingTable.getTableHeader()
-                .setToolTipText("Click to specify sorting; Control-Click to specify secondary sorting");
+        refsetSortingTable
+            .getTableHeader()
+            .setToolTipText(
+                "Click to specify sorting; Control-Click to specify secondary sorting");
         ReflexiveRefsetFieldData[] columns = refsetModel.getColumns();
         for (int i = 0; i < extTable.getColumnCount(); i++) {
             TableColumn column = extTable.getColumnModel().getColumn(i);
@@ -112,7 +134,8 @@ public class ReflexiveRefsetUtil {
         c.weightx = 1.0;
         c.weighty = 0.0;
         c.gridheight = 5;
-        extTable.setDefaultRenderer(StringWithExtTuple.class, new ExtTableRenderer());
+        extTable.setDefaultRenderer(StringWithExtTuple.class,
+            new ExtTableRenderer());
         extTable.setDefaultRenderer(Number.class, new ExtTableRenderer());
         extTable.setDefaultRenderer(Boolean.class, new ExtTableRenderer());
         extTable.setDefaultRenderer(Integer.class, new ExtTableRenderer());
@@ -129,7 +152,5 @@ public class ReflexiveRefsetUtil {
 
         return relPanel;
     }
-
- 
 
 }

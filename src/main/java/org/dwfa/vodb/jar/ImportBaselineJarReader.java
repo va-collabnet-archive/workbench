@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.vodb.jar;
 
 import java.awt.event.ActionEvent;
@@ -51,108 +67,110 @@ import com.sleepycat.bind.tuple.TupleInput;
 
 public class ImportBaselineJarReader implements ActionListener {
 
-	JarInputStream input;
+    JarInputStream input;
 
-	ThinConVersionedBinding conBinding = new ThinConVersionedBinding();
+    ThinConVersionedBinding conBinding = new ThinConVersionedBinding();
 
-	ThinDescVersionedBinding descBinding = new ThinDescVersionedBinding();
+    ThinDescVersionedBinding descBinding = new ThinDescVersionedBinding();
 
-	ThinRelVersionedBinding relBinding = new ThinRelVersionedBinding();
+    ThinRelVersionedBinding relBinding = new ThinRelVersionedBinding();
 
-	ThinIdVersionedBinding idBinding = new ThinIdVersionedBinding();
+    ThinIdVersionedBinding idBinding = new ThinIdVersionedBinding();
 
-	ThinImageBinder imageBinder = new ThinImageBinder();
+    ThinImageBinder imageBinder = new ThinImageBinder();
 
-	PathBinder pathBinder = new PathBinder();
+    PathBinder pathBinder = new PathBinder();
 
-	boolean continueWork = true;
+    boolean continueWork = true;
 
-	String upperProgressMessage = "Reading Jar File";
+    String upperProgressMessage = "Reading Jar File";
 
-	String lowerProgressMessage = "counting";
+    String lowerProgressMessage = "counting";
 
-	int max = -1;
+    int max = -1;
 
-	int concepts = -1;
+    int concepts = -1;
 
-	int descriptions = -1;
+    int descriptions = -1;
 
-	int relationships = -1;
+    int relationships = -1;
 
-	int ids = -1;
+    int ids = -1;
 
-	int images = -1;
+    int images = -1;
 
-	int total = -1;
+    int total = -1;
 
-	int processed = 0;
-	
-	private AceConfig config;
+    int processed = 0;
 
-	private int timePathEntries;
+    private AceConfig config;
 
-	private class ProgressUpdator implements I_UpdateProgress {
-		Timer updateTimer;
+    private int timePathEntries;
 
-		boolean firstUpdate = true;
+    private class ProgressUpdator implements I_UpdateProgress {
+        Timer updateTimer;
 
-		ActivityPanel activity = new ActivityPanel(true, null, null);
+        boolean firstUpdate = true;
 
-		public ProgressUpdator() {
-			super();
-			updateTimer = new Timer(300, this);
-			updateTimer.start();
-		}
+        ActivityPanel activity = new ActivityPanel(true, null, null);
 
-		public void actionPerformed(ActionEvent e) {
-			if (firstUpdate) {
-				firstUpdate = false;
-				try {
-					ActivityViewer.addActivity(activity);
-				} catch (Exception e1) {
-					AceLog.getAppLog().alertAndLogException(e1);
-				}
-			}
-			activity.setIndeterminate(total == -1);
-			activity.setValue(processed);
-			activity.setMaximum(total);
-			activity.setProgressInfoUpper(upperProgressMessage);
-			activity.setProgressInfoLower(lowerProgressMessage + processed);
-			if (!continueWork) {
-				activity.complete();
-				updateTimer.stop();
-			}
-		}
+        public ProgressUpdator() {
+            super();
+            updateTimer = new Timer(300, this);
+            updateTimer.start();
+        }
 
-		public void normalCompletion() {
-			activity.complete();
-			updateTimer.stop();
-		}
+        public void actionPerformed(ActionEvent e) {
+            if (firstUpdate) {
+                firstUpdate = false;
+                try {
+                    ActivityViewer.addActivity(activity);
+                } catch (Exception e1) {
+                    AceLog.getAppLog().alertAndLogException(e1);
+                }
+            }
+            activity.setIndeterminate(total == -1);
+            activity.setValue(processed);
+            activity.setMaximum(total);
+            activity.setProgressInfoUpper(upperProgressMessage);
+            activity.setProgressInfoLower(lowerProgressMessage + processed);
+            if (!continueWork) {
+                activity.complete();
+                updateTimer.stop();
+            }
+        }
 
-	}
+        public void normalCompletion() {
+            activity.complete();
+            updateTimer.stop();
+        }
 
-	public ImportBaselineJarReader(final Configuration riverConfig) {
-		try {
-			final File jarFile = FileDialogUtil
-					.getExistingFile("Select baseline jar file to import", null, null, config.getActiveFrame());
-			ProgressUpdator updater = new ProgressUpdator();
-			updater.activity.addActionListener(this);
-			ACE.threadPool.execute(new Runnable() {
-				public void run() {
-					try {
-						importJar(jarFile, riverConfig);
-					} catch (TaskFailedException ex) {
-						AceLog.getAppLog().alertAndLogException(ex);
-					}
-				}
+    }
 
-			});
-		} catch (TaskFailedException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		}
-	}
+    public ImportBaselineJarReader(final Configuration riverConfig) {
+        try {
+            final File jarFile =
+                    FileDialogUtil.getExistingFile(
+                        "Select baseline jar file to import", null, null,
+                        config.getActiveFrame());
+            ProgressUpdator updater = new ProgressUpdator();
+            updater.activity.addActionListener(this);
+            ACE.threadPool.execute(new Runnable() {
+                public void run() {
+                    try {
+                        importJar(jarFile, riverConfig);
+                    } catch (TaskFailedException ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                    }
+                }
 
-	protected void importJar(File jarFile, final Configuration riverConfig) throws TaskFailedException {
+            });
+        } catch (TaskFailedException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+    }
+
+    protected void importJar(File jarFile, final Configuration riverConfig) throws TaskFailedException {
 		try {
 			JarFile jf = new JarFile(jarFile);
 			Manifest mf = jf.getManifest();
@@ -268,189 +286,191 @@ public class ImportBaselineJarReader implements ActionListener {
 		
 	}
 
-	private void processIds(InputStream inputStream) throws IOException,
-			InterruptedException {
-		ThinIdVersionedBinding binding = new ThinIdVersionedBinding();
-		DataInputStream dis = new DataInputStream(inputStream);
-		byte[] buffer = new byte[1024];
-		while (dis.available() > 0) {
-			try {
-				int size = dis.readInt();
-				if (size > buffer.length) {
-					buffer = new byte[size];
-					AceLog.getAppLog().info("Increasing id buffer: " + size);
-				}
-				int read = dis.read(buffer, 0, size);
-				while (read != size) {
-					size = size - read;
-					read = dis.read(buffer, read, size);
-				}
-				TupleInput input = new TupleInput(buffer);
-				I_IdVersioned jarId = binding.entryToObject(input);
-				AceConfig.getVodb().writeId(jarId);
-				processed++;
-			} catch (Throwable e) {
-				AceLog.getAppLog().info("processed: " + processed);
-				dis.close();
-				AceLog.getAppLog().alertAndLogException(e);
-				throw new RuntimeException(e);
-			}
-		}
-		dis.close();
-	}
-	
-	private void processImages(InputStream inputStream) throws Exception {
-		ThinImageBinder binding = new ThinImageBinder();
-		DataInputStream dis = new DataInputStream(inputStream);
-		byte[] buffer = new byte[1024];
-		while (dis.available() > 0) {
-			int size = dis.readInt();
-			if (size > buffer.length) {
-				buffer = new byte[size];
-				AceLog.getAppLog().info("Increasing image buffer: " + size);
-			}
-			int read = dis.read(buffer, 0, size);
-			while (read != size) {
-				size = size - read;
-				read = dis.read(buffer, read, size);
-			}
-			TupleInput input = new TupleInput(buffer);
-			I_ImageVersioned jarImage = binding.entryToObject(input);
-			AceConfig.getVodb().writeImage(jarImage);
-			processed++;
-		}
-		dis.close();
-	}
+    private void processIds(InputStream inputStream) throws IOException,
+            InterruptedException {
+        ThinIdVersionedBinding binding = new ThinIdVersionedBinding();
+        DataInputStream dis = new DataInputStream(inputStream);
+        byte[] buffer = new byte[1024];
+        while (dis.available() > 0) {
+            try {
+                int size = dis.readInt();
+                if (size > buffer.length) {
+                    buffer = new byte[size];
+                    AceLog.getAppLog().info("Increasing id buffer: " + size);
+                }
+                int read = dis.read(buffer, 0, size);
+                while (read != size) {
+                    size = size - read;
+                    read = dis.read(buffer, read, size);
+                }
+                TupleInput input = new TupleInput(buffer);
+                I_IdVersioned jarId = binding.entryToObject(input);
+                AceConfig.getVodb().writeId(jarId);
+                processed++;
+            } catch (Throwable e) {
+                AceLog.getAppLog().info("processed: " + processed);
+                dis.close();
+                AceLog.getAppLog().alertAndLogException(e);
+                throw new RuntimeException(e);
+            }
+        }
+        dis.close();
+    }
 
-	private void processRelationships(InputStream inputStream)
-			throws Exception {
-		ThinRelVersionedBinding binding = new ThinRelVersionedBinding();
-		DataInputStream dis = new DataInputStream(inputStream);
-		byte[] buffer = new byte[1024];
-		while (dis.available() > 0) {
-			int size = dis.readInt();
-			if (size > buffer.length) {
-				buffer = new byte[size];
-				AceLog.getAppLog().info("Increasing relationship buffer: " + size);
-			}
-			int read = dis.read(buffer, 0, size);
-			while (read != size) {
-				size = size - read;
-				read = dis.read(buffer, read, size);
-			}
-			TupleInput input = new TupleInput(buffer);
-			I_RelVersioned jarRel = binding.entryToObject(input);
-			AceConfig.getVodb().writeRel(jarRel);
-			processed++;
-		}
-		dis.close();
-	}
+    private void processImages(InputStream inputStream) throws Exception {
+        ThinImageBinder binding = new ThinImageBinder();
+        DataInputStream dis = new DataInputStream(inputStream);
+        byte[] buffer = new byte[1024];
+        while (dis.available() > 0) {
+            int size = dis.readInt();
+            if (size > buffer.length) {
+                buffer = new byte[size];
+                AceLog.getAppLog().info("Increasing image buffer: " + size);
+            }
+            int read = dis.read(buffer, 0, size);
+            while (read != size) {
+                size = size - read;
+                read = dis.read(buffer, read, size);
+            }
+            TupleInput input = new TupleInput(buffer);
+            I_ImageVersioned jarImage = binding.entryToObject(input);
+            AceConfig.getVodb().writeImage(jarImage);
+            processed++;
+        }
+        dis.close();
+    }
 
-	private void processDescriptions(InputStream inputStream)
-			throws Exception {
-		ThinDescVersionedBinding binding = new ThinDescVersionedBinding();
-		DataInputStream dis = new DataInputStream(inputStream);
-		byte[] buffer = new byte[1024];
-		while (dis.available() > 0) {
-			int size = dis.readInt();
-			if (size > buffer.length) {
-				buffer = new byte[size];
-				AceLog.getAppLog().info("Increasing description buffer: " + size);
-			}
-			int read = dis.read(buffer, 0, size);
-			while (read != size) {
-				size = size - read;
-				read = dis.read(buffer, read, size);
-			}
-			TupleInput input = new TupleInput(buffer);
-			I_DescriptionVersioned jarDesc = binding.entryToObject(input);
-			AceConfig.getVodb().writeDescription(jarDesc);
-			processed++;
-		}
-		dis.close();
-	}
+    private void processRelationships(InputStream inputStream) throws Exception {
+        ThinRelVersionedBinding binding = new ThinRelVersionedBinding();
+        DataInputStream dis = new DataInputStream(inputStream);
+        byte[] buffer = new byte[1024];
+        while (dis.available() > 0) {
+            int size = dis.readInt();
+            if (size > buffer.length) {
+                buffer = new byte[size];
+                AceLog.getAppLog().info(
+                    "Increasing relationship buffer: " + size);
+            }
+            int read = dis.read(buffer, 0, size);
+            while (read != size) {
+                size = size - read;
+                read = dis.read(buffer, read, size);
+            }
+            TupleInput input = new TupleInput(buffer);
+            I_RelVersioned jarRel = binding.entryToObject(input);
+            AceConfig.getVodb().writeRel(jarRel);
+            processed++;
+        }
+        dis.close();
+    }
 
-	private void processConcepts(InputStream inputStream) throws Exception {
-		ThinConVersionedBinding binding = new ThinConVersionedBinding();
-		DataInputStream dis = new DataInputStream(inputStream);
-		byte[] buffer = new byte[1024];
-		while (dis.available() > 0) {
-			int size = dis.readInt();
-			if (size > buffer.length) {
-				buffer = new byte[size];
-				AceLog.getAppLog().info("Setting concept buffer size to: " + size);
-			}
-			int read = dis.read(buffer, 0, size);
-			while (read != size) {
-				size = size - read;
-				read = dis.read(buffer, read, size);
-			}
-			TupleInput input = new TupleInput(buffer);
-			I_ConceptAttributeVersioned jarCon = binding.entryToObject(input);
-			AceConfig.getVodb().writeConceptAttributes(jarCon);
-			processed++;
-		}
-		dis.close();
-	}
+    private void processDescriptions(InputStream inputStream) throws Exception {
+        ThinDescVersionedBinding binding = new ThinDescVersionedBinding();
+        DataInputStream dis = new DataInputStream(inputStream);
+        byte[] buffer = new byte[1024];
+        while (dis.available() > 0) {
+            int size = dis.readInt();
+            if (size > buffer.length) {
+                buffer = new byte[size];
+                AceLog.getAppLog().info(
+                    "Increasing description buffer: " + size);
+            }
+            int read = dis.read(buffer, 0, size);
+            while (read != size) {
+                size = size - read;
+                read = dis.read(buffer, read, size);
+            }
+            TupleInput input = new TupleInput(buffer);
+            I_DescriptionVersioned jarDesc = binding.entryToObject(input);
+            AceConfig.getVodb().writeDescription(jarDesc);
+            processed++;
+        }
+        dis.close();
+    }
 
-	private void processPaths(InputStream inputStream) throws Exception {
-		DataInputStream dis = new DataInputStream(inputStream);
-		byte[] buffer = new byte[1024];
-		while (dis.available() > 0) {
-			int size = dis.readInt();
-			if (size > buffer.length) {
-				buffer = new byte[size];
-				AceLog.getAppLog().info("Setting path buffer size to: " + size);
-			}
-			int read = dis.read(buffer, 0, size);
-			while (read != size) {
-				size = size - read;
-				read = dis.read(buffer, read, size);
-			}
-			TupleInput input = new TupleInput(buffer);
-			try {
-				I_Path jarPath = pathBinder.entryToObject(input);
-				AceConfig.getVodb().writePath(jarPath);
-			} catch (RuntimeException e) {
-				AceLog.getAppLog().info("processing paths: " + processed);
-				throw e;
-			}
-			processed++;
-		}
-		dis.close();
-	}
-	private void processTimePaths(InputStream inputStream) throws Exception {
-		TimePathIdBinder timePathIdBinder = new TimePathIdBinder();
-		DataInputStream dis = new DataInputStream(inputStream);
-		byte[] buffer = new byte[1024];
-		while (dis.available() > 0) {
-			int size = dis.readInt();
-			if (size > buffer.length) {
-				buffer = new byte[size];
-				AceLog.getAppLog().info("Setting path buffer size to: " + size);
-			}
-			int read = dis.read(buffer, 0, size);
-			while (read != size) {
-				size = size - read;
-				read = dis.read(buffer, read, size);
-			}
-			TupleInput input = new TupleInput(buffer);
-			try {
-				TimePathId jarTimePath = (TimePathId) timePathIdBinder.entryToObject(input);
-				AceConfig.getVodb().writeTimePath(jarTimePath);
-			} catch (RuntimeException e) {
-				AceLog.getAppLog().info("processing paths: " + processed);
-				throw e;
-			}
-			processed++;
-		}
-		dis.close();
-	}
+    private void processConcepts(InputStream inputStream) throws Exception {
+        ThinConVersionedBinding binding = new ThinConVersionedBinding();
+        DataInputStream dis = new DataInputStream(inputStream);
+        byte[] buffer = new byte[1024];
+        while (dis.available() > 0) {
+            int size = dis.readInt();
+            if (size > buffer.length) {
+                buffer = new byte[size];
+                AceLog.getAppLog().info(
+                    "Setting concept buffer size to: " + size);
+            }
+            int read = dis.read(buffer, 0, size);
+            while (read != size) {
+                size = size - read;
+                read = dis.read(buffer, read, size);
+            }
+            TupleInput input = new TupleInput(buffer);
+            I_ConceptAttributeVersioned jarCon = binding.entryToObject(input);
+            AceConfig.getVodb().writeConceptAttributes(jarCon);
+            processed++;
+        }
+        dis.close();
+    }
 
-	public void actionPerformed(ActionEvent e) {
-		continueWork = false;
-		lowerProgressMessage = "User stopped action";
-	}
+    private void processPaths(InputStream inputStream) throws Exception {
+        DataInputStream dis = new DataInputStream(inputStream);
+        byte[] buffer = new byte[1024];
+        while (dis.available() > 0) {
+            int size = dis.readInt();
+            if (size > buffer.length) {
+                buffer = new byte[size];
+                AceLog.getAppLog().info("Setting path buffer size to: " + size);
+            }
+            int read = dis.read(buffer, 0, size);
+            while (read != size) {
+                size = size - read;
+                read = dis.read(buffer, read, size);
+            }
+            TupleInput input = new TupleInput(buffer);
+            try {
+                I_Path jarPath = pathBinder.entryToObject(input);
+                AceConfig.getVodb().writePath(jarPath);
+            } catch (RuntimeException e) {
+                AceLog.getAppLog().info("processing paths: " + processed);
+                throw e;
+            }
+            processed++;
+        }
+        dis.close();
+    }
+
+    private void processTimePaths(InputStream inputStream) throws Exception {
+        TimePathIdBinder timePathIdBinder = new TimePathIdBinder();
+        DataInputStream dis = new DataInputStream(inputStream);
+        byte[] buffer = new byte[1024];
+        while (dis.available() > 0) {
+            int size = dis.readInt();
+            if (size > buffer.length) {
+                buffer = new byte[size];
+                AceLog.getAppLog().info("Setting path buffer size to: " + size);
+            }
+            int read = dis.read(buffer, 0, size);
+            while (read != size) {
+                size = size - read;
+                read = dis.read(buffer, read, size);
+            }
+            TupleInput input = new TupleInput(buffer);
+            try {
+                TimePathId jarTimePath =
+                        (TimePathId) timePathIdBinder.entryToObject(input);
+                AceConfig.getVodb().writeTimePath(jarTimePath);
+            } catch (RuntimeException e) {
+                AceLog.getAppLog().info("processing paths: " + processed);
+                throw e;
+            }
+            processed++;
+        }
+        dis.close();
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        continueWork = false;
+        lowerProgressMessage = "User stopped action";
+    }
 
 }
-

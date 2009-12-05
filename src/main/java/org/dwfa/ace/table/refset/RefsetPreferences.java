@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.table.refset;
 
 import java.io.IOException;
@@ -31,30 +47,41 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 
     private static final int dataVersion = 4;
 
-    private I_RefsetDefaultsBoolean booleanPreferences = new RefsetDefaultsBoolean();
+    private I_RefsetDefaultsBoolean booleanPreferences =
+            new RefsetDefaultsBoolean();
 
-    private I_RefsetDefaultsConcept conceptPreferences = new RefsetDefaultsConcept();
+    private I_RefsetDefaultsConcept conceptPreferences =
+            new RefsetDefaultsConcept();
 
-    private I_RefsetDefaultsInteger integerPreferences = new RefsetDefaultsInteger();
+    private I_RefsetDefaultsInteger integerPreferences =
+            new RefsetDefaultsInteger();
 
-    private I_RefsetDefaultsLanguage languagePreferences = new RefsetDefaultsLanguage();
+    private I_RefsetDefaultsLanguage languagePreferences =
+            new RefsetDefaultsLanguage();
 
-    private I_RefsetDefaultsLanguageScoped languageScopedPreferences = new RefsetDefaultsLanguageScoped();
+    private I_RefsetDefaultsLanguageScoped languageScopedPreferences =
+            new RefsetDefaultsLanguageScoped();
 
-    private I_RefsetDefaultsMeasurement measurementPreferences = new RefsetDefaultsMeasurement();
+    private I_RefsetDefaultsMeasurement measurementPreferences =
+            new RefsetDefaultsMeasurement();
 
-    private I_RefsetDefaultsString stringPreferences = new RefsetDefaultsString();
-    
-    private I_RefsetDefaultsConInt conIntPreferences = new RefsetDefaultsConInt();
-    
-    private I_RefsetDefaultsCrossMap crossMapPreferences = new RefsetDefaultsCrossMap();
+    private I_RefsetDefaultsString stringPreferences =
+            new RefsetDefaultsString();
 
-    private I_RefsetDefaultsCrossMapForRel crossMapForRelPreferences = new RefsetDefaultsCrossMapForRel();
+    private I_RefsetDefaultsConInt conIntPreferences =
+            new RefsetDefaultsConInt();
 
-    private I_RefsetDefaultsTemplate templatePreferences = new RefsetDefaultsTemplate();
-    
-    private I_RefsetDefaultsTemplateForRel templateForRelPreferences = new RefsetDefaultsTemplateForRel();
-    
+    private I_RefsetDefaultsCrossMap crossMapPreferences =
+            new RefsetDefaultsCrossMap();
+
+    private I_RefsetDefaultsCrossMapForRel crossMapForRelPreferences =
+            new RefsetDefaultsCrossMapForRel();
+
+    private I_RefsetDefaultsTemplate templatePreferences =
+            new RefsetDefaultsTemplate();
+
+    private I_RefsetDefaultsTemplateForRel templateForRelPreferences =
+            new RefsetDefaultsTemplateForRel();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -72,15 +99,18 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         out.writeObject(stringPreferences);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
             booleanPreferences = (I_RefsetDefaultsBoolean) in.readObject();
             conceptPreferences = (I_RefsetDefaultsConcept) in.readObject();
             integerPreferences = (I_RefsetDefaultsInteger) in.readObject();
             languagePreferences = (I_RefsetDefaultsLanguage) in.readObject();
-            languageScopedPreferences = (I_RefsetDefaultsLanguageScoped) in.readObject();
-            measurementPreferences = (I_RefsetDefaultsMeasurement) in.readObject();
+            languageScopedPreferences =
+                    (I_RefsetDefaultsLanguageScoped) in.readObject();
+            measurementPreferences =
+                    (I_RefsetDefaultsMeasurement) in.readObject();
             if (objDataVersion > 1) {
                 conIntPreferences = (I_RefsetDefaultsConInt) in.readObject();
             } else {
@@ -91,28 +121,34 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
                 }
             }
             if (objDataVersion > 2) {
-                crossMapPreferences = (I_RefsetDefaultsCrossMap) in.readObject();
-                crossMapForRelPreferences = (I_RefsetDefaultsCrossMapForRel) in.readObject();
-                templatePreferences = (I_RefsetDefaultsTemplate) in.readObject();
-                templateForRelPreferences = (I_RefsetDefaultsTemplateForRel) in.readObject();
+                crossMapPreferences =
+                        (I_RefsetDefaultsCrossMap) in.readObject();
+                crossMapForRelPreferences =
+                        (I_RefsetDefaultsCrossMapForRel) in.readObject();
+                templatePreferences =
+                        (I_RefsetDefaultsTemplate) in.readObject();
+                templateForRelPreferences =
+                        (I_RefsetDefaultsTemplateForRel) in.readObject();
             } else {
                 try {
                     crossMapPreferences = new RefsetDefaultsCrossMap();
-                    crossMapForRelPreferences = new RefsetDefaultsCrossMapForRel();
+                    crossMapForRelPreferences =
+                            new RefsetDefaultsCrossMapForRel();
                     templatePreferences = new RefsetDefaultsTemplate();
-                    templateForRelPreferences = new RefsetDefaultsTemplateForRel();
+                    templateForRelPreferences =
+                            new RefsetDefaultsTemplateForRel();
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }
             }
             if (objDataVersion > 3) {
-            	stringPreferences = (I_RefsetDefaultsString) in.readObject();
+                stringPreferences = (I_RefsetDefaultsString) in.readObject();
             } else {
-            	try {
-					stringPreferences = new RefsetDefaultsString();
-				} catch (TerminologyException e) {
-	                   throw new ToIoException(e);
-				}
+                try {
+                    stringPreferences = new RefsetDefaultsString();
+                } catch (TerminologyException e) {
+                    throw new ToIoException(e);
+                }
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -180,12 +216,12 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         return stringPreferences;
     }
 
-	/* (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getConIntPreferences()
      */
-	public I_RefsetDefaultsConInt getConIntPreferences() {
-		return conIntPreferences;
-	}
+    public I_RefsetDefaultsConInt getConIntPreferences() {
+        return conIntPreferences;
+    }
 
     public I_RefsetDefaultsCrossMap getCrossMapPreferences() {
         return crossMapPreferences;

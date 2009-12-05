@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.refset;
 
 import java.awt.GridBagConstraints;
@@ -40,7 +56,7 @@ public class RefsetSpecPanel extends JPanel {
 
         public void actionPerformed(ActionEvent arg0) {
             try {
-            	commentTableModel = setupCommentTable();
+                commentTableModel = setupCommentTable();
                 setupRefsetMemberTable(commentTableModel);
             } catch (NoSuchMethodException e) {
                 AceLog.getAppLog().alertAndLogException(e);
@@ -52,11 +68,11 @@ public class RefsetSpecPanel extends JPanel {
     }
 
     /**
-	 *
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
 
-	private ReflexiveRefsetCommentTableModel commentTableModel;
+    private ReflexiveRefsetCommentTableModel commentTableModel;
 
     RefsetSpecEditor editor;
 
@@ -64,41 +80,49 @@ public class RefsetSpecPanel extends JPanel {
 
     private I_ConfigAceFrame aceFrameConfig;
 
-	private ReflexiveRefsetTableModel refsetTableModel;
+    private ReflexiveRefsetTableModel refsetTableModel;
 
-    private static final String HIERARCHICAL_VIEW =           "taxonomy";
+    private static final String HIERARCHICAL_VIEW = "taxonomy";
     private static final String REFSET_AND_PARENT_ONLY_VIEW = "  tree  ";
-    private static final String TABLE_VIEW =                  " members";
-    private static final String COMMENT_VIEW =                "comments";
+    private static final String TABLE_VIEW = " members";
+    private static final String COMMENT_VIEW = "comments";
 
     public RefsetSpecPanel(ACE ace) throws Exception {
         super(new GridBagLayout());
         aceFrameConfig = ace.getAceFrameConfig();
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         split.setOneTouchExpandable(true);
-        
-        TermTreeHelper hierarchicalTreeHelper = new TermTreeHelper(
-                new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), false), ace);
-        
-        TermTreeHelper refsetAndParentOnlyTreeHelper = new TermTreeHelper(
-                new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), true), ace);
-        
-        editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper, this);
+
+        TermTreeHelper hierarchicalTreeHelper =
+                new TermTreeHelper(new RefsetSpecFrameConfig(ace
+                    .getAceFrameConfig(), new IntSet(), false), ace);
+
+        TermTreeHelper refsetAndParentOnlyTreeHelper =
+                new TermTreeHelper(new RefsetSpecFrameConfig(ace
+                    .getAceFrameConfig(), new IntSet(), true), ace);
+
+        editor =
+                new RefsetSpecEditor(ace, hierarchicalTreeHelper,
+                    refsetAndParentOnlyTreeHelper, this);
         split.setTopComponent(editor.getContentPanel());
 
         ace.getAceFrameConfig().addPropertyChangeListener("viewPositions",
-        		refsetAndParentOnlyTreeHelper);
-        ace.getAceFrameConfig().addPropertyChangeListener("commit", refsetAndParentOnlyTreeHelper);
+            refsetAndParentOnlyTreeHelper);
+        ace.getAceFrameConfig().addPropertyChangeListener("commit",
+            refsetAndParentOnlyTreeHelper);
         editor.getLabel().addTermChangeListener(refsetAndParentOnlyTreeHelper);
 
         ace.getAceFrameConfig().addPropertyChangeListener("viewPositions",
-                hierarchicalTreeHelper);
-        ace.getAceFrameConfig().addPropertyChangeListener("commit", hierarchicalTreeHelper);
+            hierarchicalTreeHelper);
+        ace.getAceFrameConfig().addPropertyChangeListener("commit",
+            hierarchicalTreeHelper);
         editor.getLabel().addTermChangeListener(hierarchicalTreeHelper);
 
         bottomTabs = new JTabbedPane();
-        bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
-        bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
+        bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper
+            .getHierarchyPanel());
+        bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW,
+            refsetAndParentOnlyTreeHelper.getHierarchyPanel());
 
         bottomTabs.addTab(TABLE_VIEW, new JScrollPane());
         bottomTabs.addTab(COMMENT_VIEW, new JScrollPane());
@@ -126,21 +150,23 @@ public class RefsetSpecPanel extends JPanel {
         refsetTableModel.propertyChange(null);
     }
 
-    public ReflexiveRefsetCommentTableModel setupCommentTable() throws NoSuchMethodException, Exception {
-        JTableWithDragImage commentTable = createCommentTable(aceFrameConfig, editor);
+    public ReflexiveRefsetCommentTableModel setupCommentTable()
+            throws NoSuchMethodException, Exception {
+        JTableWithDragImage commentTable =
+                createCommentTable(aceFrameConfig, editor);
         for (int i = 0; i < bottomTabs.getTabCount(); i++) {
             if (bottomTabs.getTitleAt(i).equals(COMMENT_VIEW)) {
-                JScrollPane tableScroller = (JScrollPane) bottomTabs
-                        .getComponentAt(i);
+                JScrollPane tableScroller =
+                        (JScrollPane) bottomTabs.getComponentAt(i);
                 tableScroller.setViewportView(commentTable);
                 break;
             }
         }
-    	TableSorter sorter = (TableSorter) commentTable.getModel();
+        TableSorter sorter = (TableSorter) commentTable.getModel();
         return (ReflexiveRefsetCommentTableModel) sorter.getTableModel();
     }
 
-	protected static JTableWithDragImage createCommentTable(I_ConfigAceFrame aceFrameConfig, RefsetSpecEditor editor)
+    protected static JTableWithDragImage createCommentTable(I_ConfigAceFrame aceFrameConfig, RefsetSpecEditor editor)
 			throws NoSuchMethodException, Exception {
 		List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
@@ -415,7 +441,8 @@ public class RefsetSpecPanel extends JPanel {
         return editor.getTreeInSpecEditor();
     }
 
-    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException,
+            TerminologyException {
         return editor.getRefsetSpecInSpecEditor();
     }
 
@@ -423,11 +450,11 @@ public class RefsetSpecPanel extends JPanel {
         editor.setTermComponent(refset);
     }
 
-	public ReflexiveRefsetCommentTableModel getCommentTableModel() {
-		return commentTableModel;
-	}
+    public ReflexiveRefsetCommentTableModel getCommentTableModel() {
+        return commentTableModel;
+    }
 
-	public RefsetSpecEditor getRefsetSpecEditor() {
-		return editor;
-	}
+    public RefsetSpecEditor getRefsetSpecEditor() {
+        return editor;
+    }
 }

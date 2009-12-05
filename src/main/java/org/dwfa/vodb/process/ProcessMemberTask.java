@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.vodb.process;
 
 import java.util.UUID;
@@ -26,24 +42,26 @@ public abstract class ProcessMemberTask implements Runnable {
     protected UUID pathUuid;
     protected int version;
     protected int memberId;
-    
+
     ProcessMemberTask(int arrayIndex) {
         super();
         this.arrayIndex = arrayIndex;
     }
 
-
     public boolean isUsable() {
         return usable;
     }
 
-
     protected abstract Exception getProcessException();
+
     protected abstract void setProcessException(Exception processException);
+
     protected abstract ThinExtByRefPart makeNewPart() throws Exception;
+
     protected abstract ProcessMemberTask[] getTaskArray();
+
     protected abstract Semaphore getSemaphore();
-    
+
     public void run() {
         if (getProcessException() != null) {
             getSemaphore().release();
@@ -109,11 +127,10 @@ public abstract class ProcessMemberTask implements Runnable {
         }
     }
 
-
     protected abstract EXT_TYPE getRefsetType();
 
-    protected void resetCore(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid,
-        int version, int memberId) {
+    protected void resetCore(UUID refsetUuid, UUID statusUuid,
+            UUID componentUuid, UUID pathUuid, int version, int memberId) {
         this.usable = false;
         this.taskSequence = ProcessMemberTask.sequence++;
         this.refsetUuid = refsetUuid;
@@ -123,7 +140,5 @@ public abstract class ProcessMemberTask implements Runnable {
         this.version = version;
         this.memberId = memberId;
     }
-
-
 
 }

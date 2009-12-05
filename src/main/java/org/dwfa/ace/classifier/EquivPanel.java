@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.classifier;
 
 import java.awt.Dimension;
@@ -52,8 +68,8 @@ public class EquivPanel extends JPanel {
             c.weightx = 0.5;
             c.weighty = 0.5;
             this.add(new JLabel(
-                    "<HTML><FONT COLOR='gray'><I> -- No equivalences reported from"
-                            + " most recent classification. --"), c);
+                "<HTML><FONT COLOR='gray'><I> -- No equivalences reported from"
+                    + " most recent classification. --"), c);
             return;
         }
 
@@ -70,8 +86,8 @@ public class EquivPanel extends JPanel {
             return;
         }
 
-        EquivTableModel theTableModel = new EquivTableModel(theTableStr,
-                SnoQuery.getEquiv());
+        EquivTableModel theTableModel =
+                new EquivTableModel(theTableStr, SnoQuery.getEquiv());
         JTable table = new JTable(theTableModel);
 
         EquivTableRenderer renderer = new EquivTableRenderer(config);
@@ -91,7 +107,7 @@ public class EquivPanel extends JPanel {
         int tWide = 700;
         table.setRowHeight(rowHeight);
         table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight
-                * table.getRowCount()));
+            * table.getRowCount()));
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.FIRST_LINE_START;

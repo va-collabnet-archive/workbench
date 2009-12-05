@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.list;
 
 import java.io.IOException;
@@ -13,66 +29,70 @@ import org.dwfa.vodb.types.IntList;
 
 public class TerminologyIntListModel implements I_ModelTerminologyList {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private IntList elements ;
-	
-	public TerminologyIntListModel(IntList elements) {
-		super();
-		this.elements = elements;
-	}
-	
-	public I_GetConceptData getElementAt(int index) {
-		try {
-			return LocalVersionedTerminology.get().getConcept(elements.get(index));
-		} catch (TerminologyException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
-		return null;
-	}
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-	public int getSize() {
-		return elements.size();
-	}
+    private IntList elements;
 
-	public boolean addElement(I_GetConceptData o) {
-		boolean rv = elements.add(o.getConceptId());
-		return rv;
-	}
-	public void addElement(int index, I_GetConceptData element) {
-		elements.add(index, element.getConceptId());
-	}
-	public I_GetConceptData removeElement(int index) {
-		int id = elements.remove(index);
-		try {
-			return LocalVersionedTerminology.get().getConcept(id);
-		} catch (TerminologyException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
-		return null;
-	}
-	public void clear() {
-		elements.clear();
-	}
+    public TerminologyIntListModel(IntList elements) {
+        super();
+        this.elements = elements;
+    }
 
-	public void addListDataListener(ListDataListener l) {
-		elements.addListDataListener(l);
-		
-	}
+    public I_GetConceptData getElementAt(int index) {
+        try {
+            return LocalVersionedTerminology.get().getConcept(
+                elements.get(index));
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return null;
+    }
 
-	public void removeListDataListener(ListDataListener l) {
-		elements.removeListDataListener(l);
-		
-	}
+    public int getSize() {
+        return elements.size();
+    }
 
-	public IntList getElements() {
-		return elements;
-	}
+    public boolean addElement(I_GetConceptData o) {
+        boolean rv = elements.add(o.getConceptId());
+        return rv;
+    }
+
+    public void addElement(int index, I_GetConceptData element) {
+        elements.add(index, element.getConceptId());
+    }
+
+    public I_GetConceptData removeElement(int index) {
+        int id = elements.remove(index);
+        try {
+            return LocalVersionedTerminology.get().getConcept(id);
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return null;
+    }
+
+    public void clear() {
+        elements.clear();
+    }
+
+    public void addListDataListener(ListDataListener l) {
+        elements.addListDataListener(l);
+
+    }
+
+    public void removeListDataListener(ListDataListener l) {
+        elements.removeListDataListener(l);
+
+    }
+
+    public IntList getElements() {
+        return elements;
+    }
 }
