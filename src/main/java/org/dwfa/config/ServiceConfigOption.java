@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.config;
 
 import java.util.ArrayList;
@@ -6,11 +22,11 @@ import java.util.Properties;
 
 public class ServiceConfigOption {
     private String name;
-    
+
     private String policy;
-    
+
     private String securePolicy;
-    
+
     private String propName;
 
     private String desc;
@@ -18,7 +34,7 @@ public class ServiceConfigOption {
     private boolean enabled;
 
     private String codebase;
-    
+
     private String jarDir;
 
     private String classPath;
@@ -26,21 +42,19 @@ public class ServiceConfigOption {
     private String mainClass;
 
     private String[] args;
-    
+
     private String[] secureArgs;
 
     private boolean optional;
 
     private boolean alertIfSelected;
-    
+
     private boolean alertIfDeselected;
 
     private String alertString;
-    
+
     private transient String prefix;
 
-
-    
     /**
      * @param name
      * @param desc
@@ -49,10 +63,10 @@ public class ServiceConfigOption {
      * @param classPath
      * @param args
      */
-    public ServiceConfigOption(String name, String policy, String securePolicy, 
-               String propName, String desc, boolean enabledByDefault,
+    public ServiceConfigOption(String name, String policy, String securePolicy,
+            String propName, String desc, boolean enabledByDefault,
             String codebase, String jarDir, String classPath, String mainClass,
-            String[] args, String[] secureArgs, boolean optional, 
+            String[] args, String[] secureArgs, boolean optional,
             boolean alertIfSelected, boolean alertIfDeselected,
             String alertString) {
         super();
@@ -74,15 +88,15 @@ public class ServiceConfigOption {
         this.alertString = alertString;
         Properties sysProps = System.getProperties();
         sysProps.setProperty(this.propName, new Boolean(enabledByDefault)
-                .toString());
+            .toString());
 
     }
-    
+
     public String getPrefix() {
-            if (this.prefix == null) {
-                this.prefix = this.propName.split("[.]")[2];
-            }
-            return this.prefix;
+        if (this.prefix == null) {
+            this.prefix = this.propName.split("[.]")[2];
+        }
+        return this.prefix;
     }
 
     public String[] getSetupStrings(boolean secure) {
@@ -167,17 +181,17 @@ public class ServiceConfigOption {
         return (String[]) stringList.toArray(setupStrings);
         
     }
+
     public String getNonActivatableServiceDescriptor() {
         StringBuffer buff = new StringBuffer();
         buff.append("new NonActivatableServiceDescriptor(");
-        buff.append(this.getPrefix() +"_Codebase,");
-        buff.append(this.getPrefix() +"_Policy,");
-        buff.append(this.getPrefix() +"_Classpath,");
-        buff.append(this.getPrefix() +"_Class,");
-        buff.append(this.getPrefix() +"_Args)");
+        buff.append(this.getPrefix() + "_Codebase,");
+        buff.append(this.getPrefix() + "_Policy,");
+        buff.append(this.getPrefix() + "_Classpath,");
+        buff.append(this.getPrefix() + "_Class,");
+        buff.append(this.getPrefix() + "_Args)");
         return buff.toString();
     }
-
 
     /**
      * @return Returns the alertIfDeselected.
@@ -186,14 +200,12 @@ public class ServiceConfigOption {
         return alertIfDeselected;
     }
 
-
     /**
      * @param alertIfDeselected The alertIfDeselected to set.
      */
     public void setAlertIfDeselected(boolean alertIfDeselected) {
         this.alertIfDeselected = alertIfDeselected;
     }
-
 
     /**
      * @return Returns the alertIfSelected.
@@ -202,14 +214,12 @@ public class ServiceConfigOption {
         return alertIfSelected;
     }
 
-
     /**
      * @param alertIfSelected The alertIfSelected to set.
      */
     public void setAlertIfSelected(boolean alertIfSelected) {
         this.alertIfSelected = alertIfSelected;
     }
-
 
     /**
      * @return Returns the alertString.
@@ -218,14 +228,12 @@ public class ServiceConfigOption {
         return alertString;
     }
 
-
     /**
      * @param alertString The alertString to set.
      */
     public void setAlertString(String alertString) {
         this.alertString = alertString;
     }
-
 
     /**
      * @return Returns the args.
@@ -234,14 +242,12 @@ public class ServiceConfigOption {
         return args;
     }
 
-
     /**
      * @param args The args to set.
      */
     public void setArgs(String[] args) {
         this.args = args;
     }
-
 
     /**
      * @return Returns the classPath.
@@ -250,14 +256,12 @@ public class ServiceConfigOption {
         return classPath;
     }
 
-
     /**
      * @param classPath The classPath to set.
      */
     public void setClassPath(String classPath) {
         this.classPath = classPath;
     }
-
 
     /**
      * @return Returns the codebase.
@@ -266,14 +270,12 @@ public class ServiceConfigOption {
         return codebase;
     }
 
-
     /**
      * @param codebase The codebase to set.
      */
     public void setCodebase(String codebase) {
         this.codebase = codebase;
     }
-
 
     /**
      * @return Returns the desc.
@@ -282,14 +284,12 @@ public class ServiceConfigOption {
         return desc;
     }
 
-
     /**
      * @param desc The desc to set.
      */
     public void setDesc(String desc) {
         this.desc = desc;
     }
-
 
     /**
      * @return Returns the enabled.
@@ -298,14 +298,12 @@ public class ServiceConfigOption {
         return enabled;
     }
 
-
     /**
      * @param enabled The enabled to set.
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-
 
     /**
      * @return Returns the jarDir.
@@ -314,14 +312,12 @@ public class ServiceConfigOption {
         return jarDir;
     }
 
-
     /**
      * @param jarDir The jarDir to set.
      */
     public void setJarDir(String jarDir) {
         this.jarDir = jarDir;
     }
-
 
     /**
      * @return Returns the mainClass.
@@ -330,14 +326,12 @@ public class ServiceConfigOption {
         return mainClass;
     }
 
-
     /**
      * @param mainClass The mainClass to set.
      */
     public void setMainClass(String mainClass) {
         this.mainClass = mainClass;
     }
-
 
     /**
      * @return Returns the name.
@@ -346,14 +340,12 @@ public class ServiceConfigOption {
         return name;
     }
 
-
     /**
      * @param name The name to set.
      */
     public void setName(String name) {
         this.name = name;
     }
-
 
     /**
      * @return Returns the optional.
@@ -362,14 +354,12 @@ public class ServiceConfigOption {
         return optional;
     }
 
-
     /**
      * @param optional The optional to set.
      */
     public void setOptional(boolean optional) {
         this.optional = optional;
     }
-
 
     /**
      * @return Returns the policy.
@@ -378,14 +368,12 @@ public class ServiceConfigOption {
         return policy;
     }
 
-
     /**
      * @param policy The policy to set.
      */
     public void setPolicy(String policy) {
         this.policy = policy;
     }
-
 
     /**
      * @return Returns the propName.
@@ -394,14 +382,12 @@ public class ServiceConfigOption {
         return propName;
     }
 
-
     /**
      * @param propName The propName to set.
      */
     public void setPropName(String propName) {
         this.propName = propName;
     }
-
 
     /**
      * @return Returns the secureArgs.
@@ -410,14 +396,12 @@ public class ServiceConfigOption {
         return secureArgs;
     }
 
-
     /**
      * @param secureArgs The secureArgs to set.
      */
     public void setSecureArgs(String[] secureArgs) {
         this.secureArgs = secureArgs;
     }
-
 
     /**
      * @return Returns the securePolicy.
@@ -426,14 +410,12 @@ public class ServiceConfigOption {
         return securePolicy;
     }
 
-
     /**
      * @param securePolicy The securePolicy to set.
      */
     public void setSecurePolicy(String securePolicy) {
         this.securePolicy = securePolicy;
     }
-
 
     /**
      * @param prefix The prefix to set.

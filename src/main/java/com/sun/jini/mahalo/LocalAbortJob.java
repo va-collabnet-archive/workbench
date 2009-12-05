@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.sun.jini.mahalo;
 
 import java.rmi.AccessException;
@@ -42,7 +58,7 @@ public class LocalAbortJob extends LocalJob implements TransactionConstants {
     LocalParticipantHandle[] handles;
     int maxtries = 5;
     static final Logger logger = TxnManagerImpl.participantLogger;
-    
+
     /**
      * Constructs an <code>AbortJob</code>
      *
@@ -63,31 +79,30 @@ public class LocalAbortJob extends LocalJob implements TransactionConstants {
      * @see com.sun.jini.mahalo.log.ClientLog
      * @see net.jini.core.transaction.server.TransactionParticipant
      */
-    public LocalAbortJob(Transaction tr, TaskManager pool,
-		      WakeupManager wm, ClientLog log,
-		      LocalParticipantHandle[] handles) {
-	super(pool, wm);
+    public LocalAbortJob(Transaction tr, TaskManager pool, WakeupManager wm,
+            ClientLog log, LocalParticipantHandle[] handles) {
+        super(pool, wm);
 
-	if (log == null)
-	    throw new IllegalArgumentException("AbortJob: AbortJob: " +
-							"log is null");
+        if (log == null)
+            throw new IllegalArgumentException("AbortJob: AbortJob: "
+                + "log is null");
 
-	this.log = log;
+        this.log = log;
 
         if (!(tr instanceof ServerTransaction))
-            throw new IllegalArgumentException("PrepareJob: PrepareJob: " +
-                                        "must be a ServerTransaction");
- 
-        this.tr =  (ServerTransaction) tr;
- 
+            throw new IllegalArgumentException("PrepareJob: PrepareJob: "
+                + "must be a ServerTransaction");
+
+        this.tr = (ServerTransaction) tr;
+
         if (handles == null)
-            throw new IllegalArgumentException("PrepareJob: PrepareJob: " +
-                                        "must have participants");
- 
+            throw new IllegalArgumentException("PrepareJob: PrepareJob: "
+                + "must have participants");
+
         if (handles.length == 0)
-            throw new IllegalArgumentException("PrepareJob: PrepareJob: " +
-                                        "must have participants");
- 
+            throw new IllegalArgumentException("PrepareJob: PrepareJob: "
+                + "must have participants");
+
         this.handles = handles;
     }
 
@@ -96,14 +111,15 @@ public class LocalAbortJob extends LocalJob implements TransactionConstants {
      * inform participants to roll-back.
      */
     TaskManager.Task[] createTasks() {
-	TaskManager.Task[] tmp = new TaskManager.Task[handles.length];
+        TaskManager.Task[] tmp = new TaskManager.Task[handles.length];
 
-	for (int i = 0; i < handles.length; i++) {
-	    tmp[i] = 
-	        new LocalParticipantTask(getPool(), getMgr(), this, handles[i]);
-	}
+        for (int i = 0; i < handles.length; i++) {
+            tmp[i] =
+                    new LocalParticipantTask(getPool(), getMgr(), this,
+                        handles[i]);
+        }
 
-	return tmp;
+        return tmp;
     }
 
     /**
@@ -122,64 +138,61 @@ public class LocalAbortJob extends LocalJob implements TransactionConstants {
      * @see com.sun.jini.thread.TaskManager.Task
      */
     Object doWork(TaskManager.Task who, Object param) {
-        LocalParticipantHandle handle = (LocalParticipantHandle)param;
+        LocalParticipantHandle handle = (LocalParticipantHandle) param;
         TransactionParticipant par = null;
- 
+
         //check if a vote already exists because it was
         //recovered from the log. In this situation,
         //we do not need to log this info since it
         //exists in the log which was used for recovery...
 
         if (logger.isLoggable(Level.FINEST)) {
-            logger.log(Level.FINEST,
-                "AbortJob:doWork aborting handle: {0}", handle);
-	}
-	int vote = 0;
- 
-        vote = handle.getPrepState();
- 
-        switch (vote) {
-            case NOTCHANGED:
-            case ABORTED:
-                return new Integer(ABORTED);
+            logger.log(Level.FINEST, "AbortJob:doWork aborting handle: {0}",
+                handle);
         }
- 
+        int vote = 0;
+
+        vote = handle.getPrepState();
+
+        switch (vote) {
+        case NOTCHANGED:
+        case ABORTED:
+            return new Integer(ABORTED);
+        }
+
         //Instruct the TransactionParticipant to roll back
         //after unpacking it and checking against the
         //max retry threshold.
- 
+
         if (par == null)
             par = handle.getPreParedParticipant();
- 
+
         //If you have exhausted the max retry threshold
         //stop, so that no further attempts are made.
- 
-	try {
+
+        try {
             if (attempt(who) > maxtries) {
                 return new Integer(ABORTED);
             }
-	} catch (JobException je) {
-	    return null;
-	}
+        } catch (JobException je) {
+            return null;
+        }
 
- 
- 
         //At this point, if participant is null, there
         //must be an error unpacking, so retry later
         if (par == null)
             return null;
- 
- 
+
         //Here we actually need to instruct the participant to
         //roll back.  Note the RemoteException causes a
         //retry. Here we only log info for the cases
         //where a final outcome is available.
-	//
-	//Note: handle UnknownHostException and
-	//      NoSuchObjectException (activation problem)
- 
+        //
+        //Note: handle UnknownHostException and
+        //      NoSuchObjectException (activation problem)
+
         Object response = null;
- 
+
         try {
             par.abort(tr.mgr, tr.id);
             response = new Integer(ABORTED);
@@ -218,21 +231,21 @@ public class LocalAbortJob extends LocalJob implements TransactionConstants {
         } catch (RuntimeException rte) {
             //Something happened with the participant, so
             //stop retrying
-	    response = new Integer(ABORTED);
+            response = new Integer(ABORTED);
         }
- 
+
         if (response != null) {
-	    handle.setPrepState(ABORTED);
+            handle.setPrepState(ABORTED);
             try {
-                log.write( new LocalParticipantAbortRecord(handle));
+                log.write(new LocalParticipantAbortRecord(handle));
             } catch (com.sun.jini.mahalo.log.LogException le) {
                 //the full package name used to disambiguate
                 //the LogException
             }
 
-	    return response;
+            return response;
         }
- 
+
         return null;
     }
 
@@ -243,31 +256,31 @@ public class LocalAbortJob extends LocalJob implements TransactionConstants {
      * @see com.sun.jini.mahalo.Job
      */
     Object computeResult() throws JobException {
-	try {
-	    if (!isCompleted(0))
-	        throw new ResultNotReadyException("Cannot compute result " +
-					"since there are jobs pending");
-	} catch (JobNotStartedException jnse) {
-	    throw new ResultNotReadyException("Cannot compute result since" +
-					   " jobs were not created");
-	}
+        try {
+            if (!isCompleted(0))
+                throw new ResultNotReadyException("Cannot compute result "
+                    + "since there are jobs pending");
+        } catch (JobNotStartedException jnse) {
+            throw new ResultNotReadyException("Cannot compute result since"
+                + " jobs were not created");
+        }
 
-	int tmp = 0;
-	int count = 0;
+        int tmp = 0;
+        int count = 0;
 
-	for (int i = 0; i < results.length; i++) {
-	    tmp = ((Integer)results[i]).intValue();
+        for (int i = 0; i < results.length; i++) {
+            tmp = ((Integer) results[i]).intValue();
 
-	    if (tmp == ABORTED)
-		count++;
-	}
+            if (tmp == ABORTED)
+                count++;
+        }
 
         if (logger.isLoggable(Level.FINEST)) {
             logger.log(Level.FINEST,
-                "AbortJob:computeResult {0} participants ABORTED", 
-		new Integer(count));
-	}
+                "AbortJob:computeResult {0} participants ABORTED", new Integer(
+                    count));
+        }
 
-	return new Integer(ABORTED);
+        return new Integer(ABORTED);
     }
 }

@@ -1,4 +1,21 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.sun.jini.mahalo;
+
 import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +30,6 @@ import com.sun.jini.mahalo.log.ClientLog;
 import com.sun.jini.thread.TaskManager;
 import com.sun.jini.thread.WakeupManager;
 
-
 /**
  * An implementation of a <code>Job</code> which interacts with
  * a set of <code>TransactionParticipant</code>s to inform them
@@ -27,31 +43,32 @@ import com.sun.jini.thread.WakeupManager;
  * @see net.jini.core.transaction.Transaction
  * @see net.jini.core.transaction.server.TransactionParticipant
  */
-public class LocalPrepareAndCommitJob extends LocalJob implements TransactionConstants {
+public class LocalPrepareAndCommitJob extends LocalJob implements
+        TransactionConstants {
     ServerTransaction tr;
     ClientLog log;
     LocalParticipantHandle handle;
     int maxtries = 5;
-    
+
     /*
      * Field that holds the last received remote exception, if any.
      * Used as a flag for retry logic below.
      */
     private volatile RemoteException reCaught = null;
-    
+
     /*
      * Flag used to indicate that client needs to be notified of a possible
      * indeterminate state.
      */
     private volatile boolean notifyClient = false;
-    
+
     /** Logger for operations related messages */
-    private static final Logger operationsLogger = 
-       TxnManagerImpl.operationsLogger;
+    private static final Logger operationsLogger =
+            TxnManagerImpl.operationsLogger;
 
     /** Logger for persistence related messages */
-    private static final Logger persistenceLogger = 
-        TxnManagerImpl.persistenceLogger;
+    private static final Logger persistenceLogger =
+            TxnManagerImpl.persistenceLogger;
 
     /**
      * Constructs a <code>PrepareAndCommitJob</code>.
@@ -74,31 +91,27 @@ public class LocalPrepareAndCommitJob extends LocalJob implements TransactionCon
      * @see net.jini.core.transaction.server.TransactionParticipant
      */
     public LocalPrepareAndCommitJob(Transaction tr, TaskManager pool,
-		      WakeupManager wm, ClientLog log,
-		      LocalParticipantHandle handle) {
-	super(pool, wm);
+            WakeupManager wm, ClientLog log, LocalParticipantHandle handle) {
+        super(pool, wm);
 
-	if (log == null)
-	    throw new IllegalArgumentException("PrepareAndCommitJob: " +
-					"PrepareAndCommitJob: log is null");
+        if (log == null)
+            throw new IllegalArgumentException("PrepareAndCommitJob: "
+                + "PrepareAndCommitJob: log is null");
 
-	this.log = log;
+        this.log = log;
 
-	if (!(tr instanceof ServerTransaction))
-	    throw new IllegalArgumentException("PrepareAndCommitJob: " +
-						"PrepareAndCommitJob: " +
-					"must be a ServerTransaction");
+        if (!(tr instanceof ServerTransaction))
+            throw new IllegalArgumentException("PrepareAndCommitJob: "
+                + "PrepareAndCommitJob: " + "must be a ServerTransaction");
 
-	this.tr =  (ServerTransaction) tr;
+        this.tr = (ServerTransaction) tr;
 
-	if (handle == null)
-	    throw new IllegalArgumentException("PrepareAndCommitJob: " +
-						"PrepareJob: " +
-					"must have participants");
+        if (handle == null)
+            throw new IllegalArgumentException("PrepareAndCommitJob: "
+                + "PrepareJob: " + "must have participants");
 
-	this.handle = handle;
+        this.handle = handle;
     }
-
 
     /**
      * The work to be performed by each <code>TaskManager.Task</code>
@@ -117,77 +130,74 @@ public class LocalPrepareAndCommitJob extends LocalJob implements TransactionCon
      */
     Object doWork(TaskManager.Task who, Object param) {
         if (operationsLogger.isLoggable(Level.FINE)) {
-            operationsLogger.entering(PrepareAndCommitJob.class.getName(), 
-	        "doWork", new Object[] {who, param});
-	}
-	LocalParticipantHandle handle = (LocalParticipantHandle)param;
-	TransactionParticipant par = null;
+            operationsLogger.entering(PrepareAndCommitJob.class.getName(),
+                "doWork", new Object[] { who, param });
+        }
+        LocalParticipantHandle handle = (LocalParticipantHandle) param;
+        TransactionParticipant par = null;
 
         //check if a vote already exists because it was
         //recovered from the log. In this situation,
         //we do not need to log this info since it
         //exists in the log which was used for recovery...
- 
+
         int vote = handle.getPrepState();
- 
+
         switch (vote) {
-            case COMMITTED:
-            case NOTCHANGED:
-            case ABORTED:
-            case PREPARED:
-                if (operationsLogger.isLoggable(Level.FINE)) {
-                    operationsLogger.exiting(
-		        PrepareAndCommitJob.class.getName(), 
- 	                "doWork", new Integer(vote));
-		}
-		return new Integer(vote);
+        case COMMITTED:
+        case NOTCHANGED:
+        case ABORTED:
+        case PREPARED:
+            if (operationsLogger.isLoggable(Level.FINE)) {
+                operationsLogger.exiting(PrepareAndCommitJob.class.getName(),
+                    "doWork", new Integer(vote));
+            }
+            return new Integer(vote);
         }
- 
+
         //...otherwise, explicitly instruct the participant to
         //prepare after unpacking it and checking against the
         //max retry threshold
- 
+
         if (par == null)
             par = handle.getPreParedParticipant();
- 
+
         //If you have exhausted the max retry threshold
         //stop, so that no further attempts are made.
- 
-	try {
+
+        try {
             if (attempt(who) > maxtries) {
-	        if (operationsLogger.isLoggable(Level.FINE)) {
-                    operationsLogger.exiting(
-			PrepareAndCommitJob.class.getName(), 
-	                "doWork", new Integer(ABORTED));
-		}
-	        return new Integer(ABORTED);
+                if (operationsLogger.isLoggable(Level.FINE)) {
+                    operationsLogger.exiting(PrepareAndCommitJob.class
+                        .getName(), "doWork", new Integer(ABORTED));
+                }
+                return new Integer(ABORTED);
             }
-	} catch (JobException je) {
-	    if (operationsLogger.isLoggable(Level.FINE)) {
-                operationsLogger.exiting(PrepareAndCommitJob.class.getName(), 
-	            "doWork", null);
-	    }
-	    return null;
-	}
- 
- 
+        } catch (JobException je) {
+            if (operationsLogger.isLoggable(Level.FINE)) {
+                operationsLogger.exiting(PrepareAndCommitJob.class.getName(),
+                    "doWork", null);
+            }
+            return null;
+        }
+
         //At this point, if participant is null, there
         //must be an error unpacking, so retry later
         if (par == null) {
-	    if (operationsLogger.isLoggable(Level.FINE)) {
-                operationsLogger.exiting(PrepareAndCommitJob.class.getName(), 
-	            "doWork", null);
-	    }
+            if (operationsLogger.isLoggable(Level.FINE)) {
+                operationsLogger.exiting(PrepareAndCommitJob.class.getName(),
+                    "doWork", null);
+            }
             return null;
         }
- 
+
         //Here we actually need to ask the participant to
         //prepare.  Note the RemoteException causes a
         //retry. Here we only log FINE for the cases
         //where a final outcome is available.
- 
+
         Object response = null;
- 
+
         try {
             vote = par.prepareAndCommit(tr.mgr, tr.id);
             response = new Integer(vote);
@@ -202,54 +212,52 @@ public class LocalPrepareAndCommitJob extends LocalJob implements TransactionCon
             if (operationsLogger.isLoggable(Level.FINE)) {
                 operationsLogger.log(Level.FINE,
                     "Ignoring remote exception from participant.", re);
-	    }
+            }
         } catch (RuntimeException rte) {
-	    vote = ABORTED;
-	    response = new Integer(vote);
-	}
+            vote = ABORTED;
+            response = new Integer(vote);
+        }
 
         if (response != null) {
-	    handle.setPrepState(vote);
+            handle.setPrepState(vote);
             try {
-                log.write( new LocalPrepareAndCommitRecord(handle, vote));
+                log.write(new LocalPrepareAndCommitRecord(handle, vote));
             } catch (com.sun.jini.mahalo.log.LogException le) {
                 //the full package name used to disambiguate
                 //the LogException
                 if (persistenceLogger.isLoggable(Level.FINE)) {
                     persistenceLogger.log(Level.FINE,
-	            "Problem writing PrepareAndCommitRecord.", le);
-	        }
-//TODO - ignore?		
+                        "Problem writing PrepareAndCommitRecord.", le);
+                }
+                //TODO - ignore?		
             }
             if (operationsLogger.isLoggable(Level.FINE)) {
-                operationsLogger.exiting(PrepareAndCommitJob.class.getName(), 
-	            "doWork", response);
-	    }
+                operationsLogger.exiting(PrepareAndCommitJob.class.getName(),
+                    "doWork", response);
+            }
 
-	    return response;
+            return response;
         }
-	
+
         if (operationsLogger.isLoggable(Level.FINE)) {
-            operationsLogger.exiting(PrepareAndCommitJob.class.getName(), 
-	        "doWork", null);
-	}
+            operationsLogger.exiting(PrepareAndCommitJob.class.getName(),
+                "doWork", null);
+        }
 
-	return null;
+        return null;
     }
-
 
     /**
      * Creates the <code>TaskManager.Task</code>s necessary to
      * inform participants to vote and roll-forward/back.
      */
     TaskManager.Task[] createTasks() {
-	TaskManager.Task[] tmp = new TaskManager.Task[1];
+        TaskManager.Task[] tmp = new TaskManager.Task[1];
 
-	tmp[0] = new LocalParticipantTask(getPool(), getMgr(), this, handle);
+        tmp[0] = new LocalParticipantTask(getPool(), getMgr(), this, handle);
 
-	return tmp;
+        return tmp;
     }
-
 
     /**
      * Gathers partial results submitted by tasks and produces
@@ -259,38 +267,38 @@ public class LocalPrepareAndCommitJob extends LocalJob implements TransactionCon
      */
     Object computeResult() throws JobException {
         if (operationsLogger.isLoggable(Level.INFO)) {
-            operationsLogger.entering(PrepareAndCommitJob.class.getName(), 
-	        "computeResult");
-	}
-	try {
-	    if (!isCompleted(0))
-	        throw new ResultNotReadyException("Cannot compute result " +
-					"since there are jobs pending");
-	} catch (JobNotStartedException jnse) {
-	    throw new ResultNotReadyException("Cannot compute result since" +
-					   " jobs were not created");
-	}
+            operationsLogger.entering(PrepareAndCommitJob.class.getName(),
+                "computeResult");
+        }
+        try {
+            if (!isCompleted(0))
+                throw new ResultNotReadyException("Cannot compute result "
+                    + "since there are jobs pending");
+        } catch (JobNotStartedException jnse) {
+            throw new ResultNotReadyException("Cannot compute result since"
+                + " jobs were not created");
+        }
 
-	int prepstate = NOTCHANGED;
+        int prepstate = NOTCHANGED;
 
-	prepstate = ((Integer)results[0]).intValue();
+        prepstate = ((Integer) results[0]).intValue();
 
         Integer result = new Integer(prepstate);
         if (operationsLogger.isLoggable(Level.INFO)) {
-            operationsLogger.exiting(PrepareAndCommitJob.class.getName(), 
-	        "computeResult", result);
-	}
-	return result;
+            operationsLogger.exiting(PrepareAndCommitJob.class.getName(),
+                "computeResult", result);
+        }
+        return result;
     }
-    
+
     /**
      * Simple accessor that returns the the exception to send back to the
      * client. 
      */
-    Exception getAlternateException() { 
+    Exception getAlternateException() {
         if (notifyClient)
-           return reCaught; 
-        else 
-           return null;
+            return reCaught;
+        else
+            return null;
     }
 }

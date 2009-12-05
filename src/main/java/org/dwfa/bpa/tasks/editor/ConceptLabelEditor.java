@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.bpa.tasks.editor;
 
 import java.awt.Component;
@@ -12,17 +28,16 @@ import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 
-public class ConceptLabelEditor  extends PropertyEditorSupport 
-    implements PropertyChangeListener {
+public class ConceptLabelEditor extends PropertyEditorSupport implements
+        PropertyChangeListener {
 
- 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
-    
     private ConceptLabel editor = new ConceptLabel();
+
     /**
      * @param arg0
      */
@@ -30,7 +45,7 @@ public class ConceptLabelEditor  extends PropertyEditorSupport
         super();
         this.editor.addPropertyChangeListener("concept", this);
     }
-    
+
     /**
      * @return TermEntry
      * @see java.beans.PropertyEditor#getValue()
@@ -38,7 +53,6 @@ public class ConceptLabelEditor  extends PropertyEditorSupport
     public TermEntry getValue() {
         return (TermEntry) super.getValue();
     }
-    
 
     /**
      * Must be a <code>TermEntry</code>. 
@@ -56,7 +70,7 @@ public class ConceptLabelEditor  extends PropertyEditorSupport
                 } else {
                     super.setValue(value);
                     TermEntry entry = (TermEntry) value;
-                     try {
+                    try {
                         this.editor.setConcept(entry.getLocalConcept());
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
@@ -67,9 +81,9 @@ public class ConceptLabelEditor  extends PropertyEditorSupport
                 super.setValue(value);
                 editor.setNull();
             }
-        
+
         }
-      }
+    }
 
     /**
      * @see java.beans.PropertyEditor#isPaintable()
@@ -91,7 +105,7 @@ public class ConceptLabelEditor  extends PropertyEditorSupport
      * @see java.beans.PropertyEditor#getJavaInitializationString()
      */
     public String getJavaInitializationString() {
-        return "TermEntry.getByName(" +  this.getAsText() + ")";
+        return "TermEntry.getByName(" + this.getAsText() + ")";
     }
 
     /**
@@ -131,6 +145,7 @@ public class ConceptLabelEditor  extends PropertyEditorSupport
     public boolean supportsCustomEditor() {
         return true;
     }
+
     public void propertyChange(PropertyChangeEvent evt) {
         I_ConceptualizeLocally c = editor.getConcept();
         try {

@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.sun.jini.mahalo;
 
 import java.util.List;
@@ -9,7 +25,6 @@ import net.jini.core.transaction.server.TransactionParticipant;
 import com.sun.jini.thread.RetryTask;
 import com.sun.jini.thread.TaskManager;
 import com.sun.jini.thread.WakeupManager;
-
 
 /**
  * A <code>ParticipantTask</code> is a general task which
@@ -23,9 +38,9 @@ import com.sun.jini.thread.WakeupManager;
 public class LocalParticipantTask extends RetryTask {
     LocalParticipantHandle handle;
     LocalJob myjob;
-    private static final Logger operationsLogger = 
-        TxnManagerImpl.operationsLogger;
-	
+    private static final Logger operationsLogger =
+            TxnManagerImpl.operationsLogger;
+
     /**
      * Constructs a <code>ParticipantTask</code>.
      *
@@ -39,10 +54,10 @@ public class LocalParticipantTask extends RetryTask {
      *               this task interacts.
      */
     public LocalParticipantTask(TaskManager manager, WakeupManager wm,
-    		LocalJob myjob, LocalParticipantHandle handle) {
-	super(manager, wm);
-	this.myjob = myjob;
-	this.handle = handle;
+            LocalJob myjob, LocalParticipantHandle handle) {
+        super(manager, wm);
+        this.myjob = myjob;
+        this.handle = handle;
     }
 
     /**
@@ -57,25 +72,25 @@ public class LocalParticipantTask extends RetryTask {
 
     public boolean tryOnce() {
         if (operationsLogger.isLoggable(Level.FINER)) {
-            operationsLogger.entering(ParticipantTask.class.getName(), 
-	        "tryOnce");
-	}
+            operationsLogger.entering(ParticipantTask.class.getName(),
+                "tryOnce");
+        }
 
-	boolean result = false;
-	try {
-	    result = myjob.performWork(this, handle);
-	} catch (UnknownTaskException ute) {
-	    //If task doesn't belong to the
-	    //Job, then stop doing work.
-	    result = true;
-	} catch (JobException je) {
-	    je.printStackTrace();
-	}
+        boolean result = false;
+        try {
+            result = myjob.performWork(this, handle);
+        } catch (UnknownTaskException ute) {
+            //If task doesn't belong to the
+            //Job, then stop doing work.
+            result = true;
+        } catch (JobException je) {
+            je.printStackTrace();
+        }
         if (operationsLogger.isLoggable(Level.FINER)) {
-            operationsLogger.exiting(ParticipantTask.class.getName(), 
-	        "tryOnce", Boolean.valueOf(result));
-	}
+            operationsLogger.exiting(ParticipantTask.class.getName(),
+                "tryOnce", Boolean.valueOf(result));
+        }
 
-	return result;
+        return result;
     }
 }

@@ -1,7 +1,21 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /*
  * Created on Mar 21, 2005
- *
- * Copyright 2005 by Informatics, Inc. 
  */
 package org.dwfa.jini;
 
@@ -34,13 +48,12 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
-
 import net.jini.core.lookup.ServiceID;
 import net.jini.core.lookup.ServiceItem;
 
 /*
  * ListDialog.java is a 1.4 class meant to be used by programs such as
- * ListDialogRunner.  It requires no additional files.
+ * ListDialogRunner. It requires no additional files.
  */
 
 /**
@@ -48,18 +61,17 @@ import net.jini.core.lookup.ServiceItem;
  * list.  See ListDialogRunner.java for an example of using ListDialog.
  * The basics:
  * <pre>
-    String[] choices = {"A", "long", "array", "of", "strings"};
-    String selectedName = ListDialog.showDialog(
-                                componentInControllingFrame,
-                                locatorComponent,
-                                "A description of the list:",
-                                "Dialog Title",
-                                choices,
-                                choices[0]);
+ String[] choices = {"A", "long", "array", "of", "strings"};
+ String selectedName = ListDialog.showDialog(
+ componentInControllingFrame,
+ locatorComponent,
+ "A description of the list:",
+ "Dialog Title",
+ choices,
+ choices[0]);
  * </pre>
  */
-public class SelectServiceDialog extends JDialog
-                        implements ActionListener {
+public class SelectServiceDialog extends JDialog implements ActionListener {
     /**
      * 
      */
@@ -78,28 +90,21 @@ public class SelectServiceDialog extends JDialog
      * dialog should appear.
      */
     public static ServiceItem showDialog(Component frameComp,
-                                    Component locationComp,
-                                    String labelText,
-                                    String title,
-                                    ServiceItem[] possibleValues,
-                                    ServiceItem initialValue,
-                                    ServiceItem longValue) {
+            Component locationComp, String labelText, String title,
+            ServiceItem[] possibleValues, ServiceItem initialValue,
+            ServiceItem longValue) {
         Frame frame = JOptionPane.getFrameForComponent(frameComp);
-        dialog = new SelectServiceDialog(frame,
-                                locationComp,
-                                labelText,
-                                title,
-                                possibleValues,
-                                initialValue,
-                                longValue);
+        dialog =
+                new SelectServiceDialog(frame, locationComp, labelText, title,
+                    possibleValues, initialValue, longValue);
         dialog.setVisible(true);
         return value;
     }
 
     private void setValue(ServiceItem newValue) {
-		if (newValue == null) {
-			newValue = (ServiceItem) list.getModel().getElementAt(0);
-		}
+        if (newValue == null) {
+            newValue = (ServiceItem) list.getModel().getElementAt(0);
+        }
         value = newValue;
         list.setSelectedValue(value, true);
     }
@@ -225,7 +230,7 @@ public class SelectServiceDialog extends JDialog
     //Handle clicks on the Set and Cancel buttons.
     public void actionPerformed(ActionEvent e) {
         if ("Set".equals(e.getActionCommand())) {
-            SelectServiceDialog.value = (ServiceItem)(list.getSelectedValue());
+            SelectServiceDialog.value = (ServiceItem) (list.getSelectedValue());
         } else {
             SelectServiceDialog.value = null;
         }

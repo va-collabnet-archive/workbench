@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.bpa.tasks.process;
 
 import java.beans.BeanDescriptor;
@@ -15,22 +31,25 @@ public class SetProcessDestinationBeanInfo extends SimpleBeanInfo {
     public SetProcessDestinationBeanInfo() {
         super();
     }
+
     public PropertyDescriptor[] getPropertyDescriptors() {
-        try {  
+        try {
             PropertyDescriptor newDestination =
-                new PropertyDescriptor("newDestination", SetProcessDestination.class);
+                    new PropertyDescriptor("newDestination",
+                        SetProcessDestination.class);
             newDestination.setBound(true);
             newDestination.setPropertyEditorClass(JTextFieldEditor.class);
             newDestination.setDisplayName("set destination");
-            newDestination.setShortDescription("Sets the destination of the process to the provided value.");
-
+            newDestination
+                .setShortDescription("Sets the destination of the process to the provided value.");
 
             PropertyDescriptor rv[] = { newDestination };
             return rv;
         } catch (IntrospectionException e) {
-             throw new Error(e.toString());
+            throw new Error(e.toString());
         }
-     }        
+    }
+
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */

@@ -1,6 +1,21 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /*
  * Created on Aug 17, 2005
- *
  */
 package org.dwfa.jini;
 
@@ -26,34 +41,35 @@ import net.jini.url.httpmd.HttpmdUtil;
  * @author Sun Microsystems, Inc.
  * 
  */
-public class MdClassAnnotationProvider
-    extends PreferredClassProvider
-{
+public class MdClassAnnotationProvider extends PreferredClassProvider {
     private final String codebase;
 
-    public MdClassAnnotationProvider()
-	throws IOException, MalformedURLException
-    {
-	super(false);
+    public MdClassAnnotationProvider() throws IOException,
+            MalformedURLException {
+        super(false);
         String codebaseApp = null;
         try {
-	    codebaseApp = HttpmdUtil.computeDigestCodebase(
-	        System.getProperty("export.codebase.source.app"),
-	        System.getProperty("export.codebase.app"));
-        } catch(NullPointerException e) { /* properties not set */ }
+            codebaseApp =
+                    HttpmdUtil.computeDigestCodebase(System
+                        .getProperty("export.codebase.source.app"), System
+                        .getProperty("export.codebase.app"));
+        } catch (NullPointerException e) { /* properties not set */
+        }
 
         String codebaseJsk = null;
         try {
-	    codebaseJsk = HttpmdUtil.computeDigestCodebase(
-	        System.getProperty("export.codebase.source.jsk"),
-	        System.getProperty("export.codebase.jsk"));
-        } catch(NullPointerException e) { /* properties not set */ }
+            codebaseJsk =
+                    HttpmdUtil.computeDigestCodebase(System
+                        .getProperty("export.codebase.source.jsk"), System
+                        .getProperty("export.codebase.jsk"));
+        } catch (NullPointerException e) { /* properties not set */
+        }
 
-        if( (codebaseApp != null) && (codebaseJsk != null) ) {
-            codebase = codebaseApp+" "+codebaseJsk;
-        } else if(codebaseApp != null) {
+        if ((codebaseApp != null) && (codebaseJsk != null)) {
+            codebase = codebaseApp + " " + codebaseJsk;
+        } else if (codebaseApp != null) {
             codebase = codebaseApp;
-        } else if(codebaseJsk != null) {
+        } else if (codebaseJsk != null) {
             codebase = codebaseJsk;
         } else {
             throw new NullPointerException("no codebase properties defined");
@@ -61,6 +77,6 @@ public class MdClassAnnotationProvider
     }
 
     protected String getClassAnnotation(ClassLoader loader) {
-	return codebase;
+        return codebase;
     }
 }

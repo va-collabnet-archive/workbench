@@ -1,7 +1,21 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /*
  * Created on Apr 19, 2005
- *
- * Copyright 2005 by Informatics, Inc. 
  */
 package org.dwfa.bpa.tasks.pwdbreaker;
 
@@ -14,8 +28,6 @@ import net.jini.space.JavaSpace05;
 import org.dwfa.bpa.process.GenericTaskEntry;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
-
-
 
 public class CryptTask extends GenericTaskEntry {
     /**
@@ -31,18 +43,19 @@ public class CryptTask extends GenericTaskEntry {
 
     public UUID masterId;
 
-    static String[] charMap = { "^@", "^A", "^B", "^C", "^D", "^E", "^F", "^G",
-            "^H", "^I", "^J", "^K", "^L", "^M", "^N", "^O", "^P", "^Q", "^R",
-            "^S", "^T", "^U", "^V", "^W", "^X", "^Y", "^Z", "^[", "^\\", "^]",
-            "^^", "^_", " ", "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*",
-            "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7",
-            "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D",
-            "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
-            "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^",
-            "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
-            "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x",
-            "y", "z", "{", "|", "}", "~", "^?", };
-    
+    static String[] charMap =
+            { "^@", "^A", "^B", "^C", "^D", "^E", "^F", "^G", "^H", "^I", "^J",
+             "^K", "^L", "^M", "^N", "^O", "^P", "^Q", "^R", "^S", "^T", "^U",
+             "^V", "^W", "^X", "^Y", "^Z", "^[", "^\\", "^]", "^^", "^_", " ",
+             "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-",
+             ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":",
+             ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G",
+             "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+             "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^", "_", "`", "a",
+             "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
+             "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{",
+             "|", "}", "~", "^?", };
+
     public CryptTask() {
 
     }
@@ -52,8 +65,7 @@ public class CryptTask extends GenericTaskEntry {
      * @param word
      * @param encrypted
      */
-    public CryptTask(Integer tries, byte[] word, String encrypted,
-            UUID masterId) {
+    public CryptTask(Integer tries, byte[] word, String encrypted, UUID masterId) {
         super();
         this.tries = tries;
         this.word = word;
@@ -85,7 +97,7 @@ public class CryptTask extends GenericTaskEntry {
         CryptResult result = new CryptResult(null, this.masterId);
         return result;
     }
-    
+
     static void nextWord(byte[] word) {
         int pos = 5;
         for (;;) {
@@ -97,7 +109,7 @@ public class CryptTask extends GenericTaskEntry {
             }
         }
     }
-    
+
     public static String getPrintableWord(byte[] word) {
         String string = "";
         for (int i = 0; i < word.length; i++) {

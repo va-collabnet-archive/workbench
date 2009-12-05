@@ -1,7 +1,18 @@
-/*
- * Created on Mar 19, 2005
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Copyright 2005 by Informatics, Inc. 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.dwfa.bpa.dnd;
 
@@ -17,22 +28,22 @@ import java.util.logging.Logger;
 public class BpaTargetListener implements DropTargetListener {
 
     private static Logger logger = Logger.getLogger("org.dwfa.bpa.dnd");
-    
+
     private I_DoDragAndDrop targetComponent;
 
     private String prefix;
-    
+
     private boolean dropHighlight = false;
-    
+
     /**
      * @param targetComponent
      * @param prefix
      * @param label
      *            TODO
      * @throws ClassNotFoundException
-     */    
-    public BpaTargetListener(I_DoDragAndDrop targetComponent,
-            String prefix) throws ClassNotFoundException {
+     */
+    public BpaTargetListener(I_DoDragAndDrop targetComponent, String prefix)
+            throws ClassNotFoundException {
         super();
         this.targetComponent = targetComponent;
         this.prefix = prefix;
@@ -44,8 +55,8 @@ public class BpaTargetListener implements DropTargetListener {
     public void dragEnter(DropTargetDragEvent ev) {
         if (this.isDragOk(ev)) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Target " + this.prefix + " dragEnter targetComponent"
-                        + ev);
+                logger.fine("Target " + this.prefix
+                    + " dragEnter targetComponent" + ev);
             }
             this.targetComponent.highlightForDrop(true);
             this.dropHighlight = true;
@@ -60,8 +71,8 @@ public class BpaTargetListener implements DropTargetListener {
     public void dragOver(DropTargetDragEvent ev) {
         if (this.isDragOk(ev)) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Target " + this.prefix + " dragOver targetComponent"
-                        + ev);
+                logger.fine("Target " + this.prefix
+                    + " dragOver targetComponent" + ev);
             }
             ev.acceptDrag(this.targetComponent.getAcceptableActions());
         }
@@ -74,8 +85,8 @@ public class BpaTargetListener implements DropTargetListener {
     public void dropActionChanged(DropTargetDragEvent ev) {
         if (this.isDragOk(ev)) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Target " + this.prefix + " dropActionChanged targetComponent"
-                        + ev);
+                logger.fine("Target " + this.prefix
+                    + " dropActionChanged targetComponent" + ev);
             }
             ev.acceptDrag(this.targetComponent.getAcceptableActions());
         }
@@ -88,7 +99,7 @@ public class BpaTargetListener implements DropTargetListener {
     public void dragExit(DropTargetEvent ev) {
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Target " + this.prefix + " dragExit targetComponent"
-                    + ev);
+                + ev);
         }
         if (this.dropHighlight) {
             this.targetComponent.highlightForDrop(false);
@@ -167,7 +178,7 @@ public class BpaTargetListener implements DropTargetListener {
 
     }
 
-	private boolean isDragOk(DropTargetDragEvent ev) {
+    private boolean isDragOk(DropTargetDragEvent ev) {
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Target " + this.prefix + " isDragOk targetComponent"
                     + ev);

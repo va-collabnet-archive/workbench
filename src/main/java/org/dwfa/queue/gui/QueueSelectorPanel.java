@@ -1,7 +1,21 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /*
  * Created on Apr 28, 2005
- *
- * Copyright 2005 by Informatics, Inc. 
  */
 package org.dwfa.queue.gui;
 
@@ -20,7 +34,6 @@ import net.jini.core.lookup.ServiceID;
 
 import org.dwfa.bpa.process.I_DescribeQueueEntry;
 import org.dwfa.bpa.process.I_QueueProcesses;
-
 
 /**
  * @author kec
@@ -57,15 +70,16 @@ public class QueueSelectorPanel extends JPanel {
         }
     }
 
-    private JButton selectButton = new JButton("<html><font color='#006400'>select");
+    private JButton selectButton =
+            new JButton("<html><font color='#006400'>select");
 
     private JLabel statusMessage = new JLabel();
-    
+
     private JTable queueTable;
     QueueTableModel model;
 
-    public QueueSelectorPanel(I_QueueProcesses queue) throws RemoteException, InterruptedException,
-            IOException {
+    public QueueSelectorPanel(I_QueueProcesses queue) throws RemoteException,
+            InterruptedException, IOException {
         super(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -131,7 +145,7 @@ public class QueueSelectorPanel extends JPanel {
     public JButton getSelectButton() {
         return selectButton;
     }
-    
+
     public I_DescribeQueueEntry getSelectedEntryMetaData() {
         return model.getRowMetaData(this.queueTable.getSelectedRow());
     }
