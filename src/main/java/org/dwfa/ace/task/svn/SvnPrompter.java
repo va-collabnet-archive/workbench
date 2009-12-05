@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.task.svn;
 
 import java.awt.Container;
@@ -63,8 +79,11 @@ public class SvnPrompter implements PromptUserPassword3 {
             public void ancestorRemoved(AncestorEvent arg0) {
             }
         });
-        int action = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), promptPane, realm,
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
+        int action =
+                JOptionPane.showOptionDialog(LogWithAlerts
+                    .getActiveFrame(parentContainer), promptPane, realm,
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, null, userTextField);
         LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
         if (action == JOptionPane.CANCEL_OPTION) {
             userAllowedSave = false;
@@ -107,8 +126,11 @@ public class SvnPrompter implements PromptUserPassword3 {
             public void ancestorRemoved(AncestorEvent arg0) {
             }
         });
-        int action = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), promptPane, realm,
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
+        int action =
+                JOptionPane.showOptionDialog(LogWithAlerts
+                    .getActiveFrame(parentContainer), promptPane, realm,
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, null, userTextField);
         if (parentContainer != null) {
             LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
         }
@@ -131,13 +153,16 @@ public class SvnPrompter implements PromptUserPassword3 {
         Object[] options = { "Reject", "Accept Temporary" };
         int optionType = JOptionPane.YES_NO_OPTION;
         if (allowPermanently) {
-            options = new Object[] { "Reject", "Accept Temporary",
-                    "Accept Permanently" };
+            options =
+                    new Object[] { "Reject", "Accept Temporary",
+                                  "Accept Permanently" };
             optionType = JOptionPane.YES_NO_CANCEL_OPTION;
         }
-        int returnValue = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), info, "Trust SSL Server",
-                optionType, JOptionPane.QUESTION_MESSAGE, null, options,
-                options[0]);
+        int returnValue =
+                JOptionPane.showOptionDialog(LogWithAlerts
+                    .getActiveFrame(parentContainer), info, "Trust SSL Server",
+                    optionType, JOptionPane.QUESTION_MESSAGE, null, options,
+                    options[0]);
         LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
         return returnValue;
     }
@@ -145,12 +170,15 @@ public class SvnPrompter implements PromptUserPassword3 {
     public String askQuestion(String realm, String question, boolean showAnswer) {
         return askQuestion(realm, question, "", showAnswer);
     }
-    public String askQuestion(String realm, String question, String defaultAnswer, boolean showAnswer) {
+
+    public String askQuestion(String realm, String question,
+            String defaultAnswer, boolean showAnswer) {
         if (showAnswer == false) {
             return askQuestion(realm, question, showAnswer, false);
         }
-        return (String) JOptionPane.showInputDialog(LogWithAlerts.getActiveFrame(parentContainer), question, realm,
-                JOptionPane.PLAIN_MESSAGE, null, null, defaultAnswer);
+        return (String) JOptionPane.showInputDialog(LogWithAlerts
+            .getActiveFrame(parentContainer), question, realm,
+            JOptionPane.PLAIN_MESSAGE, null, null, defaultAnswer);
     }
 
     public boolean askYesNo(String realm, String question, boolean yesIsDefault) {
@@ -158,9 +186,11 @@ public class SvnPrompter implements PromptUserPassword3 {
         if (yesIsDefault) {
             initialValue = JOptionPane.YES_OPTION;
         }
-        int n = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), question, realm,
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                null, initialValue);
+        int n =
+                JOptionPane.showOptionDialog(LogWithAlerts
+                    .getActiveFrame(parentContainer), question, realm,
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, null, initialValue);
         LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
         return n == JOptionPane.YES_OPTION;
     }
@@ -190,24 +220,30 @@ public class SvnPrompter implements PromptUserPassword3 {
     public static void main(String[] args) {
         SvnPrompter p = new SvnPrompter();
         System.out.println("boolean: "
-                + p.askYesNo("http://aceworkspace.net",
-                        "Do you trust this (default true)", true));
+            + p.askYesNo("http://aceworkspace.net",
+                "Do you trust this (default true)", true));
         System.out.println("boolean: "
-                + p.askYesNo("http://aceworkspace.net",
-                        "Do you trust this (default false)", false));
+            + p.askYesNo("http://aceworkspace.net",
+                "Do you trust this (default false)", false));
         System.out.println("String: "
-                + p.askQuestion("http://aceworkspace.net",
-                        "Do you trust this? enter yes or no", true));
+            + p.askQuestion("http://aceworkspace.net",
+                "Do you trust this? enter yes or no", true));
         System.out.println("boolean: "
-                + p.askTrustSSLServer("Do you trust this SSL?", false));
+            + p.askTrustSSLServer("Do you trust this SSL?", false));
         System.out.println("boolean: "
-                + p.askTrustSSLServer("Do you trust this SSL?", true));
+            + p.askTrustSSLServer("Do you trust this SSL?", true));
         System.out.println("boolean: " + p.prompt("HTTP:??", "KEC", true));
         System.out.println("boolean: " + p.prompt("HTTP:??", "KEC", false));
-        System.out.println("String: " + p.askQuestion("HTTP:??", "This is the question", true, true));
-        System.out.println("String: " + p.askQuestion("HTTP:??", "This is the question", true, false));
-        System.out.println("String: " + p.askQuestion("HTTP:??", "This is the question (hide answer)", false, true));
-        System.out.println("String: " + p.askQuestion("HTTP:??", "This is the question (hide answer)", false, false));
+        System.out.println("String: "
+            + p.askQuestion("HTTP:??", "This is the question", true, true));
+        System.out.println("String: "
+            + p.askQuestion("HTTP:??", "This is the question", true, false));
+        System.out.println("String: "
+            + p.askQuestion("HTTP:??", "This is the question (hide answer)",
+                false, true));
+        System.out.println("String: "
+            + p.askQuestion("HTTP:??", "This is the question (hide answer)",
+                false, false));
     }
 
     public Container getParentContainer() {

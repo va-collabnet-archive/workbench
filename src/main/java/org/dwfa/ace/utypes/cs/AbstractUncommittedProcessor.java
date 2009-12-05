@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.utypes.cs;
 
 import java.io.IOException;
@@ -20,36 +36,36 @@ import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.ace.utypes.UniversalIdList;
 
 public abstract class AbstractUncommittedProcessor implements
-		I_ProcessUniversalChangeSets {
+        I_ProcessUniversalChangeSets {
 
-	public void processAcePath(UniversalAcePath path, long time)
-			throws IOException {
-		AceLog.getEditLog().fine("Importing new universal path: \n" + path);
-		processNewUniversalAcePath(path);
-	}
+    public void processAcePath(UniversalAcePath path, long time)
+            throws IOException {
+        AceLog.getEditLog().fine("Importing new universal path: \n" + path);
+        processNewUniversalAcePath(path);
+    }
 
-	protected abstract void processNewUniversalAcePath(UniversalAcePath path);
+    protected abstract void processNewUniversalAcePath(UniversalAcePath path);
 
-	public void processUniversalAceBean(UniversalAceBean bean, long time)
-			throws IOException {
-		if (time == Long.MAX_VALUE) {
-			throw new IOException("commit time = Long.MAX_VALUE");
-		}
-		// Process all the parts...
-		processUncommittedIds(time, bean);
-		processUncommittedConceptAttributes(time, bean);
-		processUncommittedDescriptions(time, bean);
-		processUncommittedRelationships(time, bean);
-		processUncommittedImages(time, bean);
+    public void processUniversalAceBean(UniversalAceBean bean, long time)
+            throws IOException {
+        if (time == Long.MAX_VALUE) {
+            throw new IOException("commit time = Long.MAX_VALUE");
+        }
+        // Process all the parts...
+        processUncommittedIds(time, bean);
+        processUncommittedConceptAttributes(time, bean);
+        processUncommittedDescriptions(time, bean);
+        processUncommittedRelationships(time, bean);
+        processUncommittedImages(time, bean);
 
-		processConceptAttributeChanges(time, bean);
-		processDescriptionChanges(time, bean);
-		processRelationshipChanges(time, bean);
-		processImageChanges(time, bean);
+        processConceptAttributeChanges(time, bean);
+        processDescriptionChanges(time, bean);
+        processRelationshipChanges(time, bean);
+        processImageChanges(time, bean);
 
-	}
+    }
 
-	public void processAceEbr(UniversalAceExtByRefBean bean, long time)
+    public void processAceEbr(UniversalAceExtByRefBean bean, long time)
 			throws IOException {
 		if (time == Long.MAX_VALUE) {
 			throw new IOException("commit time = Long.MAX_VALUE");
@@ -63,10 +79,10 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	protected abstract void processUncommittedUniversalAceExtByRefPart(
-			UniversalAceExtByRefPart part)  throws IOException;
+    protected abstract void processUncommittedUniversalAceExtByRefPart(
+            UniversalAceExtByRefPart part) throws IOException;
 
-	public void processIdList(UniversalIdList list, long time)
+    public void processIdList(UniversalIdList list, long time)
 			throws IOException {
 		if (time == Long.MAX_VALUE) {
 			throw new IOException("commit time = Long.MAX_VALUE");
@@ -84,10 +100,10 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	protected abstract void processUncommittedUniversalAceIdentificationPart(
-			UniversalAceIdentificationPart part)  throws IOException;
+    protected abstract void processUncommittedUniversalAceIdentificationPart(
+            UniversalAceIdentificationPart part) throws IOException;
 
-	private void processConceptAttributeChanges(long time, UniversalAceBean bean)
+    private void processConceptAttributeChanges(long time, UniversalAceBean bean)
 			throws IOException {
 		if (bean.getConceptAttributes() != null) {
 			UniversalAceConceptAttributes attributes = bean
@@ -103,10 +119,10 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	protected abstract void processUncommittedUniversalAceConceptAttributesPart(
-			UniversalAceConceptAttributesPart part) throws IOException;
+    protected abstract void processUncommittedUniversalAceConceptAttributesPart(
+            UniversalAceConceptAttributesPart part) throws IOException;
 
-	private void processUncommittedConceptAttributes(long time,
+    private void processUncommittedConceptAttributes(long time,
 			UniversalAceBean bean) throws IOException {
 		if (bean.getUncommittedConceptAttributes() != null) {
 			for (UniversalAceConceptAttributesPart part : bean
@@ -118,7 +134,7 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	private void processImageChanges(long time, UniversalAceBean bean)
+    private void processImageChanges(long time, UniversalAceBean bean)
 			throws IOException {
 		if (bean.getImages() != null) {
 			for (UniversalAceImage image : bean.getImages()) {
@@ -131,10 +147,10 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	protected abstract void processUncommittedUniversalAceImagePart(
-			UniversalAceImagePart part) throws IOException;
+    protected abstract void processUncommittedUniversalAceImagePart(
+            UniversalAceImagePart part) throws IOException;
 
-	private void processUncommittedImages(long time, UniversalAceBean bean)
+    private void processUncommittedImages(long time, UniversalAceBean bean)
 			throws IOException {
 		if (bean.getUncommittedImages() != null) {
 			for (UniversalAceImage image : bean.getUncommittedImages()) {
@@ -147,7 +163,7 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	private void processUncommittedRelationships(long time,
+    private void processUncommittedRelationships(long time,
 			UniversalAceBean bean) throws IOException {
 		if (bean.getUncommittedSourceRels() != null) {
 			for (UniversalAceRelationship rel : bean.getUncommittedSourceRels()) {
@@ -160,10 +176,10 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	protected abstract void processUncommittedUniversalAceRelationshipPart(
-			UniversalAceRelationshipPart part) throws IOException;
+    protected abstract void processUncommittedUniversalAceRelationshipPart(
+            UniversalAceRelationshipPart part) throws IOException;
 
-	private void processRelationshipChanges(long time, UniversalAceBean bean)
+    private void processRelationshipChanges(long time, UniversalAceBean bean)
 			throws IOException {
 		if (bean.getSourceRels() != null) {
 			for (UniversalAceRelationship rel : bean.getSourceRels()) {
@@ -176,7 +192,7 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	private void processDescriptionChanges(long time, UniversalAceBean bean)
+    private void processDescriptionChanges(long time, UniversalAceBean bean)
 			throws IOException {
 		if (bean.getDescriptions() != null) {
 			for (UniversalAceDescription desc : bean.getDescriptions()) {
@@ -189,7 +205,7 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	private void processUncommittedDescriptions(long time, UniversalAceBean bean)
+    private void processUncommittedDescriptions(long time, UniversalAceBean bean)
 			throws IOException {
 		if (bean.getUncommittedDescriptions() != null) {
 			for (UniversalAceDescription desc : bean.getUncommittedDescriptions()) {
@@ -198,7 +214,7 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	private void processDescription(long time, UniversalAceDescription desc)
+    private void processDescription(long time, UniversalAceDescription desc)
 			throws IOException {
 		if (desc.getVersions() != null) {
 			for (UniversalAceDescriptionPart part : desc.getVersions()) {
@@ -209,10 +225,10 @@ public abstract class AbstractUncommittedProcessor implements
 		}
 	}
 
-	protected abstract void processUncommittedUniversalAceDescriptionPart(
-			UniversalAceDescriptionPart part)  throws IOException;
+    protected abstract void processUncommittedUniversalAceDescriptionPart(
+            UniversalAceDescriptionPart part) throws IOException;
 
-	private void processUncommittedIds(long time, UniversalAceBean bean)
+    private void processUncommittedIds(long time, UniversalAceBean bean)
 			throws IOException {
 		if (bean.getUncommittedIds() != null) {
 			for (UniversalAceIdentification id : bean.getUncommittedIds()) {
@@ -225,5 +241,4 @@ public abstract class AbstractUncommittedProcessor implements
 			}
 		}
 	}
-
 }

@@ -1,4 +1,20 @@
 /**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * 
  */
 package org.dwfa.ace.dnd;
@@ -38,7 +54,8 @@ public class AceTransferAction extends AbstractAction implements UIResource {
             Clipboard clipboard = getClipboard(c);
             String name = (String) getValue(Action.NAME);
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-            	AceLog.getAppLog().fine("Doing transfer action: " + name
+                AceLog.getAppLog().fine(
+                    "Doing transfer action: " + name
                         + " with transfer handler: " + th);
             }
 
@@ -49,18 +66,21 @@ public class AceTransferAction extends AbstractAction implements UIResource {
                 if ((clipboard != null) && (th != null) && (name != null)) {
                     if ("cut".equals(name)) {
                         th.exportToClipboard(c, clipboard,
-                                DnDConstants.ACTION_MOVE);
+                            DnDConstants.ACTION_MOVE);
                     } else if ("copy".equals(name)) {
                         th.exportToClipboard(c, clipboard,
-                                DnDConstants.ACTION_COPY);
+                            DnDConstants.ACTION_COPY);
                     } else if ("paste".equals(name)) {
                         trans = clipboard.getContents(null);
                     }
                 } else {
-                	AceLog.getAppLog().log(Level.WARNING, "clipboard, th, or name is null: " + clipboard + " " + th + " " + name);
+                    AceLog.getAppLog().log(
+                        Level.WARNING,
+                        "clipboard, th, or name is null: " + clipboard + " "
+                            + th + " " + name);
                 }
             } catch (IllegalStateException ise) {
-            	AceLog.getAppLog().log(Level.SEVERE, ise.getMessage(), ise);
+                AceLog.getAppLog().log(Level.SEVERE, ise.getMessage(), ise);
                 UIManager.getLookAndFeel().provideErrorFeedback(c);
                 return;
             }
@@ -78,6 +98,5 @@ public class AceTransferAction extends AbstractAction implements UIResource {
     private Clipboard getClipboard(JComponent c) {
         return Toolkit.getDefaultToolkit().getSystemClipboard();
     }
-
 
 }

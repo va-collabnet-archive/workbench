@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.task.refset.spec.wf;
 
 import java.awt.GridBagConstraints;
@@ -62,23 +78,36 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
 
     private I_GetConceptData selectedConceptType;
 
-    public SelectPromotionListPanel(I_GetConceptData promotionRefsetConcept) throws Exception {
+    public SelectPromotionListPanel(I_GetConceptData promotionRefsetConcept)
+            throws Exception {
         super();
         refsetHelper = new SpecRefsetHelper();
         this.promotionRefsetConcept = promotionRefsetConcept;
         termFactory = LocalVersionedTerminology.get();
         unreviewedAdditionStatus =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids());
+                termFactory
+                    .getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION
+                        .getUids());
         unreviewedDeletionStatus =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
+                termFactory
+                    .getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION
+                        .getUids());
         reviewedApprovedAdditionStatus =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION.getUids());
+                termFactory
+                    .getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION
+                        .getUids());
         reviewedApprovedDeletionStatus =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION.getUids());
+                termFactory
+                    .getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION
+                        .getUids());
         reviewedRejectedAdditionStatus =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
+                termFactory
+                    .getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION
+                        .getUids());
         reviewedRejectedDeletionStatus =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
+                termFactory
+                    .getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
+                        .getUids());
         init();
     }
 

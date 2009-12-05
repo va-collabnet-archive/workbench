@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.file;
 
 import java.io.BufferedWriter;
@@ -19,26 +35,36 @@ import org.dwfa.tapi.TerminologyException;
 
 public class DescTupleFileUtil {
 
-    public static String exportTuple(I_DescriptionTuple descTuple) throws TerminologyException, IOException {
+    public static String exportTuple(I_DescriptionTuple descTuple)
+            throws TerminologyException, IOException {
 
         I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-        UUID tupleUuid = ArchitectonicAuxiliary.Concept.DESC_TUPLE.getUids().iterator().next();
-        UUID conceptUuid = termFactory.getUids(descTuple.getConceptId()).iterator().next();
-        UUID descUuid = termFactory.getUids(descTuple.getDescId()).iterator().next();
+        UUID tupleUuid =
+                ArchitectonicAuxiliary.Concept.DESC_TUPLE.getUids().iterator()
+                    .next();
+        UUID conceptUuid =
+                termFactory.getUids(descTuple.getConceptId()).iterator().next();
+        UUID descUuid =
+                termFactory.getUids(descTuple.getDescId()).iterator().next();
         String text = descTuple.getText();
         String lang = descTuple.getLang();
-        UUID typeUuid = termFactory.getUids(descTuple.getTypeId()).iterator().next();
-        UUID pathUuid = termFactory.getUids(descTuple.getPathId()).iterator().next();
-        UUID statusUuid = termFactory.getUids(descTuple.getStatusId()).iterator().next();
+        UUID typeUuid =
+                termFactory.getUids(descTuple.getTypeId()).iterator().next();
+        UUID pathUuid =
+                termFactory.getUids(descTuple.getPathId()).iterator().next();
+        UUID statusUuid =
+                termFactory.getUids(descTuple.getStatusId()).iterator().next();
         boolean initialCapSignificant = descTuple.getInitialCaseSignificant();
         int effectiveDate = descTuple.getVersion();
 
-        String idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(descUuid));
+        String idTuple =
+                IDTupleFileUtil.exportTuple(termFactory.getId(descUuid));
 
-        return idTuple + tupleUuid + "\t" + conceptUuid + "\t" + descUuid + "\t" + text + "\t" + lang + "\t"
-            + initialCapSignificant + "\t" + typeUuid + "\t" + pathUuid + "\t" + statusUuid + "\t" + effectiveDate
-            + "\n";
+        return idTuple + tupleUuid + "\t" + conceptUuid + "\t" + descUuid
+            + "\t" + text + "\t" + lang + "\t" + initialCapSignificant + "\t"
+            + typeUuid + "\t" + pathUuid + "\t" + statusUuid + "\t"
+            + effectiveDate + "\n";
     }
 
     public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,

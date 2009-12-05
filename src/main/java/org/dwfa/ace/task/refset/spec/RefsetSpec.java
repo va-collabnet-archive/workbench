@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.task.refset.spec;
 
 import java.util.List;
@@ -35,8 +51,12 @@ public class RefsetSpec {
         if (memberRefsetInputted) {
             try {
                 I_GetConceptData specifiesRefsetRel =
-                        termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
-                this.spec = getLatestDestinationRelationshipSource(concept, specifiesRefsetRel);
+                        termFactory
+                            .getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET
+                                .getUids());
+                this.spec =
+                        getLatestDestinationRelationshipSource(concept,
+                            specifiesRefsetRel);
                 termFactory = LocalVersionedTerminology.get();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -53,8 +73,11 @@ public class RefsetSpec {
     public I_GetConceptData getMemberRefsetConcept() {
         try {
             I_GetConceptData specifiesRefsetRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
-            return getLatestSourceRelationshipTarget(getRefsetSpecConcept(), specifiesRefsetRel);
+                    termFactory
+                        .getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET
+                            .getUids());
+            return getLatestSourceRelationshipTarget(getRefsetSpecConcept(),
+                specifiesRefsetRel);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -64,13 +87,16 @@ public class RefsetSpec {
     public I_GetConceptData getMarkedParentRefsetConcept() {
         try {
             I_GetConceptData markedParentRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
+                    termFactory
+                        .getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET
+                            .getUids());
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
                 return null;
             }
 
-            return getLatestSourceRelationshipTarget(memberRefsetConcept, markedParentRel);
+            return getLatestSourceRelationshipTarget(memberRefsetConcept,
+                markedParentRel);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -80,13 +106,16 @@ public class RefsetSpec {
     public I_GetConceptData getRefsetPurposeConcept() {
         try {
             I_GetConceptData refsetPurposeRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
+                    termFactory
+                        .getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL
+                            .getUids());
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
                 return null;
             }
 
-            return getLatestSourceRelationshipTarget(memberRefsetConcept, refsetPurposeRel);
+            return getLatestSourceRelationshipTarget(memberRefsetConcept,
+                refsetPurposeRel);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -95,13 +124,16 @@ public class RefsetSpec {
 
     public I_GetConceptData getCommentsRefsetConcept() {
         try {
-            I_GetConceptData commentsRel = termFactory.getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
+            I_GetConceptData commentsRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.COMMENTS_REL
+                        .getUids());
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
                 return null;
             }
 
-            return getLatestSourceRelationshipTarget(memberRefsetConcept, commentsRel);
+            return getLatestSourceRelationshipTarget(memberRefsetConcept,
+                commentsRel);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -110,13 +142,17 @@ public class RefsetSpec {
 
     public I_GetConceptData getPromotionRefsetConcept() {
         try {
-            I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
+            I_GetConceptData promotionRel =
+                    termFactory
+                        .getConcept(RefsetAuxiliary.Concept.PROMOTION_REL
+                            .getUids());
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
                 return null;
             }
 
-            return getLatestSourceRelationshipTarget(memberRefsetConcept, promotionRel);
+            return getLatestSourceRelationshipTarget(memberRefsetConcept,
+                promotionRel);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

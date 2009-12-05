@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.refset;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -36,7 +52,8 @@ public interface I_RefsetDefaultsTemplateForRel extends I_RefsetDefaults {
 
     public Integer[] getBrowseAttributeOrderPopupItems();
 
-    public void setBrowseAttributeOrderPopupItems(Integer[] browseAttributeOrderPopupItems);
+    public void setBrowseAttributeOrderPopupItems(
+            Integer[] browseAttributeOrderPopupItems);
 
     public int getBrowseValueOrder();
 
@@ -44,7 +61,8 @@ public interface I_RefsetDefaultsTemplateForRel extends I_RefsetDefaults {
 
     public Integer[] getBrowseValueOrderPopupItems();
 
-    public void setBrowseValueOrderPopupItems(Integer[] browseValueOrderPopupItems);
+    public void setBrowseValueOrderPopupItems(
+            Integer[] browseValueOrderPopupItems);
 
     public int getNotesScreenOrder();
 
@@ -52,15 +70,18 @@ public interface I_RefsetDefaultsTemplateForRel extends I_RefsetDefaults {
 
     public Integer[] getNotesScreenOrderPopupItems();
 
-    public void setNotesScreenOrderPopupItems(Integer[] notesScreenOrderPopupItems);
+    public void setNotesScreenOrderPopupItems(
+            Integer[] notesScreenOrderPopupItems);
 
     public I_GetConceptData getAttributeDisplayStatus();
 
-    public void setAttributeDisplayStatus(I_GetConceptData attributeDisplayStatus);
+    public void setAttributeDisplayStatus(
+            I_GetConceptData attributeDisplayStatus);
 
     public I_IntList getAttributeDisplayStatusPopupIds();
 
-    public void setAttributeDisplayStatusPopupIds(I_IntList attributeDisplayStatusPopupIds);
+    public void setAttributeDisplayStatusPopupIds(
+            I_IntList attributeDisplayStatusPopupIds);
 
     public I_GetConceptData getCharacteristicStatus();
 
@@ -68,6 +89,7 @@ public interface I_RefsetDefaultsTemplateForRel extends I_RefsetDefaults {
 
     public I_IntList getCharacteristicStatusPopupIds();
 
-    public void setCharacteristicStatusPopupIds(I_IntList characteristicStatusPopupIds);
+    public void setCharacteristicStatusPopupIds(
+            I_IntList characteristicStatusPopupIds);
 
 }

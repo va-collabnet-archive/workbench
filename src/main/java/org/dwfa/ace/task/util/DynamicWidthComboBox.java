@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.task.util;
 
 import java.awt.Dimension;
@@ -48,11 +64,14 @@ public class DynamicWidthComboBox extends JComboBox {
                     }
 
                     Dimension popupSize = comboBox.getSize();
-                    popupSize.setSize(widestWidth + (2 * padding), getPopupHeightForRowCount(comboBox
-                        .getMaximumRowCount()));
+                    popupSize
+                        .setSize(widestWidth + (2 * padding),
+                            getPopupHeightForRowCount(comboBox
+                                .getMaximumRowCount()));
 
                     Rectangle popupBounds =
-                            computePopupBounds(0, comboBox.getBounds().height, popupSize.width, popupSize.height);
+                            computePopupBounds(0, comboBox.getBounds().height,
+                                popupSize.width, popupSize.height);
 
                     scroller.setMaximumSize(popupBounds.getSize());
                     scroller.setPreferredSize(popupBounds.getSize());
@@ -68,7 +87,8 @@ public class DynamicWidthComboBox extends JComboBox {
                     }
 
                     list.ensureIndexIsVisible(list.getSelectedIndex());
-                    setLightWeightPopupEnabled(comboBox.isLightWeightPopupEnabled());
+                    setLightWeightPopupEnabled(comboBox
+                        .isLightWeightPopupEnabled());
                     show(comboBox, popupBounds.x, popupBounds.y);
                 }
             };

@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.task.refset.members;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -14,7 +30,8 @@ import org.dwfa.ace.task.util.Logger;
  * {@link #processExtensionByReference} should be called for each extension and @{link #clean} should be called
  * after all extensions have been supplied to the @{link #processExtensionByReference} to release allocated resources.
  */
-public final class WriteRefsetDescriptionsProcessExtByRef implements CleanableProcessExtByRef {
+public final class WriteRefsetDescriptionsProcessExtByRef implements
+        CleanableProcessExtByRef {
 
     private final Logger logger;
     private final RefsetUtil refsetUtil;
@@ -22,9 +39,10 @@ public final class WriteRefsetDescriptionsProcessExtByRef implements CleanablePr
     private final RefsetWriter refsetWriter;
     private final I_TermFactory termFactory;
 
-    public WriteRefsetDescriptionsProcessExtByRef(final RefsetExportValidator refsetExportValidator,
-          final RefsetWriter refsetWriter, final RefsetUtil refsetUtil, final I_TermFactory termFactory,
-          final Logger logger) {
+    public WriteRefsetDescriptionsProcessExtByRef(
+            final RefsetExportValidator refsetExportValidator,
+            final RefsetWriter refsetWriter, final RefsetUtil refsetUtil,
+            final I_TermFactory termFactory, final Logger logger) {
         this.termFactory = termFactory;
         this.logger = logger;
         this.refsetExportValidator = refsetExportValidator;
@@ -32,10 +50,13 @@ public final class WriteRefsetDescriptionsProcessExtByRef implements CleanablePr
         this.refsetUtil = refsetUtil;
     }
 
-    public void processExtensionByReference(final I_ThinExtByRefVersioned refset) throws Exception {
-        I_GetConceptData refsetConcept = termFactory.getConcept(refset.getRefsetId());
+    public void processExtensionByReference(final I_ThinExtByRefVersioned refset)
+            throws Exception {
+        I_GetConceptData refsetConcept =
+                termFactory.getConcept(refset.getRefsetId());
         try {
-            refsetExportValidator.validateIsConceptExtension(refset.getTypeId(), refsetUtil);
+            refsetExportValidator.validateIsConceptExtension(
+                refset.getTypeId(), refsetUtil);
             refsetExportValidator.validateIsCurrent(refsetConcept, refsetUtil);
             refsetWriter.write(refset);
         } catch (RefsetExportValidationException e) {

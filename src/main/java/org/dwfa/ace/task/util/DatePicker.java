@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.task.util;
 
 import java.awt.Color;
@@ -64,7 +80,8 @@ public class DatePicker extends JPanel {
      * @param maximumDate The maximum selectable date.
      * @param format
      */
-    public DatePicker(Calendar minimumDate, Calendar maximumDate, SimpleDateFormat format) {
+    public DatePicker(Calendar minimumDate, Calendar maximumDate,
+            SimpleDateFormat format) {
         this(Calendar.getInstance(), minimumDate, maximumDate, format);
     }
 
@@ -78,14 +95,16 @@ public class DatePicker extends JPanel {
      * @param maximumDate The maximum selectable date.
      * @param format
      */
-    public DatePicker(Calendar defaultDate, Calendar minimumDate, Calendar maximumDate, SimpleDateFormat format) {
+    public DatePicker(Calendar defaultDate, Calendar minimumDate,
+            Calendar maximumDate, SimpleDateFormat format) {
         if (defaultDate != null) {
             originalDate = (Calendar) defaultDate.clone();
         } else {
             originalDate = Calendar.getInstance();
         }
         clearTime(originalDate);
-        calendarPanel = new CalendarPanel(originalDate, minimumDate, maximumDate);
+        calendarPanel =
+                new CalendarPanel(originalDate, minimumDate, maximumDate);
         this.format = format;
         init();
     }
@@ -124,7 +143,8 @@ public class DatePicker extends JPanel {
     // update text field display, based on selected date
     private void setText() {
         if (getSelectedDate() != null) {
-            textField.setText(format.format(getSelectedDate().getTime()).toString());
+            textField.setText(format.format(getSelectedDate().getTime())
+                .toString());
         } else {
             textField.setText("");
         }
@@ -203,7 +223,8 @@ public class DatePicker extends JPanel {
 
         // strings to be used as label for current month
         private final String[] months =
-                new String[] { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
+                new String[] { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL",
+                              "AUG", "SEP", "OCT", "NOV", "DEC" };
 
         private Calendar selectedDate;
         private Calendar currentDate;
@@ -220,7 +241,8 @@ public class DatePicker extends JPanel {
         private JButton[][] daysOfMonth = new JButton[6][7];
         private JPanel dayPanel;
 
-        private CalendarPanel(Calendar currentDate, Calendar minimumDate, Calendar maximumDate) {
+        private CalendarPanel(Calendar currentDate, Calendar minimumDate,
+                Calendar maximumDate) {
             if (currentDate != null) {
                 this.currentDate = (Calendar) currentDate.clone();
                 this.highlightedDate = (Calendar) currentDate.clone();
@@ -256,10 +278,14 @@ public class DatePicker extends JPanel {
             nextYear = new JButton(">>");
             nextYear.setFocusable(false);
             nextYear.setMargin(new Insets(0, 0, 0, 0));
-            previousYear.addActionListener(new NextPreviousListener(Calendar.YEAR, false));
-            previousMonth.addActionListener(new NextPreviousListener(Calendar.MONTH, false));
-            nextMonth.addActionListener(new NextPreviousListener(Calendar.MONTH, true));
-            nextYear.addActionListener(new NextPreviousListener(Calendar.YEAR, true));
+            previousYear.addActionListener(new NextPreviousListener(
+                Calendar.YEAR, false));
+            previousMonth.addActionListener(new NextPreviousListener(
+                Calendar.MONTH, false));
+            nextMonth.addActionListener(new NextPreviousListener(
+                Calendar.MONTH, true));
+            nextYear.addActionListener(new NextPreviousListener(Calendar.YEAR,
+                true));
 
             dayPanel = new JPanel();
             GridLayout layout = new GridLayout(7, 7);
@@ -399,7 +425,8 @@ public class DatePicker extends JPanel {
                 }
 
                 daysOfMonth[week][weekday - 1] = day;
-                daysOfMonth[week][weekday - 1].addActionListener(new DayButtonListener(date));
+                daysOfMonth[week][weekday - 1]
+                    .addActionListener(new DayButtonListener(date));
 
                 if (weekday == Calendar.SATURDAY) {
                     week++;
@@ -418,12 +445,14 @@ public class DatePicker extends JPanel {
                     } else {
                         // blank space for grid positions outside of current
                         // month
-                        dayPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+                        dayPanel
+                            .add(Box.createRigidArea(new Dimension(10, 10)));
                     }
                 }
             }
 
-            monthLabel.setText(months[currentDate.get(Calendar.MONTH)] + " " + currentDate.get(Calendar.YEAR));
+            monthLabel.setText(months[currentDate.get(Calendar.MONTH)] + " "
+                + currentDate.get(Calendar.YEAR));
 
             updateButtons();
             repaint();
@@ -439,13 +468,15 @@ public class DatePicker extends JPanel {
             if (maximumDate != null) {
                 // add year to test whether "Next Year" button should be enabled
                 tempDate.add(Calendar.YEAR, 1);
-                nextYear.setEnabled(!tempDate.after(maximumDate) && !tempDate.before(minimumDate));
+                nextYear.setEnabled(!tempDate.after(maximumDate)
+                    && !tempDate.before(minimumDate));
                 tempDate.add(Calendar.YEAR, -1);
 
                 // add month to test whether "Next Month" button should be
                 // enabled
                 tempDate.add(Calendar.MONTH, 1);
-                nextMonth.setEnabled(!tempDate.after(maximumDate) && !tempDate.before(minimumDate));
+                nextMonth.setEnabled(!tempDate.after(maximumDate)
+                    && !tempDate.before(minimumDate));
                 tempDate.add(Calendar.MONTH, -1);
             }
 
@@ -456,7 +487,8 @@ public class DatePicker extends JPanel {
                 tempDate.add(Calendar.YEAR, -1);
                 tempDate.add(Calendar.MONTH, 1);
                 tempDate.add(Calendar.DAY_OF_MONTH, -1);
-                previousYear.setEnabled(!tempDate.after(maximumDate) && !tempDate.before(minimumDate));
+                previousYear.setEnabled(!tempDate.after(maximumDate)
+                    && !tempDate.before(minimumDate));
                 tempDate.add(Calendar.DAY_OF_MONTH, 1);
                 tempDate.add(Calendar.MONTH, -1);
                 tempDate.add(Calendar.YEAR, 1);
@@ -464,7 +496,8 @@ public class DatePicker extends JPanel {
                 // take day to test whether "Previous Month" button should be
                 // enabled
                 tempDate.add(Calendar.DAY_OF_MONTH, -1);
-                previousMonth.setEnabled(!tempDate.after(maximumDate) && !tempDate.before(minimumDate));
+                previousMonth.setEnabled(!tempDate.after(maximumDate)
+                    && !tempDate.before(minimumDate));
             }
         }
 
@@ -528,7 +561,8 @@ public class DatePicker extends JPanel {
                     clearTime(selectedDate);
                 }
                 // set the selected date
-                selectedDate.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH));
+                selectedDate.set(Calendar.DAY_OF_MONTH, date
+                    .get(Calendar.DAY_OF_MONTH));
                 selectedDate.set(Calendar.MONTH, date.get(Calendar.MONTH));
                 selectedDate.set(Calendar.YEAR, date.get(Calendar.YEAR));
 

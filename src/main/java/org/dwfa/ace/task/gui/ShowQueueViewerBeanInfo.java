@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.task.gui;
 
 import java.beans.BeanDescriptor;
@@ -14,30 +30,32 @@ public class ShowQueueViewerBeanInfo extends SimpleBeanInfo {
      */
     public ShowQueueViewerBeanInfo() {
         super();
-     }
+    }
 
     public PropertyDescriptor[] getPropertyDescriptors() {
-        try {  
+        try {
             PropertyDescriptor show =
-                new PropertyDescriptor("show", ShowQueueViewer.class);
+                    new PropertyDescriptor("show", ShowQueueViewer.class);
             show.setBound(true);
             show.setPropertyEditorClass(CheckboxEditor.class);
             show.setDisplayName("Show Queue Viewer:");
-            show.setShortDescription("Select to show the queue viewer to the user.");
+            show
+                .setShortDescription("Select to show the queue viewer to the user.");
 
-            PropertyDescriptor rv[] =
-                { show };
+            PropertyDescriptor rv[] = { show };
             return rv;
         } catch (IntrospectionException e) {
-             throw new Error(e.toString());
+            throw new Error(e.toString());
         }
-     }        
+    }
+
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ShowQueueViewer.class);
-        bd.setDisplayName("<html><font color='green'><center>Show Queue Viewer");
+        bd
+            .setDisplayName("<html><font color='green'><center>Show Queue Viewer");
         return bd;
     }
 

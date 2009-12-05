@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.task.input;
 
 import java.text.DecimalFormat;
@@ -7,7 +23,6 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.NumberFormatter;
-
 
 /**
  * Number formatter - customised formatting class that can optionally include/exclude
@@ -23,8 +38,8 @@ public class NumberFormatterImpl extends NumberFormatter {
     NumberFilter filter = null;
     private static final long serialVersionUID = 1L;
 
-    public NumberFormatterImpl(DecimalFormat decimalFormat, boolean allowNegative, boolean allowZero,
-            boolean allowDouble) {
+    public NumberFormatterImpl(DecimalFormat decimalFormat,
+            boolean allowNegative, boolean allowZero, boolean allowDouble) {
         super(decimalFormat);
         this.allowNegative = allowNegative;
         this.allowZero = allowZero;
@@ -38,12 +53,15 @@ public class NumberFormatterImpl extends NumberFormatter {
 
     private class NumberFilter extends DocumentFilter {
 
-        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
-            throws BadLocationException {
+        public void insertString(FilterBypass fb, int offset, String string,
+                AttributeSet attr) throws BadLocationException {
 
             // insert the new string into the existing string
-            String modified = fb.getDocument().getText(0, offset) + string
-                    + fb.getDocument().getText(offset, fb.getDocument().getLength() - offset);
+            String modified =
+                    fb.getDocument().getText(0, offset)
+                        + string
+                        + fb.getDocument().getText(offset,
+                            fb.getDocument().getLength() - offset);
 
             // if it's valid, we'll save the modified string
             if (isValidEntry(modified)) {
@@ -51,13 +69,14 @@ public class NumberFormatterImpl extends NumberFormatter {
             }
         }
 
-        public void replace(FilterBypass fb, int offset, int length, String text,
-                AttributeSet attrs) throws BadLocationException {
+        public void replace(FilterBypass fb, int offset, int length,
+                String text, AttributeSet attrs) throws BadLocationException {
 
             // insert the replacement string into the existing string
-            String modified = fb.getDocument().getText(0, offset)
-                    + text
-                    + fb.getDocument().getText(offset + length,
+            String modified =
+                    fb.getDocument().getText(0, offset)
+                        + text
+                        + fb.getDocument().getText(offset + length,
                             fb.getDocument().getLength() - (offset + length));
 
             // if it's valid, we'll save the modified string
@@ -115,7 +134,7 @@ public class NumberFormatterImpl extends NumberFormatter {
         if (o == null) {
             return "";
         } else {
-            Number entry = (Number)o;
+            Number entry = (Number) o;
             return entry.toString();
         }
     }

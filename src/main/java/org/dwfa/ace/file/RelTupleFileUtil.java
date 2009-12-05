@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.ace.file;
 
 import java.io.BufferedWriter;
@@ -19,28 +35,44 @@ import org.dwfa.tapi.TerminologyException;
 
 public class RelTupleFileUtil {
 
-    public static String exportTuple(I_RelTuple relTuple) throws TerminologyException, IOException {
+    public static String exportTuple(I_RelTuple relTuple)
+            throws TerminologyException, IOException {
 
         try {
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            UUID tupleUuid = ArchitectonicAuxiliary.Concept.REL_TUPLE.getUids().iterator().next();
-            UUID relUuid = termFactory.getUids(relTuple.getRelId()).iterator().next();
-            UUID c1Uuid = termFactory.getUids(relTuple.getC1Id()).iterator().next();
-            UUID c2Uuid = termFactory.getUids(relTuple.getC2Id()).iterator().next();
-            UUID charUuid = termFactory.getUids(relTuple.getCharacteristicId()).iterator().next();
+            UUID tupleUuid =
+                    ArchitectonicAuxiliary.Concept.REL_TUPLE.getUids()
+                        .iterator().next();
+            UUID relUuid =
+                    termFactory.getUids(relTuple.getRelId()).iterator().next();
+            UUID c1Uuid =
+                    termFactory.getUids(relTuple.getC1Id()).iterator().next();
+            UUID c2Uuid =
+                    termFactory.getUids(relTuple.getC2Id()).iterator().next();
+            UUID charUuid =
+                    termFactory.getUids(relTuple.getCharacteristicId())
+                        .iterator().next();
             int group = relTuple.getGroup();
-            UUID refUuid = termFactory.getUids(relTuple.getRefinabilityId()).iterator().next();
-            UUID relTypeUuid = termFactory.getUids(relTuple.getTypeId()).iterator().next();
-            UUID pathUuid = termFactory.getUids(relTuple.getPathId()).iterator().next();
-            UUID statusUuid = termFactory.getUids(relTuple.getStatusId()).iterator().next();
+            UUID refUuid =
+                    termFactory.getUids(relTuple.getRefinabilityId())
+                        .iterator().next();
+            UUID relTypeUuid =
+                    termFactory.getUids(relTuple.getTypeId()).iterator().next();
+            UUID pathUuid =
+                    termFactory.getUids(relTuple.getPathId()).iterator().next();
+            UUID statusUuid =
+                    termFactory.getUids(relTuple.getStatusId()).iterator()
+                        .next();
             int effectiveDate = relTuple.getVersion();
 
-            String idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(relUuid));
+            String idTuple =
+                    IDTupleFileUtil.exportTuple(termFactory.getId(relUuid));
 
-            return idTuple + tupleUuid + "\t" + relUuid + "\t" + c1Uuid + "\t" + c2Uuid + "\t" + charUuid + "\t"
-                + group + "\t" + refUuid + "\t" + relTypeUuid + "\t" + pathUuid + "\t" + statusUuid + "\t"
-                + effectiveDate + "\n";
+            return idTuple + tupleUuid + "\t" + relUuid + "\t" + c1Uuid + "\t"
+                + c2Uuid + "\t" + charUuid + "\t" + group + "\t" + refUuid
+                + "\t" + relTypeUuid + "\t" + pathUuid + "\t" + statusUuid
+                + "\t" + effectiveDate + "\n";
         } catch (Exception e) {
             e.printStackTrace();
             throw new TerminologyException(e.getMessage());
