@@ -28,8 +28,8 @@
     <name>ACE API</name>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/ace-api/trunk/dev</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/ace-api/trunk/dev</developerConnection>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/ace-api</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/ace-api</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
     </scm>
     <dependencies>
