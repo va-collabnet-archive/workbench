@@ -32,8 +32,8 @@
         workflow bundles. </description>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/dwfa-mojo/site/index.html</url>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/dwfa-mojo/trunk</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/dwfa-mojo/trunk</developerConnection>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-mojo</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-mojo</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
     </scm>
     <dependencies>
