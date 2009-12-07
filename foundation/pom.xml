@@ -33,8 +33,8 @@
     <url>http://www.informatics.com</url>
   </organization>
   <scm>
-    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/foundation/trunk</connection>
-    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/foundation/trunk</developerConnection>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/foundation</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/foundation</developerConnection>
     <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
   </scm>
   <dependencies>
