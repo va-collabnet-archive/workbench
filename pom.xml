@@ -28,8 +28,8 @@
     <name>term mojo</name>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/index.html</url>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/term-mojo/trunk/dev</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/term-mojo/trunk/dev</developerConnection>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/term-mojo</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/term-mojo</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
     </scm>
     <organization>
