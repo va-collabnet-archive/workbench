@@ -32,8 +32,8 @@
     <inceptionYear>2005</inceptionYear>
     <description>ACE editor toolkit and version-oriented database</description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/vodb/branches/nehta</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/vodb/branches/nehta</developerConnection>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta/vodb</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta/vodb</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
     </scm>
     <licenses>
@@ -225,14 +225,6 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <useReleaseProfile>false</useReleaseProfile>
-                    <tagBase>https://csfe.aceworkspace.net/svn/repos/workbench/vodb/tags/nehta</tagBase>
                 </configuration>
             </plugin>
             <plugin>

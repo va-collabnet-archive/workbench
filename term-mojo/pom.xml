@@ -26,8 +26,8 @@
     <packaging>maven-plugin</packaging>
     <name>term mojo</name>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/term-mojo/branches/nehta</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/term-mojo/branches/nehta</developerConnection>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta/term-mojo</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta/term-mojo</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
     </scm>
     <licenses>
@@ -93,13 +93,6 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <tagBase>https://csfe.aceworkspace.net/svn/repos/workbench/term-mojo/tags/nehta</tagBase>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
