@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,13 +25,13 @@ public interface I_GetExtensionData {
 
     I_ThinExtByRefVersioned getExtension() throws IOException;
 
-    UniversalAceExtByRefBean getUniversalAceBean() throws TerminologyException,
-            IOException;
+    UniversalAceExtByRefBean getUniversalAceBean() throws TerminologyException, IOException;
 
     int getMemberId();
 
     /**
      * Removes this extension from the uncommitted extension cache.
+     * 
      * @throws IOException If an exception occurs.
      */
     void removeFromCache() throws IOException;

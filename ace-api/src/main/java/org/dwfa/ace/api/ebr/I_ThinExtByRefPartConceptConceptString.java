@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,21 +18,24 @@ package org.dwfa.ace.api.ebr;
 
 public interface I_ThinExtByRefPartConceptConceptString extends I_ThinExtByRefPart {
 
-	   public int getC1id();
-	   public void setC1id(int c1id);
+    public int getC1id();
 
-	   public int getC2id();
-	   public void setC2id(int c2id);
+    public void setC1id(int c1id);
 
-	   /** @deprecated Use {@link #getStringValue()} */
-	   @Deprecated
-	   public String getStr();
-	   
-	   /** @deprecated Use {@link #setStringValue(String)} */
-	   @Deprecated
-	   public void setStr(String str);
-	   
-	   public String getStringValue();
-	   public void setStringValue(String value);
+    public int getC2id();
+
+    public void setC2id(int c2id);
+
+    /** @deprecated Use {@link #getStringValue()} */
+    @Deprecated
+    public String getStr();
+
+    /** @deprecated Use {@link #setStringValue(String)} */
+    @Deprecated
+    public void setStr(String str);
+
+    public String getStringValue();
+
+    public void setStringValue(String value);
 
 }

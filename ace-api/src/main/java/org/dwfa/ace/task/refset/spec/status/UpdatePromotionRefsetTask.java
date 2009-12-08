@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -125,10 +125,8 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             termFactory = LocalVersionedTerminology.get();
             currentStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             retiredStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-            unreviewedStatusConcept =
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
-            readyToPromoteStatusConcept =
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.getUids());
+            unreviewedStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
+            readyToPromoteStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.getUids());
             promotedStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROMOTED.getUids());
             activeStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
 
@@ -148,23 +146,15 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                 throw new Exception("Unable to find promotion refset.");
             }
 
-            unreviewedAdditionStatus =
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids());
-            unreviewedDeletionStatus =
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
-            reviewedApprovedAdditionStatus =
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION.getUids());
-            reviewedApprovedDeletionStatus =
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION.getUids());
-            reviewedRejectedAdditionStatus =
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
-            reviewedRejectedDeletionStatus =
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
+            unreviewedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids());
+            unreviewedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
+            reviewedApprovedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION.getUids());
+            reviewedApprovedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION.getUids());
+            reviewedRejectedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
+            reviewedRejectedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
 
-            List<I_ThinExtByRefVersioned> memberExtensions =
-                    termFactory.getRefsetExtensionMembers(memberRefsetConcept.getConceptId());
-            List<I_ThinExtByRefVersioned> promotionExtensions =
-                    termFactory.getRefsetExtensionMembers(promotionConcept.getConceptId());
+            List<I_ThinExtByRefVersioned> memberExtensions = termFactory.getRefsetExtensionMembers(memberRefsetConcept.getConceptId());
+            List<I_ThinExtByRefVersioned> promotionExtensions = termFactory.getRefsetExtensionMembers(promotionConcept.getConceptId());
 
             updatePromotionsRefset(memberExtensions, promotionExtensions);
 
@@ -189,8 +179,8 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
         SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
         for (I_ThinExtByRefVersioned memberExtension : memberExtensions) {
             I_ThinExtByRefPart latestMemberPart = getLatestPart(memberExtension);
-            I_ThinExtByRefVersioned promotionExtension =
-                    getExtensionByComponent(memberExtension.getComponentId(), promotionExtensions);
+            I_ThinExtByRefVersioned promotionExtension = getExtensionByComponent(memberExtension.getComponentId(),
+                promotionExtensions);
             I_GetConceptData promotionStatus = null;
             if (promotionExtension != null) {
                 promotionStatus = getPromotionStatus(promotionExtension);
@@ -206,8 +196,8 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed addition
-                        refsetHelper.newRefsetExtension(promotionConcept.getConceptId(), memberExtension
-                            .getComponentId(), unreviewedAdditionStatus.getConceptId());
+                        refsetHelper.newRefsetExtension(promotionConcept.getConceptId(),
+                            memberExtension.getComponentId(), unreviewedAdditionStatus.getConceptId());
                     } else if (promotionStatus.equals(unreviewedAdditionStatus)
                         || promotionStatus.equals(reviewedApprovedAdditionStatus)
                         || promotionStatus.equals(reviewedRejectedAdditionStatus)) {
@@ -215,27 +205,29 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                     } else if (promotionStatus.equals(unreviewedDeletionStatus)
                         || promotionStatus.equals(reviewedApprovedDeletionStatus)
                         || promotionStatus.equals(reviewedRejectedDeletionStatus)) {
-                        // refsetHelper.retireConceptExtension(promotionConcept.getConceptId(), memberExtension
+                        // refsetHelper.retireConceptExtension(promotionConcept.getConceptId(),
+                        // memberExtension
                         // .getComponentId());
-                        refsetHelper.newConceptExtensionPart(promotionConcept.getConceptId(), memberExtension
-                            .getComponentId(), unreviewedAdditionStatus.getConceptId(), currentStatusConcept
-                            .getConceptId());
+                        refsetHelper.newConceptExtensionPart(promotionConcept.getConceptId(),
+                            memberExtension.getComponentId(), unreviewedAdditionStatus.getConceptId(),
+                            currentStatusConcept.getConceptId());
                     }
 
                 } else if (latestMemberPart.getStatusId() == retiredStatusConcept.getConceptId()) {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed deletion
-                        refsetHelper.newRefsetExtension(promotionConcept.getConceptId(), memberExtension
-                            .getComponentId(), unreviewedDeletionStatus.getConceptId());
+                        refsetHelper.newRefsetExtension(promotionConcept.getConceptId(),
+                            memberExtension.getComponentId(), unreviewedDeletionStatus.getConceptId());
                     } else if (promotionStatus.equals(unreviewedAdditionStatus)
                         || promotionStatus.equals(reviewedApprovedAdditionStatus)
                         || promotionStatus.equals(reviewedRejectedAdditionStatus)) {
-                        // refsetHelper.retireConceptExtension(promotionConcept.getConceptId(), memberExtension
+                        // refsetHelper.retireConceptExtension(promotionConcept.getConceptId(),
+                        // memberExtension
                         // .getComponentId());
-                        refsetHelper.newConceptExtensionPart(promotionConcept.getConceptId(), memberExtension
-                            .getComponentId(), unreviewedDeletionStatus.getConceptId(), currentStatusConcept
-                            .getConceptId());
+                        refsetHelper.newConceptExtensionPart(promotionConcept.getConceptId(),
+                            memberExtension.getComponentId(), unreviewedDeletionStatus.getConceptId(),
+                            currentStatusConcept.getConceptId());
                     } else if (promotionStatus.equals(unreviewedDeletionStatus)
                         || promotionStatus.equals(reviewedApprovedDeletionStatus)
                         || promotionStatus.equals(reviewedRejectedDeletionStatus)) {

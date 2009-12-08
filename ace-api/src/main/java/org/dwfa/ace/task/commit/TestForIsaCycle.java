@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,10 +31,9 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = {
-        @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-        @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-        @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
 public class TestForIsaCycle extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
@@ -44,8 +43,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
         out.writeInt(dataVersion);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             //
@@ -55,8 +53,8 @@ public class TestForIsaCycle extends AbstractConceptTest {
     }
 
     @Override
-    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept,
-            boolean forCommit) throws TaskFailedException {
+    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
+            throws TaskFailedException {
         ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
         List<I_RelVersioned> usrl = concept.getUncommittedSourceRels();
@@ -66,9 +64,8 @@ public class TestForIsaCycle extends AbstractConceptTest {
             List<I_RelTuple> rvtl = rv.getTuples();
             for (I_RelTuple rt : rvtl) {
                 try {
-                    
-                    boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt
-                            .getTypeId(), rt.getC2Id());
+
+                    boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt.getTypeId(), rt.getC2Id());
                     if (test)
                         foundCycle = true;
                 } catch (TerminologyException e) {
@@ -82,10 +79,8 @@ public class TestForIsaCycle extends AbstractConceptTest {
         }
 
         if (foundCycle)
-            alertList.add(new AlertToDataConstraintFailure(
-                    AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-                    "<html>Added IS_A relationship will create a cycle. ",
-                    concept));
+            alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+                "<html>Added IS_A relationship will create a cycle. ", concept));
 
         return alertList;
     }

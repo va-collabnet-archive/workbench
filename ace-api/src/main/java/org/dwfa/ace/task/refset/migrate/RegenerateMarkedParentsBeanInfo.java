@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,16 +28,12 @@ public class RegenerateMarkedParentsBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor memberConceptPropName =
-                    new PropertyDescriptor("memberConceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor memberConceptPropName = new PropertyDescriptor("memberConceptPropName",
+                getBeanDescriptor().getBeanClass());
             memberConceptPropName.setBound(true);
-            memberConceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            memberConceptPropName
-                .setDisplayName("<html><font color='green'>Refset member concept property:");
-            memberConceptPropName
-                .setShortDescription("The property containing the concept which defines a refset member. ");
+            memberConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            memberConceptPropName.setDisplayName("<html><font color='green'>Refset member concept property:");
+            memberConceptPropName.setShortDescription("The property containing the concept which defines a refset member. ");
 
             PropertyDescriptor rv[] = { memberConceptPropName };
             return rv;
@@ -51,8 +47,7 @@ public class RegenerateMarkedParentsBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(RegenerateMarkedParents.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Regenerate<br>marked parents");
+        bd.setDisplayName("<html><font color='green'><center>Regenerate<br>marked parents");
         return bd;
     }
 

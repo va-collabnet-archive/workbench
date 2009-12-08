@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,42 +28,28 @@ public class AddConceptToRefsetBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor refsetConceptPropName =
-                    new PropertyDescriptor("refsetConceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor refsetConceptPropName = new PropertyDescriptor("refsetConceptPropName",
+                getBeanDescriptor().getBeanClass());
             refsetConceptPropName.setBound(true);
-            refsetConceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            refsetConceptPropName
-                .setDisplayName("<html><font color='green'>Refset concept property:");
-            refsetConceptPropName
-                .setShortDescription("The property containing the refset concept. ");
+            refsetConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetConceptPropName.setDisplayName("<html><font color='green'>Refset concept property:");
+            refsetConceptPropName.setShortDescription("The property containing the refset concept. ");
 
-            PropertyDescriptor memberConceptPropName =
-                    new PropertyDescriptor("memberConceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor memberConceptPropName = new PropertyDescriptor("memberConceptPropName",
+                getBeanDescriptor().getBeanClass());
             memberConceptPropName.setBound(true);
-            memberConceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            memberConceptPropName
-                .setDisplayName("<html><font color='green'>Member concept property:");
-            memberConceptPropName
-                .setShortDescription("The property containing the target member concept. ");
+            memberConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            memberConceptPropName.setDisplayName("<html><font color='green'>Member concept property:");
+            memberConceptPropName.setShortDescription("The property containing the target member concept. ");
 
-            PropertyDescriptor conceptExtValuePropName =
-                    new PropertyDescriptor("conceptExtValuePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptExtValuePropName = new PropertyDescriptor("conceptExtValuePropName",
+                getBeanDescriptor().getBeanClass());
             conceptExtValuePropName.setBound(true);
-            conceptExtValuePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptExtValuePropName
-                .setDisplayName("<html><font color='green'>Extension value concept property:");
-            conceptExtValuePropName
-                .setShortDescription("The property containing the value for the new concept extension. ");
+            conceptExtValuePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptExtValuePropName.setDisplayName("<html><font color='green'>Extension value concept property:");
+            conceptExtValuePropName.setShortDescription("The property containing the value for the new concept extension. ");
 
-            PropertyDescriptor rv[] =
-                    { refsetConceptPropName, memberConceptPropName,
-                     conceptExtValuePropName };
+            PropertyDescriptor rv[] = { refsetConceptPropName, memberConceptPropName, conceptExtValuePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -75,8 +61,7 @@ public class AddConceptToRefsetBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(AddConceptToRefset.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Add concept to refset");
+        bd.setDisplayName("<html><font color='green'><center>Add concept to refset");
         return bd;
     }
 

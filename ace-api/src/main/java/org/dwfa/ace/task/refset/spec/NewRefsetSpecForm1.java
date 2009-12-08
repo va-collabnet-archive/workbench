@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -139,9 +139,8 @@ public class NewRefsetSpecForm1 extends JPanel {
         if (refsetNames.size() != 0) {
             this.add(refsetParentComboBox, gridBagConstraints);
         } else {
-            JLabel noParentsAvailLabel =
-                    new JLabel(
-                        "No refset parents available - current user does not have permission to create new refsets.");
+            JLabel noParentsAvailLabel = new JLabel(
+                "No refset parents available - current user does not have permission to create new refsets.");
             this.add(noParentsAvailLabel, gridBagConstraints);
         }
 

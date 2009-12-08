@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,16 +28,12 @@ public class ClearAllowedStatusInProfileBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("The property that contains the profile to write to disk.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the profile to write to disk.");
 
             PropertyDescriptor rv[] = { profilePropName };
             return rv;
@@ -50,10 +46,8 @@ public class ClearAllowedStatusInProfileBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(ClearAllowedStatusInProfile.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>clear allowed status<br>in profile");
+        BeanDescriptor bd = new BeanDescriptor(ClearAllowedStatusInProfile.class);
+        bd.setDisplayName("<html><font color='green'><center>clear allowed status<br>in profile");
         return bd;
     }
 }

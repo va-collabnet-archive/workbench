@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,10 +22,12 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.bpa.process.TaskFailedException;
 
 /**
- * An interface for JavaBeans that can be used to validate data as a task in a business process, or wrapped in a MOJO, 
- * or accessed at commit time, or when changes are created. 
+ * An interface for JavaBeans that can be used to validate data as a task in a
+ * business process, or wrapped in a MOJO,
+ * or accessed at commit time, or when changes are created.
  * 
- * The intent is to provide a generic class for testing data constraints that can be applied:
+ * The intent is to provide a generic class for testing data constraints that
+ * can be applied:
  * <ol>
  * <li>When a change is made to a component, before a commit
  * <li>When a change to a component is committed
@@ -33,12 +35,12 @@ import org.dwfa.bpa.process.TaskFailedException;
  * <li>When a change set is imported
  * <li>When validating an entire database
  * </ol>
+ * 
  * @author kec
- *
+ * 
  */
 public interface I_TestDataConstraints {
 
-    public List<AlertToDataConstraintFailure> test(I_Transact component, 
-    		boolean forCommit) throws TaskFailedException;
+    public List<AlertToDataConstraintFailure> test(I_Transact component, boolean forCommit) throws TaskFailedException;
 
 }

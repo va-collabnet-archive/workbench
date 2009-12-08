@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,16 +35,12 @@ public class SetWFToSelectPromotionListPanelTaskBeanInfo extends SimpleBeanInfo 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
             PropertyDescriptor memberRefsetUuidPropName;
-            memberRefsetUuidPropName =
-                    new PropertyDescriptor("memberRefsetUuidPropName",
-                        getBeanDescriptor().getBeanClass());
+            memberRefsetUuidPropName = new PropertyDescriptor("memberRefsetUuidPropName",
+                getBeanDescriptor().getBeanClass());
             memberRefsetUuidPropName.setBound(true);
-            memberRefsetUuidPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            memberRefsetUuidPropName
-                .setDisplayName("<html><font color='green'>Member refset UUID prop:");
-            memberRefsetUuidPropName
-                .setShortDescription("The member refset UUID prop.");
+            memberRefsetUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            memberRefsetUuidPropName.setDisplayName("<html><font color='green'>Member refset UUID prop:");
+            memberRefsetUuidPropName.setShortDescription("The member refset UUID prop.");
 
             PropertyDescriptor rv[] = { memberRefsetUuidPropName };
             return rv;
@@ -57,10 +53,8 @@ public class SetWFToSelectPromotionListPanelTaskBeanInfo extends SimpleBeanInfo 
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(SetWFToSelectPromotionListPanelTask.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set WF Panel to<br>select promotion list<br>panel");
+        BeanDescriptor bd = new BeanDescriptor(SetWFToSelectPromotionListPanelTask.class);
+        bd.setDisplayName("<html><font color='green'><center>Set WF Panel to<br>select promotion list<br>panel");
         return bd;
     }
 

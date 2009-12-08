@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info for TakeFirstItemInAttachmentList class.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 public class TakeFirstItemInAttachmentListBeanInfo extends SimpleBeanInfo {
 
@@ -39,18 +40,13 @@ public class TakeFirstItemInAttachmentListBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor listName =
-                    new PropertyDescriptor("listName",
-                        TakeFirstItemInAttachmentList.class);
+            PropertyDescriptor listName = new PropertyDescriptor("listName", TakeFirstItemInAttachmentList.class);
             listName.setBound(true);
             listName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            listName
-                .setDisplayName("<html><font color='green'>Name of temporary list:");
+            listName.setDisplayName("<html><font color='green'>Name of temporary list:");
             listName.setShortDescription("Name of the temporary list.");
 
-            PropertyDescriptor conceptKey =
-                    new PropertyDescriptor("conceptKey",
-                        TakeFirstItemInAttachmentList.class);
+            PropertyDescriptor conceptKey = new PropertyDescriptor("conceptKey", TakeFirstItemInAttachmentList.class);
             conceptKey.setBound(true);
             conceptKey.setPropertyEditorClass(PropertyNameLabelEditor.class);
             conceptKey.setDisplayName("<html><font color='green'>Concept key:");
@@ -67,10 +63,8 @@ public class TakeFirstItemInAttachmentListBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(TakeFirstItemInAttachmentList.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Take First Item<br>In Attachment List<br> Return Concept");
+        BeanDescriptor bd = new BeanDescriptor(TakeFirstItemInAttachmentList.class);
+        bd.setDisplayName("<html><font color='green'><center>Take First Item<br>In Attachment List<br> Return Concept");
         return bd;
     }
 

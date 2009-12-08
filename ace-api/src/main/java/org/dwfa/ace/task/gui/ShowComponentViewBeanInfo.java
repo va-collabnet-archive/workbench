@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,8 +24,9 @@ import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 
 /**
  * Bean info to ShowComponentView class.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 public class ShowComponentViewBeanInfo extends SimpleBeanInfo {
 
@@ -38,14 +39,11 @@ public class ShowComponentViewBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor visible =
-                    new PropertyDescriptor("visible", ShowComponentView.class);
+            PropertyDescriptor visible = new PropertyDescriptor("visible", ShowComponentView.class);
             visible.setBound(true);
             visible.setPropertyEditorClass(CheckboxEditor.class);
-            visible
-                .setDisplayName("<html><font color='green'>Show component view");
-            visible
-                .setShortDescription("Choose whether to show component view.");
+            visible.setDisplayName("<html><font color='green'>Show component view");
+            visible.setShortDescription("Choose whether to show component view.");
 
             PropertyDescriptor rv[] = { visible };
             return rv;
@@ -59,8 +57,7 @@ public class ShowComponentViewBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ShowComponentView.class);
-        bd.setDisplayName("<html><font color='green'><center>Show or Hide <br>"
-            + "Component View");
+        bd.setDisplayName("<html><font color='green'><center>Show or Hide <br>" + "Component View");
         return bd;
     }
 

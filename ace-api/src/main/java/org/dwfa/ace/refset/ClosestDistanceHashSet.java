@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,85 +29,83 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ClosestDistanceHashSet implements Map<Integer, ConceptRefsetInclusionDetails> {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	HashMap<Integer, ConceptRefsetInclusionDetails> map = new HashMap<Integer, ConceptRefsetInclusionDetails>();
+    private static final long serialVersionUID = 1L;
+    HashMap<Integer, ConceptRefsetInclusionDetails> map = new HashMap<Integer, ConceptRefsetInclusionDetails>();
 
-	public void add(ConceptRefsetInclusionDetails o) {
+    public void add(ConceptRefsetInclusionDetails o) {
 
-		ConceptRefsetInclusionDetails oldObject = map.get(o.getConceptId());
-		
-		if (oldObject == null) {
-			map.put(o.getConceptId(), o);
-		} else {
-			if (o.getDistance() < oldObject.getDistance()) {
-				map.put(o.getConceptId(), o);
-			}
-		}
-	}
+        ConceptRefsetInclusionDetails oldObject = map.get(o.getConceptId());
 
-	public void clear() {
-		map.clear();
-	}
+        if (oldObject == null) {
+            map.put(o.getConceptId(), o);
+        } else {
+            if (o.getDistance() < oldObject.getDistance()) {
+                map.put(o.getConceptId(), o);
+            }
+        }
+    }
 
-	public boolean containsKey(Object key) {
-		return map.containsKey(key);
-	}
+    public void clear() {
+        map.clear();
+    }
 
-	public boolean containsValue(Object value) {
-		return map.containsValue(value);
-	}
+    public boolean containsKey(Object key) {
+        return map.containsKey(key);
+    }
 
-	public Set<Entry<Integer, ConceptRefsetInclusionDetails>> entrySet() {
-		return map.entrySet();
-	}
+    public boolean containsValue(Object value) {
+        return map.containsValue(value);
+    }
 
-	public ConceptRefsetInclusionDetails get(Object key) {
-		return map.get(key);
-	}
+    public Set<Entry<Integer, ConceptRefsetInclusionDetails>> entrySet() {
+        return map.entrySet();
+    }
 
-	public boolean isEmpty() {
-		return map.isEmpty();
-	}
+    public ConceptRefsetInclusionDetails get(Object key) {
+        return map.get(key);
+    }
 
-	public Set<Integer> keySet() {
-		return map.keySet();
-	}
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
 
-	public ConceptRefsetInclusionDetails remove(Object key) {
-		return map.remove(key);
-	}
+    public Set<Integer> keySet() {
+        return map.keySet();
+    }
 
-	public int size() {
-		return map.size();
-	}
+    public ConceptRefsetInclusionDetails remove(Object key) {
+        return map.remove(key);
+    }
 
-	public String toString() {
-		return map.toString();
-	}
+    public int size() {
+        return map.size();
+    }
 
-	public Collection<ConceptRefsetInclusionDetails> values() {
-		return map.values();
-	}
+    public String toString() {
+        return map.toString();
+    }
 
-	public ConceptRefsetInclusionDetails put(Integer arg0,
-			ConceptRefsetInclusionDetails arg1) {
-		throw new UnsupportedOperationException("This method is unsupported for this class, use the add(ConceptRefsetInclusionDetails) method instead");
-	}
-	
+    public Collection<ConceptRefsetInclusionDetails> values() {
+        return map.values();
+    }
 
-	public void putAll(
-			Map<? extends Integer, ? extends ConceptRefsetInclusionDetails> arg0) {
-		throw new UnsupportedOperationException("This method is unsupported for this class, use the add(ConceptRefsetInclusionDetails) method instead");
-	}
+    public ConceptRefsetInclusionDetails put(Integer arg0, ConceptRefsetInclusionDetails arg1) {
+        throw new UnsupportedOperationException(
+            "This method is unsupported for this class, use the add(ConceptRefsetInclusionDetails) method instead");
+    }
 
-	public void removeAll(ClosestDistanceHashSet newMembersToBeRemoved) {
-		for (Integer key : newMembersToBeRemoved.keySet()) {
-			map.remove(key);
-		}		
-	}
-	
-	
+    public void putAll(Map<? extends Integer, ? extends ConceptRefsetInclusionDetails> arg0) {
+        throw new UnsupportedOperationException(
+            "This method is unsupported for this class, use the add(ConceptRefsetInclusionDetails) method instead");
+    }
+
+    public void removeAll(ClosestDistanceHashSet newMembersToBeRemoved) {
+        for (Integer key : newMembersToBeRemoved.keySet()) {
+            map.remove(key);
+        }
+    }
+
 }

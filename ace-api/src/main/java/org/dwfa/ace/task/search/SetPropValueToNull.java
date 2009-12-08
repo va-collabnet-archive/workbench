@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,26 +38,23 @@ public class SetPropValueToNull extends AbstractTask {
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
-    
 
     /**
-     * Property name for the term component to test. 
+     * Property name for the term component to test.
      */
     private String componentPropName = ProcessAttachmentKeys.SEARCH_TEST_ITEM.getAttachmentKey();
-    
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.componentPropName);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             this.componentPropName = (String) in.readObject();
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
@@ -66,7 +63,7 @@ public class SetPropValueToNull extends AbstractTask {
     }
 
     public final Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        
+
         try {
             process.setProperty(componentPropName, null);
             return Condition.CONTINUE;
@@ -80,7 +77,6 @@ public class SetPropValueToNull extends AbstractTask {
             throw new TaskFailedException(e);
         }
     }
-    
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()

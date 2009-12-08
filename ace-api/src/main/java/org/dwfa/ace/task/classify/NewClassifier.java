@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,22 +56,19 @@ public class NewClassifier extends AbstractTask {
         }
     }
 
-    public void complete(I_EncodeBusinessProcess arg0, I_Work arg1)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess arg0, I_Work arg1) throws TaskFailedException {
         // nothing to do...
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
             final I_SnorocketFactory rocket = (I_SnorocketFactory) Class.forName(
-                    "au.csiro.snorocket.ace.SnorocketFactory"
-            ).newInstance();
+                "au.csiro.snorocket.ace.SnorocketFactory").newInstance();
             final I_TermFactory tf = (I_TermFactory) LocalVersionedTerminology.get();
             int isaId = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
             rocket.setIsa(isaId);
-            
+
             process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), rocket);
         } catch (Exception e) {
             throw new TaskFailedException(e);

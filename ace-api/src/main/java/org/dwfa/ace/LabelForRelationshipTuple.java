@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,53 +16,48 @@
  */
 package org.dwfa.ace;
 
-
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_RelTuple;
 
-
 public class LabelForRelationshipTuple extends LabelForTuple {
-	
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	private I_RelTuple rel;
-	
-	
-	public LabelForRelationshipTuple(I_RelTuple rel, boolean longForm, boolean showStatus) {
-		super(longForm, showStatus);
-		this.rel = rel;
-	}
-	
+    private static final long serialVersionUID = 1L;
+    private I_RelTuple rel;
 
-	public I_ImplementActiveLabel copy() throws IOException {
-		return TermLabelMaker.newLabel(rel, isLongForm(), getShowStatus());
-	}
+    public LabelForRelationshipTuple(I_RelTuple rel, boolean longForm, boolean showStatus) {
+        super(longForm, showStatus);
+        this.rel = rel;
+    }
 
-	public I_RelTuple getRel() {
-		return rel;
-	}
+    public I_ImplementActiveLabel copy() throws IOException {
+        return TermLabelMaker.newLabel(rel, isLongForm(), getShowStatus());
+    }
 
-	@Override
-	protected boolean tupleEquals(Object obj) {
-		if (LabelForRelationshipTuple.class.isAssignableFrom(obj.getClass())) {
-			LabelForRelationshipTuple another = (LabelForRelationshipTuple) obj;
-			return rel.equals(another.rel);
-		}
-		return false;
-	}
+    public I_RelTuple getRel() {
+        return rel;
+    }
 
-	@Override
-	protected int tupleHash() {
-		return this.rel.hashCode();
-	}
+    @Override
+    protected boolean tupleEquals(Object obj) {
+        if (LabelForRelationshipTuple.class.isAssignableFrom(obj.getClass())) {
+            LabelForRelationshipTuple another = (LabelForRelationshipTuple) obj;
+            return rel.equals(another.rel);
+        }
+        return false;
+    }
 
-	@Override
-	protected String getTupleString() {
-		return rel.toString();
-	}
-	
+    @Override
+    protected int tupleHash() {
+        return this.rel.hashCode();
+    }
+
+    @Override
+    protected String getTupleString() {
+        return rel.toString();
+    }
+
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,12 +30,12 @@ import java.util.Arrays;
 
 public final class DescriptionWriterImplTest {
 
-    private static final int CONCEPT_ID                 = 1000;
-    private static final String SNOMED_ID               = "123456";
-    private static final String TAB_SEPARATOR           = "\t";
-    private static final String LINE_SEPARATOR          = "\n";
-    private static final String DESCRIPTION_TUBLE_TEXT  = "Description Tuble Text";
-    private static final String SOME_TEXT               = "some text";
+    private static final int CONCEPT_ID = 1000;
+    private static final String SNOMED_ID = "123456";
+    private static final String TAB_SEPARATOR = "\t";
+    private static final String LINE_SEPARATOR = "\n";
+    private static final String DESCRIPTION_TUBLE_TEXT = "Description Tuble Text";
+    private static final String SOME_TEXT = "some text";
 
     private IMocksControl mockControl;
     private Writer mockWriter;
@@ -65,19 +65,19 @@ public final class DescriptionWriterImplTest {
         mockControl.replay();
 
         DescriptionWriter writer = new DescriptionWriterImpl(mockWriter, mockTermFactory, mockRefsetUtil,
-                LINE_SEPARATOR);
+            LINE_SEPARATOR);
         writer.write(mockConcept, Arrays.asList(mockDescriptionTuple));
 
         mockControl.verify();
     }
-    
+
     @Test
     public void shouldAppendSuppliedText() throws Exception {
         EasyMock.expect(mockWriter.append(SOME_TEXT)).andReturn(mockWriter);
         mockControl.replay();
 
         DescriptionWriter writer = new DescriptionWriterImpl(mockWriter, mockTermFactory, mockRefsetUtil,
-                LINE_SEPARATOR);
+            LINE_SEPARATOR);
         writer.append(SOME_TEXT);
 
         mockControl.verify();
@@ -90,7 +90,7 @@ public final class DescriptionWriterImplTest {
         mockControl.replay();
 
         DescriptionWriter writer = new DescriptionWriterImpl(mockWriter, mockTermFactory, mockRefsetUtil,
-                LINE_SEPARATOR);
+            LINE_SEPARATOR);
         writer.close();
 
         mockControl.verify();

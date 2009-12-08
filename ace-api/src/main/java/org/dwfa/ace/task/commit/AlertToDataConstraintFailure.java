@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,52 +23,51 @@ import javax.swing.JComponent;
 
 import org.dwfa.ace.api.I_GetConceptData;
 
-
 public class AlertToDataConstraintFailure {
 
-	public enum ALERT_TYPE { INFORMATIONAL, WARNING, ERROR, RESOLVED };
-	
-	private ALERT_TYPE alertType;
-	
-	private String alertMessage;
-	
-	private List<I_Fixup> fixOptions = new ArrayList<I_Fixup>();
-	
-	private transient JComponent rendererComponent;
-	
-	private I_GetConceptData conceptWithAlert;
-	
-	public AlertToDataConstraintFailure(ALERT_TYPE alertType,
-			String alertMessage, I_GetConceptData conceptWithAlert) {
-		super();
-		this.alertType = alertType;
-		this.alertMessage = alertMessage;
-		this.conceptWithAlert = conceptWithAlert;
-	}
+    public enum ALERT_TYPE {
+        INFORMATIONAL, WARNING, ERROR, RESOLVED
+    };
 
-	public ALERT_TYPE getAlertType() {
-		return alertType;
-	}
+    private ALERT_TYPE alertType;
 
-	public String getAlertMessage() {
-		return alertMessage;
-	}
+    private String alertMessage;
 
-	public List<I_Fixup> getFixOptions() {
-		return fixOptions;
-	}
+    private List<I_Fixup> fixOptions = new ArrayList<I_Fixup>();
 
-	public JComponent getRendererComponent() {
-		return rendererComponent;
-	}
+    private transient JComponent rendererComponent;
 
-	public void setRendererComponent(JComponent rendererComponent) {
-		this.rendererComponent = rendererComponent;
-	}
+    private I_GetConceptData conceptWithAlert;
 
-	public I_GetConceptData getConceptWithAlert() {
-		return conceptWithAlert;
-	}
-    
+    public AlertToDataConstraintFailure(ALERT_TYPE alertType, String alertMessage, I_GetConceptData conceptWithAlert) {
+        super();
+        this.alertType = alertType;
+        this.alertMessage = alertMessage;
+        this.conceptWithAlert = conceptWithAlert;
+    }
+
+    public ALERT_TYPE getAlertType() {
+        return alertType;
+    }
+
+    public String getAlertMessage() {
+        return alertMessage;
+    }
+
+    public List<I_Fixup> getFixOptions() {
+        return fixOptions;
+    }
+
+    public JComponent getRendererComponent() {
+        return rendererComponent;
+    }
+
+    public void setRendererComponent(JComponent rendererComponent) {
+        this.rendererComponent = rendererComponent;
+    }
+
+    public I_GetConceptData getConceptWithAlert() {
+        return conceptWithAlert;
+    }
 
 }

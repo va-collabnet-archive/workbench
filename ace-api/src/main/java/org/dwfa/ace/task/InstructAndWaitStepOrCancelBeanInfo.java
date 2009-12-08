@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,15 +26,11 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 public class InstructAndWaitStepOrCancelBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor instruction =
-                    new PropertyDescriptor("instruction",
-                        InstructAndWaitStepOrCancel.class);
+            PropertyDescriptor instruction = new PropertyDescriptor("instruction", InstructAndWaitStepOrCancel.class);
             instruction.setBound(true);
             instruction.setPropertyEditorClass(JTextFieldEditor.class);
-            instruction
-                .setDisplayName("<html><font color='green'>Instruction:");
-            instruction
-                .setShortDescription("Instructions to present to the user in the workflow panel. ");
+            instruction.setDisplayName("<html><font color='green'>Instruction:");
+            instruction.setShortDescription("Instructions to present to the user in the workflow panel. ");
 
             PropertyDescriptor rv[] = { instruction };
             return rv;
@@ -47,10 +43,8 @@ public class InstructAndWaitStepOrCancelBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(InstructAndWaitStepOrCancel.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Instruct and Wait<br>for Step or Cancel");
+        BeanDescriptor bd = new BeanDescriptor(InstructAndWaitStepOrCancel.class);
+        bd.setDisplayName("<html><font color='green'><center>Instruct and Wait<br>for Step or Cancel");
         return bd;
     }
 }

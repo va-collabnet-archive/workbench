@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,16 +25,12 @@ import org.dwfa.ace.utypes.UniversalIdList;
 
 public interface I_ProcessUniversalChangeSets {
 
-    public void processUniversalAceBean(UniversalAceBean bean, long commitTime)
-            throws IOException;
+    public void processUniversalAceBean(UniversalAceBean bean, long commitTime) throws IOException;
 
-    public void processIdList(UniversalIdList list, long commitTime)
-            throws IOException;
+    public void processIdList(UniversalIdList list, long commitTime) throws IOException;
 
-    public void processAcePath(UniversalAcePath path, long commitTime)
-            throws IOException;
+    public void processAcePath(UniversalAcePath path, long commitTime) throws IOException;
 
-    public void processAceEbr(UniversalAceExtByRefBean bean, long time)
-            throws IOException;
+    public void processAceEbr(UniversalAceExtByRefBean bean, long time) throws IOException;
 
 }

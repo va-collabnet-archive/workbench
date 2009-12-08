@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -97,8 +97,7 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
             boolean foundMatch = false;
 
             I_GetConceptData refsetSpec = termFactory.getConcept(extension.getRefsetId());
-            I_GetConceptData specifiesRefsetRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+            I_GetConceptData specifiesRefsetRel = termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             I_GetConceptData memberRefset = getLatestRelationshipTarget(refsetSpec, specifiesRefsetRel);
             if (memberRefset == null) { // not a refset spec being reviewed
                 return alertList;
@@ -129,7 +128,6 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
         Set<I_Position> allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
 
-
         I_GetConceptData reviewerRole = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids());
         I_IntSet roleAllowedTypes = termFactory.newIntSet();
         roleAllowedTypes.add(reviewerRole.getConceptId());
@@ -138,16 +136,16 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
         I_GetConceptData isARel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
         isAAllowedTypes.add(isARel.getConceptId());
 
-        List<I_RelTuple> roleRels =
-                concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true, true);
+        List<I_RelTuple> roleRels = concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true,
+            true);
 
         for (I_RelTuple roleRel : roleRels) {
 
             I_GetConceptData roleType = termFactory.getConcept(roleRel.getTypeId());
             I_GetConceptData hierarchyPermission = termFactory.getConcept(roleRel.getC2Id());
 
-            List<I_RelTuple> permissionRels =
-                    roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions, true, true);
+            List<I_RelTuple> permissionRels = roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions,
+                true, true);
 
             for (I_RelTuple permissionRel : permissionRels) {
                 I_GetConceptData permission = termFactory.getConcept(permissionRel.getC1Id());
@@ -165,13 +163,12 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         Set<I_Position> allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
-        I_GetConceptData reviewRefsetPermissionRel =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids());
+        I_GetConceptData reviewRefsetPermissionRel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids());
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(reviewRefsetPermissionRel.getConceptId());
 
-        Set<I_GetConceptData> refsets =
-                concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true, true);
+        Set<I_GetConceptData> refsets = concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true,
+            true);
 
         return refsets;
     }
@@ -196,8 +193,8 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
         Set<I_Position> allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
 
-        List<I_RelTuple> relationships =
-                concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true, true);
+        List<I_RelTuple> relationships = concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true,
+            true);
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {
                 latestVersion = rel.getVersion();

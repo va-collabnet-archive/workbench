@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,8 +35,9 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * This task takes a set as input and checks if it contains 2 or more items.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/prop/set", type = BeanType.TASK_BEAN) })
 public class TwoOrMoreItemsInSet extends AbstractTask {

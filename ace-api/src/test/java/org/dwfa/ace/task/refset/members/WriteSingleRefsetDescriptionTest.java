@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,9 +43,9 @@ import java.util.Collection;
 
 public final class WriteSingleRefsetDescriptionTest {
 
-    private static final String WORKING_REFSET_KEY  = "REFSET_KEY";
-    private static final String DIRECTORY_KEY       = "DIR_KEY";
-    private static final int REFSET_CONCEPT_ID      = 1200;
+    private static final String WORKING_REFSET_KEY = "REFSET_KEY";
+    private static final String DIRECTORY_KEY = "DIR_KEY";
+    private static final int REFSET_CONCEPT_ID = 1200;
 
     private IMocksControl mockControl;
     private LocalVersionedTerminologyWrapper mockTerminologyWrapper;
@@ -57,29 +57,28 @@ public final class WriteSingleRefsetDescriptionTest {
         mockTermFactory = mockControl.createMock(I_TermFactory.class);
         mockTerminologyWrapper = mockControl.createMock(LocalVersionedTerminologyWrapper.class);
     }
-    
+
     @Test
     public void shouldExtendAbstractTask() {
         assertTrue("WriteSingleRefsetDescription should extend AbstractTask",
-                AbstractTask.class.isAssignableFrom(WriteSingleRefsetDescription.class));
+            AbstractTask.class.isAssignableFrom(WriteSingleRefsetDescription.class));
     }
 
     @Test
     public void shouldEvaluateABusinessProcess() throws Exception {
         I_EncodeBusinessProcess mockBusinessProcess = mockControl.createMock(I_EncodeBusinessProcess.class);
         CleanableProcessExtByRef mockCleanableProcess = mockControl.createMock(CleanableProcessExtByRef.class);
-        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder =
-                mockControl.createMock(CleanableProcessExtByRefBuilder.class);
+        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder = mockControl.createMock(CleanableProcessExtByRefBuilder.class);
         PropertyValidator mockPropertyValidator = mockControl.createMock(PropertyValidator.class);
         I_Work mockWork = mockControl.createMock(I_Work.class);
 
-        expectEvaluateCalled(mockBusinessProcess, mockCleanableProcess,  mockCleanableProcessBuilder,
-                mockPropertyValidator);
+        expectEvaluateCalled(mockBusinessProcess, mockCleanableProcess, mockCleanableProcessBuilder,
+            mockPropertyValidator);
 
         mockControl.replay();
 
         I_DefineTask task = new WriteSingleRefsetDescription(WORKING_REFSET_KEY, mockCleanableProcessBuilder,
-                DIRECTORY_KEY, mockPropertyValidator, mockTerminologyWrapper);
+            DIRECTORY_KEY, mockPropertyValidator, mockTerminologyWrapper);
         Condition condition = task.evaluate(mockBusinessProcess, mockWork);
         assertThat(condition, equalTo(Condition.CONTINUE));
 
@@ -88,13 +87,12 @@ public final class WriteSingleRefsetDescriptionTest {
 
     @Test
     public void shouldReturnTheExpectedConditions() {
-        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder =
-                mockControl.createMock(CleanableProcessExtByRefBuilder.class);
+        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder = mockControl.createMock(CleanableProcessExtByRefBuilder.class);
         PropertyValidator mockPropertyValidator = mockControl.createMock(PropertyValidator.class);
         mockControl.replay();
 
         I_DefineTask task = new WriteSingleRefsetDescription(WORKING_REFSET_KEY, mockCleanableProcessBuilder,
-                DIRECTORY_KEY, mockPropertyValidator, mockTerminologyWrapper);
+            DIRECTORY_KEY, mockPropertyValidator, mockTerminologyWrapper);
         assertThat(task.getConditions(), equalTo((Collection) Arrays.asList(Condition.CONTINUE)));
 
         mockControl.verify();
@@ -102,13 +100,12 @@ public final class WriteSingleRefsetDescriptionTest {
 
     @Test
     public void shouldReturnZeroContainerIds() {
-        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder =
-                mockControl.createMock(CleanableProcessExtByRefBuilder.class);
+        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder = mockControl.createMock(CleanableProcessExtByRefBuilder.class);
         PropertyValidator mockPropertyValidator = mockControl.createMock(PropertyValidator.class);
         mockControl.replay();
 
-        I_DefineTask task = new WriteSingleRefsetDescription(WORKING_REFSET_KEY,
-                mockCleanableProcessBuilder, DIRECTORY_KEY, mockPropertyValidator, mockTerminologyWrapper);
+        I_DefineTask task = new WriteSingleRefsetDescription(WORKING_REFSET_KEY, mockCleanableProcessBuilder,
+            DIRECTORY_KEY, mockPropertyValidator, mockTerminologyWrapper);
         int[] containerIds = task.getDataContainerIds();
         assertThat(containerIds.length, equalTo(0));
     }
@@ -126,10 +123,9 @@ public final class WriteSingleRefsetDescriptionTest {
     }
 
     private void expectEvaluateCalled(final I_EncodeBusinessProcess mockBusinessProcess,
-                                      final CleanableProcessExtByRef mockCleanableProcess,
-                                      final CleanableProcessExtByRefBuilder mockCleanableProcessBuilder,
-                                      final PropertyValidator mockPropertyValidator)
-            throws Exception {
+            final CleanableProcessExtByRef mockCleanableProcess,
+            final CleanableProcessExtByRefBuilder mockCleanableProcessBuilder,
+            final PropertyValidator mockPropertyValidator) throws Exception {
 
         File mockDirectoryFile = mockControl.createMock(File.class);
         I_GetConceptData mockRefset = mockControl.createMock(I_GetConceptData.class);
@@ -140,23 +136,23 @@ public final class WriteSingleRefsetDescriptionTest {
         mockPropertyValidator.validate(mockDirectoryFile, "output directory");
         mockPropertyValidator.validate(mockRefset, "selected refset");
 
-        EasyMock.expect(mockCleanableProcessBuilder.withTermFactory(mockTermFactory)).
-                andReturn(mockCleanableProcessBuilder);
-        EasyMock.expect(mockCleanableProcessBuilder.withSelectedDir(mockDirectoryFile)).
-                andReturn(mockCleanableProcessBuilder);
-        EasyMock.expect(mockCleanableProcessBuilder.withLogger(EasyMock.isA(Logger.class))).
-                andReturn(mockCleanableProcessBuilder);
+        EasyMock.expect(mockCleanableProcessBuilder.withTermFactory(mockTermFactory)).andReturn(
+            mockCleanableProcessBuilder);
+        EasyMock.expect(mockCleanableProcessBuilder.withSelectedDir(mockDirectoryFile)).andReturn(
+            mockCleanableProcessBuilder);
+        EasyMock.expect(mockCleanableProcessBuilder.withLogger(EasyMock.isA(Logger.class))).andReturn(
+            mockCleanableProcessBuilder);
         EasyMock.expect(mockCleanableProcessBuilder.build()).andReturn(mockCleanableProcess);
         EasyMock.expect(mockRefset.getConceptId()).andReturn(REFSET_CONCEPT_ID);
 
         I_ThinExtByRefVersioned mockExt1 = mockControl.createMock(I_ThinExtByRefVersioned.class);
         I_ThinExtByRefVersioned mockExt2 = mockControl.createMock(I_ThinExtByRefVersioned.class);
-        EasyMock.expect(mockTermFactory.getRefsetExtensionMembers(REFSET_CONCEPT_ID)).
-                andReturn(Arrays.asList(mockExt1, mockExt2));
+        EasyMock.expect(mockTermFactory.getRefsetExtensionMembers(REFSET_CONCEPT_ID)).andReturn(
+            Arrays.asList(mockExt1, mockExt2));
 
         mockCleanableProcess.processExtensionByReference(mockExt1);
         mockCleanableProcess.processExtensionByReference(mockExt2);
-        
+
         mockCleanableProcess.clean();
     }
 }

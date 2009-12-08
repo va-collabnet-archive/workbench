@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,19 +64,19 @@ public class SnoQuery {
     static public ArrayList<SnoRel> getIsaAdded() {
         return isaAdded;
     }
-    
+
     static public ArrayList<SnoRel> getIsaDropped() {
         return isaDropped;
     }
-    
+
     static public ArrayList<SnoRel> getRoleAdded() {
         return roleAdded;
     }
-    
+
     static public ArrayList<SnoRel> getRoleDropped() {
         return roleDropped;
     }
-    
+
     static public SnoConGrpList getEquiv() {
         return equivCon;
     }

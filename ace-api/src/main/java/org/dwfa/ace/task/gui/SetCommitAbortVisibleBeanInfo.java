@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,25 +28,18 @@ public class SetCommitAbortVisibleBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor visible =
-                    new PropertyDescriptor("visible", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor visible = new PropertyDescriptor("visible", getBeanDescriptor().getBeanClass());
             visible.setBound(true);
             visible.setPropertyEditorClass(CheckboxEditor.class);
             visible.setDisplayName("<html><font color='green'>visible:");
-            visible
-                .setShortDescription("Set the commit/abort buttons visible or hidden...");
+            visible.setShortDescription("Set the commit/abort buttons visible or hidden...");
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("The property that contains the profile.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the profile.");
 
             PropertyDescriptor rv[] = { visible, profilePropName };
             return rv;
@@ -60,8 +53,7 @@ public class SetCommitAbortVisibleBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetCommitAbortVisible.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set Commit/Abort<br>Visible");
+        bd.setDisplayName("<html><font color='green'><center>Set Commit/Abort<br>Visible");
         return bd;
     }
 }

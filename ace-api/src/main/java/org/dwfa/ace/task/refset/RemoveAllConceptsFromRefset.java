@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,92 +44,91 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset", type = BeanType.TASK_BEAN) })
 public class RemoveAllConceptsFromRefset extends AbstractTask {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
-	
+    private static final int dataVersion = 1;
+
     /**
-     * Property name for the term component to test. 
+     * Property name for the term component to test.
      */
     private String componentPropName = ProcessAttachmentKeys.SEARCH_TEST_ITEM.getAttachmentKey();
 
-	transient private I_TermFactory termFactory;
+    transient private I_TermFactory termFactory;
 
-	transient private int retiredConceptId;
+    transient private int retiredConceptId;
 
-
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
         out.writeObject(this.componentPropName);
-	}
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			this.componentPropName = (String) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            this.componentPropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-		// Nothing to do
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do
+    }
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-		try {
-			I_GetConceptData refset = (I_GetConceptData) process.readProperty(componentPropName);
-			int refsetId = refset.getConceptId();
-			
-			termFactory = LocalVersionedTerminology.get();
-			retiredConceptId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_GetConceptData refset = (I_GetConceptData) process.readProperty(componentPropName);
+            int refsetId = refset.getConceptId();
 
-			I_ConfigAceFrame config = 
-				(I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            termFactory = LocalVersionedTerminology.get();
+            retiredConceptId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids()
+                .iterator()
+                .next());
 
-			List<I_ThinExtByRefVersioned> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
-			for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
-				List<I_ThinExtByRefTuple> extensions = 
-					thinExtByRefVersioned.getTuples(config.getAllowedStatus(), config.getViewPositionSet(), true);
-				for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
-					if (thinExtByRefTuple.getRefsetId() == refsetId) {
-						I_ThinExtByRefPart part = thinExtByRefTuple.getPart();
-						I_ThinExtByRefPart clone = part.duplicatePart();
-						
-						clone.setStatus(retiredConceptId);
-						clone.setVersion(Integer.MAX_VALUE);
-						thinExtByRefVersioned.addVersion(clone);
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-						termFactory.addUncommitted(thinExtByRefVersioned);
-					}
-				}
-			}
-			
-			return Condition.CONTINUE;
-			
-		} catch (Exception e) {
-			throw new TaskFailedException(e);
-		}
-	}
+            List<I_ThinExtByRefVersioned> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
+            for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
+                List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(config.getAllowedStatus(),
+                    config.getViewPositionSet(), true);
+                for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
+                    if (thinExtByRefTuple.getRefsetId() == refsetId) {
+                        I_ThinExtByRefPart part = thinExtByRefTuple.getPart();
+                        I_ThinExtByRefPart clone = part.duplicatePart();
 
-	
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+                        clone.setStatus(retiredConceptId);
+                        clone.setVersion(Integer.MAX_VALUE);
+                        thinExtByRefVersioned.addVersion(clone);
 
-	public Collection<Condition> getConditions() {
-		return AbstractTask.CONTINUE_CONDITION;
-	}
+                        termFactory.addUncommitted(thinExtByRefVersioned);
+                    }
+                }
+            }
 
-	public String getComponentPropName() {
-		return componentPropName;
-	}
+            return Condition.CONTINUE;
 
-	public void setComponentPropName(String componentPropName) {
-		this.componentPropName = componentPropName;
-	}
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+    }
+
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
+
+    public Collection<Condition> getConditions() {
+        return AbstractTask.CONTINUE_CONDITION;
+    }
+
+    public String getComponentPropName() {
+        return componentPropName;
+    }
+
+    public void setComponentPropName(String componentPropName) {
+        this.componentPropName = componentPropName;
+    }
 
 }

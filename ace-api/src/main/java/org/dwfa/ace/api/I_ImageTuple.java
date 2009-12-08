@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,27 +18,26 @@ package org.dwfa.ace.api;
 
 public interface I_ImageTuple extends I_AmTypedTuple {
 
-	public byte[] getImage();
+    public byte[] getImage();
 
-	public int getImageId();
+    public int getImageId();
 
-	public String getTextDescription();
+    public String getTextDescription();
 
-	public String getFormat();
+    public String getFormat();
 
-	public int getConceptId();
+    public int getConceptId();
 
-	public I_ImageVersioned getVersioned();
+    public I_ImageVersioned getVersioned();
 
-	/**
-	 * @deprecated Use {@link #duplicate()}
-	 */
-	@Deprecated
-	public I_ImagePart duplicatePart();
+    /**
+     * @deprecated Use {@link #duplicate()}
+     */
+    @Deprecated
+    public I_ImagePart duplicatePart();
 
-	public I_ImagePart duplicate();
-	
-	public I_ImagePart getPart();
+    public I_ImagePart duplicate();
 
+    public I_ImagePart getPart();
 
 }

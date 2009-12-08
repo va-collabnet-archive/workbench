@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,16 +35,12 @@ public class HasDisapprovedItemsTaskBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
 
         try {
-            PropertyDescriptor promotionUuidPropName =
-                    new PropertyDescriptor("promotionUuidPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor promotionUuidPropName = new PropertyDescriptor("promotionUuidPropName",
+                getBeanDescriptor().getBeanClass());
             promotionUuidPropName.setBound(true);
-            promotionUuidPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            promotionUuidPropName
-                .setDisplayName("<html><font color='green'>promotion UUID prop:");
-            promotionUuidPropName
-                .setShortDescription("The property that will contain the UUID of the promotion refset");
+            promotionUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            promotionUuidPropName.setDisplayName("<html><font color='green'>promotion UUID prop:");
+            promotionUuidPropName.setShortDescription("The property that will contain the UUID of the promotion refset");
 
             PropertyDescriptor rv[] = { promotionUuidPropName };
             return rv;
@@ -58,8 +54,7 @@ public class HasDisapprovedItemsTaskBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(HasDisapprovedItemsTask.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Has members with<br>disapproved promotion<br>status");
+        bd.setDisplayName("<html><font color='green'><center>Has members with<br>disapproved promotion<br>status");
         return bd;
     }
 

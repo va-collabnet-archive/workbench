@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,47 +23,47 @@ import java.util.Collection;
 import java.util.UUID;
 
 public class UniversalAceExtByRefPartMeasurement extends UniversalAceExtByRefPart {
-   /**
+    /**
     * 
     */
-   private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-   private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-   private Collection<UUID> unitsOfMeasureUids;
-   private double measurementValue;
+    private Collection<UUID> unitsOfMeasureUids;
+    private double measurementValue;
 
-   private void writeObject(ObjectOutputStream out) throws IOException {
-      out.writeInt(dataVersion);
-      out.writeObject(unitsOfMeasureUids);
-      out.writeDouble(measurementValue);
-   }
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(unitsOfMeasureUids);
+        out.writeDouble(measurementValue);
+    }
 
-   @SuppressWarnings("unchecked")
-   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-      int objDataVersion = in.readInt();
-      if (objDataVersion == dataVersion) {
-         unitsOfMeasureUids = (Collection<UUID>) in.readObject();
-         measurementValue = in.readDouble();
-      } else {
-         throw new IOException("Can't handle dataversion: " + objDataVersion);
-      }
-   }
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            unitsOfMeasureUids = (Collection<UUID>) in.readObject();
+            measurementValue = in.readDouble();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-   public double getMeasurementValue() {
-      return measurementValue;
-   }
+    public double getMeasurementValue() {
+        return measurementValue;
+    }
 
-   public void setMeasurementValue(double measurementValue) {
-      this.measurementValue = measurementValue;
-   }
+    public void setMeasurementValue(double measurementValue) {
+        this.measurementValue = measurementValue;
+    }
 
-   public Collection<UUID> getUnitsOfMeasureUids() {
-      return unitsOfMeasureUids;
-   }
+    public Collection<UUID> getUnitsOfMeasureUids() {
+        return unitsOfMeasureUids;
+    }
 
-   public void setUnitsOfMeasureUids(Collection<UUID> unitsOfMeasureUids) {
-      this.unitsOfMeasureUids = unitsOfMeasureUids;
-   }
+    public void setUnitsOfMeasureUids(Collection<UUID> unitsOfMeasureUids) {
+        this.unitsOfMeasureUids = unitsOfMeasureUids;
+    }
 
 }

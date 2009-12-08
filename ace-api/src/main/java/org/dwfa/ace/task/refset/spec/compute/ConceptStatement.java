@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -94,8 +94,7 @@ public class ConceptStatement extends RefsetSpecStatement {
             }
             break;
         case CONCEPT_IS_MEMBER_OF:
-            List<I_ThinExtByRefVersioned> refsetExtensions =
-                    termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
+            List<I_ThinExtByRefVersioned> refsetExtensions = termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ThinExtByRefVersioned ext : refsetExtensions) {
                 refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
@@ -302,8 +301,8 @@ public class ConceptStatement extends RefsetSpecStatement {
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
         // get list of all children of input concept
-        Set<I_GetConceptData> childStatuses =
-                queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<I_GetConceptData> childStatuses = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true,
+            true);
 
         // call conceptStatusIs on each
         for (I_GetConceptData childStatus : childStatuses) {

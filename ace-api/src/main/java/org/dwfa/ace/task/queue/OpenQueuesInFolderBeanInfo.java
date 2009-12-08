@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,14 +27,11 @@ public class OpenQueuesInFolderBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor queueDir =
-                    new PropertyDescriptor("queueDir", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor queueDir = new PropertyDescriptor("queueDir", getBeanDescriptor().getBeanClass());
             queueDir.setBound(true);
             queueDir.setPropertyEditorClass(JTextFieldEditorOneLine.class);
             queueDir.setDisplayName("<html><font color='green'>queue dir:");
-            queueDir
-                .setShortDescription("The directory containing the queues to open (searched recursively).");
+            queueDir.setShortDescription("The directory containing the queues to open (searched recursively).");
 
             PropertyDescriptor rv[] = { queueDir };
             return rv;
@@ -48,8 +45,7 @@ public class OpenQueuesInFolderBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(OpenQueuesInFolder.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Open Queues in Folder");
+        bd.setDisplayName("<html><font color='green'><center>Open Queues in Folder");
         return bd;
     }
 

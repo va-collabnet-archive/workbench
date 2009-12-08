@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -97,17 +97,20 @@ public class PromoteRefset extends AbstractTask {
             I_Position viewPosition = viewPositionSet.iterator().next();
             promoteRefset(config, viewPosition, promotionPaths, tf, refsetToPromote);
 
-            for (I_GetConceptData memberRefsetIdentity : RefsetHelper
-                .getSpecificationRefsetForRefset(refsetToPromote, config)) {
+            for (I_GetConceptData memberRefsetIdentity : RefsetHelper.getSpecificationRefsetForRefset(refsetToPromote,
+                config)) {
                 promoteRefset(config, viewPosition, promotionPaths, tf, memberRefsetIdentity);
             }
-            for (I_GetConceptData promotionRefsetIdentity : RefsetHelper.getPromotionRefsetForRefset(refsetToPromote, config)) {
+            for (I_GetConceptData promotionRefsetIdentity : RefsetHelper.getPromotionRefsetForRefset(refsetToPromote,
+                config)) {
                 promoteRefset(config, viewPosition, promotionPaths, tf, promotionRefsetIdentity);
             }
-            for (I_GetConceptData markedParentRefsetIdentity : RefsetHelper.getMarkedParentRefsetForRefset(refsetToPromote, config)) {
+            for (I_GetConceptData markedParentRefsetIdentity : RefsetHelper.getMarkedParentRefsetForRefset(
+                refsetToPromote, config)) {
                 promoteRefset(config, viewPosition, promotionPaths, tf, markedParentRefsetIdentity);
             }
-            for (I_GetConceptData commentsRefsetIdentity : RefsetHelper.getCommentsRefsetForRefset(refsetToPromote, config)) {
+            for (I_GetConceptData commentsRefsetIdentity : RefsetHelper.getCommentsRefsetForRefset(refsetToPromote,
+                config)) {
                 promoteRefset(config, viewPosition, promotionPaths, tf, commentsRefsetIdentity);
             }
 
@@ -121,8 +124,8 @@ public class PromoteRefset extends AbstractTask {
             I_TermFactory tf, I_GetConceptData refsetIdentity) throws TerminologyException, IOException {
         refsetIdentity.promote(viewPosition, promotionPaths, config.getAllowedStatus());
         tf.addUncommittedNoChecks(refsetIdentity);
-        promoteMembers(config, viewPosition, promotionPaths, tf
-            .getRefsetExtensionMembers(refsetIdentity.getConceptId()));
+        promoteMembers(config, viewPosition, promotionPaths,
+            tf.getRefsetExtensionMembers(refsetIdentity.getConceptId()));
     }
 
     private void promoteMembers(I_ConfigAceFrame config, I_Position viewPosition, Set<I_Path> promitionSets,

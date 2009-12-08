@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -186,8 +186,8 @@ public class PromptUsernameAndPassword extends AbstractTask {
                 public void ancestorRemoved(AncestorEvent arg0) {
                 }
             });
-            int action = JOptionPane.showOptionDialog(parentFrame, promptPane, prompt, 
-                                                      JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
+            int action = JOptionPane.showOptionDialog(parentFrame, promptPane, prompt, JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
             if (action == JOptionPane.CANCEL_OPTION) {
                 throw new TaskFailedException("User canceled operation.");
             }
@@ -211,6 +211,7 @@ public class PromptUsernameAndPassword extends AbstractTask {
             this.username = username;
         }
     }
+
     public static void main(String[] args) {
         Prompter p = new Prompter();
         try {
@@ -218,7 +219,7 @@ public class PromptUsernameAndPassword extends AbstractTask {
             System.out.println("username: " + p.getUsername());
             System.out.println("password: " + p.getPassword());
         } catch (TaskFailedException e) {
-             e.printStackTrace();
+            e.printStackTrace();
         }
         System.exit(0);
     }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,53 +25,51 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 
 public abstract class Query implements I_ProcessConcepts {
 
-   public enum JOIN {
-      AND, OR
-   };
+    public enum JOIN {
+        AND, OR
+    };
 
-   private JOIN queryType;
+    private JOIN queryType;
 
-   private I_ConfigAceFrame profile;
+    private I_ConfigAceFrame profile;
 
-   private List<I_MatchConcept> matchers = new ArrayList<I_MatchConcept>();
-   
-   
+    private List<I_MatchConcept> matchers = new ArrayList<I_MatchConcept>();
 
-   public Query(JOIN queryType, I_ConfigAceFrame profile) {
-      super();
-      this.queryType = queryType;
-      this.profile = profile;
-   }
+    public Query(JOIN queryType, I_ConfigAceFrame profile) {
+        super();
+        this.queryType = queryType;
+        this.profile = profile;
+    }
 
-   public void processConcept(I_GetConceptData concept) throws Exception {
-      switch (queryType) {
-      case AND:
-         for (I_MatchConcept m : matchers) {
-            if (m.matchConcept(concept, profile) == false) {
-               return;
+    public void processConcept(I_GetConceptData concept) throws Exception {
+        switch (queryType) {
+        case AND:
+            for (I_MatchConcept m : matchers) {
+                if (m.matchConcept(concept, profile) == false) {
+                    return;
+                }
+                processMatch(concept);
             }
-            processMatch(concept);
-         }
-         break;
-      case OR:
-         for (I_MatchConcept m : matchers) {
-            if (m.matchConcept(concept, profile)) {
-               processMatch(concept);
-               break;
+            break;
+        case OR:
+            for (I_MatchConcept m : matchers) {
+                if (m.matchConcept(concept, profile)) {
+                    processMatch(concept);
+                    break;
+                }
             }
-         }
-         break;
+            break;
 
-      default:
-         throw new Exception("Don't know how to handle: " + queryType);
-      }
+        default:
+            throw new Exception("Don't know how to handle: " + queryType);
+        }
 
-   }
+    }
 
-   public abstract void processMatch(I_GetConceptData concept) throws Exception;
+    public abstract void processMatch(I_GetConceptData concept) throws Exception;
 
-   public List<I_MatchConcept> getMatchers() {
-      return matchers;
-   }
+    public List<I_MatchConcept> getMatchers() {
+        return matchers;
+    }
 
 }

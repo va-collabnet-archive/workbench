@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,54 +44,11 @@ import org.dwfa.tapi.TerminologyException;
 public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     protected enum QUERY_TOKENS {
-        CONCEPT_IS(RefsetAuxiliary.Concept.CONCEPT_IS),
-        CONCEPT_IS_CHILD_OF(RefsetAuxiliary.Concept.CONCEPT_IS_CHILD_OF),
-        CONCEPT_IS_KIND_OF(RefsetAuxiliary.Concept.CONCEPT_IS_KIND_OF),
-        CONCEPT_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.CONCEPT_IS_DESCENDENT_OF),
-        CONCEPT_IS_MEMBER_OF(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF),
-        CONCEPT_STATUS_IS(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS),
-        CONCEPT_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_CHILD_OF),
-        CONCEPT_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_KIND_OF),
-        CONCEPT_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_DESCENDENT_OF),
-        CONCEPT_CONTAINS_REL_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING),
-        CONCEPT_CONTAINS_DESC_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING),
+        CONCEPT_IS(RefsetAuxiliary.Concept.CONCEPT_IS), CONCEPT_IS_CHILD_OF(RefsetAuxiliary.Concept.CONCEPT_IS_CHILD_OF), CONCEPT_IS_KIND_OF(RefsetAuxiliary.Concept.CONCEPT_IS_KIND_OF), CONCEPT_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.CONCEPT_IS_DESCENDENT_OF), CONCEPT_IS_MEMBER_OF(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF), CONCEPT_STATUS_IS(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS), CONCEPT_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_CHILD_OF), CONCEPT_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_KIND_OF), CONCEPT_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_DESCENDENT_OF), CONCEPT_CONTAINS_REL_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING), CONCEPT_CONTAINS_DESC_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING),
 
-        DESC_IS(RefsetAuxiliary.Concept.DESC_IS),
-        DESC_IS_MEMBER_OF(RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF),
-        DESC_STATUS_IS(RefsetAuxiliary.Concept.DESC_STATUS_IS),
-        DESC_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.DESC_STATUS_IS_CHILD_OF),
-        DESC_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.DESC_STATUS_IS_KIND_OF),
-        DESC_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.DESC_STATUS_IS_DESCENDENT_OF),
-        DESC_TYPE_IS(RefsetAuxiliary.Concept.DESC_TYPE_IS),
-        DESC_TYPE_IS_CHILD_OF(RefsetAuxiliary.Concept.DESC_TYPE_IS_CHILD_OF),
-        DESC_TYPE_IS_KIND_OF(RefsetAuxiliary.Concept.DESC_TYPE_IS_KIND_OF),
-        DESC_TYPE_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.DESC_TYPE_IS_DESCENDENT_OF),
-        DESC_REGEX_MATCH(RefsetAuxiliary.Concept.DESC_REGEX_MATCH),
-        DESC_LUCENE_MATCH(RefsetAuxiliary.Concept.DESC_LUCENE_MATCH),
+        DESC_IS(RefsetAuxiliary.Concept.DESC_IS), DESC_IS_MEMBER_OF(RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF), DESC_STATUS_IS(RefsetAuxiliary.Concept.DESC_STATUS_IS), DESC_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.DESC_STATUS_IS_CHILD_OF), DESC_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.DESC_STATUS_IS_KIND_OF), DESC_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.DESC_STATUS_IS_DESCENDENT_OF), DESC_TYPE_IS(RefsetAuxiliary.Concept.DESC_TYPE_IS), DESC_TYPE_IS_CHILD_OF(RefsetAuxiliary.Concept.DESC_TYPE_IS_CHILD_OF), DESC_TYPE_IS_KIND_OF(RefsetAuxiliary.Concept.DESC_TYPE_IS_KIND_OF), DESC_TYPE_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.DESC_TYPE_IS_DESCENDENT_OF), DESC_REGEX_MATCH(RefsetAuxiliary.Concept.DESC_REGEX_MATCH), DESC_LUCENE_MATCH(RefsetAuxiliary.Concept.DESC_LUCENE_MATCH),
 
-        REL_IS(RefsetAuxiliary.Concept.REL_IS),
-        REL_RESTRICTION_IS(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF),
-        REL_IS_MEMBER_OF(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF),
-        REL_STATUS_IS(RefsetAuxiliary.Concept.REL_STATUS_IS),
-        REL_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.REL_STATUS_IS_KIND_OF),
-        REL_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_STATUS_IS_CHILD_OF),
-        REL_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_STATUS_IS_DESCENDENT_OF),
-        REL_TYPE_IS(RefsetAuxiliary.Concept.REL_TYPE_IS),
-        REL_TYPE_IS_KIND_OF(RefsetAuxiliary.Concept.REL_TYPE_IS_KIND_OF),
-        REL_TYPE_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_TYPE_IS_CHILD_OF),
-        REL_TYPE_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_TYPE_IS_DESCENDENT_OF),
-        REL_LOGICAL_QUANTIFIER_IS(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS),
-        REL_LOGICAL_QUANTIFIER_IS_KIND_OF(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_KIND_OF),
-        REL_LOGICAL_QUANTIFIER_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_CHILD_OF),
-        REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF),
-        REL_CHARACTERISTIC_IS(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS),
-        REL_CHARACTERISTIC_IS_KIND_OF(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_KIND_OF),
-        REL_CHARACTERISTIC_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_CHILD_OF),
-        REL_CHARACTERISTIC_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_DESCENDENT_OF),
-        REL_REFINABILITY_IS(RefsetAuxiliary.Concept.REL_REFINABILITY_IS),
-        REL_REFINABILITY_IS_KIND_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_KIND_OF),
-        REL_REFINABILITY_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_CHILD_OF),
-        REL_REFINABILITY_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_DESCENDENT_OF);
+        REL_IS(RefsetAuxiliary.Concept.REL_IS), REL_RESTRICTION_IS(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF), REL_IS_MEMBER_OF(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF), REL_STATUS_IS(RefsetAuxiliary.Concept.REL_STATUS_IS), REL_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.REL_STATUS_IS_KIND_OF), REL_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_STATUS_IS_CHILD_OF), REL_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_STATUS_IS_DESCENDENT_OF), REL_TYPE_IS(RefsetAuxiliary.Concept.REL_TYPE_IS), REL_TYPE_IS_KIND_OF(RefsetAuxiliary.Concept.REL_TYPE_IS_KIND_OF), REL_TYPE_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_TYPE_IS_CHILD_OF), REL_TYPE_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_TYPE_IS_DESCENDENT_OF), REL_LOGICAL_QUANTIFIER_IS(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS), REL_LOGICAL_QUANTIFIER_IS_KIND_OF(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_KIND_OF), REL_LOGICAL_QUANTIFIER_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_CHILD_OF), REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF), REL_CHARACTERISTIC_IS(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS), REL_CHARACTERISTIC_IS_KIND_OF(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_KIND_OF), REL_CHARACTERISTIC_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_CHILD_OF), REL_CHARACTERISTIC_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_DESCENDENT_OF), REL_REFINABILITY_IS(RefsetAuxiliary.Concept.REL_REFINABILITY_IS), REL_REFINABILITY_IS_KIND_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_KIND_OF), REL_REFINABILITY_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_CHILD_OF), REL_REFINABILITY_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_DESCENDENT_OF);
 
         protected int nid;
 
@@ -208,9 +165,8 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
         // get list of all children of input concept
-        Set<I_GetConceptData> childStatuses =
-                ((I_GetConceptData) queryConstraint).getDestRelOrigins(termFactory.getActiveAceFrameConfig()
-                    .getAllowedStatus(), allowedTypes, null, true, true);
+        Set<I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint).getDestRelOrigins(
+            termFactory.getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, null, true, true);
 
         // call conceptStatusIs on each
         for (I_GetConceptData childStatus : childStatuses) {

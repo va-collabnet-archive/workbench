@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,56 +31,38 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ConceptStringExtTupleFileUtil {
 
-    public static String exportTuple(I_ThinExtByRefTuple tuple)
-            throws TerminologyException, IOException {
+    public static String exportTuple(I_ThinExtByRefTuple tuple) throws TerminologyException, IOException {
 
         try {
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            UUID tupleUuid =
-                    ArchitectonicAuxiliary.Concept.EXT_CONCEPT_STRING_TUPLE
-                        .getUids().iterator().next();
+            UUID tupleUuid = ArchitectonicAuxiliary.Concept.EXT_CONCEPT_STRING_TUPLE.getUids().iterator().next();
 
-            UUID memberUuid =
-                    termFactory.getUids(tuple.getMemberId()).iterator().next();
-            UUID refsetUuid =
-                    termFactory.getUids(tuple.getRefsetId()).iterator().next();
-            UUID componentUuid =
-                    termFactory.getUids(tuple.getComponentId()).iterator()
-                        .next();
-            UUID typeUuid =
-                    termFactory.getUids(tuple.getTypeId()).iterator().next();
-            if (!typeUuid
-                .equals(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION
-                    .getUids().iterator().next())) {
-                throw new TerminologyException(
-                    "Non concept string ext tuple passed to concept file util.");
+            UUID memberUuid = termFactory.getUids(tuple.getMemberId()).iterator().next();
+            UUID refsetUuid = termFactory.getUids(tuple.getRefsetId()).iterator().next();
+            UUID componentUuid = termFactory.getUids(tuple.getComponentId()).iterator().next();
+            UUID typeUuid = termFactory.getUids(tuple.getTypeId()).iterator().next();
+            if (!typeUuid.equals(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids().iterator().next())) {
+                throw new TerminologyException("Non concept string ext tuple passed to concept file util.");
             }
 
-            I_ThinExtByRefPartConceptString part =
-                    (I_ThinExtByRefPartConceptString) tuple.getPart();
+            I_ThinExtByRefPartConceptString part = (I_ThinExtByRefPartConceptString) tuple.getPart();
 
-            UUID conceptUuid =
-                    termFactory.getUids(part.getC1id()).iterator().next();
-            UUID pathUuid =
-                    termFactory.getUids(tuple.getPathId()).iterator().next();
-            UUID statusUuid =
-                    termFactory.getUids(tuple.getStatusId()).iterator().next();
+            UUID conceptUuid = termFactory.getUids(part.getC1id()).iterator().next();
+            UUID pathUuid = termFactory.getUids(tuple.getPathId()).iterator().next();
+            UUID statusUuid = termFactory.getUids(tuple.getStatusId()).iterator().next();
             int effectiveDate = tuple.getVersion();
             String extString = part.getStr();
 
-            return tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t"
-                + componentUuid + "\t" + typeUuid + "\t" + conceptUuid + "\t"
-                + extString + "\t" + pathUuid + "\t" + statusUuid + "\t"
-                + effectiveDate + "\n";
+            return tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t" + componentUuid + "\t" + typeUuid + "\t"
+                + conceptUuid + "\t" + extString + "\t" + pathUuid + "\t" + statusUuid + "\t" + effectiveDate + "\n";
         } catch (Exception e) {
             e.printStackTrace();
             throw new TerminologyException(e.getMessage());
         }
     }
 
-    public static boolean importTuple(String inputLine,
-            BufferedWriter outputFileWriter, int lineCount,
+    public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
             UUID pathToOverrideUuid) throws TerminologyException {
 
         try {
@@ -108,9 +90,7 @@ public class ConceptStringExtTupleFileUtil {
                 }
                 statusUuid = UUID.fromString(lineParts[8]);
             } catch (Exception e) {
-                String errorMessage =
-                        "Cannot parse UUID from string -> UUID "
-                            + e.getMessage();
+                String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -120,9 +100,7 @@ public class ConceptStringExtTupleFileUtil {
             try {
                 effectiveDate = Integer.parseInt(lineParts[9]);
             } catch (Exception e) {
-                String errorMessage =
-                        "Cannot parse Integer from string -> Integer "
-                            + e.getMessage();
+                String errorMessage = "Cannot parse Integer from string -> Integer " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -135,8 +113,7 @@ public class ConceptStringExtTupleFileUtil {
             TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
-                String errorMessage =
-                        "pathUuid has no identifier - importing with temporary assigned ID.";
+                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -144,8 +121,7 @@ public class ConceptStringExtTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
             }
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage =
-                        "Refset UUID has no identifier - importing with temporary assigned ID.";
+                String errorMessage = "Refset UUID has no identifier - importing with temporary assigned ID.";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -153,8 +129,7 @@ public class ConceptStringExtTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(refsetUuid, pathUuid);
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage =
-                        "Component UUID has no identifier - importing with temporary assigned ID.";
+                String errorMessage = "Component UUID has no identifier - importing with temporary assigned ID.";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -162,8 +137,7 @@ public class ConceptStringExtTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(componentUuid, pathUuid);
             }
             if (!termFactory.hasId(conceptUuid)) {
-                String errorMessage =
-                        "conceptUuid UUID has no identifier - importing with temporary assigned ID.";
+                String errorMessage = "conceptUuid UUID has no identifier - importing with temporary assigned ID.";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -171,8 +145,7 @@ public class ConceptStringExtTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(conceptUuid, pathUuid);
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage =
-                        "statusUuid has no identifier - importing with temporary assigned ID.";
+                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -180,14 +153,11 @@ public class ConceptStringExtTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
             }
             try {
-                refsetHelper.newConceptStringRefsetExtension(termFactory.getId(
-                    refsetUuid).getNativeId(), termFactory.getId(componentUuid)
-                    .getNativeId(), termFactory.getId(conceptUuid)
-                    .getNativeId(), extString, memberUuid, pathUuid,
-                    statusUuid, effectiveDate);
+                refsetHelper.newConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNativeId(),
+                    termFactory.getId(componentUuid).getNativeId(), termFactory.getId(conceptUuid).getNativeId(),
+                    extString, memberUuid, pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
-                String errorMessage =
-                        "Exception thrown while creating new concept string refset extension";
+                String errorMessage = "Exception thrown while creating new concept string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -196,9 +166,8 @@ public class ConceptStringExtTupleFileUtil {
 
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage =
-                    "Exception of unknown cause thrown while importing concept string ext tuple : "
-                        + e.getLocalizedMessage();
+            String errorMessage = "Exception of unknown cause thrown while importing concept string ext tuple : "
+                + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage + e.getLocalizedMessage());

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,64 +38,61 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset", type = BeanType.TASK_BEAN) })
 public class GetWorkingRefset extends AbstractTask {
 
-	private static final long serialVersionUID = 1360688704199093367L;
+    private static final long serialVersionUID = 1360688704199093367L;
 
-	private static final int dataVersion = 1;
-	
+    private static final int dataVersion = 1;
+
     private String componentPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
 
-
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
         out.writeObject(this.componentPropName);
-	}
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			this.componentPropName = (String) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            this.componentPropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-		// Nothing to do
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do
+    }
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-		try {
-			
-			I_TermFactory tf = LocalVersionedTerminology.get();
-			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			
-			I_GetConceptData refset = config.getContext();
-			
-			process.setProperty(componentPropName, refset);
-			
-			return Condition.CONTINUE;
-			
-		} catch (Exception e) {
-			throw new TaskFailedException(e);
-		}
-	}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 
-	public Collection<Condition> getConditions() {
-		return AbstractTask.CONTINUE_CONDITION;
-	}
+            I_GetConceptData refset = config.getContext();
 
-	public String getComponentPropName() {
-		return componentPropName;
-	}
+            process.setProperty(componentPropName, refset);
 
-	public void setComponentPropName(String componentPropName) {
-		this.componentPropName = componentPropName;
-	}
-	
+            return Condition.CONTINUE;
 
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+    }
+
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
+
+    public Collection<Condition> getConditions() {
+        return AbstractTask.CONTINUE_CONDITION;
+    }
+
+    public String getComponentPropName() {
+        return componentPropName;
+    }
+
+    public void setComponentPropName(String componentPropName) {
+        this.componentPropName = componentPropName;
+    }
 
 }

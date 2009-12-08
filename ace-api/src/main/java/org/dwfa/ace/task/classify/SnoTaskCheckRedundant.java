@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,8 +52,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
-public class SnoTaskCheckRedundant extends AbstractTask implements
-        ActionListener {
+public class SnoTaskCheckRedundant extends AbstractTask implements ActionListener {
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
@@ -61,8 +60,7 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
         out.writeInt(dataVersion);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         final int objDataVersion = in.readInt();
 
         if (objDataVersion <= dataVersion) {
@@ -109,8 +107,7 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
         continueThisAction = false; // User requested to stop process
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         List<SnoRel> cEditSnoRels;
         List<SnoRel> cClassSnoRels; // "Classifier Path" Relationships
 
@@ -130,7 +127,9 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
         try {
             // **** GUI:START: 1. GET STATED PATH SNORELS ****
             continueThisAction = true;
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in activity viewer
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            // activity
+            // viewer
             gui.addActionListener(this);
             String guiStr = "Compare Stated & Inferred 1/3: Get Edit Path";
             gui.setProgressInfoUpper(guiStr);
@@ -142,17 +141,14 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
             cEditSnoRels = new ArrayList<SnoRel>();
             long startTime = System.currentTimeMillis();
             SnoPathProcess pcEdit;
-            pcEdit = new SnoPathProcess(logger, null, null, cEditSnoRels,
-                    cEditPathPos, gui);
+            pcEdit = new SnoPathProcess(logger, null, null, cEditSnoRels, cEditPathPos, gui);
             tf.iterateConcepts(pcEdit);
-            logger.info("\r\n::: [SnorocketTaskExp] GET STATED PATH DATA"
-                    + pcEdit.getStats(startTime));
+            logger.info("\r\n::: [SnorocketTaskExp] GET STATED PATH DATA" + pcEdit.getStats(startTime));
 
             // ** GUI:DONE: 1. GET STATED PATH SNORELS **
             if (continueThisAction) {
-                gui.setProgressInfoLower("edit path rels = "
-                        + pcEdit.countRelAdded + ", lapsed time = "
-                        + toStringLapseSec(startTime));
+                gui.setProgressInfoLower("edit path rels = " + pcEdit.countRelAdded + ", lapsed time = "
+                    + toStringLapseSec(startTime));
                 gui.complete(); // PHASE 1. DONE
             } else {
                 gui.setProgressInfoLower("comparison stopped by user");
@@ -161,7 +157,9 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
             }
 
             // **** GUI:START: 2. GET CLASSIFIER PATH DATA ****
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in activity viewer
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            // activity
+            // viewer
             gui.addActionListener(this);
             guiStr = "Compare Stated & Inferred 2/3: Get Classifier Path";
             gui.setProgressInfoUpper(guiStr);
@@ -172,17 +170,14 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
             // GET CLASSIFIER_PATH RELS
             cClassSnoRels = new ArrayList<SnoRel>();
             startTime = System.currentTimeMillis();
-            SnoPathProcess pcClass = new SnoPathProcess(logger, null, null,
-                    cClassSnoRels, cClassPathPos, gui);
+            SnoPathProcess pcClass = new SnoPathProcess(logger, null, null, cClassSnoRels, cClassPathPos, gui);
             tf.iterateConcepts(pcClass);
-            logger.info("\r\n::: [SnorocketTaskExp] GET INFERRED PATH DATA"
-                    + pcClass.getStats(startTime));
+            logger.info("\r\n::: [SnorocketTaskExp] GET INFERRED PATH DATA" + pcClass.getStats(startTime));
 
             // ** GUI:DONE: 2 -- done
             if (continueThisAction) {
-                gui.setProgressInfoLower("classifier path rels = "
-                        + pcClass.countRelAdded + ", lapsed time = "
-                        + toStringLapseSec(startTime));
+                gui.setProgressInfoLower("classifier path rels = " + pcClass.countRelAdded + ", lapsed time = "
+                    + toStringLapseSec(startTime));
                 gui.complete(); // 3 GET CLASSIFIER RESULTS -- done
                 pcClass = null; // :MEMORY:
             } else {
@@ -192,7 +187,9 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
             }
 
             // **** GUI: 3. COMPARE RESULTS ****
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in activity viewer
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            // activity
+            // viewer
             gui.addActionListener(this);
             guiStr = "Compare Stated & Inferred 3/3: Check Redundant Roles";
             gui.setProgressInfoUpper(guiStr);
@@ -201,8 +198,7 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
             startTime = System.currentTimeMillis();
             logger.info(checkRedundantRoles(cClassSnoRels));
             // 3 GET CLASSIFIER RESULTS -- done
-            gui.setProgressInfoLower("lapsed time = "
-                    + toStringLapseSec(startTime));
+            gui.setProgressInfoLower("lapsed time = " + toStringLapseSec(startTime));
             gui.complete();
 
         } catch (TerminologyException e) {
@@ -268,8 +264,7 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
 
             // !!! CHECK FOR REDUNDANT
 
-            if ((histListA.size() < historySize)
-                    && (sr.c1Id >= historyStartC1Nid)) {
+            if ((histListA.size() < historySize) && (sr.c1Id >= historyStartC1Nid)) {
                 histListA.add(sr);
                 updateSets(sr, histC1Set, histTypeSet, histC2Set);
             }
@@ -278,8 +273,8 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
         StringBuffer s = new StringBuffer();
         s.append("\r\n::: [SnoTaskCheckRedunant] compareResults()");
         long lapseTime = System.currentTimeMillis() - startTime;
-        s.append("\r\n::: [Time] Check for redundant roles: \t" + lapseTime
-                + "\t(mS)\t" + (((float) lapseTime / 1000) / 60) + "\t(min)");
+        s.append("\r\n::: [Time] Check for redundant roles: \t" + lapseTime + "\t(mS)\t"
+            + (((float) lapseTime / 1000) / 60) + "\t(min)");
         s.append("\r\n");
 
         s.append("\r\n::: CONCEPT IDS");
@@ -305,8 +300,7 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
         return s.toString();
     }
 
-    private void updateSets(SnoRel rel, Set<Integer> cid1Set,
-            Set<Integer> typeSet, Set<Integer> cid2Set) {
+    private void updateSets(SnoRel rel, Set<Integer> cid1Set, Set<Integer> typeSet, Set<Integer> cid2Set) {
         cid1Set.add(new Integer(rel.c1Id));
         typeSet.add(new Integer(rel.typeId));
         cid2Set.add(new Integer(rel.c2Id));
@@ -323,60 +317,42 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
             isaNid = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
             rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
             if (config.getClassifierIsaType() != null) {
-                int checkIsaNid = tf.uuidToNative(config.getClassifierIsaType()
-                        .getUids());
+                int checkIsaNid = tf.uuidToNative(config.getClassifierIsaType().getUids());
                 if (checkIsaNid != isaNid) {
                     logger.severe("\r\n::: SERVERE ERROR isaNid MISMACTH ****");
                 }
             } else {
                 String errStr = "Profile must have only one edit path. Found: "
-                        + tf.getActiveAceFrameConfig().getEditingPathSet();
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
-                        new TaskFailedException(errStr));
+                    + tf.getActiveAceFrameConfig().getEditingPathSet();
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new TaskFailedException(errStr));
                 return Condition.STOP;
             }
 
             if (config.getClassificationRoot() != null) {
-                int checkRootNid = tf.uuidToNative(config
-                        .getClassificationRoot().getUids());
+                int checkRootNid = tf.uuidToNative(config.getClassificationRoot().getUids());
                 if (checkRootNid != rootNid) {
                     logger.severe("\r\n::: SERVERE ERROR rootNid MISMACTH ***");
                 }
             } else {
                 String errStr = "Profile must have only one edit path. Found: "
-                        + tf.getActiveAceFrameConfig().getEditingPathSet();
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
-                        new TaskFailedException(errStr));
+                    + tf.getActiveAceFrameConfig().getEditingPathSet();
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new TaskFailedException(errStr));
                 return Condition.STOP;
             }
 
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
-                    .getUids()); // 0 CURRENT, 1 RETIRED
-            isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
-                    .getUids());
-            isOPTIONAL_REFINABILITY = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
-                            .getUids());
-            isNOT_REFINABLE = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-                            .getUids());
-            isMANDATORY_REFINABILITY = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY
-                            .getUids());
-            isCh_STATED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
-                            .getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-                            .getUids());
-            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP
-                            .getUids());
-            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP
-                            .getUids());
-            tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-                    .getUids());
+            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()); // 0
+            // CURRENT,
+            // 1
+            // RETIRED
+            isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+            isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+            isMANDATORY_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
+            isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
+            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
+            tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -392,9 +368,8 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
         try {
             if (config.getEditingPathSet().size() != 1) {
                 String errStr = "Profile must have only one edit path. Found: "
-                        + tf.getActiveAceFrameConfig().getEditingPathSet();
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
-                        new TaskFailedException(errStr));
+                    + tf.getActiveAceFrameConfig().getEditingPathSet();
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new TaskFailedException(errStr));
                 return Condition.STOP;
             }
 
@@ -402,8 +377,7 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
             I_GetConceptData cEditPathObj = config.getClassifierInputPath();
             if (cEditPathObj == null) {
                 String errStr = "Classifier Input (Edit) Path -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
-                        new Exception(errStr));
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
                 return Condition.STOP;
             }
 
@@ -417,8 +391,7 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
             I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
             if (cClassPathObj == null) {
                 String errStr = "Classifier Output (Inferred) Path -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
-                        new Exception(errStr));
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
                 return Condition.STOP;
             }
             cClassPathNid = cClassPathObj.getConceptId();
@@ -465,8 +438,7 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
         try {
             I_GetConceptData a = tf.getConcept(nid);
             a.getUids().iterator().next().toString();
-            String s = nid + "\t" + a.getUids().iterator().next().toString()
-                    + "\t" + a.getInitialText();
+            String s = nid + "\t" + a.getUids().iterator().next().toString() + "\t" + a.getInitialText();
             return s;
         } catch (TerminologyException e) {
             e.printStackTrace();
@@ -483,20 +455,14 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
         s.append("\r\n:::\t" + rootNid + "\t : rootNid");
         s.append("\r\n:::\t" + isCURRENT + "\t : isCURRENT");
         s.append("\r\n:::\t" + isRETIRED + "\t : isRETIRED");
-        s.append("\r\n:::\t" + isOPTIONAL_REFINABILITY
-                + "\t : isOPTIONAL_REFINABILITY");
+        s.append("\r\n:::\t" + isOPTIONAL_REFINABILITY + "\t : isOPTIONAL_REFINABILITY");
         s.append("\r\n:::\t" + isNOT_REFINABLE + "\t : isNOT_REFINABLE");
-        s.append("\r\n:::\t" + isMANDATORY_REFINABILITY
-                + "\t : isMANDATORY_REFINABILITY");
+        s.append("\r\n:::\t" + isMANDATORY_REFINABILITY + "\t : isMANDATORY_REFINABILITY");
 
-        s.append("\r\n:::\t" + isCh_STATED_RELATIONSHIP
-                + "\t : isCh_STATED_RELATIONSHIP");
-        s.append("\r\n:::\t" + isCh_DEFINING_CHARACTERISTIC
-                + "\t : isCh_DEFINING_CHARACTERISTIC");
-        s.append("\r\n:::\t" + isCh_STATED_AND_INFERRED_RELATIONSHIP
-                + "\t : isCh_STATED_AND_INFERRED_RELATIONSHIP");
-        s.append("\r\n:::\t" + isCh_STATED_AND_SUBSUMED_RELATIONSHIP
-                + "\t : isCh_STATED_AND_SUBSUMED_RELATIONSHIP");
+        s.append("\r\n:::\t" + isCh_STATED_RELATIONSHIP + "\t : isCh_STATED_RELATIONSHIP");
+        s.append("\r\n:::\t" + isCh_DEFINING_CHARACTERISTIC + "\t : isCh_DEFINING_CHARACTERISTIC");
+        s.append("\r\n:::\t" + isCh_STATED_AND_INFERRED_RELATIONSHIP + "\t : isCh_STATED_AND_INFERRED_RELATIONSHIP");
+        s.append("\r\n:::\t" + isCh_STATED_AND_SUBSUMED_RELATIONSHIP + "\t : isCh_STATED_AND_SUBSUMED_RELATIONSHIP");
         s.append("\r\n");
         return s.toString();
     }
@@ -507,10 +473,8 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
         s.append("\r\n::: [SnorocketTaskExp] PATH ID -- " + pStr);
         try {
             for (I_Position position : pathPos) {
-                s.append("\r\n::: ... PathID:\t"
-                        + position.getPath().getConceptId() + "\tVersion:\t"
-                        + position.getVersion() + "\tUUIDs:\t"
-                        + position.getPath().getUniversal());
+                s.append("\r\n::: ... PathID:\t" + position.getPath().getConceptId() + "\tVersion:\t"
+                    + position.getVersion() + "\tUUIDs:\t" + position.getPath().getUniversal());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -521,8 +485,7 @@ public class SnoTaskCheckRedundant extends AbstractTask implements
         return s.toString();
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // nothing to do
     }
 

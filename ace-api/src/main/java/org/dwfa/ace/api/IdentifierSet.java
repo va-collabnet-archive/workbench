@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,35 +39,46 @@ public class IdentifierSet implements I_RepresentIdSet {
         bitSet = new OpenBitSet(numBits);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.api.I_RepresentIdSet#isMember(int)
      */
     public boolean isMember(int nid) {
         return bitSet.fastGet(nid + offset);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.api.I_RepresentIdSet#setMember(int)
      */
     public void setMember(int nid) {
         bitSet.fastSet(nid + offset);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.api.I_RepresentIdSet#setNotMember(int)
      */
     public void setNotMember(int nid) {
         bitSet.fastClear(nid + offset);
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.ace.api.I_RepresentIdSet#and(org.dwfa.ace.api.IdentifierSet)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.api.I_RepresentIdSet#and(org.dwfa.ace.api.IdentifierSet)
      */
     public void and(I_RepresentIdSet other) {
         bitSet.and(((IdentifierSet) other).bitSet);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.api.I_RepresentIdSet#or(org.dwfa.ace.api.IdentifierSet)
      */
     public void or(I_RepresentIdSet other) {

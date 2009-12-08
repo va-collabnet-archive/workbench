@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,12 +38,12 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/file", type = BeanType.TASK_BEAN) })
 public class WriteConceptListFile extends AbstractTask {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
     private String outputFilePropName = ProcessAttachmentKeys.PROCESS_FILENAME.getAttachmentKey();
     private String conceptListPropName = ProcessAttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
@@ -51,108 +51,104 @@ public class WriteConceptListFile extends AbstractTask {
 
     private int hostIndex = 3;
 
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeInt(hostIndex);
+        out.writeObject(outputFilePropName);
+        out.writeObject(conceptListPropName);
+        out.writeObject(errorMessagePropName);
+    }
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeInt(hostIndex);
-		out.writeObject(outputFilePropName);
-		out.writeObject(conceptListPropName);
-		out.writeObject(errorMessagePropName);
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            hostIndex = in.readInt();
+            outputFilePropName = (String) in.readObject();
+            conceptListPropName = (String) in.readObject();
+            errorMessagePropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			hostIndex = in.readInt();
-			outputFilePropName = (String) in.readObject();
-			conceptListPropName = (String) in.readObject();
-			errorMessagePropName = (String) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
+    }
 
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do...
+    }
 
-	}
+    @SuppressWarnings("unchecked")
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        Condition returnValue = Condition.FALSE;
+        try {
+            List<I_GetConceptData> conceptList = (List<I_GetConceptData>) process.readProperty(conceptListPropName);
 
-	@SuppressWarnings("unchecked")
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		Condition returnValue = Condition.FALSE;
-		try {
-			List<I_GetConceptData> conceptList = (List<I_GetConceptData>) process.readProperty(conceptListPropName);
-			
-			String filename = (String) process.readProperty(outputFilePropName);
-			File outputFile = new File(filename);
-					
-			if (!outputFile.exists() || outputFile.canWrite()) {
+            String filename = (String) process.readProperty(outputFilePropName);
+            File outputFile = new File(filename);
 
-				ConceptListWriter writer = new ConceptListWriter();
-				writer.open(outputFile, false);
-				writer.write(conceptList);
-				writer.close();
-				
-				returnValue = Condition.TRUE;
-				
-			} else {
-				process.setProperty(errorMessagePropName, "Cannot write to file " + outputFile.getAbsolutePath() + ".");
-			}
-			
-		} catch (Exception e) {
-			try {
-				process.setProperty(errorMessagePropName, "Cannot write to file due to exception - " + e.getMessage());
-				e.printStackTrace();
-			} catch (Exception e1) {
-				throw new TaskFailedException("failed creating error message for exception " + e.getMessage(), e1);
-			}
-		}
+            if (!outputFile.exists() || outputFile.canWrite()) {
 
-		return returnValue;
-	}
+                ConceptListWriter writer = new ConceptListWriter();
+                writer.open(outputFile, false);
+                writer.write(conceptList);
+                writer.close();
 
-	public Collection<Condition> getConditions() {
-		return CONDITIONAL_TEST_CONDITIONS;
-	}
+                returnValue = Condition.TRUE;
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+            } else {
+                process.setProperty(errorMessagePropName, "Cannot write to file " + outputFile.getAbsolutePath() + ".");
+            }
 
-	public Integer getHostIndex() {
-		return hostIndex;
-	}
+        } catch (Exception e) {
+            try {
+                process.setProperty(errorMessagePropName, "Cannot write to file due to exception - " + e.getMessage());
+                e.printStackTrace();
+            } catch (Exception e1) {
+                throw new TaskFailedException("failed creating error message for exception " + e.getMessage(), e1);
+            }
+        }
 
-	public void setHostIndex(Integer hostIndex) {
-		this.hostIndex = hostIndex;
-	}
+        return returnValue;
+    }
 
-	public String getOutputFilePropName() {
-		return outputFilePropName;
-	}
+    public Collection<Condition> getConditions() {
+        return CONDITIONAL_TEST_CONDITIONS;
+    }
 
-	public void setOutputFilePropName(String outputFilePropName) {
-		this.outputFilePropName = outputFilePropName;
-	}
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-	public String getConceptListPropName() {
-		return conceptListPropName;
-	}
+    public Integer getHostIndex() {
+        return hostIndex;
+    }
 
-	public void setConceptListPropName(String conceptListPropName) {
-		this.conceptListPropName = conceptListPropName;
-	}
+    public void setHostIndex(Integer hostIndex) {
+        this.hostIndex = hostIndex;
+    }
 
-	public String getErrorMessagePropName() {
-		return errorMessagePropName;
-	}
+    public String getOutputFilePropName() {
+        return outputFilePropName;
+    }
 
-	public void setErrorMessagePropName(String errorMessage) {
-		this.errorMessagePropName = errorMessage;
-	}
+    public void setOutputFilePropName(String outputFilePropName) {
+        this.outputFilePropName = outputFilePropName;
+    }
+
+    public String getConceptListPropName() {
+        return conceptListPropName;
+    }
+
+    public void setConceptListPropName(String conceptListPropName) {
+        this.conceptListPropName = conceptListPropName;
+    }
+
+    public String getErrorMessagePropName() {
+        return errorMessagePropName;
+    }
+
+    public void setErrorMessagePropName(String errorMessage) {
+        this.errorMessagePropName = errorMessage;
+    }
 
 }

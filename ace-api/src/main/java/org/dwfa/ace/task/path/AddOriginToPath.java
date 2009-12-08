@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,9 +51,9 @@ public class AddOriginToPath extends AbstractTask {
     private static final int DATA_VERSION = 1;
 
     private static final String LATEST_VERSION_STR = "latest";
-    
+
     private static final String PRESENT_TIME_STR = "now";
-    
+
     private String pathConceptPropName = ProcessAttachmentKeys.TO_PATH_CONCEPT.getAttachmentKey();
 
     private String originPathConceptPropName = ProcessAttachmentKeys.FROM_PATH_CONCEPT.getAttachmentKey();
@@ -88,19 +88,19 @@ public class AddOriginToPath extends AbstractTask {
 
             I_GetConceptData subjectPathConcept = (I_GetConceptData) process.readProperty(pathConceptPropName);
             I_GetConceptData originPathConcept = (I_GetConceptData) process.readProperty(originPathConceptPropName);
-            
+
             if (subjectPathConcept == null) {
                 throw new TaskFailedException("A path concept has not be specified.");
             }
-            
+
             if (originPathConcept == null) {
                 throw new TaskFailedException("An origin path concept has not be specified.");
-            }            
-            
+            }
+
             if (originPositionStr == null || originPositionStr.isEmpty()) {
                 throw new TaskFailedException("A origin position (time) has not be specified.");
             }
-            
+
             I_TermFactory termFactory = LocalVersionedTerminology.get();
             int version;
 
@@ -111,23 +111,23 @@ public class AddOriginToPath extends AbstractTask {
                     version = termFactory.convertToThinVersion(System.currentTimeMillis());
                 } else {
                     version = termFactory.convertToThinVersion(originPositionStr);
-                }            
+                }
             } catch (ParseException e) {
                 throw new TaskFailedException("Invalid position (time): '" + originPositionStr + "'.", e);
             }
 
             I_Path subjectPath = termFactory.getPath(subjectPathConcept.getUids());
             I_Path originPath = termFactory.getPath(originPathConcept.getUids());
-            
+
             subjectPath.addOrigin(termFactory.newPosition(originPath, version));
-            
+
             return Condition.CONTINUE;
 
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
     }
-    
+
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
@@ -159,7 +159,5 @@ public class AddOriginToPath extends AbstractTask {
     public void setOriginPositionStr(String originPositionStr) {
         this.originPositionStr = originPositionStr;
     }
-
-
 
 }

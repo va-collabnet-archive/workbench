@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,14 +20,14 @@ import java.util.List;
 
 public class AceEditor {
 
-   private static List<I_ConfigAceFrame> aceFrames;
+    private static List<I_ConfigAceFrame> aceFrames;
 
-   public static List<I_ConfigAceFrame> getAceFrames() {
-      return aceFrames;
-   }
+    public static List<I_ConfigAceFrame> getAceFrames() {
+        return aceFrames;
+    }
 
-   public static void setAceFrames(List<I_ConfigAceFrame> aceFrames) {
-      AceEditor.aceFrames = aceFrames;
-   }
+    public static void setAceFrames(List<I_ConfigAceFrame> aceFrames) {
+        AceEditor.aceFrames = aceFrames;
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,13 +41,12 @@ public class RemoveSvnEntry extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             //
@@ -57,29 +56,24 @@ public class RemoveSvnEntry extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             String key = (String) worker.selectFromList(config.getSubversionMap().keySet().toArray(),
-                                                        "Remove Subversion Entry:",
-                                                        "Select the subversion entry to remove from the profile...");
+                "Remove Subversion Entry:", "Select the subversion entry to remove from the profile...");
             config.getSubversionMap().remove(key);
-             return Condition.CONTINUE;
+            return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         }
     }
 
-    
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
@@ -88,4 +82,4 @@ public class RemoveSvnEntry extends AbstractTask {
         return new int[] {};
     }
 
- }
+}

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,54 +39,53 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/developer", type = BeanType.TASK_BEAN) })
 public class FindConceptInfoInDatabase extends AbstractTask {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
-	
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}//End method writeObject
+    private static final int dataVersion = 1;
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }// End method writeObject
 
-	}//End method readObject
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// nothing to do. 
+    }// End method readObject
 
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // nothing to do.
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		
-		I_TermFactory termFactory = LocalVersionedTerminology.get();
-		
-		try{
-				UUID uuid = UUID.fromString("e9adad8e-99c6-3b5d-b3e8-0925e5ab54da");
+    }
 
-				int nid = termFactory.uuidToNative(uuid);
-				
-				I_GetConceptData concept = termFactory.getConcept(nid);
-				worker.getLogger().info("Found concept: " + concept);
-				worker.getLogger().info("Concept attributes: " + concept.getConceptAttributes());
-				
-				List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null, termFactory.getActiveAceFrameConfig().getViewPositionSet(), true);
-				worker.getLogger().info("Concept attribute tuples: " + tuples);
-					
-		}
-		catch(Exception e){throw new TaskFailedException(e);}	
-		return Condition.CONTINUE;
-	}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
-	public Collection<Condition> getConditions() {
-		return AbstractTask.CONTINUE_CONDITION;
-	}
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+        try {
+            UUID uuid = UUID.fromString("e9adad8e-99c6-3b5d-b3e8-0925e5ab54da");
+
+            int nid = termFactory.uuidToNative(uuid);
+
+            I_GetConceptData concept = termFactory.getConcept(nid);
+            worker.getLogger().info("Found concept: " + concept);
+            worker.getLogger().info("Concept attributes: " + concept.getConceptAttributes());
+
+            List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null,
+                termFactory.getActiveAceFrameConfig().getViewPositionSet(), true);
+            worker.getLogger().info("Concept attribute tuples: " + tuples);
+
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+        return Condition.CONTINUE;
+    }
+
+    public Collection<Condition> getConditions() {
+        return AbstractTask.CONTINUE_CONDITION;
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,32 +41,32 @@ public class UniversalAceExtByRefPartTemplateForRel extends UniversalAceExtByRef
     private static final int dataVersion = 1;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-       out.writeInt(dataVersion);
-       out.writeObject(valueTypeUid);
-       out.writeInt(cardinality);
-       out.writeObject(semanticStatusUid);
-       out.writeInt(browseAttributeOrder);
-       out.writeInt(browseValueOrder);
-       out.writeInt(notesScreenOrder);
-       out.writeObject(attributeDisplayStatusUid);
-       out.writeObject(characteristicStatusUid);
+        out.writeInt(dataVersion);
+        out.writeObject(valueTypeUid);
+        out.writeInt(cardinality);
+        out.writeObject(semanticStatusUid);
+        out.writeInt(browseAttributeOrder);
+        out.writeInt(browseValueOrder);
+        out.writeInt(notesScreenOrder);
+        out.writeObject(attributeDisplayStatusUid);
+        out.writeObject(characteristicStatusUid);
     }
 
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-       int objDataVersion = in.readInt();
-       if (objDataVersion == dataVersion) {
-           valueTypeUid = (Collection<UUID>) in.readObject();
-           cardinality = in.readInt();
-           semanticStatusUid = (Collection<UUID>) in.readObject();
-           browseAttributeOrder = in.readInt();
-           browseValueOrder = in.readInt();
-           notesScreenOrder = in.readInt();
-           attributeDisplayStatusUid = (Collection<UUID>) in.readObject();
-           characteristicStatusUid = (Collection<UUID>) in.readObject();
-       } else {
-          throw new IOException("Can't handle dataversion: " + objDataVersion);
-       }
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            valueTypeUid = (Collection<UUID>) in.readObject();
+            cardinality = in.readInt();
+            semanticStatusUid = (Collection<UUID>) in.readObject();
+            browseAttributeOrder = in.readInt();
+            browseValueOrder = in.readInt();
+            notesScreenOrder = in.readInt();
+            attributeDisplayStatusUid = (Collection<UUID>) in.readObject();
+            characteristicStatusUid = (Collection<UUID>) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
     }
 
     public Collection<UUID> getValueTypeUid() {
@@ -132,6 +132,5 @@ public class UniversalAceExtByRefPartTemplateForRel extends UniversalAceExtByRef
     public void setCharacteristicStatusUid(Collection<UUID> characteristicStatusUid) {
         this.characteristicStatusUid = characteristicStatusUid;
     }
-
 
 }

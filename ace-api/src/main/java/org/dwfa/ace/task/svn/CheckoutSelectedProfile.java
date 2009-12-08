@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,13 +39,13 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/svn", type = BeanType.TASK_BEAN) })
 public class CheckoutSelectedProfile extends AbstractTask {
 
-	/**
+    /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private String svnUrl = "http://www.cnn.com";
 
     private String checkoutLocation = "profiles/users";
@@ -56,41 +56,38 @@ public class CheckoutSelectedProfile extends AbstractTask {
         out.writeObject(checkoutLocation);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-        	svnUrl = (String) in.readObject();
-        	checkoutLocation = (String) in.readObject();
+            svnUrl = (String) in.readObject();
+            checkoutLocation = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             SubversionData svd = new SubversionData();
             svd.setRepositoryUrlStr(svnUrl);
             List<String> listing = config.svnList(svd);
-            String selectedProfile = (String) worker.selectFromList(listing.toArray(), "Select profile", 
-            		"Please select the profile to checkout to your local bundle");
-            JOptionPane.showMessageDialog(config.getWorkflowPanel().getTopLevelAncestor(), "Selected: " + selectedProfile);
-             return Condition.CONTINUE;
+            String selectedProfile = (String) worker.selectFromList(listing.toArray(), "Select profile",
+                "Please select the profile to checkout to your local bundle");
+            JOptionPane.showMessageDialog(config.getWorkflowPanel().getTopLevelAncestor(), "Selected: "
+                + selectedProfile);
+            return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         }
     }
-    
+
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
@@ -98,21 +95,21 @@ public class CheckoutSelectedProfile extends AbstractTask {
     public int[] getDataContainerIds() {
         return new int[] {};
     }
-    
+
     public String getSvnUrl() {
-		return svnUrl;
-	}
+        return svnUrl;
+    }
 
-	public void setSvnUrl(String svnUrl) {
-		this.svnUrl = svnUrl;
-	}
+    public void setSvnUrl(String svnUrl) {
+        this.svnUrl = svnUrl;
+    }
 
-	public String getCheckoutLocation() {
-		return checkoutLocation;
-	}
+    public String getCheckoutLocation() {
+        return checkoutLocation;
+    }
 
-	public void setCheckoutLocation(String checkoutLocation) {
-		this.checkoutLocation = checkoutLocation;
-	}
+    public void setCheckoutLocation(String checkoutLocation) {
+        this.checkoutLocation = checkoutLocation;
+    }
 
 }

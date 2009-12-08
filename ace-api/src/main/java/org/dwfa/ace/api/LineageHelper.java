@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,29 +29,29 @@ import org.dwfa.tapi.TerminologyRuntimeException;
 public class LineageHelper {
 
     protected I_TermFactory termFactory;
-    
+
     protected Set<I_Position> viewPositions;
     protected I_IntSet allowedStatuses;
     protected I_IntSet isARelTypes;
-    
+
     private Logger logger = Logger.getLogger(LineageHelper.class.getName());
-    
-    public LineageHelper() {        
+
+    public LineageHelper() {
         try {
             termFactory = LocalVersionedTerminology.get();
         } catch (Exception e) {
             throw new TerminologyRuntimeException(e);
         }
-    }            
-    
+    }
+
     public Set<I_GetConceptData> getParents(I_GetConceptData concept) throws Exception {
-        return getAllAncestors(concept, new FirstRelationOnly()); 
+        return getAllAncestors(concept, new FirstRelationOnly());
     }
-    
+
     public Set<I_GetConceptData> getChildren(I_GetConceptData concept) throws Exception {
-        return getAllDescendants(concept, new FirstRelationOnly()); 
+        return getAllDescendants(concept, new FirstRelationOnly());
     }
-    
+
     /**
      * Get all the ancestors (parents, parents of parents, etc) of a particular
      * concept.
@@ -61,11 +61,10 @@ public class LineageHelper {
         if (conditions == null) {
             conditions = new Condition[] { new NotAlreadyVisited() };
         }
-        
+
         // find all the parents
-        Set<I_GetConceptData> parentConcepts =
-                getAllAncestors(new HashSet<I_GetConceptData>(), concept, getAllowedStatuses(), getIsARelTypes(),
-                    getViewPositions(), conditions);
+        Set<I_GetConceptData> parentConcepts = getAllAncestors(new HashSet<I_GetConceptData>(), concept,
+            getAllowedStatuses(), getIsARelTypes(), getViewPositions(), conditions);
 
         logger.fine("Found " + parentConcepts.size() + " ancestors of concept '" + concept.getInitialText() + "'.");
 
@@ -76,7 +75,8 @@ public class LineageHelper {
             I_IntSet allowedStatuses, I_IntSet allowedTypes, Set<I_Position> positions, Condition... conditions)
             throws Exception {
 
-        ITERATE_PARENTS: for (I_RelTuple childTuple : child.getSourceRelTuples(allowedStatuses, allowedTypes, positions, false, true)) {
+        ITERATE_PARENTS: for (I_RelTuple childTuple : child.getSourceRelTuples(allowedStatuses, allowedTypes,
+            positions, false, true)) {
             I_GetConceptData parentConcept = termFactory.getConcept(childTuple.getC2Id());
             if (parentConcept.getConceptId() == child.getConceptId()) {
                 continue ITERATE_PARENTS;
@@ -89,13 +89,13 @@ public class LineageHelper {
                 }
             }
             if (resultSet.add(parentConcept)) {
-                resultSet.addAll(
-                    getAllAncestors(resultSet, parentConcept, allowedStatuses, allowedTypes, positions, conditions));
+                resultSet.addAll(getAllAncestors(resultSet, parentConcept, allowedStatuses, allowedTypes, positions,
+                    conditions));
             }
         }
         return resultSet;
     }
-    
+
     /**
      * Get all the descendants (children, children of children, etc) of a
      * particular concept.
@@ -105,11 +105,10 @@ public class LineageHelper {
         if (conditions == null) {
             conditions = new Condition[] { new NotAlreadyVisited() };
         }
-        
+
         // find all the children
-        Set<I_GetConceptData> descendants =
-                getAllDescendants(new HashSet<I_GetConceptData>(), concept, getAllowedStatuses(), getIsARelTypes(),
-                    getViewPositions(), conditions);
+        Set<I_GetConceptData> descendants = getAllDescendants(new HashSet<I_GetConceptData>(), concept,
+            getAllowedStatuses(), getIsARelTypes(), getViewPositions(), conditions);
 
         logger.fine("Found " + descendants.size() + " descendants of concept '" + concept.getInitialText() + "'.");
 
@@ -120,34 +119,34 @@ public class LineageHelper {
             I_IntSet allowedStatuses, I_IntSet allowedTypes, Set<I_Position> positions, Condition... conditions)
             throws Exception {
 
-        ITERATE_CHILDREN:
-            for (I_RelTuple childTuple : parent.getDestRelTuples(allowedStatuses, allowedTypes, positions, false, true)) {
-                I_GetConceptData childConcept = termFactory.getConcept(childTuple.getC1Id());
-                if (childConcept.getConceptId() == parent.getConceptId()) {
-                    continue ITERATE_CHILDREN;
-                }
-                if (conditions != null) {
-                    for (Condition condition : conditions) {
-                        if (!condition.evaluate(childConcept)) {
-                            continue ITERATE_CHILDREN;
-                        }
+        ITERATE_CHILDREN: for (I_RelTuple childTuple : parent.getDestRelTuples(allowedStatuses, allowedTypes,
+            positions, false, true)) {
+            I_GetConceptData childConcept = termFactory.getConcept(childTuple.getC1Id());
+            if (childConcept.getConceptId() == parent.getConceptId()) {
+                continue ITERATE_CHILDREN;
+            }
+            if (conditions != null) {
+                for (Condition condition : conditions) {
+                    if (!condition.evaluate(childConcept)) {
+                        continue ITERATE_CHILDREN;
                     }
                 }
-                if (resultSet.add(childConcept)) {
-                    resultSet.addAll(
-                        getAllDescendants(resultSet, childConcept, allowedStatuses, allowedTypes, positions, conditions));
-                }
             }
-    
+            if (resultSet.add(childConcept)) {
+                resultSet.addAll(getAllDescendants(resultSet, childConcept, allowedStatuses, allowedTypes, positions,
+                    conditions));
+            }
+        }
+
         return resultSet;
-    }    
-    
+    }
+
     public boolean hasAncestor(I_GetConceptData concept, I_GetConceptData ancestor) throws TerminologyException {
         try {
             CeaseWhenFound foundCondition = new CeaseWhenFound(ancestor);
             getAllAncestors(concept, foundCondition, new NotAlreadyVisited());
             return foundCondition.wasFound();
-            
+
         } catch (Exception e) {
             throw new TerminologyException(e);
         }
@@ -158,12 +157,12 @@ public class LineageHelper {
             CeaseWhenFound foundCondition = new CeaseWhenFound(descendant);
             getAllDescendants(concept, foundCondition, new NotAlreadyVisited());
             return foundCondition.wasFound();
-            
+
         } catch (Exception e) {
-            throw new TerminologyException(e); 
+            throw new TerminologyException(e);
         }
     }
-    
+
     /**
      * @return The view positions from the active config.
      *         Returns null if no config set or config contains no view
@@ -183,8 +182,8 @@ public class LineageHelper {
         }
 
         return (this.viewPositions.isEmpty()) ? null : this.viewPositions;
-    }    
- 
+    }
+
     /**
      * @return The allowed status from the active config.
      *         Returns just "CURRENT" if no config set.
@@ -215,7 +214,7 @@ public class LineageHelper {
             this.isARelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
         }
         return this.isARelTypes;
-    }    
+    }
 
     /**
      * A simple template for logic that defines if a process should be executed
@@ -223,13 +222,14 @@ public class LineageHelper {
      */
     public interface Condition {
         public boolean evaluate(I_GetConceptData concept) throws Exception;
-    }    
+    }
 
     protected class NotAlreadyVisited implements Condition {
         private HashSet<Integer> visited = new HashSet<Integer>();
 
-        public NotAlreadyVisited() {};
-        
+        public NotAlreadyVisited() {
+        };
+
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             return visited.add(concept.getConceptId());
         }
@@ -250,16 +250,16 @@ public class LineageHelper {
             }
             return false;
         }
-    }    
-    
+    }
+
     protected class CeaseWhenFound implements Condition {
         private boolean found = false;
         private I_GetConceptData concept;
-        
+
         public CeaseWhenFound(I_GetConceptData concept) {
             this.concept = concept;
         };
-        
+
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             if (found) {
                 return false;
@@ -271,17 +271,18 @@ public class LineageHelper {
             }
             return true;
         }
-        
+
         public boolean wasFound() {
             return this.found;
         }
     }
-    
+
     protected class FirstRelationOnly implements Condition {
         private boolean firstTime = true;
-        
-        public FirstRelationOnly() {}
-        
+
+        public FirstRelationOnly() {
+        }
+
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             if (firstTime) {
                 firstTime = false;
@@ -291,5 +292,5 @@ public class LineageHelper {
             }
         }
     }
-    
+
 }

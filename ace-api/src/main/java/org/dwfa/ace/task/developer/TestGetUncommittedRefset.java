@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,106 +45,103 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/developer", type = BeanType.TASK_BEAN) })
-public class TestGetUncommittedRefset extends AbstractTask{
-	
-	private static final long serialVersionUID = 1L;
+public class TestGetUncommittedRefset extends AbstractTask {
 
-	private static final int dataVersion = 1;
-	
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}//End method writeObject
+    private static final long serialVersionUID = 1L;
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
+    private static final int dataVersion = 1;
 
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }// End method writeObject
 
-	}//End method readObject
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
 
-		
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do...
-	}//End method complete
-	
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-	throws TaskFailedException {
-	
-		try {
-			I_TermFactory termFactory = LocalVersionedTerminology.get();
-			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-			StringBuffer msg = new StringBuffer();
-			msg.append("\n");
-			// TEST 1
-			I_GetConceptData userInfo = termFactory.getConcept(
-			        ArchitectonicAuxiliary.Concept.USER_INFO.getUids());
-			
-			List<I_GetConceptData> uncommitted = new ArrayList<I_GetConceptData>();
-			
-			listNumOfRelRefsetMembers(termFactory, config, userInfo, "  Number of user info extensions BEFORE COMMIT: ", msg);
-			for (I_Transact transact: termFactory.getUncommitted()) {
-				if (I_GetConceptData.class.isAssignableFrom(transact.getClass())) {
-					uncommitted.add((I_GetConceptData) transact);
-					listNumOfRelRefsetMembers(termFactory, config, (I_GetConceptData) transact, "  Number of uncommitted concept extensions BEFORE COMMIT: ", msg);
-				}
-			}
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-			termFactory.commit();
+    }// End method readObject
 
-			// TEST 2
-			listNumOfRelRefsetMembers(termFactory, config, userInfo, "  Number of user info extensions AFTER COMMIT: ", msg);
-			
-			for (I_GetConceptData concept: uncommitted) {
-				listNumOfRelRefsetMembers(termFactory, config, concept, "  Number of uncommitted concept extensions AFTER COMMIT: ", msg);
-			}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
+    }// End method complete
 
-			AceLog.getEditLog().info(msg.toString());
-			return Condition.CONTINUE;
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		} catch (Exception e) {
-			throw new TaskFailedException(e);
-		}
-		
-	}//End method evaluate
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
-	private void listNumOfRelRefsetMembers(I_TermFactory termFactory,
-			I_ConfigAceFrame config, I_GetConceptData userInfo, String comment, StringBuffer msg)
-			throws IOException, TerminologyException {
-		I_IntSet allowedTypes = termFactory.newIntSet();
-		for (int destRelNid: config.getDestRelTypes().getSetValues()) {
-		    allowedTypes.add(destRelNid);
-		}
-		allowedTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-		List<I_RelTuple> srcRelTuples = userInfo.getSourceRelTuples(
-		        config.getAllowedStatus(), allowedTypes,
-		        config.getViewPositionSet(), true);
-		for (I_RelTuple relTuple : srcRelTuples) {
-		    List<I_ThinExtByRefVersioned> extensions =
-		        termFactory.getAllExtensionsForComponent(relTuple.getRelId(), true);
-		    msg.append(comment + extensions.size() + "\n");
-		    for (I_ThinExtByRefVersioned ext: extensions) {
-		    	for (I_ThinExtByRefPart part: ext.getVersions()) {
-		    		if (part.getVersion() == Integer.MAX_VALUE) {
-		    			msg.append("\n     Uncommitted extension: " + ext + "\n");
-					    break;
-		    		}
-		    	}
-		    }
-		}
-	}
-	
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}//End method getConditions	
+        try {
+            I_TermFactory termFactory = LocalVersionedTerminology.get();
+            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+            StringBuffer msg = new StringBuffer();
+            msg.append("\n");
+            // TEST 1
+            I_GetConceptData userInfo = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER_INFO.getUids());
 
-	public int[] getDataContainerIds() {
+            List<I_GetConceptData> uncommitted = new ArrayList<I_GetConceptData>();
+
+            listNumOfRelRefsetMembers(termFactory, config, userInfo,
+                "  Number of user info extensions BEFORE COMMIT: ", msg);
+            for (I_Transact transact : termFactory.getUncommitted()) {
+                if (I_GetConceptData.class.isAssignableFrom(transact.getClass())) {
+                    uncommitted.add((I_GetConceptData) transact);
+                    listNumOfRelRefsetMembers(termFactory, config, (I_GetConceptData) transact,
+                        "  Number of uncommitted concept extensions BEFORE COMMIT: ", msg);
+                }
+            }
+
+            termFactory.commit();
+
+            // TEST 2
+            listNumOfRelRefsetMembers(termFactory, config, userInfo, "  Number of user info extensions AFTER COMMIT: ",
+                msg);
+
+            for (I_GetConceptData concept : uncommitted) {
+                listNumOfRelRefsetMembers(termFactory, config, concept,
+                    "  Number of uncommitted concept extensions AFTER COMMIT: ", msg);
+            }
+
+            AceLog.getEditLog().info(msg.toString());
+            return Condition.CONTINUE;
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+
+    }// End method evaluate
+
+    private void listNumOfRelRefsetMembers(I_TermFactory termFactory, I_ConfigAceFrame config,
+            I_GetConceptData userInfo, String comment, StringBuffer msg) throws IOException, TerminologyException {
+        I_IntSet allowedTypes = termFactory.newIntSet();
+        for (int destRelNid : config.getDestRelTypes().getSetValues()) {
+            allowedTypes.add(destRelNid);
+        }
+        allowedTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+        List<I_RelTuple> srcRelTuples = userInfo.getSourceRelTuples(config.getAllowedStatus(), allowedTypes,
+            config.getViewPositionSet(), true);
+        for (I_RelTuple relTuple : srcRelTuples) {
+            List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(relTuple.getRelId(),
+                true);
+            msg.append(comment + extensions.size() + "\n");
+            for (I_ThinExtByRefVersioned ext : extensions) {
+                for (I_ThinExtByRefPart part : ext.getVersions()) {
+                    if (part.getVersion() == Integer.MAX_VALUE) {
+                        msg.append("\n     Uncommitted extension: " + ext + "\n");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }// End method getConditions
+
+    public int[] getDataContainerIds() {
         return new int[] {};
-	}
+    }
 
-}//End class CreateRefsetMembersetPair
+}// End class CreateRefsetMembersetPair

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,25 +29,18 @@ public class SetChangeSetRootBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("The property that contains the profile to modify.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the profile to modify.");
 
-            PropertyDescriptor rootDirName =
-                    new PropertyDescriptor("rootDirName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor rootDirName = new PropertyDescriptor("rootDirName", getBeanDescriptor().getBeanClass());
             rootDirName.setBound(true);
             rootDirName.setPropertyEditorClass(JTextFieldEditor.class);
             rootDirName.setDisplayName("<html><font color='green'>cs root:");
-            rootDirName
-                .setShortDescription("The root directory for the change sets.");
+            rootDirName.setShortDescription("The root directory for the change sets.");
 
             PropertyDescriptor rv[] = { profilePropName, rootDirName };
             return rv;
@@ -61,8 +54,7 @@ public class SetChangeSetRootBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetChangeSetRoot.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>set change set<br>root");
+        bd.setDisplayName("<html><font color='green'><center>set change set<br>root");
         return bd;
     }
 }

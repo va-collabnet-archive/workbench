@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,6 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui", type = BeanType.TASK_BEAN) })
-
 public class ShowQueueViewerForProfile extends AbstractTask {
 
     /**
@@ -45,27 +44,25 @@ public class ShowQueueViewerForProfile extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private Boolean show = true;
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-    
 
     public String getProfilePropName() {
-		return profilePropName;
-	}
+        return profilePropName;
+    }
 
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
-	}
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
+    }
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(show);
         out.writeObject(profilePropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             show = (Boolean) in.readObject();
@@ -76,30 +73,28 @@ public class ShowQueueViewerForProfile extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-	          if (profile == null) {
-	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-	          }
-	          profile.setShowQueueViewer(show);
+            if (profile == null) {
+                profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            }
+            profile.setShowQueueViewer(show);
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
-		} catch (IllegalAccessException e) {
-	        throw new TaskFailedException(e);
-		} catch (InvocationTargetException e) {
-	        throw new TaskFailedException(e);
-		}
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        }
     }
 
     public Collection<Condition> getConditions() {

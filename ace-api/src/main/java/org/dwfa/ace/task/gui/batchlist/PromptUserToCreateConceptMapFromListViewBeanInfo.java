@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,22 +23,17 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
-public class PromptUserToCreateConceptMapFromListViewBeanInfo extends
-        SimpleBeanInfo {
+public class PromptUserToCreateConceptMapFromListViewBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor conceptMapPropName =
-                    new PropertyDescriptor("conceptMapPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptMapPropName = new PropertyDescriptor("conceptMapPropName",
+                getBeanDescriptor().getBeanClass());
             conceptMapPropName.setBound(true);
-            conceptMapPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptMapPropName
-                .setDisplayName("<html><font color='green'>concept map prop:");
-            conceptMapPropName
-                .setShortDescription("The property that contains the resulting concept map.");
+            conceptMapPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptMapPropName.setDisplayName("<html><font color='green'>concept map prop:");
+            conceptMapPropName.setShortDescription("The property that contains the resulting concept map.");
 
             PropertyDescriptor rv[] = { conceptMapPropName };
             return rv;
@@ -51,11 +46,8 @@ public class PromptUserToCreateConceptMapFromListViewBeanInfo extends
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(
-                    PromptUserToCreateConceptMapFromListView.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Create Concept Map<br>from Concepts<br>in List View");
+        BeanDescriptor bd = new BeanDescriptor(PromptUserToCreateConceptMapFromListView.class);
+        bd.setDisplayName("<html><font color='green'><center>Create Concept Map<br>from Concepts<br>in List View");
         return bd;
     }
 }

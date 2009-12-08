@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,7 +55,7 @@ public class ClearRenderOverrideList extends AbstractTask {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             profilePropName = (String) in.readObject();
-         } else {
+        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
@@ -66,11 +66,11 @@ public class ClearRenderOverrideList extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            
+
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
             profile.getTaxonomyRendererOverrideList().clear();
             return Condition.CONTINUE;
-            
+
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         } catch (IntrospectionException e) {

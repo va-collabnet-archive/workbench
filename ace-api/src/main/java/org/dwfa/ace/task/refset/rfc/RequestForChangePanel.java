@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -362,10 +362,11 @@ public class RequestForChangePanel extends JPanel {
     }
 
     private Set<I_GetConceptData> getAllUsers() throws IOException, TerminologyException {
-        I_GetConceptData userParent =
-                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+        I_GetConceptData userParent = LocalVersionedTerminology.get().getConcept(
+            ArchitectonicAuxiliary.Concept.USER.getUids());
         I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
-        allowedTypes.add(LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
+        allowedTypes.add(LocalVersionedTerminology.get()
+            .getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
             .getConceptId());
 
         return userParent.getDestRelOrigins(allowedTypes, true, true);

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,21 +43,21 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/change sets", type = BeanType.TASK_BEAN) })
 public class ConvertAllChangeSets extends AbstractTask {
 
-	private String outputSuffix = ".xml";
+    private String outputSuffix = ".xml";
 
-	private String inputSuffix = ".jcs";
+    private String inputSuffix = ".jcs";
 
-	private String rootDirStr = "profiles/";
-	
-	private boolean recurseSubdirectories = true;
+    private String rootDirStr = "profiles/";
 
-	private static final long serialVersionUID = 1;
+    private boolean recurseSubdirectories = true;
 
-	private static final int dataVersion = 0;
+    private static final long serialVersionUID = 1;
 
-	private Logger logger;
+    private static final int dataVersion = 0;
 
-	private String changeSetTransformer = ChangeSetXmlEncoder.class.getName();
+    private Logger logger;
+
+    private String changeSetTransformer = ChangeSetXmlEncoder.class.getName();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -68,144 +68,139 @@ public class ConvertAllChangeSets extends AbstractTask {
         out.writeObject(changeSetTransformer);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-                                                                 ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
             rootDirStr = (String) in.readObject();
             recurseSubdirectories = in.readBoolean();
             outputSuffix = (String) in.readObject();
             inputSuffix = (String) in.readObject();
-			changeSetTransformer  = (String) in.readObject();
+            changeSetTransformer = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
-	
-	public void addAllChangeSetFiles(File rootFile,
-			List<File> changeSetFiles, final String suffix) {
-		File[] children = rootFile.listFiles(new FileFilter() {
 
-			public boolean accept(File child) {
-				if (child.isHidden() || child.getName().startsWith(".")) {
-					return false;
-				}
-				if (child.isDirectory()) {
-					return recurseSubdirectories;
-				}
-				return child.getName().endsWith(suffix);
-			}
-		});
-		if (children != null) {
-			for (File child : children) {
-				if (child.isDirectory()) {
-					logger.info("recursing directory " + child);
-					addAllChangeSetFiles(child, changeSetFiles, suffix);
-				} else {
-					logger.info("adding file " + child);
-					changeSetFiles.add(child);
-				}
-			}
-		}
-	}
+    public void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles, final String suffix) {
+        File[] children = rootFile.listFiles(new FileFilter() {
 
+            public boolean accept(File child) {
+                if (child.isHidden() || child.getName().startsWith(".")) {
+                    return false;
+                }
+                if (child.isDirectory()) {
+                    return recurseSubdirectories;
+                }
+                return child.getName().endsWith(suffix);
+            }
+        });
+        if (children != null) {
+            for (File child : children) {
+                if (child.isDirectory()) {
+                    logger.info("recursing directory " + child);
+                    addAllChangeSetFiles(child, changeSetFiles, suffix);
+                } else {
+                    logger.info("adding file " + child);
+                    changeSetFiles.add(child);
+                }
+            }
+        }
+    }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
-	 */
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
-		logger = worker.getLogger();
-		File rootDir = new File(rootDirStr);
+        logger = worker.getLogger();
+        File rootDir = new File(rootDirStr);
 
-		if (!rootDir.exists() || !rootDir.canRead()) {
-			throw new TaskFailedException("Specified root directory '"
-					+ rootDirStr + "' either does not exist or cannot be read");
-		}
+        if (!rootDir.exists() || !rootDir.canRead()) {
+            throw new TaskFailedException("Specified root directory '" + rootDirStr
+                + "' either does not exist or cannot be read");
+        }
 
-		List<File> changeSetFiles = new ArrayList<File>();
-		addAllChangeSetFiles(rootDir, changeSetFiles, inputSuffix);
+        List<File> changeSetFiles = new ArrayList<File>();
+        addAllChangeSetFiles(rootDir, changeSetFiles, inputSuffix);
 
-		ChangeSetTransformer transformer = ConvertChangeSet.getChangeSetTransformer(changeSetTransformer);
-		transformer.setOutputSuffix(outputSuffix);
-		
-		for (File file : changeSetFiles) {
-			logger.info("Processing change set " + file.getParent() + File.separator + file.getName());
-			try {
-				transformer.transform(logger, file);
-			} catch (Exception e) {
-				throw new TaskFailedException("Failed processing file " + file, e);
-			}
-		}
+        ChangeSetTransformer transformer = ConvertChangeSet.getChangeSetTransformer(changeSetTransformer);
+        transformer.setOutputSuffix(outputSuffix);
 
-		return Condition.CONTINUE;
-	}
+        for (File file : changeSetFiles) {
+            logger.info("Processing change set " + file.getParent() + File.separator + file.getName());
+            try {
+                transformer.transform(logger, file);
+            } catch (Exception e) {
+                throw new TaskFailedException("Failed processing file " + file, e);
+            }
+        }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
-	 */
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do.
+        return Condition.CONTINUE;
+    }
 
-	}
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do.
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
-	 */
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+    }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
-	 */
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     */
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-	public void setInputSuffix(String inputSuffix) {
-		this.inputSuffix = inputSuffix;
-	}
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
+     */
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-	public String getRootDirStr() {
-		return rootDirStr;
-	}
+    public void setInputSuffix(String inputSuffix) {
+        this.inputSuffix = inputSuffix;
+    }
 
-	public void setRootDirStr(String rootDirStr) {
-		this.rootDirStr = rootDirStr;
-	}
+    public String getRootDirStr() {
+        return rootDirStr;
+    }
 
-	public boolean isRecurseSubdirectories() {
-		return recurseSubdirectories;
-	}
+    public void setRootDirStr(String rootDirStr) {
+        this.rootDirStr = rootDirStr;
+    }
 
-	public void setRecurseSubdirectories(boolean recurseSubdirectories) {
-		this.recurseSubdirectories = recurseSubdirectories;
-	}
+    public boolean isRecurseSubdirectories() {
+        return recurseSubdirectories;
+    }
 
-	public String getOutputSuffix() {
-		return outputSuffix;
-	}
+    public void setRecurseSubdirectories(boolean recurseSubdirectories) {
+        this.recurseSubdirectories = recurseSubdirectories;
+    }
 
-	public void setOutputSuffix(String outputSuffix) {
-		this.outputSuffix = outputSuffix;
-	}
+    public String getOutputSuffix() {
+        return outputSuffix;
+    }
 
-	public String getInputSuffix() {
-		return inputSuffix;
-	}
+    public void setOutputSuffix(String outputSuffix) {
+        this.outputSuffix = outputSuffix;
+    }
 
-	public String getChangeSetTransformer() {
-		return changeSetTransformer;
-	}
+    public String getInputSuffix() {
+        return inputSuffix;
+    }
 
-	public void setChangeSetTransformer(String changeSetTransformer) {
-		this.changeSetTransformer = changeSetTransformer;
-	}
+    public String getChangeSetTransformer() {
+        return changeSetTransformer;
+    }
+
+    public void setChangeSetTransformer(String changeSetTransformer) {
+        this.changeSetTransformer = changeSetTransformer;
+    }
 
 }

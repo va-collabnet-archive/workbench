@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,9 +26,12 @@ import org.dwfa.tapi.TerminologyException;
 public interface I_OverrideTaxonomyRenderer {
 
     /**
-     * This method is passed in the rendered component based on the default rendering. The method may override or provide
-     * any decorations desired to provide special displays, such as providing special annotations for refset types or for
-     * spelling concerns. 
+     * This method is passed in the rendered component based on the default
+     * rendering. The method may override or provide
+     * any decorations desired to provide special displays, such as providing
+     * special annotations for refset types or for
+     * spelling concerns.
+     * 
      * @param component the rendered component
      * @param tree the tree this component will be contained within
      * @param concept the concept that this node corresponds to
@@ -36,14 +39,13 @@ public interface I_OverrideTaxonomyRenderer {
      * @param expanded true if expanded
      * @param leaf true if a leaf node
      * @param row the row of the component
-     * @param hasFocus true if 
+     * @param hasFocus true if
      * @param frameConfig
-     * @return the rendered component with any overrides or decorations deemed appropriate by the override class. 
+     * @return the rendered component with any overrides or decorations deemed
+     *         appropriate by the override class.
      */
-    public JLabel overrideTreeCellRendererComponent(JLabel component,
-            JTree tree, I_GetConceptData concept, boolean sel,
-            boolean expanded, boolean leaf, int row, boolean hasFocus,
-            I_ConfigAceFrame frameConfig) throws TerminologyException,
-            IOException;
+    public JLabel overrideTreeCellRendererComponent(JLabel component, JTree tree, I_GetConceptData concept,
+            boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus, I_ConfigAceFrame frameConfig)
+            throws TerminologyException, IOException;
 
 }

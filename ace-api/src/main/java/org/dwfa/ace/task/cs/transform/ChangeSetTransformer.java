@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,20 +30,16 @@ public abstract class ChangeSetTransformer {
 
     protected String outputSuffix = ".xml";
 
-    protected XMLEncoder getEncoder(File changeset)
-            throws FileNotFoundException {
-        XMLEncoder encoder =
-                new XMLEncoder(new BufferedOutputStream(new FileOutputStream(
-                    new File(changeset.getParent(), changeset.getName()
-                        + outputSuffix))));
+    protected XMLEncoder getEncoder(File changeset) throws FileNotFoundException {
+        XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(new File(
+            changeset.getParent(), changeset.getName() + outputSuffix))));
 
-        encoder.setPersistenceDelegate(UUID.class,
-            new java.beans.PersistenceDelegate() {
-                protected Expression instantiate(Object oldInstance, Encoder out) {
-                    return new Expression(oldInstance, oldInstance.getClass(),
-                        "fromString", new Object[] { oldInstance.toString() });
-                }
-            });
+        encoder.setPersistenceDelegate(UUID.class, new java.beans.PersistenceDelegate() {
+            protected Expression instantiate(Object oldInstance, Encoder out) {
+                return new Expression(oldInstance, oldInstance.getClass(), "fromString",
+                    new Object[] { oldInstance.toString() });
+            }
+        });
 
         return encoder;
     }
@@ -56,7 +52,6 @@ public abstract class ChangeSetTransformer {
         this.outputSuffix = outputSuffix;
     }
 
-    public abstract void transform(Logger logger, File changeset)
-            throws Exception;
+    public abstract void transform(Logger logger, File changeset) throws Exception;
 
 }

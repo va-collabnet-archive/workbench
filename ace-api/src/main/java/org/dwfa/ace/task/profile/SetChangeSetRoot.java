@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,11 +37,14 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Sets the change set root directory to a new root. This change will take effect the next time a change set is opened. If a change 
- * set is already open, it will not take effect until the log rolls over to a new file. As a result, if immediate changes are required,
- * the environment should be restarted. 
+ * Sets the change set root directory to a new root. This change will take
+ * effect the next time a change set is opened. If a change
+ * set is already open, it will not take effect until the log rolls over to a
+ * new file. As a result, if immediate changes are required,
+ * the environment should be restarted.
+ * 
  * @author kec
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class SetChangeSetRoot extends AbstractTask {
@@ -75,25 +78,24 @@ public class SetChangeSetRoot extends AbstractTask {
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
-    
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            
+
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-	          if (profile == null) {
-	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-	          }
-            
-            File currentChangeSetFile = new File(profile.getDbConfig().getChangeSetRoot(), 
-            		profile.getDbConfig().getChangeSetWriterFileName());
+            if (profile == null) {
+                profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            }
+
+            File currentChangeSetFile = new File(profile.getDbConfig().getChangeSetRoot(), profile.getDbConfig()
+                .getChangeSetWriterFileName());
             worker.getLogger().info("Current (old) change set file: " + currentChangeSetFile.getAbsolutePath());
             profile.getDbConfig().setChangeSetRoot(new File(rootDirName));
-            File newChangeSetFile = new File(profile.getDbConfig().getChangeSetRoot(), 
-            		profile.getDbConfig().getChangeSetWriterFileName());
+            File newChangeSetFile = new File(profile.getDbConfig().getChangeSetRoot(), profile.getDbConfig()
+                .getChangeSetWriterFileName());
             worker.getLogger().info("New change set file: " + newChangeSetFile.getAbsolutePath());
             return Condition.CONTINUE;
-            
+
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         } catch (IntrospectionException e) {
@@ -102,7 +104,7 @@ public class SetChangeSetRoot extends AbstractTask {
             throw new TaskFailedException(e);
         } catch (InvocationTargetException e) {
             throw new TaskFailedException(e);
-        } 
+        }
     }
 
     public int[] getDataContainerIds() {
@@ -121,12 +123,12 @@ public class SetChangeSetRoot extends AbstractTask {
         this.profilePropName = profilePropName;
     }
 
-	public String getRootDirName() {
-		return rootDirName;
-	}
+    public String getRootDirName() {
+        return rootDirName;
+    }
 
-	public void setRootDirName(String rootDirName) {
-		this.rootDirName = rootDirName;
-	}
+    public void setRootDirName(String rootDirName) {
+        this.rootDirName = rootDirName;
+    }
 
 }

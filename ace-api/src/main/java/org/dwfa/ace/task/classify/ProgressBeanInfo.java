@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,12 +27,10 @@ public class ProgressBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor progress =
-                    new PropertyDescriptor("progress", Progress.class);
+            PropertyDescriptor progress = new PropertyDescriptor("progress", Progress.class);
             progress.setBound(true);
             progress.setPropertyEditorClass(JTextFieldEditor.class);
-            progress
-                .setDisplayName("<html><font color='green'>Progress (max 100):");
+            progress.setDisplayName("<html><font color='green'>Progress (max 100):");
             progress.setShortDescription("Enter progress. min = 0, max = 100");
             PropertyDescriptor rv[] = { progress };
             return rv;

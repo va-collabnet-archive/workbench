@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,69 +37,45 @@ public class GetRequestForChangePanelDataTaskBeanInfo extends SimpleBeanInfo {
         try {
 
             PropertyDescriptor refsetSpecUuidPropName;
-            refsetSpecUuidPropName =
-                    new PropertyDescriptor("refsetSpecUuidPropName",
-                        getBeanDescriptor().getBeanClass());
+            refsetSpecUuidPropName = new PropertyDescriptor("refsetSpecUuidPropName",
+                getBeanDescriptor().getBeanClass());
             refsetSpecUuidPropName.setBound(true);
-            refsetSpecUuidPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            refsetSpecUuidPropName
-                .setDisplayName("<html><font color='green'>specification refset UUID prop:");
-            refsetSpecUuidPropName
-                .setShortDescription("The property to put the specification refset UUID into.");
+            refsetSpecUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetSpecUuidPropName.setDisplayName("<html><font color='green'>specification refset UUID prop:");
+            refsetSpecUuidPropName.setShortDescription("The property to put the specification refset UUID into.");
 
             PropertyDescriptor nextUserTermEntryPropName;
-            nextUserTermEntryPropName =
-                    new PropertyDescriptor("nextUserTermEntryPropName",
-                        getBeanDescriptor().getBeanClass());
+            nextUserTermEntryPropName = new PropertyDescriptor("nextUserTermEntryPropName",
+                getBeanDescriptor().getBeanClass());
             nextUserTermEntryPropName.setBound(true);
-            nextUserTermEntryPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            nextUserTermEntryPropName
-                .setDisplayName("<html><font color='green'>next person:");
-            nextUserTermEntryPropName
-                .setShortDescription("The next person the BP will go to.");
+            nextUserTermEntryPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            nextUserTermEntryPropName.setDisplayName("<html><font color='green'>next person:");
+            nextUserTermEntryPropName.setShortDescription("The next person the BP will go to.");
 
             PropertyDescriptor commentsPropName;
-            commentsPropName =
-                    new PropertyDescriptor("commentsPropName",
-                        getBeanDescriptor().getBeanClass());
+            commentsPropName = new PropertyDescriptor("commentsPropName", getBeanDescriptor().getBeanClass());
             commentsPropName.setBound(true);
-            commentsPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            commentsPropName
-                .setDisplayName("<html><font color='green'>comments prop name:");
-            commentsPropName
-                .setShortDescription("The property to put the comments into.");
+            commentsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            commentsPropName.setDisplayName("<html><font color='green'>comments prop name:");
+            commentsPropName.setShortDescription("The property to put the comments into.");
 
             PropertyDescriptor refsetUuidPropName;
-            refsetUuidPropName =
-                    new PropertyDescriptor("refsetUuidPropName",
-                        getBeanDescriptor().getBeanClass());
+            refsetUuidPropName = new PropertyDescriptor("refsetUuidPropName", getBeanDescriptor().getBeanClass());
             refsetUuidPropName.setBound(true);
-            refsetUuidPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            refsetUuidPropName
-                .setDisplayName("<html><font color='green'>member refset UUID prop:");
-            refsetUuidPropName
-                .setShortDescription("The property to put the member refset UUID into.");
+            refsetUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetUuidPropName.setDisplayName("<html><font color='green'>member refset UUID prop:");
+            refsetUuidPropName.setShortDescription("The property to put the member refset UUID into.");
 
             PropertyDescriptor originalRequestPropName;
-            originalRequestPropName =
-                    new PropertyDescriptor("originalRequestPropName",
-                        getBeanDescriptor().getBeanClass());
+            originalRequestPropName = new PropertyDescriptor("originalRequestPropName",
+                getBeanDescriptor().getBeanClass());
             originalRequestPropName.setBound(true);
-            originalRequestPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            originalRequestPropName
-                .setDisplayName("<html><font color='green'>original request prop:");
-            originalRequestPropName
-                .setShortDescription("The property to put the original request into.");
+            originalRequestPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            originalRequestPropName.setDisplayName("<html><font color='green'>original request prop:");
+            originalRequestPropName.setShortDescription("The property to put the original request into.");
 
-            PropertyDescriptor rv[] =
-                    { nextUserTermEntryPropName, commentsPropName,
-                     refsetUuidPropName, originalRequestPropName,
-                     refsetSpecUuidPropName };
+            PropertyDescriptor rv[] = { nextUserTermEntryPropName, commentsPropName, refsetUuidPropName,
+                                       originalRequestPropName, refsetSpecUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -110,10 +86,8 @@ public class GetRequestForChangePanelDataTaskBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(GetRequestForChangePanelDataTask.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Get request for change<br>panel data");
+        BeanDescriptor bd = new BeanDescriptor(GetRequestForChangePanelDataTask.class);
+        bd.setDisplayName("<html><font color='green'><center>Get request for change<br>panel data");
         return bd;
     }
 

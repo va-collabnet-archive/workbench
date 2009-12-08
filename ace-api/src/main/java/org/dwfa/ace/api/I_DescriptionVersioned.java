@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,78 +27,81 @@ import org.dwfa.tapi.TerminologyException;
 
 public interface I_DescriptionVersioned extends I_AmTermComponent {
 
-	public boolean addVersion(I_DescriptionPart newPart);
+    public boolean addVersion(I_DescriptionPart newPart);
 
-	public List<I_DescriptionPart> getVersions();
-	
-	/**
-	 * @param returnConflictResolvedLatestState
-	 * @return the versions of this description, filtered to a conflict managed state if passed true
-	 * @throws TerminologyException
-	 * @throws IOException
-	 */
-	public List<I_DescriptionPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+    public List<I_DescriptionPart> getVersions();
 
-	public int versionCount();
+    /**
+     * @param returnConflictResolvedLatestState
+     * @return the versions of this description, filtered to a conflict managed
+     *         state if passed true
+     * @throws TerminologyException
+     * @throws IOException
+     */
+    public List<I_DescriptionPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException,
+            IOException;
 
-	public boolean matches(Pattern p);
+    public int versionCount();
 
-	public int getConceptId();
+    public boolean matches(Pattern p);
 
-	public int getDescId();
+    public int getConceptId();
 
-	public List<I_DescriptionTuple> getTuples();
-	
-	/**
-	 * @param returnConflictResolvedLatestState
-	 * @return the tuples of this description, filtered to a conflict managed state if passed true
-	 * @throws TerminologyException
-	 * @throws IOException
-	 */
-	public List<I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
-	
-	public I_DescriptionTuple getFirstTuple();
+    public int getDescId();
 
-	public I_DescriptionTuple getLastTuple();
+    public List<I_DescriptionTuple> getTuples();
 
-	
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positionSet, List<I_DescriptionTuple> matchingTuples,
-         boolean addUncommitted);
-         
-	/**
-	 * Retrieves tuples matching the specified allowedStatuses, allowedTypes and positions -
-	 * tuples are returned in the supplied returnTuples List parameter
-	 * 
-	 * @param allowedStatus
-	 *            statuses tuples must match to be returned
-	 * @param allowedTypes
-	 *            types tuples must match to be returned
-	 * @param positionSet
-	 *            postions a tuple must be on to be returned
-	 * @param matchingTuples
-	 *            List to be populated with the result of the search
-	 * @param addUncommitted
-	 *            if true matching items from the uncommitted list will be
-	 *            added, if false the uncommitted list is ignored
-	 * @param returnConflictResolvedLatestState
-	 *            indicates if all tuples or just the latest state using the
-	 *            current profile's conflict resolution strategy is required
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positionSet, List<I_DescriptionTuple> matchingTuples,
-         boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
-	
-	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
+    /**
+     * @param returnConflictResolvedLatestState
+     * @return the tuples of this description, filtered to a conflict managed
+     *         state if passed true
+     * @throws TerminologyException
+     * @throws IOException
+     */
+    public List<I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException,
+            IOException;
 
-	public boolean merge(I_DescriptionVersioned jarDesc);
+    public I_DescriptionTuple getFirstTuple();
 
-	public Set<TimePathId> getTimePathSet();
+    public I_DescriptionTuple getLastTuple();
 
-	public I_DescribeConceptLocally toLocalFixedDesc();
-	
-	public UniversalAceDescription getUniversal() throws IOException, TerminologyException;
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positionSet,
+            List<I_DescriptionTuple> matchingTuples, boolean addUncommitted);
+
+    /**
+     * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
+     * positions -
+     * tuples are returned in the supplied returnTuples List parameter
+     * 
+     * @param allowedStatus
+     *            statuses tuples must match to be returned
+     * @param allowedTypes
+     *            types tuples must match to be returned
+     * @param positionSet
+     *            postions a tuple must be on to be returned
+     * @param matchingTuples
+     *            List to be populated with the result of the search
+     * @param addUncommitted
+     *            if true matching items from the uncommitted list will be
+     *            added, if false the uncommitted list is ignored
+     * @param returnConflictResolvedLatestState
+     *            indicates if all tuples or just the latest state using the
+     *            current profile's conflict resolution strategy is required
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positionSet,
+            List<I_DescriptionTuple> matchingTuples, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            throws TerminologyException, IOException;
+
+    public void convertIds(I_MapNativeToNative jarToDbNativeMap);
+
+    public boolean merge(I_DescriptionVersioned jarDesc);
+
+    public Set<TimePathId> getTimePathSet();
+
+    public I_DescribeConceptLocally toLocalFixedDesc();
+
+    public UniversalAceDescription getUniversal() throws IOException, TerminologyException;
 
 }

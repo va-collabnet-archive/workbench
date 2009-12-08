@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -85,10 +85,8 @@ public class SnoPathProcess implements I_ProcessConcepts {
     // GUI
     I_ShowActivity gui = null;
 
-    public SnoPathProcess(Logger logger, I_SnorocketFactory rocket,
-            List<SnoCon> snocons, List<SnoRel> snorels,
-            List<I_Position> fromPathPos, I_ShowActivity gui)
-            throws TerminologyException, IOException {
+    public SnoPathProcess(Logger logger, I_SnorocketFactory rocket, List<SnoCon> snocons, List<SnoRel> snorels,
+            List<I_Position> fromPathPos, I_ShowActivity gui) throws TerminologyException, IOException {
         this.logger = logger;
         this.rocket = rocket;
         this.snocons = snocons;
@@ -101,8 +99,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
 
     public void processConcept(I_GetConceptData concept) throws Exception {
         if (++countConSeen % 25000 == 0) {
-            logger.info("::: [SnoPathProcess] Concepts viewed:\t"
-                    + countConSeen);
+            logger.info("::: [SnoPathProcess] Concepts viewed:\t" + countConSeen);
         }
         if (concept.getConceptId() == rootNid) {
             if (rocket != null)
@@ -172,8 +169,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         }
     }
 
-    private List<SnoRel> findRelationships(I_GetConceptData concept)
-            throws IOException {
+    private List<SnoRel> findRelationships(I_GetConceptData concept) throws IOException {
         // STATISTICS VARIABLES
         int tmpCountRelCharStated = 0;
         int tmpCountRelCharDefining = 0;
@@ -217,7 +213,8 @@ public class SnoPathProcess implements I_ProcessConcepts {
                 }
 
                 // SET UP STATED FORMS LOOP
-                // NOTE: inferred_only, descriptive and historic relationships are not included
+                // NOTE: inferred_only, descriptive and historic relationships
+                // are not included
                 int p1c = rPart1.getCharacteristicId();
                 boolean keep = false;
                 if (p1c == isCh_DEFINING_CHARACTERISTIC) {
@@ -274,34 +271,18 @@ public class SnoPathProcess implements I_ProcessConcepts {
             isaNid = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
             rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
             // 0 CURRENT, 1 RETIRED
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
-                    .getUids());
-            isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
-                    .getUids());
+            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+            isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
             // NOT_REFINABLE | OPTIONAL_REFINABILITY | MANDATORY_REFINABILITY
-            isOPTIONAL_REFINABILITY = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY
-                            .getUids());
-            isNOT_REFINABLE = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-                            .getUids());
-            isMANDATORY_REFINABILITY = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY
-                            .getUids());
+            isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+            isMANDATORY_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
 
             // Characteristic
-            isCh_STATED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
-                            .getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-                            .getUids());
-            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP
-                            .getUids());
-            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP
-                            .getUids());
+            isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
+            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -317,9 +298,8 @@ public class SnoPathProcess implements I_ProcessConcepts {
         s.append("\r\n::: [SnoPathProcess] ProcessPath()");
         if (startTime > 0) {
             long lapseTime = System.currentTimeMillis() - startTime;
-            s.append("\r\n::: [Time] get vodb data: \t" + lapseTime
-                    + "\t(mS)\t" + (((float) lapseTime / 1000) / 60)
-                    + "\t(min)");
+            s.append("\r\n::: [Time] get vodb data: \t" + lapseTime + "\t(mS)\t" + (((float) lapseTime / 1000) / 60)
+                + "\t(min)");
             s.append("\r\n:::");
         }
 
@@ -339,8 +319,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         s.append("\r\n::: Stated:           \t" + countRelCharStated);
         s.append("\r\n::: Stated & Inferred:\t" + countRelCharStatedInferred);
         s.append("\r\n::: Stated & Subsumed:\t" + countRelCharStatedSubsumed);
-        int total = countRelCharStated + countRelCharDefining
-                + countRelCharStatedInferred + countRelCharStatedSubsumed;
+        int total = countRelCharStated + countRelCharDefining + countRelCharStatedInferred + countRelCharStatedSubsumed;
         s.append("\r\n:::            TOTAL=\t" + total);
         s.append("\r\n::: ");
         s.append("\r\n::: Optional Refinability: \t" + countRelRefOpt);

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,8 +49,8 @@ public class RefsetQueryFactory {
             ParseException {
 
         // create tree object that corresponds to the database's refset spec
-        List<I_ThinExtByRefVersioned> extensions =
-                LocalVersionedTerminology.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
+        List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(
+            refsetSpec.getConceptId(), true);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptId());
@@ -76,7 +76,8 @@ public class RefsetQueryFactory {
     }
 
     /**
-     * Create a "possible" query that contains all historical clauses to iterate over, even retired clauses.
+     * Create a "possible" query that contains all historical clauses to iterate
+     * over, even retired clauses.
      * 
      * @param configFrame
      * @param termFactory
@@ -92,8 +93,8 @@ public class RefsetQueryFactory {
             ParseException {
 
         // create tree object that corresponds to the database's refset spec
-        List<I_ThinExtByRefVersioned> extensions =
-                LocalVersionedTerminology.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
+        List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(
+            refsetSpec.getConceptId(), true);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptId());
@@ -154,9 +155,8 @@ public class RefsetQueryFactory {
 
             boolean addUncommitted = true;
             boolean returnConflictResolvedLatestState = true;
-            List<I_ThinExtByRefTuple> extensions =
-                    currExt.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSet(), addUncommitted,
-                        returnConflictResolvedLatestState);
+            List<I_ThinExtByRefTuple> extensions = currExt.getTuples(configFrame.getAllowedStatus(),
+                configFrame.getViewPositionSet(), addUncommitted, returnConflictResolvedLatestState);
             if (extensions.size() > 0) {
                 I_ThinExtByRefPart thinPart = extensions.get(0).getPart();
 

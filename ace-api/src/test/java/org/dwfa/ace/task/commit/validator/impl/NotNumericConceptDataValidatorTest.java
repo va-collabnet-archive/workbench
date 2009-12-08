@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 /**
- *  Copyright (c) 2009 International Health Terminology Standards Development Organisation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.dwfa.ace.task.commit.validator.impl;
 
@@ -51,7 +52,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- *
+ * 
  * @author matt
  */
 public class NotNumericConceptDataValidatorTest {
@@ -72,7 +73,6 @@ public class NotNumericConceptDataValidatorTest {
         mockTermFactory = mocksControl.createMock(I_TermFactory.class);
         LocalVersionedTerminology.setStealthfactory(mockTermFactory);
 
-
         mockConcept = mocksControl.createMock(I_GetConceptData.class);
         mockNotRequiredConcept = mocksControl.createMock(I_GetConceptData.class);
         descriptions = new ArrayList<I_DescriptionVersioned>();
@@ -86,21 +86,23 @@ public class NotNumericConceptDataValidatorTest {
 
     @Test
     public void passValidationWithNullValue() throws Exception {
-        this.expectGetFsnConceptOnTermFactory().expectGetPTConceptOnTermFactory().expectUuidToNativeOnTermFactory().
-                expectCorrectTypeId(1).
-                expectCorrectConceptId(2).expectNullString(1).expectGetDescriptions();
+        this.expectGetFsnConceptOnTermFactory()
+            .expectGetPTConceptOnTermFactory()
+            .expectUuidToNativeOnTermFactory()
+            .expectCorrectTypeId(1)
+            .expectCorrectConceptId(2)
+            .expectNullString(1)
+            .expectGetDescriptions();
 
         mocksControl.replay();
 
-        mockConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        mockConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 
-        mockNotRequiredConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+        mockNotRequiredConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
 
-        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next());
+        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next());
 
         Assert.assertEquals(mockConcept.getConceptId(), conceptId);
 
@@ -109,7 +111,7 @@ public class NotNumericConceptDataValidatorTest {
             classBeingTested.validate();
         } catch (ValidationException ex) {
             Logger.getLogger(NotNumericConceptDataValidatorTest.class.getName()).log(Level.INFO,
-                    String.format("Exception thrown unexpectedly: %1$s", ex.getMessage()));
+                String.format("Exception thrown unexpectedly: %1$s", ex.getMessage()));
             TestCase.fail("ValidationException should NOT be thrown with a null value");
         }
 
@@ -118,21 +120,23 @@ public class NotNumericConceptDataValidatorTest {
 
     @Test
     public void failValidationWithNumericValue() throws Exception {
-        this.expectGetFsnConceptOnTermFactory().expectGetPTConceptOnTermFactory().expectUuidToNativeOnTermFactory().
-                expectCorrectTypeId(1).
-                expectCorrectConceptId(3).expectNumericValue(2).expectGetDescriptions();
+        this.expectGetFsnConceptOnTermFactory()
+            .expectGetPTConceptOnTermFactory()
+            .expectUuidToNativeOnTermFactory()
+            .expectCorrectTypeId(1)
+            .expectCorrectConceptId(3)
+            .expectNumericValue(2)
+            .expectGetDescriptions();
 
         mocksControl.replay();
 
-        mockConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        mockConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 
-        mockNotRequiredConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+        mockNotRequiredConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
 
-        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next());
+        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next());
 
         Assert.assertEquals(mockConcept.getConceptId(), conceptId);
 
@@ -142,7 +146,7 @@ public class NotNumericConceptDataValidatorTest {
             TestCase.fail("ValidationException should be thrown");
         } catch (ValidationException ex) {
             Logger.getLogger(NotNumericConceptDataValidatorTest.class.getName()).log(Level.INFO,
-                    String.format("Exception thrown as expected: %1$s", ex.getMessage()));
+                String.format("Exception thrown as expected: %1$s", ex.getMessage()));
         }
 
         mocksControl.verify();
@@ -150,21 +154,22 @@ public class NotNumericConceptDataValidatorTest {
 
     @Test
     public void skipValidationWithNotMatchingConceptType() throws Exception {
-        this.expectGetFsnConceptOnTermFactory().expectGetPTConceptOnTermFactory().expectUuidToNativeOnTermFactory().
-                expectWrongTypeId(1).
-                expectWrongConceptId(2).expectGetDescriptions();
+        this.expectGetFsnConceptOnTermFactory()
+            .expectGetPTConceptOnTermFactory()
+            .expectUuidToNativeOnTermFactory()
+            .expectWrongTypeId(1)
+            .expectWrongConceptId(2)
+            .expectGetDescriptions();
 
         mocksControl.replay();
 
-        mockConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        mockConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 
-        mockNotRequiredConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+        mockNotRequiredConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
 
-        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next());
+        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next());
 
         Assert.assertEquals(mockConcept.getConceptId(), conceptId);
 
@@ -174,7 +179,7 @@ public class NotNumericConceptDataValidatorTest {
         } catch (ValidationException ex) {
             TestCase.fail("ValidationException should Not be thrown");
             Logger.getLogger(NotNumericConceptDataValidatorTest.class.getName()).log(Level.INFO,
-                    String.format("Exception thrown unexpectedly: %1$s", ex.getMessage()));
+                String.format("Exception thrown unexpectedly: %1$s", ex.getMessage()));
         }
 
         mocksControl.verify();
@@ -182,19 +187,20 @@ public class NotNumericConceptDataValidatorTest {
 
     @Test
     public void passValidationWithAlphaNumericValue() throws Exception {
-        this.expectGetFsnConceptOnTermFactory().expectUuidToNativeOnTermFactory().
-                expectCorrectTypeId(1).
-                expectCorrectConceptId(2).
-                expectAlphaNumericString(2).expectGetDescriptions();
+        this.expectGetFsnConceptOnTermFactory()
+            .expectUuidToNativeOnTermFactory()
+            .expectCorrectTypeId(1)
+            .expectCorrectConceptId(2)
+            .expectAlphaNumericString(2)
+            .expectGetDescriptions();
 
         mocksControl.replay();
 
-        mockConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        mockConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 
-        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next());
+        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next());
 
         Assert.assertEquals(mockConcept.getConceptId(), conceptId);
 
@@ -204,30 +210,30 @@ public class NotNumericConceptDataValidatorTest {
         } catch (ValidationException ex) {
             TestCase.fail("ValidationException should Not be thrown");
             Logger.getLogger(NotNumericConceptDataValidatorTest.class.getName()).log(Level.INFO,
-                    String.format("Exception thrown unexpectedly: %1$s", ex.getMessage()));
+                String.format("Exception thrown unexpectedly: %1$s", ex.getMessage()));
         }
 
         mocksControl.verify();
     }
 
     private NotNumericConceptDataValidatorTest expectGetFsnConceptOnTermFactory() throws Exception {
-        EasyMock.expect(mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids())).
-                andReturn(mockConcept);
+        EasyMock.expect(
+            mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()))
+            .andReturn(mockConcept);
         return this;
     }
 
     private NotNumericConceptDataValidatorTest expectGetPTConceptOnTermFactory() throws Exception {
-        EasyMock.expect(mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids())).andReturn(mockConcept);
+        EasyMock.expect(mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()))
+            .andReturn(mockConcept);
         return this;
     }
 
     private NotNumericConceptDataValidatorTest expectUuidToNativeOnTermFactory() throws Exception {
-        EasyMock.expect(mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next())).
-                andReturn(Integer.MIN_VALUE);
+        EasyMock.expect(
+            mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+                .iterator()
+                .next())).andReturn(Integer.MIN_VALUE);
         return this;
     }
 
@@ -271,4 +277,3 @@ public class NotNumericConceptDataValidatorTest {
         return this;
     }
 }
-

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,8 +27,9 @@ public class WriteAttachmentToDiskBeanInfo extends SimpleBeanInfo {
 
     /**
      * Bean info for WriteAttachmentToDisk class.
+     * 
      * @author Susan Castillo
-     *
+     * 
      */
     public WriteAttachmentToDiskBeanInfo() {
         super();
@@ -36,24 +37,17 @@ public class WriteAttachmentToDiskBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor uuidStrPropName =
-                    new PropertyDescriptor("uuidStrPropName",
-                        WriteAttachmentToDisk.class);
+            PropertyDescriptor uuidStrPropName = new PropertyDescriptor("uuidStrPropName", WriteAttachmentToDisk.class);
             uuidStrPropName.setBound(true);
-            uuidStrPropName
-                .setDisplayName("<html><font color='green'>Uuid key:");
+            uuidStrPropName.setDisplayName("<html><font color='green'>Uuid key:");
             uuidStrPropName.setShortDescription("Uuid data key");
-            uuidStrPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidStrPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
 
-            PropertyDescriptor htmlDataPropName =
-                    new PropertyDescriptor("htmlDataPropName",
-                        WriteAttachmentToDisk.class);
+            PropertyDescriptor htmlDataPropName = new PropertyDescriptor("htmlDataPropName",
+                WriteAttachmentToDisk.class);
             htmlDataPropName.setBound(true);
-            htmlDataPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            htmlDataPropName
-                .setDisplayName("<html><font color='green'>html data key:");
+            htmlDataPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            htmlDataPropName.setDisplayName("<html><font color='green'>html data key:");
             htmlDataPropName.setShortDescription("html data key.");
 
             PropertyDescriptor rv[] = { uuidStrPropName, htmlDataPropName };
@@ -68,8 +62,7 @@ public class WriteAttachmentToDiskBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(WriteAttachmentToDisk.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Write Attachment<br>to Disk");
+        bd.setDisplayName("<html><font color='green'><center>Write Attachment<br>to Disk");
         return bd;
     }
 }

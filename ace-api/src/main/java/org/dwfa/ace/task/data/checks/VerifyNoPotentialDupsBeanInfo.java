@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,16 +31,12 @@ public class VerifyNoPotentialDupsBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor activeConceptPropName =
-                    new PropertyDescriptor("activeConceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor activeConceptPropName = new PropertyDescriptor("activeConceptPropName",
+                getBeanDescriptor().getBeanClass());
             activeConceptPropName.setBound(true);
-            activeConceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            activeConceptPropName
-                .setDisplayName("<html><font color='green'>Concept property:");
-            activeConceptPropName
-                .setShortDescription("Name of the property containing the concept. ");
+            activeConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            activeConceptPropName.setDisplayName("<html><font color='green'>Concept property:");
+            activeConceptPropName.setShortDescription("Name of the property containing the concept. ");
 
             PropertyDescriptor rv[] = { activeConceptPropName };
             return rv;
@@ -54,9 +50,8 @@ public class VerifyNoPotentialDupsBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(VerifyNoPotentialDups.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Verify concept is not<br> a potential duplicate");
+        bd.setDisplayName("<html><font color='green'><center>Verify concept is not<br> a potential duplicate");
         return bd;
     }
 
-}//End class VerifyNoPotentialDupsBeanInfo
+}// End class VerifyNoPotentialDupsBeanInfo

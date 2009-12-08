@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,29 +28,21 @@ public class SetEditPathFromPropertyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor editPathPropName =
-                    new PropertyDescriptor("editPathPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor editPathPropName = new PropertyDescriptor("editPathPropName",
+                getBeanDescriptor().getBeanClass());
             editPathPropName.setBound(true);
-            editPathPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            editPathPropName
-                .setDisplayName("<html><font color='green'>editing path:");
-            editPathPropName
-                .setShortDescription("The property that contains the edit path concept");
+            editPathPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            editPathPropName.setDisplayName("<html><font color='green'>editing path:");
+            editPathPropName.setShortDescription("The property that contains the edit path concept");
 
-            PropertyDescriptor keepExistingEditPaths =
-                    new PropertyDescriptor("keepExistingEditPaths",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor keepExistingEditPaths = new PropertyDescriptor("keepExistingEditPaths",
+                getBeanDescriptor().getBeanClass());
             keepExistingEditPaths.setBound(true);
             keepExistingEditPaths.setPropertyEditorClass(CheckboxEditor.class);
-            keepExistingEditPaths
-                .setDisplayName("<html><font color='green'>Keep existing edit paths");
-            keepExistingEditPaths
-                .setShortDescription("Uncheck to edit just the specified path");
+            keepExistingEditPaths.setDisplayName("<html><font color='green'>Keep existing edit paths");
+            keepExistingEditPaths.setShortDescription("Uncheck to edit just the specified path");
 
-            PropertyDescriptor rv[] =
-                    { editPathPropName, keepExistingEditPaths };
+            PropertyDescriptor rv[] = { editPathPropName, keepExistingEditPaths };
             return rv;
 
         } catch (IntrospectionException e) {
@@ -63,8 +55,7 @@ public class SetEditPathFromPropertyBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetEditPathFromProperty.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set edit path<br/>from property");
+        bd.setDisplayName("<html><font color='green'><center>Set edit path<br/>from property");
         return bd;
     }
 }

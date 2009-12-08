@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,39 +28,28 @@ public class PromptUsernameAndPasswordBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor promptMessage =
-                    new PropertyDescriptor("promptMessage", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor promptMessage = new PropertyDescriptor("promptMessage",
+                getBeanDescriptor().getBeanClass());
             promptMessage.setBound(true);
             promptMessage.setPropertyEditorClass(JTextFieldEditor.class);
-            promptMessage
-                .setDisplayName("<html><font color='green'>prompt message:");
+            promptMessage.setDisplayName("<html><font color='green'>prompt message:");
             promptMessage.setShortDescription("The prompt message.");
 
-            PropertyDescriptor usernamePropName =
-                    new PropertyDescriptor("usernamePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor usernamePropName = new PropertyDescriptor("usernamePropName",
+                getBeanDescriptor().getBeanClass());
             usernamePropName.setBound(true);
-            usernamePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            usernamePropName
-                .setDisplayName("<html><font color='green'>username prop:");
-            usernamePropName
-                .setShortDescription("The property that contains the username.");
+            usernamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            usernamePropName.setDisplayName("<html><font color='green'>username prop:");
+            usernamePropName.setShortDescription("The property that contains the username.");
 
-            PropertyDescriptor passwordPropName =
-                    new PropertyDescriptor("passwordPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor passwordPropName = new PropertyDescriptor("passwordPropName",
+                getBeanDescriptor().getBeanClass());
             passwordPropName.setBound(true);
-            passwordPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            passwordPropName
-                .setDisplayName("<html><font color='green'>password prop:");
-            passwordPropName
-                .setShortDescription("The property that contains the password.");
+            passwordPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            passwordPropName.setDisplayName("<html><font color='green'>password prop:");
+            passwordPropName.setShortDescription("The property that contains the password.");
 
-            PropertyDescriptor rv[] =
-                    { promptMessage, usernamePropName, passwordPropName };
+            PropertyDescriptor rv[] = { promptMessage, usernamePropName, passwordPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -72,8 +61,7 @@ public class PromptUsernameAndPasswordBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(PromptUsernameAndPassword.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>prompt<br>username/password");
+        bd.setDisplayName("<html><font color='green'><center>prompt<br>username/password");
         return bd;
     }
 }

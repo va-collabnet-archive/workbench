@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,17 +19,17 @@ package org.dwfa.ace.api;
 import java.io.IOException;
 
 public interface I_ImplementTermFactory extends I_TermFactory {
-    public void setup(Object envHome, boolean readOnly, Long cacheSize)
-            throws IOException;
+    public void setup(Object envHome, boolean readOnly, Long cacheSize) throws IOException;
 
-    public void setup(Object envHome, boolean readOnly, Long cacheSize,
-            DatabaseSetupConfig databaseSetupConfig) throws IOException;
+    public void setup(Object envHome, boolean readOnly, Long cacheSize, DatabaseSetupConfig databaseSetupConfig)
+            throws IOException;
 
     public void checkpoint() throws IOException;
 
     /**
      * 
-     * @param minUtilization a number between 0 and 90 reflecting the desired minimum percent utilization of the log files. 
+     * @param minUtilization a number between 0 and 90 reflecting the desired
+     *            minimum percent utilization of the log files.
      * @throws IOException
      */
     public void compress(int minUtilization) throws IOException;

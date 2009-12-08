@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,24 +27,18 @@ public class CheckoutSelectedProfileBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor svnUrl =
-                    new PropertyDescriptor("svnUrl", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor svnUrl = new PropertyDescriptor("svnUrl", getBeanDescriptor().getBeanClass());
             svnUrl.setBound(true);
             svnUrl.setPropertyEditorClass(JTextFieldEditor.class);
             svnUrl.setDisplayName("<html><font color='green'>svn url:");
-            svnUrl
-                .setShortDescription("The URL of the repository to checkout.");
+            svnUrl.setShortDescription("The URL of the repository to checkout.");
 
-            PropertyDescriptor checkoutLocation =
-                    new PropertyDescriptor("checkoutLocation",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor checkoutLocation = new PropertyDescriptor("checkoutLocation",
+                getBeanDescriptor().getBeanClass());
             checkoutLocation.setBound(true);
             checkoutLocation.setPropertyEditorClass(JTextFieldEditor.class);
-            checkoutLocation
-                .setDisplayName("<html><font color='green'>checkout location:");
-            checkoutLocation
-                .setShortDescription("The local directory to hold the working copy.");
+            checkoutLocation.setDisplayName("<html><font color='green'>checkout location:");
+            checkoutLocation.setShortDescription("The local directory to hold the working copy.");
 
             PropertyDescriptor rv[] = { svnUrl, checkoutLocation };
             return rv;
@@ -58,8 +52,7 @@ public class CheckoutSelectedProfileBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(CheckoutSelectedProfile.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>checkout selected<br>profile");
+        bd.setDisplayName("<html><font color='green'><center>checkout selected<br>profile");
         return bd;
     }
 }

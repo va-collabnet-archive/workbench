@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,28 +40,21 @@ public class CreateMatchReviewAssignmentsBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor inputFileNamePropName =
-                    new PropertyDescriptor("inputFileNamePropName",
-                        CreateMatchReviewAssignments.class);
+            PropertyDescriptor inputFileNamePropName = new PropertyDescriptor("inputFileNamePropName",
+                CreateMatchReviewAssignments.class);
             inputFileNamePropName.setBound(true);
-            inputFileNamePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            inputFileNamePropName
-                .setDisplayName("<html><font color='green'>Input File Name:");
+            inputFileNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            inputFileNamePropName.setDisplayName("<html><font color='green'>Input File Name:");
             inputFileNamePropName.setShortDescription("File Name");
 
-            PropertyDescriptor bpFileNamePropName =
-                    new PropertyDescriptor("bpFileNamePropName",
-                        CreateMatchReviewAssignments.class);
+            PropertyDescriptor bpFileNamePropName = new PropertyDescriptor("bpFileNamePropName",
+                CreateMatchReviewAssignments.class);
             bpFileNamePropName.setBound(true);
-            bpFileNamePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            bpFileNamePropName
-                .setDisplayName("<html><font color='green'>BP Input File Name:");
+            bpFileNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            bpFileNamePropName.setDisplayName("<html><font color='green'>BP Input File Name:");
             bpFileNamePropName.setShortDescription("File Name");
 
-            PropertyDescriptor rv[] =
-                    { inputFileNamePropName, bpFileNamePropName };
+            PropertyDescriptor rv[] = { inputFileNamePropName, bpFileNamePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -72,10 +65,8 @@ public class CreateMatchReviewAssignmentsBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(CreateMatchReviewAssignments.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Create Match Review <br> Assignments");
+        BeanDescriptor bd = new BeanDescriptor(CreateMatchReviewAssignments.class);
+        bd.setDisplayName("<html><font color='green'><center>Create Match Review <br> Assignments");
         return bd;
     }
 

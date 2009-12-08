@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,48 +33,44 @@ import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public class AddOrToRefsetSpec extends AbstractAddRefsetSpecTask {
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			//
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            //
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	protected int getRefsetPartTypeId() throws IOException, TerminologyException {
-		int typeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION
-				.localize().getNid();
-		return typeId;
-	}
+    protected int getRefsetPartTypeId() throws IOException, TerminologyException {
+        int typeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid();
+        return typeId;
+    }
 
-	protected I_ThinExtByRefPartConceptConcept createAndPopulatePart(
-			I_TermFactory tf, I_Path p, I_ConfigAceFrame configFrame) throws IOException,
-			TerminologyException {
-		I_ThinExtByRefPartConceptConcept specPart = tf.newConceptConceptExtensionPart();
-		if (getClauseIsTrue()) {
-			specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid());
-		} else {
-			specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid());
-		}
-		specPart.setC2id(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.localize().getNid());
-		specPart.setPathId(p.getConceptId());
-		specPart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-		specPart.setVersion(Integer.MAX_VALUE);
-		return specPart;
-	}
+    protected I_ThinExtByRefPartConceptConcept createAndPopulatePart(I_TermFactory tf, I_Path p,
+            I_ConfigAceFrame configFrame) throws IOException, TerminologyException {
+        I_ThinExtByRefPartConceptConcept specPart = tf.newConceptConceptExtensionPart();
+        if (getClauseIsTrue()) {
+            specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid());
+        } else {
+            specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid());
+        }
+        specPart.setC2id(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.localize().getNid());
+        specPart.setPathId(p.getConceptId());
+        specPart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+        specPart.setVersion(Integer.MAX_VALUE);
+        return specPart;
+    }
 
 }
-

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,6 +25,7 @@ import org.dwfa.bpa.tasks.editor.IncrementEditor;
 
 /**
  * Bean info to ShowConceptTab class.
+ * 
  * @author Christine Hill
  */
 public class ShowConceptTabBeanInfo extends SimpleBeanInfo {
@@ -39,8 +40,7 @@ public class ShowConceptTabBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
 
         try {
-            PropertyDescriptor index =
-                    new PropertyDescriptor("index", ShowConceptTab.class);
+            PropertyDescriptor index = new PropertyDescriptor("index", ShowConceptTab.class);
             index.setBound(true);
             index.setPropertyEditorClass(IncrementEditor.class);
             index.setDisplayName("<html><font color='green'>Concept tab:");
@@ -57,8 +57,7 @@ public class ShowConceptTabBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ShowConceptTab.class);
-        bd.setDisplayName("<html><font color='green'><center>Switch to <br>"
-            + "Concept Tab");
+        bd.setDisplayName("<html><font color='green'><center>Switch to <br>" + "Concept Tab");
         return bd;
     }
 

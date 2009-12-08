@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,54 +37,36 @@ public class ExportRefsetSpecForManualReviewTaskBeanInfo extends SimpleBeanInfo 
     public PropertyDescriptor[] getPropertyDescriptors() {
         PropertyDescriptor outputFilePropName;
         try {
-            outputFilePropName =
-                    new PropertyDescriptor("outputFilePropName",
-                        getBeanDescriptor().getBeanClass());
+            outputFilePropName = new PropertyDescriptor("outputFilePropName", getBeanDescriptor().getBeanClass());
             outputFilePropName.setBound(true);
-            outputFilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            outputFilePropName
-                .setDisplayName("<html><font color='green'>Output file property:");
-            outputFilePropName
-                .setShortDescription("Name of the property containing the filename to export to. ");
+            outputFilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            outputFilePropName.setDisplayName("<html><font color='green'>Output file property:");
+            outputFilePropName.setShortDescription("Name of the property containing the filename to export to. ");
 
-            PropertyDescriptor refsetSpecUuidPropName =
-                    new PropertyDescriptor("refsetSpecUuidPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor refsetSpecUuidPropName = new PropertyDescriptor("refsetSpecUuidPropName",
+                getBeanDescriptor().getBeanClass());
             refsetSpecUuidPropName.setBound(true);
-            refsetSpecUuidPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            refsetSpecUuidPropName
-                .setDisplayName("<html><font color='green'>refset spec uuid property:");
-            refsetSpecUuidPropName
-                .setShortDescription("Name of the property containing the refset spec uuid. ");
+            refsetSpecUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetSpecUuidPropName.setDisplayName("<html><font color='green'>refset spec uuid property:");
+            refsetSpecUuidPropName.setShortDescription("Name of the property containing the refset spec uuid. ");
 
             PropertyDescriptor descriptionTypeTermEntry;
-            descriptionTypeTermEntry =
-                    new PropertyDescriptor("descriptionTypeTermEntry",
-                        getBeanDescriptor().getBeanClass());
+            descriptionTypeTermEntry = new PropertyDescriptor("descriptionTypeTermEntry",
+                getBeanDescriptor().getBeanClass());
             descriptionTypeTermEntry.setBound(true);
-            descriptionTypeTermEntry
-                .setPropertyEditorClass(ConceptLabelPropEditor.class);
-            descriptionTypeTermEntry
-                .setDisplayName("<html><font color='green'>desc type concept to use:");
-            descriptionTypeTermEntry
-                .setShortDescription("The desc type concept to use.");
+            descriptionTypeTermEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
+            descriptionTypeTermEntry.setDisplayName("<html><font color='green'>desc type concept to use:");
+            descriptionTypeTermEntry.setShortDescription("The desc type concept to use.");
 
             PropertyDescriptor maxLineCount;
-            maxLineCount =
-                    new PropertyDescriptor("maxLineCount", getBeanDescriptor()
-                        .getBeanClass());
+            maxLineCount = new PropertyDescriptor("maxLineCount", getBeanDescriptor().getBeanClass());
             maxLineCount.setBound(true);
             maxLineCount.setPropertyEditorClass(IncrementEditor.class);
-            maxLineCount
-                .setDisplayName("<html><font color='green'>max line count in exported file:");
-            maxLineCount
-                .setShortDescription("The max line count in exported file.");
+            maxLineCount.setDisplayName("<html><font color='green'>max line count in exported file:");
+            maxLineCount.setShortDescription("The max line count in exported file.");
 
-            PropertyDescriptor rv[] =
-                    { outputFilePropName, descriptionTypeTermEntry,
-                     maxLineCount, refsetSpecUuidPropName };
+            PropertyDescriptor rv[] = { outputFilePropName, descriptionTypeTermEntry, maxLineCount,
+                                       refsetSpecUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -95,10 +77,8 @@ public class ExportRefsetSpecForManualReviewTaskBeanInfo extends SimpleBeanInfo 
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(ExportRefsetSpecForManualReviewTask.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Export refset spec for<br>manual review");
+        BeanDescriptor bd = new BeanDescriptor(ExportRefsetSpecForManualReviewTask.class);
+        bd.setDisplayName("<html><font color='green'><center>Export refset spec for<br>manual review");
         return bd;
     }
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,147 +46,139 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/relationship", type = BeanType.TASK_BEAN) })
 public class CreateRelationship extends AbstractTask {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
-	
+    private static final int dataVersion = 1;
+
     private String activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
-    
+
     private String relParentPropName = ProcessAttachmentKeys.REL_PARENT.getAttachmentKey();
-    
+
     private TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
     private TermEntry relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
     private TermEntry relRefinability = new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
     private TermEntry relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(relParentPropName);
+        out.writeObject(activeConceptPropName);
+        out.writeObject(relType);
+        out.writeObject(relCharacteristic);
+        out.writeObject(relRefinability);
+        out.writeObject(relStatus);
+    }
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(relParentPropName);
-		out.writeObject(activeConceptPropName);
-		out.writeObject(relType);
-		out.writeObject(relCharacteristic);
-		out.writeObject(relRefinability);
-		out.writeObject(relStatus);
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            relParentPropName = (String) in.readObject();
+            activeConceptPropName = (String) in.readObject();
+            relType = (TermEntry) in.readObject();
+            relCharacteristic = (TermEntry) in.readObject();
+            relRefinability = (TermEntry) in.readObject();
+            relStatus = (TermEntry) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			relParentPropName = (String) in.readObject();
-			activeConceptPropName = (String) in.readObject();
-			relType = (TermEntry) in.readObject();
-			relCharacteristic = (TermEntry) in.readObject();
-			relRefinability = (TermEntry) in.readObject();
-			relStatus = (TermEntry) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
+    }
 
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do...
+    }
 
-	}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			
-			I_GetConceptData concept = (I_GetConceptData) process.readProperty(activeConceptPropName);
-			if (config.getEditingPathSet().size() == 0) {
-				throw new TaskFailedException("You must select at least one editing path. ");
-			}
-			
-			I_GetConceptData relParentConcept = (I_GetConceptData) process.readProperty(relParentPropName);
+            I_GetConceptData concept = (I_GetConceptData) process.readProperty(activeConceptPropName);
+            if (config.getEditingPathSet().size() == 0) {
+                throw new TaskFailedException("You must select at least one editing path. ");
+            }
 
-			LocalVersionedTerminology.get().newRelationship(UUID.randomUUID(),
-					concept, 
-					LocalVersionedTerminology.get().getConcept(relType.ids),
-					relParentConcept,
-					LocalVersionedTerminology.get().getConcept(relCharacteristic.ids),
-					LocalVersionedTerminology.get().getConcept(relRefinability.ids), 
-					LocalVersionedTerminology.get().getConcept(relStatus.ids),0,
-					config);
-			LocalVersionedTerminology.get().addUncommitted(concept);
-			return Condition.CONTINUE;
-		} catch (IllegalArgumentException e) {
-			throw new TaskFailedException(e);
-		} catch (IllegalAccessException e) {
-			throw new TaskFailedException(e);
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(e);
-		} catch (IntrospectionException e) {
-			throw new TaskFailedException(e);
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		} catch (TerminologyException e) {
-			throw new TaskFailedException(e);
-		}
-	}
+            I_GetConceptData relParentConcept = (I_GetConceptData) process.readProperty(relParentPropName);
 
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+            LocalVersionedTerminology.get().newRelationship(UUID.randomUUID(), concept,
+                LocalVersionedTerminology.get().getConcept(relType.ids), relParentConcept,
+                LocalVersionedTerminology.get().getConcept(relCharacteristic.ids),
+                LocalVersionedTerminology.get().getConcept(relRefinability.ids),
+                LocalVersionedTerminology.get().getConcept(relStatus.ids), 0, config);
+            LocalVersionedTerminology.get().addUncommitted(concept);
+            return Condition.CONTINUE;
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-	public String getActiveConceptPropName() {
-		return activeConceptPropName;
-	}
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-	public void setActiveConceptPropName(String propName) {
-		this.activeConceptPropName = propName;
-	}
+    public String getActiveConceptPropName() {
+        return activeConceptPropName;
+    }
 
-	public String getRelParentPropName() {
-		return relParentPropName;
-	}
+    public void setActiveConceptPropName(String propName) {
+        this.activeConceptPropName = propName;
+    }
 
-	public void setRelParentPropName(String newStatusPropName) {
-		this.relParentPropName = newStatusPropName;
-	}
+    public String getRelParentPropName() {
+        return relParentPropName;
+    }
 
-	public TermEntry getRelCharacteristic() {
-		return relCharacteristic;
-	}
+    public void setRelParentPropName(String newStatusPropName) {
+        this.relParentPropName = newStatusPropName;
+    }
 
-	public void setRelCharacteristic(TermEntry relCharacteristic) {
-		this.relCharacteristic = relCharacteristic;
-	}
+    public TermEntry getRelCharacteristic() {
+        return relCharacteristic;
+    }
 
-	public TermEntry getRelRefinability() {
-		return relRefinability;
-	}
+    public void setRelCharacteristic(TermEntry relCharacteristic) {
+        this.relCharacteristic = relCharacteristic;
+    }
 
-	public void setRelRefinability(TermEntry relRefinability) {
-		this.relRefinability = relRefinability;
-	}
+    public TermEntry getRelRefinability() {
+        return relRefinability;
+    }
 
-	public TermEntry getRelType() {
-		return relType;
-	}
+    public void setRelRefinability(TermEntry relRefinability) {
+        this.relRefinability = relRefinability;
+    }
 
-	public void setRelType(TermEntry relType) {
-		this.relType = relType;
-	}
+    public TermEntry getRelType() {
+        return relType;
+    }
 
-	public TermEntry getRelStatus() {
-		return relStatus;
-	}
+    public void setRelType(TermEntry relType) {
+        this.relType = relType;
+    }
 
-	public void setRelStatus(TermEntry relStatus) {
-		this.relStatus = relStatus;
-	}
+    public TermEntry getRelStatus() {
+        return relStatus;
+    }
+
+    public void setRelStatus(TermEntry relStatus) {
+        this.relStatus = relStatus;
+    }
 
 }

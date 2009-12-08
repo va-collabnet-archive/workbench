@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-/** 
+/**
  * This task shows or hides the search component in the ACE Editor UI.
  * 
  * @author susan
@@ -40,65 +40,60 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui", type = BeanType.TASK_BEAN) })
 public class ShowSearch extends AbstractTask {
 
-		/**
+    /**
 		 * 
 		 */
-		private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-		private static final int dataVersion = 1;
-		
-	    private Boolean showSearch = true;
-	    
+    private static final int dataVersion = 1;
 
-		private void writeObject(ObjectOutputStream out) throws IOException {
-			out.writeInt(dataVersion);
-			out.writeObject(showSearch);
-		}
+    private Boolean showSearch = true;
 
-		private void readObject(ObjectInputStream in) throws IOException,
-				ClassNotFoundException {
-			int objDataVersion = in.readInt();
-			if (objDataVersion == dataVersion) {
-				showSearch = (Boolean) in.readObject();
-			} else {
-				throw new IOException("Can't handle dataversion: " + objDataVersion);
-			}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(showSearch);
+    }
 
-		}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            showSearch = (Boolean) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-		public void complete(I_EncodeBusinessProcess process, I_Work worker)
-				throws TaskFailedException {
-			// Nothing to do...
+    }
 
-		}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
-		public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-				throws TaskFailedException {
-			try {
-				I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-				config.setShowSearch(showSearch);
-				
-				return Condition.CONTINUE;
-			} catch (IllegalArgumentException e) {
-				throw new TaskFailedException(e);
-			}
-		}
+    }
 
-		public Collection<Condition> getConditions() {
-			return CONTINUE_CONDITION;
-		}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            config.setShowSearch(showSearch);
 
-		public int[] getDataContainerIds() {
-			return new int[] {};
-		}
+            return Condition.CONTINUE;
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-		public Boolean getShowSearch() {
-			return showSearch;
-		}
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-		public void setShowSearch(Boolean showSearch) {
-			this.showSearch = showSearch;
-		}
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
+
+    public Boolean getShowSearch() {
+        return showSearch;
+    }
+
+    public void setShowSearch(Boolean showSearch) {
+        this.showSearch = showSearch;
+    }
 
 }

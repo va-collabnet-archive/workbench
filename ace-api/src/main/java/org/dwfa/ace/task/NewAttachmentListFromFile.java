@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,8 +42,9 @@ import org.dwfa.util.bean.Spec;
  * Creates a new attachment list based on an (initially) hardcoded file name.
  * The file name may also be edited as a text string via the user interface.
  * The file should consist of a list of UUIDs.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN) })
 public class NewAttachmentListFromFile extends AbstractTask {
@@ -65,29 +66,24 @@ public class NewAttachmentListFromFile extends AbstractTask {
         out.writeObject(listName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             fileName = (String) in.readObject();
             listName = (String) in.readObject();
         } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-                         throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-                                throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
 
-            ArrayList<Collection<UUID>> temporaryList
-                    = new ArrayList<Collection<UUID>>();
+            ArrayList<Collection<UUID>> temporaryList = new ArrayList<Collection<UUID>>();
 
             if (worker.getLogger().isLoggable(Level.FINE)) {
                 worker.getLogger().fine(("Reading in file: " + fileName));

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,8 +40,9 @@ import org.dwfa.util.io.FileIO;
 
 /**
  * Opens a file dialog and displays only .bp files for selection.
+ * 
  * @author Susan Castillo
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
 public class ChooseBusinessProcessFile extends AbstractTask {
@@ -69,34 +70,30 @@ public class ChooseBusinessProcessFile extends AbstractTask {
         out.writeObject(processFileNamePropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             defaultDir = (String) in.readObject();
             processFileNamePropName = (String) in.readObject();
         } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-                         throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-                                throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             // prompt to find file
-            FileDialog dialog = new FileDialog(new Frame(),
-                "Select a business process");
+            FileDialog dialog = new FileDialog(new Frame(), "Select a business process");
             dialog.setDirectory(defaultDir);
-            dialog.setFilenameFilter(new FilenameFilter(){
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".bp");
-				}});
+            dialog.setFilenameFilter(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".bp");
+                }
+            });
             dialog.setVisible(true);
             if (dialog.getFile() == null) {
                 return Condition.ITEM_CANCELED;
@@ -110,7 +107,7 @@ public class ChooseBusinessProcessFile extends AbstractTask {
 
             process.setProperty(this.processFileNamePropName, FileIO.getRelativePath(selectedFile));
 
-             return Condition.ITEM_COMPLETE;
+            return Condition.ITEM_COMPLETE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         } catch (InvocationTargetException e) {
@@ -146,4 +143,3 @@ public class ChooseBusinessProcessFile extends AbstractTask {
         this.processFileNamePropName = fileKey;
     }
 }
-

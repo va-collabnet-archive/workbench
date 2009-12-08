@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,34 +23,34 @@ import org.dwfa.ace.api.I_Path;
 
 public interface I_ThinExtByRefTuple extends I_ThinExtByRefPart, I_AmTuple {
 
-	/**
-	 * @deprecated Use {@link #getStatusId()}
-	 */
-   @Deprecated	
-   public int getStatus();
+    /**
+     * @deprecated Use {@link #getStatusId()}
+     */
+    @Deprecated
+    public int getStatus();
 
-   /**
-    * @deprecated Use {@link #setStatusId(int)}
-    */
-   @Deprecated
-   public void setStatus(int idStatus);
+    /**
+     * @deprecated Use {@link #setStatusId(int)}
+     */
+    @Deprecated
+    public void setStatus(int idStatus);
 
-   public void addVersion(I_ThinExtByRefPart part);
+    public void addVersion(I_ThinExtByRefPart part);
 
-   public int getComponentId();
+    public int getComponentId();
 
-   public int getMemberId();
+    public int getMemberId();
 
-   public int getRefsetId();
+    public int getRefsetId();
 
-   public int getTypeId();
+    public int getTypeId();
 
-   public List<? extends I_ThinExtByRefPart> getVersions();
+    public List<? extends I_ThinExtByRefPart> getVersions();
 
-   public I_ThinExtByRefVersioned getCore();
+    public I_ThinExtByRefVersioned getCore();
 
-   public I_ThinExtByRefPart getPart();
+    public I_ThinExtByRefPart getPart();
 
-   public boolean promote(I_Path path);
+    public boolean promote(I_Path path);
 
 }

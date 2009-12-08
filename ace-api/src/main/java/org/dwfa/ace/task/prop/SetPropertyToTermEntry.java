@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,7 +53,7 @@ public class SetPropertyToTermEntry extends AbstractTask {
     private TermEntry termEntry = new TermEntry(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
 
     private boolean convertToConcept = true;
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(termPropName);
@@ -86,12 +86,12 @@ public class SetPropertyToTermEntry extends AbstractTask {
             } else {
                 process.setProperty(termPropName, termEntry);
             }
-            
+
             return Condition.CONTINUE;
-            
+
         } catch (Exception e) {
             throw new TaskFailedException(e);
-        } 
+        }
     }
 
     public int[] getDataContainerIds() {

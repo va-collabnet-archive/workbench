@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,9 +32,8 @@ import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 
 public class ConceptTransferable implements Transferable {
 
-    public static String conceptBeanType =
-            DataFlavor.javaJVMLocalObjectMimeType + ";class="
-                + I_GetConceptData.class.getName();
+    public static String conceptBeanType = DataFlavor.javaJVMLocalObjectMimeType + ";class="
+        + I_GetConceptData.class.getName();
 
     I_GetConceptData conceptTransferable;
 
@@ -52,44 +51,33 @@ public class ConceptTransferable implements Transferable {
             // should never happen.
             throw new RuntimeException(e);
         }
-        supportedFlavors =
-                new DataFlavor[] {
-                                  conceptBeanFlavor,
-                                  FixedTerminologyTransferable.universalFixedConceptFlavor,
-                                  FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor,
-                                  DataFlavor.stringFlavor };
+        supportedFlavors = new DataFlavor[] { conceptBeanFlavor,
+                                             FixedTerminologyTransferable.universalFixedConceptFlavor,
+                                             FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor,
+                                             DataFlavor.stringFlavor };
     }
 
-    public Object getTransferData(DataFlavor flavor)
-            throws UnsupportedFlavorException, IOException {
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if (conceptTransferable == null) {
             return null;
         }
         if (flavor.equals(conceptBeanFlavor)) {
             return conceptTransferable;
-        } else if (flavor
-            .equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
+        } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
             try {
-                return conceptTransferable.getConceptAttributes()
-                    .getLocalFixedConcept().universalize();
+                return conceptTransferable.getConceptAttributes().getLocalFixedConcept().universalize();
             } catch (IOException e) {
-                AceLog.getAppLog()
-                    .log(Level.SEVERE, e.getLocalizedMessage(), e);
+                AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
             } catch (TerminologyException e) {
-                AceLog.getAppLog()
-                    .log(Level.SEVERE, e.getLocalizedMessage(), e);
+                AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
             }
-        } else if (flavor
-            .equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
+        } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
             try {
-                return conceptTransferable.getConceptAttributes()
-                    .getLocalFixedConcept().universalize();
+                return conceptTransferable.getConceptAttributes().getLocalFixedConcept().universalize();
             } catch (IOException e) {
-                AceLog.getAppLog()
-                    .log(Level.SEVERE, e.getLocalizedMessage(), e);
+                AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
             } catch (TerminologyException e) {
-                AceLog.getAppLog()
-                    .log(Level.SEVERE, e.getLocalizedMessage(), e);
+                AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
             }
         } else if (flavor.equals(DataFlavor.stringFlavor)) {
             return conceptTransferable.toString();
@@ -102,11 +90,11 @@ public class ConceptTransferable implements Transferable {
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-		for (DataFlavor f : supportedFlavors) {
-			if (f.equals(flavor)) {
-				return true;
-			}
-		}
-		return false;
-	}
+        for (DataFlavor f : supportedFlavors) {
+            if (f.equals(flavor)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

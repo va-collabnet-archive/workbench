@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -109,8 +109,7 @@ public class InstructAndWait extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         this.done = false;
-        I_ConfigAceFrame config =
-                (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+        I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
         boolean subversionButtonVisible = config.isBuilderToggleVisible();
@@ -141,9 +140,8 @@ public class InstructAndWait extends AbstractTask {
                     c.gridx++;
                     workflowPanel.add(new JLabel("  "), c);
                     c.gridx++;
-                    stepButton =
-                            new JButton(new ImageIcon(InstructAndWait.class
-                                .getResource("/32x32/plain/media_step_forward.png")));
+                    stepButton = new JButton(new ImageIcon(
+                        InstructAndWait.class.getResource("/32x32/plain/media_step_forward.png")));
                     workflowPanel.add(stepButton, c);
                     stepButton.addActionListener(new StepActionListener());
                     c.gridx++;

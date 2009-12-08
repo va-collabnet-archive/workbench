@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,20 +46,21 @@ public abstract class ChangeSetImporter implements ActionListener {
         continueImport = false;
     }
 
-    public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets, String suffix) throws TaskFailedException {
-    	importAllChangeSets(logger, validators, rootDirStr, validateChangeSets, suffix, null);
+    public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets,
+            String suffix) throws TaskFailedException {
+        importAllChangeSets(logger, validators, rootDirStr, validateChangeSets, suffix, null);
     }
-    
+
     @SuppressWarnings("unchecked")
-    public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets, 
-    		String suffix, String prefix) throws TaskFailedException {
+    public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets,
+            String suffix, String prefix) throws TaskFailedException {
         try {
             I_TermFactory tf = LocalVersionedTerminology.get();
             I_ShowActivity activity = tf.newActivityPanel(true, tf.getActiveAceFrameConfig());
             activity.setProgressInfoUpper("Importing " + suffix + " change sets. ");
             activity.setIndeterminate(true);
             activity.addActionListener(this);
-            String[] validatorArray = new String[]{};
+            String[] validatorArray = new String[] {};
 
             if (validators != null && validators != "") {
                 validatorArray = validators.split("'");
@@ -78,8 +79,8 @@ public abstract class ChangeSetImporter implements ActionListener {
                     }
                 }
                 readerSet.add(csr);
-                logger.info("Adding reader: " + csf.getAbsolutePath() + 
-                		"\nThis has nextCommitTime() of : " + csr.nextCommitTime() + " (" + new Date(csr.nextCommitTime()) + ")");
+                logger.info("Adding reader: " + csf.getAbsolutePath() + "\nThis has nextCommitTime() of : "
+                    + csr.nextCommitTime() + " (" + new Date(csr.nextCommitTime()) + ")");
             }
 
             int max = avaibleBytes(readerSet);
@@ -99,13 +100,13 @@ public abstract class ChangeSetImporter implements ActionListener {
         }
     }
 
-
-    public int avaibleBytes(TreeSet<I_ReadChangeSet> readerSet) throws FileNotFoundException, IOException, ClassNotFoundException {
+    public int avaibleBytes(TreeSet<I_ReadChangeSet> readerSet) throws FileNotFoundException, IOException,
+            ClassNotFoundException {
         int available = 0;
-        for (I_ReadChangeSet reader: readerSet) {
-            available = available  + reader.availableBytes();
+        for (I_ReadChangeSet reader : readerSet) {
+            available = available + reader.availableBytes();
         }
-         return available;
+        return available;
     }
 
     public abstract I_ReadChangeSet getChangeSetReader(File csf);
@@ -116,7 +117,8 @@ public abstract class ChangeSetImporter implements ActionListener {
             public int compare(I_ReadChangeSet r1, I_ReadChangeSet r2) {
                 try {
                     if (r1.nextCommitTime() == r2.nextCommitTime()) {
-                        return r1.getChangeSetFile().toURL().toString().compareTo(r2.getChangeSetFile().toURL().toString());
+                        return r1.getChangeSetFile().toURL().toString().compareTo(
+                            r2.getChangeSetFile().toURL().toString());
                     }
                     if (r1.nextCommitTime() > r2.nextCommitTime()) {
                         return 1;
@@ -144,19 +146,17 @@ public abstract class ChangeSetImporter implements ActionListener {
         I_ReadChangeSet first = readerSet.first();
         readerSet.remove(first);
         if (AceLog.getEditLog().isLoggable(Level.INFO)) {
-            AceLog.getEditLog().info("\n--------------------------\nNow reading change set: " + 
-            		first.getChangeSetFile().getName() + 
-            		"; " + new Date(first.nextCommitTime()) +
-            		"; available bytes: " + first.availableBytes() +
-            		" (" + readerSet.size() + " readers left)" +
-            		"\n--------------------------\n ");
+            AceLog.getEditLog().info(
+                "\n--------------------------\nNow reading change set: " + first.getChangeSetFile().getName() + "; "
+                    + new Date(first.nextCommitTime()) + "; available bytes: " + first.availableBytes() + " ("
+                    + readerSet.size() + " readers left)" + "\n--------------------------\n ");
         }
         Long nextCommitTime = null;
-        for (I_ReadChangeSet reader: readerSet) {
-        	if (reader.nextCommitTime() > first.nextCommitTime()) {
-        		nextCommitTime = reader.nextCommitTime();
-        		break;
-        	}
+        for (I_ReadChangeSet reader : readerSet) {
+            if (reader.nextCommitTime() > first.nextCommitTime()) {
+                nextCommitTime = reader.nextCommitTime();
+                break;
+            }
         }
 
         if (nextCommitTime == null) {
@@ -165,15 +165,17 @@ public abstract class ChangeSetImporter implements ActionListener {
             first.readUntil(nextCommitTime);
         }
         if (first.nextCommitTime() == Long.MAX_VALUE) {
-        	AceLog.getEditLog().info("\nFinished reader: " + first.getChangeSetFile().getName() + 
-            		" (" + readerSet.size() + " readers left)\n");
+            AceLog.getEditLog().info(
+                "\nFinished reader: " + first.getChangeSetFile().getName() + " (" + readerSet.size()
+                    + " readers left)\n");
 
-            //don't add back since it is complete.
+            // don't add back since it is complete.
         } else {
-        	if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-            	AceLog.getEditLog().fine("Adding back reader: " + first.getChangeSetFile().getName() + 
-                		"\nThis has nextCommitTime() of : " + first.nextCommitTime() + " (" + new Date(first.nextCommitTime()) + ")");
-        	}
+            if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                AceLog.getEditLog().fine(
+                    "Adding back reader: " + first.getChangeSetFile().getName() + "\nThis has nextCommitTime() of : "
+                        + first.nextCommitTime() + " (" + new Date(first.nextCommitTime()) + ")");
+            }
             readerSet.add(first);
         }
         if (tf.getTransactional()) {
@@ -181,12 +183,12 @@ public abstract class ChangeSetImporter implements ActionListener {
         }
     }
 
-    
     public static void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles, final String suffix) {
-    	addAllChangeSetFiles(rootFile, changeSetFiles, suffix, null);
+        addAllChangeSetFiles(rootFile, changeSetFiles, suffix, null);
     }
 
-    public static void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles, final String suffix, final String prefix) {
+    public static void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles, final String suffix,
+            final String prefix) {
         File[] children = rootFile.listFiles(new FileFilter() {
 
             public boolean accept(File child) {
@@ -201,7 +203,7 @@ public abstract class ChangeSetImporter implements ActionListener {
                 } else {
                     return child.getName().endsWith(suffix);
                 }
-           }
+            }
         });
         if (children != null) {
             for (File child : children) {

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,95 +38,88 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-/** 
+/**
  * This task performs a Lucene search with the string provided.
  * 
  * @author susan
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui", type = BeanType.TASK_BEAN) })
-
 public class PerformLuceneSearch extends AbstractTask {
-	
 
-			/**
+    /**
 			 * 
 			 */
-			private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-			private static final int dataVersion = 1;
-			
-		    private String searchString = "nicolas";
-		    private TermEntry searchRoot = null;
+    private static final int dataVersion = 1;
 
-			private void writeObject(ObjectOutputStream out) throws IOException {
-				out.writeInt(dataVersion);
-				out.writeObject(searchString);
-				out.writeObject(searchRoot);
-			}
+    private String searchString = "nicolas";
+    private TermEntry searchRoot = null;
 
-			private void readObject(ObjectInputStream in) throws IOException,
-					ClassNotFoundException {
-				int objDataVersion = in.readInt();
-				if (objDataVersion == dataVersion) {
-					searchString = (String) in.readObject();
-					searchRoot = (TermEntry) in.readObject();
-				} else {
-					throw new IOException("Can't handle dataversion: " + objDataVersion);
-				}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(searchString);
+        out.writeObject(searchRoot);
+    }
 
-			}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            searchString = (String) in.readObject();
+            searchRoot = (TermEntry) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-			public void complete(I_EncodeBusinessProcess process, I_Work worker)
-					throws TaskFailedException {
-				// Nothing to do...
+    }
 
-			}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
-			public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-					throws TaskFailedException {
-				try {
-					I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-						.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-					if (searchRoot == null) {
-						config.performLuceneSearch(searchString, new ArrayList<I_TestSearchResults>());
-					} else {
-						I_GetConceptData searchRootConcept = LocalVersionedTerminology.get().getConcept(searchRoot.ids);
-						config.performLuceneSearch(searchString, searchRootConcept);
-					}
-									
-					return Condition.CONTINUE;
-				} catch (IllegalArgumentException e) {
-					throw new TaskFailedException(e);
-				} catch (TerminologyException e) {
-					throw new TaskFailedException(e);
-				} catch (IOException e) {
-					throw new TaskFailedException(e);
-				}
-			}
+    }
 
-			public Collection<Condition> getConditions() {
-				return CONTINUE_CONDITION;
-			}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            if (searchRoot == null) {
+                config.performLuceneSearch(searchString, new ArrayList<I_TestSearchResults>());
+            } else {
+                I_GetConceptData searchRootConcept = LocalVersionedTerminology.get().getConcept(searchRoot.ids);
+                config.performLuceneSearch(searchString, searchRootConcept);
+            }
 
-			public int[] getDataContainerIds() {
-				return new int[] {};
-			}
+            return Condition.CONTINUE;
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-			public TermEntry getSearchRoot() {
-				return searchRoot;
-			}
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-			public void setSearchRoot(TermEntry searchRoot) {
-				this.searchRoot = searchRoot;
-			}
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-			public String getSearchString() {
-				return searchString;
-			}
+    public TermEntry getSearchRoot() {
+        return searchRoot;
+    }
 
-			public void setSearchString(String searchString) {
-				this.searchString = searchString;
-			}
+    public void setSearchRoot(TermEntry searchRoot) {
+        this.searchRoot = searchRoot;
+    }
 
+    public String getSearchString() {
+        return searchString;
+    }
+
+    public void setSearchString(String searchString) {
+        this.searchString = searchString;
+    }
 
 }

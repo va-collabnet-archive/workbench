@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,9 +27,12 @@ import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.plaf.basic.ComboPopup;
 
 /**
- * This class extends JComboBox by allowing the popup size to be configured dynamically. By default the width of the
- * popup is the same size as the JComboBox. However, in this implementation the width of the popup is calculated based
- * on the combo box contents - the width is set to that of the largest item contained in the drop-down list.
+ * This class extends JComboBox by allowing the popup size to be configured
+ * dynamically. By default the width of the
+ * popup is the same size as the JComboBox. However, in this implementation the
+ * width of the popup is calculated based
+ * on the combo box contents - the width is set to that of the largest item
+ * contained in the drop-down list.
  * Based on code : http://forums.sun.com/thread.jspa?threadID=5386868
  * 
  * @author Christine Hill
@@ -64,14 +67,11 @@ public class DynamicWidthComboBox extends JComboBox {
                     }
 
                     Dimension popupSize = comboBox.getSize();
-                    popupSize
-                        .setSize(widestWidth + (2 * padding),
-                            getPopupHeightForRowCount(comboBox
-                                .getMaximumRowCount()));
+                    popupSize.setSize(widestWidth + (2 * padding),
+                        getPopupHeightForRowCount(comboBox.getMaximumRowCount()));
 
-                    Rectangle popupBounds =
-                            computePopupBounds(0, comboBox.getBounds().height,
-                                popupSize.width, popupSize.height);
+                    Rectangle popupBounds = computePopupBounds(0, comboBox.getBounds().height, popupSize.width,
+                        popupSize.height);
 
                     scroller.setMaximumSize(popupBounds.getSize());
                     scroller.setPreferredSize(popupBounds.getSize());
@@ -87,8 +87,7 @@ public class DynamicWidthComboBox extends JComboBox {
                     }
 
                     list.ensureIndexIsVisible(list.getSelectedIndex());
-                    setLightWeightPopupEnabled(comboBox
-                        .isLightWeightPopupEnabled());
+                    setLightWeightPopupEnabled(comboBox.isLightWeightPopupEnabled());
                     show(comboBox, popupBounds.x, popupBounds.y);
                 }
             };

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,10 +38,8 @@ public final class RefsetWriterImpl implements RefsetWriter {
     private final WriterFactory writerFactory;
     private DescriptionSelector descSelector;
 
-    public RefsetWriterImpl(
-            final RefsetWriterParameterObject refsetWriterParameterObject,
-            final CommonAPIParameterObject commonAPIParameterObject,
-            DescriptionSelector descSelector) {
+    public RefsetWriterImpl(final RefsetWriterParameterObject refsetWriterParameterObject,
+            final CommonAPIParameterObject commonAPIParameterObject, DescriptionSelector descSelector) {
         refsetUtil = commonAPIParameterObject.getRefsetUtil();
         termFactory = commonAPIParameterObject.getTermFactory();
         logger = commonAPIParameterObject.getLogger();
@@ -54,21 +52,21 @@ public final class RefsetWriterImpl implements RefsetWriter {
 
     public void write(final I_ThinExtByRefVersioned refset) throws Exception {
         try {
-            List<I_DescriptionTuple> refsetDescriptionsList =
-                    refsetUtil.getFSNDescriptionsForConceptHavingCurrentStatus(termFactory, refset.getRefsetId());
+            List<I_DescriptionTuple> refsetDescriptionsList = refsetUtil.getFSNDescriptionsForConceptHavingCurrentStatus(
+                termFactory, refset.getRefsetId());
 
             int componentId = refset.getComponentId();
             I_GetConceptData concept = termFactory.getConcept(componentId);
             I_DescriptionTuple refsetNameDescription = refsetUtil.assertExactlyOne(refsetDescriptionsList);
-            List<I_DescriptionTuple> descriptionTuples =
-                    refsetUtil.getPTDescriptionsForConceptHavingCurrentStatus(termFactory, componentId);
+            List<I_DescriptionTuple> descriptionTuples = refsetUtil.getPTDescriptionsForConceptHavingCurrentStatus(
+                termFactory, componentId);
 
             if (descSelector != null) {
-            	I_DescriptionTuple preferredDesc = descSelector.getPreferred(descriptionTuples);
-            	descriptionTuples.clear();
-            	descriptionTuples.add(preferredDesc);
+                I_DescriptionTuple preferredDesc = descSelector.getPreferred(descriptionTuples);
+                descriptionTuples.clear();
+                descriptionTuples.add(preferredDesc);
             }
-            
+
             String refsetName = refsetNameDescription.getText();
             progressLogger.logProgress(refsetName);
 

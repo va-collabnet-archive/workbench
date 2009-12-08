@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,8 +63,7 @@ public class ChooseTxtFileTask extends AbstractTask {
     /**
      * The key used by file attachment.
      */
-    private String fileKey = ProcessAttachmentKeys.DEFAULT_FILE
-            .getAttachmentKey();
+    private String fileKey = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
 
     private String message = "Please select a file";
 
@@ -83,8 +82,7 @@ public class ChooseTxtFileTask extends AbstractTask {
         out.writeObject(message);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             fileName = (String) in.readObject();
@@ -95,21 +93,18 @@ public class ChooseTxtFileTask extends AbstractTask {
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
 
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileChooser.setDialogTitle(message);
             fileChooser.setFileFilter(new TxtFileFilter());
-            int returnValue = fileChooser
-                    .showDialog(new Frame(), "Choose file");
+            int returnValue = fileChooser.showDialog(new Frame(), "Choose file");
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 fileName = fileChooser.getSelectedFile().getPath();
                 System.out.println(fileName);
@@ -137,8 +132,7 @@ public class ChooseTxtFileTask extends AbstractTask {
     private class TxtFileFilter extends FileFilter {
         @Override
         public boolean accept(File arg0) {
-            return arg0.isDirectory()
-                    || arg0.getName().toLowerCase().endsWith(".txt");
+            return arg0.isDirectory() || arg0.getName().toLowerCase().endsWith(".txt");
         }
 
         @Override

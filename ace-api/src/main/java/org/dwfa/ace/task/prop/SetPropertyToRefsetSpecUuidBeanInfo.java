@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,14 +34,11 @@ public class SetPropertyToRefsetSpecUuidBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor propName =
-                    new PropertyDescriptor("propName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor propName = new PropertyDescriptor("propName", getBeanDescriptor().getBeanClass());
             propName.setBound(true);
             propName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             propName.setDisplayName("<html><font color='green'>Uuid property:");
-            propName
-                .setShortDescription("Name of the property containing the concept uuid. ");
+            propName.setShortDescription("Name of the property containing the concept uuid. ");
 
             PropertyDescriptor rv[] = { propName };
             return rv;
@@ -54,10 +51,8 @@ public class SetPropertyToRefsetSpecUuidBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(SetPropertyToRefsetSpecUuid.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set Property<br>to refset spec UUID");
+        BeanDescriptor bd = new BeanDescriptor(SetPropertyToRefsetSpecUuid.class);
+        bd.setDisplayName("<html><font color='green'><center>Set Property<br>to refset spec UUID");
         return bd;
     }
 

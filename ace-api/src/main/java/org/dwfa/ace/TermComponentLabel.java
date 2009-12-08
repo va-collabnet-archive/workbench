@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,8 +65,7 @@ import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
-public class TermComponentLabel extends JLabel implements FocusListener,
-        I_ContainTermComponent, ClipboardOwner {
+public class TermComponentLabel extends JLabel implements FocusListener, I_ContainTermComponent, ClipboardOwner {
 
     private I_AmTermComponent termComponent;
 
@@ -115,67 +114,61 @@ public class TermComponentLabel extends JLabel implements FocusListener,
         private static final long serialVersionUID = 1L;
 
         public void actionPerformed(ActionEvent e) {
-			try {
-			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			StringBuffer buff = new StringBuffer();
-			buff.append("<concept>\n");
-			if (getTermComponent() == null) {
-				
-			} else {
-				I_TermFactory tf = LocalVersionedTerminology.get();
-				I_GetConceptData concept = (I_GetConceptData) getTermComponent();
-				buff.append("  <concept-ids>\n");
-				for (I_IdTuple idt: concept.getId().getTuples()) {
-					writeIdentifiersToBuff("    ", buff, idt);
-				}
-				buff.append("  </concept-ids>\n");
-				buff.append("  <descriptions>\n");
-				for (I_DescriptionTuple dt: concept.getDescriptionTuples(config.getAllowedStatus(), 
-						null, config.getViewPositionSet())) {
-					buff.append("    <description type='"); 
-					I_GetConceptData type = tf.getConcept(dt.getTypeId());
-					
-					I_DescriptionTuple typeDesc = type.getDescTuple(config.getLongLabelDescPreferenceList(), 
-							config.getLanguagePreferenceList(),
-							config.getAllowedStatus(), config.getViewPositionSet(), config.getLanguageSortPref());
-					buff.append(typeDesc.getText()); 
-					buff.append("'\n                 text='"); 
-					buff.append(dt.getText());
-					buff.append("'>\n");
-					for (I_IdTuple idt: tf.getId(dt.getDescId()).getTuples()) {
-						writeIdentifiersToBuff("      ", buff, idt);
-					}
-					buff.append("    </description>\n");
-				}
-				buff.append("  </descriptions>\n");
-			}
-			buff.append("</concept>\n");
-			StringSelection transferable = new StringSelection(buff.toString());
-			
-			clipboard.setContents(transferable, TermComponentLabel.this);
-			} catch (Exception ex) {
-				AceLog.getAppLog().alertAndLogException(ex);
-			}
-		}
+            try {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringBuffer buff = new StringBuffer();
+                buff.append("<concept>\n");
+                if (getTermComponent() == null) {
 
-        private void writeIdentifiersToBuff(String indent, StringBuffer buff,
-                I_IdTuple idt) throws IOException {
+                } else {
+                    I_TermFactory tf = LocalVersionedTerminology.get();
+                    I_GetConceptData concept = (I_GetConceptData) getTermComponent();
+                    buff.append("  <concept-ids>\n");
+                    for (I_IdTuple idt : concept.getId().getTuples()) {
+                        writeIdentifiersToBuff("    ", buff, idt);
+                    }
+                    buff.append("  </concept-ids>\n");
+                    buff.append("  <descriptions>\n");
+                    for (I_DescriptionTuple dt : concept.getDescriptionTuples(config.getAllowedStatus(), null,
+                        config.getViewPositionSet())) {
+                        buff.append("    <description type='");
+                        I_GetConceptData type = tf.getConcept(dt.getTypeId());
+
+                        I_DescriptionTuple typeDesc = type.getDescTuple(config.getLongLabelDescPreferenceList(),
+                            config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSet(),
+                            config.getLanguageSortPref());
+                        buff.append(typeDesc.getText());
+                        buff.append("'\n                 text='");
+                        buff.append(dt.getText());
+                        buff.append("'>\n");
+                        for (I_IdTuple idt : tf.getId(dt.getDescId()).getTuples()) {
+                            writeIdentifiersToBuff("      ", buff, idt);
+                        }
+                        buff.append("    </description>\n");
+                    }
+                    buff.append("  </descriptions>\n");
+                }
+                buff.append("</concept>\n");
+                StringSelection transferable = new StringSelection(buff.toString());
+
+                clipboard.setContents(transferable, TermComponentLabel.this);
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+
+        private void writeIdentifiersToBuff(String indent, StringBuffer buff, I_IdTuple idt) throws IOException {
             buff.append(indent);
             buff.append("<id source='");
             I_GetConceptData source;
             try {
-                source =
-                        LocalVersionedTerminology.get().getConcept(
-                            idt.getSource());
+                source = LocalVersionedTerminology.get().getConcept(idt.getSource());
             } catch (TerminologyException e) {
                 throw new IOException(e);
             }
-            I_DescriptionTuple sourceDesc =
-                    source.getDescTuple(
-                        config.getLongLabelDescPreferenceList(), config
-                            .getLanguagePreferenceList(), config
-                            .getAllowedStatus(), config.getViewPositionSet(),
-                        config.getLanguageSortPref());
+            I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(),
+                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSet(),
+                config.getLanguageSortPref());
             buff.append(sourceDesc.getText());
             buff.append("' value='");
             buff.append(idt.getSourceId().toString());
@@ -191,43 +184,37 @@ public class TermComponentLabel extends JLabel implements FocusListener,
         private static final long serialVersionUID = 1L;
 
         public void actionPerformed(ActionEvent e) {
-			try {
-			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			StringBuffer buff = new StringBuffer();
-			if (getTermComponent() == null) {
-				
-			} else {
-				I_GetConceptData concept = (I_GetConceptData) getTermComponent();
-				buff.append("cid source\tcid\tdesc\n");
-				I_DescriptionTuple dt = concept.getDescTuple(config.getLongLabelDescPreferenceList(), config);
-				for (I_IdTuple idt: concept.getId().getTuples()) {
-					writeIdentifiersToBuff(buff, idt, dt.getText());
-				}
-			}
-			StringSelection transferable = new StringSelection(buff.toString());
-			
-			clipboard.setContents(transferable, TermComponentLabel.this);
-			} catch (Exception ex) {
-				AceLog.getAppLog().alertAndLogException(ex);
-			}
-		}
+            try {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringBuffer buff = new StringBuffer();
+                if (getTermComponent() == null) {
 
-        private void writeIdentifiersToBuff(StringBuffer buff, I_IdTuple idt,
-                String text) throws IOException {
+                } else {
+                    I_GetConceptData concept = (I_GetConceptData) getTermComponent();
+                    buff.append("cid source\tcid\tdesc\n");
+                    I_DescriptionTuple dt = concept.getDescTuple(config.getLongLabelDescPreferenceList(), config);
+                    for (I_IdTuple idt : concept.getId().getTuples()) {
+                        writeIdentifiersToBuff(buff, idt, dt.getText());
+                    }
+                }
+                StringSelection transferable = new StringSelection(buff.toString());
+
+                clipboard.setContents(transferable, TermComponentLabel.this);
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+
+        private void writeIdentifiersToBuff(StringBuffer buff, I_IdTuple idt, String text) throws IOException {
             I_GetConceptData source;
             try {
-                source =
-                        LocalVersionedTerminology.get().getConcept(
-                            idt.getSource());
+                source = LocalVersionedTerminology.get().getConcept(idt.getSource());
             } catch (TerminologyException e) {
                 throw new IOException(e);
             }
-            I_DescriptionTuple sourceDesc =
-                    source.getDescTuple(
-                        config.getLongLabelDescPreferenceList(), config
-                            .getLanguagePreferenceList(), config
-                            .getAllowedStatus(), config.getViewPositionSet(),
-                        config.getLanguageSortPref());
+            I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(),
+                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSet(),
+                config.getLanguageSortPref());
             buff.append(sourceDesc.getText());
             buff.append("\t");
             buff.append(idt.getSourceId().toString());
@@ -249,8 +236,8 @@ public class TermComponentLabel extends JLabel implements FocusListener,
         public void dragGestureRecognized(DragGestureEvent dge) {
             Image dragImage = getDragImage();
             Point imageOffset = new Point(0, 0);
-            dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset,
-                new ConceptTransferable((I_GetConceptData) termComponent), dsl);
+            dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
+                (I_GetConceptData) termComponent), dsl);
         }
     }
 
@@ -267,14 +254,9 @@ public class TermComponentLabel extends JLabel implements FocusListener,
         super("<html><font color=red>Empty");
         this.config = config;
         addFocusListener(this);
-        setTransferHandler(LocalVersionedTerminology.get()
-            .makeTerminologyTransferHandler(this));
-        DragSource.getDefaultDragSource()
-            .createDefaultDragGestureRecognizer(
-                this,
-                DnDConstants.ACTION_COPY,
-                new DragGestureListenerWithImage(
-                    new TermLabelDragSourceListener()));
+        setTransferHandler(LocalVersionedTerminology.get().makeTerminologyTransferHandler(this));
+        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
+            new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
 
         setFocusable(true);
         setEnabled(true);
@@ -307,27 +289,20 @@ public class TermComponentLabel extends JLabel implements FocusListener,
         });
 
         ActionMap map = this.getActionMap();
-        map.put(TransferHandler.getCutAction().getValue(Action.NAME),
-            TransferHandler.getCutAction());
-        map.put(TransferHandler.getCopyAction().getValue(Action.NAME),
-            TransferHandler.getCopyAction());
-        map.put(TransferHandler.getPasteAction().getValue(Action.NAME),
-            TransferHandler.getPasteAction());
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
-            "deleteTask");
-        this.getInputMap().put(
-            KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
+        map.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
+        map.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
+        map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
         map.put("deleteTask", new DeleteAction());
         map.put("Copy TDT", new CopyTDT());
         map.put("Copy XML", new CopyXML());
         setBorder(noFocusBorder);
     }
 
-    private static final Border hasFocusBorder =
-            UIManager.getBorder("List.focusCellHighlightBorder");
+    private static final Border hasFocusBorder = UIManager.getBorder("List.focusCellHighlightBorder");
 
-    private static final Border noFocusBorder =
-            BorderFactory.createEmptyBorder(1, 1, 1, 1);
+    private static final Border noFocusBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
 
     public void focusGained(FocusEvent e) {
         setBorder(hasFocusBorder);
@@ -338,7 +313,9 @@ public class TermComponentLabel extends JLabel implements FocusListener,
         setBorder(noFocusBorder);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.I_ContainTermComponent#getTermComponent()
      */
     public I_AmTermComponent getTermComponent() {
@@ -347,8 +324,12 @@ public class TermComponentLabel extends JLabel implements FocusListener,
 
     private boolean frozen = false;
 
-    /* (non-Javadoc)
-     * @see org.dwfa.ace.I_ContainTermComponent#setTermComponent(org.dwfa.vodb.types.I_AmTermComponent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.I_ContainTermComponent#setTermComponent(org.dwfa.vodb.types
+     * .I_AmTermComponent)
      */
     public void setTermComponent(I_AmTermComponent termComponent) {
         if (isFrozen()) {
@@ -357,13 +338,10 @@ public class TermComponentLabel extends JLabel implements FocusListener,
         Object old = this.termComponent;
         this.termComponent = termComponent;
         if (termComponent != null) {
-            if (I_GetConceptData.class.isAssignableFrom(termComponent
-                .getClass())) {
+            if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
                 I_GetConceptData cb = (I_GetConceptData) termComponent;
                 try {
-                    I_DescriptionTuple desc =
-                            cb.getDescTuple(config
-                                .getLongLabelDescPreferenceList(), config);
+                    I_DescriptionTuple desc = cb.getDescTuple(config.getLongLabelDescPreferenceList(), config);
                     if (desc != null) {
                         this.setText(desc.getText());
                     } else {
@@ -403,16 +381,13 @@ public class TermComponentLabel extends JLabel implements FocusListener,
     public Image getDragImage() {
         JLabel dragLabel = TermLabelMaker.makeLabel(getText());
         dragLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        Image dragImage =
-                createImage(dragLabel.getWidth(), dragLabel.getHeight());
+        Image dragImage = createImage(dragLabel.getWidth(), dragLabel.getHeight());
         dragLabel.setVisible(true);
         Graphics og = dragImage.getGraphics();
         og.setClip(dragLabel.getBounds());
         dragLabel.paint(og);
         og.dispose();
-        FilteredImageSource fis =
-                new FilteredImageSource(dragImage.getSource(), TermLabelMaker
-                    .getTransparentFilter());
+        FilteredImageSource fis = new FilteredImageSource(dragImage.getSource(), TermLabelMaker.getTransparentFilter());
         dragImage = Toolkit.getDefaultToolkit().createImage(fis);
         return dragImage;
     }

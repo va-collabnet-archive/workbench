@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,14 +47,14 @@ public class SnoDLSet {
     public static void moveDL(int indexA, int direction) {
         int max = dlList.size();
         int indexB = indexA + direction;
-        
+
         if (indexB >= 0 && indexB < max) {
             SnoDL tmp = dlList.get(indexA);
             dlList.set(indexA, dlList.get(indexB)); // move B to A
             dlList.set(indexB, tmp); // move A to B
         }
     }
-    
+
     public static void duplicateDL(int index) {
         dlList.add(new SnoDL(dlList.get(index)));
     }
@@ -62,7 +62,7 @@ public class SnoDLSet {
     public static ArrayList<SnoDL> getDLList() {
         return dlList;
     }
-    
+
     public static void setDLList(ArrayList<SnoDL> dll) {
         dlList = dll;
     }

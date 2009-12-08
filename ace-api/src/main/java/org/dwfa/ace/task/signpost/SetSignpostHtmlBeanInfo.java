@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,15 +27,11 @@ public class SetSignpostHtmlBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor htmlPropName =
-                    new PropertyDescriptor("htmlPropName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor htmlPropName = new PropertyDescriptor("htmlPropName", getBeanDescriptor().getBeanClass());
             htmlPropName.setBound(true);
             htmlPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            htmlPropName
-                .setDisplayName("<html><font color='green'>Set signpost html");
-            htmlPropName
-                .setShortDescription("Set the signpost html to value contained in this property.");
+            htmlPropName.setDisplayName("<html><font color='green'>Set signpost html");
+            htmlPropName.setShortDescription("Set the signpost html to value contained in this property.");
 
             PropertyDescriptor rv[] = { htmlPropName };
             return rv;
@@ -49,8 +45,7 @@ public class SetSignpostHtmlBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetSignpostHtml.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set Signpost html");
+        bd.setDisplayName("<html><font color='green'><center>Set Signpost html");
         return bd;
     }
 

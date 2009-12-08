@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -86,16 +86,16 @@ public class SaveProfile extends AbstractTask {
             I_ConfigAceDb aceConfig = termFactory.newAceDbConfig();
             String username = (String) process.readProperty(usernamePropName);
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-	          if (profile == null) {
-	        	  profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-	          }
+            if (profile == null) {
+                profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            }
             aceConfig.getAceFrames().add(profile);
             File userDir = new File("profiles" + File.separator + "users" + File.separator + username);
             File changeSetRoot = new File(userDir, "changesets");
             changeSetRoot.mkdirs();
             aceConfig.setChangeSetRoot(changeSetRoot);
             aceConfig.setChangeSetWriterFileName(username + ".#0#" + UUID.randomUUID().toString() + ".jcs");
-            
+
             File profileFile = new File(userDir, username + ".ace");
             profileFile.getParentFile().mkdirs();
             FileOutputStream fos = new FileOutputStream(profileFile);
@@ -106,10 +106,10 @@ public class SaveProfile extends AbstractTask {
 
             File startupFolder = new File(userDir, "startup");
             startupFolder.mkdirs();
-            
+
             File shutdownFolder = new File(userDir, "shutdown");
             shutdownFolder.mkdirs();
-         
+
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);

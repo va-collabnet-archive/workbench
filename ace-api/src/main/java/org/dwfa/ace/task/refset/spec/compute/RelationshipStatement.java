@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -127,8 +127,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
         switch (tokenEnum) {
         case REL_IS_MEMBER_OF:
-            List<I_ThinExtByRefVersioned> refsetExtensions =
-                    termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
+            List<I_ThinExtByRefVersioned> refsetExtensions = termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ThinExtByRefVersioned ext : refsetExtensions) {
                 refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
@@ -200,8 +199,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-        Set<I_GetConceptData> children =
-                ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<I_GetConceptData> children = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes,
+            null, true, true);
 
         for (I_GetConceptData child : children) {
             if (relRefinabilityIs(child, relTuple)) {
@@ -256,8 +255,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-        Set<I_GetConceptData> children =
-                ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<I_GetConceptData> children = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes,
+            null, true, true);
 
         for (I_GetConceptData child : children) {
             if (relCharIs(child, relTuple)) {
@@ -311,8 +310,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-        Set<I_GetConceptData> children =
-                ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<I_GetConceptData> children = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes,
+            null, true, true);
 
         for (I_GetConceptData child : children) {
             if (relTypeIs(child, relTuple)) {
@@ -371,8 +370,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-        Set<I_GetConceptData> children =
-                ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<I_GetConceptData> children = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes,
+            null, true, true);
 
         for (I_GetConceptData child : children) {
             if (relStatusIs(child, relTuple)) {
@@ -405,7 +404,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relRestrictionIs(I_RelTuple relTuple) throws IOException, TerminologyException {
-        throw new TerminologyException("Unimplemented query : rel restriction is"); // unimplemented TODO
+        throw new TerminologyException("Unimplemented query : rel restriction is"); // unimplemented
+        // TODO
     }
 
     private boolean relLogicalQuantifierIsDescendentOf(I_RelTuple relTuple) throws TerminologyException {

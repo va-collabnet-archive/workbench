@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,8 +44,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         this.refsetId = refsetId;
         this.memberTypeId = memberTypeId;
         this.refsetHelper = new RefsetHelper(termFactory);
-        this.parentMemberTypeId =
-                termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids()).getConceptId();
+        this.parentMemberTypeId = termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids())
+            .getConceptId();
         this.parentRefsetId = getParentRefset();
     }
 
@@ -64,8 +64,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
     }
 
     public void removeParentMembers(Integer... conceptIds) throws Exception {
-        Condition[] traversingConditions =
-                new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
+        Condition[] traversingConditions = new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId),
+                                                            new NotAlreadyVisited() };
 
         // Get all ancestors
         Set<Integer> toBeRetired = new HashSet<Integer>();
@@ -92,8 +92,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         }
 
         // Reset memory of visited concepts
-        traversingConditions =
-                new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
+        traversingConditions = new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId),
+                                                new NotAlreadyVisited() };
 
         // Find all ancestors of the lineages not to be modified
         Set<Integer> ancestorIdsToExclude = new HashSet<Integer>();
@@ -127,8 +127,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         I_IntSet allowedType = termFactory.newIntSet();
         allowedType.add(termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptId());
 
-        Set<I_GetConceptData> targetParentRefsets =
-                memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType, null, false, true);
+        Set<I_GetConceptData> targetParentRefsets = memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType,
+            null, false, true);
 
         if (targetParentRefsets == null || targetParentRefsets.size() == 0) {
             throw new TerminologyException("Unable to locate parent member refset for '"
@@ -155,8 +155,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
                 isATypes.add(termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids())
                     .getConceptId());
                 I_GetConceptData memberRefset = termFactory.getConcept(this.refsetId);
-                Set<I_GetConceptData> requiredIsAType =
-                        memberRefset.getSourceRelTargets(getAllowedStatuses(), isATypes, null, false, true);
+                Set<I_GetConceptData> requiredIsAType = memberRefset.getSourceRelTargets(getAllowedStatuses(),
+                    isATypes, null, false, true);
 
                 if (requiredIsAType != null && requiredIsAType.size() > 0) {
                     // relationship exists so use the is-a specified by the

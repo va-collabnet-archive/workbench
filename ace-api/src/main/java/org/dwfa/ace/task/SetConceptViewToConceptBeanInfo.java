@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,24 +35,17 @@ public class SetConceptViewToConceptBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor propName =
-                    new PropertyDescriptor("propName",
-                        SetConceptViewToConcept.class);
+            PropertyDescriptor propName = new PropertyDescriptor("propName", SetConceptViewToConcept.class);
             propName.setBound(true);
             propName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            propName
-                .setDisplayName("<html><font color='green'>Concept property:");
-            propName
-                .setShortDescription("Name of the property containing the concept. ");
+            propName.setDisplayName("<html><font color='green'>Concept property:");
+            propName.setShortDescription("Name of the property containing the concept. ");
 
-            PropertyDescriptor hostIndex =
-                    new PropertyDescriptor("hostIndex",
-                        SetConceptViewToConcept.class);
+            PropertyDescriptor hostIndex = new PropertyDescriptor("hostIndex", SetConceptViewToConcept.class);
             hostIndex.setBound(true);
             hostIndex.setPropertyEditorClass(IncrementEditor.class);
             hostIndex.setDisplayName("<html><font color='green'>Concept tab:");
-            hostIndex
-                .setShortDescription("Index of the concept tab to put the concept into. ");
+            hostIndex.setShortDescription("Index of the concept tab to put the concept into. ");
 
             PropertyDescriptor rv[] = { propName, hostIndex };
             return rv;
@@ -66,8 +59,7 @@ public class SetConceptViewToConceptBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetConceptViewToConcept.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set Concept View<br>to Concept");
+        bd.setDisplayName("<html><font color='green'><center>Set Concept View<br>to Concept");
         return bd;
     }
 

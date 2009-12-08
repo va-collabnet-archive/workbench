@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info for CopyHtmlFileToProperty class.
+ * 
  * @author Susan Castillo
- *
+ * 
  */
 public class CopyHtmlFileToPropertyBeanInfo extends SimpleBeanInfo {
 
@@ -36,28 +37,21 @@ public class CopyHtmlFileToPropertyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor detailHtmlFileNameProp =
-                    new PropertyDescriptor("detailHtmlFileNameProp",
-                        CopyHtmlFileToProperty.class);
+            PropertyDescriptor detailHtmlFileNameProp = new PropertyDescriptor("detailHtmlFileNameProp",
+                CopyHtmlFileToProperty.class);
             detailHtmlFileNameProp.setBound(true);
-            detailHtmlFileNameProp
-                .setDisplayName("<html><font color='green'>Html File Name:");
+            detailHtmlFileNameProp.setDisplayName("<html><font color='green'>Html File Name:");
             detailHtmlFileNameProp.setShortDescription("File Name");
-            detailHtmlFileNameProp
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
+            detailHtmlFileNameProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
 
-            PropertyDescriptor htmlDataPropName =
-                    new PropertyDescriptor("htmlDataPropName",
-                        CopyHtmlFileToProperty.class);
+            PropertyDescriptor htmlDataPropName = new PropertyDescriptor("htmlDataPropName",
+                CopyHtmlFileToProperty.class);
             htmlDataPropName.setBound(true);
-            htmlDataPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            htmlDataPropName
-                .setDisplayName("<html><font color='green'>Html data key:");
+            htmlDataPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            htmlDataPropName.setDisplayName("<html><font color='green'>Html data key:");
             htmlDataPropName.setShortDescription("Html data key.");
 
-            PropertyDescriptor rv[] =
-                    { detailHtmlFileNameProp, htmlDataPropName };
+            PropertyDescriptor rv[] = { detailHtmlFileNameProp, htmlDataPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -69,8 +63,7 @@ public class CopyHtmlFileToPropertyBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(CopyHtmlFileToProperty.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Copy Html File<br>to Property");
+        bd.setDisplayName("<html><font color='green'><center>Copy Html File<br>to Property");
         return bd;
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,25 +28,18 @@ public class ChangeConceptStatusBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor newStatus =
-                    new PropertyDescriptor("newStatus", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor newStatus = new PropertyDescriptor("newStatus", getBeanDescriptor().getBeanClass());
             newStatus.setBound(true);
             newStatus.setPropertyEditorClass(ConceptLabelPropEditor.class);
             newStatus.setDisplayName("New status:");
-            newStatus
-                .setShortDescription("The new status value for the concept.");
+            newStatus.setShortDescription("The new status value for the concept.");
 
-            PropertyDescriptor activeConceptPropName =
-                    new PropertyDescriptor("activeConceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor activeConceptPropName = new PropertyDescriptor("activeConceptPropName",
+                getBeanDescriptor().getBeanClass());
             activeConceptPropName.setBound(true);
-            activeConceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            activeConceptPropName
-                .setDisplayName("<html><font color='green'>Concept property:");
-            activeConceptPropName
-                .setShortDescription("Name of the property containing the concept to change the status of. ");
+            activeConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            activeConceptPropName.setDisplayName("<html><font color='green'>Concept property:");
+            activeConceptPropName.setShortDescription("Name of the property containing the concept to change the status of. ");
 
             PropertyDescriptor rv[] = { newStatus, activeConceptPropName };
             return rv;
@@ -60,8 +53,7 @@ public class ChangeConceptStatusBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ChangeConceptStatus.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Change Concept Status");
+        bd.setDisplayName("<html><font color='green'><center>Change Concept Status");
         return bd;
     }
 }

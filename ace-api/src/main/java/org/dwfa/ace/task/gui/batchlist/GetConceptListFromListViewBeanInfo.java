@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,16 +29,12 @@ public class GetConceptListFromListViewBeanInfo extends SimpleBeanInfo {
 
         try {
 
-            PropertyDescriptor conceptListPropName =
-                    new PropertyDescriptor("conceptListPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptListPropName = new PropertyDescriptor("conceptListPropName",
+                getBeanDescriptor().getBeanClass());
             conceptListPropName.setBound(true);
-            conceptListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptListPropName
-                .setDisplayName("<html><font color='green'>Concept list property:");
-            conceptListPropName
-                .setShortDescription("The property set to the concept list rom the list view.");
+            conceptListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptListPropName.setDisplayName("<html><font color='green'>Concept list property:");
+            conceptListPropName.setShortDescription("The property set to the concept list rom the list view.");
 
             PropertyDescriptor rv[] = { conceptListPropName };
             return rv;
@@ -51,10 +47,8 @@ public class GetConceptListFromListViewBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(GetConceptListFromListView.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Get Concept List<br>from List View");
+        BeanDescriptor bd = new BeanDescriptor(GetConceptListFromListView.class);
+        bd.setDisplayName("<html><font color='green'><center>Get Concept List<br>from List View");
         return bd;
     }
 
