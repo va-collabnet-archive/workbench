@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,17 +44,16 @@ import net.jini.config.ConfigurationException;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.util.OpenFramesWindowListener;
 
-public class JavaBrowser extends ComponentFrame implements HyperlinkListener,
-        ActionListener {
+public class JavaBrowser extends ComponentFrame implements HyperlinkListener, ActionListener {
 
     /**
      * http://today.java.net/pub/a/today/2004/05/24/html-pt1.html
      * http://today.java.net/pub/a/today/2004/06/14/html-pt2.html
-     * Other options to consider: 
-     *  http://jrex.mozdev.org/docs.html
-     *  https://jdic.dev.java.net/
-     *  http://sourceforge.net/projects/jxwb/
-     *  http://multivalent.sourceforge.net/
+     * Other options to consider:
+     * http://jrex.mozdev.org/docs.html
+     * https://jdic.dev.java.net/
+     * http://sourceforge.net/projects/jxwb/
+     * http://multivalent.sourceforge.net/
      */
     private static final long serialVersionUID = 1L;
 
@@ -92,7 +91,7 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener,
 
         browser.addHyperlinkListener(this);
 
-        //Put the address text filed and button on the north of frame
+        // Put the address text filed and button on the north of frame
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.add(addrLabel);
@@ -110,8 +109,7 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener,
 
         // Add the panel to the north
         cp.add(panel, "North");
-        cp.add(new JScrollPane(browser, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-            JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+        cp.add(new JScrollPane(browser, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.addWindowListener(new OpenFramesWindowListener(this, this.cfb));
         this.setBounds(getDefaultFrameSize());
@@ -146,8 +144,7 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener,
                     browser.setPage(page);
                 } catch (Exception e1) {
                     // Not a valid URL
-                    browser.setText("Could not load page:" + page + "\n"
-                        + "Error:" + e1.getMessage());
+                    browser.setText("Could not load page:" + page + "\n" + "Error:" + e1.getMessage());
                 }
             } else {
                 // Maybe user specified a URL
@@ -156,8 +153,7 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener,
                     browser.setPage(url);
                 } catch (Exception e) {
                     // Not a valid URL
-                    browser.setText("Could not load page:" + page + "\n"
-                        + "Error:" + e.getMessage());
+                    browser.setText("Could not load page:" + page + "\n" + "Error:" + e.getMessage());
                 }
 
             }
@@ -224,13 +220,12 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener,
             // them
             displayPage(page);
         } catch (Exception exc) {
-            browser.setText("Page could not be loaded:" + page + "\n"
-                + "Error:" + exc.getMessage());
+            browser.setText("Page could not be loaded:" + page + "\n" + "Error:" + exc.getMessage());
         }
     }
 
     /**
-     * @throws ConfigurationException 
+     * @throws ConfigurationException
      * @see org.dwfa.bpa.util.ComponentFrame#getNextFrameName()
      */
     public String getNextFrameName() throws ConfigurationException {

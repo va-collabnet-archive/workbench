@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,30 +52,33 @@ import javax.swing.table.TableModel;
  * getValueAt(row, col)) they are passed to the underlying model after the row
  * numbers have been translated via the internal mapping array. This way, the
  * TableSorter appears to hold another copy of the table with the rows in a
- * different order. <p/> TableSorter registers itself as a listener to the
- * underlying model, just as the JTable itself would. Events recieved from the
- * model are examined, sometimes manipulated (typically widened), and then
- * passed on to the TableSorter's listeners (typically the JTable). If a change
- * to the model has invalidated the order of TableSorter's rows, a note of this
- * is made and the sorter will resort the rows the next time a value is
- * requested. <p/> When the tableHeader property is set, either by using the
- * setTableHeader() method or the two argument constructor, the table header may
- * be used as a complete UI for TableSorter. The default renderer of the
- * tableHeader is decorated with a renderer that indicates the sorting status of
- * each column. In addition, a mouse listener is installed with the following
- * behavior:
+ * different order.
+ * <p/>
+ * TableSorter registers itself as a listener to the underlying model, just as
+ * the JTable itself would. Events recieved from the model are examined,
+ * sometimes manipulated (typically widened), and then passed on to the
+ * TableSorter's listeners (typically the JTable). If a change to the model has
+ * invalidated the order of TableSorter's rows, a note of this is made and the
+ * sorter will resort the rows the next time a value is requested.
+ * <p/>
+ * When the tableHeader property is set, either by using the setTableHeader()
+ * method or the two argument constructor, the table header may be used as a
+ * complete UI for TableSorter. The default renderer of the tableHeader is
+ * decorated with a renderer that indicates the sorting status of each column.
+ * In addition, a mouse listener is installed with the following behavior:
  * <ul>
- * <li> Mouse-click: Clears the sorting status of all other columns and advances
+ * <li>Mouse-click: Clears the sorting status of all other columns and advances
  * the sorting status of that column through three values: {NOT_SORTED,
  * ASCENDING, DESCENDING} (then back to NOT_SORTED again).
- * <li> SHIFT-mouse-click: Clears the sorting status of all other columns and
+ * <li>SHIFT-mouse-click: Clears the sorting status of all other columns and
  * cycles the sorting status of the column through the same three values, in the
  * opposite order: {NOT_SORTED, DESCENDING, ASCENDING}.
- * <li> CONTROL-mouse-click and CONTROL-SHIFT-mouse-click: as above except that
+ * <li>CONTROL-mouse-click and CONTROL-SHIFT-mouse-click: as above except that
  * the changes to the column do not cancel the statuses of columns that are
  * already sorting - giving a way to initiate a compound sort.
  * </ul>
- * <p/> This is a long overdue rewrite of a class of the same name that first
+ * <p/>
+ * This is a long overdue rewrite of a class of the same name that first
  * appeared in the swing table demos in 1997.
  * 
  * @author Philip Milne
@@ -84,7 +87,7 @@ import javax.swing.table.TableModel;
  * @author Parwinder Sekhon
  * @version 2.0 02/27/04
  * 
- * Modified to support enumerations and generic collections.
+ *          Modified to support enumerations and generic collections.
  * @author Keith Campbell
  */
 
@@ -406,7 +409,7 @@ public class TableSorter extends AbstractTableModel {
             // clause avoids this problem.
             int column = e.getColumn();
             if (e.getFirstRow() == e.getLastRow() && column != TableModelEvent.ALL_COLUMNS
-                    && getSortingStatus(column) == SortOrder.NOT_SORTED && modelToView != null) {
+                && getSortingStatus(column) == SortOrder.NOT_SORTED && modelToView != null) {
                 int viewIndex = getModelToView()[e.getFirstRow()];
                 fireTableChanged(new TableModelEvent(TableSorter.this, viewIndex, viewIndex, column, e.getType()));
                 return;
@@ -531,9 +534,9 @@ public class TableSorter extends AbstractTableModel {
         }
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-            boolean hasFocus, int row, int column) {
+                boolean hasFocus, int row, int column) {
             Component c = tableCellRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
-                                                                          column);
+                column);
             if (c instanceof JLabel) {
                 JLabel l = (JLabel) c;
                 l.setHorizontalTextPosition(JLabel.LEFT);

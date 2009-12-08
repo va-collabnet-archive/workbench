@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class LookAndFeelCellRenderer extends JLabel implements ListCellRenderer {
 
@@ -51,10 +51,11 @@ public class LookAndFeelCellRenderer extends JLabel implements ListCellRenderer 
     }
 
     /**
-     * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
+     * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList,
+     *      java.lang.Object, int, boolean, boolean)
      */
-    public Component getListCellRendererComponent(JList list, Object value,
-            int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+            boolean cellHasFocus) {
         if (UIManager.LookAndFeelInfo.class.isAssignableFrom(value.getClass())) {
             UIManager.LookAndFeelInfo lafInfo = (LookAndFeelInfo) value;
             this.setText(lafInfo.getName());
@@ -68,8 +69,7 @@ public class LookAndFeelCellRenderer extends JLabel implements ListCellRenderer 
         }
         setEnabled(list.isEnabled());
         setFont(list.getFont());
-        setBorder((cellHasFocus) ? UIManager
-            .getBorder("List.focusCellHighlightBorder") : noFocusBorder);
+        setBorder((cellHasFocus) ? UIManager.getBorder("List.focusCellHighlightBorder") : noFocusBorder);
         return this;
     }
 

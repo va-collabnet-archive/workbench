@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,40 +46,39 @@ import com.sun.jini.start.LifeCycle;
 
 /**
  * @author kec
- *
+ * 
  */
-public abstract class ComponentFrame extends JFrame implements I_InitComponentMenus  {
-    
-    
-	/**
+public abstract class ComponentFrame extends JFrame implements I_InitComponentMenus {
+
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	protected static Logger logger = Logger.getLogger(ComponentFrame.class.getName());
-	protected ComponentFrameBean cfb;
-	protected final static int MENU_MASK = getMenuMask();
+    private static final long serialVersionUID = 1L;
+    protected static Logger logger = Logger.getLogger(ComponentFrame.class.getName());
+    protected ComponentFrameBean cfb;
+    protected final static int MENU_MASK = getMenuMask();
 
-	public static int getMenuMask() {
-		try {
-			return Toolkit.getDefaultToolkit()
-			.getMenuShortcutKeyMask();
-		} catch (HeadlessException e) {
-			//
-		}
-		return 0;
-	}
+    public static int getMenuMask() {
+        try {
+            return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        } catch (HeadlessException e) {
+            //
+        }
+        return 0;
+    }
+
     protected Configuration config;
     private String[] args;
     private LifeCycle lc;
     protected File menuDir;
-    
+
     public static Rectangle getDefaultFrameSize() {
-    	Toolkit tk = Toolkit.getDefaultToolkit();
-    	Dimension screenSize = tk.getScreenSize();
-    	if (screenSize.width < 1400) {
-    		return new Rectangle(0, 0, screenSize.width - 50, screenSize.height - 50);
-    	}
-		return new Rectangle(0, 0, 1400, 1028);
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Dimension screenSize = tk.getScreenSize();
+        if (screenSize.width < 1400) {
+            return new Rectangle(0, 0, screenSize.width - 50, screenSize.height - 50);
+        }
+        return new Rectangle(0, 0, 1400, 1028);
     }
 
     public class NewFrame implements ActionListener {
@@ -100,16 +99,16 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
         public void actionPerformed(ActionEvent e) {
             try {
                 Class<? extends ComponentFrame> classToMake = ComponentFrame.this.getClass();
-                Constructor<? extends ComponentFrame> c = classToMake.getConstructor(new Class[] {String[].class, LifeCycle.class});
-                c.newInstance(new Object[] { args, lc});
+                Constructor<? extends ComponentFrame> c = classToMake.getConstructor(new Class[] { String[].class,
+                                                                                                  LifeCycle.class });
+                c.newInstance(new Object[] { args, lc });
             } catch (Exception e1) {
                 logger.log(Level.SEVERE, e1.getMessage());
             }
-            
+
         }
-        
+
     }
-    
 
     /**
      * @param title
@@ -118,12 +117,15 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
     public ComponentFrame(String[] args, LifeCycle lc) throws Exception {
         this(args, lc, false);
     }
+
     public ComponentFrame(String[] args, LifeCycle lc, File menuDir) throws Exception {
         this(args, lc, false, menuDir);
     }
+
     public ComponentFrame(String[] args, LifeCycle lc, boolean hiddenFrame) throws Exception {
         this(args, lc, hiddenFrame, null);
     }
+
     public ComponentFrame(String[] args, LifeCycle lc, boolean hiddenFrame, File menuDir) throws Exception {
         super();
         this.args = args;
@@ -131,30 +133,25 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
         this.menuDir = menuDir;
         String argsStr;
         if (args == null) {
-        	argsStr = "null";
+            argsStr = "null";
         } else {
-        	argsStr = Arrays.asList(args).toString();
+            argsStr = Arrays.asList(args).toString();
         }
-		logger.info("\n*******************\n\n" + 
-            "Starting " + this.getClass().getSimpleName() + " with config file: " + argsStr +
-				"\n\n******************\n");
-        config = ConfigurationProvider.getInstance(args, getClass()
-                .getClassLoader());
+        logger.info("\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: "
+            + argsStr + "\n\n******************\n");
+        config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
         this.setTitle(this.getNextFrameName());
         this.cfb = new ComponentFrameBean(args, lc, this, this, hiddenFrame);
         this.cfb.setup();
     }
 
-    
-
     public abstract void addAppMenus(JMenuBar mainMenuBar) throws Exception;
-    
-    public abstract JMenu getQuitMenu();
-    
-    public abstract JMenuItem[] getNewWindowMenu();
-    
-    public abstract String getNextFrameName() throws ConfigurationException;
 
+    public abstract JMenu getQuitMenu();
+
+    public abstract JMenuItem[] getNewWindowMenu();
+
+    public abstract String getNextFrameName() throws ConfigurationException;
 
     /**
      * @return Returns the args.
@@ -162,12 +159,10 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
     public String[] getArgs() {
         return args;
     }
-    
+
     public boolean okToClose() {
-       return getDefaultCloseOperation() == WindowConstants.DISPOSE_ON_CLOSE; 
+        return getDefaultCloseOperation() == WindowConstants.DISPOSE_ON_CLOSE;
     }
-
-
 
     /**
      * @return Returns the lc.
@@ -175,12 +170,14 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
     public LifeCycle getLc() {
         return lc;
     }
-    
+
     public abstract int getCount();
+
     public List<I_DoQuitActions> getQuitList() {
         return cfb.getQuitList();
     }
-   public JMenuItem getQuitMI() {
-      return cfb.getQuitMI();
-   }
+
+    public JMenuItem getQuitMI() {
+        return cfb.getQuitMI();
+    }
 }

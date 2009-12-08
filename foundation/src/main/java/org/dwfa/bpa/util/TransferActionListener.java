@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,17 +31,14 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JComponent;
 
-public class TransferActionListener implements ActionListener,
-        PropertyChangeListener {
+public class TransferActionListener implements ActionListener, PropertyChangeListener {
 
-    static Logger logger =
-            Logger.getLogger(TransferActionListener.class.getName());
+    static Logger logger = Logger.getLogger(TransferActionListener.class.getName());
 
     private JComponent focusOwner = null;
 
     public TransferActionListener() {
-        KeyboardFocusManager manager =
-                KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addPropertyChangeListener("permanentFocusOwner", this);
     }
 
@@ -67,17 +64,14 @@ public class TransferActionListener implements ActionListener,
         String action = (String) e.getActionCommand();
         Action a = focusOwner.getActionMap().get(action.toLowerCase());
         if (a != null) {
-            a.actionPerformed(new ActionEvent(focusOwner,
-                ActionEvent.ACTION_PERFORMED, null));
+            a.actionPerformed(new ActionEvent(focusOwner, ActionEvent.ACTION_PERFORMED, null));
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Sent action: " + e.getActionCommand() + " to: "
-                    + focusOwner);
+                logger.fine("Sent action: " + e.getActionCommand() + " to: " + focusOwner);
             }
         } else {
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("null Action for:" + action);
-                logger.fine("Available actions:"
-                    + Arrays.asList(focusOwner.getActionMap().allKeys()));
+                logger.fine("Available actions:" + Arrays.asList(focusOwner.getActionMap().allKeys()));
             }
 
         }

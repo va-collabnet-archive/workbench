@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,17 +51,13 @@ public class DescriptionSpec {
     public I_DescribeConceptLocally localize() {
         try {
             I_ConceptualizeLocally localConcept = concept.localize();
-            int dnid =
-                    LocalFixedTerminology.getStore().getNid(
-                        Arrays.asList(uuids));
-            I_DescribeConceptLocally desc =
-                    LocalFixedTerminology.getStore().getDescription(dnid,
-                        localConcept.getNid());
+            int dnid = LocalFixedTerminology.getStore().getNid(Arrays.asList(uuids));
+            I_DescribeConceptLocally desc = LocalFixedTerminology.getStore()
+                .getDescription(dnid, localConcept.getNid());
             if (description.equals(desc.getText())) {
                 return desc;
             } else {
-                throw new RuntimeException("Descriptions to not match. 1: "
-                    + description + " 2: " + desc.getText());
+                throw new RuntimeException("Descriptions to not match. 1: " + description + " 2: " + desc.getText());
             }
         } catch (NoMappingException e) {
             throw new RuntimeException(e);

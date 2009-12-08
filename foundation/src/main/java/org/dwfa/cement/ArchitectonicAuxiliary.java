@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -308,11 +308,11 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                       new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
                   EXTERNAL_REFERENCE(new String[] {"external reference (description type)", "external reference"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                  
+
                   READ_XHTML_DESC(new String[] {"read XHMTL desc (description type)", "read XHTML desc"}, null,
-                                new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),  
+                                new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   READ_SYN_XHTML_DESC(new String[] {"read synonym XHMTL desc (description type)", "read synonym XHMTL desc"}, null,
-                                new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),              
+                                new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
 
                   READ_198_DESC(new String[] {"read 198 desc (description type)", "read 198 desc"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
@@ -335,9 +335,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                   READ_KEY_DESC(new String[] {"read key (description type)", "read key"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   READ_OPCS_20_DESC(new String[] {"read opcs code (description type)", "read opcs"}, null,
-                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),  
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   READ_ICD10_20_DESC(new String[] {"read icd10 (description type)", "read icd10"}, null,
-                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),          
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
 
                   FULLY_SPECIFIED_DESCRIPTION_TYPE(PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID,
                           new String[] {"fully specified name (description type)", "fully specified name"}, null,
@@ -371,15 +371,15 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             IS_ANALOG("is an analog of (relationship type)",
                              new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_READ_V2_V3_ANALOG("is a Read V2 analog of Read V3(relationship type)",
-                       		new I_ConceptualizeUniversally[] { RELATIONSHIP }), 
+                       		new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_READ_4B_V3_ANALOG("is a Read 4Byte analog of Read V3 (relationship type)",
-                           new I_ConceptualizeUniversally[] { RELATIONSHIP }),   
+                           new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_TERM_OF("is a Term of (relationship type)",
                                    new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_TERM_OF_SYN("is a Synonym Term of (relationship type)",
-                        new I_ConceptualizeUniversally[] { RELATIONSHIP }),  
+                        new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_READ_V3_TEMPLATE("is a Read V3 Template (relationship type)",
-                        new I_ConceptualizeUniversally[] { RELATIONSHIP }),      
+                        new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_ALIAS_OF("is alias of (relationship type)",
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             DUP_REL_TYPE("dup rel type (terminology constant)",
@@ -660,23 +660,23 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
         RX_NORM("RX Norm ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
-        /*  
+        /*
         READ_V3_TERM("Read V3 Term ID", null,
         		new I_ConceptualizeUniversally[] { ID_SOURCE }),
         READ_V3_TERM_SYN("Read V3 Term Synonym ID", null,
-                new I_ConceptualizeUniversally[] { ID_SOURCE }),        		
-         
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
+
         READ_V2_TERM("Read V2 Term ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
         READ_V2_TERM_SYN("Read V2 Term Synonym ID", null,
-                 new I_ConceptualizeUniversally[] { ID_SOURCE }),        
-            */ 
+                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
+            */
                 READ_V3("Read V3 ID", null,
                         new I_ConceptualizeUniversally[] { ID_SOURCE }),
                 READ_V2("Read V2 ID", null,
                         new I_ConceptualizeUniversally[] { ID_SOURCE }),
                 READ_4B("Read 4Byte ID", null,
-                        new I_ConceptualizeUniversally[] { ID_SOURCE }),       
+                        new I_ConceptualizeUniversally[] { ID_SOURCE }),
         CPT("CPT ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE });
        ;
@@ -1075,22 +1075,22 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     /**
      * Values:
      * <li>0 Defining This relationship represents a defining characteristic of
-     * the sourceId concept. Hierarchical relationships (e.g. �ISA� and
-     * �PART-OF�) are also regarded as defining relationships Example: ��Site� =
-     * �Liver�� is a defining characteristic of �Liver biopsy�.
+     * the sourceId concept. Hierarchical relationships (e.g. ISA and
+     * PART-OF) are also regarded as defining relationships Example: Site =
+     * Liver is a defining characteristic of Liver biopsy.
      * <li>1 Qualifier This relationship represents an optional qualifying
-     * characteristic. Example: ��Revision status� = �Conversion from other type
-     * of arthroplasty�� is a possible qualification of �Hip replacement�
+     * characteristic. Example: Revision status = Conversion from other type
+     * of arthroplasty is a possible qualification of Hip replacement
      * <li>2 Historical This is used to relate an inactive concept to another
-     * concept. Example: The �Same As� relationship connects an inactive concept
+     * concept. Example: The Same As relationship connects an inactive concept
      * with the concept it duplicated. Only used in the Historical Relationships
      * File.
      * <li>3 Additional This relationship represents a context specific
      * characteristic. This is used to convey characteristics of a concept that
      * apply at a particular time within a particular organization but which are
-     * not intrinsic to the concept. Example: �Prescription Only Medicine� is a
-     * context specific characteristic of the I_Concept �Amoxycillin 250mg
-     * capsule�. It is true currently in the UK but is not true in some other
+     * not intrinsic to the concept. Example: Prescription Only Medicine is a
+     * context specific characteristic of the I_Concept Amoxycillin 250mg
+     * capsule. It is true currently in the UK but is not true in some other
      * countries.
      *
      * @param type
@@ -1187,7 +1187,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
          * <li>5 Erroneous The Description has been withdrawn as the Term
          * contains errors.
          * <li>6 Limited The Description is a valid Description of a Concept
-         * which has �limited� status (i.e. the Concept has ConceptStatus = 6).
+         * which has limited status (i.e. the Concept has ConceptStatus = 6).
          * <li>7 Inappropriate The Description has been withdrawn as the Term
          * should not refer to this concept.
          * <li>8 Concept noncurrent The Description is a valid Description of a
