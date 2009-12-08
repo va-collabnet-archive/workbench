@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,8 +27,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
- * Export the standard CEMeNT (Common Enumerations and Metadata to Normalize Terminology) taxonomies in
- * a standard SNOMED format (no branch ids or effective date for concepts or relationships).
+ * Export the standard CEMeNT (Common Enumerations and Metadata to Normalize
+ * Terminology) taxonomies in
+ * a standard SNOMED format (no branch ids or effective date for concepts or
+ * relationships).
  * 
  * @goal export-cement
  * @phase process-resources
@@ -59,12 +61,12 @@ public class ExportCement extends AbstractMojo {
     private MavenSession session;
 
     /**
-     * Only execute this mojo for one of the allowed goals. 
+     * Only execute this mojo for one of the allowed goals.
      * This will prevent unexpected execution of plugins when
      * other goals are executed such as eclipse:eclipse or
-     * site:site. 
+     * site:site.
      * 
-     * There may be better ways to do this... If you find one, 
+     * There may be better ways to do this... If you find one,
      * please let us know :-)
      */
 
@@ -78,19 +80,12 @@ public class ExportCement extends AbstractMojo {
             try {
                 String prefix;
                 if (output == null) {
-                    prefix =
-                            outputDirectory.getCanonicalPath()
-                                + File.separatorChar + "generated-resources"
-                                + File.separatorChar + "concrete"
-                                + File.separatorChar
-                                + dateFormat.format(new Date())
-                                + File.separatorChar;
+                    prefix = outputDirectory.getCanonicalPath() + File.separatorChar + "generated-resources"
+                        + File.separatorChar + "concrete" + File.separatorChar + dateFormat.format(new Date())
+                        + File.separatorChar;
                 } else {
                     output = output.replace('/', File.separatorChar);
-                    prefix =
-                            output + File.separator
-                                + dateFormat.format(new Date())
-                                + File.separatorChar;
+                    prefix = output + File.separator + dateFormat.format(new Date()) + File.separatorChar;
                 }
                 ArchitectonicAuxiliary.main(new String[] { prefix });
             } catch (Exception e) {

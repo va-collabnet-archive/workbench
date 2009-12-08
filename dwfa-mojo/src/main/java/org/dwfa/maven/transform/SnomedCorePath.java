@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,16 +24,14 @@ import org.dwfa.maven.Transform;
 
 public class SnomedCorePath extends AbstractTransform {
 
-	UUID pathUUID = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()
-			.iterator().next();
+    UUID pathUUID = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator().next();
 
-	public String transform(String input) throws Exception {
-		return setLastTransform(pathUUID.toString());
-	}
+    public String transform(String input) throws Exception {
+        return setLastTransform(pathUUID.toString());
+    }
 
-	@Override
-	public void setupImpl(Transform transformer) throws IOException,
-			ClassNotFoundException {
-		 // nothing to do...
-	}
+    @Override
+    public void setupImpl(Transform transformer) throws IOException, ClassNotFoundException {
+        // nothing to do...
+    }
 }

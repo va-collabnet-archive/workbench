@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,9 +35,7 @@ public class FullySpecifiedDescToPathUuid extends AbstractTransform {
 
     public void setupImpl(Transform transformer) {
         try {
-            pathUUID =
-                    Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                        pathFsName);
+            pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsName);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         } catch (UnsupportedEncodingException e) {

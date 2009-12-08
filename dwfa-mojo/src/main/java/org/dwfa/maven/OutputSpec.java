@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,17 +22,17 @@ public class OutputSpec {
     private I_ReadAndTransform[] constantSpecs;
 
     public String toString() {
-		StringBuffer b = new StringBuffer();
-		b.append("\nInputFileSpec: \n");
-		for (InputFileSpec is: inputSpecs) {
-			b.append(is);
-		}
-		b.append("\nWriters: \n");
-		for (I_TransformAndWrite w: writers) {
-			b.append(w);
-		}
-		return b.toString();
-	}
+        StringBuffer b = new StringBuffer();
+        b.append("\nInputFileSpec: \n");
+        for (InputFileSpec is : inputSpecs) {
+            b.append(is);
+        }
+        b.append("\nWriters: \n");
+        for (I_TransformAndWrite w : writers) {
+            b.append(w);
+        }
+        return b.toString();
+    }
 
     public InputFileSpec[] getInputSpecs() {
         return inputSpecs;

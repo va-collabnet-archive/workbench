@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,79 +47,79 @@ import org.apache.maven.plugin.MojoFailureException;
  */
 public class WriteBeans extends AbstractMojo implements ExceptionListener {
 
-	/**
-	 * Location of the build directory.
-	 * 
-	 * @parameter expression="${project.build.directory}"
-	 * @required
-	 */
-	private File outputDirectory;
+    /**
+     * Location of the build directory.
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File outputDirectory;
 
-	/**
-	 * Location of the build directory.
-	 * 
-	 * @parameter expression="${project.build.sourceDirectory}"
-	 * @required
-	 */
-	private File sourceDirectory;
+    /**
+     * Location of the build directory.
+     * 
+     * @parameter expression="${project.build.sourceDirectory}"
+     * @required
+     */
+    private File sourceDirectory;
 
-	/**
-	 * @parameter
-	 * @required
-	 */
-	BeanSpec[] specs;
-	
-	/**
-	 * @parameter
-	 * 
-	 */
-	private String targetSubDir;
+    /**
+     * @parameter
+     * @required
+     */
+    BeanSpec[] specs;
 
-	private Exception e = null;
+    /**
+     * @parameter
+     * 
+     */
+    private String targetSubDir;
 
-	private File rootDir;
+    private Exception e = null;
 
-	public WriteBeans() {
-		super();
-	}
+    private File rootDir;
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		if (targetSubDir != null) {
-			rootDir = new File(outputDirectory, targetSubDir);
-		} else {
-			rootDir = outputDirectory;
-		}
-		for (int i = 0; i < specs.length; i++) {
-			if (specs[i].getType().equalsIgnoreCase("task")) {
-				writeTaskBean(specs[i]);
-			} else if (specs[i].getType().equalsIgnoreCase("bean")) {
+    public WriteBeans() {
+        super();
+    }
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (targetSubDir != null) {
+            rootDir = new File(outputDirectory, targetSubDir);
+        } else {
+            rootDir = outputDirectory;
+        }
+        for (int i = 0; i < specs.length; i++) {
+            if (specs[i].getType().equalsIgnoreCase("task")) {
+                writeTaskBean(specs[i]);
+            } else if (specs[i].getType().equalsIgnoreCase("bean")) {
                 writeGenericBean(specs[i]);
             } else {
                 writeProcessBean(specs[i]);
             }
-		}
+        }
 
-	}
+    }
 
     private void writeTaskBean(BeanSpec spec) throws MojoExecutionException {
         try {
             String suffix = ".task";
             writeBean(spec, rootDir, suffix);
         } catch (Exception e) {
-            throw new MojoExecutionException("Problem loading class: "
-                    + spec.getSourceName(), e);
+            throw new MojoExecutionException("Problem loading class: " + spec.getSourceName(), e);
         }
     }
+
     private void writeGenericBean(BeanSpec spec) throws MojoExecutionException {
         try {
             String suffix = ".bean";
             writeBean(spec, rootDir, suffix);
 
         } catch (Exception e) {
-            throw new MojoExecutionException("Problem loading class: "
-                    + spec.getSourceName(), e);
+            throw new MojoExecutionException("Problem loading class: " + spec.getSourceName(), e);
         }
     }
+
     /**
      * @param spec
      * @param rootDir
@@ -133,12 +133,14 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
      * @throws FileNotFoundException
      */
     @SuppressWarnings("unchecked")
-	private void writeBean(BeanSpec spec, File rootDir, String suffix) throws IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, FileNotFoundException {
+    private void writeBean(BeanSpec spec, File rootDir, String suffix) throws IOException, ClassNotFoundException,
+            NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException,
+            FileNotFoundException {
         rootDir.mkdirs();
         Class beanClass = this.getClass().getClassLoader().loadClass(spec.getSourceName());
         Object obj;
         if (beanClass.isEnum()) {
-            Method m = beanClass.getMethod("valueOf", new Class[] { String.class});
+            Method m = beanClass.getMethod("valueOf", new Class[] { String.class });
             obj = m.invoke(null, new Object[] { spec.getConstructArg() });
         } else {
             if (spec.getConstructArg() == null) {
@@ -149,11 +151,11 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
                 obj = beanConstructor.newInstance(new Object[] { spec.getConstructArg() });
             }
         }
-    
+
         File taskDir = rootDir;
         if (spec.getDirName() != null) {
-           taskDir = new File(rootDir, spec.getDirName());
-            
+            taskDir = new File(rootDir, spec.getDirName());
+
         }
         taskDir.mkdirs();
         File taskFile;
@@ -168,31 +170,25 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
         oos.writeObject(obj);
         oos.close();
     }
-	
 
-	@SuppressWarnings("unchecked")
-	private void writeProcessBean(BeanSpec spec) throws MojoExecutionException {
-		try {
-			rootDir.mkdirs();
+    @SuppressWarnings("unchecked")
+    private void writeProcessBean(BeanSpec spec) throws MojoExecutionException {
+        try {
+            rootDir.mkdirs();
 
-			ClassLoader origCl = Thread.currentThread().getContextClassLoader();
-			Class decoderClass = origCl.loadClass("java.beans.XMLDecoder");
-			Constructor decoderConstructor = decoderClass
-					.getConstructor(new Class[] { InputStream.class });
-            File xmlSourceFile = new File(sourceDirectory
-                    .getAbsolutePath()
-                    + "/../process/"
-                    + spec.getSourceName()
-                    + ".xml");
-			getLog().info("Reading: " + xmlSourceFile);
-			final XMLDecoder d = (XMLDecoder) decoderConstructor
-					.newInstance(new Object[] { new BufferedInputStream(
-							new FileInputStream(xmlSourceFile)) });
+            ClassLoader origCl = Thread.currentThread().getContextClassLoader();
+            Class decoderClass = origCl.loadClass("java.beans.XMLDecoder");
+            Constructor decoderConstructor = decoderClass.getConstructor(new Class[] { InputStream.class });
+            File xmlSourceFile = new File(sourceDirectory.getAbsolutePath() + "/../process/" + spec.getSourceName()
+                + ".xml");
+            getLog().info("Reading: " + xmlSourceFile);
+            final XMLDecoder d = (XMLDecoder) decoderConstructor.newInstance(new Object[] { new BufferedInputStream(
+                new FileInputStream(xmlSourceFile)) });
 
-			d.setExceptionListener(this);
-			Object process = d.readObject();
-			d.close();
-			Thread.currentThread().setContextClassLoader(origCl);
+            d.setExceptionListener(this);
+            Object process = d.readObject();
+            d.close();
+            Thread.currentThread().setContextClassLoader(origCl);
 
             File processFile;
             if (spec.getFormat().equalsIgnoreCase("queue")) {
@@ -207,58 +203,56 @@ public class WriteBeans extends AbstractMojo implements ExceptionListener {
                 String procIdStr = xmlData.substring(stringElemLoc + 8, stringElemLoc + 8 + 36);
                 File processDir = new File(rootDir, spec.getDirName());
                 processDir.mkdirs();
-                /* 
-                 * Creating its own entry id causes duplicate entries if mvn is run twice
-                 * Not creating its own entry id reauires each process to have a unique id, or else
-                 * it will be overwritten. 
-                Uuid entryId = UuidFactory.generate();
-                processFile = new File(processDir, procIdStr + "." + 
-                        entryId + ".bp");
-                        */
-                processFile = new File(processDir, procIdStr + "." + 
-                        procIdStr + ".bp");
+                /*
+                 * Creating its own entry id causes duplicate entries if mvn is
+                 * run twice
+                 * Not creating its own entry id reauires each process to have a
+                 * unique id, or else
+                 * it will be overwritten.
+                 * Uuid entryId = UuidFactory.generate();
+                 * processFile = new File(processDir, procIdStr + "." +
+                 * entryId + ".bp");
+                 */
+                processFile = new File(processDir, procIdStr + "." + procIdStr + ".bp");
             } else {
                 File processDir = new File(rootDir, spec.getDirName());
                 processDir.mkdirs();
                 processFile = new File(processDir, spec.getSourceName() + ".bp");
             }
-			FileOutputStream fos = new FileOutputStream(processFile);
-			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			ObjectOutputStream oos = new ObjectOutputStream(bos);
-			oos.writeObject(process);
-			oos.close();
+            FileOutputStream fos = new FileOutputStream(processFile);
+            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(process);
+            oos.close();
 
-		} catch (Exception e) {
-			throw new MojoExecutionException("Problem making process: "
-					+ spec.getSourceName(), e);
-		}
-		if (e != null) {
-			throw new MojoExecutionException("Problem making process: "
-					+ spec.getSourceName(), e);
-		}
-	}
+        } catch (Exception e) {
+            throw new MojoExecutionException("Problem making process: " + spec.getSourceName(), e);
+        }
+        if (e != null) {
+            throw new MojoExecutionException("Problem making process: " + spec.getSourceName(), e);
+        }
+    }
 
-	public void exceptionThrown(Exception e) {
-		this.getLog().error(e);
-		this.e = e;
-		
-	}
+    public void exceptionThrown(Exception e) {
+        this.getLog().error(e);
+        this.e = e;
 
-	public File getOutputDirectory() {
-		return outputDirectory;
-	}
+    }
 
-	public void setOutputDirectory(File outputDirectory) {
-		this.outputDirectory = outputDirectory;
-	}
+    public File getOutputDirectory() {
+        return outputDirectory;
+    }
 
-	public String getTargetSubDir() {
-		return targetSubDir;
-	}
+    public void setOutputDirectory(File outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
 
-	public void setTargetSubDir(String targetSubDir) {
-		this.targetSubDir = targetSubDir;
-	}
+    public String getTargetSubDir() {
+        return targetSubDir;
+    }
 
-	
+    public void setTargetSubDir(String targetSubDir) {
+        this.targetSubDir = targetSubDir;
+    }
+
 }

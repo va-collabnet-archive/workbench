@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,15 +28,14 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.io.IOException;
 
-public final class SQLFileTransformationCopierImpl implements
-        SQLFileTransformationCopier {
+public final class SQLFileTransformationCopierImpl implements SQLFileTransformationCopier {
 
     private final Log logger;
     private final File outputDirectory;
     private final boolean replaceForwardSlash;
 
-    public SQLFileTransformationCopierImpl(final Log logger,
-            final File outputDirectory, final boolean replaceForwardSlash) {
+    public SQLFileTransformationCopierImpl(final Log logger, final File outputDirectory,
+            final boolean replaceForwardSlash) {
         this.logger = logger;
         this.replaceForwardSlash = replaceForwardSlash;
         this.outputDirectory = outputDirectory;
@@ -44,9 +43,9 @@ public final class SQLFileTransformationCopierImpl implements
 
     public void copySQLFilesToTarget(final File sqlSrcDir, final File sqlTargetDir) {
         try {
-            for (File f: getSQLFiles(sqlSrcDir)) {
+            for (File f : getSQLFiles(sqlSrcDir)) {
                 RegexReplace replacer = new RegexReplace("\\$\\{project.build.directory\\}",
-                        outputDirectory.getCanonicalPath().replace('\\', '/'));
+                    outputDirectory.getCanonicalPath().replace('\\', '/'));
                 logger.info("Transforming: " + f.getName());
                 Reader is = new FileReader(f);
                 String input = FileIO.readerToString(is);
@@ -56,9 +55,8 @@ public final class SQLFileTransformationCopierImpl implements
                     sqlScript = sqlScript.replace('/', File.separatorChar);
                 }
 
-                FileIO.copyFile(new StringInputStream(sqlScript),
-                                new FileOutputStream(new File(sqlTargetDir, f.getName())),
-                                true);
+                FileIO.copyFile(new StringInputStream(sqlScript), new FileOutputStream(new File(sqlTargetDir,
+                    f.getName())), true);
             }
         } catch (IOException e) {
             throw new SQLFileTransformationCopierException(e);

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,37 +46,37 @@ import org.apache.maven.plugin.logging.Log;
 
 public class WriteDirectories extends AbstractMojo {
 
-	/**
-	 * Location of the source directory.
-	 * 
-	 * @parameter expression="${project.build.sourceDirectory}"
-	 * @required
-	 */
-	private File sourceDirectory;
+    /**
+     * Location of the source directory.
+     * 
+     * @parameter expression="${project.build.sourceDirectory}"
+     * @required
+     */
+    private File sourceDirectory;
 
-	/**
-	 * Location of the build directory.
-	 * 
-	 * @parameter expression="${project.build.directory}"
-	 * @required
-	 */
-	private File outputDirectory;
+    /**
+     * Location of the build directory.
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File outputDirectory;
 
-	/**
-	 * @parameter expression="${project.dependencies}"
-	 * @required
-	 */
-	private List<Dependency> dependencies;
+    /**
+     * @parameter expression="${project.dependencies}"
+     * @required
+     */
+    private List<Dependency> dependencies;
 
     /**
      * The dependency artifacts of this project, for resolving
-     *
+     * 
      * @pathOf(..)@ expressions. These are of type
      *              org.apache.maven.artifact.Artifact, and are keyed by
      *              groupId:artifactId, using
      *              org.apache.maven.artifact.ArtifactUtils.versionlessKey(..)
      *              for consistent formatting.
-     *
+     * 
      * @parameter expression="${project.artifacts}"
      * @required
      * @readonly
@@ -84,102 +84,97 @@ public class WriteDirectories extends AbstractMojo {
     private Set<Artifact> artifacts;
 
     /**
-	 * @parameter expression="${localRepository}"
-	 * @required
-	 */
-	private DefaultArtifactRepository localRepository;
+     * @parameter expression="${localRepository}"
+     * @required
+     */
+    private DefaultArtifactRepository localRepository;
 
-	/**
-	 * @parameter
-	 * 
-	 */
-	private String targetSubDir;
+    /**
+     * @parameter
+     * 
+     */
+    private String targetSubDir;
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private File targetDirectory;
 
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        Log l = getLog();
+        try {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + dependencies
+                + outputDirectory.getCanonicalPath(), this.getClass(), targetDirectory)) {
+                return;
+            }
+        } catch (NoSuchAlgorithmException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		Log l = getLog();
-		try {
-			if (MojoUtil.alreadyRun(getLog(), this.getClass()
-					.getCanonicalName()
-					+ dependencies + outputDirectory.getCanonicalPath(), 
-					this.getClass(), targetDirectory)) {
-				return;
-			}
-		} catch (NoSuchAlgorithmException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (IOException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
-		
-		for (Artifact a: artifacts) {
-			if (a.getScope().equals("runtime-directory")) {
-				File rootDir = this.outputDirectory;
-				if (targetSubDir != null) {
-					rootDir = new File(rootDir, targetSubDir);
-				}
-				extractArtifactDependencyToDir(l, rootDir, a);
-				
-			} else if (a.getScope().equals("resource-directory")) {
-				File rootDir = new File(this.sourceDirectory.getParentFile(), "resources");
-				if (targetSubDir != null) {
-					rootDir = new File(rootDir, targetSubDir);
-				}
-				if (rootDir.exists() == false) {
-					extractArtifactDependencyToDir(l, rootDir, a);
-				} else {
-					l.info("resource directory already exists: " + rootDir.getAbsolutePath());
-				}
-			}
-		}
-	}
+        for (Artifact a : artifacts) {
+            if (a.getScope().equals("runtime-directory")) {
+                File rootDir = this.outputDirectory;
+                if (targetSubDir != null) {
+                    rootDir = new File(rootDir, targetSubDir);
+                }
+                extractArtifactDependencyToDir(l, rootDir, a);
 
-	private void extractArtifactDependencyToDir(Log l, File rootDir, Artifact a)
-		throws MojoExecutionException {
-		l.info("Processing dependency artifact: " + a);
-		l.info("   file: " + a.getFile());
-		try {
-			FileInputStream fis = new FileInputStream(a.getFile());
-			BufferedInputStream bis = new BufferedInputStream(fis);
-			JarInputStream jis = new JarInputStream(bis);
-			JarEntry je = jis.getNextJarEntry();
-			while (je != null) {
-				// l.info(" entry: " + je.getName());
-				if (je.getName().contains("META-INF") == false) {
-					// l.info(" entry ok");
+            } else if (a.getScope().equals("resource-directory")) {
+                File rootDir = new File(this.sourceDirectory.getParentFile(), "resources");
+                if (targetSubDir != null) {
+                    rootDir = new File(rootDir, targetSubDir);
+                }
+                if (rootDir.exists() == false) {
+                    extractArtifactDependencyToDir(l, rootDir, a);
+                } else {
+                    l.info("resource directory already exists: " + rootDir.getAbsolutePath());
+                }
+            }
+        }
+    }
 
-					File destFile = new File(rootDir, je.getName());
-					destFile.getParentFile().mkdirs();
-					if (je.isDirectory()) {
-						destFile.mkdirs();
-					} else {
-						OutputStream fos = new FileOutputStream(destFile);
-						byte[] buffer = new byte[10240];
-						long bytesToRead = je.getSize();
-						while (bytesToRead > 0) { // write contents of
-							// 'is' to
-							// 'fos'
-							int bytesRead = jis.read(buffer);
-							fos.write(buffer, 0, bytesRead);
-							bytesToRead = bytesToRead - bytesRead;
-						}
-						fos.close();
-						destFile.setLastModified(je.getTime());
-					}
-				}
-				je = jis.getNextJarEntry();
-			}
-			jis.close();
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage() + " file:"
-					+ a.getFile(), e);
-		}
-	}
+    private void extractArtifactDependencyToDir(Log l, File rootDir, Artifact a) throws MojoExecutionException {
+        l.info("Processing dependency artifact: " + a);
+        l.info("   file: " + a.getFile());
+        try {
+            FileInputStream fis = new FileInputStream(a.getFile());
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            JarInputStream jis = new JarInputStream(bis);
+            JarEntry je = jis.getNextJarEntry();
+            while (je != null) {
+                // l.info(" entry: " + je.getName());
+                if (je.getName().contains("META-INF") == false) {
+                    // l.info(" entry ok");
+
+                    File destFile = new File(rootDir, je.getName());
+                    destFile.getParentFile().mkdirs();
+                    if (je.isDirectory()) {
+                        destFile.mkdirs();
+                    } else {
+                        OutputStream fos = new FileOutputStream(destFile);
+                        byte[] buffer = new byte[10240];
+                        long bytesToRead = je.getSize();
+                        while (bytesToRead > 0) { // write contents of
+                            // 'is' to
+                            // 'fos'
+                            int bytesRead = jis.read(buffer);
+                            fos.write(buffer, 0, bytesRead);
+                            bytesToRead = bytesToRead - bytesRead;
+                        }
+                        fos.close();
+                        destFile.setLastModified(je.getTime());
+                    }
+                }
+                je = jis.getNextJarEntry();
+            }
+            jis.close();
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getMessage() + " file:" + a.getFile(), e);
+        }
+    }
 }

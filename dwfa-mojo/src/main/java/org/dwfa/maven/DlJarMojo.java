@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ import com.sun.jini.tool.ClassDep;
  * 
  * @goal class-dep
  * @requiresDependencyResolution compile
-  */
+ */
 public class DlJarMojo extends AbstractMojo {
     /**
      * Location of the build directory.
@@ -96,13 +96,9 @@ public class DlJarMojo extends AbstractMojo {
      */
     private String localRepository;
 
-    private static final String pathSep = System.getProperty("path.separator",
-            ":");
+    private static final String pathSep = System.getProperty("path.separator", ":");
 
-
-
-    private static final String eol = System
-            .getProperty("line.separator", "\n");
+    private static final String eol = System.getProperty("line.separator", "\n");
 
     public void execute() throws MojoExecutionException {
         FileWriter w = null;
@@ -112,18 +108,17 @@ public class DlJarMojo extends AbstractMojo {
             argList.add("-cp");
             StringBuffer cpBuff = new StringBuffer();
 
-            //System.out.println("Dependencies: " + dependencies);
+            // System.out.println("Dependencies: " + dependencies);
             for (Dependency d : dependencies) {
                 cpBuff.append(MojoUtil.dependencyToPath(localRepository, d));
                 /*
-                String dependencyPath = MojoUtil.dependencyToPath(
-                        localRepository, d);
-                System.out.println("Dependency path: " + dependencyPath);
-                */
+                 * String dependencyPath = MojoUtil.dependencyToPath(
+                 * localRepository, d);
+                 * System.out.println("Dependency path: " + dependencyPath);
+                 */
                 cpBuff.append(pathSep);
             }
-            URLClassLoader libLoader = MojoUtil.getProjectClassLoader(
-                    dependencies, localRepository);
+            URLClassLoader libLoader = MojoUtil.getProjectClassLoader(dependencies, localRepository);
 
             // cpBuff.append(outputDirectory);
             // cpBuff.append(fileSep);
@@ -165,16 +160,12 @@ public class DlJarMojo extends AbstractMojo {
             String[] vals = dep.compute();
             for (int i = 0; i < vals.length; i++) {
                 if (dep.getFiles()) {
-                    w
-                            .write(vals[i].replace('.', File.separatorChar)
-                                    + ".class");
+                    w.write(vals[i].replace('.', File.separatorChar) + ".class");
                 } else {
                     w.write(vals[i]);
                 }
                 w.write(eol);
-                File classFile = new File(f, vals[i].replace('.',
-                        File.separatorChar)
-                        + ".class");
+                File classFile = new File(f, vals[i].replace('.', File.separatorChar) + ".class");
                 try {
                     Class theClass = Class.forName(vals[i]);
                     writeClass(classFile, theClass);
@@ -225,13 +216,13 @@ public class DlJarMojo extends AbstractMojo {
      * @throws IOException
      */
     private void writeClass(File classFile, Class theClass) throws IOException {
-		String classFileName = theClass.getName().replace('.', '/') + ".class";
-		URL classUrl = theClass.getResource("/" + classFileName);
-		InputStream classInputStream = classUrl.openStream();
-		int size = classInputStream.available();
-		byte[] data = new byte[size];
-		classInputStream.read(data, 0, size);
-		
+        String classFileName = theClass.getName().replace('.', '/') + ".class";
+        URL classUrl = theClass.getResource("/" + classFileName);
+        InputStream classInputStream = classUrl.openStream();
+        int size = classInputStream.available();
+        byte[] data = new byte[size];
+        classInputStream.read(data, 0, size);
+
         classFile.getParentFile().mkdirs();
         FileOutputStream fos = new FileOutputStream(classFile);
         BufferedOutputStream bos = new BufferedOutputStream(fos);

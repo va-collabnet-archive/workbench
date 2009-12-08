@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,8 +24,7 @@ import org.dwfa.maven.I_ReadAndTransform;
 import org.dwfa.maven.Transform;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 
-public class SnomedRefinabilityTransform extends AbstractTransform implements
-        I_ReadAndTransform {
+public class SnomedRefinabilityTransform extends AbstractTransform implements I_ReadAndTransform {
 
     private Map uuidToNativeMap;
 
@@ -34,9 +33,7 @@ public class SnomedRefinabilityTransform extends AbstractTransform implements
     }
 
     public String transform(String input) throws Exception {
-        I_ConceptualizeUniversally refinability =
-                ArchitectonicAuxiliary.getSnomedRefinabilityType(Integer
-                    .parseInt(input));
+        I_ConceptualizeUniversally refinability = ArchitectonicAuxiliary.getSnomedRefinabilityType(Integer.parseInt(input));
         UUID uid = refinability.getUids().iterator().next();
         return setLastTransform(uuidToNativeMap.get(uid).toString());
     }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,49 +28,50 @@ import java.util.Set;
 import org.dwfa.maven.Transform;
 
 public class CheckUniqueTransform extends AbstractTransform {
-   
-   static File dupFile = new File("target/dups.oos");
-   Set<String> keys = new HashSet<String>();
-   boolean duplicatesFound = false;
-   static Set<String> dups;
 
-   @SuppressWarnings("unchecked")
-   @Override
-   public void setupImpl(Transform transformer) throws IOException, ClassNotFoundException {
-      if (dups == null) {
-         if (dupFile.exists()) {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dupFile));
-            dups = (Set<String>) ois.readObject();
-            ois.close();
-         } else {
-            dups = new HashSet<String>();
-         }
-      }
-   }
+    static File dupFile = new File("target/dups.oos");
+    Set<String> keys = new HashSet<String>();
+    boolean duplicatesFound = false;
+    static Set<String> dups;
 
-   public String transform(String input) throws Exception {
-      if (keys.contains(input) || dups.contains(input)) {
-         duplicatesFound = true;
-         dups.add(input);
-         return setLastTransform("Duplicate: " + input);
-      } else {
-         keys.add(input);
-         return setLastTransform(input);
-      }
-   }
+    @SuppressWarnings("unchecked")
+    @Override
+    public void setupImpl(Transform transformer) throws IOException, ClassNotFoundException {
+        if (dups == null) {
+            if (dupFile.exists()) {
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dupFile));
+                dups = (Set<String>) ois.readObject();
+                ois.close();
+            } else {
+                dups = new HashSet<String>();
+            }
+        }
+    }
 
-   @Override
-   public void cleanup(Transform transformer) throws Exception {
-      super.cleanup(transformer);
-      if (duplicatesFound) {
-         transformer.getLog().info(this.getName() + " FOUND DUPLICATES. *** Please view the output file for details. " + dups.size());
-         transformer.getLog().info(this.getName() + " Dups: " + dups);
-         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dupFile));
-         oos.writeObject(dups);
-         oos.close();
-      } else {
-         transformer.getLog().info(this.getName() + " found no duplicates.");
-      }
-   }
+    public String transform(String input) throws Exception {
+        if (keys.contains(input) || dups.contains(input)) {
+            duplicatesFound = true;
+            dups.add(input);
+            return setLastTransform("Duplicate: " + input);
+        } else {
+            keys.add(input);
+            return setLastTransform(input);
+        }
+    }
+
+    @Override
+    public void cleanup(Transform transformer) throws Exception {
+        super.cleanup(transformer);
+        if (duplicatesFound) {
+            transformer.getLog().info(
+                this.getName() + " FOUND DUPLICATES. *** Please view the output file for details. " + dups.size());
+            transformer.getLog().info(this.getName() + " Dups: " + dups);
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dupFile));
+            oos.writeObject(dups);
+            oos.close();
+        } else {
+            transformer.getLog().info(this.getName() + " found no duplicates.");
+        }
+    }
 
 }

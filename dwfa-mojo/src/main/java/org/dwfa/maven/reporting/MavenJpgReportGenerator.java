@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,149 +43,146 @@ import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 public class MavenJpgReportGenerator extends AbstractMavenReport {
 
-	/**
-	 * The Maven Project Object
-	 * 
-	 * @parameter default-value="${project}"
-	 * @required
-	 * @readonly
-	 */
-	private MavenProject project;
+    /**
+     * The Maven Project Object
+     * 
+     * @parameter default-value="${project}"
+     * @required
+     * @readonly
+     */
+    private MavenProject project;
 
-	/**
-	 * Specifies the directory where the report will be generated
-	 * 
-	 * @parameter default-value="${project.reporting.outputDirectory}"
-	 * @required
-	 */
-	private String outputDirectory;
+    /**
+     * Specifies the directory where the report will be generated
+     * 
+     * @parameter default-value="${project.reporting.outputDirectory}"
+     * @required
+     */
+    private String outputDirectory;
 
-	/**
-	 * @component
-	 * @required
-	 * @readonly
-	 */
-	private SiteRenderer siteRenderer;
+    /**
+     * @component
+     * @required
+     * @readonly
+     */
+    private SiteRenderer siteRenderer;
 
-	/**
-	 * @parameter default-value="target/reports"
-	 * @required
-	 */
-	private File opsDirectory;
+    /**
+     * @parameter default-value="target/reports"
+     * @required
+     */
+    private File opsDirectory;
 
-	public List<File> findFiles() {
-		List filelist = new ArrayList<File>();
-		if (opsDirectory!=null && opsDirectory.isDirectory()) {
-			/*
-			 * Get directory listing, and find all extract language files
-			 * with .xtc extension
-			 */
-			FilenameFilter filter = new FilenameFilter() {
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".jpg");
-				}
-			};
-			String[] files = opsDirectory.list(filter);
-			for (String file : files) {
-				File f = new File(opsDirectory+"/"+file);
-				filelist.add(f);
-			}
+    public List<File> findFiles() {
+        List filelist = new ArrayList<File>();
+        if (opsDirectory != null && opsDirectory.isDirectory()) {
+            /*
+             * Get directory listing, and find all extract language files
+             * with .xtc extension
+             */
+            FilenameFilter filter = new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".jpg");
+                }
+            };
+            String[] files = opsDirectory.list(filter);
+            for (String file : files) {
+                File f = new File(opsDirectory + "/" + file);
+                filelist.add(f);
+            }
 
-		}
-		return filelist;
-	}
+        }
+        return filelist;
+    }
 
-	public void executeReport(Locale locale) {
+    public void executeReport(Locale locale) {
 
-		Sink sink = getSink();
+        Sink sink = getSink();
 
-		List<File> filelist = findFiles();
+        List<File> filelist = findFiles();
 
-		sink.head();
-		sink.title();
-		sink.text("Graph Reports");
-		sink.title_();
-		sink.head_();
+        sink.head();
+        sink.title();
+        sink.text("Graph Reports");
+        sink.title_();
+        sink.head_();
 
-		sink.body();
+        sink.body();
 
-		for (File f : filelist) {
+        for (File f : filelist) {
 
-			sink.section1();
+            sink.section1();
 
-			sink.sectionTitle1();
-			sink.text(f.getName().substring(0,f.getName().lastIndexOf(".")));
-			sink.sectionTitle1_();
-			sink.lineBreak();
-			sink.lineBreak();
-			sink.figure();
-			sink.figureGraphics(f.getName());
-			sink.figure_();
-			sink.lineBreak();
-			File textfile = new File(f.getAbsolutePath().substring(0,f.getAbsolutePath().lastIndexOf("."))+".txt");
-			try {
-				fileCopy(f);
+            sink.sectionTitle1();
+            sink.text(f.getName().substring(0, f.getName().lastIndexOf(".")));
+            sink.sectionTitle1_();
+            sink.lineBreak();
+            sink.lineBreak();
+            sink.figure();
+            sink.figureGraphics(f.getName());
+            sink.figure_();
+            sink.lineBreak();
+            File textfile = new File(f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf(".")) + ".txt");
+            try {
+                fileCopy(f);
 
-				BufferedReader textReader = new BufferedReader(new FileReader(textfile));
-				String line = textReader.readLine();
-				while (line != null) {
-					sink.text(line);					
-					line = textReader.readLine();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+                BufferedReader textReader = new BufferedReader(new FileReader(textfile));
+                String line = textReader.readLine();
+                while (line != null) {
+                    sink.text(line);
+                    line = textReader.readLine();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-			sink.section1_();
+            sink.section1_();
 
-		}
+        }
 
+        sink.body_();
+        sink.flush();
+        sink.close();
 
+    }
 
-		sink.body_();
-		sink.flush();
-		sink.close();
+    public void fileCopy(File f) throws Exception {
+        FileInputStream fis = new FileInputStream(f);
+        FileOutputStream fos = new FileOutputStream("target/site/" + f.getName());
+        byte[] buf = new byte[1024];
+        int i = 0;
+        while ((i = fis.read(buf)) != -1) {
+            fos.write(buf, 0, i);
+        }
+        fis.close();
+        fos.close();
+    }
 
-	}
+    protected MavenProject getProject() {
+        return project;
+    }
 
-	public void fileCopy(File f) throws Exception {
-		FileInputStream fis  = new FileInputStream(f);
-		FileOutputStream fos = new FileOutputStream("target/site/"+f.getName());
-		byte[] buf = new byte[1024];
-		int i = 0;
-		while((i=fis.read(buf))!=-1) {
-			fos.write(buf, 0, i);
-		}
-		fis.close();
-		fos.close();
-	}
+    protected String getOutputDirectory() {
+        return outputDirectory;
+    }
 
-	protected MavenProject getProject() {
-		return project;
-	}
+    protected SiteRenderer getSiteRenderer() {
+        return siteRenderer;
+    }
 
-	protected String getOutputDirectory() {
-		return outputDirectory;
-	}
+    public String getDescription(Locale locale) {
+        return getBundle(locale).getString("report.description");
+    }
 
-	protected SiteRenderer getSiteRenderer() {
-		return siteRenderer;
-	}
+    public String getName(Locale locale) {
+        return getBundle(locale).getString("report.name");
+    }
 
-	public String getDescription(Locale locale) {
-		return getBundle(locale).getString("report.description");
-	}
+    public String getOutputName() {
+        return project.getArtifactId() + "-JpgReport";
+    }
 
-	public String getName(Locale locale) {
-		return getBundle(locale).getString("report.name");
-	}
-
-	public String getOutputName() {
-		return project.getArtifactId() + "-JpgReport";
-	}
-
-	private ResourceBundle getBundle(Locale locale) {
-		return ResourceBundle.getBundle("jpgreport", locale, this.getClass()
-				.getClassLoader());
-	}
+    private ResourceBundle getBundle(Locale locale) {
+        return ResourceBundle.getBundle("jpgreport", locale, this.getClass().getClassLoader());
+    }
 }

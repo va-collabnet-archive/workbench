@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,7 +51,7 @@ import org.dwfa.util.io.FileIO;
  * 
  * @goal process-project-dirs
  * @requiresDependencyResolution compile
- * @deprecated use the maven assembly plugin filesets instead. 
+ * @deprecated use the maven assembly plugin filesets instead.
  */
 public class ProcessProjectDirectories extends AbstractMojo {
 
@@ -70,24 +70,23 @@ public class ProcessProjectDirectories extends AbstractMojo {
     ExtractAndProcessSpec[] specs;
 
     /**
-     * The execution information for this commit operation. 
+     * The execution information for this commit operation.
+     * 
      * @parameter expression="${mojoExecution}"
      */
     private MojoExecution execution;
-    
+
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private File targetDirectory;
 
-
-
     private void addFileMatches(File root, Pattern filePattern, List<File> matches) throws IOException {
         if (root.isDirectory() && (root.getName().equals("target") == false)
-                && (root.getName().equals(".svn") == false)) {
+            && (root.getName().equals(".svn") == false)) {
             for (File child : root.listFiles()) {
                 addFileMatches(child, filePattern, matches);
             }
@@ -102,15 +101,15 @@ public class ProcessProjectDirectories extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Log l = getLog();
-    		try {
-    			if (MojoUtil.alreadyRun(l, execution.getExecutionId(), this.getClass(), targetDirectory)) {
-    				return;
-    			}
-    		} catch (NoSuchAlgorithmException e1) {
-    			throw new MojoExecutionException(e1.getMessage(), e1);
-    		} catch (IOException e1) {
-    			throw new MojoExecutionException(e1.getMessage(), e1);
-    		}
+            try {
+                if (MojoUtil.alreadyRun(l, execution.getExecutionId(), this.getClass(), targetDirectory)) {
+                    return;
+                }
+            } catch (NoSuchAlgorithmException e1) {
+                throw new MojoExecutionException(e1.getMessage(), e1);
+            } catch (IOException e1) {
+                throw new MojoExecutionException(e1.getMessage(), e1);
+            }
             UUID randomId = UUID.randomUUID();
 
             for (ExtractAndProcessSpec spec : specs) {
@@ -195,8 +194,8 @@ public class ProcessProjectDirectories extends AbstractMojo {
                                 I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) obj;
                                 ois.close();
 
-                                
-                                destFile = new File(destFile.getParentFile(), process.getProcessID() + "." + UUID.randomUUID() + ".bp");
+                                destFile = new File(destFile.getParentFile(), process.getProcessID() + "."
+                                    + UUID.randomUUID() + ".bp");
                                 FileOutputStream fos = new FileOutputStream(destFile);
                                 BufferedOutputStream bos = new BufferedOutputStream(fos);
                                 ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -210,10 +209,10 @@ public class ProcessProjectDirectories extends AbstractMojo {
                         if (spec.isExecutable()) {
                             if (System.getProperty("os.name").startsWith("Windows") == false) {
                                 try {
-                                    Runtime.getRuntime().exec(
-                                            "chmod a+x " + destFile.getPath());
+                                    Runtime.getRuntime().exec("chmod a+x " + destFile.getPath());
                                 } catch (RuntimeException e) {
-                                    // Ignore, may be running on windows, and the permissions
+                                    // Ignore, may be running on windows, and
+                                    // the permissions
                                     // don't matter there...;
                                 }
                             }
@@ -227,6 +226,5 @@ public class ProcessProjectDirectories extends AbstractMojo {
         }
 
     }
-
 
 }

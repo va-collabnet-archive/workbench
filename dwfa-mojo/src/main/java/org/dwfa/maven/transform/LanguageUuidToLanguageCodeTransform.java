@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,23 +25,23 @@ import org.dwfa.maven.I_ReadAndTransform;
 import org.dwfa.maven.Transform;
 
 /**
- * Transform that given the name of a language meta data concept returns the language
+ * Transform that given the name of a language meta data concept returns the
+ * language
  * code for that concept.
  * 
  * @author Dion McMurtrie
  */
-public class LanguageUuidToLanguageCodeTransform extends AbstractTransform
-        implements I_ReadAndTransform {
+public class LanguageUuidToLanguageCodeTransform extends AbstractTransform implements I_ReadAndTransform {
 
     public void setupImpl(Transform transformer) {
 
     }
 
     public String transform(String input) throws Exception {
-		Collection<UUID> uuids = new ArrayList<UUID>();
-		
-		uuids.add(UUID.fromString(input));
-		
-		return setLastTransform(ArchitectonicAuxiliary.getLanguageCode(uuids));
-	}
+        Collection<UUID> uuids = new ArrayList<UUID>();
+
+        uuids.add(UUID.fromString(input));
+
+        return setLastTransform(ArchitectonicAuxiliary.getLanguageCode(uuids));
+    }
 }
