@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
- * Generates an ACE SCTID mapping file from an AMT format concept, relationship or descriptions file.
+ * Generates an ACE SCTID mapping file from an AMT format concept, relationship
+ * or descriptions file.
  * 
  * TODO - add support for SNOMED and ARF formats
  * 
@@ -43,17 +44,15 @@ import org.apache.maven.plugin.MojoFailureException;
  * 
  */
 public class MappingFileGenerator extends AbstractMojo {
-    private static final String CONCEPTS_HEADER =
-            "CONCEPTID	CONCEPTSTATUS	FULLYSPECIFIEDNAME	CTV3ID	SNOMEDID	ISPRIMITVE	CONCEPTUUID	CONCEPTSTATUSUUID	EFFECTIVETIME";
+    private static final String CONCEPTS_HEADER = "CONCEPTID	CONCEPTSTATUS	FULLYSPECIFIEDNAME	CTV3ID	SNOMEDID	ISPRIMITVE	CONCEPTUUID	CONCEPTSTATUSUUID	EFFECTIVETIME";
 
-    private static final String DESCRIPTIONS_HEADER =
-            "DESCRIPTIONID	DESCRIPTIONSTATUS	CONCEPTID	TERM	INITIALCAPITALSTATUS	DESCRIPTIONTYPE	LANGUAGECODE	DESCRIPTIONUUID	DESCRIPTIONSTATUSUUID	DESCRIPTIONTYPEUUID	CONCEPTUUID	LANGUAGEUUID	CASESENSITIVITY	EFFECTIVETIME";
+    private static final String DESCRIPTIONS_HEADER = "DESCRIPTIONID	DESCRIPTIONSTATUS	CONCEPTID	TERM	INITIALCAPITALSTATUS	DESCRIPTIONTYPE	LANGUAGECODE	DESCRIPTIONUUID	DESCRIPTIONSTATUSUUID	DESCRIPTIONTYPEUUID	CONCEPTUUID	LANGUAGEUUID	CASESENSITIVITY	EFFECTIVETIME";
 
-    private static final String RELATIONSHIPS_HEADER =
-            "RELATIONSHIPID	CONCEPTID1	RELATIONSHIPTYPE	CONCEPTID2	CHARACTERISTICTYPE	REFINABILITY	RELATIONSHIPGROUP	RELATIONSHIPUUID	CONCEPTUUID1	RELATIONSHIPTYPEUUID	CONCEPTUUID2	CHARACTERISTICTYPEUUID	REFINABILITYUUID	RELATIONSHIPSTATUSUUID	EFFECTIVETIME";
+    private static final String RELATIONSHIPS_HEADER = "RELATIONSHIPID	CONCEPTID1	RELATIONSHIPTYPE	CONCEPTID2	CHARACTERISTICTYPE	REFINABILITY	RELATIONSHIPGROUP	RELATIONSHIPUUID	CONCEPTUUID1	RELATIONSHIPTYPEUUID	CONCEPTUUID2	CHARACTERISTICTYPEUUID	REFINABILITYUUID	RELATIONSHIPSTATUSUUID	EFFECTIVETIME";
 
     /**
-     * The file to convert to a mapping file - must be a concepts, descriptions or relationships file
+     * The file to convert to a mapping file - must be a concepts, descriptions
+     * or relationships file
      * 
      * @parameter
      * @required
@@ -69,14 +68,16 @@ public class MappingFileGenerator extends AbstractMojo {
     File outputFile;
 
     /**
-     * Indicates if data should be appended to the output file - default is not to overwrite
+     * Indicates if data should be appended to the output file - default is not
+     * to overwrite
      * 
      * @parameter
      */
     boolean append = false;
 
     /**
-     * Indicates if the generated mapping file is in "Legacy Map" format - default is not "Legacy Map" format
+     * Indicates if the generated mapping file is in "Legacy Map" format -
+     * default is not "Legacy Map" format
      * 
      * @parameter
      */
@@ -132,13 +133,11 @@ public class MappingFileGenerator extends AbstractMojo {
             writer.write("CONCEPTUUID\tFULLYSPECIFIEDNAME");
             writer.newLine();
         } catch (IOException e) {
-            throw new MojoExecutionException("failed writing to output file "
-                + outputFile, e);
+            throw new MojoExecutionException("failed writing to output file " + outputFile, e);
         }
     }
 
-    private void writeTokenByIndex(int sctid, int uuid)
-            throws MojoExecutionException {
+    private void writeTokenByIndex(int sctid, int uuid) throws MojoExecutionException {
         Pattern pattern = Pattern.compile("\\t");
         String[] tokens;
         try {
@@ -153,13 +152,11 @@ public class MappingFileGenerator extends AbstractMojo {
             }
             writer.close();
         } catch (IOException e) {
-            throw new MojoExecutionException("cannot read from input file "
-                + inputFile, e);
+            throw new MojoExecutionException("cannot read from input file " + inputFile, e);
         }
     }
 
-    private void writeToOutput(String sctid, String uuid)
-            throws MojoExecutionException {
+    private void writeToOutput(String sctid, String uuid) throws MojoExecutionException {
         try {
             writer.write(uuid);
             writer.newLine();
@@ -168,21 +165,18 @@ public class MappingFileGenerator extends AbstractMojo {
             writer.write(date);
             writer.newLine();
         } catch (IOException e) {
-            throw new MojoExecutionException("failed writing to output file "
-                + outputFile, e);
+            throw new MojoExecutionException("failed writing to output file " + outputFile, e);
         }
     }
 
-    private void writeToLegacyOutput(String uuid, String fsn)
-            throws MojoExecutionException {
+    private void writeToLegacyOutput(String uuid, String fsn) throws MojoExecutionException {
         try {
             writer.write(uuid);
             writer.write("\t");
             writer.write(fsn);
             writer.newLine();
         } catch (IOException e) {
-            throw new MojoExecutionException("failed writing to output file "
-                + outputFile, e);
+            throw new MojoExecutionException("failed writing to output file " + outputFile, e);
         }
     }
 
@@ -196,8 +190,7 @@ public class MappingFileGenerator extends AbstractMojo {
 
             return line;
         } catch (IOException e) {
-            throw new MojoExecutionException("failed reading input file "
-                + inputFile, e);
+            throw new MojoExecutionException("failed reading input file " + inputFile, e);
         }
     }
 
@@ -205,22 +198,17 @@ public class MappingFileGenerator extends AbstractMojo {
         try {
             reader = new BufferedReader(new FileReader(inputFile));
         } catch (FileNotFoundException e) {
-            throw new MojoExecutionException(
-                "cannot execute - input file must exist, be readable and not be empty",
-                e);
+            throw new MojoExecutionException("cannot execute - input file must exist, be readable and not be empty", e);
         }
 
         if (outputFile.exists()) {
-            getLog().warn(
-                "existing output file " + outputFile + " will be overwritten");
+            getLog().warn("existing output file " + outputFile + " will be overwritten");
         }
 
         try {
             writer = new BufferedWriter(new FileWriter(outputFile, append));
         } catch (IOException e) {
-            throw new MojoExecutionException(
-                "cannot execute - input file must exist, be readable and not be empty",
-                e);
+            throw new MojoExecutionException("cannot execute - input file must exist, be readable and not be empty", e);
         }
     }
 

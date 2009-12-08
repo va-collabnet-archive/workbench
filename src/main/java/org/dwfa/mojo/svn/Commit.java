@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,8 +33,9 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 
 /**
  * Commit the changes to svn.
+ * 
  * @goal svn-commit
- *
+ * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -42,35 +43,35 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class Commit extends AbstractMojo implements PromptUserPassword3 {
     /**
      * Location of the svn working copy
-     *
-     * @parameter 
+     * 
+     * @parameter
      */
     String workingCopyStr;
 
     /**
      * The svn repository url
-     *
-     * @parameter 
+     * 
+     * @parameter
      */
     String repositoryUrlStr;
 
     /**
      * The svn username
-     *
-     * @parameter 
+     * 
+     * @parameter
      */
     String username;
 
     /**
      * The svn password
-     *
-     * @parameter 
+     * 
+     * @parameter
      */
     String password;
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -78,23 +79,17 @@ public class Commit extends AbstractMojo implements PromptUserPassword3 {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass()
-                .getCanonicalName()
-                + workingCopyStr + repositoryUrlStr, this.getClass(),
-                targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + workingCopyStr + repositoryUrlStr,
+                this.getClass(), targetDirectory)) {
                 return;
             }
             if (workingCopyStr != null && workingCopyStr.length() > 1) {
-                workingCopyStr =
-                        FileIO.getNormalizedRelativePath(new File(
-                            workingCopyStr));
+                workingCopyStr = FileIO.getNormalizedRelativePath(new File(workingCopyStr));
             } else {
                 workingCopyStr = System.getProperty("user.dir");
             }
-            I_HandleSubversion svn =
-                    LocalVersionedTerminology.get().getSvnHandler();
-            SubversionData svd =
-                    new SubversionData(repositoryUrlStr, workingCopyStr);
+            I_HandleSubversion svn = LocalVersionedTerminology.get().getSvnHandler();
+            SubversionData svd = new SubversionData(repositoryUrlStr, workingCopyStr);
             svd.setUsername(username);
             svd.setPassword(password);
             svn.svnCommit(svd, this, false);
@@ -107,8 +102,7 @@ public class Commit extends AbstractMojo implements PromptUserPassword3 {
         }
     }
 
-    public String askQuestion(String arg0, String arg1, boolean arg2,
-            boolean arg3) {
+    public String askQuestion(String arg0, String arg1, boolean arg2, boolean arg3) {
         throw new UnsupportedOperationException();
     }
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,9 +33,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 
 /**
- *
+ * 
  * @goal vodb-set-edit-paths
- *
+ * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -43,7 +43,7 @@ public class VodbSetEditPaths extends AbstractMojo {
 
     /**
      * Editing path UUIDs
-     *
+     * 
      * @parameter
      * @required
      */
@@ -51,7 +51,7 @@ public class VodbSetEditPaths extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -60,13 +60,13 @@ public class VodbSetEditPaths extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             try {
-               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + editPaths,
-                       this.getClass(), targetDirectory)) {
-                   return;
-               }
-           } catch (NoSuchAlgorithmException e) {
-               throw new MojoExecutionException(e.getLocalizedMessage(), e);
-           }
+                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + editPaths, this.getClass(),
+                    targetDirectory)) {
+                    return;
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new MojoExecutionException(e.getLocalizedMessage(), e);
+            }
             I_ConfigAceFrame activeConfig = LocalVersionedTerminology.get().getActiveAceFrameConfig();
             I_TermFactory tf = LocalVersionedTerminology.get();
 
@@ -74,7 +74,7 @@ public class VodbSetEditPaths extends AbstractMojo {
             for (ConceptDescriptor pathConcept : editPaths) {
                 if (pathConcept.getUuid() == null) {
                     pathConcept.setUuid(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                            pathConcept.getDescription()).toString());
+                        pathConcept.getDescription()).toString());
                 }
                 activeConfig.addEditingPath(tf.getPath(pathConcept.getVerifiedConcept().getUids()));
             }

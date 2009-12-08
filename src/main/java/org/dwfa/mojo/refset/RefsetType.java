@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,51 +47,19 @@ import org.dwfa.mojo.refset.writers.StringRefsetHandler;
 
 enum RefsetType {
 
-    CONCEPT(
-        Concept.CONCEPT_EXTENSION,
-        ConceptRefsetHandler.class,
-        ".concept.refset"
-    ),
+    CONCEPT(Concept.CONCEPT_EXTENSION, ConceptRefsetHandler.class, ".concept.refset"),
 
-    CONCEPT_CONCEPT(
-            Concept.CONCEPT_CONCEPT_EXTENSION,
-            ConceptConceptRefsetHandler.class, //TODO
-            ".concept.concept.refset"
-    ),
-    CONCEPT_CONCEPT_CONCEPT(
-            Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION,
-            ConceptConceptConceptRefsetHandler.class, //TODO
-            ".concept.concept.concept.refset"
-        ),
-    INTEGER(
-        Concept.INT_EXTENSION,
-        IntegerRefsetHandler.class,
-        ".integer.refset"
-    ),
+    CONCEPT_CONCEPT(Concept.CONCEPT_CONCEPT_EXTENSION, ConceptConceptRefsetHandler.class, // TODO
+    ".concept.concept.refset"), CONCEPT_CONCEPT_CONCEPT(Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION, ConceptConceptConceptRefsetHandler.class, // TODO
+    ".concept.concept.concept.refset"), INTEGER(Concept.INT_EXTENSION, IntegerRefsetHandler.class, ".integer.refset"),
 
-    STRING(
-        Concept.STRING_EXTENSION,
-        StringRefsetHandler.class,
-        ".string.refset"
-    ),
+    STRING(Concept.STRING_EXTENSION, StringRefsetHandler.class, ".string.refset"),
 
-    BOOLEAN(
-        Concept.BOOLEAN_EXTENSION,
-        BooleanRefsetHandler.class,
-        ".boolean.refset"
-    ),
+    BOOLEAN(Concept.BOOLEAN_EXTENSION, BooleanRefsetHandler.class, ".boolean.refset"),
 
-    CONCEPT_INTEGER(
-        Concept.CONCEPT_INT_EXTENSION,
-        ConceptIntegerRefsetHandler.class,
-        ".concept.integer.refset"
-    ),
+    CONCEPT_INTEGER(Concept.CONCEPT_INT_EXTENSION, ConceptIntegerRefsetHandler.class, ".concept.integer.refset"),
 
-    CONCEPT_DOUBLE(
-            Concept.MEASUREMENT_EXTENSION,
-            ConceptDoubleRefsetHandler.class,
-            ".concept.double.refset"
-    );
+    CONCEPT_DOUBLE(Concept.MEASUREMENT_EXTENSION, ConceptDoubleRefsetHandler.class, ".concept.double.refset");
 
     private Class<? extends MemberRefsetHandler> refsetWriterClass;
     private MemberRefsetHandler refsetWriter = null;
@@ -123,14 +91,15 @@ enum RefsetType {
             return CONCEPT_DOUBLE;
         }
 
-        throw new EnumConstantNotPresentException(RefsetType.class, "No refset type for the class "
-                + part.getClass() + " exists. Full object is " + part);
+        throw new EnumConstantNotPresentException(RefsetType.class, "No refset type for the class " + part.getClass()
+            + " exists. Full object is " + part);
     }
 
     /**
      * @param filename
      * @return The appropriate refset type based on the file name.
-     * @throws EnumConstantNotPresentException where the filename cannot be matched
+     * @throws EnumConstantNotPresentException where the filename cannot be
+     *             matched
      */
     public static RefsetType findByFilename(String filename) {
         for (RefsetType t : RefsetType.values()) {
@@ -185,7 +154,8 @@ enum RefsetType {
         };
     }
 
-    public static IterableFileReader<I_ThinExtByRefPart> getHandlerForFile(File file) throws InstantiationException, IllegalAccessException {
+    public static IterableFileReader<I_ThinExtByRefPart> getHandlerForFile(File file) throws InstantiationException,
+            IllegalAccessException {
         return findByFilename(file.getName()).getRefsetHandler();
     }
 }

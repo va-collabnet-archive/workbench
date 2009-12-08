@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,12 +22,12 @@ import java.io.IOException;
 import org.dwfa.ace.file.GenericFileWriter;
 import org.dwfa.tapi.TerminologyException;
 
-public class Rf2ConceptWriter extends GenericFileWriter<Rf2ConceptWriter.Rf2ConceptRow>{
+public class Rf2ConceptWriter extends GenericFileWriter<Rf2ConceptWriter.Rf2ConceptRow> {
 
     public Rf2ConceptWriter(File conceptFile) throws IOException {
         open(conceptFile, false);
     }
-    
+
     /**
      * @see org.dwfa.ace.file.GenericFileWriter#serialize(java.lang.Object)
      */
@@ -36,24 +36,25 @@ public class Rf2ConceptWriter extends GenericFileWriter<Rf2ConceptWriter.Rf2Conc
         return conceptRow.toString();
     }
 
-    public class Rf2ConceptRow extends GenericFileWriter<Rf2ConceptRow>{
+    public class Rf2ConceptRow extends GenericFileWriter<Rf2ConceptRow> {
         String conceptSctId;
         String effectiveTime;
         String active;
         String moduleSctId;
         String definiationStatusSctId;
-        
+
         public Rf2ConceptRow() {
-            
+
         }
-        
+
         /**
          * @see java.lang.Object#toString()
          */
-        public String toString(){
-            return conceptSctId + "\t" + effectiveTime + "\t" + active + "\t" + moduleSctId + "\t" + definiationStatusSctId;
+        public String toString() {
+            return conceptSctId + "\t" + effectiveTime + "\t" + active + "\t" + moduleSctId + "\t"
+                + definiationStatusSctId;
         }
-        
+
         /**
          * @return the conceptSctId
          */

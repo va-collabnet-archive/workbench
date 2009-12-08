@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,14 +36,14 @@ import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- *This goal will add all the  given concept as path.
+ *This goal will add all the given concept as path.
  * 
  * @goal vodb-create-new-path-from-exist-concept
  * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  * @author Ming Zhang
- *
+ * 
  */
 
 public class VodbCreateNewPathFromParentConcept extends AbstractMojo {
@@ -65,44 +65,44 @@ public class VodbCreateNewPathFromParentConcept extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private File targetDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-		// Use the architectonic branch for all path editing.
-		try {
-			try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() +  pathConcept.getDescription(),
-						this.getClass(), targetDirectory)) {
-					return;
-				}
-			} catch (NoSuchAlgorithmException e) {
-				throw new MojoExecutionException(e.getLocalizedMessage(), e);
-			} 
-			I_TermFactory tf = LocalVersionedTerminology.get();
-			Set<I_Position> pathOrigins = null;
-			if (origins != null) {
-				pathOrigins = new HashSet<I_Position>(origins.length);
-				for (SimpleUniversalAcePosition pos : origins) {
-					I_Path originPath = tf.getPath(pos.getPathId());
-					pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
-				}
-			}
-			I_GetConceptData path = pathConcept.getVerifiedConcept();
-								
-			tf.newPath(pathOrigins, path);
+        // Use the architectonic branch for all path editing.
+        try {
+            try {
+                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + pathConcept.getDescription(),
+                    this.getClass(), targetDirectory)) {
+                    return;
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new MojoExecutionException(e.getLocalizedMessage(), e);
+            }
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            Set<I_Position> pathOrigins = null;
+            if (origins != null) {
+                pathOrigins = new HashSet<I_Position>(origins.length);
+                for (SimpleUniversalAcePosition pos : origins) {
+                    I_Path originPath = tf.getPath(pos.getPathId());
+                    pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
+                }
+            }
+            I_GetConceptData path = pathConcept.getVerifiedConcept();
 
-		} catch (TerminologyException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (IOException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (ParseException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
-	}
+            tf.newPath(pathOrigins, path);
+
+        } catch (TerminologyException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (ParseException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
+    }
 }

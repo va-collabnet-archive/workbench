@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,22 +44,38 @@ public final class TableSchemaParserTest {
 
     @Test
     public void shouldParseASchema() {
-        String schema = new SchemaBuilder().
-                createTable().withName("current_concepts").
-                    createColumn().withName("CONCEPTID").withType("BIGINT(20)").isMandatory().isPrimaryKey().
-                    addToTable().
-                    createColumn().withName("CONCEPTSTATUS").withType("INT(2)").isMandatory().
-                    addToTable().
-                    createColumn().withName("FULLYSPECIFIEDNAME").withType("VARCHAR(255)").isMandatory().
-                    addToTable().
-                    createColumn().withName("CTV3ID").withType("VARCHAR(5)").
-                    addToTable().
-                    createColumn().withName("SNOMEDID").withType("VARCHAR(8)").
-                    addToTable().
-                    createColumn().withName("ISPRIMITVE").withType("INT(1)").
-                    addToTable().
-                addToSchema().
-                build();
+        String schema = new SchemaBuilder().createTable()
+            .withName("current_concepts")
+            .createColumn()
+            .withName("CONCEPTID")
+            .withType("BIGINT(20)")
+            .isMandatory()
+            .isPrimaryKey()
+            .addToTable()
+            .createColumn()
+            .withName("CONCEPTSTATUS")
+            .withType("INT(2)")
+            .isMandatory()
+            .addToTable()
+            .createColumn()
+            .withName("FULLYSPECIFIEDNAME")
+            .withType("VARCHAR(255)")
+            .isMandatory()
+            .addToTable()
+            .createColumn()
+            .withName("CTV3ID")
+            .withType("VARCHAR(5)")
+            .addToTable()
+            .createColumn()
+            .withName("SNOMEDID")
+            .withType("VARCHAR(8)")
+            .addToTable()
+            .createColumn()
+            .withName("ISPRIMITVE")
+            .withType("INT(1)")
+            .addToTable()
+            .addToSchema()
+            .build();
 
         Table table = parser.parse(schema);
         assertThat(table.getName(), equalTo("current_concepts"));
@@ -74,32 +90,59 @@ public final class TableSchemaParserTest {
         expectTableColumn(tableColumns.get(4), "SNOMEDID", "VARCHAR");
         expectTableColumn(tableColumns.get(5), "ISPRIMITVE", "INT");
     }
-    
+
     @Test
     public void shouldParseASchemaWithPadding() {
-        String schema = new SchemaBuilder().
-                createTable().withName("   arf_uuid_descriptions     ").
-                    createColumn().withName("    ID").withType("VARCHAR(30)").isMandatory().
-                    addToTable().
-                    createColumn().withName("  PATH_ID").withType("     VARCHAR(30)       ").isMandatory().
-                    addToTable().
-                    createColumn().withName("EFFECTIVE_DATE      ").withType("TIMESTAMP             ").isMandatory().
-                    addToTable().
-                    createColumn().withName("  ACTIVE").withType("VARCHAR(30)").isMandatory().
-                    addToTable().
-                    createColumn().withName("CONCEPT_ID        ").withType("      VARCHAR(30)").isMandatory().
-                    addToTable().
-                    createColumn().withName("                 TERM").withType("VARCHAR(500)").isMandatory().
-                    addToTable().
-                    createColumn().withName("TYPE_ID").withType("VARCHAR(30)").isMandatory().
-                    addToTable().
-                    createColumn().withName("             LANGUAGE_ID").withType("VARCHAR(30)").isMandatory().
-                    addToTable().
-                    createColumn().withName("CASE_SENSITIVITY_ID").withType("            VARCHAR(30)").isMandatory().
-                    addToTable().
-                setCompositKeyOn("ID, PATH_ID, EFFECTIVE_DATE").
-                addToSchema().
-                build();
+        String schema = new SchemaBuilder().createTable()
+            .withName("   arf_uuid_descriptions     ")
+            .createColumn()
+            .withName("    ID")
+            .withType("VARCHAR(30)")
+            .isMandatory()
+            .addToTable()
+            .createColumn()
+            .withName("  PATH_ID")
+            .withType("     VARCHAR(30)       ")
+            .isMandatory()
+            .addToTable()
+            .createColumn()
+            .withName("EFFECTIVE_DATE      ")
+            .withType("TIMESTAMP             ")
+            .isMandatory()
+            .addToTable()
+            .createColumn()
+            .withName("  ACTIVE")
+            .withType("VARCHAR(30)")
+            .isMandatory()
+            .addToTable()
+            .createColumn()
+            .withName("CONCEPT_ID        ")
+            .withType("      VARCHAR(30)")
+            .isMandatory()
+            .addToTable()
+            .createColumn()
+            .withName("                 TERM")
+            .withType("VARCHAR(500)")
+            .isMandatory()
+            .addToTable()
+            .createColumn()
+            .withName("TYPE_ID")
+            .withType("VARCHAR(30)")
+            .isMandatory()
+            .addToTable()
+            .createColumn()
+            .withName("             LANGUAGE_ID")
+            .withType("VARCHAR(30)")
+            .isMandatory()
+            .addToTable()
+            .createColumn()
+            .withName("CASE_SENSITIVITY_ID")
+            .withType("            VARCHAR(30)")
+            .isMandatory()
+            .addToTable()
+            .setCompositKeyOn("ID, PATH_ID, EFFECTIVE_DATE")
+            .addToSchema()
+            .build();
 
         Table table = parser.parse(schema);
         assertThat(table.getName(), equalTo("arf_uuid_descriptions"));

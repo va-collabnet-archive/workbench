@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ public final class TableCacheTest {
     public void setup() {
         cache = new TableCacheBuilder().build();
     }
-    
+
     @Test
     public void shouldReturnACacheFile() {
         cache.cache(buildReleaseConfig(buildSchema()));
@@ -53,7 +53,7 @@ public final class TableCacheTest {
         expectColumn(tableColumns.get(0), "ID", "INT");
         expectColumn(tableColumns.get(1), "DESCRIPTION", "VARCHAR");
     }
-    
+
     @Test
     public void shouldThrowAnExceptionForAnUncachedFile() {
         try {
@@ -74,10 +74,17 @@ public final class TableCacheTest {
     }
 
     private String buildSchema() {
-        return new SchemaBuilder().
-                        createTable().withName("CURRENT_CONCEPT").
-                        createColumn().withName("ID").withType("INT(10)").addToTable().
-                        createColumn().withName("DESCRIPTION").withType("VARCHAR(30)").addToTable().
-                   addToSchema().build();
+        return new SchemaBuilder().createTable()
+            .withName("CURRENT_CONCEPT")
+            .createColumn()
+            .withName("ID")
+            .withType("INT(10)")
+            .addToTable()
+            .createColumn()
+            .withName("DESCRIPTION")
+            .withType("VARCHAR(30)")
+            .addToTable()
+            .addToSchema()
+            .build();
     }
 }

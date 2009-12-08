@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,10 +19,12 @@ package org.dwfa.mojo.refset.scrub;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 
 /**
- * Interface for various implementations that will identify candidate concept extensions that need
- * to be processed or corrected in some manner. It is intended that these concept extensions be passed to 
- * an appropriate {@link ConceptExtHandler}   
+ * Interface for various implementations that will identify candidate concept
+ * extensions that need
+ * to be processed or corrected in some manner. It is intended that these
+ * concept extensions be passed to
+ * an appropriate {@link ConceptExtHandler}
  */
 public interface ConceptExtFinder extends Iterable<I_ThinExtByRefVersioned> {
-	
+
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import org.dwfa.tapi.TerminologyRuntimeException;
 
 /**
  * Read ace identifier file rows into AceIdentifierRow
- *
+ * 
  * @author Ean Dungey
  */
 public class AceIdentifierReader extends IterableFileReader<AceIdentifierReader.AceIdentifierRow> {
@@ -34,7 +34,7 @@ public class AceIdentifierReader extends IterableFileReader<AceIdentifierReader.
 
     /**
      * Create the reader for the file.
-     *
+     * 
      * @param file File to read.
      */
     public AceIdentifierReader(File file) {
@@ -64,7 +64,7 @@ public class AceIdentifierReader extends IterableFileReader<AceIdentifierReader.
     }
 
     /**
-     *
+     * 
      * Ace file identifier row.
      */
     public class AceIdentifierRow {
@@ -91,14 +91,15 @@ public class AceIdentifierReader extends IterableFileReader<AceIdentifierReader.
 
         /**
          * Creates a AceIdentifierRow from an ace line.
-         *
+         * 
          * @param line From an ace concept file
          * @throws TerminologyException if not in the correct format.
          */
         public AceIdentifierRow(String line) throws TerminologyException {
-            String[] columns = line.split( "\t" );
-            if(columns.length != IDENTIFIER_COLUMNS){
-                throw new TerminologyException("Invalid file format. Ace identifier file must have " + IDENTIFIER_COLUMNS + " columns");
+            String[] columns = line.split("\t");
+            if (columns.length != IDENTIFIER_COLUMNS) {
+                throw new TerminologyException("Invalid file format. Ace identifier file must have "
+                    + IDENTIFIER_COLUMNS + " columns");
             }
 
             primaryUuid = columns[0];
@@ -139,7 +140,7 @@ public class AceIdentifierReader extends IterableFileReader<AceIdentifierReader.
 
         /**
          * This may be a Uuid or a SctId.
-         *
+         * 
          * @return the sourceId
          */
         public final String getSourceId() {
@@ -169,7 +170,7 @@ public class AceIdentifierReader extends IterableFileReader<AceIdentifierReader.
 
         /**
          * either yyyyMMdd or yyyyMMdd'T'hhmmss'Z'
-         *
+         * 
          * @return the effectiveTime
          */
         public final String getEffectiveTime() {

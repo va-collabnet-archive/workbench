@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,14 +48,15 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 /**
  * Converts specified description types to tall-man capitalisation.
  * Generates a report and workflow based on modified concepts.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 
 /**
- *
+ * 
  * @goal vodb-execute-tallman
- *
+ * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -65,24 +66,28 @@ public class VodbExecuteTallMan extends AbstractMojo {
     /**
      * Branch to which the latest component of specified branch will be
      * copied to.
+     * 
      * @parameter
      */
     private ConceptDescriptor editingBranchDescriptor;
 
     /**
      * Branch which will be copied to new branch.
+     * 
      * @parameter
      */
     private ConceptDescriptor viewingBranchDescriptor;
 
     /**
      * Description types to check.
+     * 
      * @parameter
      */
     private ConceptDescriptor[] descriptionsToCheck;
 
     /**
      * Contains list of words in their target capitalisation.
+     * 
      * @parameter
      * @required
      */
@@ -90,6 +95,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
     /**
      * Location to write output.
+     * 
      * @parameter
      * @required
      */
@@ -97,7 +103,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
     /**
      * Location to modified concepts report.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -106,16 +112,18 @@ public class VodbExecuteTallMan extends AbstractMojo {
     /**
      * Location to unmodified concepts report.
      * i.e. where the tall man word existed (ignoring capitilisation)
-     * but didn't need to be modified due to already containing correct capitilisation.
-     *
+     * but didn't need to be modified due to already containing correct
+     * capitilisation.
+     * 
      * @parameter
      * @required
      */
     private File unmodifiedConceptsOutputFile;
 
     /**
-     * Report on tall man words which weren't found at all in any concept's description.
-     *
+     * Report on tall man words which weren't found at all in any concept's
+     * description.
+     * 
      * @parameter
      * @required
      */
@@ -143,14 +151,10 @@ public class VodbExecuteTallMan extends AbstractMojo {
             workflowOutputFile.getParentFile().mkdirs();
             modifiedConceptsOutputFile.getParentFile().mkdirs();
 
-            BufferedWriter workflowWriter = new BufferedWriter(
-                    new FileWriter(workflowOutputFile));
-            BufferedWriter modifiedConceptsWriter = new BufferedWriter(
-                    new FileWriter(modifiedConceptsOutputFile));
-            BufferedWriter unmodifiedConceptsWriter = new BufferedWriter(
-                    new FileWriter(unmodifiedConceptsOutputFile));
-            BufferedWriter unusedTallManWordsWriter = new BufferedWriter(
-                    new FileWriter(unusedTallManWordsOutputFile));
+            BufferedWriter workflowWriter = new BufferedWriter(new FileWriter(workflowOutputFile));
+            BufferedWriter modifiedConceptsWriter = new BufferedWriter(new FileWriter(modifiedConceptsOutputFile));
+            BufferedWriter unmodifiedConceptsWriter = new BufferedWriter(new FileWriter(unmodifiedConceptsOutputFile));
+            BufferedWriter unusedTallManWordsWriter = new BufferedWriter(new FileWriter(unusedTallManWordsOutputFile));
 
             // read in tall man words from input file
             in = new BufferedReader(new FileReader(inputFile));
@@ -169,9 +173,8 @@ public class VodbExecuteTallMan extends AbstractMojo {
             // iterate over each concept
             termFactory.iterateConcepts(tallManWriter);
 
-            String message = "Tallman plugin modified "
-                            + tallManWriter.getNumberModifiedDescriptions()
-                            + " descriptions.";
+            String message = "Tallman plugin modified " + tallManWriter.getNumberModifiedDescriptions()
+                + " descriptions.";
             getLog().info(message);
 
             // write uuids of modified concepts to workflow file
@@ -249,21 +252,20 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
             List<UUID> uuids = concept.getUids();
 
-            // create list of IDs of description types to check (e.g. preferred term)
+            // create list of IDs of description types to check (e.g. preferred
+            // term)
             I_IntSet descriptionTypesToCheck = termFactory.newIntSet();
             for (I_GetConceptData descriptionConcept : descriptionTypes) {
                 descriptionTypesToCheck.add(descriptionConcept.getConceptId());
             }
 
             int currentUnreviewedId = termFactory.getConcept(
-                    ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId();
+                ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId();
 
             // get origins
-            I_Path originPath = termFactory.getPath(ArchitectonicAuxiliary.
-                    Concept.ARCHITECTONIC_BRANCH.getUids());
+            I_Path originPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
-            I_Position originPosition = termFactory.newPosition(originPath,
-                                                    Integer.MAX_VALUE);
+            I_Position originPosition = termFactory.newPosition(originPath, Integer.MAX_VALUE);
 
             Set<I_Position> origins = new HashSet<I_Position>();
             origins.add(originPosition);
@@ -273,29 +275,26 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
             // get concept/path/position of the branch being copied
             I_Path oldPath = termFactory.getPath(viewingBranch.getUids());
-            
-            I_Position oldPosition = termFactory.newPosition(oldPath,
-                    Integer.MAX_VALUE);
+
+            I_Position oldPosition = termFactory.newPosition(oldPath, Integer.MAX_VALUE);
             Set<I_Position> positionsToCheck = new HashSet<I_Position>();
             positionsToCheck.add(oldPosition);
 
             // get latest descriptions
-            List<I_DescriptionTuple> descriptionTuples =
-                concept.getDescriptionTuples(null, descriptionTypesToCheck, positionsToCheck);
+            List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, descriptionTypesToCheck,
+                positionsToCheck);
 
             // copy latest descriptions to new path/version
-            for (I_DescriptionTuple tuple: descriptionTuples) {
+            for (I_DescriptionTuple tuple : descriptionTuples) {
 
                 String currentDescription = tuple.getText();
                 tuple.getConceptId();
 
                 // find descriptions that contain the tall man word
                 // (ignoring case)
-                if (descriptionContainsTallManWordIgnoresCase(
-                        tallManWords, currentDescription)) {
+                if (descriptionContainsTallManWordIgnoresCase(tallManWords, currentDescription)) {
 
-                    String updatedCurrentDescription = replaceAllTallManWords(
-                            tallManWords, currentDescription, uuids);
+                    String updatedCurrentDescription = replaceAllTallManWords(tallManWords, currentDescription, uuids);
 
                     if (currentDescription.equals(updatedCurrentDescription)) {
                         // nothing changed
@@ -312,14 +311,14 @@ public class VodbExecuteTallMan extends AbstractMojo {
                         newPart.setVersion(Integer.MAX_VALUE);
                         newPart.setPathId(copyToPath.getConceptId());
                         tuple.getDescVersioned().addVersion(newPart);
-                        //termFactory.addUncommitted(concept);
+                        // termFactory.addUncommitted(concept);
 
                         // update the current concept with
                         // get latest concept attributes
-                        List<I_ConceptAttributeTuple> conceptAttributeTuples =
-                            concept.getConceptAttributeTuples(null, positionsToCheck);
+                        List<I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null,
+                            positionsToCheck);
                         // copy latest attributes and set status to unreviewed
-                        for (I_ConceptAttributeTuple attribute: conceptAttributeTuples) {
+                        for (I_ConceptAttributeTuple attribute : conceptAttributeTuples) {
                             I_ConceptAttributePart newAttributePart = attribute.duplicatePart();
                             newAttributePart.setConceptStatus(currentUnreviewedId);
                             newAttributePart.setVersion(Integer.MAX_VALUE);
@@ -334,28 +333,29 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
         /**
          * Searches a string for multiple tall man words to replace.
+         * 
          * @param tallManWords
          * @param stringToReplace
          * @param currentUuid
          * @return
          */
-        public String replaceAllTallManWords(HashSet<String> tallManWords,
-                String stringToReplace, List<UUID> currentUuid) {
+        public String replaceAllTallManWords(HashSet<String> tallManWords, String stringToReplace,
+                List<UUID> currentUuid) {
 
             String result = stringToReplace;
-            for (String tallManWord: tallManWords) {
+            for (String tallManWord : tallManWords) {
                 result = replaceSingleTallManWord(tallManWord, result);
             }
 
             if (!result.equals(stringToReplace)) {
-                modifiedDescriptions.add(stringToReplace
-                        + " CONVERTED TO: " + result + "\t " + currentUuid);
+                modifiedDescriptions.add(stringToReplace + " CONVERTED TO: " + result + "\t " + currentUuid);
             }
             return result;
         }
 
         /**
          * Searches a string for a single tall man word to replace.
+         * 
          * @param tallmanWord
          * @param stringToReplace
          * @return
@@ -368,7 +368,8 @@ public class VodbExecuteTallMan extends AbstractMojo {
             for (int x = 0; x < tallmanWord.length(); x++) {
                 char c = tallmanWord.charAt(x);
 
-                // create group for first character so we can reference this later
+                // create group for first character so we can reference this
+                // later
                 if (x == 0) {
                     searchString = searchString + "(";
                 }
@@ -382,7 +383,8 @@ public class VodbExecuteTallMan extends AbstractMojo {
             }
             searchString = searchString + "(\\b)";
 
-            // compile with case insensitive so that all combinations of case will be matched
+            // compile with case insensitive so that all combinations of case
+            // will be matched
             Pattern pattern = Pattern.compile(searchString, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(stringToReplace);
 
@@ -397,7 +399,8 @@ public class VodbExecuteTallMan extends AbstractMojo {
                 }
 
                 // replace the match with the tall man word, but include the
-                // word boundary we found (otherwise it would drop spaces, brackets etc)
+                // word boundary we found (otherwise it would drop spaces,
+                // brackets etc)
                 matcher.appendReplacement(result, matcher.group(1) + tallmanWord + matcher.group(3));
             }
             matcher.appendTail(result);
@@ -406,16 +409,17 @@ public class VodbExecuteTallMan extends AbstractMojo {
         }
 
         /**
-         * Checks if a description contains a tall man word, ignoring case differences.
+         * Checks if a description contains a tall man word, ignoring case
+         * differences.
+         * 
          * @param tallManWords
          * @param stringToCheck
          * @return
          */
-        public boolean descriptionContainsTallManWordIgnoresCase(HashSet<String> tallManWords,
-                String stringToCheck) {
+        public boolean descriptionContainsTallManWordIgnoresCase(HashSet<String> tallManWords, String stringToCheck) {
             boolean result = false;
             stringToCheck = stringToCheck.toLowerCase();
-            for (String word: tallManWords) {
+            for (String word : tallManWords) {
                 if (stringToCheck.contains(word.toLowerCase())) {
                     foundTallManWords.add(word);
                     result = true;
@@ -426,6 +430,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
         /**
          * Gets the number of modified descriptions.
+         * 
          * @return
          */
         public int getNumberModifiedDescriptions() {
@@ -434,6 +439,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
         /**
          * Sets the number of modified descriptions.
+         * 
          * @param numberModifiedDescriptions
          */
         public void setNumberModifiedDescriptions(int numberModifiedDescriptions) {

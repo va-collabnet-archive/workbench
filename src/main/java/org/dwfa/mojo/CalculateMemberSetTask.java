@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,6 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/refsets", type = BeanType.TASK_BEAN) })
 public class CalculateMemberSetTask extends AbstractTask {
 
-
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
@@ -57,8 +56,7 @@ public class CalculateMemberSetTask extends AbstractTask {
         out.writeObject(membersetPath);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-                                                         ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             root = (TermEntry) in.readObject();
@@ -66,28 +64,23 @@ public class CalculateMemberSetTask extends AbstractTask {
             memberset = (TermEntry) in.readObject();
             membersetPath = (TermEntry) in.readObject();
         } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-                                        throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-                                        throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             VodbCalculateMemberSet calculator = new VodbCalculateMemberSet();
 
             // set up root descriptor
             ConceptDescriptor rootDescriptor = new ConceptDescriptor();
-            I_GetConceptData rootConcept =
-                LocalVersionedTerminology.get().getConcept(root.ids);
+            I_GetConceptData rootConcept = LocalVersionedTerminology.get().getConcept(root.ids);
             if (rootConcept == null) {
-                throw new TaskFailedException("rootConcept is null. Ids: "
-                        + Arrays.asList(root.ids));
+                throw new TaskFailedException("rootConcept is null. Ids: " + Arrays.asList(root.ids));
             }
             rootDescriptor.setUuid((rootConcept.getUids().iterator().next()).toString());
             rootDescriptor.setDescription(calculator.getFsnFromConceptId(rootConcept.getConceptId())); // TODO
@@ -95,11 +88,9 @@ public class CalculateMemberSetTask extends AbstractTask {
 
             // set up ref set (spec) descriptor
             ConceptDescriptor refSetSpecDescriptor = new ConceptDescriptor();
-            I_GetConceptData refsetConcept =
-                LocalVersionedTerminology.get().getConcept(refset.ids);
+            I_GetConceptData refsetConcept = LocalVersionedTerminology.get().getConcept(refset.ids);
             if (refsetConcept == null) {
-                throw new TaskFailedException("refsetConcept is null. Ids: "
-                        + Arrays.asList(refset.ids));
+                throw new TaskFailedException("refsetConcept is null. Ids: " + Arrays.asList(refset.ids));
             }
             refSetSpecDescriptor.setUuid((refsetConcept.getUids().iterator().next()).toString());
             refSetSpecDescriptor.setDescription(calculator.getFsnFromConceptId(refsetConcept.getConceptId())); // TODO
@@ -107,11 +98,9 @@ public class CalculateMemberSetTask extends AbstractTask {
 
             // set up member set descriptor
             ConceptDescriptor memberSetSpecDescriptor = new ConceptDescriptor();
-            I_GetConceptData membersetConcept =
-                LocalVersionedTerminology.get().getConcept(memberset.ids);
+            I_GetConceptData membersetConcept = LocalVersionedTerminology.get().getConcept(memberset.ids);
             if (membersetConcept == null) {
-                throw new TaskFailedException("membersetConcept is null. Ids: "
-                        + Arrays.asList(memberset.ids));
+                throw new TaskFailedException("membersetConcept is null. Ids: " + Arrays.asList(memberset.ids));
             }
             memberSetSpecDescriptor.setUuid((membersetConcept.getUids().iterator().next()).toString());
             memberSetSpecDescriptor.setDescription(calculator.getFsnFromConceptId(membersetConcept.getConceptId())); // TODO
@@ -119,11 +108,9 @@ public class CalculateMemberSetTask extends AbstractTask {
 
             // set up member set path descriptor
             ConceptDescriptor memberSetPathDescriptor = new ConceptDescriptor();
-            I_GetConceptData membersetPathConcept =
-                LocalVersionedTerminology.get().getConcept(membersetPath.ids);
+            I_GetConceptData membersetPathConcept = LocalVersionedTerminology.get().getConcept(membersetPath.ids);
             if (membersetPathConcept == null) {
-                throw new TaskFailedException("membersetPathConcept is null. Ids: "
-                        + Arrays.asList(membersetPath.ids));
+                throw new TaskFailedException("membersetPathConcept is null. Ids: " + Arrays.asList(membersetPath.ids));
             }
             memberSetPathDescriptor.setUuid((membersetPathConcept.getUids().iterator().next()).toString());
             memberSetPathDescriptor.setDescription(calculator.getFsnFromConceptId(membersetPathConcept.getConceptId())); // TODO

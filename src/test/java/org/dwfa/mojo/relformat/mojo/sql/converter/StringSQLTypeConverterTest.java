@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,16 +29,16 @@ public final class StringSQLTypeConverterTest {
     public void setup() {
         converter = new StringSQLTypeConverter();
     }
-    
+
     @Test
     public void shouldConvertAStringValue() {
         String converted = converter.convert("BooHoo");
         assertThat(converted, equalTo("'BooHoo'"));
     }
-    
+
     @Test
     public void shouldEscapeQuotations() {
-      String converted = converter.convert("Chrone's disease");
-      assertThat(converted, equalTo("'Chrone''s disease'"));
+        String converted = converter.convert("Chrone's disease");
+        assertThat(converted, equalTo("'Chrone''s disease'"));
     }
 }

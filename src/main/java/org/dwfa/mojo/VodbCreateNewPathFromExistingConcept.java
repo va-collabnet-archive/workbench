@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@ import org.dwfa.tapi.TerminologyException;
  * @phase process-resources
  * @requiresDependencyResolution compile
  * @author Ming Zhang
- *
+ * 
  */
 
 public class VodbCreateNewPathFromExistingConcept extends AbstractMojo {
@@ -67,59 +67,56 @@ public class VodbCreateNewPathFromExistingConcept extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private File targetDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-		// Use the architectonic branch for all path editing.
-		try {
-			try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() +  pathParent.getDescription(), 
-						this.getClass(), targetDirectory)) {
-					return;
-				}
-			} catch (NoSuchAlgorithmException e) {
-				throw new MojoExecutionException(e.getLocalizedMessage(), e);
-			} 
-			I_TermFactory tf = LocalVersionedTerminology.get();
-			Set<I_Position> pathOrigins = null;
-			if (origins != null) {
-				pathOrigins = new HashSet<I_Position>(origins.length);
-				for (SimpleUniversalAcePosition pos : origins) {
-					I_Path originPath = tf.getPath(pos.getPathId());
-					pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
-				}
-			}
-			I_GetConceptData parent = pathParent.getVerifiedConcept();
-			I_IntSet allowedStatus = tf.newIntSet();
-			allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
-			
-			I_IntSet allowedTypes = tf.newIntSet();
-			
-			allowedTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-			Set<I_GetConceptData> s = parent.getDestRelOrigins(allowedStatus, allowedTypes, null, false);
-			if (s.size() >0)
-			{
-				for (I_GetConceptData child :s)
-				{
-					if (tf.hasId(child.getUids())) 
-					{
-						getLog().info("Find path to add" + child.toString());							
-						tf.newPath(pathOrigins, child);
-					}
-				}
-			}
-		} catch (TerminologyException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (IOException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (ParseException e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
-	}
+        // Use the architectonic branch for all path editing.
+        try {
+            try {
+                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + pathParent.getDescription(),
+                    this.getClass(), targetDirectory)) {
+                    return;
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new MojoExecutionException(e.getLocalizedMessage(), e);
+            }
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            Set<I_Position> pathOrigins = null;
+            if (origins != null) {
+                pathOrigins = new HashSet<I_Position>(origins.length);
+                for (SimpleUniversalAcePosition pos : origins) {
+                    I_Path originPath = tf.getPath(pos.getPathId());
+                    pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
+                }
+            }
+            I_GetConceptData parent = pathParent.getVerifiedConcept();
+            I_IntSet allowedStatus = tf.newIntSet();
+            allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+
+            I_IntSet allowedTypes = tf.newIntSet();
+
+            allowedTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+            Set<I_GetConceptData> s = parent.getDestRelOrigins(allowedStatus, allowedTypes, null, false);
+            if (s.size() > 0) {
+                for (I_GetConceptData child : s) {
+                    if (tf.hasId(child.getUids())) {
+                        getLog().info("Find path to add" + child.toString());
+                        tf.newPath(pathOrigins, child);
+                    }
+                }
+            }
+        } catch (TerminologyException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (ParseException e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
+    }
 }

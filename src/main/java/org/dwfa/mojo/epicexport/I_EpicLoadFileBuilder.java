@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,22 +36,23 @@ public interface I_EpicLoadFileBuilder {
     /**
      * Populates an Epic item number value pair for export into loadfiles
      * 
-     * @param refsetId - The field number from the refest which identifies what the
-     * element is
+     * @param refsetId - The field number from the refest which identifies what
+     *            the
+     *            element is
      * @param value - The Object that contains the value
      * @param previousValue - The object that contains the previous value
      */
-    public void sendItemForExport(String item, Object value,
-            Object previousValue);
+    public void sendItemForExport(String item, Object value, Object previousValue);
 
-    /** Prepares the writer for receiving values for a record; initializes the
+    /**
+     * Prepares the writer for receiving values for a record; initializes the
      * buffer of values.
      */
     public void newExportRecord();
 
     public abstract String getEpicItemNumber(int refsetNumber);
 
-    /** 
+    /**
      * Abstract method to determine which items export and how.
      * 
      * @param version - Passed to determine which load file to write to
@@ -62,7 +63,8 @@ public interface I_EpicLoadFileBuilder {
     /**
      * Writes an item to the Epic load file
      * 
-     * @param @param epicItemNumber - The item number of the value to write to the load file
+     * @param @param epicItemNumber - The item number of the value to write to
+     *        the load file
      * @param aliasItemNumber - The item number to use in the load file
      */
     public void writeItem(String epicItemNumber, String aliasItemNumber);
@@ -83,25 +85,31 @@ public interface I_EpicLoadFileBuilder {
     public void setParentConcept(I_GetConceptData parentConcept);
 
     /**
-     * If an item has no value set, will populate the the file with the value of another
-     * item.  If the value of epicItemNumber is set, will populate with that item.
+     * If an item has no value set, will populate the the file with the value of
+     * another
+     * item. If the value of epicItemNumber is set, will populate with that
+     * item.
      * 
      * @param epicItemNumber - The item number to check for if populated. I
-     * @param defaultItem - If not populated, will use this item number to populate.
+     * @param defaultItem - If not populated, will use this item number to
+     *            populate.
      */
     public void writeItemWithDefault(String epicItemNumber, String defaultItem);
 
     /**
-     * If an item has changed value since the last version, will populate the load file,
+     * If an item has changed value since the last version, will populate the
+     * load file,
      * otherwise will leave it out of the load file.
      * 
      * @param epicItemNumber - The item number of the value to populate
-     * @param aliasItemNumber - The item number that will appear in the load file.
+     * @param aliasItemNumber - The item number that will appear in the load
+     *            file.
      */
     public void writeItemIfChanged(String epicItemNumber, String aliasItemNumber);
 
     /**
-     * If an item has changed value since the last version, will populate the load file,
+     * If an item has changed value since the last version, will populate the
+     * load file,
      * otherwise will leave it out of the load file.
      * 
      * @param epicItemNumber - The item number of the value to populate

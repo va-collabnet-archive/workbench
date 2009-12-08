@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -222,7 +222,8 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
                 // String refsetId = toId(tf, refsetNid, sctId);
                 String componentId = toId(tf, componentNid, sctId);
 
-                // return refsetId + FILE_DELIMITER + componentId + FILE_DELIMITER + statusInt;
+                // return refsetId + FILE_DELIMITER + componentId +
+                // FILE_DELIMITER + statusInt;
                 return subsetId + FILE_DELIMITER + componentId + FILE_DELIMITER + statusInt;
             } else {
                 throw new Exception("Part is not of type concept ext " + part);
@@ -266,18 +267,16 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         UUID uuid;
         if (memberId == null) {
             // generate new id
-            uuid =
-                    UUID.nameUUIDFromBytes(("org.dwfa." + getTermFactory().getUids(componentNid) + getTermFactory()
-                        .getUids(refsetNid)).getBytes("8859_1"));
+            uuid = UUID.nameUUIDFromBytes(("org.dwfa." + getTermFactory().getUids(componentNid) + getTermFactory().getUids(
+                refsetNid)).getBytes("8859_1"));
         } else {
             if (getTermFactory().getUids(memberId) == null) {
                 System.out.println("Member id " + memberId + " has no UUIDs!!! for refset "
                     + getTermFactory().getConcept(refsetNid) + " for component "
                     + getTermFactory().getConcept(componentNid));
 
-                uuid =
-                        UUID.nameUUIDFromBytes(("org.dwfa." + getTermFactory().getUids(componentNid) + getTermFactory()
-                            .getUids(refsetNid)).getBytes("8859_1"));
+                uuid = UUID.nameUUIDFromBytes(("org.dwfa." + getTermFactory().getUids(componentNid) + getTermFactory().getUids(
+                    refsetNid)).getBytes("8859_1"));
             } else {
                 uuid = getTermFactory().getUids(memberId).iterator().next();
             }
@@ -331,8 +330,8 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
     public String getSnomedIntegerId(I_TermFactory tf, int componentId) throws TerminologyException, IOException {
 
         I_IdVersioned idVersioned = tf.getId(componentId);
-        int snomedIntegerId =
-                tf.getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNativeId();
+        int snomedIntegerId = tf.getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())
+            .getNativeId();
 
         List<I_IdPart> parts = idVersioned.getVersions();
         I_IdPart latestPart = null;
@@ -424,19 +423,16 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         }
 
         if (versioned == null) {
-            memberNid =
-                    getTermFactory().uuidToNativeWithGeneration(memberUuid,
-                        ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
-                        getTermFactory().getPaths(), Integer.MAX_VALUE);
+            memberNid = getTermFactory().uuidToNativeWithGeneration(memberUuid,
+                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), getTermFactory().getPaths(),
+                Integer.MAX_VALUE);
 
             if (isTransactional()) {
-                versioned =
-                        getTermFactory().newExtension(refsetNid, memberNid, componentNid,
-                            getTermFactory().uuidToNative(refsetType.getUids()));
+                versioned = getTermFactory().newExtension(refsetNid, memberNid, componentNid,
+                    getTermFactory().uuidToNative(refsetType.getUids()));
             } else {
-                versioned =
-                        getTermFactory().getDirectInterface().newExtensionBypassCommit(refsetNid, memberNid,
-                            componentNid, getTermFactory().uuidToNative(refsetType.getUids()));
+                versioned = getTermFactory().getDirectInterface().newExtensionBypassCommit(refsetNid, memberNid,
+                    componentNid, getTermFactory().uuidToNative(refsetType.getUids()));
             }
 
         }

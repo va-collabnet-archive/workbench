@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,11 +32,11 @@ import java.util.Map;
 
 public final class LineValueToSQLTypeConverterBuilder {
 
-    private static final String VARCHAR_TYPE        = "VARCHAR";
-    private static final String CHAR_TYPE           = "CHAR";
-    private static final String TIMESTAMP_TYPE      = "TIMESTAMP";
-    private static final String TIME_TYPE           = "TIME";
-    private static final String DATE_TYPE           = "DATE";
+    private static final String VARCHAR_TYPE = "VARCHAR";
+    private static final String CHAR_TYPE = "CHAR";
+    private static final String TIMESTAMP_TYPE = "TIMESTAMP";
+    private static final String TIME_TYPE = "TIME";
+    private static final String DATE_TYPE = "DATE";
 
     public LineValueToSQLTypeConverter build() {
         Map<String, SQLTypeConverter> converterMap = new HashMap<String, SQLTypeConverter>();

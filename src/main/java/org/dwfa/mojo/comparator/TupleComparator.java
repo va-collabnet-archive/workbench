@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,8 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import java.util.Comparator;
 
 /**
- * This comparator sorts a list of tuples, firstly by description id (arbitrary value,
+ * This comparator sorts a list of tuples, firstly by description id (arbitrary
+ * value,
  * but can be used to group versions) and then by description version
  */
 public class TupleComparator implements Comparator {

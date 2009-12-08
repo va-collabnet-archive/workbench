@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,9 +27,9 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
 
 /**
- *
+ * 
  * @goal vodb-close
- *
+ * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -37,19 +37,17 @@ public class VodbClose extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private File targetDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        I_ImplementTermFactory termFactoryImpl =
-                (I_ImplementTermFactory) LocalVersionedTerminology.get();
+        I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) LocalVersionedTerminology.get();
         try {
             try {
-                if (MojoUtil.alreadyRun(getLog(), "VodbClose", this.getClass(),
-                    targetDirectory)) {
+                if (MojoUtil.alreadyRun(getLog(), "VodbClose", this.getClass(), targetDirectory)) {
                     return;
                 }
             } catch (NoSuchAlgorithmException e) {

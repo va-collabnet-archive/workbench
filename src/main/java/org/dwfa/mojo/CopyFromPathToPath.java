@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,17 +29,19 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Copies from all the specified paths and their children to the new path. Note that this
- * mojo will only copy content that is explicitly on the origin paths, not inherited from
+ * Copies from all the specified paths and their children to the new path. Note
+ * that this
+ * mojo will only copy content that is explicitly on the origin paths, not
+ * inherited from
  * a parent path.
- *
+ * 
  * @goal copy-from-path-to-path
  */
 public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcepts {
 
     /**
      * Paths to copy the data from
-     *
+     * 
      * @parameter
      * @required
      */
@@ -47,58 +49,61 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Path to copy the data to
-     *
+     * 
      * @parameter
      * @required
      */
     ConceptDescriptor toPath;
 
     /**
-     * This status will be used to change all content to if set, otherwise the status of the
+     * This status will be used to change all content to if set, otherwise the
+     * status of the
      * components on the origin path will be used
-     *
+     * 
      * @parameter
      */
     ConceptDescriptor status = null;
 
     /**
      * The release time to stamp all copies with, otherwise NOW will be used
-     *
+     * 
      * @parameter
      */
     Date releaseTime = null;
 
     /**
-     * Indicate if all history or only the latest state of the objects should be copied - defaults to false
-     *
+     * Indicate if all history or only the latest state of the objects should be
+     * copied - defaults to false
+     * 
      * @parameter
      */
     boolean copyOnlyLatestState = false;
 
     /**
-     * Indicates whether to read all parts of the object and copy any found, or only the very latest part in time sequence across all paths
-     *
+     * Indicates whether to read all parts of the object and copy any found, or
+     * only the very latest part in time sequence across all paths
+     * 
      * @parameter
      */
     boolean readLatestPartOnly = false;
 
     /**
      * Indicates whether to include child paths
-     *
+     * 
      * @parameter
      */
     boolean includeChildPaths = false;
 
     /**
      * Indicates whether to include the SNOMED Is A
-     *
+     * 
      * @parameter
      */
     boolean includeSnomedIsA = true;
 
     /**
      * Indicates whether to require a a concept to have attributes
-     *
+     * 
      * @parameter
      */
     boolean validate = true;
@@ -166,18 +171,17 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             if (duplicateVersionRelationships) {
                 duplicateVersionError += "One or more relationships were found with multiple versions on the same path and with the same timestamp. ";
             }
-            if (duplicateVersionDescriptions ||
-                    duplicateVersionRelationships) {
+            if (duplicateVersionDescriptions || duplicateVersionRelationships) {
                 throw new MojoExecutionException(duplicateVersionError);
             }
         } catch (Exception e) {
-            throw new MojoExecutionException("failed copying from paths "
-                    + fromPaths + " to path " + toPath, e);
+            throw new MojoExecutionException("failed copying from paths " + fromPaths + " to path " + toPath, e);
         }
 
     }
 
-    private void addToFromPaths(List<I_GetConceptData> fromPathConcepts, I_GetConceptData verifiedConcept) throws IOException {
+    private void addToFromPaths(List<I_GetConceptData> fromPathConcepts, I_GetConceptData verifiedConcept)
+            throws IOException {
         fromPathConcepts.add(verifiedConcept);
 
         Set<I_GetConceptData> children = verifiedConcept.getDestRelOrigins(null, null, null, false);
@@ -196,9 +200,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         duplicateDescTuples = new ArrayList<I_DescriptionTuple>();
         duplicateRelTuples = new ArrayList<I_RelTuple>();
 
-        if (validate ||
-                (arg0.getConceptAttributes() != null &&
-                arg0.getConceptAttributes().versionCount() > 0)) {
+        if (validate || (arg0.getConceptAttributes() != null && arg0.getConceptAttributes().versionCount() > 0)) {
             processConceptAttributes(arg0.getConceptAttributes());
         }
         processDescription(arg0.getDescriptions());
@@ -209,19 +211,24 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         processImages(arg0.getImages());
         processRelationship(arg0.getSourceRels());
 
-        // Log all Duplicate-versioned descriptions and relationships on the same path and timestamp here
+        // Log all Duplicate-versioned descriptions and relationships on the
+        // same path and timestamp here
         if (!duplicateDescTuples.isEmpty()) {
             duplicateVersionDescriptions = Boolean.TRUE;
             getLog().error("***** Duplicate-versioned description tuple(s) in concept: " + arg0.getUids().get(0));
             for (I_DescriptionTuple tuple : duplicateDescTuples) {
-                getLog().error("Desc id: " + tuple.getDescId() + ", Path id: " + tuple.getPathId() + ", Version: " + tuple.getVersion() + "\n\t(" + tuple.getText() + ")");
+                getLog().error(
+                    "Desc id: " + tuple.getDescId() + ", Path id: " + tuple.getPathId() + ", Version: "
+                        + tuple.getVersion() + "\n\t(" + tuple.getText() + ")");
             }
         }
         if (!duplicateRelTuples.isEmpty()) {
             duplicateVersionRelationships = Boolean.TRUE;
             getLog().error("***** Duplicate-versioned relationship tuple(s) in concept: " + arg0.getUids().get(0));
             for (I_RelTuple tuple : duplicateRelTuples) {
-                getLog().error("Rel id: " + tuple.getRelId() + ", Path id: " + tuple.getPathId() + ", Version: " + tuple.getVersion() + "\n\t(" + tuple.getTypeId() + ")");
+                getLog().error(
+                    "Rel id: " + tuple.getRelId() + ", Path id: " + tuple.getPathId() + ", Version: "
+                        + tuple.getVersion() + "\n\t(" + tuple.getTypeId() + ")");
             }
         }
     }
@@ -239,9 +246,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    public void processConceptAttributes(
-            I_ConceptAttributeVersioned conceptAttributeVersioned)
-            throws Exception {
+    public void processConceptAttributes(I_ConceptAttributeVersioned conceptAttributeVersioned) throws Exception {
 
         if (++conceptAttributeCount % 1000 == 0) {
             getLog().info("processed concept attribute " + conceptAttributeCount);
@@ -279,8 +284,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    private I_ConceptAttributeTuple getLatestAttributes(
-            List<I_ConceptAttributeTuple> tuples) {
+    private I_ConceptAttributeTuple getLatestAttributes(List<I_ConceptAttributeTuple> tuples) {
         I_ConceptAttributeTuple latest = null;
         for (I_ConceptAttributeTuple conceptAttributeTuple : tuples) {
             if (latest == null || latest.getVersion() < conceptAttributeTuple.getVersion()) {
@@ -290,8 +294,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         return latest;
     }
 
-    private void duplicateConceptAttributeTuple(
-            I_ConceptAttributeTuple latestPart) {
+    private void duplicateConceptAttributeTuple(I_ConceptAttributeTuple latestPart) {
         I_ConceptAttributePart newPart = latestPart.duplicatePart();
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
@@ -310,26 +313,30 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    public void processDescription(I_DescriptionVersioned descriptionVersioned)
-            throws Exception {
+    public void processDescription(I_DescriptionVersioned descriptionVersioned) throws Exception {
 
         if (++descriptionCount % 1000 == 0) {
             getLog().info("processed description " + descriptionCount);
         }
 
         Collection<I_DescriptionTuple> allTuples = descriptionVersioned.getTuples();
-        Map<TupleKey, List<I_AmTypedTuple>> versionsMap =
-                new HashMap<TupleKey, List<I_AmTypedTuple>>();
+        Map<TupleKey, List<I_AmTypedTuple>> versionsMap = new HashMap<TupleKey, List<I_AmTypedTuple>>();
 
-        // Check for multi-versioned descriptions, with the same path and timestamp
+        // Check for multi-versioned descriptions, with the same path and
+        // timestamp
         for (I_DescriptionTuple tuple : allTuples) {
-            
+
             /**
-             * add each tuple to a hashmap with a composite key of <tupletype>id, pathid & timestamp.
-             * If the current tuple exists in the map with these ids and time then we have a
-             * multi-versioned commit (bad). Store a copy of each of these so they can be logged,
-             * after iterating each version of this description/relationship, and then fail the build once all
-             * description/relationship have been copied (so we get to log all bad data)
+             * add each tuple to a hashmap with a composite key of
+             * <tupletype>id, pathid & timestamp.
+             * If the current tuple exists in the map with these ids and time
+             * then we have a
+             * multi-versioned commit (bad). Store a copy of each of these so
+             * they can be logged,
+             * after iterating each version of this description/relationship,
+             * and then fail the build once all
+             * description/relationship have been copied (so we get to log all
+             * bad data)
              */
 
             TupleKey key = new TupleKey(tuple.getDescId(), tuple.getPathId(), tuple.getVersion());
@@ -337,7 +344,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
 
             if (versionsMap.containsKey(key)) {
 
-                versions = versionsMap.get(key);                
+                versions = versionsMap.get(key);
 
                 if (!duplicateDescTuples.contains(tuple)) {
                     duplicateDescTuples.add(tuple);
@@ -404,8 +411,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         t.getDescVersioned().addVersion(newPart);
     }
 
-    public void processExtensionByReference(I_ThinExtByRefVersioned extByRef)
-            throws Exception {
+    public void processExtensionByReference(I_ThinExtByRefVersioned extByRef) throws Exception {
 
         if (++extCount % 1000 == 0) {
             getLog().info("processed extension " + extCount);
@@ -605,26 +611,30 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    public void processRelationship(I_RelVersioned relVersioned)
-            throws Exception {
+    public void processRelationship(I_RelVersioned relVersioned) throws Exception {
 
         if (++relCount % 1000 == 0) {
             getLog().info("processed relationship " + relCount);
         }
 
         Collection<I_RelTuple> allTuples = relVersioned.getTuples();
-        Map<TupleKey, List<I_AmTypedTuple>> versionsMap =
-                new HashMap<TupleKey, List<I_AmTypedTuple>>();
+        Map<TupleKey, List<I_AmTypedTuple>> versionsMap = new HashMap<TupleKey, List<I_AmTypedTuple>>();
 
-        // Check for multi-versioned relationships, with the same path and timestamp
+        // Check for multi-versioned relationships, with the same path and
+        // timestamp
         for (I_RelTuple tuple : allTuples) {
 
             /**
-             * add each tuple to a hashmap with a composite key of <tupletype>id, pathid & timestamp.
-             * If the current tuple exists in the map with these ids and time then we have a
-             * multi-versioned commit (bad). Store a copy of each of these so they can be logged,
-             * after iterating each version of this description/relationship, and then fail the build once all
-             * description/relationship have been copied (so we get to log all bad data)
+             * add each tuple to a hashmap with a composite key of
+             * <tupletype>id, pathid & timestamp.
+             * If the current tuple exists in the map with these ids and time
+             * then we have a
+             * multi-versioned commit (bad). Store a copy of each of these so
+             * they can be logged,
+             * after iterating each version of this description/relationship,
+             * and then fail the build once all
+             * description/relationship have been copied (so we get to log all
+             * bad data)
              */
 
             TupleKey key = new TupleKey(tuple.getRelId(), tuple.getPathId(), tuple.getVersion());
@@ -692,10 +702,10 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         I_RelPart newPart = t.duplicatePart();
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
-		if (statusId != 0) {
-			newPart.setStatusId(statusId);
-		}
-		t.getRelVersioned().addVersion(newPart);
-	}
+        if (statusId != 0) {
+            newPart.setStatusId(statusId);
+        }
+        t.getRelVersioned().addVersion(newPart);
+    }
 
 }

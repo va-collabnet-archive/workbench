@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ import java.util.List;
 
 public final class SchemaBuilder {
 
-    private static  final String lineSeparator = new SystemPropertyReaderImpl().getLineSeparator();
+    private static final String lineSeparator = new SystemPropertyReaderImpl().getLineSeparator();
 
     private final List<TableBuilder> tableBuilders;
 
@@ -84,12 +84,12 @@ public final class SchemaBuilder {
 
             builder.append("create table ").append(tableName).append(" (").append(lineSeparator);
 
-            for (int x=0; x < columnBuilders.size(); x++) {
+            for (int x = 0; x < columnBuilders.size(); x++) {
                 ColumnBuilder columnBuilder = columnBuilders.get(x);
 
                 builder.append(columnBuilder.build());
 
-                if (x < (columnBuilders.size() -1)) {
+                if (x < (columnBuilders.size() - 1)) {
                     builder.append(",").append(lineSeparator);
                 }
             }
@@ -111,7 +111,6 @@ public final class SchemaBuilder {
         private String columnType;
         private boolean mandatory;
         private boolean primaryKey;
-
 
         public ColumnBuilder(final SchemaBuilder.TableBuilder parent) {
             this.parent = parent;
@@ -141,7 +140,7 @@ public final class SchemaBuilder {
             return parent;
         }
 
-        public String build() {                        
+        public String build() {
             StringBuilder builder = new StringBuilder();
             builder.append(columnName).append(" ").append(columnType);
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,11 +24,14 @@ import java.sql.Statement;
 import java.util.Date;
 
 /**
- * Note that SNOMED ids are "unsigned", if we where to convert to integers, or other 
- * representation, starting at MinInt + 1, and using MinInt for the equivalent of "null" , might be
- * a good option. 
+ * Note that SNOMED ids are "unsigned", if we where to convert to integers, or
+ * other
+ * representation, starting at MinInt + 1, and using MinInt for the equivalent
+ * of "null" , might be
+ * a good option.
+ * 
  * @author kec
- *
+ * 
  */
 public abstract class GenerateSnomedJDBC extends ProcessSnomedSources {
 
@@ -117,9 +120,7 @@ public abstract class GenerateSnomedJDBC extends ProcessSnomedSources {
 
     public PreparedStatement getConceptStatement() throws SQLException {
         if (conceptStatement == null) {
-            conceptStatement =
-                    conn
-                        .prepareStatement("INSERT INTO CONCEPTS(ID, VERSION, STATUS, DEFINED) VALUES (?, ?, ?, ?)");
+            conceptStatement = conn.prepareStatement("INSERT INTO CONCEPTS(ID, VERSION, STATUS, DEFINED) VALUES (?, ?, ?, ?)");
         }
         return conceptStatement;
     }
@@ -128,9 +129,7 @@ public abstract class GenerateSnomedJDBC extends ProcessSnomedSources {
 
     public PreparedStatement getDescriptionStatement() throws SQLException {
         if (descriptionStatement == null) {
-            descriptionStatement =
-                    conn
-                        .prepareStatement("INSERT INTO DESCRIPTIONS(ID, VERSION, STATUS, CID, INITCAP, TYPE, TEXT, LANG) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            descriptionStatement = conn.prepareStatement("INSERT INTO DESCRIPTIONS(ID, VERSION, STATUS, CID, INITCAP, TYPE, TEXT, LANG) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         }
         return descriptionStatement;
     }
@@ -139,15 +138,13 @@ public abstract class GenerateSnomedJDBC extends ProcessSnomedSources {
 
     public PreparedStatement getRelStatement() throws SQLException {
         if (relStatement == null) {
-            relStatement =
-                    conn
-                        .prepareStatement("INSERT INTO RELATIONSHIPS (ID, VERSION, C1ID, TYPEID, C2ID, CHARID, REFID, ROLEGRP) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            relStatement = conn.prepareStatement("INSERT INTO RELATIONSHIPS (ID, VERSION, C1ID, TYPEID, C2ID, CHARID, REFID, ROLEGRP) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         }
         return relStatement;
     }
 
-    public void writeConcept(Date releaseDate, long conceptKey,
-            int conceptStatus, int defChar) throws IOException, SQLException {
+    public void writeConcept(Date releaseDate, long conceptKey, int conceptStatus, int defChar) throws IOException,
+            SQLException {
         PreparedStatement insert = getConceptStatement();
         insert.setLong(1, conceptKey);
         insert.setLong(2, releaseDate.getTime());
@@ -161,10 +158,8 @@ public abstract class GenerateSnomedJDBC extends ProcessSnomedSources {
         countAndCommit();
     }
 
-    public void writeRelationship(Date releaseDate, long relID,
-            long conceptOneID, long relationshipTypeConceptID,
-            long conceptTwoID, long characteristic, long refinability, int group)
-            throws IOException, SQLException {
+    public void writeRelationship(Date releaseDate, long relID, long conceptOneID, long relationshipTypeConceptID,
+            long conceptTwoID, long characteristic, long refinability, int group) throws IOException, SQLException {
         PreparedStatement insert = getRelStatement();
         insert.setLong(1, relID);
         insert.setLong(2, releaseDate.getTime());
@@ -179,9 +174,8 @@ public abstract class GenerateSnomedJDBC extends ProcessSnomedSources {
 
     }
 
-    public void writeDescription(Date releaseDate, long descriptionId,
-            int status, long conceptId, String text, int capStatus,
-            int typeInt, String lang) throws IOException, SQLException {
+    public void writeDescription(Date releaseDate, long descriptionId, int status, long conceptId, String text,
+            int capStatus, int typeInt, String lang) throws IOException, SQLException {
         PreparedStatement insert = getDescriptionStatement();
         insert.setLong(1, descriptionId);
         insert.setLong(2, releaseDate.getTime());

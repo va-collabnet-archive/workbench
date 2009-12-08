@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,45 +27,47 @@ import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class SimpleUniversalAcePosition {
-	
-	private static SimpleDateFormat dateParser = new SimpleDateFormat();
-	private ConceptDescriptor pathConcept;
-	private String timeStr;
-	
-	public SimpleUniversalAcePosition(ConceptDescriptor pathConcept, String timeStr) {
-		super();
-		this.pathConcept = pathConcept;
-		this.timeStr = timeStr;
-	}
-	
-	public SimpleUniversalAcePosition() {
-		super();
-	}
-	public String getTimeStr() {
-		return timeStr;
-	}
-	public void setTimeStr(String timeStr) {
-		this.timeStr = timeStr;
-	}
-	
-	public int getTime() throws ParseException {
-		if (timeStr == null) {
-			return Integer.MAX_VALUE;
-		}
-		Date date = dateParser.parse(timeStr);
-		return ThinVersionHelper.convert(date.getTime());
-	}
 
-	public Collection<UUID> getPathId() throws IOException, Exception {
-		return pathConcept.getVerifiedConcept().getUids();
-	}
+    private static SimpleDateFormat dateParser = new SimpleDateFormat();
+    private ConceptDescriptor pathConcept;
+    private String timeStr;
 
-	public ConceptDescriptor getPathConcept() {
-		return pathConcept;
-	}
+    public SimpleUniversalAcePosition(ConceptDescriptor pathConcept, String timeStr) {
+        super();
+        this.pathConcept = pathConcept;
+        this.timeStr = timeStr;
+    }
 
-	public void setPathConcept(ConceptDescriptor pathConcept) {
-		this.pathConcept = pathConcept;
-	}
+    public SimpleUniversalAcePosition() {
+        super();
+    }
+
+    public String getTimeStr() {
+        return timeStr;
+    }
+
+    public void setTimeStr(String timeStr) {
+        this.timeStr = timeStr;
+    }
+
+    public int getTime() throws ParseException {
+        if (timeStr == null) {
+            return Integer.MAX_VALUE;
+        }
+        Date date = dateParser.parse(timeStr);
+        return ThinVersionHelper.convert(date.getTime());
+    }
+
+    public Collection<UUID> getPathId() throws IOException, Exception {
+        return pathConcept.getVerifiedConcept().getUids();
+    }
+
+    public ConceptDescriptor getPathConcept() {
+        return pathConcept;
+    }
+
+    public void setPathConcept(ConceptDescriptor pathConcept) {
+        this.pathConcept = pathConcept;
+    }
 
 }

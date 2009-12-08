@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,8 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Captures information about a <code>ComponentRefsetKey</code>. Stores <code>I_ThinExtByRefVersioned</code> members
- * for this component-refset combination. 
+ * Captures information about a <code>ComponentRefsetKey</code>. Stores
+ * <code>I_ThinExtByRefVersioned</code> members
+ * for this component-refset combination.
  */
 public final class ComponentRefsetMembers {
 
@@ -48,7 +49,7 @@ public final class ComponentRefsetMembers {
     }
 
     public List<I_ThinExtByRefVersioned> getMembers() {
-        //return a copy.
+        // return a copy.
         return new ArrayList<I_ThinExtByRefVersioned>(members);
     }
 
@@ -57,4 +58,3 @@ public final class ComponentRefsetMembers {
     }
 
 }
-

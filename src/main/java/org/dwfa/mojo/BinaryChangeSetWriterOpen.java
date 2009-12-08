@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,8 +38,9 @@ public class BinaryChangeSetWriterOpen extends AbstractMojo {
     /**
      * The change set directory
      * 
-     * @parameter expression="${project.build.directory}/generated-resources/changesets/"
-
+     * @parameter
+     *            expression="${project.build.directory}/generated-resources/changesets/"
+     * 
      * @required
      */
     File changeSetDir;
@@ -47,16 +48,14 @@ public class BinaryChangeSetWriterOpen extends AbstractMojo {
     /**
      * The change set file name
      * 
-     * @parameter 
+     * @parameter
      */
     String changeSetFileName = UUID.randomUUID() + ".jcs";
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         try {
-            I_WriteChangeSet writer =
-                    termFactory.newBinaryChangeSetWriter(new File(changeSetDir,
-                        changeSetFileName));
+            I_WriteChangeSet writer = termFactory.newBinaryChangeSetWriter(new File(changeSetDir, changeSetFileName));
             termFactory.addChangeSetWriter(writer);
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);

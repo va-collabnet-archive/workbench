@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ public class AceConceptReader extends IterableFileReader<AceConceptReader.AceCon
     public AceConceptReader(File file) {
         setSourceFile(file);
     }
-    
+
     /**
      * @see org.dwfa.ace.file.IterableFileReader#processLine(java.lang.String)
      * @throws TerminologyRuntimeException if the row is invalid.
@@ -49,7 +49,7 @@ public class AceConceptReader extends IterableFileReader<AceConceptReader.AceCon
     @Override
     protected AceConceptRow processLine(String line) {
         AceConceptRow aceConceptRow;
-        
+
         try {
             aceConceptRow = new AceConceptRow(line);
         } catch (IndexOutOfBoundsException ex) {
@@ -59,7 +59,7 @@ public class AceConceptReader extends IterableFileReader<AceConceptReader.AceCon
             logger.info("Cannot process line:" + ex);
             throw new TerminologyRuntimeException(ex);
         }
-        
+
         return aceConceptRow;
     }
 
@@ -91,13 +91,13 @@ public class AceConceptReader extends IterableFileReader<AceConceptReader.AceCon
         private String pathUuid;
         /** status concept UUID. */
         private String statusUuid;
-        
+
         /**
          * Default constructor.
          */
         public AceConceptRow() {
         }
-        
+
         /**
          * Creates a AceConceptRow from an ace line.
          * 
@@ -105,11 +105,12 @@ public class AceConceptReader extends IterableFileReader<AceConceptReader.AceCon
          * @throws TerminologyException if not in the correct format.
          */
         public AceConceptRow(String line) throws TerminologyException {
-            String[] columns = line.split( "\t" );
-            if(columns.length != CONCEPT_COLUMNS){
-                throw new TerminologyException("Invalid file format. Ace concept file must have " + CONCEPT_COLUMNS + " columns");
+            String[] columns = line.split("\t");
+            if (columns.length != CONCEPT_COLUMNS) {
+                throw new TerminologyException("Invalid file format. Ace concept file must have " + CONCEPT_COLUMNS
+                    + " columns");
             }
-            
+
             conceptId = columns[0];
             conceptStatus = columns[1];
             fullySpecifiedName = columns[2];

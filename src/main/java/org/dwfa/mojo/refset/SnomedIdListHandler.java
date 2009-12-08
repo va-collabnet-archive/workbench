@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,64 +29,68 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
 /**
- * Processes a tab delimited file containing a snomed concept id in the first column.
- * For each concept listed an inclusion specification extension will be produced. 
+ * Processes a tab delimited file containing a snomed concept id in the first
+ * column.
+ * For each concept listed an inclusion specification extension will be
+ * produced.
  * 
- * @deprecated Use {@link ConceptListReader} along with {@link MemberRefsetHelper}
+ * @deprecated Use {@link ConceptListReader} along with
+ *             {@link MemberRefsetHelper}
  */
-@Deprecated 
+@Deprecated
 public class SnomedIdListHandler extends IterableFileReader<I_ThinExtByRefVersioned> {
-	
-	protected I_TermFactory termFactory = LocalVersionedTerminology.get();
-	
-	/**
-	 * @parameter 
-	 * @required
-	 */
-	protected ConceptDescriptor refsetType;
-	
-	@Override
-	protected I_ThinExtByRefVersioned processLine(String line) {
 
-		String[] tokens = line.split( "\t" );
-		
-		try {
-			int sourceId = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
-			I_GetConceptData concept = termFactory.getConcept(tokens[0], sourceId);
+    protected I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-			int memberId = termFactory.uuidToNativeWithGeneration( UUID.randomUUID(),
-	                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
-	                termFactory.getPaths(), Integer.MAX_VALUE );
-			
-			int refsetTypeId = termFactory.uuidToNative( 
-					RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids().iterator().next() );
-			
-            int statusId = termFactory.uuidToNative(
-                    ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
-			
+    /**
+     * @parameter
+     * @required
+     */
+    protected ConceptDescriptor refsetType;
+
+    @Override
+    protected I_ThinExtByRefVersioned processLine(String line) {
+
+        String[] tokens = line.split("\t");
+
+        try {
+            int sourceId = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
+            I_GetConceptData concept = termFactory.getConcept(tokens[0], sourceId);
+
+            int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
+                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), termFactory.getPaths(),
+                Integer.MAX_VALUE);
+
+            int refsetTypeId = termFactory.uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids()
+                .iterator()
+                .next());
+
+            int statusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
+
             int specTypeId = getRefsetType().getVerifiedConcept().getId().getNativeId();
-            
-			I_ThinExtByRefPartConcept extPart = termFactory.newConceptExtensionPart();			
-			extPart.setConceptId( specTypeId );
-			extPart.setStatusId( statusId );
-			
-			I_ThinExtByRefVersioned extension = termFactory.newExtension( 0, memberId, concept.getConceptId(), refsetTypeId );
-			extension.addVersion(extPart);
 
-			return extension;
-				
-		} catch (Exception e) {
-			throw new RuntimeException("Unable to process extension for snomed id " + tokens[0], e);
-		}
-	}
+            I_ThinExtByRefPartConcept extPart = termFactory.newConceptExtensionPart();
+            extPart.setConceptId(specTypeId);
+            extPart.setStatusId(statusId);
 
-	public ConceptDescriptor getRefsetType() {
-		assert (refsetType != null) : "A refset type has not been specified";
-		return refsetType;
-	}
+            I_ThinExtByRefVersioned extension = termFactory.newExtension(0, memberId, concept.getConceptId(),
+                refsetTypeId);
+            extension.addVersion(extPart);
 
-	public void setRefsetType(ConceptDescriptor refsetType) {
-		this.refsetType = refsetType;
-	}
+            return extension;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to process extension for snomed id " + tokens[0], e);
+        }
+    }
+
+    public ConceptDescriptor getRefsetType() {
+        assert (refsetType != null) : "A refset type has not been specified";
+        return refsetType;
+    }
+
+    public void setRefsetType(ConceptDescriptor refsetType) {
+        this.refsetType = refsetType;
+    }
 
 }

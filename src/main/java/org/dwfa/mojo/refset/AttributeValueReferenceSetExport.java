@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -71,8 +71,9 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
     private HashMap<String, BufferedWriter> writerMap = new HashMap<String, BufferedWriter>();
 
     /**
-     * Setup files <code>positions</code> <code>exportSpecifications</code> <code>allowedStatuses</code>
-     * <code>sctidRefsetOutputDirectory</code> <code>uuidRefsetOutputDirectory</code> and iterate over concepts in
+     * Setup files <code>positions</code> <code>exportSpecifications</code>
+     * <code>allowedStatuses</code> <code>sctidRefsetOutputDirectory</code>
+     * <code>uuidRefsetOutputDirectory</code> and iterate over concepts in
      * the DB.
      * 
      * @see org.apache.maven.plugin.Mojo#execute()
@@ -180,7 +181,8 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
     }
 
     /**
-     * Create/update and export concept extensions (Inactivation refset) for all concepts that are not active, inactive
+     * Create/update and export concept extensions (Inactivation refset) for all
+     * concepts that are not active, inactive
      * or current.
      * 
      * @param latest I_AmPart latest version of the concept
@@ -212,7 +214,8 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
     }
 
     /**
-     * Create/update and export concept extensions (Reason for inactivation refset) for all concepts.
+     * Create/update and export concept extensions (Reason for inactivation
+     * refset) for all concepts.
      * 
      * @param latest I_AmPart latest version of the concept
      * @param relId concept id
@@ -224,16 +227,14 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
         if (part == null) {
             // no extension at all
             part = tf.newConceptExtensionPart();
-            part
-                .setC1id(latest.isDefined() ? getNid(Concept.DEFINED_DEFINITION) : getNid(Concept.PRIMITIVE_DEFINITION));
+            part.setC1id(latest.isDefined() ? getNid(Concept.DEFINED_DEFINITION) : getNid(Concept.PRIMITIVE_DEFINITION));
             part.setPathId(latest.getPathId());
             part.setStatusId(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
             part.setVersion(latest.getVersion());
             export(part, null, ConceptConstants.DEFINITION_TYPE_EXTENSION.localize().getNid(), conceptId);
         } else if (part.getC1id() != latest.getStatusId()) {
             // add a new row with the latest refinability
-            part
-                .setC1id(latest.isDefined() ? getNid(Concept.DEFINED_DEFINITION) : getNid(Concept.PRIMITIVE_DEFINITION));
+            part.setC1id(latest.isDefined() ? getNid(Concept.DEFINED_DEFINITION) : getNid(Concept.PRIMITIVE_DEFINITION));
             export((I_ThinExtByRefTuple) part);
         }
     }
@@ -251,7 +252,8 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
     }
 
     /**
-     * Create/update and export concept extensions (relationships refinability reference) for all concepts.
+     * Create/update and export concept extensions (relationships refinability
+     * reference) for all concepts.
      * 
      * @param latest I_AmPart latest version of the concept
      * @param relId concept id

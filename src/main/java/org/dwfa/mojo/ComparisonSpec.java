@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,12 +18,14 @@ package org.dwfa.mojo;
 
 /**
  * <h1>ComparisonSpec</h1>
- * <p>This class is used to create an object to hold configuration details 
- * used by the {@link CompareFileContent} mojo.</p>
+ * <p>
+ * This class is used to create an object to hold configuration details used by
+ * the {@link CompareFileContent} mojo.
+ * </p>
  * 
  * @see org.dwfa.mojo.CompareFileContent
  * 
- *
+ * 
  */
 public class ComparisonSpec {
     private String comparisonBase = null;
@@ -58,4 +60,4 @@ public class ComparisonSpec {
         super();
     }
 
-}//End class ComparisonSpec
+}// End class ComparisonSpec

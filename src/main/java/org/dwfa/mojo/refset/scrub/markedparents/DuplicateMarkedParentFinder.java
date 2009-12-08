@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,25 +34,27 @@ import java.util.List;
  */
 public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 
-	/**
-	 * The name of the file to generate containing a list of all the qualifing concept extensions
-	 * that are found.
-	 * @parameter
-	 */
-	public String reportFile;
+    /**
+     * The name of the file to generate containing a list of all the qualifing
+     * concept extensions
+     * that are found.
+     * 
+     * @parameter
+     */
+    public String reportFile;
 
-	/**
-	 * Specifies the list of concepts that are processed.
-	 * @parameter
-	 */
-	public ConceptDescriptor[] validTypeConcepts;
+    /**
+     * Specifies the list of concepts that are processed.
+     * 
+     * @parameter
+     */
+    public ConceptDescriptor[] validTypeConcepts;
 
-
-	private RefsetHelper refsetHelper;
+    private RefsetHelper refsetHelper;
 
     private CandidateWriter candidateWriter;
 
-	private List<Integer> validTypeIds;
+    private List<Integer> validTypeIds;
 
     private DuplicateMarketParentSifter duplicateMarketParentSifter;
 
@@ -68,25 +70,25 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
     }
 
     /**
-	 * Finds members which are "marked parents" and which are current.
-	 */
-	public Iterator<I_ThinExtByRefVersioned> iterator() {
-		try {
+     * Finds members which are "marked parents" and which are current.
+     */
+    public Iterator<I_ThinExtByRefVersioned> iterator() {
+        try {
             injectValidTypeIds();
             candidateWriter = new CandidateWriter(reportFile, termFactory);
             markedParentProcessor = new MarkedParentProcessor(candidateWriter, validTypeIds);
 
             processRefsets();
-            
+
             List<I_ThinExtByRefVersioned> siftedResults = duplicateMarketParentSifter.sift(markedParentProcessor);
             System.out.println("Found " + siftedResults.size() + " candidate extensions.");
             return siftedResults.iterator();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		} finally {
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
             candidateWriter.close();
-		}
-	}
+        }
+    }
 
     private void processRefsets() throws Exception {
         for (Integer refsetId : refsetHelper.getSpecificationRefsets()) {
@@ -107,12 +109,12 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
     }
 
     /**
-	 * Utilises the {@link RefsetUtilities} class by injecting the db
-	 */
-	private class RefsetHelper extends RefsetUtilities {
-        
-		public RefsetHelper(final I_TermFactory termFactory) {
-			super.termFactory = termFactory;
-		}
-	}
+     * Utilises the {@link RefsetUtilities} class by injecting the db
+     */
+    private class RefsetHelper extends RefsetUtilities {
+
+        public RefsetHelper(final I_TermFactory termFactory) {
+            super.termFactory = termFactory;
+        }
+    }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,9 +29,9 @@ public class GenerateSnomedOpenBase extends GenerateSnomedJDBC {
 
     /**
      * Location of the directory to output data files to.
-     * KEC: I added this field, because the maven plugin plugin would 
+     * KEC: I added this field, because the maven plugin plugin would
      * crash unless there was at least one commented field. This field is
-     * not actually used by the plugin. 
+     * not actually used by the plugin.
      * 
      * @parameter expression="${project.build.directory}"
      * @required
@@ -41,17 +41,22 @@ public class GenerateSnomedOpenBase extends GenerateSnomedJDBC {
 
     public void setup() throws Exception {
 
-		Class.forName("com.openbase.jdbc.ObDriver");
-  		String url = "jdbc:openbase://g5-1.informatics.com/snomed";		// Set here your hostname and the database name 
-	    getLog().info("OpenBase url: " + url);
-		setConn(DriverManager.getConnection(url, "snomed", "sdo"));
-		getConn().setAutoCommit(false);
-		createTables();
-		getConn().commit();
-	    getLog().info("Opened OpenBase database");
-	}
+        Class.forName("com.openbase.jdbc.ObDriver");
+        String url = "jdbc:openbase://g5-1.informatics.com/snomed"; // Set here
+        // your
+        // hostname
+        // and the
+        // database
+        // name
+        getLog().info("OpenBase url: " + url);
+        setConn(DriverManager.getConnection(url, "snomed", "sdo"));
+        getConn().setAutoCommit(false);
+        createTables();
+        getConn().commit();
+        getLog().info("Opened OpenBase database");
+    }
 
-	public String longDataType() {
-		return "longlong";
-	}
+    public String longDataType() {
+        return "longlong";
+    }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,14 +39,15 @@ import org.dwfa.maven.MojoUtil;
 public class VodbCommit extends AbstractMojo {
 
     /**
-     * The execution information for this commit operation. 
+     * The execution information for this commit operation.
+     * 
      * @parameter expression="${mojoExecution}"
      */
     MojoExecution execution;
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -54,9 +55,8 @@ public class VodbCommit extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass()
-                .getCanonicalName()
-                + execution.getExecutionId(), this.getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + execution.getExecutionId(),
+                this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -65,12 +65,9 @@ public class VodbCommit extends AbstractMojo {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        getLog().info(
-            "commiting (id: " + execution.getExecutionId() + "): "
-                + termFactory);
+        getLog().info("commiting (id: " + execution.getExecutionId() + "): " + termFactory);
         if (termFactory != null) {
-            if (termFactory.getUncommitted() != null
-                && termFactory.getUncommitted().size() > 0) {
+            if (termFactory.getUncommitted() != null && termFactory.getUncommitted().size() > 0) {
                 try {
 
                     termFactory.commit();
@@ -78,15 +75,11 @@ public class VodbCommit extends AbstractMojo {
                     throw new MojoExecutionException(e.getLocalizedMessage(), e);
                 }
             } else {
-                getLog().info(
-                    "termfactory.getUncommitted().size() = "
-                        + termFactory.getUncommitted().size());
+                getLog().info("termfactory.getUncommitted().size() = " + termFactory.getUncommitted().size());
             }
         } else {
-            Exception ex =
-                    new Exception(
-                        "Attempting commit with null term factory (id: "
-                            + execution.getExecutionId() + "): " + termFactory);
+            Exception ex = new Exception("Attempting commit with null term factory (id: " + execution.getExecutionId()
+                + "): " + termFactory);
             throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
         }
 

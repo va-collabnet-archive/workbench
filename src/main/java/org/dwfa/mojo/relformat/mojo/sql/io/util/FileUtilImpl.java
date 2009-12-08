@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,9 +42,9 @@ public final class FileUtilImpl implements FileUtil {
     }
 
     public String changeExtension(final String fileName, final String extension) {
-        return new StringBuilder().append(
-            fileName.substring(0, (fileName.lastIndexOf('.') + 1))).append(
-            extension).toString();
+        return new StringBuilder().append(fileName.substring(0, (fileName.lastIndexOf('.') + 1)))
+            .append(extension)
+            .toString();
     }
 
     public void closeSilently(final Reader reader) {
@@ -53,7 +53,7 @@ public final class FileUtilImpl implements FileUtil {
                 reader.close();
             }
         } catch (Exception e) {
-            //be silent
+            // be silent
         }
     }
 
@@ -63,7 +63,7 @@ public final class FileUtilImpl implements FileUtil {
                 writer.close();
             }
         } catch (Exception e) {
-            //be silent
+            // be silent
         }
     }
 }

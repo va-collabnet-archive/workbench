@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,141 +47,139 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
  * @author Dion McMurtrie
  */
 public class ProcessRefsetChangeSets extends AbstractMojo {
-	/**
-	 * To show how dodgy it is, it is even runnable from the command line.
-	 * Just pass in the path to the change sets and it will recursively
-	 * look in the specified directory and child directories.
-	 * 
-	 * @param args
-	 * @throws MojoExecutionException
-	 * @throws MojoFailureException
-	 */
-	public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
-		ProcessRefsetChangeSets process = new ProcessRefsetChangeSets();
-		process.changeSetDirectory = new File(args[0]);
-		process.execute();
-	}
+    /**
+     * To show how dodgy it is, it is even runnable from the command line.
+     * Just pass in the path to the change sets and it will recursively
+     * look in the specified directory and child directories.
+     * 
+     * @param args
+     * @throws MojoExecutionException
+     * @throws MojoFailureException
+     */
+    public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
+        ProcessRefsetChangeSets process = new ProcessRefsetChangeSets();
+        process.changeSetDirectory = new File(args[0]);
+        process.execute();
+    }
 
-	/**
-	 * Threshold number of changes per file, defaults to 1000.
-	 *
-	 * @parameter
-	 */
-	private int fileBatchSize = 1000;
+    /**
+     * Threshold number of changes per file, defaults to 1000.
+     * 
+     * @parameter
+     */
+    private int fileBatchSize = 1000;
 
-	/**
-	 * Location of the change sets, recursively descended for .jcs files.
-	 *
-	 * @parameter
-	 * @required
-	 */
-	private File changeSetDirectory;
+    /**
+     * Location of the change sets, recursively descended for .jcs files.
+     * 
+     * @parameter
+     * @required
+     */
+    private File changeSetDirectory;
 
-	private Map<String, Integer> fileNameMap = new HashMap<String, Integer>();
-	
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		assert changeSetDirectory.isDirectory(): "the specified file must be a directory!";
-		
-		try {
-			processDirectory(changeSetDirectory);
-		} catch (Exception e) {
-			throw new MojoExecutionException("error processing change sets", e);
-		}
-	}
-	
-	private void processDirectory(File directory) throws FileNotFoundException, IOException, ClassNotFoundException {
+    private Map<String, Integer> fileNameMap = new HashMap<String, Integer>();
 
-		File[] files = directory.listFiles(new FileFilter(){
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        assert changeSetDirectory.isDirectory() : "the specified file must be a directory!";
 
-			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getName().endsWith(".jcs");
-			}	
-			
-		});
-			
-		for(File file : files) {
-			if (file.isDirectory()) {
-				processDirectory(file);
-			} else {
-				processChangeset(file);
-			}
-		}
-	}
+        try {
+            processDirectory(changeSetDirectory);
+        } catch (Exception e) {
+            throw new MojoExecutionException("error processing change sets", e);
+        }
+    }
 
-	private void processChangeset(File changeset) throws IOException,
-			FileNotFoundException, ClassNotFoundException {
-		getLog().info("processing " + changeset);
-		String changeSetBaseName = changeset.getName();
-		
-		File newChangeSet = new File(changeset.getParent(), createNewFile(changeSetBaseName));
-		File oldChangeSet = new File(changeset.getParent(), changeset.getName() + ".old");
-		changeset.renameTo(oldChangeSet);
-		
-		ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(oldChangeSet)));
-		ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(newChangeSet)));
-		
-		int refsetBeans = 0;				
-		try {
-			Object firstObject = ois.readObject();
-			getLog().info("First object - " + firstObject);
-			
-			oos.writeObject(firstObject);
+    private void processDirectory(File directory) throws FileNotFoundException, IOException, ClassNotFoundException {
 
-			Long time = ois.readLong();
+        File[] files = directory.listFiles(new FileFilter() {
 
-			int count = 0;
-			while (time != Long.MAX_VALUE) {
-				Object obj = ois.readObject();
-				if (obj instanceof UniversalAceExtByRefBean) {
-					oos.writeLong(time);
-					oos.writeObject(obj);
-					refsetBeans++;
-					if (refsetBeans % fileBatchSize == 0) {
-						oos.close();
-						newChangeSet = new File(newChangeSet.getParent(), createNewFile(changeSetBaseName));
-						oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(newChangeSet)));
-						oos.writeObject(firstObject);
-						refsetBeans = 0;
-					}
-				}
-				
-				if (count++ % 1000 == 0) {
-					oos.flush();
-				}
-				
-				time = ois.readLong();
-			}
-		} catch (EOFException ex) {
-	        ois.close();
-	        oos.close();
-	        oldChangeSet.delete();
-	        if (refsetBeans == 0) {
-	        	//delete the file if there is nothing in it.
-	        	getLog().info("removing empty file " + newChangeSet);
-	        	newChangeSet.delete();
-	        }
-	        getLog().info("End of change set. ");
-	    }
-		
-	}
+            public boolean accept(File pathname) {
+                return pathname.isDirectory() || pathname.getName().endsWith(".jcs");
+            }
 
+        });
 
-	private String createNewFile(String basename) throws IOException {
-		int fileNumber;
-		String newFileName;
-		
-		if (fileNameMap.containsKey(basename)) {
-			fileNumber = fileNameMap.get(basename);
-			fileNumber++;
-			getLog().info("rolled over to new file number " + fileNumber + " for basename " + basename);
-			newFileName = basename.replaceAll(".jcs", "." + fileNumber + ".jcs");
-			fileNameMap.put(basename, fileNumber);
-		} else {
-			fileNameMap.put(basename, 0);
-			newFileName = basename;
-		}
-		
-		return newFileName;
-	}
+        for (File file : files) {
+            if (file.isDirectory()) {
+                processDirectory(file);
+            } else {
+                processChangeset(file);
+            }
+        }
+    }
+
+    private void processChangeset(File changeset) throws IOException, FileNotFoundException, ClassNotFoundException {
+        getLog().info("processing " + changeset);
+        String changeSetBaseName = changeset.getName();
+
+        File newChangeSet = new File(changeset.getParent(), createNewFile(changeSetBaseName));
+        File oldChangeSet = new File(changeset.getParent(), changeset.getName() + ".old");
+        changeset.renameTo(oldChangeSet);
+
+        ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(oldChangeSet)));
+        ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(newChangeSet)));
+
+        int refsetBeans = 0;
+        try {
+            Object firstObject = ois.readObject();
+            getLog().info("First object - " + firstObject);
+
+            oos.writeObject(firstObject);
+
+            Long time = ois.readLong();
+
+            int count = 0;
+            while (time != Long.MAX_VALUE) {
+                Object obj = ois.readObject();
+                if (obj instanceof UniversalAceExtByRefBean) {
+                    oos.writeLong(time);
+                    oos.writeObject(obj);
+                    refsetBeans++;
+                    if (refsetBeans % fileBatchSize == 0) {
+                        oos.close();
+                        newChangeSet = new File(newChangeSet.getParent(), createNewFile(changeSetBaseName));
+                        oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(newChangeSet)));
+                        oos.writeObject(firstObject);
+                        refsetBeans = 0;
+                    }
+                }
+
+                if (count++ % 1000 == 0) {
+                    oos.flush();
+                }
+
+                time = ois.readLong();
+            }
+        } catch (EOFException ex) {
+            ois.close();
+            oos.close();
+            oldChangeSet.delete();
+            if (refsetBeans == 0) {
+                // delete the file if there is nothing in it.
+                getLog().info("removing empty file " + newChangeSet);
+                newChangeSet.delete();
+            }
+            getLog().info("End of change set. ");
+        }
+
+    }
+
+    private String createNewFile(String basename) throws IOException {
+        int fileNumber;
+        String newFileName;
+
+        if (fileNameMap.containsKey(basename)) {
+            fileNumber = fileNameMap.get(basename);
+            fileNumber++;
+            getLog().info("rolled over to new file number " + fileNumber + " for basename " + basename);
+            newFileName = basename.replaceAll(".jcs", "." + fileNumber + ".jcs");
+            fileNameMap.put(basename, fileNumber);
+        } else {
+            fileNameMap.put(basename, 0);
+            newFileName = basename;
+        }
+
+        return newFileName;
+    }
 
 }
