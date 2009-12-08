@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,8 +42,7 @@ public class BpaTargetListener implements DropTargetListener {
      *            TODO
      * @throws ClassNotFoundException
      */
-    public BpaTargetListener(I_DoDragAndDrop targetComponent, String prefix)
-            throws ClassNotFoundException {
+    public BpaTargetListener(I_DoDragAndDrop targetComponent, String prefix) throws ClassNotFoundException {
         super();
         this.targetComponent = targetComponent;
         this.prefix = prefix;
@@ -55,8 +54,7 @@ public class BpaTargetListener implements DropTargetListener {
     public void dragEnter(DropTargetDragEvent ev) {
         if (this.isDragOk(ev)) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Target " + this.prefix
-                    + " dragEnter targetComponent" + ev);
+                logger.fine("Target " + this.prefix + " dragEnter targetComponent" + ev);
             }
             this.targetComponent.highlightForDrop(true);
             this.dropHighlight = true;
@@ -71,8 +69,7 @@ public class BpaTargetListener implements DropTargetListener {
     public void dragOver(DropTargetDragEvent ev) {
         if (this.isDragOk(ev)) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Target " + this.prefix
-                    + " dragOver targetComponent" + ev);
+                logger.fine("Target " + this.prefix + " dragOver targetComponent" + ev);
             }
             ev.acceptDrag(this.targetComponent.getAcceptableActions());
         }
@@ -85,8 +82,7 @@ public class BpaTargetListener implements DropTargetListener {
     public void dropActionChanged(DropTargetDragEvent ev) {
         if (this.isDragOk(ev)) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Target " + this.prefix
-                    + " dropActionChanged targetComponent" + ev);
+                logger.fine("Target " + this.prefix + " dropActionChanged targetComponent" + ev);
             }
             ev.acceptDrag(this.targetComponent.getAcceptableActions());
         }
@@ -98,8 +94,7 @@ public class BpaTargetListener implements DropTargetListener {
      */
     public void dragExit(DropTargetEvent ev) {
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Target " + this.prefix + " dragExit targetComponent"
-                + ev);
+            logger.fine("Target " + this.prefix + " dragExit targetComponent" + ev);
         }
         if (this.dropHighlight) {
             this.targetComponent.highlightForDrop(false);
@@ -112,8 +107,7 @@ public class BpaTargetListener implements DropTargetListener {
      */
     public void drop(DropTargetDropEvent ev) {
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Target " + this.prefix + " drop targetComponent"
-                    + ev);
+            logger.fine("Target " + this.prefix + " drop targetComponent" + ev);
         }
         this.targetComponent.getJComponent().requestFocus();
         if (this.dropHighlight) {
@@ -125,8 +119,8 @@ public class BpaTargetListener implements DropTargetListener {
             while (localFlavorItr.hasNext()) {
                 DataFlavor flavor = localFlavorItr.next();
                 if (ev.isDataFlavorSupported(flavor)) {
-                 chosen = flavor;
-                 break;
+                    chosen = flavor;
+                    break;
                 }
             }
             if (chosen == null) {
@@ -134,8 +128,8 @@ public class BpaTargetListener implements DropTargetListener {
                 while (serialFlavorItr.hasNext()) {
                     DataFlavor flavor = serialFlavorItr.next();
                     if (ev.isDataFlavorSupported(flavor)) {
-                     chosen = flavor;
-                     break;
+                        chosen = flavor;
+                        break;
                     }
                 }
             }
@@ -143,14 +137,14 @@ public class BpaTargetListener implements DropTargetListener {
             // DragGestureRecognizer
             int sa = ev.getSourceActions();
             if ((sa & this.targetComponent.getAcceptableActions()) == 0) {
-                 //System.out.println(" reject drop");
+                // System.out.println(" reject drop");
                 ev.rejectDrop();
                 ev.dropComplete(true);
                 return;
             }
             Object data = null;
             try {
-                 //System.out.println(" accept drop");
+                // System.out.println(" accept drop");
                 ev.acceptDrop(this.targetComponent.getAcceptableActions());
                 data = ev.getTransferable().getTransferData(chosen);
                 if (data == null) {
@@ -158,20 +152,20 @@ public class BpaTargetListener implements DropTargetListener {
                     ev.dropComplete(true);
                     throw new NullPointerException();
                 }
-                
-                //Add drop handler here...
+
+                // Add drop handler here...
                 this.targetComponent.setDroppedObject(data, ev);
-                
-                ev.dropComplete(true);       
+
+                ev.dropComplete(true);
             } catch (Throwable t) {
                 t.printStackTrace();
                 ev.dropComplete(true);
-                //showBorder(false);
+                // showBorder(false);
                 return;
             }
 
         } else {
-             System.out.println(prefix + " reject drop");
+            System.out.println(prefix + " reject drop");
             ev.rejectDrop();
             ev.dropComplete(true);
         }
@@ -180,22 +174,19 @@ public class BpaTargetListener implements DropTargetListener {
 
     private boolean isDragOk(DropTargetDragEvent ev) {
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Target " + this.prefix + " isDragOk targetComponent"
-                    + ev);
+            logger.fine("Target " + this.prefix + " isDragOk targetComponent" + ev);
         }
         if (this.targetComponent.isDragging()) {
-         return false;   
+            return false;
         }
 
-        
-        
         DataFlavor chosen = null;
         Iterator<DataFlavor> localFlavorItr = this.targetComponent.getLocalFlavors().iterator();
         while (localFlavorItr.hasNext()) {
             DataFlavor flavor = localFlavorItr.next();
             if (ev.isDataFlavorSupported(flavor)) {
-             chosen = flavor;
-             break;
+                chosen = flavor;
+                break;
             }
         }
         if (chosen == null) {
@@ -203,13 +194,13 @@ public class BpaTargetListener implements DropTargetListener {
             while (serialFlavorItr.hasNext()) {
                 DataFlavor flavor = serialFlavorItr.next();
                 if (ev.isDataFlavorSupported(flavor)) {
-                 chosen = flavor;
-                 break;
+                    chosen = flavor;
+                    break;
                 }
             }
         }
         if (chosen == null) {
-         return false;   
+            return false;
         }
         // the actions specified when the sourceId
         // created the DragGestureRecognizer
@@ -219,7 +210,7 @@ public class BpaTargetListener implements DropTargetListener {
         if ((sa & this.targetComponent.getAcceptableActions()) == 0) {
             return false;
         }
-        
+
         return true;
     }
 }

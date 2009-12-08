@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ import org.dwfa.bpa.util.FrameWithOpenFramesListener;
 
 /**
  * @author kec
- *
+ * 
  */
 public class AttachmentPanel extends JPanel implements ActionListener {
     /**
@@ -61,8 +61,7 @@ public class AttachmentPanel extends JPanel implements ActionListener {
         GridBagConstraints c = new GridBagConstraints();
         this.key = key;
         this.process = process;
-        this.setBorder(BorderFactory.createTitledBorder("Attachment: "
-            + this.key));
+        this.setBorder(BorderFactory.createTitledBorder("Attachment: " + this.key));
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
         c.weightx = 0;
@@ -72,8 +71,7 @@ public class AttachmentPanel extends JPanel implements ActionListener {
         this.openButton.addActionListener(this);
         this.add(openButton, c);
         c.gridx++;
-        this.add(new JLabel(this.process.readAttachement(key).getClass()
-            .getName()), c);
+        this.add(new JLabel(this.process.readAttachement(key).getClass().getName()), c);
         c.gridx++;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
@@ -104,15 +102,13 @@ public class AttachmentPanel extends JPanel implements ActionListener {
     private void open(Object object) throws IOException, ClassNotFoundException {
         if (MarshalledObject.class.isAssignableFrom(object.getClass())) {
             MarshalledObject marshalledObj = (MarshalledObject) object;
-            this.open(marshalledObj.get());//recursive call
-        } else if (I_EncodeBusinessProcess.class.isAssignableFrom(object
-            .getClass())) {
+            this.open(marshalledObj.get());// recursive call
+        } else if (I_EncodeBusinessProcess.class.isAssignableFrom(object.getClass())) {
             I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) object;
             try {
-                ProcessPanel panel =
-                        new ProcessPanel(process, null, doubleClickHandler);
-                new FrameWithOpenFramesListener("Attached Process: "
-                    + process.getName(), "Attachment", new JScrollPane(panel));
+                ProcessPanel panel = new ProcessPanel(process, null, doubleClickHandler);
+                new FrameWithOpenFramesListener("Attached Process: " + process.getName(), "Attachment",
+                    new JScrollPane(panel));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -121,9 +117,8 @@ public class AttachmentPanel extends JPanel implements ActionListener {
             textPane.setText(object.toString());
             textPane.setEditable(false);
             try {
-                new FrameWithOpenFramesListener("Attached Object: "
-                    + process.getName(), "Attachment",
-                    new JScrollPane(textPane));
+                new FrameWithOpenFramesListener("Attached Object: " + process.getName(), "Attachment", new JScrollPane(
+                    textPane));
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

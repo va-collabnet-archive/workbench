@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,107 +41,99 @@ import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/worker plugins", type = BeanType.TASK_BEAN) })
 public class AddGetWorkFromQueuePlugin extends AbstractTask {
-  private static final long serialVersionUID = 1;
-  private static final int  dataVersion      = 1;
+    private static final long serialVersionUID = 1;
+    private static final int dataVersion = 1;
 
-  private String            workerPropName   = ProcessAttachmentKeysForWorkerTasks.WORKER.getAttachmentKey();
-  private String            queueAddress        = "pcpInbox.@informatics.com";
+    private String workerPropName = ProcessAttachmentKeysForWorkerTasks.WORKER.getAttachmentKey();
+    private String queueAddress = "pcpInbox.@informatics.com";
 
-  private void writeObject(ObjectOutputStream out) throws IOException {
-    out.writeInt(dataVersion);
-    out.writeObject(workerPropName);
-    out.writeObject(queueAddress);
-  }
-
-  private void readObject(java.io.ObjectInputStream in) throws IOException,
-      ClassNotFoundException {
-    int objDataVersion = in.readInt();
-    if (objDataVersion == 1) {
-      this.workerPropName = (String) in.readObject();
-      this.queueAddress = (String) in.readObject();
-    } else {
-      throw new IOException("Can't handle dataversion: " + objDataVersion);
-    }
-  }
-
-
-  /**
-   * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-   *      org.dwfa.bpa.process.I_Work)
-   */
-  public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-      throws TaskFailedException {
-    try {
-      ServiceID serviceID = null;
-      Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
-      Entry[] attrSetTemplates;
-
-      attrSetTemplates = new Entry[] { new ElectronicAddress(queueAddress) };
-      getLogger().info(
-          "Setting queue attributes to to: " + Arrays.asList(attrSetTemplates));
-
-      ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes,
-          attrSetTemplates);
-
-      ServiceItemFilter filter = worker.getServiceProxyFilter();
-      ServiceItem[] services = worker.lookup(template, 1, 500, filter,
-          1000 * 15);
-      
-      I_Work workerToModify = (I_Work) process.readProperty(ProcessAttachmentKeysForWorkerTasks.WORKER.getAttachmentKey());
-
-
-      GetWorkFromQueuePlugin getWorkPlugin = new GetWorkFromQueuePlugin(workerToModify, (I_QueueProcesses) services[0].service,
-          new SelectAll());
-      workerToModify.setPluginForInterface(I_GetWorkFromQueue.class, getWorkPlugin);
-      getWorkPlugin.start((I_QueueProcesses) services[0].service);
-      
-    } catch (Exception e) {
-      throw new TaskFailedException(e);
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(workerPropName);
+        out.writeObject(queueAddress);
     }
 
-    return Condition.CONTINUE;
-  }
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+            this.workerPropName = (String) in.readObject();
+            this.queueAddress = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-  /**
-   * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-   *      org.dwfa.bpa.process.I_Work)
-   */
-  public void complete(I_EncodeBusinessProcess process, I_Work worker)
-      throws TaskFailedException {
-    // nothing to do...
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            ServiceID serviceID = null;
+            Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Entry[] attrSetTemplates;
 
-  }
+            attrSetTemplates = new Entry[] { new ElectronicAddress(queueAddress) };
+            getLogger().info("Setting queue attributes to to: " + Arrays.asList(attrSetTemplates));
 
-  /**
-   * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
-   */
-  public Collection<Condition> getConditions() {
-    return CONTINUE_CONDITION;
-  }
+            ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
 
-  /**
-   * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
-   */
-  public int[] getDataContainerIds() {
-    return new int[] {};
-  }
+            ServiceItemFilter filter = worker.getServiceProxyFilter();
+            ServiceItem[] services = worker.lookup(template, 1, 500, filter, 1000 * 15);
 
-  public String getWorkerPropName() {
-    return workerPropName;
-  }
+            I_Work workerToModify = (I_Work) process.readProperty(ProcessAttachmentKeysForWorkerTasks.WORKER.getAttachmentKey());
 
-  public void setWorkerPropName(String workerPropName) {
-    this.workerPropName = workerPropName;
-  }
+            GetWorkFromQueuePlugin getWorkPlugin = new GetWorkFromQueuePlugin(workerToModify,
+                (I_QueueProcesses) services[0].service, new SelectAll());
+            workerToModify.setPluginForInterface(I_GetWorkFromQueue.class, getWorkPlugin);
+            getWorkPlugin.start((I_QueueProcesses) services[0].service);
 
-  public String getQueueAddress() {
-    return queueAddress;
-  }
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
 
-  public void setQueueAddress(String queueName) {
-    Object old = this.queueAddress;
-    this.queueAddress = queueName;
-    this.firePropertyChange("queueName", old, queueName);
-  }
+        return Condition.CONTINUE;
+    }
+
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // nothing to do...
+
+    }
+
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     */
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
+
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
+     */
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
+
+    public String getWorkerPropName() {
+        return workerPropName;
+    }
+
+    public void setWorkerPropName(String workerPropName) {
+        this.workerPropName = workerPropName;
+    }
+
+    public String getQueueAddress() {
+        return queueAddress;
+    }
+
+    public void setQueueAddress(String queueName) {
+        Object old = this.queueAddress;
+        this.queueAddress = queueName;
+        this.firePropertyChange("queueName", old, queueName);
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,35 +34,36 @@ import javax.swing.JLabel;
 
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 
-public class ProcessReadOnly implements PropertyEditor  {
+public class ProcessReadOnly implements PropertyEditor {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-    
+
     private JLabel editor = new JLabel();
-    
+
     /**
      * 
      */
 
     /**
-        * @param arg0
-        */
-       public ProcessReadOnly() {
-           editor.setMinimumSize(new Dimension(40, 10));
-           editor.setBorder(BorderFactory.createLoweredBevelBorder());
+     * @param arg0
+     */
+    public ProcessReadOnly() {
+        editor.setMinimumSize(new Dimension(40, 10));
+        editor.setBorder(BorderFactory.createLoweredBevelBorder());
 
-        }
+    }
+
     /**
      * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
      */
     public void itemStateChanged(ItemEvent evt) {
-           this.firePropertyChange();
-        
+        this.firePropertyChange();
+
     }
-       
+
     /**
      * @return String
      * @see java.beans.PropertyEditor#getValue()
@@ -70,11 +71,10 @@ public class ProcessReadOnly implements PropertyEditor  {
     public String getValue() {
         return editor.getText();
     }
-       
-       
 
     /**
-     * Must be a <code>Level</code> representing logging level for the logger. 
+     * Must be a <code>Level</code> representing logging level for the logger.
+     * 
      * @see java.beans.PropertyEditor#setValue(java.lang.Object)
      */
     public void setValue(Object value) {
@@ -82,13 +82,9 @@ public class ProcessReadOnly implements PropertyEditor  {
             this.editor.setText("null process");
         } else {
             I_EncodeBusinessProcess p = (I_EncodeBusinessProcess) value;
-            this.editor.setText("<html>Name: " + p.getName() +
-                                "<p>Id: " + p.getId());
+            this.editor.setText("<html>Name: " + p.getName() + "<p>Id: " + p.getId());
         }
     }
-
-
-
 
     /**
      * @see java.beans.PropertyEditor#isPaintable()
@@ -98,8 +94,10 @@ public class ProcessReadOnly implements PropertyEditor  {
     }
 
     /**
-     * Calls the paint method on this swing component. 
-     * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics, java.awt.Rectangle)
+     * Calls the paint method on this swing component.
+     * 
+     * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics,
+     *      java.awt.Rectangle)
      */
     public void paintValue(Graphics gfx, Rectangle box) {
         this.editor.setBounds(box);
@@ -110,7 +108,7 @@ public class ProcessReadOnly implements PropertyEditor  {
      * @see java.beans.PropertyEditor#getJavaInitializationString()
      */
     public String getJavaInitializationString() {
-        return "new String(" +  this.getValue() + ")";
+        return "new String(" + this.getValue() + ")";
     }
 
     /**
@@ -128,7 +126,8 @@ public class ProcessReadOnly implements PropertyEditor  {
     }
 
     /**
-     * Returns null since this editor provides a custom GUI component. 
+     * Returns null since this editor provides a custom GUI component.
+     * 
      * @see java.beans.PropertyEditor#getTags()
      */
     public String[] getTags() {
@@ -136,7 +135,8 @@ public class ProcessReadOnly implements PropertyEditor  {
     }
 
     /**
-     * Returns swing component to edit the check box. 
+     * Returns swing component to edit the check box.
+     * 
      * @see java.beans.PropertyEditor#getCustomEditor()
      */
     public Component getCustomEditor() {
@@ -144,60 +144,59 @@ public class ProcessReadOnly implements PropertyEditor  {
     }
 
     /**
-     * Returns true since this editor provides a custom GUI component. 
+     * Returns true since this editor provides a custom GUI component.
+     * 
      * @see java.beans.PropertyEditor#supportsCustomEditor()
      */
     public boolean supportsCustomEditor() {
         return true;
     }
 
-       /**
-        * Register a listener for the PropertyChange event. The class will fire a
-        * PropertyChange value whenever the value is updated.
-        * 
-        * @param listener
-        *            An object to be invoked when a PropertyChange event is fired.
-        */
-       public synchronized void addPropertyChangeListener(
-               PropertyChangeListener listener) {
-           if (listeners == null) {
-               listeners = new java.util.Vector<PropertyChangeListener>();
-           }
-           listeners.addElement(listener);
-       }
+    /**
+     * Register a listener for the PropertyChange event. The class will fire a
+     * PropertyChange value whenever the value is updated.
+     * 
+     * @param listener
+     *            An object to be invoked when a PropertyChange event is fired.
+     */
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (listeners == null) {
+            listeners = new java.util.Vector<PropertyChangeListener>();
+        }
+        listeners.addElement(listener);
+    }
 
-       /**
-        * Remove a listener for the PropertyChange event.
-        * 
-        * @param listener
-        *            The PropertyChange listener to be removed.
-        */
-       public synchronized void removePropertyChangeListener(
-               PropertyChangeListener listener) {
-           if (listeners == null) {
-               return;
-           }
-           listeners.removeElement(listener);
-       }
+    /**
+     * Remove a listener for the PropertyChange event.
+     * 
+     * @param listener
+     *            The PropertyChange listener to be removed.
+     */
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+        if (listeners == null) {
+            return;
+        }
+        listeners.removeElement(listener);
+    }
 
-       /**
-        * Report that we have been modified to any interested listeners.
-        */
-       public void firePropertyChange() {
-           Vector<PropertyChangeListener> targets;
-           synchronized (this) {
-               if (listeners == null) {
-                   return;
-               }
-               targets = new Vector<PropertyChangeListener>(listeners);
-           }
-           // Tell our listeners that "everything" has changed.
-           PropertyChangeEvent evt = new PropertyChangeEvent(this.editor, null, null, null);
+    /**
+     * Report that we have been modified to any interested listeners.
+     */
+    public void firePropertyChange() {
+        Vector<PropertyChangeListener> targets;
+        synchronized (this) {
+            if (listeners == null) {
+                return;
+            }
+            targets = new Vector<PropertyChangeListener>(listeners);
+        }
+        // Tell our listeners that "everything" has changed.
+        PropertyChangeEvent evt = new PropertyChangeEvent(this.editor, null, null, null);
 
-           for (PropertyChangeListener l: targets) {
-               l.propertyChange(evt);
-           }
-       }
+        for (PropertyChangeListener l : targets) {
+            l.propertyChange(evt);
+        }
+    }
 
-       private java.util.Vector<PropertyChangeListener> listeners;
-   }
+    private java.util.Vector<PropertyChangeListener> listeners;
+}

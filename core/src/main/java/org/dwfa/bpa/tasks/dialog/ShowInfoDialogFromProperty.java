@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,32 +35,31 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * @author kec
- *
+ * 
  */
-@BeanList(specs = 
-	  { @Spec(directory = "tasks/misc tasks", type = BeanType.TASK_BEAN)})
-
+@BeanList(specs = { @Spec(directory = "tasks/misc tasks", type = BeanType.TASK_BEAN) })
 public class ShowInfoDialogFromProperty extends AbstractTask {
-	
+
     private String messagePropertyName = "A: DLG_MSG";
-    
+
     /**
      * 
-     * @return Name of the property containing the message to display. 
+     * @return Name of the property containing the message to display.
      */
     public String getMessagePropertyName() {
-		return messagePropertyName;
-	}
+        return messagePropertyName;
+    }
 
     /**
      * 
-     * @param messagePropertyName name of the property containing the message to display. 
+     * @param messagePropertyName name of the property containing the message to
+     *            display.
      */
-	public void setMessagePropertyName(String messagePropertyName) {
-		this.messagePropertyName = messagePropertyName;
-	}
+    public void setMessagePropertyName(String messagePropertyName) {
+        this.messagePropertyName = messagePropertyName;
+    }
 
-	private static final long serialVersionUID = 1;
+    private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
 
@@ -69,8 +68,7 @@ public class ShowInfoDialogFromProperty extends AbstractTask {
         out.writeObject(messagePropertyName);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             messagePropertyName = (String) in.readObject();
@@ -81,33 +79,33 @@ public class ShowInfoDialogFromProperty extends AbstractTask {
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
-		try {
-			String msg = (String) process.readProperty(messagePropertyName);
-			msg = process.substituteProperties(msg);
-			JFrame parentFrame = null;
-			for (JFrame frame: OpenFrames.getFrames()) {
-				if (frame.isActive()) {
-					parentFrame = frame;
-					break;
-				}
-			}
-		    JOptionPane.showMessageDialog(parentFrame, msg);
-		    return Condition.CONTINUE;
-		} catch (Exception e) {
-			throw new TaskFailedException(e);
-		}
-     }
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            String msg = (String) process.readProperty(messagePropertyName);
+            msg = process.substituteProperties(msg);
+            JFrame parentFrame = null;
+            for (JFrame frame : OpenFrames.getFrames()) {
+                if (frame.isActive()) {
+                    parentFrame = frame;
+                    break;
+                }
+            }
+            JOptionPane.showMessageDialog(parentFrame, msg);
+            return Condition.CONTINUE;
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
-        // Nothing to do. 
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do.
 
     }
 
@@ -125,4 +123,4 @@ public class ShowInfoDialogFromProperty extends AbstractTask {
         return new int[] {};
     }
 
- }
+}

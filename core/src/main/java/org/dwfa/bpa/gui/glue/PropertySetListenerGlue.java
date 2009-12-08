@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,12 +29,13 @@ public class PropertySetListenerGlue {
     private String removeMethodName, addMethodName, replaceMethodName, getSetMethodName;
     private Class<?> methodArgClass;
     private Object target;
+
     /**
      * @param property
      * @param target
      */
-    public PropertySetListenerGlue(String removeMethodName, String addMethodName, 
-        String replaceMethodName, String getSetMethodName, Class<?> methodArgClass, Object target) {
+    public PropertySetListenerGlue(String removeMethodName, String addMethodName, String replaceMethodName,
+            String getSetMethodName, Class<?> methodArgClass, Object target) {
         this.removeMethodName = removeMethodName;
         this.addMethodName = addMethodName;
         this.replaceMethodName = replaceMethodName;
@@ -43,28 +44,36 @@ public class PropertySetListenerGlue {
         this.target = target;
     }
 
-    public void removeObj(Object obj) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    public void removeObj(Object obj) throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+            IllegalAccessException, InvocationTargetException {
         if (this.removeMethodName == null) {
             return;
         }
-        Method targetMethod = target.getClass().getMethod(this.removeMethodName, new Class[] {methodArgClass});
-        targetMethod.invoke(target, new Object[] {obj});
+        Method targetMethod = target.getClass().getMethod(this.removeMethodName, new Class[] { methodArgClass });
+        targetMethod.invoke(target, new Object[] { obj });
     }
-    public void addObj(Object obj) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+
+    public void addObj(Object obj) throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+            IllegalAccessException, InvocationTargetException {
         if (this.addMethodName == null) {
             return;
         }
-        Method targetMethod = target.getClass().getMethod(this.addMethodName, new Class[] {methodArgClass});
-        targetMethod.invoke(target, new Object[] {obj});
+        Method targetMethod = target.getClass().getMethod(this.addMethodName, new Class[] { methodArgClass });
+        targetMethod.invoke(target, new Object[] { obj });
     }
-    public void replaceObj(Object oldObj, Object newObj) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+
+    public void replaceObj(Object oldObj, Object newObj) throws SecurityException, NoSuchMethodException,
+            IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         if (this.replaceMethodName == null) {
             return;
         }
-        Method targetMethod = target.getClass().getMethod(this.replaceMethodName, new Class[] {methodArgClass, methodArgClass});
-        targetMethod.invoke(target, new Object[] {oldObj, newObj});
+        Method targetMethod = target.getClass().getMethod(this.replaceMethodName,
+            new Class[] { methodArgClass, methodArgClass });
+        targetMethod.invoke(target, new Object[] { oldObj, newObj });
     }
-    public Set<?> getSet() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+
+    public Set<?> getSet() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+            IllegalAccessException, InvocationTargetException {
         if (this.getSetMethodName == null) {
             return new HashSet<Object>();
         }

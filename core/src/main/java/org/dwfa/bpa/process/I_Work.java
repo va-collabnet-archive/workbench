@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -80,9 +80,8 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
      * @throws InterruptedException
      * @throws PrivilegedActionException
      */
-    public Transaction getActiveTransaction() throws LeaseDeniedException,
-            RemoteException, IOException, InterruptedException,
-            PrivilegedActionException;
+    public Transaction getActiveTransaction() throws LeaseDeniedException, RemoteException, IOException,
+            InterruptedException, PrivilegedActionException;
 
     /**
      * Creates a second transaction that will become the active transaction
@@ -96,14 +95,13 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
      * @throws IOException
      * @throws InterruptedException
      */
-    public Transaction getNextTransaction() throws LeaseDeniedException,
-            RemoteException, IOException, InterruptedException;
+    public Transaction getNextTransaction() throws LeaseDeniedException, RemoteException, IOException,
+            InterruptedException;
 
-    public void abortActiveTransaction() throws UnknownTransactionException,
-      CannotAbortException, RemoteException;
-    
+    public void abortActiveTransaction() throws UnknownTransactionException, CannotAbortException, RemoteException;
+
     public void discardActiveTransaction();
-    
+
     /**
      * Commits the active transaction, and makes the next transaction (if any)
      * the active transaction.
@@ -111,11 +109,9 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
      * @throws RemoteException
      * @throws TransactionException
      */
-    public void commitActiveTransaction() throws RemoteException,
-            TransactionException;
-    
-    public void commitTransactionIfActive() throws TransactionException, RemoteException;
+    public void commitActiveTransaction() throws RemoteException, TransactionException;
 
+    public void commitTransactionIfActive() throws TransactionException, RemoteException;
 
     /**
      * @return Unique identifier for this worker.
@@ -126,7 +122,6 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
      * @return Text description of this worker.
      */
     public String getWorkerDesc();
-    
 
     /**
      * @param workspaceId
@@ -151,20 +146,18 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
      * @throws HeadlessException
      * @throws Exception
      */
-    public I_Workspace createWorkspace(UUID workspaceId, String name, File menuDir)
-            throws WorkspaceActiveException, Exception;
+    public I_Workspace createWorkspace(UUID workspaceId, String name, File menuDir) throws WorkspaceActiveException,
+            Exception;
 
-    public I_Workspace createWorkspace(UUID workspaceId, String name,
-            I_ManageUserTransactions transactionInterface, File menuDir)
-            throws WorkspaceActiveException, Exception;
+    public I_Workspace createWorkspace(UUID workspaceId, String name, I_ManageUserTransactions transactionInterface,
+            File menuDir) throws WorkspaceActiveException, Exception;
 
     /**
      * @param workspaceId
      * @return Workspace corresponding to the provided identifier
      * @throws NoSuchWorkspaceException
      */
-    public I_Workspace getWorkspace(UUID workspaceId)
-            throws NoSuchWorkspaceException;
+    public I_Workspace getWorkspace(UUID workspaceId) throws NoSuchWorkspaceException;
 
     /**
      * @return the last workspace created or retrieved, or set with a call to
@@ -201,8 +194,7 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
      * @return
      * @throws TaskFailedException
      */
-    public Object selectFromList(Object[] list, String title,
-            String instructions) throws TaskFailedException;
+    public Object selectFromList(Object[] list, String title, String instructions) throws TaskFailedException;
 
     /**
      * Causes this worker to execute a process
@@ -211,8 +203,7 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
      *            The process to be executed
      * @throws TaskFailedException
      */
-    public Condition execute(I_EncodeBusinessProcess process)
-            throws TaskFailedException;
+    public Condition execute(I_EncodeBusinessProcess process) throws TaskFailedException;
 
     public Stack<I_EncodeBusinessProcess> getProcessStack();
 
@@ -234,8 +225,7 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
      * @throws WorkspaceActiveException
      * @throws TransactionException
      */
-    public I_Workspace createHeadlessWorkspace(UUID workspace_id)
-            throws WorkspaceActiveException, HeadlessException,
+    public I_Workspace createHeadlessWorkspace(UUID workspace_id) throws WorkspaceActiveException, HeadlessException,
             TransactionException;
 
     public LoginContext getLoginContext();
@@ -244,82 +234,75 @@ public interface I_Work extends I_ManageProperties, I_KeepTime {
 
     public void logout() throws LoginException;
 
-    public Object prepareProxy(Object proxy,
-            Class<I_QueueProcesses> interfaceClass)
-            throws ConfigurationException, PrivilegedActionException;
+    public Object prepareProxy(Object proxy, Class<I_QueueProcesses> interfaceClass) throws ConfigurationException,
+            PrivilegedActionException;
 
-    public ServiceItemFilter getServiceProxyFilter()
-            throws ConfigurationException;
+    public ServiceItemFilter getServiceProxyFilter() throws ConfigurationException;
 
-    public Object doAsPrivileged(PrivilegedExceptionAction<Object> action,
-            AccessControlContext acc) throws PrivilegedActionException;
-
-    public Object doAsPrivileged(PrivilegedAction<Object> action,
-            AccessControlContext acc);
-
-    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter,
-            long waitDur) throws InterruptedException, RemoteException,
-            PrivilegedActionException, ConfigurationException;
-
-    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter)
-            throws InterruptedException, RemoteException,
-            PrivilegedActionException, ConfigurationException;
-
-    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches,
-            int maxMatches, ServiceItemFilter filter, long waitDur)
-            throws InterruptedException, RemoteException,
-            PrivilegedActionException, ConfigurationException;
-
-    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches,
-            int maxMatches, ServiceItemFilter filter, long waitDur,
-            boolean lookupLocal) throws InterruptedException, RemoteException,
-            PrivilegedActionException, ConfigurationException;
-
-    public ServiceItem[] lookupAllGroups(ServiceTemplate tmpl, int minMatches,
-            int maxMatches, ServiceItemFilter filter, long waitDur)
-            throws InterruptedException, RemoteException,
-            PrivilegedActionException, ConfigurationException;
-
-    public ServiceItem[] lookupAllGroups(ServiceTemplate template,
-            int maxMatches, ServiceItemFilter filter)
-            throws InterruptedException, RemoteException,
-            PrivilegedActionException, ConfigurationException;
-
-    public Transaction createTransaction(long transactionDuration)
+    public Object doAsPrivileged(PrivilegedExceptionAction<Object> action, AccessControlContext acc)
             throws PrivilegedActionException;
 
-    public void renewFor(Lease lease, long desiredDuration, long renewDuration,
-            LeaseListener listener);
+    public Object doAsPrivileged(PrivilegedAction<Object> action, AccessControlContext acc);
 
-    public LookupCache createLookupCache(ServiceTemplate tmpl,
-            ServiceItemFilter filter, ServiceDiscoveryListener listener)
-            throws RemoteException, PrivilegedActionException;
+    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter, long waitDur)
+            throws InterruptedException, RemoteException, PrivilegedActionException, ConfigurationException;
 
-    public JoinManager createJoinManager(Object object, Entry[] entries,
-            ServiceID serviceID, LeaseRenewalManager leaseMgr)
-            throws PrivilegedActionException;
+    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter) throws InterruptedException,
+            RemoteException, PrivilegedActionException, ConfigurationException;
 
-    public ServiceItemFilter getServiceProxyFilter(ServiceItemFilter extraFilter)
-            throws ConfigurationException;
-    
-    public Object getObjFromFilesystem(Frame parent, String title, String startDir, FilenameFilter fileFilter) throws IOException, ClassNotFoundException;
-    public void writeObjToFilesystem(Frame parent, String title, String startDir, String defaultFile, Object obj) throws IOException;
-    
+    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches, int maxMatches, ServiceItemFilter filter,
+            long waitDur) throws InterruptedException, RemoteException, PrivilegedActionException,
+            ConfigurationException;
+
+    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches, int maxMatches, ServiceItemFilter filter,
+            long waitDur, boolean lookupLocal) throws InterruptedException, RemoteException, PrivilegedActionException,
+            ConfigurationException;
+
+    public ServiceItem[] lookupAllGroups(ServiceTemplate tmpl, int minMatches, int maxMatches,
+            ServiceItemFilter filter, long waitDur) throws InterruptedException, RemoteException,
+            PrivilegedActionException, ConfigurationException;
+
+    public ServiceItem[] lookupAllGroups(ServiceTemplate template, int maxMatches, ServiceItemFilter filter)
+            throws InterruptedException, RemoteException, PrivilegedActionException, ConfigurationException;
+
+    public Transaction createTransaction(long transactionDuration) throws PrivilegedActionException;
+
+    public void renewFor(Lease lease, long desiredDuration, long renewDuration, LeaseListener listener);
+
+    public LookupCache createLookupCache(ServiceTemplate tmpl, ServiceItemFilter filter,
+            ServiceDiscoveryListener listener) throws RemoteException, PrivilegedActionException;
+
+    public JoinManager createJoinManager(Object object, Entry[] entries, ServiceID serviceID,
+            LeaseRenewalManager leaseMgr) throws PrivilegedActionException;
+
+    public ServiceItemFilter getServiceProxyFilter(ServiceItemFilter extraFilter) throws ConfigurationException;
+
+    public Object getObjFromFilesystem(Frame parent, String title, String startDir, FilenameFilter fileFilter)
+            throws IOException, ClassNotFoundException;
+
+    public void writeObjToFilesystem(Frame parent, String title, String startDir, String defaultFile, Object obj)
+            throws IOException;
+
     public boolean isExecuting();
-    
+
     public void flagExecutionStop();
+
     public boolean isExecutionStopFlagged();
-    
-    public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException, PrivilegedActionException;
+
+    public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException,
+            PrivilegedActionException;
+
     public I_KeepTime getTimer();
+
     public void setTimer(I_KeepTime timer);
-    
+
     public void writeAttachment(String key, Object value);
+
     public Object readAttachement(String key);
+
     public Object takeAttachment(String key);
-    
+
     public I_PluginToWorker getPluginForInterface(Class<? extends I_PluginToWorker> pluginInterface);
-    
-    public void setPluginForInterface(Class<? extends I_PluginToWorker> pluginInterface, 
-        I_PluginToWorker plugin);
+
+    public void setPluginForInterface(Class<? extends I_PluginToWorker> pluginInterface, I_PluginToWorker plugin);
 }

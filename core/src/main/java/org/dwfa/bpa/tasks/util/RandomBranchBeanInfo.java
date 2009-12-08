@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,14 +30,11 @@ public class RandomBranchBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor relativeTimeProp =
-                    new PropertyDescriptor("branchFrequency",
-                        RandomBranch.class);
+            PropertyDescriptor relativeTimeProp = new PropertyDescriptor("branchFrequency", RandomBranch.class);
             relativeTimeProp.setBound(true);
             relativeTimeProp.setPropertyEditorClass(ProbabilityEditor.class);
             relativeTimeProp.setDisplayName("branch probability");
-            relativeTimeProp
-                .setShortDescription("The probability this task evaluates to true.");
+            relativeTimeProp.setShortDescription("The probability this task evaluates to true.");
 
             PropertyDescriptor rv[] = { relativeTimeProp };
             return rv;

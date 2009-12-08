@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,13 +34,11 @@ import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.pwdbreaker.ConfigureCryptBreakerWorkspace;
 
-
 /**
  * @author kec
- *  
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/flow tasks", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/flow tasks", type = BeanType.TASK_BEAN) })
 public class WaitForInputFieldCancelOrComplete extends WaitForCancelOrComplete {
     private static final long serialVersionUID = 1;
 
@@ -48,15 +46,14 @@ public class WaitForInputFieldCancelOrComplete extends WaitForCancelOrComplete {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
 
         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
@@ -67,65 +64,61 @@ public class WaitForInputFieldCancelOrComplete extends WaitForCancelOrComplete {
      */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // nothing to do
-    
+
     }
+
     /**
-     * @see org.dwfa.bpa.tasks.ws.WaitForCancelOrComplete#evaluateAfterAction(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work, org.dwfa.bpa.process.Condition)
+     * @see org.dwfa.bpa.tasks.ws.WaitForCancelOrComplete#evaluateAfterAction(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work, org.dwfa.bpa.process.Condition)
      */
     @Override
     public void evaluateAfterAction(I_EncodeBusinessProcess process, I_Work worker, Condition exitCondition) {
         // nothing to do
-        
+
     }
+
     /**
-     * @see org.dwfa.bpa.tasks.ws.WaitForCancelOrComplete#evaluateStart(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.tasks.ws.WaitForCancelOrComplete#evaluateStart(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
     public void evaluateStart(I_EncodeBusinessProcess process, I_Work worker) {
         // nothing to do
     }
 
-
     /**
      * @param worker
-     * @throws TaskFailedException 
+     * @throws TaskFailedException
      */
     protected void addListeners(final I_Work worker) throws TaskFailedException {
         I_Workspace workspace = worker.getCurrentWorkspace();
         FieldInputPanel fieldInputPanel;
         try {
-            fieldInputPanel = (FieldInputPanel) workspace
-                    .getPanel(ConfigureCryptBreakerWorkspace.INPUT);
+            fieldInputPanel = (FieldInputPanel) workspace.getPanel(ConfigureCryptBreakerWorkspace.INPUT);
         } catch (NoMatchingEntryException e) {
             throw new TaskFailedException(e);
         }
-        fieldInputPanel
-                .addCancelActionListener(cancelActionListener);
-        fieldInputPanel
-                .addCompleteActionListener(completeActionListener);
+        fieldInputPanel.addCancelActionListener(cancelActionListener);
+        fieldInputPanel.addCompleteActionListener(completeActionListener);
         fieldInputPanel.setCancelEnabled(true);
         fieldInputPanel.setCompleteEnabled(true);
     }
 
     /**
      * @param worker
-     * @throws TaskFailedException 
+     * @throws TaskFailedException
      */
     protected void removeListeners(final I_Work worker) throws TaskFailedException {
         I_Workspace workspace = worker.getCurrentWorkspace();
         FieldInputPanel fieldInputPanel;
         try {
-            fieldInputPanel = (FieldInputPanel) workspace
-                    .getPanel(ConfigureCryptBreakerWorkspace.INPUT);
+            fieldInputPanel = (FieldInputPanel) workspace.getPanel(ConfigureCryptBreakerWorkspace.INPUT);
         } catch (NoMatchingEntryException e) {
             throw new TaskFailedException(e);
         }
-        fieldInputPanel
-                .removeCancelActionListener(cancelActionListener);
-        fieldInputPanel
-                .removeCompleteActionListener(completeActionListener);
+        fieldInputPanel.removeCancelActionListener(cancelActionListener);
+        fieldInputPanel.removeCompleteActionListener(completeActionListener);
         fieldInputPanel.setCancelEnabled(false);
         fieldInputPanel.setCompleteEnabled(false);
     }
-
 
 }

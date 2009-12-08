@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -85,18 +85,17 @@ import org.dwfa.jini.TransactionParticipantAggregator;
 
 import com.sun.jini.start.LifeCycle;
 
-public abstract class ObjectServerCore<T extends I_DescribeObject> implements
-        ActionListener {
-	
-	private static Set<ObjectServerCore<I_DescribeObject>> openServers = new HashSet<ObjectServerCore<I_DescribeObject>>();
+public abstract class ObjectServerCore<T extends I_DescribeObject> implements ActionListener {
 
-	public static void refreshServers() {
-		for (ObjectServerCore<I_DescribeObject> server: openServers) {
-			server.initEntryMetaInfo();
-		}
-	}
-	
-	public static class MatchEntryID implements FileFilter {
+    private static Set<ObjectServerCore<I_DescribeObject>> openServers = new HashSet<ObjectServerCore<I_DescribeObject>>();
+
+    public static void refreshServers() {
+        for (ObjectServerCore<I_DescribeObject> server : openServers) {
+            server.initEntryMetaInfo();
+        }
+    }
+
+    public static class MatchEntryID implements FileFilter {
         EntryID entryID;
 
         /**
@@ -147,11 +146,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      * 
      * @throws IOException
      */
-    protected static ServiceID createServiceID(File directory)
-            throws IOException {
-    	UUID uuid = UUID.randomUUID();
-        ServiceID sid = new ServiceID(uuid.getMostSignificantBits(), uuid
-                .getLeastSignificantBits());
+    protected static ServiceID createServiceID(File directory) throws IOException {
+        UUID uuid = UUID.randomUUID();
+        ServiceID sid = new ServiceID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
         File serviceIdFile = new File(directory, "ServiceID.oos");
         FileOutputStream fos = new FileOutputStream(serviceIdFile);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
@@ -181,16 +178,15 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
 
     protected String nodeInboxAddress;
 
-    private Set<T> uncommittedTakes = Collections
-            .synchronizedSet(new HashSet<T>());
+    private Set<T> uncommittedTakes = Collections.synchronizedSet(new HashSet<T>());
 
     private SortedSet<T> objectInfoSortedSet;
 
     private Comparator<T> nativeComparator;
-    
+
     private I_GetObjectInputStream oisGetter = new DefaultObjectInputStreamCreator();
 
-	private File logDir; 
+    private File logDir;
 
     /**
      * @param files
@@ -198,9 +194,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      */
     public File undoTake(File file) {
         String currentName = file.getName();
-        String newName = currentName.substring(0,
-                currentName.lastIndexOf(getFileSuffixTakePending())).concat(
-                getFileSuffix());
+        String newName = currentName.substring(0, currentName.lastIndexOf(getFileSuffixTakePending())).concat(
+            getFileSuffix());
         File newFile = new File(file.getParentFile(), newName);
         file.renameTo(newFile);
         return newFile;
@@ -209,20 +204,19 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
     /**
      * @param files
      * @param i
-     * @throws IOException 
+     * @throws IOException
      */
     public File finishWrite(File file) {
         String currentName = file.getName();
-        String newName = currentName.substring(0,
-                currentName.lastIndexOf(getFileSuffixWritePending())).concat(
-                getFileSuffix());
+        String newName = currentName.substring(0, currentName.lastIndexOf(getFileSuffixWritePending())).concat(
+            getFileSuffix());
         File newFile = new File(file.getParentFile(), newName);
         file.renameTo(newFile);
         try {
-			writeLogEntry(newFile);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+            writeLogEntry(newFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return newFile;
     }
 
@@ -232,9 +226,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      */
     public File startTake(File file) {
         String currentName = file.getName();
-        String newName = currentName.substring(0,
-                currentName.lastIndexOf(getFileSuffix())).concat(
-                getFileSuffixTakePending());
+        String newName = currentName.substring(0, currentName.lastIndexOf(getFileSuffix())).concat(
+            getFileSuffixTakePending());
         File newFile = new File(file.getParentFile(), newName);
         file.renameTo(newFile);
         return newFile;
@@ -245,28 +238,25 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         super();
         openServers.add((ObjectServerCore<I_DescribeObject>) this);
         getLogger().info(
-                "\n*******************\n\n"
-                        + "Starting " + this.getClass().getSimpleName() + " with config file: "
-                        + Arrays.asList(args) + "\n\n******************\n");
-        this.config = ConfigurationProvider.getInstance(args, getClass()
-                .getClassLoader());
+            "\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: "
+                + Arrays.asList(args) + "\n\n******************\n");
+        this.config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
         this.lifeCycle = lc;
-        oisGetter = (I_GetObjectInputStream) this.config.getEntry(this
-                .getClass().getName(), "objectGetter", I_GetObjectInputStream.class);
-        Boolean readInsteadOfTakeBool = (Boolean) this.config.getEntry(this
-                .getClass().getName(), "readInsteadOfTake", Boolean.class,
-                new Boolean(false));
+        oisGetter = (I_GetObjectInputStream) this.config.getEntry(this.getClass().getName(), "objectGetter",
+            I_GetObjectInputStream.class);
+        Boolean readInsteadOfTakeBool = (Boolean) this.config.getEntry(this.getClass().getName(), "readInsteadOfTake",
+            Boolean.class, new Boolean(false));
         this.readInsteadOfTake = readInsteadOfTakeBool.booleanValue();
-        this.nodeInboxAddress = (String) this.config.getEntry(this.getClass()
-                .getName(), "nodeInboxAddress", String.class);
-        this.directory = (File) this.config.getEntry(this.getClass().getName(),
-                "directory", File.class, new File(args[0]).getParentFile());
+        this.nodeInboxAddress = (String) this.config.getEntry(this.getClass().getName(), "nodeInboxAddress",
+            String.class);
+        this.directory = (File) this.config.getEntry(this.getClass().getName(), "directory", File.class, new File(
+            args[0]).getParentFile());
         this.directory.mkdirs();
         this.logDir = new File(this.directory, ".llog");
         this.logDir.mkdirs();
 
-        this.nativeComparator = (Comparator<T>) this.config.getEntry(this
-                .getClass().getName(), "nativeComparator", Comparator.class);
+        this.nativeComparator = (Comparator<T>) this.config.getEntry(this.getClass().getName(), "nativeComparator",
+            Comparator.class);
         initFromDirectory();
         this.init();
     }
@@ -293,49 +283,45 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      *             if a problem occurs
      */
     @SuppressWarnings("unchecked")
-   protected void init() throws Exception {
+    protected void init() throws Exception {
         if (JiniManager.isLocalOnly()) {
-        	List<Entry> entryList = new ArrayList<Entry>();
-            Entry[] entries = (Entry[]) this.config.getEntry(this.getClass()
-                    .getName(), "entries", Entry[].class, new Entry[] {});
+            List<Entry> entryList = new ArrayList<Entry>();
+            Entry[] entries = (Entry[]) this.config.getEntry(this.getClass().getName(), "entries", Entry[].class,
+                new Entry[] {});
             entryList.addAll(Arrays.asList(entries));
-            
 
-             Entry[] moreEntries = getFixedServiceEntries();
-             entryList.addAll(Arrays.asList(moreEntries));
-             
-             ServiceItem serviceItem = new ServiceItem(this.getServiceID(),
-                    this, (Entry[]) entryList.toArray(new Entry[entryList
-                            .size()]));
+            Entry[] moreEntries = getFixedServiceEntries();
+            entryList.addAll(Arrays.asList(moreEntries));
+
+            ServiceItem serviceItem = new ServiceItem(this.getServiceID(), this,
+                (Entry[]) entryList.toArray(new Entry[entryList.size()]));
             LookupJiniAndLocal.addToLocalServices(serviceItem);
 
         } else {
-            LoginContext loginContext = (LoginContext) config
-            .getEntry(this.getClass().getName(), "loginContext",
-                    LoginContext.class, null);
-           if (loginContext == null) {
+            LoginContext loginContext = (LoginContext) config.getEntry(this.getClass().getName(), "loginContext",
+                LoginContext.class, null);
+            if (loginContext == null) {
                 getLogger().info(
-                        "initAsSubject: " + this.getClass().getName() + " "
-                                + this.getServiceID() + " with no login context.");
+                    "initAsSubject: " + this.getClass().getName() + " " + this.getServiceID()
+                        + " with no login context.");
                 initAsSubject();
             } else {
                 loginContext.login();
                 StringBuffer message = new StringBuffer();
-                message.append("initAsSubject: " + this.getClass().getName() + " "
-                        + this.getServiceID() + " with subject");
+                message.append("initAsSubject: " + this.getClass().getName() + " " + this.getServiceID()
+                    + " with subject");
                 if (getLogger().isLoggable(Level.FINE)) {
                     message.append(loginContext.getSubject());
                 }
                 message.append(".");
 
                 getLogger().info(message.toString());
-                Subject.doAsPrivileged(loginContext.getSubject(),
-                        new PrivilegedExceptionAction() {
-                            public Object run() throws Exception {
-                                initAsSubject();
-                                return null;
-                            }
-                        }, null);
+                Subject.doAsPrivileged(loginContext.getSubject(), new PrivilegedExceptionAction() {
+                    public Object run() throws Exception {
+                        initAsSubject();
+                        return null;
+                    }
+                }, null);
             }
         }
     }
@@ -349,12 +335,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      * @throws RemoteException
      *             if a remote communication problem occurs
      */
-    protected Exporter getExporter() throws ConfigurationException,
-            RemoteException {
-        return (Exporter) config
-                .getEntry(this.getClass().getName(), "exporter",
-                        Exporter.class, new BasicJeriExporter(TcpServerEndpoint
-                                .getInstance(0), new BasicILFactory()));
+    protected Exporter getExporter() throws ConfigurationException, RemoteException {
+        return (Exporter) config.getEntry(this.getClass().getName(), "exporter", Exporter.class, new BasicJeriExporter(
+            TcpServerEndpoint.getInstance(0), new BasicILFactory()));
     }
 
     protected abstract Object export(Exporter exporter) throws ExportException;
@@ -382,8 +365,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         return new EntryID(UUID.randomUUID());
     }
 
-    protected void initFromDirectory() throws IOException,
-            ClassNotFoundException {
+    protected void initFromDirectory() throws IOException, ClassNotFoundException {
         File serviceIdFile = new File(this.directory, "ServiceID.oos");
         if (serviceIdFile.exists()) {
             FileInputStream fis = new FileInputStream(serviceIdFile);
@@ -402,8 +384,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         File[] files = this.directory.listFiles(new FileFilter() {
 
             public boolean accept(File pathname) {
-                return (pathname.getName().endsWith(getFileSuffixTakePending()) || pathname
-                        .getName().endsWith(getFileSuffixWritePending()));
+                return (pathname.getName().endsWith(getFileSuffixTakePending()) || pathname.getName().endsWith(
+                    getFileSuffixWritePending()));
             }
         });
         if (files != null) {
@@ -411,16 +393,11 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
                 if (files[i].getName().endsWith(getFileSuffixTakePending())) {
                     undoTake(files[i]);
 
-                } else if (files[i].getName().endsWith(
-                        getFileSuffixWritePending())) {
+                } else if (files[i].getName().endsWith(getFileSuffixWritePending())) {
                     String currentName = files[i].getName();
-                    String newName = currentName.substring(
-                            0,
-                            currentName
-                                    .lastIndexOf(getFileSuffixWritePending()))
-                            .concat(getFileSuffix());
-                    files[i].renameTo(new File(files[i].getParentFile(),
-                            newName));
+                    String newName = currentName.substring(0, currentName.lastIndexOf(getFileSuffixWritePending()))
+                        .concat(getFileSuffix());
+                    files[i].renameTo(new File(files[i].getParentFile(), newName));
 
                 }
             }
@@ -431,22 +408,21 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
             }
         });
         if (files != null) {
-        	for (File f: files) {
-        		writeLogEntry(f);
-        	}
+            for (File f : files) {
+                writeLogEntry(f);
+            }
         }
 
     }
 
-    public Object read(EntryID entryID, Transaction t) throws IOException,
-            ClassNotFoundException, NoMatchingEntryException {
+    public Object read(EntryID entryID, Transaction t) throws IOException, ClassNotFoundException,
+            NoMatchingEntryException {
         File[] files = this.directory.listFiles(new MatchEntryID(entryID));
         if (files == null) {
-          throw new NoMatchingEntryException("No matching files for entryID: " + entryID);
+            throw new NoMatchingEntryException("No matching files for entryID: " + entryID);
         }
         if (files.length != 1) {
-            throw new NoMatchingEntryException("Found " + files.length
-                    + " matching files for entryID: " + entryID);
+            throw new NoMatchingEntryException("Found " + files.length + " matching files for entryID: " + entryID);
         }
         FileInputStream fis = new FileInputStream(files[0]);
         BufferedInputStream bis = new BufferedInputStream(fis);
@@ -463,15 +439,14 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      * @see org.dwfa.bpa.process.I_QueueProcesses#read(net.jini.id.Uuid,
      *      net.jini.core.transaction.Transaction)
      */
-    public Object read(UUID objectID, Transaction t) throws IOException,
-            ClassNotFoundException, NoMatchingEntryException {
+    public Object read(UUID objectID, Transaction t) throws IOException, ClassNotFoundException,
+            NoMatchingEntryException {
         File[] files = this.directory.listFiles(new MatchObjectID(objectID));
         if (files == null) {
-          throw new NoMatchingEntryException("No matching files for objectID: " + objectID);
+            throw new NoMatchingEntryException("No matching files for objectID: " + objectID);
         }
         if (files.length != 1) {
-            throw new NoMatchingEntryException("Found " + files.length
-                    + " matching files for objectID: " + objectID);
+            throw new NoMatchingEntryException("Found " + files.length + " matching files for objectID: " + objectID);
         }
         FileInputStream fis = new FileInputStream(files[0]);
         BufferedInputStream bis = new BufferedInputStream(fis);
@@ -484,8 +459,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
     /**
      * @see org.dwfa.bpa.process.I_QueueProcesses#getProcessMetaData(org.dwfa.bpa.process.I_SelectProcesses)
      */
-    public Collection<T> getMetaData(I_SelectObjects selector)
-            throws RemoteException {
+    public Collection<T> getMetaData(I_SelectObjects selector) throws RemoteException {
         if (selector == null) {
             return new ArrayList<T>(this.objectInfoSortedSet);
         }
@@ -506,20 +480,18 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      * @see org.dwfa.bpa.process.I_QueueProcesses#take(net.jini.id.Uuid,
      *      net.jini.core.transaction.Transaction)
      */
-    public Object take(EntryID entryID, Transaction t)
-            throws TransactionException, IOException, ClassNotFoundException,
-            NoMatchingEntryException {
+    public Object take(EntryID entryID, Transaction t) throws TransactionException, IOException,
+            ClassNotFoundException, NoMatchingEntryException {
         try {
             if (this.readInsteadOfTake) {
                 return this.read(entryID, t);
             }
             File[] files = this.directory.listFiles(new MatchEntryID(entryID));
             if (files == null) {
-              throw new NoMatchingEntryException("No matching files for entryID: " + entryID);
+                throw new NoMatchingEntryException("No matching files for entryID: " + entryID);
             }
             if (files.length != 1) {
-                throw new NoMatchingEntryException("Found " + files.length
-                        + " matching files for entryID: " + entryID);
+                throw new NoMatchingEntryException("Found " + files.length + " matching files for entryID: " + entryID);
             }
 
             File processFile = files[0];
@@ -533,9 +505,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
 
             this.uncommittedTakes.add(objDesc);
             this.objectInfoSortedSet.remove(objDesc);
-            addTakeToTransaction(objDesc, this.objectInfoSortedSet,
-                    this.uncommittedTakes, processFile, (ServerTransaction) t,
-                    this);
+            addTakeToTransaction(objDesc, this.objectInfoSortedSet, this.uncommittedTakes, processFile,
+                (ServerTransaction) t, this);
             return obj;
         } catch (FileNotFoundException ex) {
             throw new NoMatchingEntryException(ex.toString());
@@ -547,28 +518,25 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      * @see org.dwfa.bpa.process.I_QueueProcesses#write(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.EntryID, net.jini.core.transaction.Transaction)
      */
-    public void write(T object, EntryID entryID, Transaction t)
-            throws RemoteException, IOException, TransactionException {
+    public void write(T object, EntryID entryID, Transaction t) throws RemoteException, IOException,
+            TransactionException {
         if (t == null) {
             write(object, entryID);
         } else {
-            File objectFile = new File(this.directory, object.getObjectID()
-                    + "." + entryID + getFileSuffixWritePending());
+            File objectFile = new File(this.directory, object.getObjectID() + "." + entryID
+                + getFileSuffixWritePending());
             FileOutputStream fos = new FileOutputStream(objectFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(object);
             oos.close();
-            this.addWriteToTransaction(getObjectDescription(object, entryID),
-                    this.objectInfoSortedSet, objectFile,
-                    (ServerTransaction) t, this);
+            this.addWriteToTransaction(getObjectDescription(object, entryID), this.objectInfoSortedSet, objectFile,
+                (ServerTransaction) t, this);
         }
     }
 
-    public void write(T object, EntryID entryID) throws RemoteException,
-            IOException, TransactionException {
-        File objectFile = new File(this.directory, object.getObjectID() + "."
-                + entryID + getFileSuffix());
+    public void write(T object, EntryID entryID) throws RemoteException, IOException, TransactionException {
+        File objectFile = new File(this.directory, object.getObjectID() + "." + entryID + getFileSuffix());
         FileOutputStream fos = new FileOutputStream(objectFile);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -578,26 +546,24 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         objectInfoSortedSet.add(getObjectDescription(object, entryID));
     }
 
-	private void writeLogEntry(File entryFile) throws IOException {
-		if (entryFile.exists()) {
-			File logEntry = new File(logDir, entryFile.getName());
-			if (logEntry.exists() == false) {
-				logEntry.createNewFile();
-			}
-		}
-	}
+    private void writeLogEntry(File entryFile) throws IOException {
+        if (entryFile.exists()) {
+            File logEntry = new File(logDir, entryFile.getName());
+            if (logEntry.exists() == false) {
+                logEntry.createNewFile();
+            }
+        }
+    }
 
     /**
      * @see org.dwfa.bpa.process.I_QueueProcesses#writeThenTake(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      net.jini.core.transaction.Transaction,
      *      net.jini.core.transaction.Transaction)
      */
-    public EntryID writeThenTake(T object, Transaction writeTran,
-            Transaction takeTran) throws RemoteException, IOException,
-            TransactionException {
+    public EntryID writeThenTake(T object, Transaction writeTran, Transaction takeTran) throws RemoteException,
+            IOException, TransactionException {
         EntryID entryID = newEntryID();
-        File processFile = new File(this.directory, object.getObjectID() + "."
-                + entryID + getFileSuffixTakePending());
+        File processFile = new File(this.directory, object.getObjectID() + "." + entryID + getFileSuffixTakePending());
         FileOutputStream fos = new FileOutputStream(processFile);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -605,13 +571,11 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         oos.close();
         writeLogEntry(processFile);
         T objectDesc = getObjectDescription(object, entryID);
-        this.addWriteThenTakeToTransaction(objectDesc,
-                this.objectInfoSortedSet, processFile,
-                (ServerTransaction) writeTran, takeTran);
+        this.addWriteThenTakeToTransaction(objectDesc, this.objectInfoSortedSet, processFile,
+            (ServerTransaction) writeTran, takeTran);
         this.uncommittedTakes.add(objectDesc);
-        this.addTakeToTransaction(objectDesc, this.objectInfoSortedSet,
-                this.uncommittedTakes, processFile,
-                (ServerTransaction) takeTran, this);
+        this.addTakeToTransaction(objectDesc, this.objectInfoSortedSet, this.uncommittedTakes, processFile,
+            (ServerTransaction) takeTran, this);
         return entryID;
     }
 
@@ -622,9 +586,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      * @see org.dwfa.bpa.process.I_QueueProcesses#take(org.dwfa.bpa.process.I_SelectProcesses,
      *      net.jini.core.transaction.Transaction)
      */
-    public Object take(I_SelectObjects selector, Transaction t)
-            throws TransactionException, IOException, ClassNotFoundException,
-            NoMatchingEntryException {
+    public Object take(I_SelectObjects selector, Transaction t) throws TransactionException, IOException,
+            ClassNotFoundException, NoMatchingEntryException {
         T selectedObjectInfo = null;
         synchronized (this.objectInfoSortedSet) {
             for (T desc : this.objectInfoSortedSet) {
@@ -640,9 +603,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         throw new NoMatchingEntryException();
     }
 
-    public Object read(I_SelectObjects selector, Transaction t)
-            throws TransactionException, IOException, ClassNotFoundException,
-            NoMatchingEntryException {
+    public Object read(I_SelectObjects selector, Transaction t) throws TransactionException, IOException,
+            ClassNotFoundException, NoMatchingEntryException {
         T selectedObjectInfo = null;
         synchronized (this.objectInfoSortedSet) {
             for (T desc : this.objectInfoSortedSet) {
@@ -671,8 +633,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      * @see org.dwfa.bpa.process.I_QueueProcesses#take(net.jini.id.Uuid,
      *      net.jini.core.transaction.Transaction)
      */
-    public Object take(UUID objectID, Transaction t)
-            throws TransactionException, IOException, ClassNotFoundException,
+    public Object take(UUID objectID, Transaction t) throws TransactionException, IOException, ClassNotFoundException,
             NoMatchingEntryException {
         try {
             if (this.readInsteadOfTake) {
@@ -681,14 +642,13 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
             if (t == null) {
                 return this.take(objectID);
             } else {
-                File[] files = this.directory.listFiles(new MatchObjectID(
-                        objectID));
+                File[] files = this.directory.listFiles(new MatchObjectID(objectID));
                 if (files == null) {
-                  throw new NoMatchingEntryException("Found no matching files for objectID: " + objectID);
+                    throw new NoMatchingEntryException("Found no matching files for objectID: " + objectID);
                 }
                 if (files.length != 1) {
-                  throw new NoMatchingEntryException("Found " + files.length
-                          + " matching files for objectID: " + objectID);
+                    throw new NoMatchingEntryException("Found " + files.length + " matching files for objectID: "
+                        + objectID);
                 }
 
                 File objectFile = files[0];
@@ -703,9 +663,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
                 T desc = this.getObjectDescription(obj, entryID);
                 this.uncommittedTakes.add(desc);
                 this.objectInfoSortedSet.remove(desc);
-                this.addTakeToTransaction(desc, this.objectInfoSortedSet,
-                        this.uncommittedTakes, objectFile,
-                        (ServerTransaction) t, this);
+                this.addTakeToTransaction(desc, this.objectInfoSortedSet, this.uncommittedTakes, objectFile,
+                    (ServerTransaction) t, this);
                 return obj;
             }
         } catch (FileNotFoundException ex) {
@@ -713,17 +672,16 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         }
     }
 
-    private Object take(UUID objectID) throws TransactionException,
-            IOException, ClassNotFoundException, NoMatchingEntryException {
+    private Object take(UUID objectID) throws TransactionException, IOException, ClassNotFoundException,
+            NoMatchingEntryException {
         try {
-            File[] files = this.directory
-                    .listFiles(new MatchObjectID(objectID));
+            File[] files = this.directory.listFiles(new MatchObjectID(objectID));
             if (files == null) {
-              throw new NoMatchingEntryException("No matching files for objectID: " + objectID);
+                throw new NoMatchingEntryException("No matching files for objectID: " + objectID);
             }
             if (files.length != 1) {
-                throw new NoMatchingEntryException("Found " + files.length
-                        + " matching files for objectID: " + objectID);
+                throw new NoMatchingEntryException("Found " + files.length + " matching files for objectID: "
+                    + objectID);
             }
 
             File objectFile = files[0];
@@ -744,18 +702,16 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         }
     }
 
-    public void hide(EntryID entryID, Transaction t) throws RemoteException,
-            IOException, ClassNotFoundException, TransactionException,
-            NoMatchingEntryException {
+    public void hide(EntryID entryID, Transaction t) throws RemoteException, IOException, ClassNotFoundException,
+            TransactionException, NoMatchingEntryException {
         try {
 
             File[] files = this.directory.listFiles(new MatchEntryID(entryID));
             if (files == null) {
-              throw new NoMatchingEntryException("No matching files for entryID: " + entryID);
+                throw new NoMatchingEntryException("No matching files for entryID: " + entryID);
             }
             if (files.length != 1) {
-                throw new NoMatchingEntryException("Found " + files.length
-                        + " matching files for entryID: " + entryID);
+                throw new NoMatchingEntryException("Found " + files.length + " matching files for entryID: " + entryID);
             }
 
             File objFile = files[0];
@@ -768,23 +724,21 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
             T objDesc = this.getObjectDescription(obj, entryID);
             this.uncommittedTakes.add(objDesc);
             this.objectInfoSortedSet.remove(objDesc);
-            addHideToTransaction(objDesc, this.objectInfoSortedSet,
-                    this.uncommittedTakes, objFile, (ServerTransaction) t, this);
+            addHideToTransaction(objDesc, this.objectInfoSortedSet, this.uncommittedTakes, objFile,
+                (ServerTransaction) t, this);
         } catch (FileNotFoundException ex) {
             throw new NoMatchingEntryException(ex.toString());
         }
     }
 
-    private void addTakeToTransaction(T objDesc, SortedSet<T> name,
-            Set<T> name2, File processFile, ServerTransaction st,
-            ObjectServerCore core) throws TransactionException,
-            UnknownTransactionException, CannotJoinException,
-            CrashCountException, RemoteException {
+    private void addTakeToTransaction(T objDesc, SortedSet<T> name, Set<T> name2, File processFile,
+            ServerTransaction st, ObjectServerCore core) throws TransactionException, UnknownTransactionException,
+            CannotJoinException, CrashCountException, RemoteException {
         if (st == null) {
             return;
         }
-        TakeTransactionPart part = new TakeTransactionPart<T>(objDesc,
-                objectInfoSortedSet, uncommittedTakes, processFile, this, this);
+        TakeTransactionPart part = new TakeTransactionPart<T>(objDesc, objectInfoSortedSet, uncommittedTakes,
+            processFile, this, this);
         TransactionParticipantAggregator.addTransactionPart(st, part);
         if (getLogger().isLoggable(Level.FINE)) {
             getLogger().fine("addTakeToTransaction");
@@ -792,16 +746,14 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
 
     }
 
-    private void addHideToTransaction(T objDesc, SortedSet<T> name,
-            Set<T> name2, File processFile, ServerTransaction st,
-            ObjectServerCore core) throws TransactionException,
-            UnknownTransactionException, CannotJoinException,
-            CrashCountException, RemoteException {
+    private void addHideToTransaction(T objDesc, SortedSet<T> name, Set<T> name2, File processFile,
+            ServerTransaction st, ObjectServerCore core) throws TransactionException, UnknownTransactionException,
+            CannotJoinException, CrashCountException, RemoteException {
         if (st == null) {
             return;
         }
-        HideTransactionPart part = new HideTransactionPart<T>(objDesc,
-                objectInfoSortedSet, uncommittedTakes, processFile, this, this);
+        HideTransactionPart part = new HideTransactionPart<T>(objDesc, objectInfoSortedSet, uncommittedTakes,
+            processFile, this, this);
         TransactionParticipantAggregator.addTransactionPart(st, part);
         if (getLogger().isLoggable(Level.FINE)) {
             getLogger().fine("addHideTransactionPart");
@@ -809,33 +761,28 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
 
     }
 
-    private void addWriteThenTakeToTransaction(T objectDesc, SortedSet<T> name,
-            File processFile, ServerTransaction writeTransaction,
-            Transaction takeTran) throws TransactionException,
-            UnknownTransactionException, CannotJoinException,
-            CrashCountException, RemoteException {
+    private void addWriteThenTakeToTransaction(T objectDesc, SortedSet<T> name, File processFile,
+            ServerTransaction writeTransaction, Transaction takeTran) throws TransactionException,
+            UnknownTransactionException, CannotJoinException, CrashCountException, RemoteException {
         if (writeTransaction == null) {
             return;
         }
-        WriteThenTakeTransactionPart part = new WriteThenTakeTransactionPart<T>(
-                objectDesc, objectInfoSortedSet, processFile, takeTran, this);
-        TransactionParticipantAggregator.addTransactionPart(writeTransaction,
-                part);
+        WriteThenTakeTransactionPart part = new WriteThenTakeTransactionPart<T>(objectDesc, objectInfoSortedSet,
+            processFile, takeTran, this);
+        TransactionParticipantAggregator.addTransactionPart(writeTransaction, part);
         if (getLogger().isLoggable(Level.FINE)) {
             getLogger().fine("addWriteThenTakeToTransaction");
         }
 
     }
 
-    private void addWriteToTransaction(T object, SortedSet<T> name,
-            File processFile, ServerTransaction st, ObjectServerCore core)
-            throws TransactionException, UnknownTransactionException,
-            CannotJoinException, CrashCountException, RemoteException {
+    private void addWriteToTransaction(T object, SortedSet<T> name, File processFile, ServerTransaction st,
+            ObjectServerCore core) throws TransactionException, UnknownTransactionException, CannotJoinException,
+            CrashCountException, RemoteException {
         if (st == null) {
             return;
         }
-        WriteTransactionPart part = new WriteTransactionPart<T>(object,
-                objectInfoSortedSet, processFile, this, this);
+        WriteTransactionPart part = new WriteTransactionPart<T>(object, objectInfoSortedSet, processFile, this, this);
         TransactionParticipantAggregator.addTransactionPart(st, part);
         if (getLogger().isLoggable(Level.FINE)) {
             getLogger().fine("addQueueWriteToTransaction");
@@ -847,8 +794,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      * 
      */
     protected synchronized void initEntryMetaInfo() {
-        this.objectInfoSortedSet = Collections
-                .synchronizedSortedSet(new TreeSet<T>(this.nativeComparator));
+        this.objectInfoSortedSet = Collections.synchronizedSortedSet(new TreeSet<T>(this.nativeComparator));
         File[] files = this.directory.listFiles(new FileFilter() {
 
             public boolean accept(File pathname) {
@@ -868,18 +814,16 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
                     if (idParts[1].length() != 36) {
                         EntryID entryID = new EntryID(UUID.randomUUID());
                         info = getObjectDescription(obj, entryID);
-                        files[i].renameTo(new File(files[i].getParent(), info.getObjectID() + "." + 
-                        		entryID + getFileSuffix()));
+                        files[i].renameTo(new File(files[i].getParent(), info.getObjectID() + "." + entryID
+                            + getFileSuffix()));
                     } else {
                         EntryID entryID = new EntryID(UUID.fromString(idParts[1]));
                         info = getObjectDescription(obj, entryID);
                     }
                     this.objectInfoSortedSet.add(info);
                 } catch (Exception ex) {
-                    getLogger().log(
-                            Level.SEVERE,
-                            "Exception processing file: " + files[i]
-                                    + " Message: " + ex.getMessage(), ex);
+                    getLogger().log(Level.SEVERE,
+                        "Exception processing file: " + files[i] + " Message: " + ex.getMessage(), ex);
                 }
             }
         }
@@ -901,57 +845,51 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
         /* Get the discovery manager, for discovering lookup services */
         DiscoveryManagement discoveryManager;
         try {
-            discoveryManager = (DiscoveryManagement) config.getEntry(this
-                    .getClass().getName(), "discoveryManager",
-                    DiscoveryManagement.class);
+            discoveryManager = (DiscoveryManagement) config.getEntry(this.getClass().getName(), "discoveryManager",
+                DiscoveryManagement.class);
         } catch (NoSuchEntryException e) {
-            getLogger().warning(
-                    "No entry for discoveryManager in config file. "
-                            + e.toString());
-            String[] groups = (String[]) config.getEntry(this.getClass()
-                    .getName(), "groups", String[].class);
+            getLogger().warning("No entry for discoveryManager in config file. " + e.toString());
+            String[] groups = (String[]) config.getEntry(this.getClass().getName(), "groups", String[].class);
             discoveryManager = new LookupDiscovery(groups, config);
         }
 
-        Entry[] entries = (Entry[]) this.config.getEntry(this.getClass()
-                .getName(), "entries", Entry[].class, new Entry[] {});
+        Entry[] entries = (Entry[]) this.config.getEntry(this.getClass().getName(), "entries", Entry[].class,
+            new Entry[] {});
 
         /* Get the join manager, for joining lookup services */
-        joinManager = new JoinManager(smartProxy, entries, getServiceID(),
-                discoveryManager, null /* leaseMgr */, config);
+        joinManager = new JoinManager(smartProxy, entries, getServiceID(), discoveryManager, null /* leaseMgr */,
+            config);
 
         Entry[] moreEntries = getFixedServiceEntries();
         joinManager.addAttributes(moreEntries);
 
         /*
-        Boolean publishLocalProxy = (Boolean) this.config.getEntry(this
-                .getClass().getName(), "publishLocalProxy", Boolean.class,
-                new Boolean(false));
-        if (publishLocalProxy.booleanValue()) {
-        */
-            ArrayList<Entry> entryList = new ArrayList<Entry>(Arrays
-                    .asList(entries));
-            entryList.addAll(Arrays.asList(moreEntries));
-            ListIterator<Entry> itr = entryList.listIterator();
-            while (itr.hasNext()) {
-                Entry entry = itr.next();
-                if (Name.class.isAssignableFrom(entry.getClass())) {
-                    Name oldName = (Name) entry;
-                    Name newName = new Name(oldName.name + " (local)");
-                    itr.remove();
-                    itr.add(newName);
-                    break;
-                }
-
+         * Boolean publishLocalProxy = (Boolean) this.config.getEntry(this
+         * .getClass().getName(), "publishLocalProxy", Boolean.class,
+         * new Boolean(false));
+         * if (publishLocalProxy.booleanValue()) {
+         */
+        ArrayList<Entry> entryList = new ArrayList<Entry>(Arrays.asList(entries));
+        entryList.addAll(Arrays.asList(moreEntries));
+        ListIterator<Entry> itr = entryList.listIterator();
+        while (itr.hasNext()) {
+            Entry entry = itr.next();
+            if (Name.class.isAssignableFrom(entry.getClass())) {
+                Name oldName = (Name) entry;
+                Name newName = new Name(oldName.name + " (local)");
+                itr.remove();
+                itr.add(newName);
+                break;
             }
 
-            ServiceItem serviceItem = new ServiceItem(this.getServiceID(),
-                  smartProxy, (Entry[]) entryList.toArray(new Entry[entryList
-                            .size()]));
-            LookupJiniAndLocal.addToLocalServices(serviceItem);
-            /*
         }
-        */
+
+        ServiceItem serviceItem = new ServiceItem(this.getServiceID(), smartProxy,
+            (Entry[]) entryList.toArray(new Entry[entryList.size()]));
+        LookupJiniAndLocal.addToLocalServices(serviceItem);
+        /*
+         * }
+         */
     }
 
     /**
@@ -963,8 +901,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements
      * @see org.dwfa.bpa.process.I_QueueProcesses#write(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      net.jini.core.transaction.Transaction)
      */
-    public EntryID write(T obj, Transaction t) throws RemoteException,
-            IOException, TransactionException {
+    public EntryID write(T obj, Transaction t) throws RemoteException, IOException, TransactionException {
         EntryID entryID = newEntryID();
         this.write(obj, entryID, t);
         return entryID;

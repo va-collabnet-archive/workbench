@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,15 +35,11 @@ public class ToSyncQueueBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor localPropertyName =
-                    new PropertyDescriptor("localPropName", ToSyncQueue.class);
+            PropertyDescriptor localPropertyName = new PropertyDescriptor("localPropName", ToSyncQueue.class);
             localPropertyName.setBound(true);
-            localPropertyName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            localPropertyName
-                .setDisplayName("<html><font color='blue'>Sync property");
-            localPropertyName
-                .setShortDescription("Name of the local property that holds the syncronization record. ");
+            localPropertyName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            localPropertyName.setDisplayName("<html><font color='blue'>Sync property");
+            localPropertyName.setShortDescription("Name of the local property that holds the syncronization record. ");
 
             PropertyDescriptor rv[] = { localPropertyName };
             return rv;

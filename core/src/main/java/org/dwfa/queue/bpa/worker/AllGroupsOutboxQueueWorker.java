@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ import org.dwfa.bpa.process.I_SelectProcesses;
 
 /**
  * @author kec
- *
+ * 
  */
 public class AllGroupsOutboxQueueWorker extends OutboxQueueWorker {
 
@@ -46,13 +46,11 @@ public class AllGroupsOutboxQueueWorker extends OutboxQueueWorker {
      * @param desc
      * @param selector
      * @throws ConfigurationException
-     * @throws LoginException 
-     * @throws IOException 
+     * @throws LoginException
+     * @throws IOException
      */
-    public AllGroupsOutboxQueueWorker(Configuration config, UUID id,
-            String desc, I_SelectProcesses selector)
-            throws ConfigurationException, LoginException, IOException,
-            PrivilegedActionException {
+    public AllGroupsOutboxQueueWorker(Configuration config, UUID id, String desc, I_SelectProcesses selector)
+            throws ConfigurationException, LoginException, IOException, PrivilegedActionException {
         super(config, id, desc, selector);
     }
 
@@ -63,15 +61,12 @@ public class AllGroupsOutboxQueueWorker extends OutboxQueueWorker {
      * @throws InterruptedException
      * @throws RemoteException
      * @throws IOException
-     * @throws ConfigurationException 
-     * @throws PrivilegedActionException 
+     * @throws ConfigurationException
+     * @throws PrivilegedActionException
      */
-    protected ServiceItem jinilookup(ServiceTemplate tmpl,
-            ServiceItemFilter filter) throws InterruptedException,
-            RemoteException, IOException, PrivilegedActionException,
-            ConfigurationException {
-        ServiceItem[] items =
-                this.lookupAllGroups(tmpl, 1, 1, filter, 1000 * 10);
+    protected ServiceItem jinilookup(ServiceTemplate tmpl, ServiceItemFilter filter) throws InterruptedException,
+            RemoteException, IOException, PrivilegedActionException, ConfigurationException {
+        ServiceItem[] items = this.lookupAllGroups(tmpl, 1, 1, filter, 1000 * 10);
         if (items == null || items.length < 1) {
             return null;
         }

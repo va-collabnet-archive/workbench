@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,10 +32,9 @@ import net.jini.security.proxytrust.ProxyTrustIterator;
 import net.jini.security.proxytrust.SingletonProxyTrustIterator;
 import net.jini.security.proxytrust.TrustEquivalence;
 
-
 /**
  * @author kec
- *
+ * 
  */
 public class LogManagerProxy implements I_ManageLogs, Serializable {
     /**
@@ -49,24 +48,20 @@ public class LogManagerProxy implements I_ManageLogs, Serializable {
      * if the server proxy does.
      */
     static LogManagerProxy create(I_ManageLogs serverProxy) {
-        return (serverProxy instanceof RemoteMethodControl) ? new ConstrainableProxy(
-                serverProxy)
-                : new LogManagerProxy(serverProxy);
+        return (serverProxy instanceof RemoteMethodControl) ? new ConstrainableProxy(serverProxy)
+                                                           : new LogManagerProxy(serverProxy);
     }
 
     public boolean equals(Object o) {
-        return getClass() == o.getClass()
-                && getServerProxy().equals(((LogManagerProxy) o).getServerProxy());
-    }
-     public int hashCode() {
-    	    return getServerProxy().hashCode();
+        return getClass() == o.getClass() && getServerProxy().equals(((LogManagerProxy) o).getServerProxy());
     }
 
-
+    public int hashCode() {
+        return getServerProxy().hashCode();
+    }
 
     /** A constrainable implementation of the smart proxy. */
-    private static final class ConstrainableProxy extends LogManagerProxy
-            implements RemoteMethodControl {
+    private static final class ConstrainableProxy extends LogManagerProxy implements RemoteMethodControl {
         /**
          * 
          */
@@ -83,9 +78,7 @@ public class LogManagerProxy implements I_ManageLogs, Serializable {
         }
 
         public RemoteMethodControl setConstraints(MethodConstraints mc) {
-            return new ConstrainableProxy(
-                    (I_ManageLogs) ((RemoteMethodControl) getServerProxy())
-                            .setConstraints(mc));
+            return new ConstrainableProxy((I_ManageLogs) ((RemoteMethodControl) getServerProxy()).setConstraints(mc));
         }
 
         /*
@@ -93,7 +86,7 @@ public class LogManagerProxy implements I_ManageLogs, Serializable {
          * ProxyTrustVerifier class to verify the proxy.
          */
         @SuppressWarnings("unused")
-		private ProxyTrustIterator getProxyTrustIterator() {
+        private ProxyTrustIterator getProxyTrustIterator() {
             return new SingletonProxyTrustIterator(getServerProxy());
         }
     }
@@ -112,8 +105,7 @@ public class LogManagerProxy implements I_ManageLogs, Serializable {
          * TrustEquivalence.
          */
         Verifier(I_ManageLogs serverProxy) {
-            if (serverProxy instanceof RemoteMethodControl
-                    && serverProxy instanceof TrustEquivalence) {
+            if (serverProxy instanceof RemoteMethodControl && serverProxy instanceof TrustEquivalence) {
                 this.serverProxy = (RemoteMethodControl) serverProxy;
             } else {
                 throw new UnsupportedOperationException();
@@ -121,8 +113,7 @@ public class LogManagerProxy implements I_ManageLogs, Serializable {
         }
 
         /** Implement TrustVerifier */
-        public boolean isTrustedObject(Object obj, TrustVerifier.Context ctx)
-                throws RemoteException {
+        public boolean isTrustedObject(Object obj, TrustVerifier.Context ctx) throws RemoteException {
             if (obj == null || ctx == null) {
                 throw new NullPointerException();
             } else if (!(obj instanceof ConstrainableProxy)) {
@@ -130,17 +121,18 @@ public class LogManagerProxy implements I_ManageLogs, Serializable {
             }
             RemoteMethodControl otherServerProxy = (RemoteMethodControl) ((ConstrainableProxy) obj).getServerProxy();
             MethodConstraints mc = otherServerProxy.getConstraints();
-            TrustEquivalence trusted = (TrustEquivalence) serverProxy
-                    .setConstraints(mc);
+            TrustEquivalence trusted = (TrustEquivalence) serverProxy.setConstraints(mc);
             return trusted.checkTrustEquivalence(otherServerProxy);
         }
     }
+
     /**
      * @return Returns the serverProxy.
      */
     protected I_ManageLogs getServerProxy() {
         return backend;
     }
+
     /**
      * 
      */
@@ -164,30 +156,32 @@ public class LogManagerProxy implements I_ManageLogs, Serializable {
     }
 
     /**
-     * @see org.dwfa.log.I_ManageLogs#isLoggable(java.lang.String, java.util.logging.Level)
+     * @see org.dwfa.log.I_ManageLogs#isLoggable(java.lang.String,
+     *      java.util.logging.Level)
      */
-    public boolean isLoggable(String loggerName, Level level)
-            throws RemoteException {
+    public boolean isLoggable(String loggerName, Level level) throws RemoteException {
         return this.backend.isLoggable(loggerName, level);
     }
 
     /**
      * @return
      * @throws RemoteException
-     * @see org.dwfa.log.I_ManageLogs#addRemoteHandler(java.lang.String, org.dwfa.log.I_PublishLogRecord)
+     * @see org.dwfa.log.I_ManageLogs#addRemoteHandler(java.lang.String,
+     *      org.dwfa.log.I_PublishLogRecord)
      */
     public boolean addRemoteHandler(String loggerName, I_PublishLogRecord remoteHandler) throws RemoteException {
         return this.backend.addRemoteHandler(loggerName, remoteHandler);
-        
+
     }
 
     /**
      * @throws RemoteException
-     * @see org.dwfa.log.I_ManageLogs#removeRemoteHandler(java.lang.String, net.jini.id.Uuid)
+     * @see org.dwfa.log.I_ManageLogs#removeRemoteHandler(java.lang.String,
+     *      net.jini.id.Uuid)
      */
     public void removeRemoteHandler(String loggerName, Uuid id) throws RemoteException {
         this.backend.removeRemoteHandler(loggerName, id);
-        
+
     }
 
 }

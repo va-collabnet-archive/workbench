@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,27 +37,28 @@ import net.jini.lookup.ServiceDiscoveryListener;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class ServiceListModel implements ServiceDiscoveryListener, ListModel {
 
-	private List<ServiceItem> services = Collections.synchronizedList(new ArrayList<ServiceItem>());
+    private List<ServiceItem> services = Collections.synchronizedList(new ArrayList<ServiceItem>());
 
-	private Set<ListDataListener> listeners = Collections.synchronizedSet(new HashSet<ListDataListener>());
+    private Set<ListDataListener> listeners = Collections.synchronizedSet(new HashSet<ListDataListener>());
 
-	/**
+    /**
 	 *  
 	 */
-	public ServiceListModel() {
-		super();
-	}
+    public ServiceListModel() {
+        super();
+    }
 
-	/**
-	 * @see net.jini.lookup.ServiceDiscoveryListener#serviceAdded(net.jini.lookup.ServiceDiscoveryEvent)
-	 */
-	public void serviceAdded(ServiceDiscoveryEvent event) {
-           SwingUtilities.invokeLater(new RunServiceAdded(event));
-	}
+    /**
+     * @see net.jini.lookup.ServiceDiscoveryListener#serviceAdded(net.jini.lookup.ServiceDiscoveryEvent)
+     */
+    public void serviceAdded(ServiceDiscoveryEvent event) {
+        SwingUtilities.invokeLater(new RunServiceAdded(event));
+    }
+
     /**
      * @param event
      */
@@ -71,18 +72,17 @@ public class ServiceListModel implements ServiceDiscoveryListener, ListModel {
             super();
             this.event = event;
         }
+
         public void run() {
             ServiceItem service = event.getPostEventServiceItem();
             ListDataEvent lde = null;
             synchronized (ServiceListModel.this.services) {
                 int index = ServiceListModel.this.services.size();
                 ServiceListModel.this.services.add(index, service);
-                lde = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index,
-                        index);
+                lde = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index, index);
             }
             synchronized (ServiceListModel.this.listeners) {
-                for (Iterator<ListDataListener> listenerItr = ServiceListModel.this.listeners.iterator(); listenerItr
-                        .hasNext();) {
+                for (Iterator<ListDataListener> listenerItr = ServiceListModel.this.listeners.iterator(); listenerItr.hasNext();) {
                     ListDataListener ldr = listenerItr.next();
                     ldr.intervalAdded(lde);
                 }
@@ -90,12 +90,12 @@ public class ServiceListModel implements ServiceDiscoveryListener, ListModel {
         }
     }
 
-	/**
-	 * @see net.jini.lookup.ServiceDiscoveryListener#serviceRemoved(net.jini.lookup.ServiceDiscoveryEvent)
-	 */
-	public void serviceRemoved(ServiceDiscoveryEvent event) {
-           SwingUtilities.invokeLater(new RunServiceRemoved(event));
-	}
+    /**
+     * @see net.jini.lookup.ServiceDiscoveryListener#serviceRemoved(net.jini.lookup.ServiceDiscoveryEvent)
+     */
+    public void serviceRemoved(ServiceDiscoveryEvent event) {
+        SwingUtilities.invokeLater(new RunServiceRemoved(event));
+    }
 
     /**
      * @param event
@@ -110,98 +110,96 @@ public class ServiceListModel implements ServiceDiscoveryListener, ListModel {
             super();
             this.event = event;
         }
+
         public void run() {
             ServiceItem service = event.getPreEventServiceItem();
             ListDataEvent lde = null;
             synchronized (ServiceListModel.this.services) {
                 int index = ServiceListModel.this.services.indexOf(service);
                 ServiceListModel.this.services.remove(service);
-                lde = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED,
-                        index, index);
+                lde = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, index, index);
             }
             synchronized (ServiceListModel.this.listeners) {
-                for (Iterator<ListDataListener> listenerItr = ServiceListModel.this.listeners.iterator(); listenerItr
-                        .hasNext();) {
+                for (Iterator<ListDataListener> listenerItr = ServiceListModel.this.listeners.iterator(); listenerItr.hasNext();) {
                     ListDataListener ldr = listenerItr.next();
                     ldr.intervalRemoved(lde);
                 }
             }
         }
     }
-	/**
-	 * @see net.jini.lookup.ServiceDiscoveryListener#serviceChanged(net.jini.lookup.ServiceDiscoveryEvent)
-	 */
-	public void serviceChanged(ServiceDiscoveryEvent event) {
+
+    /**
+     * @see net.jini.lookup.ServiceDiscoveryListener#serviceChanged(net.jini.lookup.ServiceDiscoveryEvent)
+     */
+    public void serviceChanged(ServiceDiscoveryEvent event) {
         SwingUtilities.invokeLater(new RunServiceChanged(event));
-	}
+    }
 
-	/**
-	 * @param event
-	 */
-	private class RunServiceChanged implements Runnable {
-		ServiceDiscoveryEvent event;
+    /**
+     * @param event
+     */
+    private class RunServiceChanged implements Runnable {
+        ServiceDiscoveryEvent event;
 
-		/**
-		 * @param event
-		 */
-		public RunServiceChanged(ServiceDiscoveryEvent event) {
-			super();
-			this.event = event;
-		}
-		public void run() {
-			ServiceItem preService = event.getPreEventServiceItem();
-			ServiceItem postService = event.getPostEventServiceItem();
-			ListDataEvent lde = null;
-			synchronized (ServiceListModel.this.services) {
-				int index = ServiceListModel.this.services.indexOf(preService);
+        /**
+         * @param event
+         */
+        public RunServiceChanged(ServiceDiscoveryEvent event) {
+            super();
+            this.event = event;
+        }
+
+        public void run() {
+            ServiceItem preService = event.getPreEventServiceItem();
+            ServiceItem postService = event.getPostEventServiceItem();
+            ListDataEvent lde = null;
+            synchronized (ServiceListModel.this.services) {
+                int index = ServiceListModel.this.services.indexOf(preService);
                 if (index != -1) {
                     ServiceListModel.this.services.set(index, postService);
-                    lde = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED,
-                            index, index);
+                    lde = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, index, index);
                 }
-			}
-			synchronized (ServiceListModel.this.listeners) {
-				for (Iterator<ListDataListener> listenerItr = ServiceListModel.this.listeners.iterator(); listenerItr
-						.hasNext();) {
-					ListDataListener ldr = listenerItr
-							.next();
-					ldr.contentsChanged(lde);
-				}
-			}
-		}
-	}
+            }
+            synchronized (ServiceListModel.this.listeners) {
+                for (Iterator<ListDataListener> listenerItr = ServiceListModel.this.listeners.iterator(); listenerItr.hasNext();) {
+                    ListDataListener ldr = listenerItr.next();
+                    ldr.contentsChanged(lde);
+                }
+            }
+        }
+    }
 
-	/**
-	 * @see javax.swing.ListModel#getSize()
-	 */
-	public int getSize() {
-		return this.services.size();
-	}
+    /**
+     * @see javax.swing.ListModel#getSize()
+     */
+    public int getSize() {
+        return this.services.size();
+    }
 
-	/**
-	 * @see javax.swing.ListModel#getElementAt(int)
-	 */
-	public Object getElementAt(int index) {
-		return this.services.get(index);
-	}
+    /**
+     * @see javax.swing.ListModel#getElementAt(int)
+     */
+    public Object getElementAt(int index) {
+        return this.services.get(index);
+    }
 
-	/**
-	 * @see javax.swing.ListModel#addListDataListener(javax.swing.event.ListDataListener)
-	 */
-	public void addListDataListener(ListDataListener l) {
-		synchronized (this.listeners) {
-			this.listeners.add(l);
-		}
+    /**
+     * @see javax.swing.ListModel#addListDataListener(javax.swing.event.ListDataListener)
+     */
+    public void addListDataListener(ListDataListener l) {
+        synchronized (this.listeners) {
+            this.listeners.add(l);
+        }
 
-	}
+    }
 
-	/**
-	 * @see javax.swing.ListModel#removeListDataListener(javax.swing.event.ListDataListener)
-	 */
-	public void removeListDataListener(ListDataListener l) {
-		synchronized (this.listeners) {
-			this.listeners.remove(l);
-		}
-	}
+    /**
+     * @see javax.swing.ListModel#removeListDataListener(javax.swing.event.ListDataListener)
+     */
+    public void removeListDataListener(ListDataListener l) {
+        synchronized (this.listeners) {
+            this.listeners.remove(l);
+        }
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,16 +30,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-
-
 public class FileTreeModel implements TreeModel {
-    private DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
-            new FileWrapper(new File(System.getProperty("user.dir"),
-            "tasks")));
+    private DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(new FileWrapper(new File(
+        System.getProperty("user.dir"), "tasks")));
     private List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
-    private DefaultMutableTreeNode processesNode = new DefaultMutableTreeNode(
-            new FileWrapper(new File(System.getProperty("user.dir"),
-            "processes")));
+    private DefaultMutableTreeNode processesNode = new DefaultMutableTreeNode(new FileWrapper(new File(
+        System.getProperty("user.dir"), "processes")));
 
     public FileTreeModel() {
         super();
@@ -125,14 +121,14 @@ public class FileTreeModel implements TreeModel {
     public void removeTreeModelListener(TreeModelListener l) {
         this.listeners.remove(l);
     }
+
     /**
      * The only event raised by this model is TreeStructureChanged with the
      * root as path, i.e. the whole tree has changed.
      */
     public void fireTreeStructureChanged() {
-        TreeModelEvent e = new TreeModelEvent(this, 
-                                              new Object[] {rootNode});
-        for (TreeModelListener l: listeners) {
+        TreeModelEvent e = new TreeModelEvent(this, new Object[] { rootNode });
+        for (TreeModelListener l : listeners) {
             l.treeStructureChanged(e);
         }
     }

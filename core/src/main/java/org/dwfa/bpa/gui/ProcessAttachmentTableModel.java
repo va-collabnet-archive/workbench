@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,8 +44,7 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = Logger.getLogger(ProcessAttachmentTableModel.class
-            .getName());
+    private static Logger logger = Logger.getLogger(ProcessAttachmentTableModel.class.getName());
 
     private I_EncodeBusinessProcess process;
 
@@ -57,7 +56,7 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
 
     public static final int SIZE = 3;
 
-   private String[] columnNames = { "class", "key name", "attachment value", "size" };
+    private String[] columnNames = { "class", "key name", "attachment value", "size" };
 
     public ProcessAttachmentTableModel(I_EncodeBusinessProcess process) {
         super();
@@ -151,10 +150,10 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
             String oldName = (String) this.getValueAt(row, NAME);
             String newName = (String) value;
             try {
-				this.process.renameAttachment(oldName, newName);
-			} catch (PropertyVetoException e) {
-				//rename failed, nothing to do. ;
-			}
+                this.process.renameAttachment(oldName, newName);
+            } catch (PropertyVetoException e) {
+                // rename failed, nothing to do. ;
+            }
         } else if (col == VALUE) {
             String name = (String) this.getValueAt(row, NAME);
             Object obj = this.process.takeAttachment(name);
@@ -169,7 +168,7 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
- 	public static int getObjectSize(Object object) {
+    public static int getObjectSize(Object object) {
         if (object == null) {
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Object is null. Cannot measure.");
@@ -177,30 +176,30 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
             return -1;
         }
         try {
-        	boolean canSerialize = false;
-        	if (Serializable.class.isAssignableFrom(object.getClass())) {
-        		canSerialize = true;
-        		if (Collection.class.isAssignableFrom(object.getClass())) {
-        			Collection<?> c = (Collection<?>) object;
-        			for (Object item: c) {
-        				if (Serializable.class.isAssignableFrom(item.getClass()) == false) {
-        					canSerialize = false;
-        					break;
-        				}
-        			}
-        		}
-        		if (Map.class.isAssignableFrom(object.getClass())) {
-        			Map<?, ?> m = (Map<?, ?>) object;
-        			for (Entry<?, ?> item: m.entrySet()) {
-        				if (Serializable.class.isAssignableFrom(item.getKey().getClass()) == false ||
-        						Serializable.class.isAssignableFrom(item.getValue().getClass()) == false) {
-        					canSerialize = false;
-        					break;
-        				}
-        			}
-        		}
-        	}
-        	if (canSerialize) {
+            boolean canSerialize = false;
+            if (Serializable.class.isAssignableFrom(object.getClass())) {
+                canSerialize = true;
+                if (Collection.class.isAssignableFrom(object.getClass())) {
+                    Collection<?> c = (Collection<?>) object;
+                    for (Object item : c) {
+                        if (Serializable.class.isAssignableFrom(item.getClass()) == false) {
+                            canSerialize = false;
+                            break;
+                        }
+                    }
+                }
+                if (Map.class.isAssignableFrom(object.getClass())) {
+                    Map<?, ?> m = (Map<?, ?>) object;
+                    for (Entry<?, ?> item : m.entrySet()) {
+                        if (Serializable.class.isAssignableFrom(item.getKey().getClass()) == false
+                            || Serializable.class.isAssignableFrom(item.getValue().getClass()) == false) {
+                            canSerialize = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (canSerialize) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(baos);
                 oos.writeObject(object);
@@ -208,9 +207,9 @@ public class ProcessAttachmentTableModel extends AbstractTableModel {
                 oos.close();
                 baos.close();
                 return bytes.length;
-        	}
-        	return -2;
-         } catch (Exception e) {
+            }
+            return -2;
+        } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
         return -3;

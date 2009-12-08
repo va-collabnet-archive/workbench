@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,16 +28,12 @@ public class ShowInfoDialogFromPropertyBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor messagePropertyName =
-                    new PropertyDescriptor("messagePropertyName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor messagePropertyName = new PropertyDescriptor("messagePropertyName",
+                getBeanDescriptor().getBeanClass());
             messagePropertyName.setBound(true);
-            messagePropertyName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            messagePropertyName
-                .setDisplayName("<html><font color='blue'>Msg property:");
-            messagePropertyName
-                .setShortDescription("Name of the property containing the dialog message text. ");
+            messagePropertyName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            messagePropertyName.setDisplayName("<html><font color='blue'>Msg property:");
+            messagePropertyName.setShortDescription("Name of the property containing the dialog message text. ");
 
             PropertyDescriptor rv[] = { messagePropertyName };
             return rv;
@@ -50,8 +46,7 @@ public class ShowInfoDialogFromPropertyBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(ShowInfoDialogFromProperty.class);
+        BeanDescriptor bd = new BeanDescriptor(ShowInfoDialogFromProperty.class);
         bd.setDisplayName("<html><center>Show Dialog<br>From Property");
         return bd;
     }

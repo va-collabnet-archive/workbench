@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,13 +52,11 @@ import org.dwfa.bpa.process.I_Workspace;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 
-
 /**
  * @author kec
- *  
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/grid/pwdbreaker", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/grid/pwdbreaker", type = BeanType.TASK_BEAN) })
 public class BreakPassword extends AbstractTask {
 
     private transient JavaSpace05 space;
@@ -90,9 +88,9 @@ public class BreakPassword extends AbstractTask {
     private transient String tries;
 
     private transient String encrypted;
-    
+
     private transient InstructionPanel instruction;
-    
+
     private transient DecimalFormat decimalFormatter;
 
     private static final long serialVersionUID = 1;
@@ -103,16 +101,15 @@ public class BreakPassword extends AbstractTask {
         out.writeInt(dataVersion);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-       } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
-    
+
     private void informUser() {
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -134,38 +131,35 @@ public class BreakPassword extends AbstractTask {
                     buff.append("<font color='blue'>");
                     buff.append("pending");
                 }
-               instruction.setInstruction(buff.toString());
+                instruction.setInstruction(buff.toString());
             }
-            
+
         });
-        
+
     }
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public synchronized Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public synchronized Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             this.exitCondition = null;
             this.waterlevel = 0;
             this.answer = null;
             I_Workspace workspace = worker.getCurrentWorkspace();
             workspace.setStatusMessage("<html><font color='red'>Breaking password...");
-            FieldInputPanel fieldInputPanel = (FieldInputPanel) workspace
-                    .getPanel(ConfigureCryptBreakerWorkspace.INPUT);
+            FieldInputPanel fieldInputPanel = (FieldInputPanel) workspace.getPanel(ConfigureCryptBreakerWorkspace.INPUT);
             Map<String, String> fieldMap = fieldInputPanel.getFields();
             this.salt = fieldMap.get("Salt:");
             this.unencrypted = fieldMap.get("Word:");
             if (unencrypted.length() != 4) {
                 throw new TaskFailedException("Password must be four characters");
             }
-            
+
             // JCrypt expects 8 chars
             unencrypted = unencrypted + "!!!!";
 
-            
             String triesPerTaskStr = fieldMap.get("Tries per task:");
             String highMarkStr = fieldMap.get("High mark:");
             String lowMarkStr = fieldMap.get("Low mark:");
@@ -173,16 +167,13 @@ public class BreakPassword extends AbstractTask {
             this.highmark = Integer.parseInt(highMarkStr);
             this.lowmark = Integer.parseInt(lowMarkStr);
             this.masterId = UUID.randomUUID();
-            
-            instruction = (InstructionPanel) workspace
-            .getPanel(ConfigureCryptBreakerWorkspace.INSTRUCTION);
 
-            ServiceTemplate tmpl = new ServiceTemplate(null,
-                    new Class[] { JavaSpace05.class }, null);
+            instruction = (InstructionPanel) workspace.getPanel(ConfigureCryptBreakerWorkspace.INSTRUCTION);
+
+            ServiceTemplate tmpl = new ServiceTemplate(null, new Class[] { JavaSpace05.class }, null);
             ServiceItemFilter filter = null;
             long waitDur = 1000 * 60 * 3;
-            ServiceItem service = worker.lookup(tmpl, filter,
-                    waitDur);
+            ServiceItem service = worker.lookup(tmpl, filter, waitDur);
             this.decimalFormatter = new DecimalFormat("#,##0");
             space = (JavaSpace05) service.service;
             GenerateThread gThread = new GenerateThread();
@@ -199,7 +190,7 @@ public class BreakPassword extends AbstractTask {
             throw new TaskFailedException(ex);
         }
     }
-    
+
     private void waitTillDone() {
         while (!this.isDone()) {
             try {
@@ -210,18 +201,17 @@ public class BreakPassword extends AbstractTask {
         }
 
     }
+
     public boolean isDone() {
         return this.exitCondition != null;
     }
 
-
-    protected void writeTask(GenericTaskEntry task) throws RemoteException,
-            TransactionException {
+    protected void writeTask(GenericTaskEntry task) throws RemoteException, TransactionException {
         space.write(task, null, Lease.FOREVER);
     }
 
-    protected Entry takeTask(Entry template) throws RemoteException,
-            UnusableEntryException, TransactionException, InterruptedException {
+    protected Entry takeTask(Entry template) throws RemoteException, UnusableEntryException, TransactionException,
+            InterruptedException {
         Entry result = (Entry) space.take(template, null, Long.MAX_VALUE);
         return result;
     }
@@ -241,7 +231,7 @@ public class BreakPassword extends AbstractTask {
             try {
                 collectResults();
                 exitCondition = Condition.CONTINUE;
-                synchronized(BreakPassword.this) {
+                synchronized (BreakPassword.this) {
                     BreakPassword.this.notifyAll();
                 }
             } catch (Exception e) {
@@ -265,8 +255,7 @@ public class BreakPassword extends AbstractTask {
                 if (testWord[1] != salt.charAt(1)) {
                     return;
                 }
-                CryptTask task = new CryptTask(new Integer(triesPerTask),
-                        testWord, encrypted, masterId);
+                CryptTask task = new CryptTask(new Integer(triesPerTask), testWord, encrypted, masterId);
                 if (getLogger().isLoggable(Level.FINE)) {
                     getLogger().fine("Writing task");
                 }
@@ -297,8 +286,8 @@ public class BreakPassword extends AbstractTask {
         return word;
     }
 
-    public void collectResults() throws RemoteException,
-            UnusableEntryException, TransactionException, InterruptedException {
+    public void collectResults() throws RemoteException, UnusableEntryException, TransactionException,
+            InterruptedException {
         int count = 0;
         Entry template;
 
@@ -344,7 +333,7 @@ public class BreakPassword extends AbstractTask {
     public void updatePerformance(long wordsTried) {
         long now = System.currentTimeMillis();
         double elapsedTime = now - startTime;
-        
+
         if (elapsedTime > 0) {
             double wordRate = wordsTried / (elapsedTime / 1000);
             this.perfStr = decimalFormatter.format(wordRate) + " words per second";
@@ -355,7 +344,7 @@ public class BreakPassword extends AbstractTask {
             getLogger().fine(this.perfStr);
         }
         informUser();
-     }
+    }
 
     private synchronized void changeWaterLevel(int delta) {
         waterlevel += delta;
@@ -381,8 +370,7 @@ public class BreakPassword extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
@@ -400,11 +388,5 @@ public class BreakPassword extends AbstractTask {
     public int[] getDataContainerIds() {
         return new int[] {};
     }
-
-
-
-
-
-
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,332 +48,308 @@ import net.jini.lookup.ServiceItemFilter;
  * 
  */
 public class JiniManager implements I_LookupServices {
-	public static Logger logger = Logger.getLogger(JiniManager.class.getName());
+    public static Logger logger = Logger.getLogger(JiniManager.class.getName());
 
-	private static boolean localOnly = false;
-   
-   private static boolean lookupInCache = true;
+    private static boolean localOnly = false;
 
-	private static JiniManager singelton;
+    private static boolean lookupInCache = true;
 
-	// private
-	private ServiceDiscoveryManager sdm;
+    private static JiniManager singelton;
 
-	private ServiceDiscoveryManager allGroupSdm;
+    // private
+    private ServiceDiscoveryManager sdm;
 
-	private LookupJiniAndLocal jiniAndLocal;
+    private ServiceDiscoveryManager allGroupSdm;
 
-	private LookupCache transactionManagerCache;
+    private LookupJiniAndLocal jiniAndLocal;
 
-	private LeaseRenewalManager leaseRenewalManager;
+    private LookupCache transactionManagerCache;
 
-	private int renewDuration = 30 * 1000; // renew every 30 seconds
+    private LeaseRenewalManager leaseRenewalManager;
 
-	public static JiniManager getLocalOnlyJiniManager() throws IOException {
-		if (singelton == null) {
-			singelton = new JiniManager(null);
-		}
-		return singelton;
-	}
+    private int renewDuration = 30 * 1000; // renew every 30 seconds
 
-	/**
-	 * @throws IOException
+    public static JiniManager getLocalOnlyJiniManager() throws IOException {
+        if (singelton == null) {
+            singelton = new JiniManager(null);
+        }
+        return singelton;
+    }
+
+    /**
+     * @throws IOException
+     * 
+     */
+    public JiniManager(ServiceDiscoveryManager sdm) throws IOException {
+        logger.info("Starting JiniManager: " + sdm);
+        this.leaseRenewalManager = new LeaseRenewalManager();
+        this.sdm = sdm;
+
+        if (localOnly == false) {
+
+            LookupLocator[] lookupLocators = new LookupLocator[0];
+            DiscoveryListener discoveryListener = null;
+
+            LookupDiscoveryManager allGroupsLookupDiscoveryManager = new LookupDiscoveryManager(
+                DiscoveryGroupManagement.ALL_GROUPS, lookupLocators, discoveryListener);
+            this.allGroupSdm = new ServiceDiscoveryManager(allGroupsLookupDiscoveryManager, leaseRenewalManager);
+
+            ServiceTemplate tmpl = new ServiceTemplate(null, new Class[] { TransactionManager.class }, null);
+            ServiceItemFilter filter = null;
+            ServiceListModel serviceListener = new ServiceListModel();
+            this.transactionManagerCache = this.createLookupCache(tmpl, filter, serviceListener);
+        }
+        this.jiniAndLocal = new LookupJiniAndLocal(this.sdm);
+
+    }
+
+    /**
+     * @param tmpl
+     * @param filter
+     * @param listener
+     * @return
+     * @throws java.rmi.RemoteException
+     */
+    public LookupCache createLookupCache(ServiceTemplate tmpl, ServiceItemFilter filter,
+            ServiceDiscoveryListener listener) throws RemoteException {
+        return sdm.createLookupCache(tmpl, filter, listener);
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object obj) {
+        return sdm.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        if (sdm == null) {
+            return super.hashCode();
+        }
+        return sdm.hashCode();
+    }
+
+    /**
+     * @return
+     */
+    public LookupDiscoveryManager getLookupDiscoveryManager() {
+        return (LookupDiscoveryManager) sdm.getDiscoveryManager();
+    }
+
+    /**
+     * @return
+     */
+    public ServiceDiscoveryManager getAllGroupsServiceDiscoveryManager() {
+        if (localOnly) {
+            throw new UnsupportedOperationException();
+        }
+        return this.allGroupSdm;
+    }
+
+    /**
+     * @return
+     */
+    public LeaseRenewalManager getLeaseRenewalManager() {
+        return sdm.getLeaseRenewalManager();
+    }
+
+    /**
+     * @param tmpl
+     * @param minMatches
+     * @param maxMatches
+     * @param filter
+     * @param waitDur
+     * @return
+     * @throws java.lang.InterruptedException
+     * @throws java.rmi.RemoteException
+     */
+    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches, int maxMatches, ServiceItemFilter filter,
+            long waitDur) throws InterruptedException, RemoteException {
+        return lookup(tmpl, minMatches, maxMatches, filter, waitDur, false);
+    }
+
+    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches, int maxMatches, ServiceItemFilter filter,
+            long waitDur, boolean lookupLocal) throws InterruptedException, RemoteException {
+        if (lookupLocal || localOnly || lookupInCache) {
+            return jiniAndLocal.lookup(tmpl, minMatches, maxMatches, filter, waitDur);
+        } else {
+            return sdm.lookup(tmpl, minMatches, maxMatches, filter, waitDur);
+        }
+    }
+
+    /**
+     * @param tmpl
+     * @param maxMatches
+     * @param filter
+     * @return
+     */
+    public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches, ServiceItemFilter filter) {
+        return this.lookup(tmpl, maxMatches, filter, false);
+    }
+
+    public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches, ServiceItemFilter filter, boolean lookupLocal) {
+        if (lookupLocal || localOnly || lookupInCache) {
+            return jiniAndLocal.lookup(tmpl, maxMatches, filter);
+        }
+        return this.sdm.lookup(tmpl, maxMatches, filter);
+    }
+
+    /**
+     * @param tmpl
+     * @param filter
+     * @return
+     */
+    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter) {
+        return this.lookup(tmpl, filter, false);
+    }
+
+    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter, boolean lookupLocal) {
+        if (lookupLocal || localOnly || lookupInCache) {
+            return jiniAndLocal.lookup(tmpl, filter);
+        }
+        return sdm.lookup(tmpl, filter);
+    }
+
+    /**
+     * @param tmpl
+     * @param filter
+     * @param waitDur
+     * @return
+     * @throws java.lang.InterruptedException
+     * @throws java.rmi.RemoteException
+     */
+    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter, long waitDur)
+            throws InterruptedException, RemoteException {
+        return this.lookup(tmpl, filter, waitDur, false);
+    }
+
+    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter, long waitDur, boolean lookupLocal)
+            throws InterruptedException, RemoteException {
+        if (lookupLocal || localOnly || lookupInCache) {
+            return jiniAndLocal.lookup(tmpl, filter, waitDur);
+        }
+        return this.sdm.lookup(tmpl, filter, waitDur);
+    }
+
+    public Transaction createTransaction(long maxDuration) throws LeaseDeniedException, RemoteException,
+            InterruptedException {
+        if (maxDuration == Long.MAX_VALUE) {
+            throw new LeaseDeniedException("Please pick a more appropriate maximum transaction duration...");
+        }
+        ServiceItem tms;
+        ServiceTemplate tmpl = new ServiceTemplate(null, new Class[] { TransactionManager.class }, null);
+        ServiceItemFilter filter = null;
+        if (localOnly) {
+            tms = this.jiniAndLocal.lookup(tmpl, filter);
+        } else {
+            tms = this.transactionManagerCache.lookup(null);
+            if (tms == null) {
+                tms = this.lookup(tmpl, filter, Lease.FOREVER);
+            }
+        }
+        TransactionManager tm = (TransactionManager) tms.service;
+        Transaction.Created tc = TransactionFactory.create(tm, renewDuration);
+        this.leaseRenewalManager.renewFor(tc.lease, maxDuration, this.renewDuration, null);
+        return tc.transaction;
+    }
+
+    /**
+     * @param lease
+     * @throws net.jini.core.lease.UnknownLeaseException
+     * @throws java.rmi.RemoteException
+     */
+    public void cancel(Lease lease) throws UnknownLeaseException, RemoteException {
+        leaseRenewalManager.cancel(lease);
+    }
+
+    /**
 	 * 
 	 */
-	public JiniManager(ServiceDiscoveryManager sdm) throws IOException {
-		logger.info("Starting JiniManager: " + sdm);
-		this.leaseRenewalManager = new LeaseRenewalManager();
-		this.sdm = sdm;
+    public void clear() {
+        leaseRenewalManager.clear();
+    }
 
-		if (localOnly == false) {
+    /**
+     * @param lease
+     * @return
+     * @throws net.jini.core.lease.UnknownLeaseException
+     */
+    public long getExpiration(Lease lease) throws UnknownLeaseException {
+        return leaseRenewalManager.getExpiration(lease);
+    }
 
-			LookupLocator[] lookupLocators = new LookupLocator[0];
-			DiscoveryListener discoveryListener = null;
+    /**
+     * @param lease
+     * @throws net.jini.core.lease.UnknownLeaseException
+     */
+    public void remove(Lease lease) throws UnknownLeaseException {
+        leaseRenewalManager.remove(lease);
+    }
 
-			LookupDiscoveryManager allGroupsLookupDiscoveryManager = new LookupDiscoveryManager(
-					DiscoveryGroupManagement.ALL_GROUPS, lookupLocators,
-					discoveryListener);
-			this.allGroupSdm = new ServiceDiscoveryManager(
-					allGroupsLookupDiscoveryManager, leaseRenewalManager);
+    /**
+     * @param lease
+     * @param desiredDuration
+     * @param renewDuration
+     * @param listener
+     */
+    public void renewFor(Lease lease, long desiredDuration, long renewDuration, LeaseListener listener) {
+        leaseRenewalManager.renewFor(lease, desiredDuration, renewDuration, listener);
+    }
 
-			ServiceTemplate tmpl = new ServiceTemplate(null,
-					new Class[] { TransactionManager.class }, null);
-			ServiceItemFilter filter = null;
-			ServiceListModel serviceListener = new ServiceListModel();
-			this.transactionManagerCache = this.createLookupCache(tmpl, filter,
-					serviceListener);
-		}
-		this.jiniAndLocal = new LookupJiniAndLocal(this.sdm);
+    /**
+     * @param lease
+     * @param desiredDuration
+     * @param listener
+     */
+    public void renewFor(Lease lease, long desiredDuration, LeaseListener listener) {
+        leaseRenewalManager.renewFor(lease, desiredDuration, listener);
+    }
 
-	}
+    /**
+     * @param lease
+     * @param desiredExpiration
+     * @param renewDuration
+     * @param listener
+     */
+    public void renewUntil(Lease lease, long desiredExpiration, long renewDuration, LeaseListener listener) {
+        leaseRenewalManager.renewUntil(lease, desiredExpiration, renewDuration, listener);
+    }
 
-	/**
-	 * @param tmpl
-	 * @param filter
-	 * @param listener
-	 * @return
-	 * @throws java.rmi.RemoteException
-	 */
-	public LookupCache createLookupCache(ServiceTemplate tmpl,
-			ServiceItemFilter filter, ServiceDiscoveryListener listener)
-			throws RemoteException {
-		return sdm.createLookupCache(tmpl, filter, listener);
-	}
+    /**
+     * @param lease
+     * @param desiredExpiration
+     * @param listener
+     */
+    public void renewUntil(Lease lease, long desiredExpiration, LeaseListener listener) {
+        leaseRenewalManager.renewUntil(lease, desiredExpiration, listener);
+    }
 
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object obj) {
-		return sdm.equals(obj);
-	}
-	@Override
-	public int hashCode() {
-		if (sdm == null) {
-			return super.hashCode();
-		}
-		return sdm.hashCode();
-	}
+    /**
+     * @param lease
+     * @param expiration
+     * @throws net.jini.core.lease.UnknownLeaseException
+     */
+    public void setExpiration(Lease lease, long expiration) throws UnknownLeaseException {
+        leaseRenewalManager.setExpiration(lease, expiration);
+    }
 
-	
-	/**
-	 * @return
-	 */
-	public LookupDiscoveryManager getLookupDiscoveryManager() {
-		return (LookupDiscoveryManager) sdm.getDiscoveryManager();
-	}
+    public void addLocalService(ServiceItem service) {
+        this.jiniAndLocal.addLocalService(service);
+    }
 
-	/**
-	 * @return
-	 */
-	public ServiceDiscoveryManager getAllGroupsServiceDiscoveryManager() {
-		if (localOnly) {
-			throw new UnsupportedOperationException();
-		}
-		return this.allGroupSdm;
-	}
+    public void addGroups(String[] groups) throws IOException {
+        this.getLookupDiscoveryManager().addGroups(groups);
+        logger.info("Added discovery groups: " + Arrays.asList(groups) + " all groups: "
+            + Arrays.asList(this.getLookupDiscoveryManager().getGroups()));
+    }
 
-	/**
-	 * @return
-	 */
-	public LeaseRenewalManager getLeaseRenewalManager() {
-		return sdm.getLeaseRenewalManager();
-	}
+    public static boolean isLocalOnly() {
+        return localOnly;
+    }
 
-	/**
-	 * @param tmpl
-	 * @param minMatches
-	 * @param maxMatches
-	 * @param filter
-	 * @param waitDur
-	 * @return
-	 * @throws java.lang.InterruptedException
-	 * @throws java.rmi.RemoteException
-	 */
-	public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches,
-			int maxMatches, ServiceItemFilter filter, long waitDur)
-			throws InterruptedException, RemoteException {
-		return lookup(tmpl, minMatches, maxMatches, filter, waitDur, false);
-	}
-
-	public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches,
-			int maxMatches, ServiceItemFilter filter, long waitDur,
-			boolean lookupLocal) throws InterruptedException, RemoteException {
-		if (lookupLocal || localOnly || lookupInCache) {
-			return jiniAndLocal.lookup(tmpl, minMatches, maxMatches, filter,
-					waitDur);
-		} else {
-			return sdm.lookup(tmpl, minMatches, maxMatches, filter, waitDur);
-		}
-	}
-
-	/**
-	 * @param tmpl
-	 * @param maxMatches
-	 * @param filter
-	 * @return
-	 */
-	public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches,
-			ServiceItemFilter filter) {
-		return this.lookup(tmpl, maxMatches, filter, false);
-	}
-
-	public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches,
-			ServiceItemFilter filter, boolean lookupLocal) {
-		if (lookupLocal || localOnly  || lookupInCache) {
-			return jiniAndLocal.lookup(tmpl, maxMatches, filter);
-		}
-		return this.sdm.lookup(tmpl, maxMatches, filter);
-	}
-
-	/**
-	 * @param tmpl
-	 * @param filter
-	 * @return
-	 */
-	public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter) {
-		return this.lookup(tmpl, filter, false);
-	}
-
-	public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter,
-			boolean lookupLocal) {
-		if (lookupLocal || localOnly  || lookupInCache) {
-			return jiniAndLocal.lookup(tmpl, filter);
-		}
-		return sdm.lookup(tmpl, filter);
-	}
-
-	/**
-	 * @param tmpl
-	 * @param filter
-	 * @param waitDur
-	 * @return
-	 * @throws java.lang.InterruptedException
-	 * @throws java.rmi.RemoteException
-	 */
-	public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter,
-			long waitDur) throws InterruptedException, RemoteException {
-		return this.lookup(tmpl, filter, waitDur, false);
-	}
-
-	public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter,
-			long waitDur, boolean lookupLocal) throws InterruptedException,
-			RemoteException {
-		if (lookupLocal || localOnly  || lookupInCache) {
-			return jiniAndLocal.lookup(tmpl, filter, waitDur);
-		}
-		return this.sdm.lookup(tmpl, filter, waitDur);
-	}
-
-	public Transaction createTransaction(long maxDuration)
-			throws LeaseDeniedException, RemoteException, InterruptedException {
-		if (maxDuration == Long.MAX_VALUE) {
-			throw new LeaseDeniedException(
-					"Please pick a more appropriate maximum transaction duration...");
-		}
-		ServiceItem tms;
-		ServiceTemplate tmpl = new ServiceTemplate(null,
-				new Class[] { TransactionManager.class }, null);
-		ServiceItemFilter filter = null;
-		if (localOnly) {
-			tms = this.jiniAndLocal.lookup(tmpl, filter);
-		} else {
-			tms = this.transactionManagerCache.lookup(null);
-			if (tms == null) {
-				tms = this.lookup(tmpl, filter, Lease.FOREVER);
-			}
-		}
-		TransactionManager tm = (TransactionManager) tms.service;
-		Transaction.Created tc = TransactionFactory.create(tm, renewDuration);
-		this.leaseRenewalManager.renewFor(tc.lease, maxDuration,
-				this.renewDuration, null);
-		return tc.transaction;
-	}
-
-	/**
-	 * @param lease
-	 * @throws net.jini.core.lease.UnknownLeaseException
-	 * @throws java.rmi.RemoteException
-	 */
-	public void cancel(Lease lease) throws UnknownLeaseException,
-			RemoteException {
-		leaseRenewalManager.cancel(lease);
-	}
-
-	/**
-	 * 
-	 */
-	public void clear() {
-		leaseRenewalManager.clear();
-	}
-
-	/**
-	 * @param lease
-	 * @return
-	 * @throws net.jini.core.lease.UnknownLeaseException
-	 */
-	public long getExpiration(Lease lease) throws UnknownLeaseException {
-		return leaseRenewalManager.getExpiration(lease);
-	}
-
-	/**
-	 * @param lease
-	 * @throws net.jini.core.lease.UnknownLeaseException
-	 */
-	public void remove(Lease lease) throws UnknownLeaseException {
-		leaseRenewalManager.remove(lease);
-	}
-
-	/**
-	 * @param lease
-	 * @param desiredDuration
-	 * @param renewDuration
-	 * @param listener
-	 */
-	public void renewFor(Lease lease, long desiredDuration, long renewDuration,
-			LeaseListener listener) {
-		leaseRenewalManager.renewFor(lease, desiredDuration, renewDuration,
-				listener);
-	}
-
-	/**
-	 * @param lease
-	 * @param desiredDuration
-	 * @param listener
-	 */
-	public void renewFor(Lease lease, long desiredDuration,
-			LeaseListener listener) {
-		leaseRenewalManager.renewFor(lease, desiredDuration, listener);
-	}
-
-	/**
-	 * @param lease
-	 * @param desiredExpiration
-	 * @param renewDuration
-	 * @param listener
-	 */
-	public void renewUntil(Lease lease, long desiredExpiration,
-			long renewDuration, LeaseListener listener) {
-		leaseRenewalManager.renewUntil(lease, desiredExpiration, renewDuration,
-				listener);
-	}
-
-	/**
-	 * @param lease
-	 * @param desiredExpiration
-	 * @param listener
-	 */
-	public void renewUntil(Lease lease, long desiredExpiration,
-			LeaseListener listener) {
-		leaseRenewalManager.renewUntil(lease, desiredExpiration, listener);
-	}
-
-	/**
-	 * @param lease
-	 * @param expiration
-	 * @throws net.jini.core.lease.UnknownLeaseException
-	 */
-	public void setExpiration(Lease lease, long expiration)
-			throws UnknownLeaseException {
-		leaseRenewalManager.setExpiration(lease, expiration);
-	}
-
-	public void addLocalService(ServiceItem service) {
-		this.jiniAndLocal.addLocalService(service);
-	}
-
-	public void addGroups(String[] groups) throws IOException {
-		this.getLookupDiscoveryManager().addGroups(groups);
-		logger.info("Added discovery groups: " + Arrays.asList(groups)
-				+ " all groups: "
-				+ Arrays.asList(this.getLookupDiscoveryManager().getGroups()));
-	}
-
-	public static boolean isLocalOnly() {
-		return localOnly;
-	}
-
-	public static void setLocalOnly(boolean localOnly) {
-		JiniManager.localOnly = localOnly;
-	}
+    public static void setLocalOnly(boolean localOnly) {
+        JiniManager.localOnly = localOnly;
+    }
 
 }

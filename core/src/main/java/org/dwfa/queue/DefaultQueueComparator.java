@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import org.dwfa.bpa.process.I_DescribeQueueEntry;
 
 /**
  * @author kec
- *
+ * 
  */
 public class DefaultQueueComparator implements Comparator {
 
@@ -61,9 +61,9 @@ public class DefaultQueueComparator implements Comparator {
         }
         return d1.getEntryID().toString().compareTo(d2.getEntryID().toString());
     }
-    
+
     @SuppressWarnings("unchecked")
-	private int compareComparables(Comparable c1, Comparable c2) {
+    private int compareComparables(Comparable c1, Comparable c2) {
         if (c1 == c2) {
             return 0;
         }
@@ -76,8 +76,7 @@ public class DefaultQueueComparator implements Comparator {
         }
         // c1 == null, c2 != null
         return 1;
-        
+
     }
-    
 
 }

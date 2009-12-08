@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,25 +28,19 @@ public class AppendStringToPropertyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor valueTextPropertyName =
-                    new PropertyDescriptor("valueText", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor valueTextPropertyName = new PropertyDescriptor("valueText",
+                getBeanDescriptor().getBeanClass());
             valueTextPropertyName.setBound(true);
-            valueTextPropertyName
-                .setPropertyEditorClass(JTextFieldEditorOneLine.class);
-            valueTextPropertyName
-                .setDisplayName("<html><font color='blue'>Append value:");
+            valueTextPropertyName.setPropertyEditorClass(JTextFieldEditorOneLine.class);
+            valueTextPropertyName.setDisplayName("<html><font color='blue'>Append value:");
             valueTextPropertyName.setShortDescription("Text to append. ");
 
-            PropertyDescriptor stringPropName =
-                    new PropertyDescriptor("stringPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor stringPropName = new PropertyDescriptor("stringPropName",
+                getBeanDescriptor().getBeanClass());
             stringPropName.setBound(true);
-            stringPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
+            stringPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             stringPropName.setDisplayName("<html><font color='blue'>property:");
-            stringPropName
-                .setShortDescription("Name of the property to append to. ");
+            stringPropName.setShortDescription("Name of the property to append to. ");
 
             PropertyDescriptor rv[] = { stringPropName, valueTextPropertyName };
             return rv;

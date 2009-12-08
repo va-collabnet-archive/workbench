@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,16 +44,17 @@ import org.dwfa.bpa.tasks.AbstractTask;
 
 /**
  * This task:
- * <ol><li>Loads a process from a URL</li>
- *     <li>Sets all the external properties of the loaded process to the value of properties 
- *         of the same name and type from within the calling process.
- *     <li>Executes the process</li>
+ * <ol>
+ * <li>Loads a process from a URL</li>
+ * <li>Sets all the external properties of the loaded process to the value of
+ * properties of the same name and type from within the calling process.
+ * <li>Executes the process</li>
  * </ol>
+ * 
  * @author kec
- *
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/start tasks", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/start tasks", type = BeanType.TASK_BEAN) })
 public class LoadSetLaunchProcessFromURL extends AbstractTask {
 
     private URL processURL = new URL("http://www.informatics.com/hello.xml");
@@ -71,14 +72,13 @@ public class LoadSetLaunchProcessFromURL extends AbstractTask {
         out.writeObject(processURL);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
             processURL = (URL) in.readObject();
-        	if (objDataVersion >= 2) {
-        		
-        	} 
+            if (objDataVersion >= 2) {
+
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -89,8 +89,7 @@ public class LoadSetLaunchProcessFromURL extends AbstractTask {
         super();
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             // Load process...
             I_EncodeBusinessProcess processToLaunch;
@@ -104,36 +103,31 @@ public class LoadSetLaunchProcessFromURL extends AbstractTask {
                 XMLDecoder d = new XMLDecoder(new BufferedInputStream(inStream));
                 processToLaunch = (I_EncodeBusinessProcess) d.readObject();
             } else {
-                processToLaunch = (I_EncodeBusinessProcess) process
-                        .getObjectFromURL(processURL);
+                processToLaunch = (I_EncodeBusinessProcess) process.getObjectFromURL(processURL);
             }
-            
+
             if (processSubject != null) {
-            	processToLaunch.setSubject(processSubject);
+                processToLaunch.setSubject(processSubject);
             }
             if (processName != null) {
-            	processToLaunch.setName(processName);
+                processToLaunch.setName(processName);
             }
             if (destination != null) {
-            	processToLaunch.setDestination(destination);
+                processToLaunch.setDestination(destination);
             }
             if (originator != null) {
-            	processToLaunch.setOriginator(originator);
+                processToLaunch.setOriginator(originator);
             }
 
             // Set properties...
-            for (PropertyDescriptor propDesc : processToLaunch.getBeanInfo()
-                    .getPropertyDescriptors()) {
-                if (PropertyDescriptorWithTarget.class
-                        .isAssignableFrom(propDesc.getClass())) {
+            for (PropertyDescriptor propDesc : processToLaunch.getBeanInfo().getPropertyDescriptors()) {
+                if (PropertyDescriptorWithTarget.class.isAssignableFrom(propDesc.getClass())) {
                     try {
                         PropertyDescriptorWithTarget pdwt = (PropertyDescriptorWithTarget) propDesc;
                         Object value = process.readProperty(pdwt.getLabel());
-                        propDesc.getWriteMethod().invoke(pdwt.getTarget(),
-                                value);
+                        propDesc.getWriteMethod().invoke(pdwt.getTarget(), value);
                         if (worker.getLogger().isLoggable(Level.FINE)) {
-                            worker.getLogger().fine(
-                                    "Set " + pdwt.getLabel() + " to " + value);
+                            worker.getLogger().fine("Set " + pdwt.getLabel() + " to " + value);
                         }
                     } catch (Exception ex) {
                         worker.getLogger().warning(ex.getMessage());
@@ -152,8 +146,7 @@ public class LoadSetLaunchProcessFromURL extends AbstractTask {
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
     }
 
@@ -177,41 +170,40 @@ public class LoadSetLaunchProcessFromURL extends AbstractTask {
      *            The processURL to set.
      * @throws MalformedURLException
      */
-    public void setProcessURLString(String processURLString)
-            throws MalformedURLException {
+    public void setProcessURLString(String processURLString) throws MalformedURLException {
         this.processURL = new URL(processURLString);
     }
 
-	public String getDestination() {
-		return destination;
-	}
+    public String getDestination() {
+        return destination;
+    }
 
-	public void setDestination(String destination) {
-		this.destination = destination;
-	}
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
 
-	public String getOriginator() {
-		return originator;
-	}
+    public String getOriginator() {
+        return originator;
+    }
 
-	public void setOriginator(String originator) {
-		this.originator = originator;
-	}
+    public void setOriginator(String originator) {
+        this.originator = originator;
+    }
 
-	public String getProcessName() {
-		return processName;
-	}
+    public String getProcessName() {
+        return processName;
+    }
 
-	public void setProcessName(String processName) {
-		this.processName = processName;
-	}
+    public void setProcessName(String processName) {
+        this.processName = processName;
+    }
 
-	public String getProcessSubject() {
-		return processSubject;
-	}
+    public String getProcessSubject() {
+        return processSubject;
+    }
 
-	public void setProcessSubject(String processSubject) {
-		this.processSubject = processSubject;
-	}
+    public void setProcessSubject(String processSubject) {
+        this.processSubject = processSubject;
+    }
 
 }

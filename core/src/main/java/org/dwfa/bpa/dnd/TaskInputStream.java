@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,19 +26,20 @@ import org.dwfa.bpa.process.I_DefineTask;
 
 /**
  * @author kec
- *
+ * 
  */
 public class TaskInputStream extends InputStream {
 
     private InputStream inputStream;
 
     /*
-    public TerminologyInputStream(I_TerminologyComponent termComponent) throws IOException {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bytes);
-        oos.writeObject(termComponent);
-        inputStream = new ByteArrayInputStream(bytes.toByteArray());
-    }
+     * public TerminologyInputStream(I_TerminologyComponent termComponent)
+     * throws IOException {
+     * ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+     * ObjectOutputStream oos = new ObjectOutputStream(bytes);
+     * oos.writeObject(termComponent);
+     * inputStream = new ByteArrayInputStream(bytes.toByteArray());
+     * }
      */
     public TaskInputStream(InputStream inputStream) throws IOException {
         this.inputStream = inputStream;
@@ -48,8 +49,7 @@ public class TaskInputStream extends InputStream {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bytes);
         oos.writeObject(task);
-        return new TaskInputStream(
-            new ByteArrayInputStream(bytes.toByteArray()));
+        return new TaskInputStream(new ByteArrayInputStream(bytes.toByteArray()));
 
     }
 

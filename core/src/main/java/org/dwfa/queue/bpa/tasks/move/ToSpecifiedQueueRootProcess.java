@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,12 +37,14 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 
 /**
- * The <code>ToSpecifiedQueueRootProcess</code> task will go to a specific queue based on the
+ * The <code>ToSpecifiedQueueRootProcess</code> task will go to a specific queue
+ * based on the
  * serviceID of the queue. Since the serviceID's are not typically avaible at
  * authoring time, this task is reserved for programatic actions that occur at
- * runtime such as the actions of the create failsafe and remove failsafe tasks. 
+ * runtime such as the actions of the create failsafe and remove failsafe tasks.
+ * 
  * @author kec
- *
+ * 
  */
 public class ToSpecifiedQueueRootProcess extends AbstractTask {
     private static final long serialVersionUID = 1;
@@ -63,18 +65,18 @@ public class ToSpecifiedQueueRootProcess extends AbstractTask {
         this.queueServiceId = elementId;
         this.firePropertyChange("queueServiceId", oldValue, this.queueServiceId);
     }
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.queueServiceId);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-                this.queueServiceId = (ServiceID) in.readObject();
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            this.queueServiceId = (ServiceID) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
@@ -84,27 +86,23 @@ public class ToSpecifiedQueueRootProcess extends AbstractTask {
         this.queueServiceId = queueServiceId;
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         return Condition.STOP;
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_EncodeBusinessProcess rootProcess = worker.getProcessStack().get(0);
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = null;
-            ServiceTemplate template = new ServiceTemplate(this.queueServiceId,
-               serviceTypes,
-               attrSetTemplates);
+            ServiceTemplate template = new ServiceTemplate(this.queueServiceId, serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
             ServiceItem service = worker.lookup(template, filter);
             I_QueueProcesses q = (I_QueueProcesses) service.service;
             q.write(rootProcess, worker.getActiveTransaction());
         } catch (Exception e) {
             throw new TaskFailedException(e);
-        } 
+        }
     }
 
     public Collection<Condition> getConditions() {

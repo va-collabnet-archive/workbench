@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,7 +44,7 @@ import net.jini.id.UuidFactory;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class HtmlHandler extends Handler implements I_PublishLogRecord {
 
@@ -55,27 +55,29 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
     private int bufferSize = 60000;
     private Uuid id = UuidFactory.generate();
     private boolean printSourceAndMethodEnabled = false;
+
     /**
      * @param logOut
      * @throws IOException
-     *  
+     * 
      */
     public HtmlHandler(JEditorPane logOut) throws IOException {
         this(logOut, "logger ");
-        
+
     }
+
     public HtmlHandler(JEditorPane logOut, String loggerName) throws IOException {
         super();
         this.logOut = logOut;
         if (loggerName.endsWith(" ") == false) {
-        	loggerName = loggerName + " ";
+            loggerName = loggerName + " ";
         }
         File root = new File("logs");
         root.mkdirs();
         FileWriter fw = new FileWriter(new File(root, loggerName + fileName.format(new Date()) + ".html"));
         this.logFile = new BufferedWriter(fw);
         this.logFile.write("<html>");
-        
+
     }
 
     /**
@@ -92,9 +94,11 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
         if (logOut != null) {
             SwingUtilities.invokeLater(new AddRecord(htmlRecord));
         }
-     }
+    }
+
     private class AddRecord implements Runnable {
         String htmlRecord;
+
         /**
          * @param htmlRecord
          */
@@ -102,18 +106,18 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
             super();
             this.htmlRecord = htmlRecord;
         }
+
         /**
          * @see java.lang.Runnable#run()
          */
         public void run() {
-            try {         
+            try {
                 if (logOut.getDocument().getLength() > bufferSize) {
                     Document doc = logOut.getDocument();
-                    doc.remove(0, bufferSize/4);
+                    doc.remove(0, bufferSize / 4);
                 }
-                ((HTMLEditorKit) logOut.getEditorKit()).read(
-                        new java.io.StringReader(htmlRecord), logOut
-                                .getDocument(), logOut.getDocument().getLength());
+                ((HTMLEditorKit) logOut.getEditorKit()).read(new java.io.StringReader(htmlRecord),
+                    logOut.getDocument(), logOut.getDocument().getLength());
                 logOut.setCaretPosition(logOut.getDocument().getLength());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -121,9 +125,9 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
                 e.printStackTrace();
             }
         }
-        
+
     }
-    
+
     private class Clear implements Runnable {
         /**
          * @param htmlRecord
@@ -131,19 +135,20 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
         public Clear() {
             super();
         }
+
         /**
          * @see java.lang.Runnable#run()
          */
         public void run() {
-            try {         
+            try {
                 Document doc = logOut.getDocument();
-            	   doc.remove(0, logOut.getDocument().getLength());
+                doc.remove(0, logOut.getDocument().getLength());
                 logOut.setCaretPosition(logOut.getDocument().getLength());
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
         }
-        
+
     }
 
     @SuppressWarnings("unchecked")
@@ -153,22 +158,22 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
         if (rec.getLevel().intValue() <= Level.FINEST.intValue()) {
             buf.append(format.format(new Date(rec.getMillis())));
             buf.append(' ');
-            buf.append("<font color='#8470FF'>"); //Light slate blue
+            buf.append("<font color='#8470FF'>"); // Light slate blue
             buf.append("FNST");
         } else if (rec.getLevel().intValue() <= Level.FINER.intValue()) {
             buf.append(format.format(new Date(rec.getMillis())));
             buf.append(' ');
-            buf.append("<font color='#808000'>"); //Olive
+            buf.append("<font color='#808000'>"); // Olive
             buf.append("FNER");
         } else if (rec.getLevel().intValue() <= Level.FINE.intValue()) {
             buf.append(format.format(new Date(rec.getMillis())));
             buf.append(' ');
-            buf.append("<font color='#4682B4'>"); //Steel blue
+            buf.append("<font color='#4682B4'>"); // Steel blue
             buf.append("FINE");
         } else if (rec.getLevel().intValue() <= Level.CONFIG.intValue()) {
             buf.append(format.format(new Date(rec.getMillis())));
             buf.append(' ');
-            buf.append("<font color='#00BFFF'>"); //DeepSkyBlue
+            buf.append("<font color='#00BFFF'>"); // DeepSkyBlue
             buf.append("CNFG");
         } else if (rec.getLevel().intValue() <= Level.INFO.intValue()) {
             buf.append(format.format(new Date(rec.getMillis())));
@@ -178,12 +183,12 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
         } else if (rec.getLevel().intValue() <= Level.WARNING.intValue()) {
             buf.append(format.format(new Date(rec.getMillis())));
             buf.append(' ');
-            buf.append("<font color='#8B0000'>"); //DarkRed
+            buf.append("<font color='#8B0000'>"); // DarkRed
             buf.append("WARN");
         } else if (rec.getLevel().intValue() >= Level.SEVERE.intValue()) {
             buf.append(format.format(new Date(rec.getMillis())));
             buf.append(' ');
-            buf.append("<font color='#DC143C'>"); //Crimpson
+            buf.append("<font color='#DC143C'>"); // Crimpson
             buf.append("SEVR");
         }
         buf.append("</font>");
@@ -192,27 +197,27 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
         buf.append(formatMessage(rec));
         Object[] params = rec.getParameters();
         if ((params != null) && (params.length > 0)) {
-        	  for (int i = 0; i < params.length; i++) {
-              buf.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-     		 buf.append("<font color='#8B0000'> param[");
-    		     buf.append(i);
-    		     buf.append("] </font>");
-    		     if (params[i] == null) {
-    		    	 buf.append("null");
-    		     } else if (Collection.class.isAssignableFrom(params[i].getClass())) {
-    		    	 	Iterator<Object> itr = ((Collection<Object>) params[i]).iterator();
-    		    	 	while (itr.hasNext()) {
-    		                buf.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-    		                buf.append(itr.next());
-    		    	 	}
-    		     } else {
-    		    	 	buf.append(params[i]);
-    		     }
-    		     
-    		     //buf.append(" ");
-    		     //buf.append(params[i].getClass().getName());
-        	  }
-        	
+            for (int i = 0; i < params.length; i++) {
+                buf.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+                buf.append("<font color='#8B0000'> param[");
+                buf.append(i);
+                buf.append("] </font>");
+                if (params[i] == null) {
+                    buf.append("null");
+                } else if (Collection.class.isAssignableFrom(params[i].getClass())) {
+                    Iterator<Object> itr = ((Collection<Object>) params[i]).iterator();
+                    while (itr.hasNext()) {
+                        buf.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+                        buf.append(itr.next());
+                    }
+                } else {
+                    buf.append(params[i]);
+                }
+
+                // buf.append(" ");
+                // buf.append(params[i].getClass().getName());
+            }
+
         }
         if (printSourceAndMethodEnabled) {
             buf.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
@@ -222,11 +227,11 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
                 buf.append(rec.getSourceMethodName().replaceAll("<", "&lt;"));
             } else {
                 buf.append("null");
-            }            
+            }
         }
-        
+
         if (rec.getThrown() != null) {
-            buf.append("<br><font color='#800000'>"); //Maroon
+            buf.append("<br><font color='#800000'>"); // Maroon
             Throwable thrown = rec.getThrown();
             buf.append("Exception: " + thrown);
             buf.append("<br>");
@@ -246,7 +251,7 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
                 }
                 causedBy = causedBy.getCause();
             }
-            
+
             buf.append("</font><br>");
         }
         buf.append("</font>\n");
@@ -280,6 +285,7 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
     public int getBufferSize() {
         return bufferSize;
     }
+
     /**
      * @param bufferSize The bufferSize to set.
      */
@@ -294,22 +300,22 @@ public class HtmlHandler extends Handler implements I_PublishLogRecord {
         return id;
     }
 
-	/**
-	 * @return Returns the printSourceAndMethodEnabled.
-	 */
-	public boolean isPrintSourceAndMethodEnabled() {
-		return printSourceAndMethodEnabled;
-	}
+    /**
+     * @return Returns the printSourceAndMethodEnabled.
+     */
+    public boolean isPrintSourceAndMethodEnabled() {
+        return printSourceAndMethodEnabled;
+    }
 
-	/**
-	 * @param printSourceAndMethodEnabled The printSourceAndMethodEnabled to set.
-	 */
-	public void setPrintSourceAndMethodEnabled(
-			boolean printSourceAndMethodEnabled) {
-		this.printSourceAndMethodEnabled = printSourceAndMethodEnabled;
-	}
+    /**
+     * @param printSourceAndMethodEnabled The printSourceAndMethodEnabled to
+     *            set.
+     */
+    public void setPrintSourceAndMethodEnabled(boolean printSourceAndMethodEnabled) {
+        this.printSourceAndMethodEnabled = printSourceAndMethodEnabled;
+    }
 
-	public void clearLog() {
+    public void clearLog() {
         SwingUtilities.invokeLater(new Clear());
-	}
+    }
 }

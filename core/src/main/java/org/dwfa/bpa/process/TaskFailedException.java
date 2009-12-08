@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,10 +17,11 @@
 package org.dwfa.bpa.process;
 
 /**
- * Thrown if a task fails for any reason. This Exception should be used to 
- * encapsulate the original exception by all tasks. 
+ * Thrown if a task fails for any reason. This Exception should be used to
+ * encapsulate the original exception by all tasks.
+ * 
  * @author kec
- *
+ * 
  */
 public class TaskFailedException extends WorkflowException {
 
@@ -38,7 +39,7 @@ public class TaskFailedException extends WorkflowException {
     }
 
     /**
-     * @param message A message describing this exception. 
+     * @param message A message describing this exception.
      */
     public TaskFailedException(String message) {
         super(message);
@@ -46,8 +47,8 @@ public class TaskFailedException extends WorkflowException {
     }
 
     /**
-     * @param message A message describing this exception. 
-     * @param cause The cause of this exception. 
+     * @param message A message describing this exception.
+     * @param cause The cause of this exception.
      */
     public TaskFailedException(String message, Throwable cause) {
         super(message, cause);
@@ -55,7 +56,7 @@ public class TaskFailedException extends WorkflowException {
     }
 
     /**
-     * @param cause The cause of this exception. 
+     * @param cause The cause of this exception.
      */
     public TaskFailedException(Throwable cause) {
         super(cause);

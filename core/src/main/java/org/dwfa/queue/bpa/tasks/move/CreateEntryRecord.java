@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,15 +44,17 @@ import org.dwfa.queue.bpa.tasks.failsafe.QueueEntryData;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+
 /**
- *  @author kec<p>
-* Creates an entry used to store a process in a queue. Useful when another 
-* process needs to know an entry record to read or delete a process in the future.
-*
-*
-*/
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/entry", type = BeanType.TASK_BEAN)})
+ * @author kec
+ *         <p>
+ *         Creates an entry used to store a process in a queue. Useful when
+ *         another process needs to know an entry record to read or delete a
+ *         process in the future.
+ * 
+ * 
+ */
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/entry", type = BeanType.TASK_BEAN) })
 public class CreateEntryRecord extends AbstractTask {
 
     /**
@@ -74,19 +76,18 @@ public class CreateEntryRecord extends AbstractTask {
     }
 
     public void setQueueType(TermEntry elementId) {
-    	TermEntry oldValue = this.queueType;
+        TermEntry oldValue = this.queueType;
         this.queueType = elementId;
         this.firePropertyChange("queueType", oldValue, this.queueType);
     }
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(localPropName);
         out.writeObject(this.queueType);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             localPropName = (String) in.readObject();
@@ -108,8 +109,7 @@ public class CreateEntryRecord extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         return Condition.CONTINUE;
     }
 
@@ -117,15 +117,13 @@ public class CreateEntryRecord extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
             ServiceID serviceID = null;
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] { this.queueType };
-            ServiceTemplate template = new ServiceTemplate(serviceID,
-                    serviceTypes, attrSetTemplates);
+            ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
             ServiceItem service = worker.lookup(template, filter);
             ServiceID queueServiceID = service.serviceID;
@@ -133,15 +131,12 @@ public class CreateEntryRecord extends AbstractTask {
 
             String origin = q.getNodeInboxAddress();
             EntryID entryID = new EntryID(UUID.randomUUID());
-            QueueEntryData qed = new QueueEntryData(origin, queueServiceID,
-                    null, entryID);
+            QueueEntryData qed = new QueueEntryData(origin, queueServiceID, null, entryID);
 
-            PropertyDescriptor[] localDescriptors = process
-                    .getAllPropertiesBeanInfo().getPropertyDescriptors();
+            PropertyDescriptor[] localDescriptors = process.getAllPropertiesBeanInfo().getPropertyDescriptors();
             PropertyDescriptorWithTarget localDescriptor = null;
             for (PropertyDescriptor d : localDescriptors) {
-                if (PropertyDescriptorWithTarget.class.isAssignableFrom(d
-                        .getClass())) {
+                if (PropertyDescriptorWithTarget.class.isAssignableFrom(d.getClass())) {
                     PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
                     if (dwt.getLabel().equals(this.localPropName)) {
                         localDescriptor = dwt;
@@ -151,10 +146,8 @@ public class CreateEntryRecord extends AbstractTask {
             }
             localDescriptor.getWriteMethod().invoke(localDescriptor.getTarget(), qed);
             worker.getLogger().info(
-                    worker.getWorkerDesc()
-                            + " Created QueueEntryRecord for: "
-                            + process.getName() + " (" + process.getProcessID()
-                            + ")");
+                worker.getWorkerDesc() + " Created QueueEntryRecord for: " + process.getName() + " ("
+                    + process.getProcessID() + ")");
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,16 +60,15 @@ import com.sun.jini.start.LifeCycle;
 public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> implements I_QueueProcesses,
         ServerProxyTrust, ProxyAccessor {
 
-	private static HashSet<String> startedQueues = new HashSet<String>();
-	
-	public static boolean started(File f) throws MalformedURLException {
-		return startedQueues.contains(f.toURI().toURL().toExternalForm());
-	}
+    private static HashSet<String> startedQueues = new HashSet<String>();
 
-	/** The server proxy, for use by getProxyVerifier */
+    public static boolean started(File f) throws MalformedURLException {
+        return startedQueues.contains(f.toURI().toURL().toExternalForm());
+    }
+
+    /** The server proxy, for use by getProxyVerifier */
     protected I_QueueProcesses serverProxy;
-    protected static Logger logger = Logger.getLogger(QueueServer.class
-            .getName());
+    protected static Logger logger = Logger.getLogger(QueueServer.class.getName());
 
     private List<I_GetWorkFromQueue> workerList = new ArrayList<I_GetWorkFromQueue>();
 
@@ -80,10 +79,9 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
     public QueueServer(String[] args, LifeCycle lc) throws Exception {
         super(args, lc);
         File file = new File(args[0]);
-   		startedQueues.add(file.toURI().toURL().toExternalForm());
-        QueueWorkerSpec[] workerSpecs = (QueueWorkerSpec[]) this.config
-                .getEntry(this.getClass().getName(), "workerSpecs",
-                        QueueWorkerSpec[].class);
+        startedQueues.add(file.toURI().toURL().toExternalForm());
+        QueueWorkerSpec[] workerSpecs = (QueueWorkerSpec[]) this.config.getEntry(this.getClass().getName(),
+            "workerSpecs", QueueWorkerSpec[].class);
         for (int i = 0; i < workerSpecs.length; i++) {
             I_GetWorkFromQueue worker = workerSpecs[i].create(this.config);
             worker.start(this);
@@ -95,10 +93,8 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
      * @return
      */
     protected Entry[] getFixedServiceEntries() {
-        Entry[] moreEntries = new Entry[] {
-                new ServiceInfo("Queue Service", "Informatics, Inc.",
-                        "Informatics, Inc.", VERSION_STRING, "Queue server",
-                        "no serial number") };
+        Entry[] moreEntries = new Entry[] { new ServiceInfo("Queue Service", "Informatics, Inc.", "Informatics, Inc.",
+            VERSION_STRING, "Queue server", "no serial number") };
         return moreEntries;
     }
 
@@ -124,8 +120,6 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
         System.out.println("QueueServer is ready");
     }
 
-
-
     /**
      * Implement the ServerProxyTrust interface to provide a verifier for secure
      * smart proxies.
@@ -143,49 +137,44 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
         return serverProxy;
     }
 
-    public I_EncodeBusinessProcess take(EntryID entryID, Transaction t)
-            throws TransactionException, IOException, ClassNotFoundException,
-            NoMatchingEntryException {
+    public I_EncodeBusinessProcess take(EntryID entryID, Transaction t) throws TransactionException, IOException,
+            ClassNotFoundException, NoMatchingEntryException {
         return (I_EncodeBusinessProcess) super.take(entryID, t);
     }
 
-
-
-    public I_EncodeBusinessProcess take(ProcessID processID, Transaction t)
-    throws TransactionException, IOException, ClassNotFoundException,
-    NoMatchingEntryException {
+    public I_EncodeBusinessProcess take(ProcessID processID, Transaction t) throws TransactionException, IOException,
+            ClassNotFoundException, NoMatchingEntryException {
         return (I_EncodeBusinessProcess) super.take(processID.getUuid(), t);
     }
 
     /**
      * @throws IOException
      * @throws ClassNotFoundException
-     * @throws NoMatchingEntryException 
+     * @throws NoMatchingEntryException
      * @see org.dwfa.bpa.process.I_QueueProcesses#read(net.jini.id.Uuid,
      *      net.jini.core.transaction.Transaction)
      */
-    public I_EncodeBusinessProcess read(EntryID entryID, Transaction t)
-            throws IOException, ClassNotFoundException, NoMatchingEntryException {
+    public I_EncodeBusinessProcess read(EntryID entryID, Transaction t) throws IOException, ClassNotFoundException,
+            NoMatchingEntryException {
         return (I_EncodeBusinessProcess) super.read(entryID, t);
     }
 
     /**
      * @throws IOException
      * @throws ClassNotFoundException
-     * @throws NoMatchingEntryException 
+     * @throws NoMatchingEntryException
      * @see org.dwfa.bpa.process.I_QueueProcesses#read(net.jini.id.Uuid,
      *      net.jini.core.transaction.Transaction)
      */
-    public I_EncodeBusinessProcess read(ProcessID processID, Transaction t)
-            throws IOException, ClassNotFoundException, NoMatchingEntryException {
+    public I_EncodeBusinessProcess read(ProcessID processID, Transaction t) throws IOException, ClassNotFoundException,
+            NoMatchingEntryException {
         return (I_EncodeBusinessProcess) super.read(processID.getUuid(), t);
     }
 
     /**
      * @see org.dwfa.bpa.process.I_QueueProcesses#getProcessMetaData(org.dwfa.bpa.process.I_SelectProcesses)
      */
-    public Collection<I_DescribeBusinessProcess> getProcessMetaData(
-            I_SelectProcesses selector) throws RemoteException {
+    public Collection<I_DescribeBusinessProcess> getProcessMetaData(I_SelectProcesses selector) throws RemoteException {
         return getMetaData(selector);
     }
 
@@ -222,20 +211,24 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
     public String getFileSuffixWritePending() {
         return ".bp.write-pending";
     }
+
     protected I_DescribeBusinessProcess getObjectDescription(Object obj, EntryID entryID) {
         return new BusinessProcessInfo((I_DescribeBusinessProcess) obj, entryID);
     }
 
-    public void write(I_EncodeBusinessProcess p, EntryID eid, Transaction t) throws RemoteException, IOException, TransactionException {
+    public void write(I_EncodeBusinessProcess p, EntryID eid, Transaction t) throws RemoteException, IOException,
+            TransactionException {
         super.write(p, eid, t);
-        
+
     }
 
-    public I_EncodeBusinessProcess take(I_SelectProcesses p, Transaction t) throws RemoteException, IOException, ClassNotFoundException, TransactionException, NoMatchingEntryException {
+    public I_EncodeBusinessProcess take(I_SelectProcesses p, Transaction t) throws RemoteException, IOException,
+            ClassNotFoundException, TransactionException, NoMatchingEntryException {
         return (I_EncodeBusinessProcess) super.take(p, t);
     }
 
-    public EntryID writeThenTake(I_EncodeBusinessProcess p, Transaction writeTran, Transaction takeTran) throws RemoteException, IOException, ClassNotFoundException, TransactionException {
+    public EntryID writeThenTake(I_EncodeBusinessProcess p, Transaction writeTran, Transaction takeTran)
+            throws RemoteException, IOException, ClassNotFoundException, TransactionException {
         return super.writeThenTake(p, writeTran, takeTran);
     }
 
@@ -244,8 +237,9 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
         return logger;
     }
 
-    public EntryID write(I_EncodeBusinessProcess process, Transaction t) throws RemoteException, IOException, TransactionException {
+    public EntryID write(I_EncodeBusinessProcess process, Transaction t) throws RemoteException, IOException,
+            TransactionException {
         return super.write(process, t);
     }
-    
+
 }

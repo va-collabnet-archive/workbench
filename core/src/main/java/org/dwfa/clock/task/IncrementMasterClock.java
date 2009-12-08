@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,15 +28,16 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Execution of this task increments the master clock by one unit. 
- * The size of the unit is determined by the configuration of the master clock. The
- * Master clock is a network accessible service. A properly configured simulation environment
- * will only have one master clock. 
+ * Execution of this task increments the master clock by one unit.
+ * The size of the unit is determined by the configuration of the master clock.
+ * The
+ * Master clock is a network accessible service. A properly configured
+ * simulation environment
+ * will only have one master clock.
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/jehri tasks/clock", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/jehri tasks/clock", type = BeanType.TASK_BEAN) })
 public class IncrementMasterClock extends MasterClockTask {
-    
+
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
@@ -45,8 +46,7 @@ public class IncrementMasterClock extends MasterClockTask {
         out.writeInt(dataVersion);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
         } else {
@@ -55,9 +55,10 @@ public class IncrementMasterClock extends MasterClockTask {
 
     }
 
-	@Override
-	protected void doTask(I_EncodeBusinessProcess process, I_Work worker, I_KeepIncrementalTime clock) throws RemoteException {
-		clock.increment();
-	}
+    @Override
+    protected void doTask(I_EncodeBusinessProcess process, I_Work worker, I_KeepIncrementalTime clock)
+            throws RemoteException {
+        clock.increment();
+    }
 
- }
+}

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,13 +34,11 @@ public class SetProcessOriginBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor newOrigin =
-                    new PropertyDescriptor("newOrigin", SetProcessOrigin.class);
+            PropertyDescriptor newOrigin = new PropertyDescriptor("newOrigin", SetProcessOrigin.class);
             newOrigin.setBound(true);
             newOrigin.setPropertyEditorClass(JTextFieldEditor.class);
             newOrigin.setDisplayName("set process origin");
-            newOrigin
-                .setShortDescription("Sets the origin of the process to the provided value.");
+            newOrigin.setShortDescription("Sets the origin of the process to the provided value.");
 
             PropertyDescriptor rv[] = { newOrigin };
             return rv;
@@ -54,8 +52,7 @@ public class SetProcessOriginBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetProcessOrigin.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set Process Origin");
+        bd.setDisplayName("<html><font color='green'><center>Set Process Origin");
         return bd;
     }
 

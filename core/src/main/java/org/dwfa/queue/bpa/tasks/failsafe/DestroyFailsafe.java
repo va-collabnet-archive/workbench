@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,15 +38,18 @@ import org.dwfa.bpa.tasks.AbstractTask;
 
 /**
  * This process uses it's <code>fsd</code> field to identify a process in an
- * queue that matches the <code>ServiceID</code> specified in the <code>fsd</code> and remove it. 
- * The primary use of this process is to remove a "failsafe" process placed on an aging queue,
- * but other uses are possible. 
+ * queue that matches the <code>ServiceID</code> specified in the
+ * <code>fsd</code> and remove it.
+ * The primary use of this process is to remove a "failsafe" process placed on
+ * an aging queue,
+ * but other uses are possible.
  * Since the QueueEntryData is not typically avaible at
  * authoring time, this task is reserved for programatic actions that occur at
- * runtime such as the actions of the create failsafe and remove failsafe tasks.  
+ * runtime such as the actions of the create failsafe and remove failsafe tasks.
+ * 
  * @author kec
  * @see CreateFailsafe
- *
+ * 
  */
 public class DestroyFailsafe extends AbstractTask {
     /**
@@ -57,14 +60,13 @@ public class DestroyFailsafe extends AbstractTask {
     private static final int dataVersion = 1;
 
     private QueueEntryData fsd;
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(fsd);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             this.fsd = (QueueEntryData) in.readObject();
@@ -80,31 +82,27 @@ public class DestroyFailsafe extends AbstractTask {
     }
 
     @SuppressWarnings("unchecked")
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-        Class<I_QueueProcesses>[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<I_QueueProcesses>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] {};
-            ServiceTemplate template = new ServiceTemplate(this.fsd
-                    .getQueueID(), serviceTypes, attrSetTemplates);
+            ServiceTemplate template = new ServiceTemplate(this.fsd.getQueueID(), serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
-            ServiceItem service = worker.lookup(template,
-                    filter);
+            ServiceItem service = worker.lookup(template, filter);
             I_QueueProcesses q = (I_QueueProcesses) service.service;
             try {
                 q.take(this.fsd.getProcessID(), worker.getActiveTransaction());
             } catch (NoMatchingEntryException e) {
                 worker.getLogger().info(e.toString());
             }
-        
-        return Condition.CONTINUE;
+
+            return Condition.CONTINUE;
         } catch (Exception ex) {
             throw new TaskFailedException(ex);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
 
     }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,8 +38,7 @@ public class GetWorkFromQueuePlugin implements I_GetWorkFromQueue, Runnable {
     private String desc;
     private I_SelectProcesses selector;
 
-    public GetWorkFromQueuePlugin(I_Work worker, I_QueueProcesses queue,
-            I_SelectProcesses selector) {
+    public GetWorkFromQueuePlugin(I_Work worker, I_QueueProcesses queue, I_SelectProcesses selector) {
         super();
         this.worker = worker;
         this.queue = queue;
@@ -57,9 +56,7 @@ public class GetWorkFromQueuePlugin implements I_GetWorkFromQueue, Runnable {
      */
     public void start(I_QueueProcesses queue) {
         this.queue = queue;
-        this.desc =
-                "Worker " + worker.getWorkerDesc() + " "
-                    + this.getClass().getName();
+        this.desc = "Worker " + worker.getWorkerDesc() + " " + this.getClass().getName();
         this.workerThread = new Thread(this, desc);
         this.workerThread.start();
     }
@@ -84,34 +81,21 @@ public class GetWorkFromQueuePlugin implements I_GetWorkFromQueue, Runnable {
                 while (true) {
                     try {
                         t = worker.getActiveTransaction();
-                        I_EncodeBusinessProcess process =
-                                this.queue.take(selector, t);
+                        I_EncodeBusinessProcess process = this.queue.take(selector, t);
                         if (worker.getLogger().isLoggable(Level.INFO)) {
                             worker.getLogger().info(
-                                desc
-                                    + " TAKE: "
-                                    + process.getName()
-                                    + " ("
-                                    + process.getProcessID()
-                                    + ") "
-                                    + ": "
-                                    + process.getCurrentTaskId()
-                                    + " "
-                                    + process.getTask(
-                                        process.getCurrentTaskId()).getName()
-                                    + " deadline: "
-                                    + Worker.dateFormat.format(process
-                                        .getDeadline()));
+                                desc + " TAKE: " + process.getName() + " (" + process.getProcessID() + ") " + ": "
+                                    + process.getCurrentTaskId() + " "
+                                    + process.getTask(process.getCurrentTaskId()).getName() + " deadline: "
+                                    + Worker.dateFormat.format(process.getDeadline()));
                         }
 
                         worker.execute(process);
                         worker.commitTransactionIfActive();
                     } catch (TaskFailedException ex) {
                         worker.discardActiveTransaction();
-                        worker.getLogger().log(
-                            Level.WARNING,
-                            "Worker: " + desc + " (" + worker.getId() + ") "
-                                + ex.getMessage(), ex);
+                        worker.getLogger().log(Level.WARNING,
+                            "Worker: " + desc + " (" + worker.getId() + ") " + ex.getMessage(), ex);
                     }
                 }
 
@@ -119,19 +103,15 @@ public class GetWorkFromQueuePlugin implements I_GetWorkFromQueue, Runnable {
                 try {
                     worker.abortActiveTransaction();
                 } catch (Exception e) {
-                    worker.getLogger().log(
-                        Level.SEVERE,
-                        "Worker: " + desc + " (" + worker.getId() + ") "
-                            + e.getMessage(), e);
+                    worker.getLogger().log(Level.SEVERE,
+                        "Worker: " + desc + " (" + worker.getId() + ") " + e.getMessage(), e);
                 }
                 if (worker.getLogger().isLoggable(Level.FINE)) {
-                    worker.getLogger().fine(
-                        desc + " (" + worker.getId() + ") started sleep.");
+                    worker.getLogger().fine(desc + " (" + worker.getId() + ") started sleep.");
                 }
                 this.sleep();
                 if (worker.getLogger().isLoggable(Level.FINE)) {
-                    worker.getLogger().fine(
-                        desc + " (" + worker.getId() + ") awake.");
+                    worker.getLogger().fine(desc + " (" + worker.getId() + ") awake.");
                 }
             } catch (Throwable ex) {
                 worker.discardActiveTransaction();

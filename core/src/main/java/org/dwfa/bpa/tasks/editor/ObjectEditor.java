@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -137,8 +137,7 @@ public class ObjectEditor implements PropertyEditor {
      * @param listener
      *            An object to be invoked when a PropertyChange event is fired.
      */
-    public synchronized void addPropertyChangeListener(
-            PropertyChangeListener listener) {
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
         if (listeners == null) {
             listeners = new java.util.Vector<PropertyChangeListener>();
         }
@@ -151,8 +150,7 @@ public class ObjectEditor implements PropertyEditor {
      * @param listener
      *            The PropertyChange listener to be removed.
      */
-    public synchronized void removePropertyChangeListener(
-            PropertyChangeListener listener) {
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
         if (listeners == null) {
             return;
         }
@@ -171,8 +169,7 @@ public class ObjectEditor implements PropertyEditor {
             targets = new Vector<PropertyChangeListener>(listeners);
         }
         // Tell our listeners that "everything" has changed.
-        PropertyChangeEvent evt = new PropertyChangeEvent(this, "value",
-                oldVal, newVal);
+        PropertyChangeEvent evt = new PropertyChangeEvent(this, "value", oldVal, newVal);
 
         for (PropertyChangeListener l : targets) {
             l.propertyChange(evt);

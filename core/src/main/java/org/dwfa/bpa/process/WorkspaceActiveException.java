@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,9 +21,10 @@ package org.dwfa.bpa.process;
 
 /**
  * Thrown when trying to create a workspace with an identifier that
- * is already active. 
+ * is already active.
+ * 
  * @author kec
- *
+ * 
  */
 public class WorkspaceActiveException extends Exception {
 

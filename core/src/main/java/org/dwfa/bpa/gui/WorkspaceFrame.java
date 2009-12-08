@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -80,15 +80,13 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
      * @param menuDir
      * @throws Exception
      */
-    public WorkspaceFrame(String title,
-            I_ManageUserTransactions transactionInterface, File menuDir,
-            I_Work worker) throws Exception {
+    public WorkspaceFrame(String title, I_ManageUserTransactions transactionInterface, File menuDir, I_Work worker)
+            throws Exception {
         super(new String[] {}, null, menuDir);
         this.title = title;
         this.menuDir = menuDir;
         this.worker = worker;
-        this.workspace = new WorkspacePanel(new ArrayList<GridBagPanel>(),
-                this, transactionInterface);
+        this.workspace = new WorkspacePanel(new ArrayList<GridBagPanel>(), this, transactionInterface);
         this.getContentPane().setLayout(new GridLayout(1, 1));
         this.getContentPane().add(workspace);
         this.setTitle(title);
@@ -104,8 +102,9 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
     }
 
     public static int getMenuMask() {
-    	return MENU_MASK;
+        return MENU_MASK;
     }
+
     @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == this.saveMI) {
@@ -116,17 +115,12 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
                 }
                 // Create a file dialog box to prompt for a new file to display
 
-                FileDialog f = new FileDialog(this,
-                        "Save Workspace Configuration", FileDialog.SAVE);
-                f.setDirectory(System.getProperty("user.dir")
-                        + System.getProperty("file.separator") + "wsconfig");
+                FileDialog f = new FileDialog(this, "Save Workspace Configuration", FileDialog.SAVE);
+                f.setDirectory(System.getProperty("user.dir") + System.getProperty("file.separator") + "wsconfig");
                 f.setVisible(true); // Display dialog and wait for response
                 if (f.getFile() != null) {
-                    File processBinaryFile = new File(f.getDirectory(), f
-                            .getFile()
-                            + ".wsc");
-                    FileOutputStream fos = new FileOutputStream(
-                            processBinaryFile);
+                    File processBinaryFile = new File(f.getDirectory(), f.getFile() + ".wsc");
+                    FileOutputStream fos = new FileOutputStream(processBinaryFile);
                     BufferedOutputStream bos = new BufferedOutputStream(fos);
                     ObjectOutputStream oos = new ObjectOutputStream(bos);
                     oos.writeObject(constraintMap);
@@ -139,10 +133,8 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
             }
         } else if (e.getSource() == this.loadMI) {
             try {
-                FileDialog f = new FileDialog(this,
-                        "Load Workspace Configuration", FileDialog.LOAD);
-                f.setDirectory(System.getProperty("user.dir")
-                        + System.getProperty("file.separator") + "wsconfig");
+                FileDialog f = new FileDialog(this, "Load Workspace Configuration", FileDialog.LOAD);
+                f.setDirectory(System.getProperty("user.dir") + System.getProperty("file.separator") + "wsconfig");
                 f.setVisible(true); // Display dialog and wait for response
                 f.setFilenameFilter(new FilenameFilter() {
 
@@ -151,18 +143,15 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
                     }
                 });
                 if (f.getFile() != null) {
-                    File processBinaryFile = new File(f.getDirectory(), f
-                            .getFile());
+                    File processBinaryFile = new File(f.getDirectory(), f.getFile());
                     FileInputStream fis = new FileInputStream(processBinaryFile);
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     ObjectInputStream ois = new ObjectInputStream(bis);
-                    Map<String, GridBagPanelConstraints> constraintMap = (Map<String, GridBagPanelConstraints>) ois
-                            .readObject();
+                    Map<String, GridBagPanelConstraints> constraintMap = (Map<String, GridBagPanelConstraints>) ois.readObject();
                     ois.close();
 
                     for (GridBagPanel gbp : this.workspace.getPanelList()) {
-                        GridBagPanelConstraints c = constraintMap.get(gbp
-                                .getTitle());
+                        GridBagPanelConstraints c = constraintMap.get(gbp.getTitle());
                         if (c != null) {
                             gbp.setConstraints(c);
                         }
@@ -187,20 +176,21 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
 
     public void addInternalFrames(JMenu menu) {
         if (this.workspace != null) {
-          /*
-            menu.addSeparator();
-            menu.add(showInInternalFrameMI);
-            if (this.workspace.isShownInInternalFrame()) {
-            menu.addSeparator();
-            Iterator<GridBagPanel> panelListItr = this.workspace.getPanelList().iterator();
-            while (panelListItr.hasNext()) {
-                GridBagPanel gbp = panelListItr.next();
-                JMenuItem menuItem = new JMenuItem(gbp.getTitle());
-                menuItem.addActionListener(new BringInternalFrameToFront(gbp));
-                menu.add(menuItem);
-            }
-            }
-            */
+            /*
+             * menu.addSeparator();
+             * menu.add(showInInternalFrameMI);
+             * if (this.workspace.isShownInInternalFrame()) {
+             * menu.addSeparator();
+             * Iterator<GridBagPanel> panelListItr =
+             * this.workspace.getPanelList().iterator();
+             * while (panelListItr.hasNext()) {
+             * GridBagPanel gbp = panelListItr.next();
+             * JMenuItem menuItem = new JMenuItem(gbp.getTitle());
+             * menuItem.addActionListener(new BringInternalFrameToFront(gbp));
+             * menu.add(menuItem);
+             * }
+             * }
+             */
         }
     }
 
@@ -215,17 +205,17 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
      * @see org.dwfa.bpa.util.ComponentFrame#addAppMenus(javax.swing.JMenuBar)
      */
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
-    	if (mainMenuBar.getMenuCount() == 0) {
+        if (mainMenuBar.getMenuCount() == 0) {
             mainMenuBar.add(fileMenu = new JMenu("File"));
-    	} else {
-    		for (int i = 0; i < mainMenuBar.getMenuCount(); i++) {
-    			JMenu menuItem = mainMenuBar.getMenu(i);
-    			if (menuItem.getText().toLowerCase().startsWith("edit")) {
-    		           mainMenuBar.add(fileMenu = new JMenu("File"), i);
-    		           break;
-    			}
-    		}
-    	}
+        } else {
+            for (int i = 0; i < mainMenuBar.getMenuCount(); i++) {
+                JMenu menuItem = mainMenuBar.getMenu(i);
+                if (menuItem.getText().toLowerCase().startsWith("edit")) {
+                    mainMenuBar.add(fileMenu = new JMenu("File"), i);
+                    break;
+                }
+            }
+        }
         System.out.println("Adding app menus: " + this.menuDir);
         if (this.menuDir != null) {
             System.out.println(this.menuDir.getName());
@@ -242,16 +232,12 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
                         }
                         if (f.listFiles() != null) {
                             for (File processFile : f.listFiles()) {
-                                ActionListener processMenuListener = new ProcessMenuActionListener(
-                                        processFile, this);
-                                ObjectInputStream ois = new ObjectInputStream(
-                                        new BufferedInputStream(new FileInputStream(
-                                                processFile)));
-                                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois
-                                        .readObject();
+                                ActionListener processMenuListener = new ProcessMenuActionListener(processFile, this);
+                                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
+                                    new FileInputStream(processFile)));
+                                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
                                 ois.close();
-                                JMenuItem processMenuItem = new JMenuItem(process
-                                        .getName());
+                                JMenuItem processMenuItem = new JMenuItem(process.getName());
                                 processMenuItem.addActionListener(processMenuListener);
                                 newMenu.add(processMenuItem);
 
@@ -265,16 +251,15 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
             }
         }
         saveMI = new JMenuItem("Save Workspace Configuration");
-        //fileMenu.add(saveMI);
+        // fileMenu.add(saveMI);
         saveMI.addActionListener(this);
 
         loadMI = new JMenuItem("Load Workspace Configuration");
-        //fileMenu.add(loadMI);
+        // fileMenu.add(loadMI);
         loadMI.addActionListener(this);
 
         showInInternalFrameMI = new JCheckBoxMenuItem("Internal Frames", false);
-        showInInternalFrameMI.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_I, MENU_MASK));
+        showInInternalFrameMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, MENU_MASK));
         showInInternalFrameMI.addActionListener(this);
     }
 
@@ -310,12 +295,12 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
         return count;
     }
 
-	public JMenu getFileMenu() {
-		return fileMenu;
-	}
+    public JMenu getFileMenu() {
+        return fileMenu;
+    }
 
-	public I_Work getWorker() {
-		return worker;
-	}
+    public I_Work getWorker() {
+        return worker;
+    }
 
 }

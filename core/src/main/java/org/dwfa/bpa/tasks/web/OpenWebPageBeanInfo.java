@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,13 +33,11 @@ public class OpenWebPageBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor webURLString =
-                    new PropertyDescriptor("webURLString", OpenWebPage.class);
+            PropertyDescriptor webURLString = new PropertyDescriptor("webURLString", OpenWebPage.class);
             webURLString.setBound(true);
             webURLString.setPropertyEditorClass(JTextFieldEditor.class);
             webURLString.setDisplayName("Web Address");
-            webURLString
-                .setShortDescription("A webURL to open in the platform native web browser.");
+            webURLString.setShortDescription("A webURL to open in the platform native web browser.");
 
             PropertyDescriptor rv[] = { webURLString };
             return rv;

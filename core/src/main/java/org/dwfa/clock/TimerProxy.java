@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,14 +39,12 @@ public class TimerProxy implements I_KeepIncrementalTime, Serializable {
      * if the server proxy does.
      */
     static TimerProxy create(I_KeepIncrementalTime serverProxy) {
-        return (serverProxy instanceof RemoteMethodControl) ? new ConstrainableProxy(
-                serverProxy)
-                : new TimerProxy(serverProxy);
+        return (serverProxy instanceof RemoteMethodControl) ? new ConstrainableProxy(serverProxy) : new TimerProxy(
+            serverProxy);
     }
 
     public boolean equals(Object o) {
-        return getClass() == o.getClass()
-                && getServerProxy().equals(((TimerProxy) o).getServerProxy());
+        return getClass() == o.getClass() && getServerProxy().equals(((TimerProxy) o).getServerProxy());
     }
 
     public int hashCode() {
@@ -54,8 +52,7 @@ public class TimerProxy implements I_KeepIncrementalTime, Serializable {
     }
 
     /** A constrainable implementation of the smart proxy. */
-    private static final class ConstrainableProxy extends TimerProxy implements
-            RemoteMethodControl {
+    private static final class ConstrainableProxy extends TimerProxy implements RemoteMethodControl {
         /**
          * 
          */
@@ -73,8 +70,7 @@ public class TimerProxy implements I_KeepIncrementalTime, Serializable {
 
         public RemoteMethodControl setConstraints(MethodConstraints mc) {
             return new ConstrainableProxy(
-                    (I_KeepIncrementalTime) ((RemoteMethodControl) getServerProxy())
-                            .setConstraints(mc));
+                (I_KeepIncrementalTime) ((RemoteMethodControl) getServerProxy()).setConstraints(mc));
         }
 
         /*
@@ -102,8 +98,7 @@ public class TimerProxy implements I_KeepIncrementalTime, Serializable {
          * TrustEquivalence.
          */
         Verifier(I_KeepIncrementalTime serverProxy) {
-            if (serverProxy instanceof RemoteMethodControl
-                    && serverProxy instanceof TrustEquivalence) {
+            if (serverProxy instanceof RemoteMethodControl && serverProxy instanceof TrustEquivalence) {
                 this.serverProxy = (RemoteMethodControl) serverProxy;
             } else {
                 throw new UnsupportedOperationException();
@@ -111,19 +106,16 @@ public class TimerProxy implements I_KeepIncrementalTime, Serializable {
         }
 
         /** Implement TrustVerifier */
-        public boolean isTrustedObject(Object obj, TrustVerifier.Context ctx)
-                throws RemoteException {
+        public boolean isTrustedObject(Object obj, TrustVerifier.Context ctx) throws RemoteException {
 
             if (obj == null || ctx == null) {
                 throw new NullPointerException();
             } else if (!(obj instanceof ConstrainableProxy)) {
                 return false;
             }
-            RemoteMethodControl otherServerProxy = (RemoteMethodControl) ((ConstrainableProxy) obj)
-                    .getServerProxy();
+            RemoteMethodControl otherServerProxy = (RemoteMethodControl) ((ConstrainableProxy) obj).getServerProxy();
             MethodConstraints mc = otherServerProxy.getConstraints();
-            TrustEquivalence trusted = (TrustEquivalence) serverProxy
-                    .setConstraints(mc);
+            TrustEquivalence trusted = (TrustEquivalence) serverProxy.setConstraints(mc);
             return trusted.checkTrustEquivalence(otherServerProxy);
         }
     }
@@ -143,16 +135,16 @@ public class TimerProxy implements I_KeepIncrementalTime, Serializable {
         this.backend = backend;
     }
 
-	public long getTime() throws RemoteException {
-		return backend.getTime();
-	}
+    public long getTime() throws RemoteException {
+        return backend.getTime();
+    }
 
-	public void increment() throws RemoteException {
-		backend.increment();
-	}
+    public void increment() throws RemoteException {
+        backend.increment();
+    }
 
-	public void reset() throws RemoteException {
-		backend.reset();
-	}
+    public void reset() throws RemoteException {
+        backend.reset();
+    }
 
 }

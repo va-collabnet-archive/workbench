@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,13 +41,13 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Prompts the user to select an InBox queue, then moves the process to that queue. 
+ * Prompts the user to select an InBox queue, then moves the process to that
+ * queue.
  * 
  * @author kec
- *  
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN) })
 public class MoveToInBox extends AbstractTask {
 
     private static final long serialVersionUID = 1;
@@ -56,63 +56,60 @@ public class MoveToInBox extends AbstractTask {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
 
         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
-	 */
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		return Condition.STOP;
-	}
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
-	 */
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		try {
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        return Condition.STOP;
+    }
+
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] { new TermEntry(QueueType.Concept.INBOX_QUEUE.getUids()) };
-            ServiceTemplate template = new ServiceTemplate(null, serviceTypes,
-                    attrSetTemplates);
+            ServiceTemplate template = new ServiceTemplate(null, serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
-            ServiceItem[] matches = worker.lookup(template, 1,
-                    100, filter, 30000, true);
-            ServiceItem service = (ServiceItem) worker.selectFromList(matches, "Available Inboxes", "Please select the recipient's in box:");
+            ServiceItem[] matches = worker.lookup(template, 1, 100, filter, 30000, true);
+            ServiceItem service = (ServiceItem) worker.selectFromList(matches, "Available Inboxes",
+                "Please select the recipient's in box:");
             if (service == null) {
                 throw new TaskFailedException("User did not select an inbox");
             }
             I_QueueProcesses q = (I_QueueProcesses) service.service;
             q.write(process, worker.getActiveTransaction());
-		} catch (Exception e) {
-			throw new TaskFailedException(e);
-		}
-	}
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
-	 */
-	public Collection<Condition> getConditions() {
-		return AbstractTask.STOP_CONDITION;
-	}
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     */
+    public Collection<Condition> getConditions() {
+        return AbstractTask.STOP_CONDITION;
+    }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
-	 */
-	public int[] getDataContainerIds() {
-		return new int[0];
-	}
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
+     */
+    public int[] getDataContainerIds() {
+        return new int[0];
+    }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,48 +43,47 @@ import com.sun.jini.lookup.entry.BasicServiceType;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class ServiceListCellRenderer extends JLabel implements ListCellRenderer, Comparator<ServiceItem> {
-	/**
+    /**
      * 
      */
     private static final long serialVersionUID = 1L;
     protected static Border noFocusBorder;
 
-	/**
+    /**
 	 *  
 	 */
-	public ServiceListCellRenderer() {
-		super();
-		if (noFocusBorder == null) {
-			noFocusBorder = new EmptyBorder(1, 1, 1, 1);
-		}
-		this.setOpaque(true);
-		setBorder(noFocusBorder);
-	}
+    public ServiceListCellRenderer() {
+        super();
+        if (noFocusBorder == null) {
+            noFocusBorder = new EmptyBorder(1, 1, 1, 1);
+        }
+        this.setOpaque(true);
+        setBorder(noFocusBorder);
+    }
 
-	/**
-	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList,
-	 *      java.lang.Object, int, boolean, boolean)
-	 */
-	public Component getListCellRendererComponent(JList list, Object value,
-			int index, boolean isSelected, boolean cellHasFocus) {
-		ServiceItem service = (ServiceItem) value;
-		this.setText(getText(service));
-		if (isSelected) {
-			setBackground(list.getSelectionBackground());
-			setForeground(list.getSelectionForeground());
-		} else {
-			setBackground(list.getBackground());
-			setForeground(list.getForeground());
-		}
-		setEnabled(list.isEnabled());
-		setFont(list.getFont());
-		setBorder((cellHasFocus) ? UIManager
-				.getBorder("List.focusCellHighlightBorder") : noFocusBorder);
-		return this;
-	}
+    /**
+     * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList,
+     *      java.lang.Object, int, boolean, boolean)
+     */
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+            boolean cellHasFocus) {
+        ServiceItem service = (ServiceItem) value;
+        this.setText(getText(service));
+        if (isSelected) {
+            setBackground(list.getSelectionBackground());
+            setForeground(list.getSelectionForeground());
+        } else {
+            setBackground(list.getBackground());
+            setForeground(list.getForeground());
+        }
+        setEnabled(list.isEnabled());
+        setFont(list.getFont());
+        setBorder((cellHasFocus) ? UIManager.getBorder("List.focusCellHighlightBorder") : noFocusBorder);
+        return this;
+    }
 
     /**
      * @param service
@@ -92,68 +91,66 @@ public class ServiceListCellRenderer extends JLabel implements ListCellRenderer,
      */
     private String getText(ServiceItem service) {
         StringBuffer textBuff = new StringBuffer();
-		List<Entry> serviceAttributes = new ArrayList<Entry>();
-		serviceAttributes.addAll(Arrays.asList(service.attributeSets));
-		textBuff.append("<html>");
-		boolean addBreak = false;
-		boolean userName = false;
-		boolean electronicAddress = false;
-		for (ListIterator<Entry> itr = serviceAttributes.listIterator(); itr.hasNext();) {
-			Entry entry = itr.next();
-			if (Name.class.isAssignableFrom(entry.getClass())) {
-				Name name = (Name) entry;
-				textBuff.append("<font color='blue'><u>");
-				textBuff.append(name.name);
-				textBuff.append("</u>");
-				textBuff.append("</font>");
-				itr.remove();
-				addBreak = true;
-				userName = true;
-			}
-		}
-		for (ListIterator<Entry> itr = serviceAttributes.listIterator(); itr.hasNext();) {
-			Entry entry = itr.next();
-			if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
-				ElectronicAddress eAddress = (ElectronicAddress) entry;
-				if (addBreak) {
-					textBuff.append("<p>");
-					addBreak = false;
-				}
-				textBuff.append("<font color='green'>");
-				textBuff.append(eAddress.address);
-				textBuff.append("</font>");
-				itr.remove();
-				addBreak = true;
-				electronicAddress = true;
-			}
-		}
-		if (userName == false && electronicAddress == false) {
+        List<Entry> serviceAttributes = new ArrayList<Entry>();
+        serviceAttributes.addAll(Arrays.asList(service.attributeSets));
+        textBuff.append("<html>");
+        boolean addBreak = false;
+        boolean userName = false;
+        boolean electronicAddress = false;
+        for (ListIterator<Entry> itr = serviceAttributes.listIterator(); itr.hasNext();) {
+            Entry entry = itr.next();
+            if (Name.class.isAssignableFrom(entry.getClass())) {
+                Name name = (Name) entry;
+                textBuff.append("<font color='blue'><u>");
+                textBuff.append(name.name);
+                textBuff.append("</u>");
+                textBuff.append("</font>");
+                itr.remove();
+                addBreak = true;
+                userName = true;
+            }
+        }
+        for (ListIterator<Entry> itr = serviceAttributes.listIterator(); itr.hasNext();) {
+            Entry entry = itr.next();
+            if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
+                ElectronicAddress eAddress = (ElectronicAddress) entry;
+                if (addBreak) {
+                    textBuff.append("<p>");
+                    addBreak = false;
+                }
+                textBuff.append("<font color='green'>");
+                textBuff.append(eAddress.address);
+                textBuff.append("</font>");
+                itr.remove();
+                addBreak = true;
+                electronicAddress = true;
+            }
+        }
+        if (userName == false && electronicAddress == false) {
             boolean serviceInfo = false;
-			for (ListIterator<Entry> itr = serviceAttributes.listIterator(); itr
-					.hasNext();) {
-				Entry entry = itr.next();
-				if (ServiceInfo.class.isAssignableFrom(entry.getClass())) {
-					ServiceInfo info = (ServiceInfo) entry;
-					if (addBreak) {
-						textBuff.append("<p>");
-						addBreak = false;
-					}
-					textBuff.append("<font color='blue'><u>");
-					textBuff.append(info.name);
-					textBuff.append("</u><p><font color='green'>");
-					textBuff.append(info.manufacturer);
-					textBuff.append("</font><p><font color='red'>Version: ");
-					textBuff.append(info.version);
-					textBuff.append("</font>");
-					itr.remove();
-					addBreak = true;
+            for (ListIterator<Entry> itr = serviceAttributes.listIterator(); itr.hasNext();) {
+                Entry entry = itr.next();
+                if (ServiceInfo.class.isAssignableFrom(entry.getClass())) {
+                    ServiceInfo info = (ServiceInfo) entry;
+                    if (addBreak) {
+                        textBuff.append("<p>");
+                        addBreak = false;
+                    }
+                    textBuff.append("<font color='blue'><u>");
+                    textBuff.append(info.name);
+                    textBuff.append("</u><p><font color='green'>");
+                    textBuff.append(info.manufacturer);
+                    textBuff.append("</font><p><font color='red'>Version: ");
+                    textBuff.append(info.version);
+                    textBuff.append("</font>");
+                    itr.remove();
+                    addBreak = true;
                     serviceInfo = true;
-				}
+                }
 
-			}
-			for (ListIterator<Entry> itr = serviceAttributes.listIterator(); itr
-					.hasNext();) {
-				Entry entry = itr.next();
+            }
+            for (ListIterator<Entry> itr = serviceAttributes.listIterator(); itr.hasNext();) {
+                Entry entry = itr.next();
                 if (BasicServiceType.class.isAssignableFrom(entry.getClass())) {
                     BasicServiceType serviceType = (BasicServiceType) entry;
                     if (serviceInfo == false) {
@@ -165,123 +162,114 @@ public class ServiceListCellRenderer extends JLabel implements ListCellRenderer,
                         addBreak = true;
                     }
                 } else {
-				if (addBreak) {
-					textBuff.append("<p>");
-					addBreak = false;
-				}
-				textBuff.append(entry);
-				addBreak = true;
+                    if (addBreak) {
+                        textBuff.append("<p>");
+                        addBreak = false;
+                    }
+                    textBuff.append(entry);
+                    addBreak = true;
                 }
-			}
-			if (service.attributeSets.length == 0) {
-				textBuff.append(service.service.getClass().getName());
-			}
-		}
+            }
+            if (service.attributeSets.length == 0) {
+                textBuff.append(service.service.getClass().getName());
+            }
+        }
         return textBuff.toString();
     }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void validate() {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void validate() {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void revalidate() {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void revalidate() {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void repaint(long tm, int x, int y, int width, int height) {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void repaint(long tm, int x, int y, int width, int height) {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void repaint(Rectangle r) {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void repaint(Rectangle r) {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	protected void firePropertyChange(String propertyName, Object oldValue,
-			Object newValue) {
-		// Strings get interned...
-		if (propertyName == "text")
-			super.firePropertyChange(propertyName, oldValue, newValue);
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        // Strings get interned...
+        if (propertyName == "text")
+            super.firePropertyChange(propertyName, oldValue, newValue);
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void firePropertyChange(String propertyName, byte oldValue,
-			byte newValue) {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void firePropertyChange(String propertyName, byte oldValue, byte newValue) {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void firePropertyChange(String propertyName, char oldValue,
-			char newValue) {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void firePropertyChange(String propertyName, char oldValue, char newValue) {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void firePropertyChange(String propertyName, short oldValue,
-			short newValue) {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void firePropertyChange(String propertyName, short oldValue, short newValue) {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void firePropertyChange(String propertyName, int oldValue,
-			int newValue) {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void firePropertyChange(String propertyName, int oldValue, int newValue) {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void firePropertyChange(String propertyName, long oldValue,
-			long newValue) {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void firePropertyChange(String propertyName, long oldValue, long newValue) {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void firePropertyChange(String propertyName, float oldValue,
-			float newValue) {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void firePropertyChange(String propertyName, float oldValue, float newValue) {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void firePropertyChange(String propertyName, double oldValue,
-			double newValue) {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void firePropertyChange(String propertyName, double oldValue, double newValue) {
+    }
 
-	/**
-	 * Overridden for performance reasons. See the <a
-	 * href="#override">Implementation Note </a> for more information.
-	 */
-	public void firePropertyChange(String propertyName, boolean oldValue,
-			boolean newValue) {
-	}
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
+     */
+    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+    }
 
     public int compare(ServiceItem s1, ServiceItem s2) {
         return this.getText(s1).toLowerCase().compareTo(this.getText(s2).toLowerCase());

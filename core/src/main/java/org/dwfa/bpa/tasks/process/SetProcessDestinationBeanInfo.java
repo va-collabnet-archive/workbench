@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,14 +34,11 @@ public class SetProcessDestinationBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor newDestination =
-                    new PropertyDescriptor("newDestination",
-                        SetProcessDestination.class);
+            PropertyDescriptor newDestination = new PropertyDescriptor("newDestination", SetProcessDestination.class);
             newDestination.setBound(true);
             newDestination.setPropertyEditorClass(JTextFieldEditor.class);
             newDestination.setDisplayName("set destination");
-            newDestination
-                .setShortDescription("Sets the destination of the process to the provided value.");
+            newDestination.setShortDescription("Sets the destination of the process to the provided value.");
 
             PropertyDescriptor rv[] = { newDestination };
             return rv;

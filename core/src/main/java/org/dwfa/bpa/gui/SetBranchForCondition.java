@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 
 /**
  * @author kec
- *
+ * 
  */
 public class SetBranchForCondition implements PropertyChangeListener {
 
@@ -40,8 +40,7 @@ public class SetBranchForCondition implements PropertyChangeListener {
      * @param condition
      * @param process
      */
-    public SetBranchForCondition(int originId, Condition condition,
-            I_EncodeBusinessProcess process) {
+    public SetBranchForCondition(int originId, Condition condition, I_EncodeBusinessProcess process) {
         super();
         this.originId = originId;
         this.condition = condition;
@@ -55,12 +54,10 @@ public class SetBranchForCondition implements PropertyChangeListener {
         int oldId = ((Integer) evt.getOldValue()).intValue();
         int newId = ((Integer) evt.getNewValue()).intValue();
         if (oldId != -1) {
-            this.process.removeBranch(this.process.getTask(originId),
-                this.process.getTask(oldId), this.condition);
+            this.process.removeBranch(this.process.getTask(originId), this.process.getTask(oldId), this.condition);
         }
         if (newId != -1) {
-            this.process.addBranch(this.process.getTask(originId), this.process
-                .getTask(newId), this.condition);
+            this.process.addBranch(this.process.getTask(originId), this.process.getTask(newId), this.condition);
         }
     }
 

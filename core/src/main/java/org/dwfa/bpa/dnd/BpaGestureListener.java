@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,8 +49,7 @@ import sun.awt.dnd.SunDragSourceContextPeer;
 
 public class BpaGestureListener implements DragGestureListener {
 
-    private static Logger logger =
-            Logger.getLogger(BpaGestureListener.class.getName());
+    private static Logger logger = Logger.getLogger(BpaGestureListener.class.getName());
     private I_DoDragAndDrop sourceComponent;
 
     private DragSourceListener dragSource;
@@ -60,8 +59,7 @@ public class BpaGestureListener implements DragGestureListener {
      * @param sourceComponent
      *            TODO
      */
-    public BpaGestureListener(I_DoDragAndDrop sourceComponent,
-            DragSourceListener dragSource) {
+    public BpaGestureListener(I_DoDragAndDrop sourceComponent, DragSourceListener dragSource) {
         super();
         this.sourceComponent = sourceComponent;
         this.dragSource = dragSource;
@@ -77,45 +75,31 @@ public class BpaGestureListener implements DragGestureListener {
                 if (this.sourceComponent.isDragging()) {
                     return;
                 }
-                Transferable transferable =
-                        this.sourceComponent.getTransferable();
+                Transferable transferable = this.sourceComponent.getTransferable();
                 String transferableString;
-                if (TaskTransferable.class.isAssignableFrom(transferable
-                    .getClass())) {
-                    I_DefineTask task =
-                            (I_DefineTask) transferable
-                                .getTransferData(TaskTransferable
-                                    .getLocalTaskFlavor());
+                if (TaskTransferable.class.isAssignableFrom(transferable.getClass())) {
+                    I_DefineTask task = (I_DefineTask) transferable.getTransferData(TaskTransferable.getLocalTaskFlavor());
                     try {
                         BeanInfo info = task.getBeanInfo();
-                        transferableString =
-                                info.getBeanDescriptor().getDisplayName();
+                        transferableString = info.getBeanDescriptor().getDisplayName();
                     } catch (IntrospectionException e1) {
                         logger.log(Level.WARNING, e1.getMessage(), e1);
                         transferableString = task.getName();
                     }
-                } else if (DataContainerTransferable.class
-                    .isAssignableFrom(transferable.getClass())) {
-                    I_ContainData data =
-                            (I_ContainData) transferable
-                                .getTransferData(DataContainerTransferable
-                                    .getLocalDataFlavor());
+                } else if (DataContainerTransferable.class.isAssignableFrom(transferable.getClass())) {
+                    I_ContainData data = (I_ContainData) transferable.getTransferData(DataContainerTransferable.getLocalDataFlavor());
                     transferableString = data.getDescription();
                 } else {
-                    transferableString =
-                            (String) transferable
-                                .getTransferData(DataFlavor.stringFlavor);
+                    transferableString = (String) transferable.getTransferData(DataFlavor.stringFlavor);
                 }
 
                 Image dragImage = this.getDragImage(transferableString);
                 Point imageOffset = new Point(0, 0);
                 try {
-                    ev.startDrag(DragSource.DefaultCopyDrop, dragImage,
-                        imageOffset, transferable, dragSource);
+                    ev.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, transferable, dragSource);
                 } catch (InvalidDnDOperationException e) {
                     logger.log(Level.WARNING, e.getMessage(), e);
-                    logger
-                        .log(Level.INFO, "Resetting SunDragSourceContextPeer");
+                    logger.log(Level.INFO, "Resetting SunDragSourceContextPeer");
                     SunDragSourceContextPeer.setDragDropInProgress(false);
                 }
             } catch (UnsupportedFlavorException e) {
@@ -143,25 +127,21 @@ public class BpaGestureListener implements DragGestureListener {
      * @throws NoMappingException
      * @throws RemoteException
      */
-    public Image getDragImage(String transferableString)
-            throws UnsupportedFlavorException, IOException, RemoteException {
+    public Image getDragImage(String transferableString) throws UnsupportedFlavorException, IOException,
+            RemoteException {
         JLabel component = new JLabel(transferableString);
         component.setBorder(BorderFactory.createLineBorder(Color.black));
-        Image dragImage =
-                sourceComponent.createImage(component.getPreferredSize().width,
-                    component.getPreferredSize().height);
+        Image dragImage = sourceComponent.createImage(component.getPreferredSize().width,
+            component.getPreferredSize().height);
         component.setVisible(true);
-        component.setBounds(0, 0, component.getPreferredSize().width, component
-            .getPreferredSize().height);
+        component.setBounds(0, 0, component.getPreferredSize().width, component.getPreferredSize().height);
         Graphics og = dragImage.getGraphics();
-        og.setClip(0, 0, component.getPreferredSize().width, component
-            .getPreferredSize().height);
+        og.setClip(0, 0, component.getPreferredSize().width, component.getPreferredSize().height);
         component.paint(og);
         og.dispose();
 
         ImageFilter filter = new TransparencyFilter();
-        FilteredImageSource filteredSrc =
-                new FilteredImageSource(dragImage.getSource(), filter);
+        FilteredImageSource filteredSrc = new FilteredImageSource(dragImage.getSource(), filter);
 
         // Create the filtered image
         dragImage = Toolkit.getDefaultToolkit().createImage(filteredSrc);
@@ -179,7 +159,8 @@ public class BpaGestureListener implements DragGestureListener {
         // This method is called for every pixel in the image
         public int filterRGB(int x, int y, int rgb) {
             if (x == -1) {
-                // The pixel value is from the image's color table rather than the image itself
+                // The pixel value is from the image's color table rather than
+                // the image itself
             }
             return rgb & 0xAAFFFFFF;
         }

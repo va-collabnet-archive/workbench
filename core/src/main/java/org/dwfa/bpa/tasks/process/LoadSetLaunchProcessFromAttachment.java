@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,8 +35,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = 
-{ @Spec(directory = "tasks/start tasks", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/start tasks", type = BeanType.TASK_BEAN) })
 public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
 
     private String processPropName;
@@ -46,68 +45,62 @@ public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
     private String processSubject;
 
     private boolean dataCheckingSuppressed = false;
-    
+
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 2;
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(processPropName);
         out.writeObject(dataCheckingSuppressed);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
             processPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-        
+
         if (objDataVersion == dataVersion) {
             dataCheckingSuppressed = (Boolean) in.readObject();
         }
     }
 
-     @SuppressWarnings("unchecked")
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    @SuppressWarnings("unchecked")
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             // Load process...
-        	MarshalledObject marshalledProcess = (MarshalledObject) process.readProperty(processPropName);
-        	if (marshalledProcess == null) {
-        		marshalledProcess = (MarshalledObject) process.readAttachement(processPropName);
-        	}
+            MarshalledObject marshalledProcess = (MarshalledObject) process.readProperty(processPropName);
+            if (marshalledProcess == null) {
+                marshalledProcess = (MarshalledObject) process.readAttachement(processPropName);
+            }
             I_EncodeBusinessProcess processToLaunch = (I_EncodeBusinessProcess) marshalledProcess.get();
-             
+
             if (processSubject != null) {
-            	processToLaunch.setSubject(processSubject);
+                processToLaunch.setSubject(processSubject);
             }
             if (processName != null) {
-            	processToLaunch.setName(processName);
+                processToLaunch.setName(processName);
             }
             if (destination != null) {
-            	processToLaunch.setDestination(destination);
+                processToLaunch.setDestination(destination);
             }
             if (originator != null) {
-            	processToLaunch.setOriginator(originator);
+                processToLaunch.setOriginator(originator);
             }
 
             // Set properties...
-            for (PropertyDescriptor propDesc : processToLaunch.getBeanInfo()
-                    .getPropertyDescriptors()) {
-                if (PropertyDescriptorWithTarget.class
-                        .isAssignableFrom(propDesc.getClass())) {
+            for (PropertyDescriptor propDesc : processToLaunch.getBeanInfo().getPropertyDescriptors()) {
+                if (PropertyDescriptorWithTarget.class.isAssignableFrom(propDesc.getClass())) {
                     try {
                         PropertyDescriptorWithTarget pdwt = (PropertyDescriptorWithTarget) propDesc;
                         Object value = process.readProperty(pdwt.getLabel());
-                        propDesc.getWriteMethod().invoke(pdwt.getTarget(),
-                                value);
+                        propDesc.getWriteMethod().invoke(pdwt.getTarget(), value);
                         if (worker.getLogger().isLoggable(Level.FINE)) {
-                            worker.getLogger().fine(
-                                    "Set " + pdwt.getLabel() + " to " + value);
+                            worker.getLogger().fine("Set " + pdwt.getLabel() + " to " + value);
                         }
                     } catch (Exception ex) {
                         worker.getLogger().warning(ex.getMessage());
@@ -134,9 +127,8 @@ public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
     private void executeWithSuppression(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         process.execute(worker);
     }
-     
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
     }
 
@@ -148,45 +140,45 @@ public class LoadSetLaunchProcessFromAttachment extends AbstractTask {
         return new int[] {};
     }
 
-	public String getDestination() {
-		return destination;
-	}
+    public String getDestination() {
+        return destination;
+    }
 
-	public void setDestination(String destination) {
-		this.destination = destination;
-	}
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
 
-	public String getOriginator() {
-		return originator;
-	}
+    public String getOriginator() {
+        return originator;
+    }
 
-	public void setOriginator(String originator) {
-		this.originator = originator;
-	}
+    public void setOriginator(String originator) {
+        this.originator = originator;
+    }
 
-	public String getProcessName() {
-		return processName;
-	}
+    public String getProcessName() {
+        return processName;
+    }
 
-	public void setProcessName(String processName) {
-		this.processName = processName;
-	}
+    public void setProcessName(String processName) {
+        this.processName = processName;
+    }
 
-	public String getProcessSubject() {
-		return processSubject;
-	}
+    public String getProcessSubject() {
+        return processSubject;
+    }
 
-	public void setProcessSubject(String processSubject) {
-		this.processSubject = processSubject;
-	}
+    public void setProcessSubject(String processSubject) {
+        this.processSubject = processSubject;
+    }
 
-	public String getProcessPropName() {
-		return processPropName;
-	}
+    public String getProcessPropName() {
+        return processPropName;
+    }
 
-	public void setProcessPropName(String processPropName) {
-		this.processPropName = processPropName;
-	}
+    public void setProcessPropName(String processPropName) {
+        this.processPropName = processPropName;
+    }
 
     public boolean isDataCheckingSuppressed() {
         return dataCheckingSuppressed;

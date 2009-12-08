@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,8 +65,7 @@ import com.sun.jini.start.LifeCycle;
  * @author kec
  * 
  */
-public class GenericWorkerManager extends ComponentFrame implements Runnable,
-        WindowListener {
+public class GenericWorkerManager extends ComponentFrame implements Runnable, WindowListener {
     /**
      * 
      */
@@ -74,8 +73,7 @@ public class GenericWorkerManager extends ComponentFrame implements Runnable,
 
     public static final String GENERIC_WORKER_LIST = "Generic worker list";
 
-    private static Logger logger = Logger.getLogger(GenericWorkerManager.class
-            .getName());
+    private static Logger logger = Logger.getLogger(GenericWorkerManager.class.getName());
 
     private JMenu managerMenu;
 
@@ -99,8 +97,7 @@ public class GenericWorkerManager extends ComponentFrame implements Runnable,
      */
     public GenericWorkerManager(String[] args, LifeCycle lc) throws Exception {
         super(args, lc);
-        this.config = ConfigurationProvider.getInstance(args, getClass()
-                .getClassLoader());
+        this.config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
         int numOfCpus = Runtime.getRuntime().availableProcessors();
         if (logger.isLoggable(Level.INFO)) {
             logger.info("Started GenericWorkerManager: " + this);
@@ -166,12 +163,9 @@ public class GenericWorkerManager extends ComponentFrame implements Runnable,
      * @throws CannotAbortException
      * @throws PrivilegedActionException
      */
-    public static int countAndLogGenericWorkers(MasterWorker worker,
-            JavaSpace05 space, SemaphoreEntry se) throws LeaseDeniedException,
-            RemoteException, InterruptedException, IOException,
-            UnusableEntryException, TransactionException,
-            UnknownTransactionException, CannotAbortException,
-            PrivilegedActionException {
+    public static int countAndLogGenericWorkers(MasterWorker worker, JavaSpace05 space, SemaphoreEntry se)
+            throws LeaseDeniedException, RemoteException, InterruptedException, IOException, UnusableEntryException,
+            TransactionException, UnknownTransactionException, CannotAbortException, PrivilegedActionException {
         Transaction t = worker.createTransaction(1000 * 60);
         // Take the semaphore for exclusive access to the GENERIC_WORKER_LIST
         Entry semaphore = space.takeIfExists(se, t, 1000 * 60);
@@ -189,8 +183,7 @@ public class GenericWorkerManager extends ComponentFrame implements Runnable,
                 gwEntry = space.takeIfExists(matchAllGwe, t, 1000 * 60);
             }
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Found " + genericWorkerCount
-                        + " generic worker entries");
+                logger.fine("Found " + genericWorkerCount + " generic worker entries");
             }
             t.abort();
             return genericWorkerCount;
@@ -205,7 +198,7 @@ public class GenericWorkerManager extends ComponentFrame implements Runnable,
      * @see java.lang.Runnable#run()
      */
     @SuppressWarnings("unchecked")
-	public void run() {
+    public void run() {
         this.worker.doAsPrivileged(new PrivilegedAction() {
 
             public Object run() {
@@ -213,87 +206,65 @@ public class GenericWorkerManager extends ComponentFrame implements Runnable,
                     while (true) {
                         try {
                             checkStop();
-                            int numOfCpus = Runtime.getRuntime()
-                                    .availableProcessors();
-                            ServiceTemplate tmpl = new ServiceTemplate(null,
-                                    new Class[] { JavaSpace05.class }, null);
+                            int numOfCpus = Runtime.getRuntime().availableProcessors();
+                            ServiceTemplate tmpl = new ServiceTemplate(null, new Class[] { JavaSpace05.class }, null);
                             ServiceItemFilter filter = null;
                             long waitDur = 1000 * 60 * 3;
-                            ServiceItem service = worker.lookup(tmpl, filter,
-                                    waitDur);
+                            ServiceItem service = worker.lookup(tmpl, filter, waitDur);
                             checkStop();
                             if (service != null) {
                                 if (logger.isLoggable(Level.INFO)) {
                                     StringBuffer buff = new StringBuffer();
                                     if (service.attributeSets != null) {
                                         for (int i = 0; i < service.attributeSets.length; i++) {
-                                            buff
-                                                    .append(service.attributeSets[i]
-                                                            + " ");
+                                            buff.append(service.attributeSets[i] + " ");
                                         }
                                     } else {
                                         buff.append("null attributeSets ");
                                     }
                                     buff.append(service.serviceID);
-                                    logger.info("Found java space: "
-                                            + buff.toString());
+                                    logger.info("Found java space: " + buff.toString());
                                 }
                                 checkStop();
                                 JavaSpace05 space = (JavaSpace05) service.service;
-                                SemaphoreEntry se = new SemaphoreEntry(
-                                        GENERIC_WORKER_LIST);
+                                SemaphoreEntry se = new SemaphoreEntry(GENERIC_WORKER_LIST);
                                 // See if the entry already exists...
-                                SemaphoreEntry e = (SemaphoreEntry) space
-                                        .readIfExists(se, null, 1000 * 60);
+                                SemaphoreEntry e = (SemaphoreEntry) space.readIfExists(se, null, 1000 * 60);
                                 if (e == null) {
-                                    DistributedSemaphore ds = new DistributedSemaphore(
-                                            space, GENERIC_WORKER_LIST);
+                                    DistributedSemaphore ds = new DistributedSemaphore(space, GENERIC_WORKER_LIST);
                                     ds.create(1);
                                     if (logger.isLoggable(Level.INFO)) {
-                                        logger
-                                                .info("Created DistributedSemaphore for "
-                                                        + GENERIC_WORKER_LIST);
+                                        logger.info("Created DistributedSemaphore for " + GENERIC_WORKER_LIST);
                                     }
                                 }
 
-                                String workerName = (String) config.getEntry(
-                                        GenericWorkerManager.this.getClass()
-                                                .getName(), "workerName",
-                                        String.class, "w");
-                                InetAddress localaddr = InetAddress
-                                        .getLocalHost();
-                                Integer numOfWorkers = (Integer) GenericWorkerManager.this.config
-                                        .getEntry(GenericWorkerManager.this
-                                                .getClass().getName(),
-                                                "numOfWorkers", Integer.class,
-                                                new Integer(numOfCpus));
+                                String workerName = (String) config.getEntry(GenericWorkerManager.this.getClass()
+                                    .getName(), "workerName", String.class, "w");
+                                InetAddress localaddr = InetAddress.getLocalHost();
+                                Integer numOfWorkers = (Integer) GenericWorkerManager.this.config.getEntry(
+                                    GenericWorkerManager.this.getClass().getName(), "numOfWorkers", Integer.class,
+                                    new Integer(numOfCpus));
                                 if (logger.isLoggable(Level.INFO)) {
-                                    logger.info("Creating " + numOfWorkers
-                                            + "  generic workers.");
+                                    logger.info("Creating " + numOfWorkers + "  generic workers.");
                                 }
                                 checkStop();
                                 for (int i = 0; i < numOfWorkers.intValue(); i++) {
-                                    String workerDesc = workerName + " "
-                                            + (i + 1);
+                                    String workerDesc = workerName + " " + (i + 1);
                                     if (logger.isLoggable(Level.INFO)) {
-                                        logger.info("Creating generic worker: "
-                                                + workerDesc);
+                                        logger.info("Creating generic worker: " + workerDesc);
                                     }
-                                    GenericWorker gw = new GenericWorker(
-                                            config, UUID.randomUUID(),
-                                            workerDesc, localaddr, space,
-                                            model, i);
+                                    GenericWorker gw = new GenericWorker(config, UUID.randomUUID(), workerDesc,
+                                        localaddr, space, model, i);
                                     workers.add(gw);
                                     if (model != null) {
-                                        model.fireTableDataChanged();                                    	
+                                        model.fireTableDataChanged();
                                     }
                                     new Thread(gw, gw.getWorkerDesc()).start();
                                 }
                                 countAndLogGenericWorkers(worker, space, se);
                                 return null;
                             }
-                            logger
-                                    .warning("Found  NULL service searching for java space.");
+                            logger.warning("Found  NULL service searching for java space.");
                             checkStop();
                         } catch (StopThreadException ex) {
                             throw ex;
@@ -306,7 +277,7 @@ public class GenericWorkerManager extends ComponentFrame implements Runnable,
                         }
                     }
                 } catch (StopThreadException ex) {
-                    for (GenericWorker w: workers) {
+                    for (GenericWorker w : workers) {
                         w.stop();
                     }
                     return null;

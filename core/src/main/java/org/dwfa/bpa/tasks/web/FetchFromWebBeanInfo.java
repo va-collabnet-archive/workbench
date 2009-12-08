@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,13 +34,11 @@ public class FetchFromWebBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor webURLString =
-                    new PropertyDescriptor("webURLString", FetchFromWeb.class);
+            PropertyDescriptor webURLString = new PropertyDescriptor("webURLString", FetchFromWeb.class);
             webURLString.setBound(true);
             webURLString.setPropertyEditorClass(JTextFieldEditor.class);
             webURLString.setDisplayName("webURLString");
-            webURLString
-                .setShortDescription("A webURL to fetch strings from to present to the user.");
+            webURLString.setShortDescription("A webURL to fetch strings from to present to the user.");
 
             PropertyDescriptor rv[] = { webURLString };
             return rv;
@@ -54,8 +52,7 @@ public class FetchFromWebBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(FetchFromWeb.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Fetch string from web");
+        bd.setDisplayName("<html><font color='green'><center>Fetch string from web");
         return bd;
     }
 
