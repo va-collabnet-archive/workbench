@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -87,10 +87,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * be exported. Only members relating to components that will be exported
      * will in turn be exported.
      * <p>
-     * For example if you have a reference set identified by concept A, and members B, C and D. If the export spec does
-     * not include exporting concept A then none of the reference set will be exported. However if the export spec does
-     * include A, but not C then the reference set will be exported except it will only have members B and D - C will be
-     * omitted.
+     * For example if you have a reference set identified by concept A, and
+     * members B, C and D. If the export spec does not include exporting concept
+     * A then none of the reference set will be exported. However if the export
+     * spec does include A, but not C then the reference set will be exported
+     * except it will only have members B and D - C will be omitted.
      * 
      * @parameter
      * @required
@@ -228,7 +229,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Gets the latest attribute for the concept.
      * 
-     * Attributes are filtered by the <code>allowedStatuses</code> and <code>positions</code> lists.
+     * Attributes are filtered by the <code>allowedStatuses</code> and
+     * <code>positions</code> lists.
      * 
      * @param concept the concept to get the latest attribute for.
      * @return latest I_ConceptAttributePart may be null.
@@ -306,7 +308,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Gets the latest extension for the concept and refset id.
      * 
-     * Extension are filtered by the <code>allowedStatuses</code> and <code>positions</code> lists.
+     * Extension are filtered by the <code>allowedStatuses</code> and
+     * <code>positions</code> lists.
      * 
      * @param componentId refset member concept
      * @param relationshipRefinabilityExtension refset.
@@ -370,8 +373,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             try {
                 refsetType = RefsetType.findByExtension(thinExtByRefPart);
             } catch (EnumConstantNotPresentException e) {
-                getLog()
-                    .warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
+                getLog().warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
                 return;
             }
             refsetTypeMap.put(refsetId, refsetType);
@@ -400,23 +402,18 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                  */
                 String sctIdFilePrefix = "der2_SCTID.";
                 String uuidFilePrefix = "der2_UUID.";
-                String fileName =
-                        refsetName + refsetType.getFileExtension() + "_" + rf2Descriptor.getContentSubType() + "_"
-                            + rf2Descriptor.getCountryCode() + rf2Descriptor.getNamespace() + "_" + releaseVersion
-                            + ".txt";
-                uuidRefsetWriter =
-                        new BufferedWriter(new FileWriter(
-                            new File(uuidRefsetOutputDirectory, uuidFilePrefix + fileName)));
-                sctIdRefsetWriter =
-                        new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, sctIdFilePrefix
-                            + fileName)));
+                String fileName = refsetName + refsetType.getFileExtension() + "_" + rf2Descriptor.getContentSubType()
+                    + "_" + rf2Descriptor.getCountryCode() + rf2Descriptor.getNamespace() + "_" + releaseVersion
+                    + ".txt";
+                uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, uuidFilePrefix
+                    + fileName)));
+                sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory,
+                    sctIdFilePrefix + fileName)));
             } else {
-                uuidRefsetWriter =
-                        new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, "UUID_" + refsetName
-                            + "_" + releaseVersion + refsetType.getFileExtension())));
-                sctIdRefsetWriter =
-                        new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, "SCTID_" + refsetName
-                            + "_" + releaseVersion + refsetType.getFileExtension())));
+                uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, "UUID_"
+                    + refsetName + "_" + releaseVersion + refsetType.getFileExtension())));
+                sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, "SCTID_"
+                    + refsetName + "_" + releaseVersion + refsetType.getFileExtension())));
             }
 
             writerMap.put(refsetId + "UUID", uuidRefsetWriter);
@@ -471,8 +468,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                 String pathVersion = null;
                 pathUuidStr = tf.getUids(pathid).iterator().next().toString();
 
-                int pathVersionRefsetNid =
-                        tf.uuidToNative(org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getUuids()[0]);
+                int pathVersionRefsetNid = tf.uuidToNative(org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getUuids()[0]);
                 int currentStatusId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
                 for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(pathid)) {
                     if (extension.getRefsetId() == pathVersionRefsetNid) {
@@ -566,7 +562,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     /**
-     * Gets the concepts preferred term filtered by <code>statusSet</code> sorted by <code>TYPE_B4_LANG</code>
+     * Gets the concepts preferred term filtered by <code>statusSet</code>
+     * sorted by <code>TYPE_B4_LANG</code>
      * 
      * @param conceptData I_GetConceptData to get the preferred term for
      * @return String preferred term
@@ -583,8 +580,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         statusSet.add(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.localize().getNid());
         statusSet.add(ArchitectonicAuxiliary.Concept.PROMOTED.localize().getNid());
 
-        I_DescriptionTuple descTuple =
-                conceptData.getDescTuple(descTypeList, null, statusSet, positions, LANGUAGE_SORT_PREF.TYPE_B4_LANG);
+        I_DescriptionTuple descTuple = conceptData.getDescTuple(descTypeList, null, statusSet, positions,
+            LANGUAGE_SORT_PREF.TYPE_B4_LANG);
         if (descTuple == null) {
             UUID conceptUuid = conceptData.getUids().iterator().next();
             throw new MojoExecutionException("Unable to obtain preferred term for concept " + conceptUuid.toString());

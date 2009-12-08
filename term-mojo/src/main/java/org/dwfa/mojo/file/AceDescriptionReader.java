@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ public class AceDescriptionReader extends IterableFileReader<AceDescriptionReade
     public AceDescriptionReader(File file) {
         setSourceFile(file);
     }
-    
+
     /**
      * @see org.dwfa.ace.file.IterableFileReader#processLine(java.lang.String)
      * @throws TerminologyRuntimeException if the row is invalid.
@@ -49,7 +49,7 @@ public class AceDescriptionReader extends IterableFileReader<AceDescriptionReade
     @Override
     protected AceDescriptionRow processLine(String line) {
         AceDescriptionRow aceDescriptionRow;
-        
+
         try {
             aceDescriptionRow = new AceDescriptionRow(line);
         } catch (IndexOutOfBoundsException ex) {
@@ -59,12 +59,12 @@ public class AceDescriptionReader extends IterableFileReader<AceDescriptionReade
             logger.info("Cannot process line:" + ex);
             throw new TerminologyRuntimeException(ex);
         }
-        
+
         return aceDescriptionRow;
     }
 
     /**
-     * Ace description file row. 
+     * Ace description file row.
      */
     public class AceDescriptionRow {
         String descriptionId;
@@ -83,13 +83,13 @@ public class AceDescriptionReader extends IterableFileReader<AceDescriptionReade
         String effectiveTime;
         String pathUuid;
         String statusUuid;
-        
+
         /**
          * Default constructor.
          */
         public AceDescriptionRow() {
         }
-        
+
         /**
          * Creates a AceDescriptionRow from an ace line.
          * 
@@ -97,11 +97,11 @@ public class AceDescriptionReader extends IterableFileReader<AceDescriptionReade
          * @throws TerminologyException if not in the correct format.
          */
         public AceDescriptionRow(String line) throws TerminologyException {
-            String[] columns = line.split( "\t" );
-            if(columns.length != 16){
+            String[] columns = line.split("\t");
+            if (columns.length != 16) {
                 throw new TerminologyException("Invalid file format. Ace concept file must have 16 columns");
             }
-            
+
             descriptionId = columns[0];
             descriptionStatus = columns[1];
             conceptId = columns[2];
@@ -343,175 +343,200 @@ public class AceDescriptionReader extends IterableFileReader<AceDescriptionReade
         public final void setStatusUuid(String statusUuid) {
             this.statusUuid = statusUuid;
         }
-        
+
         /**
          * 
-        <!-- 0 -->
-        <transform implementation="org.dwfa.maven.transform.UuidToSctDescIdWithGeneration">
-            <name>
-                DESCRIPTIONID
-            </name>
-        </transform>
-        <!-- 1 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                DESCRIPTIONSTATUS
-            </name>
-        </transform>
-        <!-- 2 -->
-        <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-            <name>
-                CONCEPTID
-            </name>
-        </transform>
-        <!-- 3 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>TERM</name>
-        </transform>
-        <!-- 4 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                CASESENSITIVITY
-            </name>
-        </transform>
-        <!-- 4 again -->
-        <transform implementation="org.dwfa.maven.transform.CaseSensitivityToUuidTransform">
-            <name>
-                CASESENSITIVITY_UUID
-            </name>
-            <columnId>
-                4
-            </columnId>
-        </transform>
-        <!-- 4 again -->
-        <transform implementation="org.dwfa.maven.transform.CaseSensitivityToUuidTransform">
-            <name>
-                CASESENSITIVITY_SCTID
-            </name>
-            <columnId>
-                4
-            </columnId>
-            <chainedTransform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-                <name>
-                    LANGUAGEID
-                </name>
-                <columnId>
-                    4
-                </columnId>
-            </chainedTransform>
-        </transform>
-        <!-- 5 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                INITIALCAPITALSTATUS
-            </name>
-        </transform>
-        <!-- 6 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                DESCRIPTIONTYPE
-            </name>
-        </transform>
-        <!-- 7 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                LANGUAGECODE
-            </name>
-        </transform>
-        <!-- 8 -->
-        <transform implementation="org.dwfa.maven.transform.LanguageCodeToUuidTransform">
-            <name>
-                LANGUAGEUUID
-            </name>
-        </transform>
-        <!-- 8 again -->
-        <transform implementation="org.dwfa.maven.transform.LanguageCodeToUuidTransform">
-            <name>
-                LANGUAGEID
-            </name>
-            <columnId>
-                8
-            </columnId>
-            <chainedTransform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-                <name>
-                    LANGUAGEID
-                </name>
-                <columnId>
-                    8
-                </columnId>
-            </chainedTransform>
-        </transform>
-        <!-- 9 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                DESCRIPTIONUUID
-            </name>
-        </transform>
-        <!-- 10 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                DESCRIPTIONSTATUSUUID
-            </name>
-        </transform>
-        <!-- 10 -->
-        <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-            <name>
-                DESCRIPTIONSTATUSID
-            </name>
-            <columnId>
-                10
-            </columnId>
-        </transform>
-        <!-- 11 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                DESCRIPTIONTYPEUUID
-            </name>
-        </transform>
-        <!-- 11 again -->
-        <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-            <name>
-                DESCRIPTIONTYPEID
-            </name>
-            <columnId>
-                11
-            </columnId>
-        </transform>
-        <!-- 12 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                CONCEPTUUID
-            </name>
-        </transform>
-        <!-- 13 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                EFFECTIVETIME
-            </name>
-        </transform>
-        <!-- 14 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>
-                PATHUUID
-            </name>
-        </transform>
-        <!-- 14 again -->
-        <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-            <name>PATHID</name>
-            <columnId>
-                14
-            </columnId>
-        </transform>
-        <!-- 15 -->
-        <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-            <name>STATUS_UUID</name>
-        </transform>
-        <!-- 15 again -->
-        <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-            <name>STATUS_SCTID</name>
-            <columnId>
-                15
-            </columnId> *
+         <!-- 0 -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctDescIdWithGeneration">
+         * <name>
+         * DESCRIPTIONID
+         * </name>
+         * </transform>
+         * <!-- 1 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * DESCRIPTIONSTATUS
+         * </name>
+         * </transform>
+         * <!-- 2 -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>
+         * CONCEPTID
+         * </name>
+         * </transform>
+         * <!-- 3 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>TERM</name>
+         * </transform>
+         * <!-- 4 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * CASESENSITIVITY
+         * </name>
+         * </transform>
+         * <!-- 4 again -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.CaseSensitivityToUuidTransform">
+         * <name>
+         * CASESENSITIVITY_UUID
+         * </name>
+         * <columnId>
+         * 4
+         * </columnId>
+         * </transform>
+         * <!-- 4 again -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.CaseSensitivityToUuidTransform">
+         * <name>
+         * CASESENSITIVITY_SCTID
+         * </name>
+         * <columnId>
+         * 4
+         * </columnId>
+         * <chainedTransform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>
+         * LANGUAGEID
+         * </name>
+         * <columnId>
+         * 4
+         * </columnId>
+         * </chainedTransform>
+         * </transform>
+         * <!-- 5 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * INITIALCAPITALSTATUS
+         * </name>
+         * </transform>
+         * <!-- 6 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * DESCRIPTIONTYPE
+         * </name>
+         * </transform>
+         * <!-- 7 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * LANGUAGECODE
+         * </name>
+         * </transform>
+         * <!-- 8 -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.LanguageCodeToUuidTransform">
+         * <name>
+         * LANGUAGEUUID
+         * </name>
+         * </transform>
+         * <!-- 8 again -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.LanguageCodeToUuidTransform">
+         * <name>
+         * LANGUAGEID
+         * </name>
+         * <columnId>
+         * 8
+         * </columnId>
+         * <chainedTransform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>
+         * LANGUAGEID
+         * </name>
+         * <columnId>
+         * 8
+         * </columnId>
+         * </chainedTransform>
+         * </transform>
+         * <!-- 9 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * DESCRIPTIONUUID
+         * </name>
+         * </transform>
+         * <!-- 10 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * DESCRIPTIONSTATUSUUID
+         * </name>
+         * </transform>
+         * <!-- 10 -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>
+         * DESCRIPTIONSTATUSID
+         * </name>
+         * <columnId>
+         * 10
+         * </columnId>
+         * </transform>
+         * <!-- 11 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * DESCRIPTIONTYPEUUID
+         * </name>
+         * </transform>
+         * <!-- 11 again -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>
+         * DESCRIPTIONTYPEID
+         * </name>
+         * <columnId>
+         * 11
+         * </columnId>
+         * </transform>
+         * <!-- 12 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * CONCEPTUUID
+         * </name>
+         * </transform>
+         * <!-- 13 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * EFFECTIVETIME
+         * </name>
+         * </transform>
+         * <!-- 14 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * PATHUUID
+         * </name>
+         * </transform>
+         * <!-- 14 again -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>PATHID</name>
+         * <columnId>
+         * 14
+         * </columnId>
+         * </transform>
+         * <!-- 15 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>STATUS_UUID</name>
+         * </transform>
+         * <!-- 15 again -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>STATUS_SCTID</name>
+         * <columnId>
+         * 15
+         * </columnId> *
          */
     }
 }

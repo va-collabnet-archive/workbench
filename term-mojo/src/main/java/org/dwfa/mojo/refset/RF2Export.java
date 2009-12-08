@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -262,8 +262,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
             try {
                 refsetType = RefsetType.findByExtension(thinExtByRefPart);
             } catch (EnumConstantNotPresentException e) {
-                getLog()
-                    .warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
+                getLog().warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
                 return;
             }
             refsetTypeMap.put(refsetId, refsetType);
@@ -299,15 +298,13 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
                 uuidFilePrefix = "";
             }
             if (fileName == null) {
-                fileName =
-                        refsetName + refsetType.getFileExtension() + "_" + rf2Descriptor.getContentSubType() + "_"
-                            + rf2Descriptor.getCountryCode() + rf2Descriptor.getNamespace() + "_" + releaseVersion
-                            + ".txt";
+                fileName = refsetName + refsetType.getFileExtension() + "_" + rf2Descriptor.getContentSubType() + "_"
+                    + rf2Descriptor.getCountryCode() + rf2Descriptor.getNamespace() + "_" + releaseVersion + ".txt";
             }
-            uuidRefsetWriter =
-                    new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, uuidFilePrefix + fileName)));
-            sctIdRefsetWriter =
-                    new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, sctIdFilePrefix + fileName)));
+            uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, uuidFilePrefix
+                + fileName)));
+            sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, sctIdFilePrefix
+                + fileName)));
 
             writerMap.put(refsetId + "UUID", uuidRefsetWriter);
             writerMap.put(refsetId + "SCTID", sctIdRefsetWriter);

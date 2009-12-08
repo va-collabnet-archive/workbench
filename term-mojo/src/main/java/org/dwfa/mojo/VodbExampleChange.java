@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,9 +44,9 @@ public class VodbExampleChange extends AbstractMojo {
 
     /**
      * Location of the directory to output data files to.
-     * KEC: I added this field, because the maven plugin plugin would 
+     * KEC: I added this field, because the maven plugin plugin would
      * crash unless there was at least one commented field. This field is
-     * not actually used by the plugin. 
+     * not actually used by the plugin.
      * 
      * @parameter expression="${project.build.directory}"
      * @required
@@ -54,32 +54,29 @@ public class VodbExampleChange extends AbstractMojo {
     @SuppressWarnings("unused")
     private String outputDirectory;
 
- 	public void execute() throws MojoExecutionException, MojoFailureException {
-		I_TermFactory termFactory = LocalVersionedTerminology.get();
-		try {
-			I_GetConceptData architectonicRoot = termFactory
-					.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT
-							.getUids());
-			I_ConceptAttributeVersioned conceptAttributes = architectonicRoot.getConceptAttributes();
-			I_GetConceptData architectonicBranch = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
-			I_Path architectonicPath = termFactory.getPath(architectonicBranch.getUids());
-			I_Position latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
-			Set<I_Position> positions = new HashSet<I_Position>();
-			positions.add(latestOnArchitectonicPath);
-			I_GetConceptData flaggedStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids());
-			
-			
-			for (I_ConceptAttributeTuple tuple: architectonicRoot.getConceptAttributeTuples(null, positions)) {
-				I_ConceptAttributePart part = tuple.duplicatePart();
-				part.setVersion(Integer.MAX_VALUE);
-				part.setConceptStatus(flaggedStatus.getConceptId());
-				conceptAttributes.addVersion(part);
-				termFactory.addUncommitted(architectonicRoot);
-			}
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        try {
+            I_GetConceptData architectonicRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
+            I_ConceptAttributeVersioned conceptAttributes = architectonicRoot.getConceptAttributes();
+            I_GetConceptData architectonicBranch = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            I_Path architectonicPath = termFactory.getPath(architectonicBranch.getUids());
+            I_Position latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
+            Set<I_Position> positions = new HashSet<I_Position>();
+            positions.add(latestOnArchitectonicPath);
+            I_GetConceptData flaggedStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids());
 
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
-	}
+            for (I_ConceptAttributeTuple tuple : architectonicRoot.getConceptAttributeTuples(null, positions)) {
+                I_ConceptAttributePart part = tuple.duplicatePart();
+                part.setVersion(Integer.MAX_VALUE);
+                part.setConceptStatus(flaggedStatus.getConceptId());
+                conceptAttributes.addVersion(part);
+                termFactory.addUncommitted(architectonicRoot);
+            }
+
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
+    }
 
 }

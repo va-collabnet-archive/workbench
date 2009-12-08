@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,17 +25,14 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
  */
 public final class TerminologyFactoryUtil {
 
-    public int getNativeConceptId(final ArchitectonicAuxiliary.Concept concept)
-            throws Exception {
-        return getTermFactory().uuidToNative(
-            concept.getUids().iterator().next());
+    public int getNativeConceptId(final ArchitectonicAuxiliary.Concept concept) throws Exception {
+        return getTermFactory().uuidToNative(concept.getUids().iterator().next());
     }
 
     public I_TermFactory getTermFactory() {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         if (termFactory == null) {
-            throw new RuntimeException(
-                "The LocalVersionedTerminology is not available. Please check the database.");
+            throw new RuntimeException("The LocalVersionedTerminology is not available. Please check the database.");
         }
 
         return termFactory;

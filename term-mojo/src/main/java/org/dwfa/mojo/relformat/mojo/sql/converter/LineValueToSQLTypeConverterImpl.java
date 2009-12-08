@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ public final class LineValueToSQLTypeConverterImpl implements LineValueToSQLType
     public String[] convert(final Table table, final String[] values) {
         String[] convertedValues = new String[values.length];
 
-        for (int index=0; index < values.length; index++) {
+        for (int index = 0; index < values.length; index++) {
             String value = values[index];
             convertedValues[index] = (value.length() == 0) ? NULL : getConverter(table, index).convert(value);
         }

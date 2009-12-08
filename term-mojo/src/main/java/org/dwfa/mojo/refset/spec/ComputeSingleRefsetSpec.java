@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,9 +57,8 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass()
-                .getCanonicalName()
-                + refsetSpecDescriptor, this.getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + refsetSpecDescriptor,
+                this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (Exception e) {
@@ -68,16 +67,14 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
 
         try {
 
-            I_GetConceptData refsetSpec =
-                    refsetSpecDescriptor.getVerifiedConcept();
+            I_GetConceptData refsetSpec = refsetSpecDescriptor.getVerifiedConcept();
             RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
-            I_GetConceptData memberRefset =
-                    refsetSpecHelper.getMemberRefsetConcept();
+            I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
 
             ComputeRefsetFromSpecTask task = new ComputeRefsetFromSpecTask();
             boolean showActivityPanel = false;
-            task.computeRefset(LocalVersionedTerminology.get()
-                .getActiveAceFrameConfig(), memberRefset, showActivityPanel);
+            task.computeRefset(LocalVersionedTerminology.get().getActiveAceFrameConfig(), memberRefset,
+                showActivityPanel);
 
             LocalVersionedTerminology.get().commit();
 

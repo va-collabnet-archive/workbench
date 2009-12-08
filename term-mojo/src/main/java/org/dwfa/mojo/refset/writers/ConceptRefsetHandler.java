@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,50 +29,52 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ConceptRefsetHandler extends MemberRefsetHandler {
 
-	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple part, boolean sctid) throws TerminologyException, IOException {
-		return formatRefsetLine(tf, part, part.getMemberId(), part.getRefsetId(), part.getComponentId(), sctid);
-	}
-	
-	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId, int componentId, boolean sctId) throws TerminologyException, IOException {
-		I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
-		
-		return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId) + MemberRefsetHandler.FILE_DELIMITER
-					+ toId(tf, conceptPart.getConceptId(), sctId);
-	}
+    @Override
+    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple part, boolean sctid)
+            throws TerminologyException, IOException {
+        return formatRefsetLine(tf, part, part.getMemberId(), part.getRefsetId(), part.getComponentId(), sctid);
+    }
 
-	@Override
-	public String getHeaderLine() {
-		return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER + "CONCEPT_VALUE_ID";
-	}
+    @Override
+    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId,
+            int componentId, boolean sctId) throws TerminologyException, IOException {
+        I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
 
-	@Override
-	protected I_ThinExtByRefPart processLine(String line) {
-		I_ThinExtByRefPartConcept part;
-		try {
-			
-			I_ThinExtByRefVersioned versioned = getExtensionVersioned(line, RefsetAuxiliary.Concept.CONCEPT_EXTENSION);
-			
-			part = getTermFactory().newConceptExtensionPart();
-			setGenericExtensionPartFields(part);
+        return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId)
+            + MemberRefsetHandler.FILE_DELIMITER + toId(tf, conceptPart.getConceptId(), sctId);
+    }
 
-			String conceptValue = getNextCurrentRowToken();
-			part.setConceptId(getNid(UUID.fromString(conceptValue)));
-			
-			versioned.addVersion(part);
-			
-			if (isTransactional()) {
-				getTermFactory().addUncommitted(versioned);
-			} else {
-				getTermFactory().getDirectInterface().writeExt(versioned);
-			}
-			
-		} catch (Exception e) {
-			throw new RuntimeException("Error occred processing file " + sourceFile, e);
-		}
-		
-		return part;
-	}
-	
+    @Override
+    public String getHeaderLine() {
+        return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER + "CONCEPT_VALUE_ID";
+    }
+
+    @Override
+    protected I_ThinExtByRefPart processLine(String line) {
+        I_ThinExtByRefPartConcept part;
+        try {
+
+            I_ThinExtByRefVersioned versioned = getExtensionVersioned(line, RefsetAuxiliary.Concept.CONCEPT_EXTENSION);
+
+            part = getTermFactory().newConceptExtensionPart();
+            setGenericExtensionPartFields(part);
+
+            String conceptValue = getNextCurrentRowToken();
+            part.setConceptId(getNid(UUID.fromString(conceptValue)));
+
+            versioned.addVersion(part);
+
+            if (isTransactional()) {
+                getTermFactory().addUncommitted(versioned);
+            } else {
+                getTermFactory().getDirectInterface().writeExt(versioned);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error occred processing file " + sourceFile, e);
+        }
+
+        return part;
+    }
+
 }

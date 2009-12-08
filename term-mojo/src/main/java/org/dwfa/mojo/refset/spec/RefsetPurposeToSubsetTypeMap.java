@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +24,8 @@ import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * This class maps between a specified refset purpose and the associated subset type (integer value).
+ * This class maps between a specified refset purpose and the associated subset
+ * type (integer value).
  * 
  * @author Christine Hill
  * 
@@ -32,14 +33,7 @@ import org.dwfa.tapi.TerminologyException;
 public class RefsetPurposeToSubsetTypeMap {
 
     protected enum SUBSET_TYPE {
-        LANGUAGE_SUBSET(1, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
-        REALM_CONCEPT_SUBSET(2, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
-        REALM_DESC_SUBSET(3, RefsetAuxiliary.Concept.ANNOTATION_PURPOSE),
-        REALM_REL_SUBSET(4, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
-        CONTEXT_CONCEPT_SUBSET(5, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
-        CONTEXT_DESC_SUBSET(6, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
-        NAVIGATION_SUBSET(7, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE),
-        DUPLICATE_TERMS_SUBSET(8, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE);
+        LANGUAGE_SUBSET(1, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE), REALM_CONCEPT_SUBSET(2, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE), REALM_DESC_SUBSET(3, RefsetAuxiliary.Concept.ANNOTATION_PURPOSE), REALM_REL_SUBSET(4, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE), CONTEXT_CONCEPT_SUBSET(5, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE), CONTEXT_DESC_SUBSET(6, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE), NAVIGATION_SUBSET(7, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE), DUPLICATE_TERMS_SUBSET(8, RefsetAuxiliary.Concept.LANGUAGE_PURPOSE);
 
         private SUBSET_TYPE(Integer i, I_ConceptualizeUniversally concept) {
             try {

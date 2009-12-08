@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,12 +52,12 @@ import org.dwfa.mojo.compare.MonitorComponents;
  * Goal which monitors two branches for changes. Agreed changes are copied
  * to a new branch. Any encountered conflicts result in a html summary report
  * and text file containing a list of the conflicting concept identifiers.
- *
+ * 
  * Optionally can check for flagged concept status (exclude
  * components from being copied if they are flagged).
- *
+ * 
  * @goal vodb-create-paths-from-base
- *
+ * 
  * @requiresDependencyResolution compile
  * @author Tore Fjellheim
  */
@@ -65,9 +65,9 @@ public class VodbCreatePathsFromChildrenOfConcept extends AbstractMojo {
 
     /**
      * Location of the directory to output data files to.
-     * KEC: I added this field, because the maven plugin plugin would 
+     * KEC: I added this field, because the maven plugin plugin would
      * crash unless there was at least one commented field. This field is
-     * not actually used by the plugin. 
+     * not actually used by the plugin.
      * 
      * @parameter expression="${project.build.directory}"
      * @required
@@ -75,27 +75,27 @@ public class VodbCreatePathsFromChildrenOfConcept extends AbstractMojo {
     @SuppressWarnings("unused")
     private String outputDirectory;
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		I_TermFactory termFactory = LocalVersionedTerminology.get();
-		try {
-			
-			List<I_Path> paths = termFactory.getPaths();
-			for (I_Path path : paths) {
-				I_GetConceptData pathConcept = termFactory.getConcept(path.getConceptId());
-				List<I_RelVersioned> rels = pathConcept.getDestRels();
-				for (int i = 0; i < rels.size();i++) {
-					int c1 = rels.get(i).getC1Id();
-					int c2 = rels.get(i).getC2Id();
-					if (c1!=path.getConceptId() && c2==path.getConceptId()) {
-						Set<I_Position> origins = new HashSet<I_Position>();
-						origins.add(termFactory.newPosition(path,Integer.MAX_VALUE));
-						termFactory.newPath(origins, termFactory.getConcept(c1));
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        try {
+
+            List<I_Path> paths = termFactory.getPaths();
+            for (I_Path path : paths) {
+                I_GetConceptData pathConcept = termFactory.getConcept(path.getConceptId());
+                List<I_RelVersioned> rels = pathConcept.getDestRels();
+                for (int i = 0; i < rels.size(); i++) {
+                    int c1 = rels.get(i).getC1Id();
+                    int c2 = rels.get(i).getC2Id();
+                    if (c1 != path.getConceptId() && c2 == path.getConceptId()) {
+                        Set<I_Position> origins = new HashSet<I_Position>();
+                        origins.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+                        termFactory.newPath(origins, termFactory.getConcept(c1));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

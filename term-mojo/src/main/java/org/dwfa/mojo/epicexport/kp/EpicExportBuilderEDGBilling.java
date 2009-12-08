@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,19 +21,15 @@ import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 
-public class EpicExportBuilderEDGBilling extends AbstractEpicExportBuilder
-        implements I_EpicLoadFileBuilder {
+public class EpicExportBuilderEDGBilling extends AbstractEpicExportBuilder implements I_EpicLoadFileBuilder {
     public static final int DISPLAY_NAME = 2;
     public static final int ITEM_11 = 11;
-    public static final String[] INTERESTED_ITEMS =
-            { "2", "40", "40", "207", "2000" };
+    public static final String[] INTERESTED_ITEMS = { "2", "40", "40", "207", "2000" };
     public static final String[] EREC_ITEMS = { "50", "7010" };
 
-    private String masterfile =
-            EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING;
+    private String masterfile = EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING;
 
-    public EpicExportBuilderEDGBilling(EpicLoadFileFactory exportManager,
-            EpicExportManager em) {
+    public EpicExportBuilderEDGBilling(EpicLoadFileFactory exportManager, EpicExportManager em) {
         super(exportManager, em);
         this.setExportIfTheseItemsChanged(INTERESTED_ITEMS);
     }
@@ -47,10 +43,9 @@ public class EpicExportBuilderEDGBilling extends AbstractEpicExportBuilder
 
         if (this.isChangedRecord()) {
             if (getFirstItem("11") == null) {
-                //"NRNC" Its a new record
-                I_EpicExportRecordWriter writer =
-                        getExportManager().getWriter(
-                            getWriterName(masterfile, version, "nrnc"));
+                // "NRNC" Its a new record
+                I_EpicExportRecordWriter writer = getExportManager().getWriter(
+                    getWriterName(masterfile, version, "nrnc"));
                 this.setWriter(writer);
                 if (writer.getRecordsWrittenCount() == 0)
                     writer.writeLine("#HELLO WORLD");
@@ -65,9 +60,8 @@ public class EpicExportBuilderEDGBilling extends AbstractEpicExportBuilder
             } else {
                 if (this.onlyHasChangesIn(EREC_ITEMS)) {
                     // "EREC" Existing record existing contact
-                    I_EpicExportRecordWriter writer =
-                            getExportManager().getWriter(
-                                getWriterName(masterfile, version, "erec"));
+                    I_EpicExportRecordWriter writer = getExportManager().getWriter(
+                        getWriterName(masterfile, version, "erec"));
                     this.setWriter(writer);
                     writer.newRecord();
                     writeItem("11", "1");
@@ -75,9 +69,8 @@ public class EpicExportBuilderEDGBilling extends AbstractEpicExportBuilder
                     writer.saveRecord();
                 } else {
                     // "ERNC" Existing record new contact
-                    I_EpicExportRecordWriter writer =
-                            getExportManager().getWriter(
-                                getWriterName(masterfile, version, "ernc"));
+                    I_EpicExportRecordWriter writer = getExportManager().getWriter(
+                        getWriterName(masterfile, version, "ernc"));
                     this.setWriter(writer);
                     writer.newRecord();
                     writeItem("2");
@@ -91,8 +84,7 @@ public class EpicExportBuilderEDGBilling extends AbstractEpicExportBuilder
         }
     }
 
-    private String getWriterName(String masterfile, String version,
-            String contact) {
+    private String getWriterName(String masterfile, String version, String contact) {
         StringBuffer ret = new StringBuffer(masterfile);
         if (version != null) {
             ret.append('_');

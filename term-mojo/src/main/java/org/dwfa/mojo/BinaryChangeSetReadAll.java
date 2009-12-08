@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,10 +29,12 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.maven.MojoUtil;
 
 /**
- * Read all binary change set under a specified directory hierarchy, and apply the results of
+ * Read all binary change set under a specified directory hierarchy, and apply
+ * the results of
  * that change set to the open database.
+ * 
  * @goal bcs-read-all
- *
+ * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -40,28 +42,29 @@ import org.dwfa.maven.MojoUtil;
 public class BinaryChangeSetReadAll extends AbstractMojo {
     /**
      * The change set directory
-     *
-     * @parameter default-value="${project.build.directory}/generated-resources/changesets/"
+     * 
+     * @parameter default-value=
+     *            "${project.build.directory}/generated-resources/changesets/"
      */
     String changeSetDir;
 
     /**
      * List of validators to use when validating change sets if validate = true
-     *
+     * 
      * @parameter
      */
-    private String[] validators =
-            new String[] { ComponentValidator.class.getName() };
+    private String[] validators = new String[] { ComponentValidator.class.getName() };
 
     /**
      * Whether to validate the change set first or not. Default value is true;
+     * 
      * @parameter
      */
     boolean validate = true;
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -69,9 +72,8 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass()
-                .getCanonicalName()
-                + changeSetDir, this.getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDir, this.getClass(),
+                targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -86,7 +88,7 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
         for (int i = 0; i < validators.length; i++) {
             validatorString += validators[i];
             if (i != validators.length - 1) {
-                //if not the last element
+                // if not the last element
                 validatorString += ",";
             }
         }
@@ -94,8 +96,7 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
         importAllChangeSetsTask.setValidators(validatorString);
         importAllChangeSetsTask.setRootDirStr(changeSetDir);
         try {
-            importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(
-                getLog()));
+            importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(getLog()));
         } catch (TaskFailedException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,14 +38,13 @@ import org.dwfa.mojo.refset.ExportSpecification;
 /**
  * * ExportDatabase <br/>
  * <p>
- * The <code>ExportDatabase</code> class Exports database tables to flat
- * files.
+ * The <code>ExportDatabase</code> class Exports database tables to flat files.
  * </p>
  * <p>
  * </p>
- *
- *
- *
+ * 
+ * 
+ * 
  * @see <code>org.apache.maven.plugin.AbstractMojo</code>
  * @author PeterVawser
  * @goal exportdata
@@ -54,15 +53,16 @@ public class ExportDatabase extends AbstractMojo {
 
     /**
      * Date format to use in output files
-     * If not specified the Path Version Reference Set will be used to determine the release version.
-     *
+     * If not specified the Path Version Reference Set will be used to determine
+     * the release version.
+     * 
      * @parameter
      */
     private String releaseDate;
 
     /**
      * Location of the directory to output data files to.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -70,42 +70,42 @@ public class ExportDatabase extends AbstractMojo {
 
     /**
      * File name for concept table data output file
-     *
+     * 
      * @parameter expression="ids.txt"
      */
     private String idsDataFileName;
 
     /**
      * File name for concept table data output file
-     *
+     * 
      * @parameter expression="concepts.txt"
      */
     private String conceptDataFileName;
 
     /**
      * File name for relationship table data output file
-     *
+     * 
      * @parameter expression="relationships.txt"
      */
     private String relationshipsDataFileName;
 
     /**
      * File name for description table data output file
-     *
+     * 
      * @parameter expression="descriptions.txt"
      */
     private String descriptionsDataFileName;
 
     /**
      * File name for description table data output file
-     *
+     * 
      * @parameter expression="errorLog.txt"
      */
     private String errorLogFileName;
 
     /**
      * Whether to validate the positions
-     *
+     * 
      * @parameter expression=true
      */
     private boolean validatePositions;
@@ -113,7 +113,7 @@ public class ExportDatabase extends AbstractMojo {
     /**
      * The set of specifications used to determine if a concept should be
      * exported.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -121,7 +121,7 @@ public class ExportDatabase extends AbstractMojo {
 
     /**
      * Positions to export data.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -129,7 +129,7 @@ public class ExportDatabase extends AbstractMojo {
 
     /**
      * Status values to include in export
-     *
+     * 
      * @parameter
      * @required
      */
@@ -144,95 +144,84 @@ public class ExportDatabase extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private File targetDirectory;
 
     /**
-     * Indicates if the concepts, descriptions and relationships exported must be a cohesive
-     * self supporting set (true), or if the resulting export may contain references to entities
+     * Indicates if the concepts, descriptions and relationships exported must
+     * be a cohesive
+     * self supporting set (true), or if the resulting export may contain
+     * references to entities
      * not represented in the export (false).
-     *
+     * 
      * @parameter expression=true
      */
     private boolean exportCohesiveSet;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-		try {
+        try {
 
-			if (MojoUtil.alreadyRun(getLog(), outputDirectory
-					+ conceptDataFileName + descriptionsDataFileName
-					+ relationshipsDataFileName,
-					this.getClass(), targetDirectory)) {
-				return;
-			}
+            if (MojoUtil.alreadyRun(getLog(), outputDirectory + conceptDataFileName + descriptionsDataFileName
+                + relationshipsDataFileName, this.getClass(), targetDirectory)) {
+                return;
+            }
 
-			I_TermFactory termFactory = LocalVersionedTerminology.get();
+            I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-			HashSet<I_Position> positions = new HashSet<I_Position>(
-					positionsForExport.length);
-			for (PositionDescriptor pd : positionsForExport) {
-				positions.add(pd.getPosition());
-			}
-			I_IntSet statusValues = termFactory.newIntSet();
-			List<I_GetConceptData> statusValueList = new ArrayList<I_GetConceptData>();
-			for (ConceptDescriptor status : statusValuesForExport) {
-				I_GetConceptData statusConcept = status.getVerifiedConcept();
-				statusValues.add(statusConcept.getConceptId());
-				statusValueList.add(statusConcept);
-			}
-			getLog().info(
-					" processing concepts for positions: " + positions
-							+ " with status: " + statusValueList);
+            HashSet<I_Position> positions = new HashSet<I_Position>(positionsForExport.length);
+            for (PositionDescriptor pd : positionsForExport) {
+                positions.add(pd.getPosition());
+            }
+            I_IntSet statusValues = termFactory.newIntSet();
+            List<I_GetConceptData> statusValueList = new ArrayList<I_GetConceptData>();
+            for (ConceptDescriptor status : statusValuesForExport) {
+                I_GetConceptData statusConcept = status.getVerifiedConcept();
+                statusValues.add(statusConcept.getConceptId());
+                statusValueList.add(statusConcept);
+            }
+            getLog().info(" processing concepts for positions: " + positions + " with status: " + statusValueList);
 
-			if (outputDirectory.endsWith("/") == false) {
-				outputDirectory = outputDirectory + "/";
-			}
-			File outputDirFile = new File(outputDirectory);
-			outputDirFile.mkdirs();
-			Writer errorWriter = new BufferedWriter(new FileWriter(
-					outputDirectory + errorLogFileName));
+            if (outputDirectory.endsWith("/") == false) {
+                outputDirectory = outputDirectory + "/";
+            }
+            File outputDirFile = new File(outputDirectory);
+            outputDirFile.mkdirs();
+            Writer errorWriter = new BufferedWriter(new FileWriter(outputDirectory + errorLogFileName));
 
-			File conceptFile = new File(outputDirectory + conceptDataFileName);
-			File relationshipFile = new File(outputDirectory
-					+ relationshipsDataFileName);
-			File descriptionFile = new File(outputDirectory
-					+ descriptionsDataFileName);
-			File idsFile = new File(outputDirectory + idsDataFileName);
-			idsFile.getParentFile().mkdirs();
-			File idMapFile = new File(buildDirectory + "/generated-resources/sct-uuid-maps", "exported-ids-sct-map.txt");
-			idMapFile.getParentFile().mkdirs();
+            File conceptFile = new File(outputDirectory + conceptDataFileName);
+            File relationshipFile = new File(outputDirectory + relationshipsDataFileName);
+            File descriptionFile = new File(outputDirectory + descriptionsDataFileName);
+            File idsFile = new File(outputDirectory + idsDataFileName);
+            idsFile.getParentFile().mkdirs();
+            File idMapFile = new File(buildDirectory + "/generated-resources/sct-uuid-maps", "exported-ids-sct-map.txt");
+            idMapFile.getParentFile().mkdirs();
 
-			Writer conceptWriter = new BufferedWriter(new FileWriter(
-					conceptFile));
-			Writer relationshipWriter = new BufferedWriter(new FileWriter(
-					relationshipFile));
-			Writer descriptionWriter = new BufferedWriter(new FileWriter(
-					descriptionFile));
-			Writer idsWriter = new BufferedWriter(new FileWriter(
-					idsFile));
-			Writer idMapWriter = new BufferedWriter(new FileWriter(idMapFile));
+            Writer conceptWriter = new BufferedWriter(new FileWriter(conceptFile));
+            Writer relationshipWriter = new BufferedWriter(new FileWriter(relationshipFile));
+            Writer descriptionWriter = new BufferedWriter(new FileWriter(descriptionFile));
+            Writer idsWriter = new BufferedWriter(new FileWriter(idsFile));
+            Writer idMapWriter = new BufferedWriter(new FileWriter(idMapFile));
 
-			ExportIterator expItr = new ExportIterator(conceptWriter,
-					descriptionWriter, relationshipWriter, idsWriter, idMapWriter, errorWriter,
-					positions, statusValues, specs, getLog());
-			expItr.setReleaseDate(releaseDate);
+            ExportIterator expItr = new ExportIterator(conceptWriter, descriptionWriter, relationshipWriter, idsWriter,
+                idMapWriter, errorWriter, positions, statusValues, specs, getLog());
+            expItr.setReleaseDate(releaseDate);
             expItr.setValidatePositions(validatePositions);
             expItr.setExportCohesiveSet(exportCohesiveSet);
             LocalVersionedTerminology.get().iterateConcepts(expItr);
 
-			conceptWriter.close();
-			relationshipWriter.close();
-			descriptionWriter.close();
-			idsWriter.close();
-			idMapWriter.close();
-			errorWriter.close();
+            conceptWriter.close();
+            relationshipWriter.close();
+            descriptionWriter.close();
+            idsWriter.close();
+            idMapWriter.close();
+            errorWriter.close();
 
-		} catch (Exception e) {
-			throw new MojoExecutionException("Unable to export database due to exception", e);
-		}
+        } catch (Exception e) {
+            throw new MojoExecutionException("Unable to export database due to exception", e);
+        }
 
-	}// End method execute
+    }// End method execute
 }// End class ExportDatabase

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,8 @@ import org.dwfa.mojo.memrefset.mojo.ChangeSet;
 import java.util.UUID;
 
 /**
- * This class follows the null object pattern. We can use this class whereever a ChangeSetBuilder is required
+ * This class follows the null object pattern. We can use this class whereever a
+ * ChangeSetBuilder is required
  * without the use of null values.
  */
 public final class NullChangeSetBuilder implements ChangeSetBuilder {

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,10 +54,10 @@ public class VodbSetViewPaths extends AbstractMojo {
             I_TermFactory tf = LocalVersionedTerminology.get();
             activeConfig.getViewPositionSet().clear();
             for (ConceptDescriptor path : viewPaths) {
-            	if (path.getUuid() == null) {
-            		path.setUuid(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, 
-            				path.getDescription()).toString());
-            	}
+                if (path.getUuid() == null) {
+                    path.setUuid(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, path.getDescription())
+                        .toString());
+                }
                 I_Path viewPath = tf.getPath(path.getVerifiedConcept().getUids());
                 activeConfig.addViewPosition(tf.newPosition(viewPath, Integer.MAX_VALUE));
             }
@@ -67,9 +67,9 @@ public class VodbSetViewPaths extends AbstractMojo {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (NoSuchAlgorithmException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		} catch (Exception e) {
+        } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
+        }
     }
 
 }

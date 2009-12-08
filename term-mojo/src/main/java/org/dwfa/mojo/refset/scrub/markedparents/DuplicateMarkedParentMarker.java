@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,11 +28,14 @@ import java.util.Map;
 import java.util.TreeSet;
 
 /**
- * Members <code>I_ThinExtByRefVersioned</code> supplied through the {@link #put(I_ThinExtByRefVersioned)}
- * mehtod are sorted by component and referenceset.
- *
- * This list of members is then processed when {@link #getDuplicates()} is called to return a list of duplicate members having
- * which are "marked parents" having a status of "current". Any "retired" members are removed.
+ * Members <code>I_ThinExtByRefVersioned</code> supplied through the
+ * {@link #put(I_ThinExtByRefVersioned)} mehtod are sorted by component and
+ * referenceset.
+ * 
+ * This list of members is then processed when {@link #getDuplicates()} is
+ * called to return a list of duplicate members having
+ * which are "marked parents" having a status of "current". Any "retired"
+ * members are removed.
  */
 public final class DuplicateMarkedParentMarker {
 
@@ -45,7 +48,9 @@ public final class DuplicateMarkedParentMarker {
     }
 
     /**
-     * Call this for each member that has a "marked parent" concept and which has a status of "current" or "retired".
+     * Call this for each member that has a "marked parent" concept and which
+     * has a status of "current" or "retired".
+     * 
      * @param member The marked parent.
      */
     public void put(final I_ThinExtByRefVersioned member) {
@@ -59,8 +64,10 @@ public final class DuplicateMarkedParentMarker {
     }
 
     /**
-     * Returns a <code>List<ComponentRefsetMembers></code> which identify the "marked parents" that are currently
+     * Returns a <code>List<ComponentRefsetMembers></code> which identify the
+     * "marked parents" that are currently
      * active and are duplicates.
+     * 
      * @return A <code>List<ComponentRefsetMembers></code> of "marked parents".
      */
     public List<ComponentRefsetMembers> getDuplicates() {
@@ -76,9 +83,12 @@ public final class DuplicateMarkedParentMarker {
 
     private void removeRetiredMembers(final ComponentRefsetMembers componentRefsetMembers) {
         for (I_ThinExtByRefVersioned member : componentRefsetMembers.getMembers()) {
-            TreeSet<I_ThinExtByRefPart> sortedVersionsSet = new TreeSet<I_ThinExtByRefPart>(new LatestVersionComparator());
+            TreeSet<I_ThinExtByRefPart> sortedVersionsSet = new TreeSet<I_ThinExtByRefPart>(
+                new LatestVersionComparator());
             sortedVersionsSet.addAll(member.getVersions());
-            if (sortedVersionsSet.last().getStatus() != currentStatusId) { //ignore non-current statuses
+            if (sortedVersionsSet.last().getStatus() != currentStatusId) { // ignore
+                // non-current
+                // statuses
                 componentRefsetMembers.removeMember(member);
             }
         }

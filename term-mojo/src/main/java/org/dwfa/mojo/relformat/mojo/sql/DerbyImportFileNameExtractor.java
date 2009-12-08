@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,13 +24,11 @@ public final class DerbyImportFileNameExtractor implements FileNameExtractor {
 
     private final FileNameExtractor fileNameExtractor;
 
-    public DerbyImportFileNameExtractor(
-            final FileNameExtractor fileNameExtractor) {
+    public DerbyImportFileNameExtractor(final FileNameExtractor fileNameExtractor) {
         this.fileNameExtractor = fileNameExtractor;
     }
 
     public String extractFileName(final Table table, final File file) {
-        return table.getName() + "-"
-            + fileNameExtractor.extractFileName(table, file);
+        return table.getName() + "-" + fileNameExtractor.extractFileName(table, file);
     }
 }

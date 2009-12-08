@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,7 +63,7 @@ import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 import org.dwfa.mojo.refset.ExportSpecification; // import
-                                                 // org.dwfa.mojo.refset.RefsetType;
+// org.dwfa.mojo.refset.RefsetType;
 // import org.dwfa.mojo.vivisimo.IntSet;
 // import org.dwfa.mojo.vivisimo.GenerateVivisimoThesaurus.ExportIterator;
 import org.dwfa.tapi.TerminologyException;
@@ -106,9 +106,7 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
         try {
             getLog().info("KP dir: " + kpDir);
 
-            BufferedReader r =
-                    new BufferedReader(new FileReader(new File(kpDir,
-                        "epic_synch.txt")));
+            BufferedReader r = new BufferedReader(new FileReader(new File(kpDir, "epic_synch.txt")));
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
@@ -140,115 +138,115 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
         }
     }
 
-    private void processRowConceptUUID(I_TermFactory tf, String line)
-			throws IOException, NoSuchAlgorithmException,
-			UnsupportedEncodingException {
+    private void processRowConceptUUID(I_TermFactory tf, String line) throws IOException, NoSuchAlgorithmException,
+            UnsupportedEncodingException {
 
-		String[] parts = line.split("\t"); // split the tab delimited line
+        String[] parts = line.split("\t"); // split the tab delimited line
 
-		// concept uuid
-		String concept_id = parts[0].trim();
+        // concept uuid
+        String concept_id = parts[0].trim();
 
-		// dot1 value
-		String dot1 = parts[1].trim();
+        // dot1 value
+        String dot1 = parts[1].trim();
 
-		// cid value
-		String cid = parts[2].trim();
+        // cid value
+        String cid = parts[2].trim();
 
-		try {
-			I_GetConceptData concept = tf.getConcept(new UUID[] { UUID
-					.fromString(concept_id) });
-			conceptsMatched++;
+        try {
+            I_GetConceptData concept = tf.getConcept(new UUID[] { UUID.fromString(concept_id) });
+            conceptsMatched++;
 
-			/*
-			 * I_GetConceptData cidSourceConcept = tf.getConcept(new UUID[] {
-			 * UUID .fromString("bf3e7556-38cb-5395-970d-f11851c9f41e") }); //
-			 * EDG // Billing // Item // 11 I_GetConceptData dot1SourceConcept =
-			 * tf .getConcept(new UUID[] { UUID
-			 * .fromString("af8be384-dc60-5b56-9ad8-bc1e4b5dfbae") }); // EDG //
-			 * Billing // Dot1 I_GetConceptData kpPath = tf.getConcept(new
-			 * UUID[] { UUID .fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a")
-			 * }); // KP // Extension // Path
-			 */
+            /*
+             * I_GetConceptData cidSourceConcept = tf.getConcept(new UUID[] {
+             * UUID .fromString("bf3e7556-38cb-5395-970d-f11851c9f41e") }); //
+             * EDG // Billing // Item // 11 I_GetConceptData dot1SourceConcept =
+             * tf .getConcept(new UUID[] { UUID
+             * .fromString("af8be384-dc60-5b56-9ad8-bc1e4b5dfbae") }); // EDG //
+             * Billing // Dot1 I_GetConceptData kpPath = tf.getConcept(new
+             * UUID[] { UUID .fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a")
+             * }); // KP // Extension // Path
+             */
 
-			I_GetConceptData cidSourceConcept = tf.getConcept(new UUID[] { UUID
-					.fromString("e3dadc2a-196d-5525-879a-3037af99607d") }); // EDG Clinical Item 11 - e3dadc2a-196d-5525-879a-3037af99607d
-			
-			I_GetConceptData dot1SourceConcept = tf
-					.getConcept(new UUID[] { UUID
-							.fromString("e49a55a7-319d-5744-b8a9-9b7cc86fd1c6") }); // EDG Clinical Dot1 - e49a55a7-319d-5744-b8a9-9b7cc86fd1c6
-			
-			I_GetConceptData kpPath = tf.getConcept(new UUID[] { UUID
-					.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a") }); // KP Extension Path
+            I_GetConceptData cidSourceConcept = tf.getConcept(new UUID[] { UUID.fromString("e3dadc2a-196d-5525-879a-3037af99607d") }); // EDG
+            // Clinical
+            // Item
+            // 11
+            // -
+            // e3dadc2a-196d-5525-879a-3037af99607d
 
-			int cidSourceNid = cidSourceConcept.getConceptId();
-			int dot1SourceNid = dot1SourceConcept.getConceptId();
-			boolean foundCidSource = false;
-			boolean foundDot1Source = false;
+            I_GetConceptData dot1SourceConcept = tf.getConcept(new UUID[] { UUID.fromString("e49a55a7-319d-5744-b8a9-9b7cc86fd1c6") }); // EDG
+            // Clinical
+            // Dot1
+            // -
+            // e49a55a7-319d-5744-b8a9-9b7cc86fd1c6
 
-			for (I_IdPart part : concept.getId().getVersions()) {
-				if (part.getSource() == cidSourceNid) {
-					foundCidSource = true;
-					if (part.getSourceId().equals(cid)) {
-						cidValuesMatched++;
-					} else {
-						getLog().warn(
-								"CID value in synch file [" + cid
-										+ "] does not match database record ["
-										+ concept_id + "]");
-						cidValuesMisMatched++;
-					}
-					if (foundCidSource && foundDot1Source) {
-						break;
-					}
-				}
+            I_GetConceptData kpPath = tf.getConcept(new UUID[] { UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a") }); // KP
+            // Extension
+            // Path
 
-				if (part.getSource() == dot1SourceNid) {
-					foundDot1Source = true;
-					if (part.getSourceId().equals(dot1)) {
-						dot1ValuesMatched++;
-					} else {
-						getLog().warn(
-								"Dot1 value in synch file [" + dot1
-										+ "] does not match database record ["
-										+ concept_id + "]");
-						dot1ValuesMisMatched++;
-					}
-					if (foundCidSource && foundDot1Source) {
-						break;
-					}
-				}
-			}
+            int cidSourceNid = cidSourceConcept.getConceptId();
+            int dot1SourceNid = dot1SourceConcept.getConceptId();
+            boolean foundCidSource = false;
+            boolean foundDot1Source = false;
 
-			if (foundDot1Source == false) {
-				I_IdPart aPart = concept.getId().getVersions().get(0)
-						.duplicate();
-				aPart.setSource(dot1SourceNid);
-				aPart.setSourceId(dot1);
-				aPart.setPathId(kpPath.getNid());
-				aPart.setVersion(Integer.MAX_VALUE);
-				concept.getId().addVersion(aPart);
-				concept.getUncommittedIdVersioned().add(concept.getId());
-				tf.addUncommitted(concept);
-				dot1ValuesSynched++;
-			}
+            for (I_IdPart part : concept.getId().getVersions()) {
+                if (part.getSource() == cidSourceNid) {
+                    foundCidSource = true;
+                    if (part.getSourceId().equals(cid)) {
+                        cidValuesMatched++;
+                    } else {
+                        getLog().warn(
+                            "CID value in synch file [" + cid + "] does not match database record [" + concept_id + "]");
+                        cidValuesMisMatched++;
+                    }
+                    if (foundCidSource && foundDot1Source) {
+                        break;
+                    }
+                }
 
-			if (foundCidSource == false) {
-				I_IdPart aPart = concept.getId().getVersions().get(0)
-						.duplicate();
-				aPart.setSource(cidSourceNid);
-				aPart.setSourceId(cid);
-				aPart.setPathId(kpPath.getNid());
-				aPart.setVersion(Integer.MAX_VALUE);
-				concept.getId().addVersion(aPart);
-				concept.getUncommittedIdVersioned().add(concept.getId());
-				tf.addUncommitted(concept);
-				cidValuesSynched++;
-			}
+                if (part.getSource() == dot1SourceNid) {
+                    foundDot1Source = true;
+                    if (part.getSourceId().equals(dot1)) {
+                        dot1ValuesMatched++;
+                    } else {
+                        getLog().warn(
+                            "Dot1 value in synch file [" + dot1 + "] does not match database record [" + concept_id
+                                + "]");
+                        dot1ValuesMisMatched++;
+                    }
+                    if (foundCidSource && foundDot1Source) {
+                        break;
+                    }
+                }
+            }
 
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+            if (foundDot1Source == false) {
+                I_IdPart aPart = concept.getId().getVersions().get(0).duplicate();
+                aPart.setSource(dot1SourceNid);
+                aPart.setSourceId(dot1);
+                aPart.setPathId(kpPath.getNid());
+                aPart.setVersion(Integer.MAX_VALUE);
+                concept.getId().addVersion(aPart);
+                concept.getUncommittedIdVersioned().add(concept.getId());
+                tf.addUncommitted(concept);
+                dot1ValuesSynched++;
+            }
+
+            if (foundCidSource == false) {
+                I_IdPart aPart = concept.getId().getVersions().get(0).duplicate();
+                aPart.setSource(cidSourceNid);
+                aPart.setSourceId(cid);
+                aPart.setPathId(kpPath.getNid());
+                aPart.setVersion(Integer.MAX_VALUE);
+                concept.getId().addVersion(aPart);
+                concept.getUncommittedIdVersioned().add(concept.getId());
+                tf.addUncommitted(concept);
+                cidValuesSynched++;
+            }
+
+        } catch (TerminologyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,11 +45,9 @@ public class PositionDescriptor {
 
     public I_Position getPosition() throws Exception {
         I_GetConceptData pathConcept = path.getVerifiedConcept();
-        I_Path pathForPosition =
-                LocalVersionedTerminology.get().getPath(pathConcept.getUids());
+        I_Path pathForPosition = LocalVersionedTerminology.get().getPath(pathConcept.getUids());
         int version = ThinVersionHelper.convert(timeString);
-        return LocalVersionedTerminology.get().newPosition(pathForPosition,
-            version);
+        return LocalVersionedTerminology.get().newPosition(pathForPosition, version);
     }
 
     public String toString() {

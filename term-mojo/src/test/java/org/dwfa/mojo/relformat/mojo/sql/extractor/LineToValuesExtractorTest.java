@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,12 +33,8 @@ public final class LineToValuesExtractorTest {
 
     @Test
     public void shouldExtractALine() {
-        String line = new LineBuilder().
-                        addValue("2011000036100").
-                        addValue("32506021000036107").
-                        addValue("20081031T000000Z").
-                        addValue("30430011000036108").
-                        build();
+        String line = new LineBuilder().addValue("2011000036100").addValue("32506021000036107").addValue(
+            "20081031T000000Z").addValue("30430011000036108").build();
 
         String[] values = extractor.extract(line);
         assertThat(values.length, equalTo(4));
@@ -47,18 +43,17 @@ public final class LineToValuesExtractorTest {
         assertThat(values[2], equalTo("20081031T000000Z"));
         assertThat(values[3], equalTo("30430011000036108"));
     }
-    
+
     @Test
     public void shouldExtractALineWithMissingData() {
-        String line = new LineBuilder().
-                        addValue("2011000036100").
-                        addValue("0").
-                        addValue("current (active status type)").
-                        addBlankValue().
-                        addBlankValue().
-                        addValue("1").
-                        build();
-        
+        String line = new LineBuilder().addValue("2011000036100")
+            .addValue("0")
+            .addValue("current (active status type)")
+            .addBlankValue()
+            .addBlankValue()
+            .addValue("1")
+            .build();
+
         String[] values = extractor.extract(line);
         assertThat(values.length, equalTo(6));
         assertThat(values[0], equalTo("2011000036100"));

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -77,7 +77,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
     File subsetOutputDirectory;
 
     /**
-     * Defines the directory to which the subset members are stored between releases. This is used to determine the
+     * Defines the directory to which the subset members are stored between
+     * releases. This is used to determine the
      * subset ID and subset version to assign.
      * 
      * @parameter
@@ -212,9 +213,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                         refsetTypeMap.put(refsetId, refsetType);
                     }
 
-                    Long memberId =
-                            Long.parseLong(refsetType.getRefsetHandler().toId(tf, thinExtByRefTuple.getComponentId(),
-                                true));
+                    Long memberId = Long.parseLong(refsetType.getRefsetHandler().toId(tf,
+                        thinExtByRefTuple.getComponentId(), true));
                     if (treeMap.containsKey(memberId)) {
                         getLog().warn(
                             "Refset " + tf.getConcept(refsetId).getInitialText()
@@ -286,8 +286,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             try {
                 refsetType = RefsetType.findByExtension(thinExtByRefPart);
             } catch (EnumConstantNotPresentException e) {
-                getLog()
-                    .warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
+                getLog().warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
                 return;
             }
             refsetTypeMap.put(refsetId, refsetType);
@@ -295,9 +294,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
         BufferedWriter subsetIndexFileWriter = writerMap.get("INDEX");
         if (subsetIndexFileWriter == null) {
-            subsetIndexFileWriter =
-                    new BufferedWriter(new FileWriter(new File(subsetOutputDirectory, "sct_subsets_" + countryCode
-                        + "_" + releaseVersion + ".txt")));
+            subsetIndexFileWriter = new BufferedWriter(new FileWriter(new File(subsetOutputDirectory, "sct_subsets_"
+                + countryCode + "_" + releaseVersion + ".txt")));
             subsetIndexFileWriter.write("SUBSETID" + FILE_DELIMITER + "SUBSETORIGINALID" + FILE_DELIMITER
                 + "SUBSETVERSION" + FILE_DELIMITER + "SUBSETNAME" + FILE_DELIMITER + "SUBSETTYPE" + FILE_DELIMITER
                 + "LANGUAGECODE" + FILE_DELIMITER + "REALMID" + FILE_DELIMITER + "CONTEXTID");
@@ -320,9 +318,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
             File subsetFile = getExportFile(refsetId);
             if (subsetFile == null) {
-                subsetFile =
-                        new File(subsetOutputDirectory, "sct_subsetmembers_" + countryCode + "_" + refsetName + "_"
-                            + releaseVersion + ".txt");
+                subsetFile = new File(subsetOutputDirectory, "sct_subsetmembers_" + countryCode + "_" + refsetName
+                    + "_" + releaseVersion + ".txt");
             } else {
                 subsetFile = new File(subsetOutputDirectory, subsetFile.getName());
             }
@@ -343,8 +340,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                 I_IntSet allowedTypes = tf.newIntSet();
                 allowedTypes.add(tf.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids()).getConceptId());
 
-                Set<I_GetConceptData> concepts =
-                        refsetConcept.getDestRelOrigins(allowedStatuses, allowedTypes, positions, true, true);
+                Set<I_GetConceptData> concepts = refsetConcept.getDestRelOrigins(allowedStatuses, allowedTypes,
+                    positions, true, true);
                 for (I_GetConceptData concept : concepts) {
                     subOriginalId = refsetType.getRefsetHandler().getSnomedIntegerId(tf, concept.getConceptId());
                     if (subOriginalId != null) {
@@ -395,8 +392,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             File storedSubsetMemberFile = new File(subsetInputDirectory, refsetUuid.toString() + ".txt");
 
             if (storedSubsetMemberFile.exists()) {
-                BufferedReader storedSubsetMemberFileReader =
-                        new BufferedReader(new FileReader(storedSubsetMemberFile));
+                BufferedReader storedSubsetMemberFileReader = new BufferedReader(new FileReader(storedSubsetMemberFile));
                 long storedSubsetId = Long.parseLong(storedSubsetMemberFileReader.readLine());
                 int storedSubsetVersion = Integer.parseInt(storedSubsetMemberFileReader.readLine());
                 TreeSet<UUID> previousMemberUuids = new TreeSet<UUID>();
@@ -415,14 +411,15 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                     return "" + storedSubsetVersion;
                 } else {
                     int subsetVersion = storedSubsetVersion + 1;
-                    long subsetId =
-                            Long.parseLong(refsetType.getRefsetHandler().generateNewSctId(refsetId, subsetVersion));
+                    long subsetId = Long.parseLong(refsetType.getRefsetHandler().generateNewSctId(refsetId,
+                        subsetVersion));
                     setSubsetId(subsetId);
                     updateStoredSubsetMemberFile(storedSubsetMemberFile, subsetId, subsetVersion);
                     return "" + subsetVersion;
                 }
             } else {
-                // the subset hasn't be released before. Use the SNOMED ID attached to the refset concept as the subset
+                // the subset hasn't be released before. Use the SNOMED ID
+                // attached to the refset concept as the subset
                 // ID. Generate the member file for use in the next release.
                 try {
 

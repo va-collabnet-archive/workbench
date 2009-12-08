@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,22 +25,18 @@ import org.dwfa.mojo.epicexport.EpicExportWriter;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 
-public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder
-        implements I_EpicLoadFileBuilder {
+public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder implements I_EpicLoadFileBuilder {
     public static final int DISPLAY_NAME = 2;
     public static final int ITEM_11 = 11;
-    public static final String[] INTERESTED_ITEMS =
-            { "2", "40", "50", "100", "7010", "7000", "80", "91", "207" };
+    public static final String[] INTERESTED_ITEMS = { "2", "40", "50", "100", "7010", "7000", "80", "91", "207" };
     public static final String[] EREC_ITEMS = { "50", "7010" };
-    // public static final String[] MANDATORY_ITEMS = {"2", "40", "7000", "7010", "91", "80", "100", "207"};
-    public static final String[] MANDATORY_ITEMS =
-            { "2", "40", "7000", "7010", "100", "207" };
+    // public static final String[] MANDATORY_ITEMS = {"2", "40", "7000",
+    // "7010", "91", "80", "100", "207"};
+    public static final String[] MANDATORY_ITEMS = { "2", "40", "7000", "7010", "100", "207" };
 
-    private String masterfile =
-            EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL;
+    private String masterfile = EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL;
 
-    public EpicExportBuilderEDGClinical(EpicLoadFileFactory exportManager,
-            EpicExportManager em) {
+    public EpicExportBuilderEDGClinical(EpicLoadFileFactory exportManager, EpicExportManager em) {
         super(exportManager, em);
         this.setExportIfTheseItemsChanged(INTERESTED_ITEMS);
     }
@@ -54,23 +50,24 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder
 
         if (this.isChangedRecord()) {
             if (getFirstItem("11") == null) {
-                //"NRNC" Its a new record
+                // "NRNC" Its a new record
                 // if (! this.allItemsArePopulated(MANDATORY_ITEMS))
-                //	throw new Exception("One or more mandatory items are missing");
-                I_EpicExportRecordWriter writer =
-                        getExportManager().getWriter(
-                            getWriterName(masterfile, version, "nrnc"));
+                // throw new
+                // Exception("One or more mandatory items are missing");
+                I_EpicExportRecordWriter writer = getExportManager().getWriter(
+                    getWriterName(masterfile, version, "nrnc"));
                 this.setWriter(writer);
                 writer.newRecord();
                 writeLiteralItem("1", "*");
                 writeItem("2");
                 writeItem("40");
-                /* if (this.itemIsPopulated("2000"))
-                	writeItem("2000");
-                else if (this.itemIsPopulated("200"))
-                	writeItem("200");
-                else
-                	throw new Exception("Missing both items 200 and 2000");
+                /*
+                 * if (this.itemIsPopulated("2000"))
+                 * writeItem("2000");
+                 * else if (this.itemIsPopulated("200"))
+                 * writeItem("200");
+                 * else
+                 * throw new Exception("Missing both items 200 and 2000");
                  */
                 writeItemIfChanged("100");
                 writeItemIfChanged("207");
@@ -83,9 +80,8 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder
             } else {
                 if (this.onlyHasChangesIn(EREC_ITEMS)) {
                     // "EREC" Existing record existing contact
-                    I_EpicExportRecordWriter writer =
-                            getExportManager().getWriter(
-                                getWriterName(masterfile, version, "erec"));
+                    I_EpicExportRecordWriter writer = getExportManager().getWriter(
+                        getWriterName(masterfile, version, "erec"));
                     this.setWriter(writer);
                     writer.newRecord();
                     writeItem("11", "1");
@@ -99,9 +95,8 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder
                     writer.saveRecord();
                 } else {
                     // "ERNC" Existing record new contact
-                    I_EpicExportRecordWriter writer =
-                            getExportManager().getWriter(
-                                getWriterName(masterfile, version, "ernc"));
+                    I_EpicExportRecordWriter writer = getExportManager().getWriter(
+                        getWriterName(masterfile, version, "ernc"));
                     this.setWriter(writer);
                     writer.newRecord();
                     writeItem("2");
@@ -118,8 +113,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder
         }
     }
 
-    private String getWriterName(String masterfile, String version,
-            String contact) {
+    private String getWriterName(String masterfile, String version, String contact) {
         StringBuffer ret = new StringBuffer(masterfile);
         if (version != null) {
             ret.append('_');

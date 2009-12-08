@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,8 @@ package org.dwfa.mojo.relformat.mojo.converter;
 
 import java.util.List;
 
-//TODO: This is a duplicate class created to allow manven to automagically pick up the format configuration.
+// TODO: This is a duplicate class created to allow manven to automagically pick
+// up the format configuration.
 public final class Format {
 
     private String type;
@@ -26,7 +27,7 @@ public final class Format {
     private List<String> filters;
 
     public Format() {
-        //for maven.
+        // for maven.
     }
 
     public Format(final String type, final List<String> filters) {

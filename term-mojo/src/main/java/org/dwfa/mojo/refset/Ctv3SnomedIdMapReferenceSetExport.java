@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,9 +36,9 @@ import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- *
+ * 
  * This mojo exports attribute value reference set from an ACE database
- *
+ * 
  * @goal export-cvt3-snomed-id-refset
  * @author Ean Dungey, Dion McMurtrie
  */
@@ -61,7 +61,7 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
     /**
      * Check if the concept meets the <code>exportSpecifications</code>, is on
      * the <code>positions</code> and has the <code>allowedStatuses</code>
-     *
+     * 
      * @see org.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.I_GetConceptData)
      */
     public void processConcept(I_GetConceptData concept) throws Exception {
@@ -81,8 +81,9 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
     }
 
     /**
-     * Create/update and export string extensions for all concepts that have SCT3 ids.
-     *
+     * Create/update and export string extensions for all concepts that have
+     * SCT3 ids.
+     * 
      * @param latest I_AmPart latest version of the concept
      * @param conceptId concept id
      * @throws Exception cannot create or export the concept.
@@ -90,8 +91,8 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
     private void exportCtv3IdMap(I_AmPart latest, int conceptId) throws Exception {
         I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.CTV3_ID_MAP_EXTENSION);
         I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) tuple;
-        I_IdPart ctv3IdPart =
-                getLatestVersion(tf.getConcept(conceptId).getId().getVersions(), ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID);
+        I_IdPart ctv3IdPart = getLatestVersion(tf.getConcept(conceptId).getId().getVersions(),
+            ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID);
         if (part == null && ctv3IdPart != null) {
             part = tf.newStringExtensionPart();
             part.setStringValue(ctv3IdPart.getSourceId().toString());
@@ -106,8 +107,9 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
     }
 
     /**
-     * Create/update and export string extensions for all concepts that have snomed ids.
-     *
+     * Create/update and export string extensions for all concepts that have
+     * snomed ids.
+     * 
      * @param latest I_AmPart latest version of the concept
      * @param conceptId concept id
      * @throws Exception cannot create or export the concept.
@@ -115,9 +117,8 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
     private void exportSnomedIdMap(I_AmPart latest, int conceptId) throws Exception {
         I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.SNOMED_ID_MAP_EXTENSION);
         I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) tuple;
-        I_IdPart snomedIdPart =
-                getLatestVersion(tf.getConcept(conceptId).getId().getVersions(),
-                    ArchitectonicAuxiliary.Concept.SNOMED_INT_ID);
+        I_IdPart snomedIdPart = getLatestVersion(tf.getConcept(conceptId).getId().getVersions(),
+            ArchitectonicAuxiliary.Concept.SNOMED_INT_ID);
         if (part == null && snomedIdPart != null) {
             part = tf.newStringExtensionPart();
             part.setStringValue(snomedIdPart.getSourceId().toString());
@@ -132,8 +133,9 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
     }
 
     /**
-     * Get the latest version for the list of id parts with the source <code>sourceConcept</code>
-     *
+     * Get the latest version for the list of id parts with the source
+     * <code>sourceConcept</code>
+     * 
      * @param sourceConcept Concept eg SNOMED_T3_UUID, SNOMED_INT_ID etc
      * @return I_IdPart latest Id version for the sourceConcept.
      * @throws IOException DB errors

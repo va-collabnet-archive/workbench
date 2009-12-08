@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
 
 /**
  * Bean info to CalculateMemberSetTaskBeanInfo class.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 public class CalculateMemberSetTaskBeanInfo extends SimpleBeanInfo {
 
@@ -39,26 +40,18 @@ public class CalculateMemberSetTaskBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor root =
-                    new PropertyDescriptor("root",
-                        CalculateMemberSetTaskBeanInfo.class);
-            PropertyDescriptor refset =
-                    new PropertyDescriptor("refset",
-                        CalculateMemberSetTaskBeanInfo.class);
-            PropertyDescriptor memberset =
-                    new PropertyDescriptor("memberset",
-                        CalculateMemberSetTaskBeanInfo.class);
-            PropertyDescriptor membersetPath =
-                    new PropertyDescriptor("membersetPath",
-                        CalculateMemberSetTaskBeanInfo.class);
+            PropertyDescriptor root = new PropertyDescriptor("root", CalculateMemberSetTaskBeanInfo.class);
+            PropertyDescriptor refset = new PropertyDescriptor("refset", CalculateMemberSetTaskBeanInfo.class);
+            PropertyDescriptor memberset = new PropertyDescriptor("memberset", CalculateMemberSetTaskBeanInfo.class);
+            PropertyDescriptor membersetPath = new PropertyDescriptor("membersetPath",
+                CalculateMemberSetTaskBeanInfo.class);
 
             root.setBound(true);
             root.setPropertyEditorClass(QueueTypeEditor.class);
             root.setDisplayName("<html><font color='green'>Drag root here:");
             root.setShortDescription("Calculate a specified member set");
 
-            PropertyDescriptor rv[] =
-                    { root, refset, memberset, membersetPath };
+            PropertyDescriptor rv[] = { root, refset, memberset, membersetPath };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -69,10 +62,8 @@ public class CalculateMemberSetTaskBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(CalculateMemberSetTaskBeanInfo.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Calculate Member Set");
+        BeanDescriptor bd = new BeanDescriptor(CalculateMemberSetTaskBeanInfo.class);
+        bd.setDisplayName("<html><font color='green'><center>Calculate Member Set");
         return bd;
     }
 
