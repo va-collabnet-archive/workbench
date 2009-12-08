@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ import java.io.IOException;
 
 /**
  * @author kec
- *
+ * 
  */
 public interface TaskWithProgress {
     /**
@@ -38,7 +38,8 @@ public interface TaskWithProgress {
     public int getLengthOfTask();
 
     /**
-     * Called  to find out how much has been done.
+     * Called to find out how much has been done.
+     * 
      * @throws IOException
      */
     public int getCurrent() throws IOException;
@@ -55,14 +56,17 @@ public interface TaskWithProgress {
     /**
      * Returns the most recent status message, or null
      * if there is no current status message.
+     * 
      * @throws IOException
      */
     public String getMessage() throws IOException;
 
     /**
-     * A guarded wait mechanism. See section 3.2.3 in Concurrent Programming in Java, 2nd edition. 
+     * A guarded wait mechanism. See section 3.2.3 in Concurrent Programming in
+     * Java, 2nd edition.
+     * 
      * @throws InterruptedException
-     *
+     * 
      */
 
     public void waitTillDone() throws InterruptedException;

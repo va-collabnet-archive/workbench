@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,37 +38,34 @@ import com.sun.jini.start.LifeCycle;
 public class NewWindowGenerator implements I_InitComponentMenus {
 
     protected static Logger logger = Logger.getLogger(NewWindowGenerator.class.getName());
-    
-    public class NewFrame implements ActionListener {
 
+    public class NewFrame implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Constructor<?> c = classToMake.getConstructor(new Class[] {String[].class, LifeCycle.class});
-                c.newInstance(new Object[] { frameArgs, null});
+                Constructor<?> c = classToMake.getConstructor(new Class[] { String[].class, LifeCycle.class });
+                c.newInstance(new Object[] { frameArgs, null });
             } catch (Exception e1) {
                 logger.log(Level.SEVERE, e1.getMessage(), e1);
             }
-            
+
         }
-        
+
     }
+
     private String[] frameArgs;
     private Class<?> classToMake;
     private String title;
 
     public NewWindowGenerator(String[] args, LifeCycle lc) throws ConfigurationException {
         super();
-        Configuration config = ConfigurationProvider.getInstance(args, getClass()
-                .getClassLoader());
-        this.title = (String) config.getEntry(this.getClass().getName(),
-                "frameName", String.class);
-        this.classToMake = (Class<?>) config.getEntry(this.getClass().getName(),
-                "frameClass", Class.class);
-        this.frameArgs = (String[]) config.getEntry(this.getClass().getName(),
-                "frameArgs", String[].class);
+        Configuration config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
+        this.title = (String) config.getEntry(this.getClass().getName(), "frameName", String.class);
+        this.classToMake = (Class<?>) config.getEntry(this.getClass().getName(), "frameClass", Class.class);
+        this.frameArgs = (String[]) config.getEntry(this.getClass().getName(), "frameArgs", String[].class);
         OpenFrames.addNewWindowMenuItemGenerator(this);
     }
+
     public JMenuItem[] getNewWindowMenu() {
         JMenuItem newWindow = new JMenuItem(this.title);
         newWindow.addActionListener(new NewFrame());
@@ -78,9 +75,11 @@ public class NewWindowGenerator implements I_InitComponentMenus {
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
         throw new UnsupportedOperationException();
     }
+
     public JMenu getQuitMenu() {
         throw new UnsupportedOperationException();
     }
+
     public void addInternalFrames(JMenu menu) {
         throw new UnsupportedOperationException();
     }

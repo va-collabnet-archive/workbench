@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ import java.io.IOException;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class TimeUtil {
 
@@ -71,8 +71,7 @@ public class TimeUtil {
      * @return
      * @throws IOException
      */
-    public static String getTimeCompleteOrRemaining(MonitorableProcess process,
-            long elapsedTime) throws IOException {
+    public static String getTimeCompleteOrRemaining(MonitorableProcess process, long elapsedTime) throws IOException {
         StringBuffer buff = new StringBuffer();
 
         if (process.isDone()) {
@@ -84,13 +83,11 @@ public class TimeUtil {
             float completed = process.getCurrent();
             float totalSize = process.getLengthOfTask();
             float percentComplete = completed / totalSize;
-            int percentCompleteInt =
-                    new Float(percentComplete * 100).intValue();
+            int percentCompleteInt = new Float(percentComplete * 100).intValue();
             buff.append(percentCompleteInt);
             buff.append("%");
             if (completed > 0) {
-                float timeRemainingInMs =
-                        elapsedTime / percentComplete - elapsedTime;
+                float timeRemainingInMs = elapsedTime / percentComplete - elapsedTime;
                 buff.append(" (remaining: ");
                 TimeUtil.appendTimeString(buff, timeRemainingInMs);
                 buff.append(")");

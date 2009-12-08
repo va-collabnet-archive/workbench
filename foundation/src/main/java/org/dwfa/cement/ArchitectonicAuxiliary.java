@@ -991,22 +991,22 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     /**
      * Values:
      * <li>0 Defining This relationship represents a defining characteristic of
-     * the sourceId concept. Hierarchical relationships (e.g. �ISA� and
-     * �PART-OF�) are also regarded as defining relationships Example: ��Site� =
-     * �Liver�� is a defining characteristic of �Liver biopsy�.
+     * the sourceId concept. Hierarchical relationships (e.g. ISA and
+     * PART-OF) are also regarded as defining relationships Example: Site =
+     * Liver is a defining characteristic of Liver biopsy.
      * <li>1 Qualifier This relationship represents an optional qualifying
-     * characteristic. Example: ��Revision status� = �Conversion from other type
-     * of arthroplasty�� is a possible qualification of �Hip replacement�
+     * characteristic. Example: Revision status = Conversion from other type
+     * of arthroplasty is a possible qualification of Hip replacement
      * <li>2 Historical This is used to relate an inactive concept to another
-     * concept. Example: The �Same As� relationship connects an inactive concept
+     * concept. Example: The Same As relationship connects an inactive concept
      * with the concept it duplicated. Only used in the Historical Relationships
      * File.
      * <li>3 Additional This relationship represents a context specific
      * characteristic. This is used to convey characteristics of a concept that
      * apply at a particular time within a particular organization but which are
-     * not intrinsic to the concept. Example: �Prescription Only Medicine� is a
-     * context specific characteristic of the I_Concept �Amoxycillin 250mg
-     * capsule�. It is true currently in the UK but is not true in some other
+     * not intrinsic to the concept. Example: Prescription Only Medicine is a
+     * context specific characteristic of the I_Concept Amoxycillin 250mg
+     * capsule. It is true currently in the UK but is not true in some other
      * countries.
      *
      * @param type
@@ -1103,7 +1103,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
          * <li>5 Erroneous The Description has been withdrawn as the Term
          * contains errors.
          * <li>6 Limited The Description is a valid Description of a Concept
-         * which has �limited� status (i.e. the Concept has ConceptStatus = 6).
+         * which has limited status (i.e. the Concept has ConceptStatus = 6).
          * <li>7 Inappropriate The Description has been withdrawn as the Term
          * should not refer to this concept.
          * <li>8 Concept noncurrent The Description is a valid Description of a

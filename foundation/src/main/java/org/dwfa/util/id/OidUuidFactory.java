@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,8 +29,7 @@ public class OidUuidFactory {
     }
 
     public static String get(String prefix, UUID uid) {
-        BigInteger biggy =
-                new BigInteger(uid.toString().replaceAll("-", ""), 16);
+        BigInteger biggy = new BigInteger(uid.toString().replaceAll("-", ""), 16);
         return prefix + biggy.toString();
     }
 
@@ -40,16 +39,14 @@ public class OidUuidFactory {
 
     public static UUID get(String prefix, String oid) {
         if (oid.startsWith(prefix) == false) {
-            throw new NumberFormatException("The oid must start with: "
-                + prefix + " found: " + oid);
+            throw new NumberFormatException("The oid must start with: " + prefix + " found: " + oid);
         }
         String bigIntPart = oid.substring(oid.lastIndexOf('.') + 1);
         BigInteger bigInt = new BigInteger(bigIntPart);
-        //should return 17 bytes, 1 sign byte, and 16 content bytes...
+        // should return 17 bytes, 1 sign byte, and 16 content bytes...
         byte[] bytes = bigInt.toByteArray();
         if (bytes[0] != 0) {
-            throw new NumberFormatException("The integer must be positive. "
-                + bytes[0] + " found: " + oid);
+            throw new NumberFormatException("The integer must be positive. " + bytes[0] + " found: " + oid);
         }
         StringBuffer b = new StringBuffer(36);
 

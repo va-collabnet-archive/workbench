@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,12 +26,9 @@ public class Type5UuidFactoryTest extends TestCase {
 
     public void testGet() {
         try {
-            UUID nameSpace_DNS =
-                    UUID.fromString("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
-            UUID testId =
-                    UUID.fromString("886313e1-3b8a-5372-9b90-0c9aee199e5d");
-            UUID generatedId =
-                    Type5UuidFactory.get(nameSpace_DNS, "python.org");
+            UUID nameSpace_DNS = UUID.fromString("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
+            UUID testId = UUID.fromString("886313e1-3b8a-5372-9b90-0c9aee199e5d");
+            UUID generatedId = Type5UuidFactory.get(nameSpace_DNS, "python.org");
 
             assertEquals(testId, generatedId);
         } catch (NoSuchAlgorithmException e) {
@@ -42,12 +39,12 @@ public class Type5UuidFactoryTest extends TestCase {
 
     }
     /*
-    public void testFromSNOMED() {
-    	
-    	uuid.uuid5(uuid.NAMESPACE_DNS, 'python.org')
-    	+    UUID('886313e1-3b8a-5372-9b90-0c9aee199e5d');
-    	
-    	fail("Not yet implemented");
-    }
+     * public void testFromSNOMED() {
+     * 
+     * uuid.uuid5(uuid.NAMESPACE_DNS, 'python.org')
+     * + UUID('886313e1-3b8a-5372-9b90-0c9aee199e5d');
+     * 
+     * fail("Not yet implemented");
+     * }
      */
 }

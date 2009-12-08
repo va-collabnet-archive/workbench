@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,26 +21,25 @@ import java.text.SimpleDateFormat;
 
 /**
  * Class used to get handles on <code>DateFormat</code>ters without using
- * <code>new SimpleDateFormat(...insert your favorite format here...)</code>
- * in an attempt to limit and one day rein in the number of different
+ * <code>new SimpleDateFormat(...insert your favorite format here...)</code> in
+ * an attempt to limit and one day rein in the number of different
  * date formats used in the code base.
  * <p>
  * This class was created by drawing existing date formats from the codebase.
  * <p>
  * If you need a <code>DateFormat</code> use one from here, please don't invent
  * yet another one. If you absolutely have to have one that isn't here please
- * add it here, don't use <code>new SimpleDateFormat()</code>. If you see
- * one here that can be removed by refactoring the code that uses that
- * date format to use one of the other date formats, fantastic, please do it!
- * Any reduction in the number of these formats is a bonus.
+ * add it here, don't use <code>new SimpleDateFormat()</code>. If you see one
+ * here that can be removed by refactoring the code that uses that date format
+ * to use one of the other date formats, fantastic, please do it! Any reduction
+ * in the number of these formats is a bonus.
  * 
  */
 public class AceDateFormat {
 
     public static final String TIME_ONLY_FORMAT = "HH:mm:ss.SSS";
     public static final String CLOCK_FORMAT = "EEE, MMM d, ''yy h:mm:ss a z";
-    public static final String CANDIDATE_WRITER_FORMAT =
-            "d MMM yyyy HH:mm:ss z";
+    public static final String CANDIDATE_WRITER_FORMAT = "d MMM yyyy HH:mm:ss z";
     public static final String SHORT_DISPLAY_FORMAT = "dd/MM/yyyy";
     public static final String DISPLAY_FORMAT = "dd-MMM-yyyy HH:mm:ss";
     public static final String TABLE_DISPLAY_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
@@ -52,8 +51,7 @@ public class AceDateFormat {
     public static final String RF2_FORMAT = "yyyyMMdd'T'HHmmss'Z'";
     public static final String RF2_TZ_FORMAT = "yyyyMMdd'T'HHmmssZ";
     public static final String OLD_ACE_EXPORT_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
-    public static final String VERSION_HELPER_TZ_FORMAT =
-            "yyyy.MM.dd HH:mm:ss z";
+    public static final String VERSION_HELPER_TZ_FORMAT = "yyyy.MM.dd HH:mm:ss z";
     public static final String VERSION_HELPER_FORMAT = "yyyy.MM.dd HH:mm:ss";
 
     public synchronized static DateFormat getVersionHelperDateFormat() {

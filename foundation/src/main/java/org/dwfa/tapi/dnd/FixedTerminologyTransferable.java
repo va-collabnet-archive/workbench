@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,34 +30,28 @@ import org.dwfa.tapi.impl.UniversalFixedRel;
 
 public abstract class FixedTerminologyTransferable implements Transferable {
 
-    public static DataFlavor universalFixedConceptFlavor =
-            new DataFlavor("application/x-java-jvm-local-objectref; class="
-                + I_ConceptualizeUniversally.class.getName(),
-                "Universal Fixed Concept");
-    public static DataFlavor universalFixedConceptInterfaceFlavor =
-            new DataFlavor(I_ConceptualizeUniversally.class,
-                "Universal Fixed Concept Interface");
-    public static DataFlavor universalFixedDescFlavor =
-            new DataFlavor(UniversalFixedDescription.class,
-                "Universal Fixed Description");
-    public static DataFlavor universalFixedDescInterfaceFlavor =
-            new DataFlavor("application/x-java-jvm-local-objectref; class="
-                + I_DescribeConceptUniversally.class.getName(),
-                "Universal Fixed Description Interface");
-    public static DataFlavor universalFixedRelFlavor =
-            new DataFlavor(UniversalFixedRel.class,
-                "Universal Fixed Relationship");
-    public static DataFlavor universalFixedRelInterfaceFlavor =
-            new DataFlavor("application/x-java-jvm-local-objectref; class="
-                + I_RelateConceptsUniversally.class.getName(),
-                "Universal Fixed Relationship Interface");
+    public static DataFlavor universalFixedConceptFlavor = new DataFlavor(
+        "application/x-java-jvm-local-objectref; class=" + I_ConceptualizeUniversally.class.getName(),
+        "Universal Fixed Concept");
+    public static DataFlavor universalFixedConceptInterfaceFlavor = new DataFlavor(I_ConceptualizeUniversally.class,
+        "Universal Fixed Concept Interface");
+    public static DataFlavor universalFixedDescFlavor = new DataFlavor(UniversalFixedDescription.class,
+        "Universal Fixed Description");
+    public static DataFlavor universalFixedDescInterfaceFlavor = new DataFlavor(
+        "application/x-java-jvm-local-objectref; class=" + I_DescribeConceptUniversally.class.getName(),
+        "Universal Fixed Description Interface");
+    public static DataFlavor universalFixedRelFlavor = new DataFlavor(UniversalFixedRel.class,
+        "Universal Fixed Relationship");
+    public static DataFlavor universalFixedRelInterfaceFlavor = new DataFlavor(
+        "application/x-java-jvm-local-objectref; class=" + I_RelateConceptsUniversally.class.getName(),
+        "Universal Fixed Relationship Interface");
 
     public DataFlavor[] getTransferDataFlavors() {
         return getSupportedFlavors();
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        for (DataFlavor f: getSupportedFlavors()) {
+        for (DataFlavor f : getSupportedFlavors()) {
             if (flavor.equals(f)) {
                 return true;
             }
@@ -71,13 +65,10 @@ public abstract class FixedTerminologyTransferable implements Transferable {
         if (obj != null) {
             if (I_ConceptualizeLocally.class.isAssignableFrom(obj.getClass())) {
                 System.out.println("Making FixedConceptTransferable");
-                return new FixedConceptTransferable(
-                    (I_ConceptualizeLocally) obj);
-            } else if (I_DescribeConceptLocally.class.isAssignableFrom(obj
-                .getClass())) {
+                return new FixedConceptTransferable((I_ConceptualizeLocally) obj);
+            } else if (I_DescribeConceptLocally.class.isAssignableFrom(obj.getClass())) {
                 System.out.println("Making FixedDescriptionTransferable");
-                return new FixedDescriptionTransferable(
-                    (I_DescribeConceptLocally) obj);
+                return new FixedDescriptionTransferable((I_DescribeConceptLocally) obj);
             }
             System.out.println("Making StringSelection Transferable");
             return new StringSelection(obj.toString());

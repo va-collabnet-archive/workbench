@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ import org.dwfa.bpa.gui.GridBagPanel;
 
 /**
  * @author kec
- *
+ * 
  */
 public class BringInternalFrameToFront implements ActionListener {
     private static Logger logger = Logger.getLogger("org.dwfa.bpa.gui.action");
@@ -61,8 +61,7 @@ public class BringInternalFrameToFront implements ActionListener {
             }
         } else {
             if ((this.panel.getParent() != null)
-                && (JLayeredPane.class.isAssignableFrom(this.panel.getParent()
-                    .getClass()))) {
+                && (JLayeredPane.class.isAssignableFrom(this.panel.getParent().getClass()))) {
                 JLayeredPane parent = (JLayeredPane) this.panel.getParent();
                 parent.setPosition(this.panel, 0);
             }

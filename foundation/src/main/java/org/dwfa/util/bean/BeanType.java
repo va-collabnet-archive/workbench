@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,15 +17,15 @@
 package org.dwfa.util.bean;
 
 public enum BeanType {
-	TASK_BEAN(".task"), GENERIC_BEAN(".bean");
-	
-	private String suffix;
+    TASK_BEAN(".task"), GENERIC_BEAN(".bean");
 
-	private BeanType(String suffix) {
-		this.suffix = suffix;
-	}
+    private String suffix;
 
-	public String getSuffix() {
-		return suffix;
-	}
+    private BeanType(String suffix) {
+        this.suffix = suffix;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
 }

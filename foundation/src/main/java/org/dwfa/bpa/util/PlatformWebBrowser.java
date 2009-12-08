@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,153 +36,143 @@ import org.dwfa.bpa.htmlbrowser.JavaBrowser;
  * 
  */
 public class PlatformWebBrowser {
-	private interface I_OpenURL {
-		public boolean openURL(URL url);
-	}
+    private interface I_OpenURL {
+        public boolean openURL(URL url);
+    }
 
-	private static boolean tryNativeBrowser = true;
+    private static boolean tryNativeBrowser = true;
 
-	private static class OpenMacWebBrowser implements I_OpenURL {
-		Class<?> fileManagerClass;
+    private static class OpenMacWebBrowser implements I_OpenURL {
+        Class<?> fileManagerClass;
 
-		Object fileManagerObj;
+        Object fileManagerObj;
 
-		Class<?>[] defArgs = { String.class };
+        Class<?>[] defArgs = { String.class };
 
-		Method openUrlMethod;
+        Method openUrlMethod;
 
-		public OpenMacWebBrowser() throws Exception {
-			fileManagerClass = Class.forName("com.apple.eio.FileManager");
-			fileManagerObj = fileManagerClass.getConstructor(new Class[] {})
-					.newInstance();
-			openUrlMethod = fileManagerClass.getDeclaredMethod("openURL",
-					defArgs);
+        public OpenMacWebBrowser() throws Exception {
+            fileManagerClass = Class.forName("com.apple.eio.FileManager");
+            fileManagerObj = fileManagerClass.getConstructor(new Class[] {}).newInstance();
+            openUrlMethod = fileManagerClass.getDeclaredMethod("openURL", defArgs);
 
-		}
+        }
 
-		public boolean openURL(URL url) {
-			Object[] args = { url.toString() };
-			try {
-				openUrlMethod.invoke(fileManagerObj, args);
-				return true;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return false;
-		}
-	}
+        public boolean openURL(URL url) {
+            Object[] args = { url.toString() };
+            try {
+                openUrlMethod.invoke(fileManagerObj, args);
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
 
-	/**
-	 * Another option is to consider exec functions. "start file.html"
-	 * opens the file in the default web browser on Windows XP.
-	 * @author kec
-	 *
-	 */
-	private static class DesktopOpener implements I_OpenURL {
+    /**
+     * Another option is to consider exec functions. "start file.html"
+     * opens the file in the default web browser on Windows XP.
+     * 
+     * @author kec
+     * 
+     */
+    private static class DesktopOpener implements I_OpenURL {
 
-		Object desktopObject;
+        Object desktopObject;
 
-		Method browseMethod;
-		
-		Method openMethod;
+        Method browseMethod;
 
-		public DesktopOpener() throws ClassNotFoundException, SecurityException,
-				NoSuchMethodException, IllegalArgumentException,
-				IllegalAccessException, InvocationTargetException {
+        Method openMethod;
 
-			Class<?> desktopClass =
-                    Class.forName("java.awt.Desktop");
+        public DesktopOpener() throws ClassNotFoundException, SecurityException, NoSuchMethodException,
+                IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 
-			Method getDesktopMethod = desktopClass.getMethod("getDesktop",
-                    new Class[] {});
-			desktopObject = getDesktopMethod.invoke(null);
+            Class<?> desktopClass = Class.forName("java.awt.Desktop");
 
-			browseMethod = desktopObject.getClass().getMethod("browse",
-                    new Class[] { Class.forName("java.net.URI") });
+            Method getDesktopMethod = desktopClass.getMethod("getDesktop", new Class[] {});
+            desktopObject = getDesktopMethod.invoke(null);
 
-			openMethod = desktopObject.getClass().getMethod("open",
-                    new Class[] { Class.forName("java.io.File") });
-		}
+            browseMethod = desktopObject.getClass().getMethod("browse", new Class[] { Class.forName("java.net.URI") });
 
-		public boolean openURL(URL url) {
+            openMethod = desktopObject.getClass().getMethod("open", new Class[] { Class.forName("java.io.File") });
+        }
 
-			try {
-				String externalForm = url.toExternalForm();
-				if (url.getProtocol().toLowerCase().equals("file") && 
-						url.getFile().toLowerCase().endsWith(".pdf")) {
-					openMethod.invoke(desktopObject, 
-							new Object[] { new File(url.getFile().replace("%20", " ")) });
-				} else {
-					externalForm = externalForm.replace(" ", "%20");
-					URL urlForUri = new URL(externalForm);
-					browseMethod.invoke(
-							desktopObject, new Object[] { urlForUri.toURI() });
-				}
-				return true;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return false;
-		}
-	}
+        public boolean openURL(URL url) {
 
-	private static class GenericOpener implements I_OpenURL {
-		JavaBrowser browser;
+            try {
+                String externalForm = url.toExternalForm();
+                if (url.getProtocol().toLowerCase().equals("file") && url.getFile().toLowerCase().endsWith(".pdf")) {
+                    openMethod.invoke(desktopObject, new Object[] { new File(url.getFile().replace("%20", " ")) });
+                } else {
+                    externalForm = externalForm.replace(" ", "%20");
+                    URL urlForUri = new URL(externalForm);
+                    browseMethod.invoke(desktopObject, new Object[] { urlForUri.toURI() });
+                }
+                return true;
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
 
-		public GenericOpener() throws Exception {
-			super();
-			browser = new JavaBrowser();
-		}
+    private static class GenericOpener implements I_OpenURL {
+        JavaBrowser browser;
 
-		public boolean openURL(URL url) {
-			try {
-				browser.displayPage(url.toString());
-				browser.setVisible(true);
-				browser.toFront();
-				return true;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return false;
-		}
+        public GenericOpener() throws Exception {
+            super();
+            browser = new JavaBrowser();
+        }
 
-	}
+        public boolean openURL(URL url) {
+            try {
+                browser.displayPage(url.toString());
+                browser.setVisible(true);
+                browser.toFront();
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
 
-	public static boolean MAC_OS_X = (System.getProperty("os.name")
-			.toLowerCase().startsWith("mac os x"));
+    }
 
-	private static I_OpenURL opener;
+    public static boolean MAC_OS_X = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
 
-	public static boolean openURL(URL url) throws Exception {
-		if (tryNativeBrowser) {
-			try {
-				if (opener == null) {
-					if (MAC_OS_X) {
-						opener = new OpenMacWebBrowser();
-					} else {
-						opener = new DesktopOpener();
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				opener = new GenericOpener();
-			}
+    private static I_OpenURL opener;
 
-		} else {
-			if (opener == null) {
-				opener = new GenericOpener();
-			}
-		}
-		return opener.openURL(url);
-	}
+    public static boolean openURL(URL url) throws Exception {
+        if (tryNativeBrowser) {
+            try {
+                if (opener == null) {
+                    if (MAC_OS_X) {
+                        opener = new OpenMacWebBrowser();
+                    } else {
+                        opener = new DesktopOpener();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                opener = new GenericOpener();
+            }
 
-	public static void main(String[] args) {
-		try {
-			PlatformWebBrowser.openURL(new URL("http://www.informatics.com"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        } else {
+            if (opener == null) {
+                opener = new GenericOpener();
+            }
+        }
+        return opener.openURL(url);
+    }
+
+    public static void main(String[] args) {
+        try {
+            PlatformWebBrowser.openURL(new URL("http://www.informatics.com"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

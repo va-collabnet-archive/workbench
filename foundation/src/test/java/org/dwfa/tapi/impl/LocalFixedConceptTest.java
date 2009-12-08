@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,20 +41,17 @@ public class LocalFixedConceptTest extends TestCase {
         RefsetAuxiliary rsa = new RefsetAuxiliary();
         rsa.addToMemoryTermServer(mts);
         mts.setGenerateIds(false);
-        I_ConceptualizeLocally localConcept =
-                ArchitectonicAuxiliary.Concept.ACTIVE.localize();
+        I_ConceptualizeLocally localConcept = ArchitectonicAuxiliary.Concept.ACTIVE.localize();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(localConcept);
 
-        ByteArrayInputStream bais =
-                new ByteArrayInputStream(baos.toByteArray());
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         ObjectInputStream ois = new ObjectInputStream(bais);
-        I_ConceptualizeLocally readConcept =
-                (I_ConceptualizeLocally) ois.readObject();
+        I_ConceptualizeLocally readConcept = (I_ConceptualizeLocally) ois.readObject();
         if (readConcept == localConcept) {
-            //System.out.println("Concepts from same server are ==");
+            // System.out.println("Concepts from same server are ==");
         } else {
             fail("Concepts should be ==");
         }

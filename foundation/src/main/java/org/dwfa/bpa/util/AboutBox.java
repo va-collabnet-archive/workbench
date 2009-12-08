@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,18 +43,14 @@ public class AboutBox {
 
             if (System.getProperty("org.dwfa.AboutBoxTitle") != null
                 && System.getProperty("org.dwfa.AboutBoxTitle").length() > 3) {
-                title =
-                        removeQuotes(System
-                            .getProperty("org.dwfa.AboutBoxTitle"));
+                title = removeQuotes(System.getProperty("org.dwfa.AboutBoxTitle"));
             }
             JDialog aboutBox = new JDialog(parent, title);
 
             String graphic = "/about-box.gif";
             if (System.getProperty("org.dwfa.AboutBoxGraphic") != null
                 && System.getProperty("org.dwfa.AboutBoxGraphic").length() > 3) {
-                graphic =
-                        removeQuotes(System
-                            .getProperty("org.dwfa.AboutBoxGraphic"));
+                graphic = removeQuotes(System.getProperty("org.dwfa.AboutBoxGraphic"));
             }
             URL aboutBoxUrl = aboutBox.getClass().getResource(graphic);
             Toolkit tk = aboutBox.getToolkit();
