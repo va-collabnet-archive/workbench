@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,9 +47,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 
 /**
- *
+ * 
  * @goal vodb-create-new-path
- *
+ * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -57,22 +57,22 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     /**
      * Path origins
-     *
+     * 
      * @parameter
      */
     SimpleUniversalAcePosition[] origins;
 
     /**
      * Path UUID
-     *
+     * 
      * @parameter
      * @required
      */
-    //String parentUUID;
+    // String parentUUID;
 
     /**
      * Parent of the new path.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -80,14 +80,14 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     /**
      * Parent of the new path.
-     *
+     * 
      * @parameter
      */
     private ConceptDescriptor status;
 
     /**
      * Path Description
-     *
+     * 
      * @parameter
      * @required
      */
@@ -95,7 +95,7 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     /**
      * Path Description
-     *
+     * 
      * @parameter
      * @required
      */
@@ -103,14 +103,15 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private File targetDirectory;
 
     /**
-     * If true, set version timestamps (commit time) to the beginning of SNOMED time to ensure it
+     * If true, set version timestamps (commit time) to the beginning of SNOMED
+     * time to ensure it
      * preceeds all other changes.
      * 
      * @parameter
@@ -121,8 +122,8 @@ public class VodbCreateNewPath extends AbstractMojo {
         // Use the architectonic branch for all path editing.
         try {
             try {
-                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + pathFsDesc,
-                        this.getClass(), targetDirectory)) {
+                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + pathFsDesc, this.getClass(),
+                    targetDirectory)) {
                     return;
                 }
             } catch (NoSuchAlgorithmException e) {
@@ -147,7 +148,7 @@ public class VodbCreateNewPath extends AbstractMojo {
             I_GetConceptData pathConcept;
 
             if (tf.hasId(pathUUID)) {
-                pathConcept = tf.getConcept(new UUID[] {pathUUID});
+                pathConcept = tf.getConcept(new UUID[] { pathUUID });
 
                 /**
                  * This addresses a problem where a UUID has been specified
@@ -157,8 +158,7 @@ public class VodbCreateNewPath extends AbstractMojo {
                  * we check for descriptions and create the path concept
                  * anyway... as the existing concept is not complete/usable
                  */
-                if (pathConcept.getDescriptions() == null
-                        || pathConcept.getDescriptions().isEmpty()) {
+                if (pathConcept.getDescriptions() == null || pathConcept.getDescriptions().isEmpty()) {
                     pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
                 }
             } else {
@@ -179,47 +179,42 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     private I_GetConceptData createNewPathConcept(I_TermFactory tf, I_ConfigAceFrame activeConfig, UUID pathUUID)
             throws TerminologyException, IOException, Exception, NoSuchAlgorithmException, UnsupportedEncodingException {
-        
+
         List<I_AmTuple> newTuples = new ArrayList<I_AmTuple>();
-        
+
         I_GetConceptData pathConcept = tf.newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
-        
+
         I_ConceptAttributeVersioned cav = pathConcept.getConceptAttributes();
         newTuples.addAll(cav.getTuples());
 
-        UUID fsDescUuid =
-                Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
-                    + ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids() + pathFsDesc);
+        UUID fsDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
+            + ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids() + pathFsDesc);
 
-        I_DescriptionVersioned idv =
-                tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
-                    ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeConfig);
+        I_DescriptionVersioned idv = tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
+            ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeConfig);
         newTuples.addAll(idv.getTuples());
-        
-        UUID prefDescUuid =
-                Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
-                    + ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() + pathPrefDesc);
 
-        I_DescriptionVersioned idvpt =
-                tf.newDescription(prefDescUuid, pathConcept, "en", pathPrefDesc,
-                    ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
+        UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
+            + ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() + pathPrefDesc);
+
+        I_DescriptionVersioned idvpt = tf.newDescription(prefDescUuid, pathConcept, "en", pathPrefDesc,
+            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
         newTuples.addAll(idvpt.getTuples());
 
-        UUID relUuid =
-                Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString() + fsDescUuid
-                    + prefDescUuid);
+        UUID relUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString() + fsDescUuid
+            + prefDescUuid);
 
         I_RelVersioned rel = tf.newRelationship(relUuid, pathConcept, activeConfig);
         newTuples.addAll(rel.getTuples());
-        
+
         if (status != null) {
             TupleListUtil.setStatus(status.getVerifiedConcept(), newTuples);
         }
-        
+
         if (setVersionAsBeginningOfTime) {
             TupleListUtil.setVersion(Integer.MIN_VALUE, newTuples);
         }
-        
+
         // need to do an immediate commit so that new concept will be available
         // to path when read from changeset
         tf.commit();

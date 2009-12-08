@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,9 +70,9 @@ import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartString;
 
 /**
- *
+ * 
  * This mojo exports reference sets from an ACE database
- *
+ * 
  * @goal refset-export
  * @author Dion McMurtrie
  */
@@ -82,7 +82,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Whether to use RF2 for the export. If not, the alternate release format
      * will be used (this is also the default).
-     *
+     * 
      * @parameter
      */
     boolean useRF2 = false;
@@ -91,7 +91,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * RF2 Descriptor - this is required if useRF2 is set to true. This
      * describes the module, namespace, content sub type and country information
      * required to export in RF2.
-     *
+     * 
      * @parameter
      */
     RF2Descriptor rf2Descriptor;
@@ -107,7 +107,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * A then none of the reference set will be exported. However if the export
      * spec does include A, but not C then the reference set will be exported
      * except it will only have members B and D - C will be omitted.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -115,7 +115,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Defines the directory to which the UUID based reference sets are exported
-     *
+     * 
      * @parameter
      * @required
      */
@@ -124,16 +124,17 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Defines the directory to which the SCTID based reference sets are
      * exported
-     *
+     * 
      * @parameter
      * @required
      */
     File sctidRefsetOutputDirectory;
 
     /**
-     * Defines the directory to which the SCTID based structural reference sets are
+     * Defines the directory to which the SCTID based structural reference sets
+     * are
      * exported
-     *
+     * 
      * @parameter
      * @required
      */
@@ -141,7 +142,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Directory where the fixed SCTID map is located
-     *
+     * 
      * @parameter
      * @required
      */
@@ -149,7 +150,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Directory where the read/write SCTID maps are stored
-     *
+     * 
      * @parameter
      * @required
      */
@@ -158,20 +159,20 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Release version used to embed in the refset file names - if not specified
      * then the "path version" reference set is used to determine the version
-     *
+     * 
      * @parameter
      */
     String releaseVersion;
     /**
      * The number of threads to use.
-     *
+     * 
      * @parameter
      */
     int numberOfThreads = 1;
 
     /**
      * Auto commit every 1000 concepts.
-     *
+     * 
      * @parameter
      */
     boolean autoCommit = false;
@@ -190,15 +191,18 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Batch processing size - defaults to 30
+     * 
      * @parameter
      */
     private int batchSize = 30;
 
     /**
      * Used to configure the release date/version to use for given paths,
-     * paths not specified will be exported with the version recorded in the database.
+     * paths not specified will be exported with the version recorded in the
+     * database.
      * Note this configuration will be ignored and overridden by the releaseDate
      * parameter
+     * 
      * @parameter
      */
     protected PathReleaseDateConfig[] pathReleaseDateConfig;
@@ -275,9 +279,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             inActiveNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid();
             currentNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
             relationshipRefinability = ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION.localize().getNid();
-            relationshipRefinabilityExtension = ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION.localize().getNid();
+            relationshipRefinabilityExtension = ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION.localize()
+                .getNid();
             descriptionInactivationIndicator = ConceptConstants.DESCRIPTION_INACTIVATION_INDICATOR.localize().getNid();
-            relationshipInactivationIndicator = ConceptConstants.RELATIONSHIP_INACTIVATION_INDICATOR.localize().getNid();
+            relationshipInactivationIndicator = ConceptConstants.RELATIONSHIP_INACTIVATION_INDICATOR.localize()
+                .getNid();
             conceptInactivationIndicator = ConceptConstants.CONCEPT_INACTIVATION_INDICATOR.localize().getNid();
             ctv3IdMapExtension = ConceptConstants.CTV3_ID_MAP_EXTENSION.localize().getNid();
             snomedIdMapExtension = ConceptConstants.SNOMED_ID_MAP_EXTENSION.localize().getNid();
@@ -293,14 +299,15 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             aceAmbiguousStatusNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.AMBIGUOUS.localize().getNid();
             aceErroneousStatusNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.ERRONEOUS.localize().getNid();
             aceOutdatedStatusNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.OUTDATED.localize().getNid();
-            aceInappropriateStatusNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.INAPPROPRIATE.localize().getNid();
-            aceMovedElsewhereStatusNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.localize().getNid();
+            aceInappropriateStatusNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.INAPPROPRIATE.localize()
+                .getNid();
+            aceMovedElsewhereStatusNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.localize()
+                .getNid();
             workQueue = LocalVersionedTerminology.get().newProcessQueue(numberOfThreads);
 
         } catch (Exception e) {
             throw new MojoExecutionException("", e);
         }
-
 
         if (!fixedMapDirectory.exists() || !fixedMapDirectory.isDirectory() || !fixedMapDirectory.canRead()) {
             throw new MojoExecutionException("Cannot proceed, fixedMapDirectory must exist and be readable");
@@ -310,8 +317,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             throw new MojoExecutionException("Cannot proceed, readWriteMapDirectory must exist and be readable");
         }
 
-        if(useRF2 && aceIdentifierFile == null || aceStructuralIdentifierFile == null){
-            throw new MojoExecutionException("Cannot proceed, RF2 requires a aceIdentifierFile and aceStructuralIdentifierFile");
+        if (useRF2 && aceIdentifierFile == null || aceStructuralIdentifierFile == null) {
+            throw new MojoExecutionException(
+                "Cannot proceed, RF2 requires a aceIdentifierFile and aceStructuralIdentifierFile");
         }
         if (useRF2 && aceIdentifierFile != null && aceStructuralIdentifierFile != null) {
             try {
@@ -329,7 +337,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             for (ExportSpecification spec : exportSpecifications) {
                 for (PositionDescriptor pd : spec.getPositionsForExport()) {
                     positions.add(pd.getPosition());
-                    positionIds .add(pd.getPosition().getPath().getConceptId());
+                    positionIds.add(pd.getPosition().getPath().getConceptId());
                 }
                 for (ConceptDescriptor status : spec.getStatusValuesForExport()) {
                     allowedStatuses.add(status.getVerifiedConcept().getConceptId());
@@ -356,14 +364,16 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
             doneSignal.await();
 
-//          Add in after R1.0.
-//            if (useRF2) {
-//                HashMap<Integer, RefsetType> refsetTypeMapCopy = new HashMap<Integer, RefsetType>();
-//                refsetTypeMapCopy.putAll(refsetTypeMap);
-//                for (Integer refsetId : refsetTypeMapCopy.keySet()) {
-//                    exportRefsetDescription(refsetId, refsetTypeMapCopy.get(refsetId));
-//                }
-//            }
+            // Add in after R1.0.
+            // if (useRF2) {
+            // HashMap<Integer, RefsetType> refsetTypeMapCopy = new
+            // HashMap<Integer, RefsetType>();
+            // refsetTypeMapCopy.putAll(refsetTypeMap);
+            // for (Integer refsetId : refsetTypeMapCopy.keySet()) {
+            // exportRefsetDescription(refsetId,
+            // refsetTypeMapCopy.get(refsetId));
+            // }
+            // }
 
             for (BufferedWriter writer : writerMap.values()) {
                 writer.close();
@@ -385,7 +395,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * NB. Activate after R1.0
      * Export the refset description for the exported refsets.
-     *
+     * 
      * @param refsetId the exported refset
      * @param refsetType the type of refset
      * @throws Exception DB or file errors
@@ -428,9 +438,10 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Gets the latest attribute for the concept.
-     *
-     * Attributes are filtered by the <code>allowedStatuses</code> and <code>positions</code> lists.
-     *
+     * 
+     * Attributes are filtered by the <code>allowedStatuses</code> and
+     * <code>positions</code> lists.
+     * 
      * @param concept the concept to get the latest attribute for.
      * @return latest I_ConceptAttributePart may be null.
      * @throws IOException looking up I_ConceptAttributePart
@@ -451,9 +462,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         boolean exportableVersionFound = false;
         I_DescriptionPart latest = null;
         for (I_DescriptionPart part : versionedDesc.getVersions()) {
-            if (checkPath(part.getPathId())
-                    && testSpecificationWithCache(part.getTypeId())
-                    && allowedStatuses.contains(part.getStatusId())) {
+            if (checkPath(part.getPathId()) && testSpecificationWithCache(part.getTypeId())
+                && allowedStatuses.contains(part.getStatusId())) {
 
                 exportableVersionFound = true;
                 if (latest == null || latest.getVersion() < part.getVersion()) {
@@ -481,12 +491,10 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             boolean exportableVersionFound = false;
             I_RelPart latest = null;
             for (I_RelPart part : versionedRel.getVersions()) {
-                if (checkPath(part.getPathId())
-                        && allowedStatuses.contains(part.getStatusId())
-                        && testSpecificationWithCache(part.getRelTypeId())
-                        && testSpecificationWithCache(part.getPathId())
-                        && testSpecificationWithCache(part.getRefinabilityId())
-                        && testSpecificationWithCache(part.getCharacteristicId())) {
+                if (checkPath(part.getPathId()) && allowedStatuses.contains(part.getStatusId())
+                    && testSpecificationWithCache(part.getRelTypeId()) && testSpecificationWithCache(part.getPathId())
+                    && testSpecificationWithCache(part.getRefinabilityId())
+                    && testSpecificationWithCache(part.getCharacteristicId())) {
 
                     exportableVersionFound = true;
                     if (latest == null || latest.getVersion() < part.getVersion()) {
@@ -509,8 +517,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     /**
-     * Create/update and export string extensions for all concepts that have SCT3 ids.
-     *
+     * Create/update and export string extensions for all concepts that have
+     * SCT3 ids.
+     * 
      * @param latest I_AmPart latest version of the concept
      * @param conceptId concept id
      * @throws Exception cannot create or export the concept.
@@ -518,11 +527,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     private void exportCtv3IdMap(I_AmPart latest, int conceptId) throws Exception {
         I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ctv3IdMapExtension);
         I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) tuple;
-        I_IdPart ctv3IdPart =
-                getLatestVersion(tf.getConcept(conceptId).getId().getVersions(), ArchitectonicAuxiliary.Concept.CTV3_ID);
-        if(ctv3IdPart != null){
+        I_IdPart ctv3IdPart = getLatestVersion(tf.getConcept(conceptId).getId().getVersions(),
+            ArchitectonicAuxiliary.Concept.CTV3_ID);
+        if (ctv3IdPart != null) {
             if (part == null) {
-                part = new ThinExtByRefPartString();//stunt extension part.
+                part = new ThinExtByRefPartString();// stunt extension part.
                 part.setStringValue(ctv3IdPart.getSourceId().toString());
                 part.setPathId(latest.getPathId());
                 part.setStatusId(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
@@ -536,8 +545,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     /**
-     * Create/update and export string extensions for all concepts that have snomed ids.
-     *
+     * Create/update and export string extensions for all concepts that have
+     * snomed ids.
+     * 
      * @param latest I_AmPart latest version of the concept
      * @param conceptId concept id
      * @throws Exception cannot create or export the concept.
@@ -545,12 +555,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     private void exportSnomedIdMap(I_AmPart latest, int conceptId) throws Exception {
         I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, snomedIdMapExtension);
         I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) tuple;
-        I_IdPart snomedIdPart =
-                getLatestVersion(tf.getConcept(conceptId).getId().getVersions(),
-                    ArchitectonicAuxiliary.Concept.SNOMED_RT_ID);
-        if(snomedIdPart != null){
+        I_IdPart snomedIdPart = getLatestVersion(tf.getConcept(conceptId).getId().getVersions(),
+            ArchitectonicAuxiliary.Concept.SNOMED_RT_ID);
+        if (snomedIdPart != null) {
             if (part == null) {
-                part = new ThinExtByRefPartString();//stunt extension part.
+                part = new ThinExtByRefPartString();// stunt extension part.
                 part.setStringValue(snomedIdPart.getSourceId().toString());
                 part.setPathId(latest.getPathId());
                 part.setStatusId(activeNId);
@@ -565,9 +574,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Export the relationships for the concepts latest version
-     *
+     * 
      * @param versionedRel the concept to export the relationships for.
-     *
+     * 
      * @throws Exception DB errors.
      */
     private void processRelationshipInactivation(I_RelVersioned versionedRel) throws Exception {
@@ -575,11 +584,10 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             boolean exportableVersionFound = false;
             I_RelPart latest = null;
             for (I_RelPart part : versionedRel.getVersions()) {
-                if (checkPath(part.getPathId())
-                        && allowedStatuses.contains(part.getStatusId())
-                        && testSpecificationWithCache(part.getCharacteristicId())
-                        && testSpecificationWithCache(part.getPathId())
-                        && testSpecificationWithCache(part.getRefinabilityId())) {
+                if (checkPath(part.getPathId()) && allowedStatuses.contains(part.getStatusId())
+                    && testSpecificationWithCache(part.getCharacteristicId())
+                    && testSpecificationWithCache(part.getPathId())
+                    && testSpecificationWithCache(part.getRefinabilityId())) {
 
                     exportableVersionFound = true;
                     if (latest == null || latest.getVersion() < part.getVersion()) {
@@ -598,18 +606,18 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Export the descriptions for the concepts latest version
-     *
-     * @param versionedDesc the description to export the inactivation status for.
-     *
+     * 
+     * @param versionedDesc the description to export the inactivation status
+     *            for.
+     * 
      * @throws Exception DB errors.
      */
     private void processDescriptionInactivation(I_DescriptionVersioned versionedDesc) throws Exception {
         boolean exportableVersionFound = false;
         I_DescriptionPart latest = null;
         for (I_DescriptionPart part : versionedDesc.getVersions()) {
-            if (checkPath(part.getPathId())
-                    && allowedStatuses.contains(part.getStatusId())
-                    && testSpecificationWithCache(part.getTypeId())) {
+            if (checkPath(part.getPathId()) && allowedStatuses.contains(part.getStatusId())
+                && testSpecificationWithCache(part.getTypeId())) {
 
                 exportableVersionFound = true;
                 if (latest == null || latest.getVersion() < part.getVersion()) {
@@ -626,9 +634,10 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     /**
-     * Create/update and export status concept extensions for all concepts that are not active, inactive
+     * Create/update and export status concept extensions for all concepts that
+     * are not active, inactive
      * or current as we want to know why they are active, inactive or current.
-     *
+     * 
      * @param latest I_AmPart latest version of the concept
      * @param relId concept id
      * @throws Exception cannot create or export the concept.
@@ -640,12 +649,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         if (rf2InactiveStatus != -1 && part == null) {
             // if the status is INACTIVE or ACTIVE there is no need for a
             // reason. For simplicity, CURRENT will be treated this way too,
-            if (latest.getStatusId() != activeNId
-                && latest.getStatusId() != inActiveNId
+            if (latest.getStatusId() != activeNId && latest.getStatusId() != inActiveNId
                 && latest.getStatusId() != currentNId) {
                 // no extension at all
-                //part = tf.newExtensionPart(ThinExtByRefPartConcept.class);
-                part = new ThinExtByRefPartConcept();//stunt extension part.
+                // part = tf.newExtensionPart(ThinExtByRefPartConcept.class);
+                part = new ThinExtByRefPartConcept();// stunt extension part.
                 part.setC1id(rf2InactiveStatus);
                 part.setPathId(latest.getPathId());
                 part.setStatusId(activeNId);
@@ -661,7 +669,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * covert the snomed CT component status to rf2 meta-data status
-     *
+     * 
      * @param statusId int
      * @return int rf2 status or -1 if no map found.
      */
@@ -686,8 +694,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     /**
-     * Create/update and export concept extensions (relationships refinability reference) for all concepts.
-     *
+     * Create/update and export concept extensions (relationships refinability
+     * reference) for all concepts.
+     * 
      * @param latest I_AmPart latest version of the concept
      * @param relId concept id
      * @throws Exception cannot create or export the concept.
@@ -697,7 +706,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
         if (part == null) {
             // no extension at all
-            part = new ThinExtByRefPartConcept();//stunt extension part.
+            part = new ThinExtByRefPartConcept();// stunt extension part.
             part.setC1id(latest.getRefinabilityId());
             part.setPathId(latest.getPathId());
             part.setStatusId(activeNId);
@@ -711,8 +720,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     /**
-     * Get the latest version for the list of id parts with the source <code>sourceConcept</code>
-     *
+     * Get the latest version for the list of id parts with the source
+     * <code>sourceConcept</code>
+     * 
      * @param sourceConcept Concept eg SNOMED_T3_UUID, SNOMED_INT_ID etc
      * @return I_IdPart latest Id version for the sourceConcept.
      * @throws IOException DB errors
@@ -731,6 +741,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
         return latestVersion;
     }
+
     synchronized boolean testSpecificationWithCache(int id) throws TerminologyException, IOException, Exception {
         Boolean result = testSpecCache.get(id);
         if (result == null) {
@@ -742,17 +753,17 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Gets the latest extension for the concept and refset id.
-     *
-     * Extension are filtered by the <code>allowedStatuses</code> and <code>positions</code> lists.
-     *
+     * 
+     * Extension are filtered by the <code>allowedStatuses</code> and
+     * <code>positions</code> lists.
+     * 
      * @param componentId refset member concept
      * @param relationshipRefinabilityExtension refset.
      * @return I_ThinExtByRefTuple the latest extension, may be null
      * @throws IOException DB error
      * @throws TerminologyException
      */
-    I_ThinExtByRefTuple getCurrentExtension(int componentId, int refsetId)
-            throws IOException, TerminologyException {
+    I_ThinExtByRefTuple getCurrentExtension(int componentId, int refsetId) throws IOException, TerminologyException {
         I_ThinExtByRefTuple latest = null;
         for (I_ThinExtByRefVersioned ext : tf.getAllExtensionsForComponent(componentId)) {
             if (ext.getRefsetId() == refsetId) {
@@ -768,22 +779,22 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Exports the refset to file.
-     *
+     * 
      * @param thinExtByRefTuple The concept extension to write to file.
-     *
+     * 
      * @throws Exception on DB or file error.
      */
     private void exportRefsets(int componentId, TYPE type) throws TerminologyException, Exception {
         List<I_ThinExtByRefVersioned> extensions = tf.getAllExtensionsForComponent(componentId);
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
             if (testSpecificationWithCache(thinExtByRefVersioned.getRefsetId())) {
-                if (!isLive(thinExtByRefVersioned) &&
-                        !isActive(thinExtByRefVersioned.getLatestVersion().getStatusId())) {
+                if (!isLive(thinExtByRefVersioned) && !isActive(thinExtByRefVersioned.getLatestVersion().getStatusId())) {
                     // move on to the next extension - don't export
                     continue;
                 }
 
-                for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses, positions, false, false)) {
+                for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses,
+                    positions, false, false)) {
                     export(thinExtByRefTuple, type);
                 }
             }
@@ -797,7 +808,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Exports the refset to file.
-     *
+     * 
      * @param thinExtByRefPart The concept extension to write to file.
      * @param memberId the id for this refset member record.
      * @param refsetId the refset id
@@ -814,7 +825,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                 try {
                     refsetType = RefsetType.findByExtension(thinExtByRefPart);
                 } catch (EnumConstantNotPresentException e) {
-                    getLog().warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
+                    getLog().warn(
+                        "No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
                     return;
                 }
                 refsetTypeMap.put(refsetId, refsetType);
@@ -835,14 +847,17 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         first = false;
     }
 
-   /**
-     * Is an extension "live", that is has the extension ever been released/exported before.
+    /**
+     * Is an extension "live", that is has the extension ever been
+     * released/exported before.
      */
     private boolean isLive(I_ThinExtByRefVersioned extension) {
 
         // TODO
-        // This being developed for a first release this method is being jury-rigged to save development effort.
-        // In subsequent releases we will need to look at the parts contain in the extension to identify any that
+        // This being developed for a first release this method is being
+        // jury-rigged to save development effort.
+        // In subsequent releases we will need to look at the parts contain in
+        // the extension to identify any that
         // are on a previous "public" release path.
 
         return false;
@@ -850,7 +865,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Gets the id file for the reference set type.
-     *
+     * 
      * @param refsetId int
      * @return AceIdentifierWriter for the clinical or structural refset
      */
@@ -866,15 +881,15 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Is the reference set clinical or structural
-     *
+     * 
      * @param refsetId int
      * @return true if reference set is structural
      */
     boolean isStructuralRefset(int refsetId) {
         boolean isStructuralRefset = refsetId == ctv3IdMapExtension || refsetId == snomedIdMapExtension
-                || refsetId == relationshipRefinability || refsetId == relationshipRefinabilityExtension
-                || refsetId == descriptionInactivationIndicator || refsetId == relationshipInactivationIndicator
-                || refsetId == conceptInactivationIndicator;
+            || refsetId == relationshipRefinability || refsetId == relationshipRefinabilityExtension
+            || refsetId == descriptionInactivationIndicator || refsetId == relationshipInactivationIndicator
+            || refsetId == conceptInactivationIndicator;
         return isStructuralRefset;
     }
 
@@ -913,23 +928,19 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                 refsetName = convertToCamelCase(refsetName);
 
                 String sctIdFilePrefix = "der2_cRefset_";
-                String fileName =
-                        refsetName + rf2Descriptor.getContentSubType() + "_" + rf2Descriptor.getCountryCode()
-                            + rf2Descriptor.getNamespace() + "_" + releaseVersion + ".txt";
+                String fileName = refsetName + rf2Descriptor.getContentSubType() + "_" + rf2Descriptor.getCountryCode()
+                    + rf2Descriptor.getNamespace() + "_" + releaseVersion + ".txt";
                 if (isStructuralRefset(refsetId)) {
-                    sctIdRefsetWriter =
-                            new BufferedWriter(new FileWriter(new File(sctidStructuralRefsetOutputDirectory,
-                                sctIdFilePrefix + fileName)));
+                    sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(
+                        sctidStructuralRefsetOutputDirectory, sctIdFilePrefix + fileName)));
                 } else {
-                    sctIdRefsetWriter =
-                            new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, sctIdFilePrefix
-                                + fileName)));
+                    sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory,
+                        sctIdFilePrefix + fileName)));
                 }
                 sctIdRefsetWriter.write(refsetTypeMap.get(refsetId).getRefsetHandler().getRF2HeaderLine());
             } else {
-                sctIdRefsetWriter =
-                    new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, "SCTID_" + refsetName
-                        + "_" + releaseVersion + ".txt")));
+                sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, "SCTID_"
+                    + refsetName + "_" + releaseVersion + ".txt")));
                 sctIdRefsetWriter.write(refsetTypeMap.get(refsetId).getRefsetHandler().getHeaderLine());
             }
             sctIdRefsetWriter.write(newLineChars);
@@ -942,15 +953,14 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     synchronized private BufferedWriter getUuidRefsetWriter(int refsetId) throws Exception {
         BufferedWriter uuidRefsetWriter = writerMap.get(refsetId + "UUID");
 
-        if(uuidRefsetWriter == null){
+        if (uuidRefsetWriter == null) {
             I_GetConceptData refsetConcept = tf.getConcept(refsetId);
             String refsetName = getPreferredTerm(refsetConcept);
             refsetName = refsetName.replace("/", "-");
             refsetName = refsetName.replace("'", "_");
 
-            uuidRefsetWriter =
-                new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, "UUID_" + refsetName
-                    + "_" + releaseVersion + ".txt")));
+            uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, "UUID_"
+                + refsetName + "_" + releaseVersion + ".txt")));
 
             uuidRefsetWriter.write(refsetTypeMap.get(refsetId).getRefsetHandler().getHeaderLine());
             uuidRefsetWriter.write(newLineChars);
@@ -963,9 +973,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Camel case with first letter capped.
-     *
+     * 
      * @param string String
-     *
+     * 
      * @return String
      */
     private String convertToCamelCase(String string) {
@@ -980,7 +990,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Gets the release version for the path concept.
-     *
+     * 
      * @param refsetConcept path refset concept.
      * @return String release preferred term.
      * @throws Exception DB error
@@ -997,8 +1007,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                 String pathVersion = null;
                 pathUuidStr = tf.getUids(pathid).iterator().next().toString();
 
-                int pathVersionRefsetNid =
-                        tf.uuidToNative(org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getUuids()[0]);
+                int pathVersionRefsetNid = tf.uuidToNative(org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getUuids()[0]);
                 int currentStatusId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
                 for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(pathid)) {
                     if (extension.getRefsetId() == pathVersionRefsetNid) {
@@ -1032,7 +1041,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Gets the latest version for this extension.
-     *
+     * 
      * @param extension I_ThinExtByRefVersioned
      * @return I_ThinExtByRefPart latest version. may be null
      */
@@ -1048,7 +1057,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Does the concept match the <code>exportSpecifications</code>
-     *
+     * 
      * @param concept I_GetConceptData
      * @return true if a matching concept.
      * @throws Exception DB error
@@ -1065,7 +1074,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Does the concept match the <code>exportSpecifications</code>
-     *
+     * 
      * @param id concept it
      * @return true if a matching concept.
      * @throws TerminologyException DB error
@@ -1078,7 +1087,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Is the path id in the list of <code>positions</code>
-     *
+     * 
      * @param pathId int
      * @return true if pathId in <code>positions</code> list
      */
@@ -1087,8 +1096,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     /**
-     * Gets the concepts preferred term filtered by <code>statusSet</code> sorted by <code>TYPE_B4_LANG</code>
-     *
+     * Gets the concepts preferred term filtered by <code>statusSet</code>
+     * sorted by <code>TYPE_B4_LANG</code>
+     * 
      * @param conceptData I_GetConceptData to get the preferred term for
      * @return String preferred term
      * @throws Exception DB error
@@ -1101,8 +1111,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         statusSet.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
         statusSet.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
 
-        I_DescriptionTuple descTuple =
-                conceptData.getDescTuple(descTypeList, null, statusSet, positions, LANGUAGE_SORT_PREF.TYPE_B4_LANG);
+        I_DescriptionTuple descTuple = conceptData.getDescTuple(descTypeList, null, statusSet, positions,
+            LANGUAGE_SORT_PREF.TYPE_B4_LANG);
         if (descTuple == null) {
             getLog().info("Cannot find Preferred Term using status and poistions, any current Preferred Term");
             descTuple = conceptData.getDescTuple(descTypeList, null, statusSet, null, LANGUAGE_SORT_PREF.TYPE_B4_LANG);
@@ -1115,8 +1125,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         return descTuple.getText();
     }
 
-    private synchronized void updateConceptsToProcessCount(int amount){
-        conceptsToProcessCount  += amount;
+    private synchronized void updateConceptsToProcessCount(int amount) {
+        conceptsToProcessCount += amount;
     }
 
     private synchronized int getConceptsToProcessCount() {
@@ -1128,7 +1138,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
         /**
          * Default constructor
-         *
+         * 
          * Doesn't update latch.
          */
         ConceptProcessor() {
@@ -1162,7 +1172,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
                 I_ConceptAttributePart latest = getLatestAttributePart(concept);
                 if (latest == null) {
-                    getLog().warn("Concept " + concept + " is exportable for specification " + exportSpecifications
+                    getLog().warn(
+                        "Concept " + concept + " is exportable for specification " + exportSpecifications
                             + " but has no parts valid for statuses " + allowedStatuses + " and positions " + positions);
                     return;
                 }
@@ -1177,7 +1188,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                     processDescriptionInactivation(desc);
                 }
 
-                if(!tf.getAllExtensionsForComponent(concept.getConceptId()).isEmpty()){
+                if (!tf.getAllExtensionsForComponent(concept.getConceptId()).isEmpty()) {
                     exportRefsets(concept.getConceptId(), TYPE.CONCEPT);
                     for (I_RelVersioned rel : concept.getSourceRels()) {
                         processRelationship(rel);
@@ -1193,7 +1204,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     /**
      * Is the status ACTIVE or a child of ACTIVE?
-     *
+     * 
      * @param statusId The status to evaluate
      * @return True is considered an ACTIVE status type
      * @throws IOException

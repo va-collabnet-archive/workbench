@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,43 +28,49 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 public class ConceptIntegerRefsetHandler extends MemberRefsetHandler {
-	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid, boolean useRf2) throws SQLException, ClassNotFoundException, Exception {
-		I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) tuple.getPart();
+    @Override
+    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid, boolean useRf2)
+            throws SQLException, ClassNotFoundException, Exception {
+        I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) tuple.getPart();
 
-		return super.formatRefsetLine(tf, tuple, sctid, useRf2) + MemberRefsetHandler.COLUMN_DELIMITER
-					+ toId(tf, conceptIntegerPart.getC1id(), sctid, TYPE.CONCEPT) + MemberRefsetHandler.COLUMN_DELIMITER
-					+ conceptIntegerPart.getIntValue();
-	}
+        return super.formatRefsetLine(tf, tuple, sctid, useRf2) + MemberRefsetHandler.COLUMN_DELIMITER
+            + toId(tf, conceptIntegerPart.getC1id(), sctid, TYPE.CONCEPT) + MemberRefsetHandler.COLUMN_DELIMITER
+            + conceptIntegerPart.getIntValue();
+    }
 
-	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId, int componentId, boolean sctId, boolean useRf2) throws SQLException, ClassNotFoundException, Exception {
-		I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) part;
+    @Override
+    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId,
+            int componentId, boolean sctId, boolean useRf2) throws SQLException, ClassNotFoundException, Exception {
+        I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) part;
 
-		return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId, useRf2) + MemberRefsetHandler.COLUMN_DELIMITER
-					+ toId(tf, conceptIntegerPart.getC1id(), sctId, TYPE.CONCEPT) + MemberRefsetHandler.COLUMN_DELIMITER
-					+ conceptIntegerPart.getIntValue();
-	}
+        return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId, useRf2)
+            + MemberRefsetHandler.COLUMN_DELIMITER + toId(tf, conceptIntegerPart.getC1id(), sctId, TYPE.CONCEPT)
+            + MemberRefsetHandler.COLUMN_DELIMITER + conceptIntegerPart.getIntValue();
+    }
 
     /**
      * @throws Exception
      * @throws ClassNotFoundException
      * @throws SQLException
-     * @see org.dwfa.mojo.refset.writers.MemberRefsetHandler#formatRefsetLineRF2(org.dwfa.ace.api.I_TermFactory, org.dwfa.ace.api.ebr.I_ThinExtByRefPart, java.lang.Integer, int, int, boolean, boolean)
+     * @see org.dwfa.mojo.refset.writers.MemberRefsetHandler#formatRefsetLineRF2(org.dwfa.ace.api.I_TermFactory,
+     *      org.dwfa.ace.api.ebr.I_ThinExtByRefPart, java.lang.Integer, int,
+     *      int, boolean, boolean)
      */
     @Override
     public String formatRefsetLineRF2(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetNid,
-            int componentId, boolean sctId, boolean useRf2, TYPE type) throws SQLException, ClassNotFoundException, Exception {
+            int componentId, boolean sctId, boolean useRf2, TYPE type) throws SQLException, ClassNotFoundException,
+            Exception {
         I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) part;
 
         return super.formatRefsetLineRF2(tf, part, memberId, refsetNid, componentId, sctId, useRf2, type)
-                + MemberRefsetHandler.COLUMN_DELIMITER + conceptIntegerPart.getIntValue();
+            + MemberRefsetHandler.COLUMN_DELIMITER + conceptIntegerPart.getIntValue();
     }
 
-	@Override
-	public String getHeaderLine() {
-		return super.getHeaderLine() + MemberRefsetHandler.COLUMN_DELIMITER + "CONCEPT_VALUE" + MemberRefsetHandler.COLUMN_DELIMITER + "INTEGER_VALUE";
-	}
+    @Override
+    public String getHeaderLine() {
+        return super.getHeaderLine() + MemberRefsetHandler.COLUMN_DELIMITER + "CONCEPT_VALUE"
+            + MemberRefsetHandler.COLUMN_DELIMITER + "INTEGER_VALUE";
+    }
 
     /**
      * @see org.dwfa.mojo.refset.writers.MemberRefsetHandler#getRF2HeaderLine()
@@ -74,33 +80,34 @@ public class ConceptIntegerRefsetHandler extends MemberRefsetHandler {
         return super.getRF2HeaderLine() + COLUMN_DELIMITER + "valueId";
     }
 
-	@Override
-	protected I_ThinExtByRefPart processLine(String line) {
-		I_ThinExtByRefPartConceptInt part;
-		try {
+    @Override
+    protected I_ThinExtByRefPart processLine(String line) {
+        I_ThinExtByRefPartConceptInt part;
+        try {
 
-			I_ThinExtByRefVersioned versioned = getExtensionVersioned(line, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION);
+            I_ThinExtByRefVersioned versioned = getExtensionVersioned(line,
+                RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION);
 
-			part = getTermFactory().newExtensionPart(I_ThinExtByRefPartConceptInt.class);
-			setGenericExtensionPartFields(part);
+            part = getTermFactory().newExtensionPart(I_ThinExtByRefPartConceptInt.class);
+            setGenericExtensionPartFields(part);
 
-			String conceptValue = getNextCurrentRowToken();
-			part.setC1id(componentIdVersionedFromIdString(conceptValue).getTermComponentId());
+            String conceptValue = getNextCurrentRowToken();
+            part.setC1id(componentIdVersionedFromIdString(conceptValue).getTermComponentId());
 
-			part.setIntValue(Integer.parseInt(getNextCurrentRowToken()));
+            part.setIntValue(Integer.parseInt(getNextCurrentRowToken()));
 
-			versioned.addVersion(part);
+            versioned.addVersion(part);
 
-			if (isTransactional()) {
-				getTermFactory().addUncommitted(versioned);
-			} else {
-				getTermFactory().getDirectInterface().writeExt(versioned);
-			}
+            if (isTransactional()) {
+                getTermFactory().addUncommitted(versioned);
+            } else {
+                getTermFactory().getDirectInterface().writeExt(versioned);
+            }
 
-		} catch (Exception e) {
-			throw new RuntimeException("Error occred processing file " + sourceFile, e);
-		}
+        } catch (Exception e) {
+            throw new RuntimeException("Error occred processing file " + sourceFile, e);
+        }
 
-		return part;
-	}
+        return part;
+    }
 }

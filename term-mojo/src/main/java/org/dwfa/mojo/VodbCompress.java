@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,8 +28,9 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
 
 /**
- * Compress database log files so their utilization is the value provided. 
- * Call this goal prior to closing the database. Corresponds to je.cleaner.minUtilization.
+ * Compress database log files so their utilization is the value provided.
+ * Call this goal prior to closing the database. Corresponds to
+ * je.cleaner.minUtilization.
  * 
  * @goal vodb-compress
  * 
@@ -39,9 +40,11 @@ import org.dwfa.maven.MojoUtil;
 public class VodbCompress extends AbstractMojo {
 
     /**
-     * Ensure the total disk space utilization percentage is above this value. 
-     * The default is set to 90 percent. The maximum is 90 percent. The environmental
+     * Ensure the total disk space utilization percentage is above this value.
+     * The default is set to 90 percent. The maximum is 90 percent. The
+     * environmental
      * default is 50 percent.
+     * 
      * @parameter
      */
     private int minUtilization = 90;
@@ -53,7 +56,7 @@ public class VodbCompress extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -61,8 +64,7 @@ public class VodbCompress extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), execution.getExecutionId(), this
-                .getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), execution.getExecutionId(), this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e1) {
@@ -70,8 +72,7 @@ public class VodbCompress extends AbstractMojo {
         } catch (IOException e1) {
             throw new MojoExecutionException(e1.getLocalizedMessage(), e1);
         }
-        I_ImplementTermFactory termFactoryImpl =
-                (I_ImplementTermFactory) LocalVersionedTerminology.get();
+        I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) LocalVersionedTerminology.get();
         try {
             termFactoryImpl.compress(minUtilization);
         } catch (Exception e) {

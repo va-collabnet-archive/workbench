@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import org.dwfa.tapi.TerminologyRuntimeException;
 
 /**
  * Read ace concept file rows into AceConceptRow
- *
+ * 
  * @author ean
  */
 public class AceConceptReader extends IterableFileReader<AceConceptReader.AceConceptRow> {
@@ -34,7 +34,7 @@ public class AceConceptReader extends IterableFileReader<AceConceptReader.AceCon
 
     /**
      * Create the reader for the file.
-     *
+     * 
      * @param file File to read.
      */
     public AceConceptReader(File file) {
@@ -100,14 +100,15 @@ public class AceConceptReader extends IterableFileReader<AceConceptReader.AceCon
 
         /**
          * Creates a AceConceptRow from an ace line.
-         *
+         * 
          * @param line From an ace concept file
          * @throws TerminologyException if not in the correct format.
          */
         public AceConceptRow(String line) throws TerminologyException {
-            String[] columns = line.split( "\t" );
-            if(columns.length != CONCEPT_COLUMNS){
-                throw new TerminologyException("Invalid file format. Ace concept file must have " + CONCEPT_COLUMNS + " columns");
+            String[] columns = line.split("\t");
+            if (columns.length != CONCEPT_COLUMNS) {
+                throw new TerminologyException("Invalid file format. Ace concept file must have " + CONCEPT_COLUMNS
+                    + " columns");
             }
 
             conceptId = columns[0];
@@ -195,7 +196,7 @@ public class AceConceptReader extends IterableFileReader<AceConceptReader.AceCon
 
         /**
          * 1 is true.
-         *
+         * 
          * @return the isPrimative
          */
         public final String getIsPrimative() {

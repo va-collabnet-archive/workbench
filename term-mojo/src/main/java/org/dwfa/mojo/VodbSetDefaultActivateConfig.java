@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,9 +32,9 @@ import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- *
+ * 
  * @goal vodb-set-default-config
- *
+ * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -42,7 +42,7 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -50,25 +50,24 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
 
     /**
      * The conflict resolution strategy to use.
-     *
+     * 
      * @parameter
      */
     private String conflictResolutionStrategy;
 
     @SuppressWarnings("unchecked")
     public void execute() throws MojoExecutionException, MojoFailureException {
-       System.setProperty("java.awt.headless", "true");
-       try {
-           try {
-               if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(),
-                       this.getClass(), targetDirectory)) {
-                   return;
-               }
-           } catch (NoSuchAlgorithmException e) {
-               throw new MojoExecutionException(e.getLocalizedMessage(), e);
-           }
-           I_TermFactory tf = LocalVersionedTerminology.get();
-           I_ConfigAceFrame activeConfig = NewDefaultProfile.newProfile(null, null, null, null, null);
+        System.setProperty("java.awt.headless", "true");
+        try {
+            try {
+                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), this.getClass(), targetDirectory)) {
+                    return;
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new MojoExecutionException(e.getLocalizedMessage(), e);
+            }
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_ConfigAceFrame activeConfig = NewDefaultProfile.newProfile(null, null, null, null, null);
 
             tf.setActiveAceFrameConfig(activeConfig);
 
@@ -94,4 +93,4 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
         this.targetDirectory = targetDirectory;
     }
 
- }
+}

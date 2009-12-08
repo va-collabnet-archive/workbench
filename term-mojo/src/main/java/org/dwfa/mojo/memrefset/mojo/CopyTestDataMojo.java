@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,30 +30,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 /**
  * This plugin copies unique test cases for the refset test framework from
- * target/changesets/users/processes/member-refset to src/test/resources/expected.
- *
+ * target/changesets/users/processes/member-refset to
+ * src/test/resources/expected.
+ * 
  * @goal copy-test-cases-to-expected-dir
  */
 public final class CopyTestDataMojo extends AbstractMojo {
 
-   /**
-    * Directory from which the test files are read.
-    * @parameter default-value=${project.build.directory}/changesets/users/processes/member-refset
-    */
+    /**
+     * Directory from which the test files are read.
+     * 
+     * @parameter 
+     *            default-value=${project.build.directory}/changesets/users/processes
+     *            /member-refset
+     */
     private File sourceDirectory;
 
     /**
      * Directory to which output files are written.
-     *
+     * 
      * @parameter default-value=${basedir}/src/test/resources/expected
      */
     private File outputDirectory;
 
     /**
      * Default extension of input files.
+     * 
      * @parameter default-value=xml
      */
     private String inputExtension;
@@ -63,8 +67,8 @@ public final class CopyTestDataMojo extends AbstractMojo {
     private final ChangeSetNameComparer nameComparer = new ChangeSetNameComparerImpl();
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        List<File> actualFiles = fileLister.list(sourceDirectory, getXMLFiles(), Arrays.<String>asList());
-        List<File> expectedFiles = fileLister.list(outputDirectory, getXMLFiles(), Arrays.<String>asList());
+        List<File> actualFiles = fileLister.list(sourceDirectory, getXMLFiles(), Arrays.<String> asList());
+        List<File> expectedFiles = fileLister.list(outputDirectory, getXMLFiles(), Arrays.<String> asList());
 
         for (File actualFile : actualFiles) {
             if (!alreadyExists(actualFile, expectedFiles)) {

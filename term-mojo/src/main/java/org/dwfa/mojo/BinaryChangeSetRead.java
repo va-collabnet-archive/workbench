@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,8 +32,9 @@ import org.dwfa.maven.MojoUtil;
 /**
  * Read a binary change set, and apply the results of that change set to the
  * open database.
+ * 
  * @goal bcs-read
- *
+ * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -41,14 +42,15 @@ import org.dwfa.maven.MojoUtil;
 public class BinaryChangeSetRead extends AbstractMojo {
     /**
      * The change set directory
-     *
-     * @parameter default-value="${project.build.directory}/generated-resources/changesets/"
+     * 
+     * @parameter default-value=
+     *            "${project.build.directory}/generated-resources/changesets/"
      */
     File changeSetDir;
 
     /**
      * The change set file name
-     *
+     * 
      * @parameter
      * @required
      */
@@ -56,13 +58,14 @@ public class BinaryChangeSetRead extends AbstractMojo {
 
     /**
      * Whether to validate the change set first or not.
+     * 
      * @parameter
      */
     boolean validate = false;
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -70,10 +73,8 @@ public class BinaryChangeSetRead extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass()
-                .getCanonicalName()
-                + changeSetDir.getCanonicalPath() + changeSetFileName, this
-                .getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDir.getCanonicalPath()
+                + changeSetFileName, this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -83,12 +84,9 @@ public class BinaryChangeSetRead extends AbstractMojo {
         }
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         try {
-            I_ReadChangeSet reader =
-                    termFactory.newBinaryChangeSetReader(new File(changeSetDir,
-                        changeSetFileName));
+            I_ReadChangeSet reader = termFactory.newBinaryChangeSetReader(new File(changeSetDir, changeSetFileName));
             if (validate) {
-                getLog().info(
-                    "******* Validating changeset before importing. ********");
+                getLog().info("******* Validating changeset before importing. ********");
                 reader.getValidators().add(new ComponentValidator());
             }
             reader.read();

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,10 +26,10 @@ import java.io.ByteArrayInputStream;
 public class ReleaseConfigReaderTest {
 
     private ReleaseConfigReader reader;
-    private static final String NAME_1          = "ARF-SCTID-CONCEPT";
-    private static final String SCHEMA_1        = "create table blah (...)";
-    private static final String NAME_2          = "CURRENT-CONCEPT";
-    private static final String SCHEMA_2        = "create table blue (...)";
+    private static final String NAME_1 = "ARF-SCTID-CONCEPT";
+    private static final String SCHEMA_1 = "create table blah (...)";
+    private static final String NAME_2 = "CURRENT-CONCEPT";
+    private static final String SCHEMA_2 = "create table blue (...)";
 
     @Before
     public void setup() {
@@ -38,16 +38,15 @@ public class ReleaseConfigReaderTest {
 
     @Test
     public void shouldReturnAReleaseConfigFile() {
-        String configContent = new ReleaseConfigBuilder().
-                createReleaseFormat().
-                    addName(NAME_1).
-                    addSchema(SCHEMA_1).
-                addReleaseFormat().
-                createReleaseFormat().
-                    addName(NAME_2).
-                    addSchema(SCHEMA_2).
-                addReleaseFormat().
-                build();
+        String configContent = new ReleaseConfigBuilder().createReleaseFormat()
+            .addName(NAME_1)
+            .addSchema(SCHEMA_1)
+            .addReleaseFormat()
+            .createReleaseFormat()
+            .addName(NAME_2)
+            .addSchema(SCHEMA_2)
+            .addReleaseFormat()
+            .build();
 
         ReleaseConfig config = reader.reader(new ByteArrayInputStream(configContent.getBytes()));
         assertThat(config.getReleaseFormats().size(), equalTo(2));

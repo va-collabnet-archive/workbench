@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,10 +40,10 @@ public final class DerbyLineBuilder {
     public String build() {
         StringBuilder builder = new StringBuilder();
 
-        for (int index=0; index < values.size(); index++) {
+        for (int index = 0; index < values.size(); index++) {
             builder.append(values.get(index));
 
-            if (index < (values.size() -1)) {
+            if (index < (values.size() - 1)) {
                 builder.append('\t');
             }
         }
@@ -52,15 +52,14 @@ public final class DerbyLineBuilder {
     }
 
     public String defaults() {
-        return new DerbyLineBuilder().
-                addValue("100").
-                addBlank().
-                addValue("Testing").
-                addValue("3").
-                addValue("A").
-                addValue("2008-11-06 15:55:33").
-                addValue("2008-11-11").
-                addValue("10:35:46").
-                build();
+        return new DerbyLineBuilder().addValue("100")
+            .addBlank()
+            .addValue("Testing")
+            .addValue("3")
+            .addValue("A")
+            .addValue("2008-11-06 15:55:33")
+            .addValue("2008-11-11")
+            .addValue("10:35:46")
+            .build();
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,7 +46,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 
 /**
- *
+ * 
  * @author ean
  * @goal update-language-refset
  */
@@ -55,7 +55,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Refset to create lanaguage extensions for.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -63,7 +63,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Path to create the extensions on
-     *
+     * 
      * @parameter
      * @required
      */
@@ -133,9 +133,9 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
             aceIdentifierFile.getParentFile().mkdirs();
         }
 
-
-        if(useRF2 && aceIdentifierFile == null || aceStructuralIdentifierFile == null){
-            throw new MojoExecutionException("Cannot proceed, RF2 requires a aceIdentifierFile and aceStructuralIdentifierFile");
+        if (useRF2 && aceIdentifierFile == null || aceStructuralIdentifierFile == null) {
+            throw new MojoExecutionException(
+                "Cannot proceed, RF2 requires a aceIdentifierFile and aceStructuralIdentifierFile");
         }
         if (useRF2 && aceIdentifierFile != null && aceStructuralIdentifierFile != null) {
             try {
@@ -182,7 +182,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Initialise the mojo variables.
-     *
+     * 
      * @throws TerminologyException DB error
      * @throws IOException DB error
      * @throws Exception DB error
@@ -191,19 +191,23 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
         referencesetConcept = termFactory.getConcept(UUID.fromString(referencesetUuidStr));
         referencesetConceptLatestVersion = getLatestVersion(referencesetConcept);
         exportPath = termFactory.getPath(UUID.fromString(exportPathUuidStr));
-        prefferredTermNid = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getConceptId();
-        synonymNid = termFactory.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getConceptId();
-        unSpecifiedDescriptionTypeNid = termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNSPECIFIED_DESCRIPTION_TYPE.getUids()).getConceptId();
+        prefferredTermNid = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids())
+            .getConceptId();
+        synonymNid = termFactory.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids())
+            .getConceptId();
+        unSpecifiedDescriptionTypeNid = termFactory.getConcept(
+            ArchitectonicAuxiliary.Concept.UNSPECIFIED_DESCRIPTION_TYPE.getUids()).getConceptId();
         activeNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid();
         currentNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
-        memberRefsetHelper =  new MemberRefsetHelper(referencesetConcept.getConceptId(), RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid());
+        memberRefsetHelper = new MemberRefsetHelper(referencesetConcept.getConceptId(),
+            RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid());
         acceptableDescriptionTypeNid = termFactory.getConcept(ConceptConstants.ACCEPTABLE.getUuids()).getConceptId();
         preferredDescriptionTypeNid = termFactory.getConcept(ConceptConstants.PREFERRED.getUuids()).getConceptId();
     }
 
     /**
      * Gets the latest version.
-     *
+     * 
      * @param concept I_GetConceptData
      * @return I_ConceptAttributePart
      * @throws IOException database error
@@ -221,7 +225,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Is the concept status one of the allowed status
-     *
+     * 
      * @param concept I_GetConceptData
      * @return boolean true if concept status in an allowed status
      * @throws IOException database error
@@ -243,32 +247,36 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Updates the concept extension for the refset.
-     *
+     * 
      * If the concept extension exists for the refset and description
-     * this will be retired if the extension type is different to the language subset type and a new extension is created.
-     *
+     * this will be retired if the extension type is different to the language
+     * subset type and a new extension is created.
+     * 
      * @param monitor used to inform the user of any errors or warnings.
      * @param refsetId int the reset to update the extension with
-     * @param conceptDescription LanguageSubsetMemberLine the current line in the subset file
-
+     * @param conceptDescription LanguageSubsetMemberLine the current line in
+     *            the subset file
+     * 
      * @throws IOException file read errors
      * @throws TerminologyException looking up concepts etc.
      * @throws Exception MemberRefsetHelper errors
      */
-    private void exportResetExtentions(int descriptionNid, int extensionTypeId)
-    throws IOException, TerminologyException, Exception {
+    private void exportResetExtentions(int descriptionNid, int extensionTypeId) throws IOException,
+            TerminologyException, Exception {
         // check if a current extension exists
         int refsetId = referencesetConcept.getConceptId();
 
-        I_ThinExtByRefPartConcept currentRefsetExtension =
-                memberRefsetHelper.getFirstCurrentRefsetExtension(refsetId, descriptionNid);
+        I_ThinExtByRefPartConcept currentRefsetExtension = memberRefsetHelper.getFirstCurrentRefsetExtension(refsetId,
+            descriptionNid);
         if (currentRefsetExtension != null) {
             int currentRefsetExtensionType = currentRefsetExtension.getC1id();
             if (currentRefsetExtensionType == extensionTypeId) {
                 export(currentRefsetExtension, null, refsetId, currentRefsetExtension.getC1id(), TYPE.DESCRIPTION);
             }
         } else {
-            I_ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();//stunt extension part.
+            I_ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();// stunt
+                                                                           // extension
+                                                                           // part.
             part.setC1id(extensionTypeId);
             part.setPathId(exportPath.getConceptId());
             part.setStatusId(activeNId);
@@ -279,10 +287,12 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
     }
 
     /**
-     * Go over all concepts and add a language extension for both the latest synonym and preferred term.
-     *
-     * If there is no en en-GB preferred term then the latest unspecified description is used.
-     *
+     * Go over all concepts and add a language extension for both the latest
+     * synonym and preferred term.
+     * 
+     * If there is no en en-GB preferred term then the latest unspecified
+     * description is used.
+     * 
      * Excludes en-US descriptions.
      */
     class ConceptIterator implements I_ProcessConcepts {
@@ -305,7 +315,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
                     for (I_DescriptionVersioned descriptionVersioned : descriptions) {
                         latest = getLatest(descriptionVersioned);
                         if (latest.getStatusId() == currentNId
-                                && (latest.getLang().equals("en-GB") || latest.getLang().equals("en"))) {
+                            && (latest.getLang().equals("en-GB") || latest.getLang().equals("en"))) {
                             if (latest.getTypeId() == prefferredTermNid) {
                                 latestPreferredTerm = descriptionVersioned;
                             } else if (latest.getTypeId() == synonymNid) {
@@ -315,31 +325,31 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
                             }
                         }
                     }
-                    //Mimic UK subset, use the latest en/GB unspecified description if no en/GB preferred term
+                    // Mimic UK subset, use the latest en/GB unspecified
+                    // description if no en/GB preferred term
                     if (latestPreferredTerm != null) {
                         exportResetExtentions(latestPreferredTerm.getDescId(), preferredDescriptionTypeNid);
-                    } else if(unSpecifiedDescriptionType != null) {
+                    } else if (unSpecifiedDescriptionType != null) {
                         exportResetExtentions(unSpecifiedDescriptionType.getDescId(), preferredDescriptionTypeNid);
                     }
 
-                    if(latestSynonym != null){
+                    if (latestSynonym != null) {
                         exportResetExtentions(latestSynonym.getDescId(), acceptableDescriptionTypeNid);
                     }
                 }
             }
 
             processedLineCount++;
-            if(processedLineCount % 1000 == 0){
+            if (processedLineCount % 1000 == 0) {
                 logger.info("Processed " + processedLineCount);
             }
         }
 
-        private I_DescriptionPart getLatest(I_DescriptionVersioned descriptionVersioned){
+        private I_DescriptionPart getLatest(I_DescriptionVersioned descriptionVersioned) {
             I_DescriptionPart latestDescriptionPart = null;
 
             for (I_DescriptionPart descriptionPart : descriptionVersioned.getVersions()) {
-                if(latestDescriptionPart == null
-                        || latestDescriptionPart.getVersion() < descriptionPart.getVersion()){
+                if (latestDescriptionPart == null || latestDescriptionPart.getVersion() < descriptionPart.getVersion()) {
                     latestDescriptionPart = descriptionPart;
                 }
             }
@@ -349,17 +359,17 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
         /**
          * Is this the latest version of the description type.
-         *
+         * 
          * @param typeNid int
          * @param currentLatest I_DescriptionTuple
          * @param description I_DescriptionTuple
          * @return true if the description is the latest.
          */
-        boolean isLatest(int typeNid, I_DescriptionPart currentLatest,  I_DescriptionPart description) {
+        boolean isLatest(int typeNid, I_DescriptionPart currentLatest, I_DescriptionPart description) {
             boolean latest = false;
 
-            if(typeNid == description.getTypeId()
-                    && (currentLatest == null || description.getVersion() > currentLatest.getVersion())){
+            if (typeNid == description.getTypeId()
+                && (currentLatest == null || description.getVersion() > currentLatest.getVersion())) {
                 latest = true;
             }
 

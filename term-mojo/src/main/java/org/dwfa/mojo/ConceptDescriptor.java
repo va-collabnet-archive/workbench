@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,14 +40,12 @@ public class ConceptDescriptor {
     public static boolean verify(I_GetConceptData concept, String description) throws Exception {
         // check that the description parameter corresponds to one of the
         // concept's descriptions
-        List<I_DescriptionTuple> descriptionTuples =
-            concept.getDescriptionTuples(null, null, null);
-        for (I_DescriptionTuple tuple: descriptionTuples) {
-            if (description.toLowerCase().trim().equals(
-                    tuple.getText().toLowerCase().trim())) {
+        List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, null);
+        for (I_DescriptionTuple tuple : descriptionTuples) {
+            if (description.toLowerCase().trim().equals(tuple.getText().toLowerCase().trim())) {
                 return true;
             }
-        }    
+        }
         return false;
     }
 
@@ -66,18 +64,17 @@ public class ConceptDescriptor {
         try {
             concept = termFactory.getConcept(uuidList);
             if (verify(concept, description)) {
-            	return concept;
+                return concept;
             }
 
         } catch (Exception e) {
             throw new Exception(e.getMessage() + " : " + description + " " + uuidList);
         }
         if (concept != null) {
-            throw new Exception("Failed to find matching description: "
-                    + description + " " + uuidList + " in concept: " + concept);
+            throw new Exception("Failed to find matching description: " + description + " " + uuidList
+                + " in concept: " + concept);
         }
-        throw new Exception("Failed to find matching description: "
-                + description + " " + uuidList);
+        throw new Exception("Failed to find matching description: " + description + " " + uuidList);
     }
 
     public String getDescription() {

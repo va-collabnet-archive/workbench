@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,8 +30,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This plugin exports ddl statements (Schema) from a release format config file.
- *
+ * This plugin exports ddl statements (Schema) from a release format config
+ * file.
+ * 
  * @goal convert-member-refset-to-xml
  * @phase process-resources
  */
@@ -39,6 +40,7 @@ public final class MemberRefsetExportMojo extends AbstractMojo {
 
     /**
      * Directory from which the input files are read.
+     * 
      * @parameter default-value=${project.build.directory}/member-refset
      * @required
      */
@@ -46,13 +48,16 @@ public final class MemberRefsetExportMojo extends AbstractMojo {
 
     /**
      * Directory to which output files are written.
-     * @parameter default-value=${project.build.directory}/transformed-member-refset
+     * 
+     * @parameter 
+     *            default-value=${project.build.directory}/transformed-member-refset
      * @required
      */
     private String outputDirectory;
 
     /**
      * Default extension of output files.
+     * 
      * @parameter default-value=xml
      * @required
      */
@@ -60,6 +65,7 @@ public final class MemberRefsetExportMojo extends AbstractMojo {
 
     /**
      * Default extension of input files.
+     * 
      * @parameter default-value=cmrscs
      * @required
      */
@@ -76,7 +82,7 @@ public final class MemberRefsetExportMojo extends AbstractMojo {
     private final CmrscsResultToXMLConverter resultToXMLConverter = new CmrscsResultToXMLConverterImpl();
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        List<File> files = fileLister.list(sourceDirectory, getInputFiles(), Arrays.<String>asList());
+        List<File> files = fileLister.list(sourceDirectory, getInputFiles(), Arrays.<String> asList());
         if (files.isEmpty()) {
             getLog().warn("No files to process in " + sourceDirectory);
         }

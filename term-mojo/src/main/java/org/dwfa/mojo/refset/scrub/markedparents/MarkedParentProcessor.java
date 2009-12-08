@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Puts "marked parents" and "normal members" into logical structures that can be used later.
+ * Puts "marked parents" and "normal members" into logical structures that can
+ * be used later.
  */
 public final class MarkedParentProcessor {
 
@@ -40,23 +41,27 @@ public final class MarkedParentProcessor {
     private final CandidateWriter candidateWriter;
     private final List<Integer> validTypeIds;
     private final int currentStatusId;
-    private final int retiredStatusId;    
+    private final int retiredStatusId;
     private final int normalMemberId;
 
-    public MarkedParentProcessor(final CandidateWriter candidateWriter, final List<Integer> validTypeIds) throws Exception {
+    public MarkedParentProcessor(final CandidateWriter candidateWriter, final List<Integer> validTypeIds)
+            throws Exception {
         this.candidateWriter = candidateWriter;
         this.validTypeIds = validTypeIds;
 
         normalMemberList = new ArrayList<ComponentRefsetKey>();
         duplicateMarkedParentMarker = new DuplicateMarkedParentMarker();
-        normalMemberId = new ConceptDescriptor(NORMAL_MEMBER_UUID, NORMAL_MEMBER_DESC).getVerifiedConcept().getId().getNativeId();
+        normalMemberId = new ConceptDescriptor(NORMAL_MEMBER_UUID, NORMAL_MEMBER_DESC).getVerifiedConcept()
+            .getId()
+            .getNativeId();
 
         TerminologyFactoryUtil terminologyFactoryUtil = new TerminologyFactoryUtil();
         retiredStatusId = terminologyFactoryUtil.getNativeConceptId(ArchitectonicAuxiliary.Concept.RETIRED);
         currentStatusId = terminologyFactoryUtil.getNativeConceptId(ArchitectonicAuxiliary.Concept.CURRENT);
     }
 
-    public void process(final String memberRefsetName, final List<I_ThinExtByRefVersioned> refsetMembers) throws Exception {
+    public void process(final String memberRefsetName, final List<I_ThinExtByRefVersioned> refsetMembers)
+            throws Exception {
         for (I_ThinExtByRefVersioned member : refsetMembers) {
             List<? extends I_ThinExtByRefPart> versions = member.getVersions();
             for (I_ThinExtByRefPart version : versions) {
@@ -68,15 +73,19 @@ public final class MarkedParentProcessor {
         }
     }
 
-    private void processType(final String memberRefsetName, final I_ThinExtByRefVersioned member, final I_ThinExtByRefPart version,
-                             final int inclusionType) throws Exception {
+    private void processType(final String memberRefsetName, final I_ThinExtByRefVersioned member,
+            final I_ThinExtByRefPart version, final int inclusionType) throws Exception {
         if (isMarkedParent(inclusionType)) {
             duplicateMarkedParentMarker.put(member);
             candidateWriter.logCandidate(memberRefsetName, member);
             return;
         }
 
-        if (isCurrent(version) && isNormalMember(inclusionType)) {  //only care about current normal members
+        if (isCurrent(version) && isNormalMember(inclusionType)) { // only care
+                                                                   // about
+                                                                   // current
+                                                                   // normal
+                                                                   // members
             normalMemberList.add(new ComponentRefsetKey(member));
             candidateWriter.logCandidate(memberRefsetName, member);
         }
@@ -95,11 +104,11 @@ public final class MarkedParentProcessor {
     }
 
     private boolean isMarkedParent(final int inclusionType) throws Exception {
-		return validTypeIds.contains(Integer.valueOf(inclusionType));
-	}
+        return validTypeIds.contains(Integer.valueOf(inclusionType));
+    }
 
     private boolean isNormalMember(final int inclusionType) throws Exception {
-        return  normalMemberId == inclusionType;
+        return normalMemberId == inclusionType;
     }
 
     public boolean isCurrent(final I_ThinExtByRefPart version) {

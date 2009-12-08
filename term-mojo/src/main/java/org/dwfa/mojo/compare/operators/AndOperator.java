@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,19 +23,18 @@ import org.dwfa.mojo.compare.Match;
 
 public class AndOperator implements CompareOperator {
 
-	public List<CompareOperator> operators;
-	
-	public boolean compare(List<Match> matches) {		
-		if (!(operators==null)) {
-			boolean result = true;
-			for (CompareOperator co : operators) {
-				result = result && co.compare(matches);
-			}
-			return result;
-		}
-		else {
-			return false;			
-		}
-	}
+    public List<CompareOperator> operators;
+
+    public boolean compare(List<Match> matches) {
+        if (!(operators == null)) {
+            boolean result = true;
+            for (CompareOperator co : operators) {
+                result = result && co.compare(matches);
+            }
+            return result;
+        } else {
+            return false;
+        }
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import org.junit.Test;
 
 /**
  * Test class for Ace to RF2 mojo.
- *
+ * 
  * @author ean dungey
  */
 public class Ace2Rf2Test {
@@ -48,7 +48,7 @@ public class Ace2Rf2Test {
      * Setup Ace2Rf2 object
      */
     @BeforeClass
-    public static void setup(){
+    public static void setup() {
         ace2Rf2 = new Ace2Rf2();
         ace2Rf2.setSourceDirectory(SRC_BUILD_DIRECTORY);
         ace2Rf2.setBuildDirectory(SRC_BUILD_DIRECTORY);
@@ -66,9 +66,9 @@ public class Ace2Rf2Test {
 
     /**
      * Test to Ace2Rf2 transformAce2Rf2 mojo.
-     *
+     * 
      * Simply checks that all rows are converted to RF2 format.
-     *
+     * 
      * @throws MojoExecutionException test error
      * @throws MojoFailureException test error
      * @throws IOException test error
@@ -76,25 +76,30 @@ public class Ace2Rf2Test {
     @Test
     public void testAce2Rf2() throws Exception {
         /*
-        ace2Rf2.execute();
-
-        Assert.assertTrue("Should be the same number of rows in the ACE and RF2 files.",
-            lineCount(ACE_IDS_TXT) == lineCount(IDS_RF2_TXT));
-
-        Assert.assertTrue("Should be the same number of rows in the ACE and RF2 files.",
-            lineCount(ACE_CONCEPTS_TXT) == lineCount(CONCEPTS_RF2_TXT));
-
-        Assert.assertTrue("Should be the same number of rows in the ACE and RF2 files.",
-            lineCount(ACE_DESCRIPTIONS_TXT) == lineCount(DESCRIPTIONS_RF2_TXT));
-
-        Assert.assertTrue("Should be the same number of rows in the ACE and RF2 files.",
-            lineCount(ACE_RELATIONSHIPS_TXT) == lineCount(RELATIONSHIPS_RF2_TXT));
-            */
+         * ace2Rf2.execute();
+         * 
+         * Assert.assertTrue(
+         * "Should be the same number of rows in the ACE and RF2 files.",
+         * lineCount(ACE_IDS_TXT) == lineCount(IDS_RF2_TXT));
+         * 
+         * Assert.assertTrue(
+         * "Should be the same number of rows in the ACE and RF2 files.",
+         * lineCount(ACE_CONCEPTS_TXT) == lineCount(CONCEPTS_RF2_TXT));
+         * 
+         * Assert.assertTrue(
+         * "Should be the same number of rows in the ACE and RF2 files.",
+         * lineCount(ACE_DESCRIPTIONS_TXT) == lineCount(DESCRIPTIONS_RF2_TXT));
+         * 
+         * Assert.assertTrue(
+         * "Should be the same number of rows in the ACE and RF2 files.",
+         * lineCount(ACE_RELATIONSHIPS_TXT) ==
+         * lineCount(RELATIONSHIPS_RF2_TXT));
+         */
     }
 
     /**
      * Test the time formatting code.
-     *
+     * 
      * @throws Exception
      */
     @Test
@@ -103,14 +108,14 @@ public class Ace2Rf2Test {
 
         ace2Rf2.getRf2Time("20091101T000000Z");
 
-        try{
+        try {
             ace2Rf2.getRf2Time("2009-11-01");
             Assert.fail("Should fail for dates 2009-11-01");
         } catch (Exception e) {
 
         }
 
-        try{
+        try {
             ace2Rf2.getRf2Time("20091101");
             Assert.fail("Should fail for dates 20091101");
         } catch (Exception e) {
@@ -120,7 +125,7 @@ public class Ace2Rf2Test {
 
     /**
      * Count the number of lines in the text file.
-     *
+     * 
      * @param filename String
      * @return long number of lines
      * @throws IOException on files opening and read errors.
@@ -129,9 +134,9 @@ public class Ace2Rf2Test {
         BufferedReader reader;
         long lineCount = 0;
 
-        reader = new BufferedReader( new FileReader( ACE_IDS_TXT ) );
+        reader = new BufferedReader(new FileReader(ACE_IDS_TXT));
 
-        for (;reader.readLine() != null;lineCount++) {
+        for (; reader.readLine() != null; lineCount++) {
         }
 
         return lineCount;

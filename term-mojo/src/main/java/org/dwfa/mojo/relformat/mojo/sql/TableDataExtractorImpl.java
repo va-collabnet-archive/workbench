@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,7 @@ public final class TableDataExtractorImpl implements TableDataExtractor {
     private final StringArrayCleaner cleaner;
     private final ColumnTypeCleaner columnTypeCleaner;
 
-    public TableDataExtractorImpl(final StringArrayCleaner cleaner,
-            final ColumnTypeCleaner columnTypeCleaner) {
+    public TableDataExtractorImpl(final StringArrayCleaner cleaner, final ColumnTypeCleaner columnTypeCleaner) {
         this.cleaner = cleaner;
         this.columnTypeCleaner = columnTypeCleaner;
     }
@@ -35,8 +34,7 @@ public final class TableDataExtractorImpl implements TableDataExtractor {
         try {
             return cleaner.clean(text.split(SPACE))[2];
         } catch (Exception e) {
-            throw new TableDataExtractorException(
-                "The table name could not be extracted from: [" + text + "]", e);
+            throw new TableDataExtractorException("The table name could not be extracted from: [" + text + "]", e);
         }
     }
 

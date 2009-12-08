@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,14 +30,17 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * This scrubber removes duplicate "marked parents" changing their status to "retired".
+ * This scrubber removes duplicate "marked parents" changing their status to
+ * "retired".
  */
 public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
 
     /**
      * TODO: REMOVE.
-     * This is not used. This has been introduced to get around a maven problem of not allowing implementations
+     * This is not used. This has been introduced to get around a maven problem
+     * of not allowing implementations
      * without parameters. Remove once this is sorted out.
+     * 
      * @parameter
      */
     private ConceptDescriptor[] validTypeConcepts;
@@ -48,32 +51,30 @@ public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
 
     public DuplicateMarkedParentScrubber() throws Exception {
         termFactory = LocalVersionedTerminology.get();
-        retiredStatusId =
-                termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
-                    .getUids().iterator().next());
+        retiredStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
     }
 
     public void process(final ConceptExtFinder finder) {
-		try {
+        try {
             for (Object aFinder : finder) {
                 processExtension((I_ThinExtByRefVersioned) aFinder);
             }
-			termFactory.commit();
-		} catch (Exception e) {
-			throw new RuntimeException("Unable to complete the scrub.", e);
-		}
-	}
+            termFactory.commit();
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to complete the scrub.", e);
+        }
+    }
 
     private void processExtension(final I_ThinExtByRefVersioned member) throws Exception {
-        //sort by version, smallest to largest.
-        SortedSet<I_ThinExtByRefPart> sortedVersions =  new TreeSet<I_ThinExtByRefPart>(new LatestVersionComparator());
+        // sort by version, smallest to largest.
+        SortedSet<I_ThinExtByRefPart> sortedVersions = new TreeSet<I_ThinExtByRefPart>(new LatestVersionComparator());
         sortedVersions.addAll(member.getVersions());
 
-        //Get the latest version.
+        // Get the latest version.
         I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) sortedVersions.last().duplicatePart();
         newPart.setStatus(retiredStatusId);
         newPart.setVersion(Integer.MAX_VALUE);
         member.addVersion(newPart);
         termFactory.addUncommitted(member);
-	}
+    }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,44 +46,47 @@ import java.util.List;
  */
 public final class ExportSQLMojo extends AbstractMojo {
 
-    //Skip refsets-no-marked-parents by default.
-    //We could make this into an attribute of Format such as List<String> excludes, with a default value if need be.
-    //The reason this has not been done is because we would then have to specify it for all refset formats.
+    // Skip refsets-no-marked-parents by default.
+    // We could make this into an attribute of Format such as List<String>
+    // excludes, with a default value if need be.
+    // The reason this has not been done is because we would then have to
+    // specify it for all refset formats.
     private static final String REFSET_NO_MARKED_PARENTS = "refsets-no-marked-parents";
 
     /**
      * The loction of where the sql files are written.
-     *
+     * 
      * @parameter expression="${project.build.directory}/sql"
      */
     private String outputDirectory;
 
-
     /**
      * The location from which the ReleaseFormat text files are read.
-     *
+     * 
      * @parameter expression="${basedir}/src/main/resources"
      */
     private File inputDirectory;
 
     /**
-     * Turns verbose logging on/off. You probably want this turned off, unless you are chasing a bug.
-     *
+     * Turns verbose logging on/off. You probably want this turned off, unless
+     * you are chasing a bug.
+     * 
      * @parameter default-value="false"
      */
     private boolean verbose;
 
     /**
-     * The location of the ReleaseConfig.xml file. Mappings between release format files and exported sql
+     * The location of the ReleaseConfig.xml file. Mappings between release
+     * format files and exported sql
      * files are done through the pom.xml and the ReleaseConfig.xml.
-     *
+     * 
      * @parameter expression="${basedir}/src/main/resources/ReleaseConfig.xml"
      */
     private File releaseFileLocation;
 
     /**
      * The configuration for each ReleaseFormat that is to be exported to sql.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -91,11 +94,11 @@ public final class ExportSQLMojo extends AbstractMojo {
 
     private final FileUtil fileUtil = new FileUtilImpl();
 
-    private final FileNameExtractorBuilder fileNameExtractorBuilder = new FileNameExtractorBuilder().
-            withExtension(".sql").withGenericExporter();
+    private final FileNameExtractorBuilder fileNameExtractorBuilder = new FileNameExtractorBuilder().withExtension(
+        ".sql").withGenericExporter();
 
-    private final SQLFileWriter sqlFileWriter = new SQLFileWriterBuilder(fileUtil).
-            withFileNameExtractor(fileNameExtractorBuilder).build();
+    private final SQLFileWriter sqlFileWriter = new SQLFileWriterBuilder(fileUtil).withFileNameExtractor(
+        fileNameExtractorBuilder).build();
 
     private final LineToSQLConverter lineToSQLConverter = new LineToSQLConverterBuilder().build();
 
@@ -114,14 +117,15 @@ public final class ExportSQLMojo extends AbstractMojo {
             try {
                 logInfo("processing format", format.getType());
                 List<File> matchingFiles = fileLister.list(inputDirectory, format.getFilters(),
-                        Arrays.asList(REFSET_NO_MARKED_PARENTS));
+                    Arrays.asList(REFSET_NO_MARKED_PARENTS));
 
                 for (File aFile : matchingFiles) {
-                  logInfo("processing file", aFile);
-                  sqlFileWriter.writer(aFile, getTable(format), outputDirectory, lineToSQLConverter);
+                    logInfo("processing file", aFile);
+                    sqlFileWriter.writer(aFile, getTable(format), outputDirectory, lineToSQLConverter);
                 }
             } catch (Exception e) {
-                getLog().error(e); //if a format fails, log and keep going to the next.
+                getLog().error(e); // if a format fails, log and keep going to
+                                   // the next.
             }
         }
     }
@@ -131,6 +135,7 @@ public final class ExportSQLMojo extends AbstractMojo {
     }
 
     private void logInfo(final String attribute, final Object message) {
-        if (verbose) getLog().info(attribute + " :" + message);
+        if (verbose)
+            getLog().info(attribute + " :" + message);
     }
 }

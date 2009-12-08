@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,32 +37,35 @@ import org.dwfa.ace.task.util.Logger;
  * Mojo that exports all reference sets.
  * 
  * @goal write-refset-descriptions
- *
+ * 
  * @phase process-classes
  * @requiresDependencyResolution compile
  * @author Dion McMurtrie
  */
 public class WriteRefsetDescriptions extends AbstractMojo {
 
-	/**
-	 * Location of the directory to output data files to.  Refset files are exported to this directory.
-	 * 
-	 * @parameter expression="${project.build.directory}"
-	 * @required
-	 */
-	private File outputDirectory;
+    /**
+     * Location of the directory to output data files to. Refset files are
+     * exported to this directory.
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File outputDirectory;
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private File targetDirectory;
 
     /**
-     * A comma separated list of languages used to selected the most preferred description for each concept written.
-     * @parameter 
+     * A comma separated list of languages used to selected the most preferred
+     * description for each concept written.
+     * 
+     * @parameter
      */
     private String language;
 
@@ -72,7 +75,7 @@ public class WriteRefsetDescriptions extends AbstractMojo {
 
     private final MojoUtilWrapper mojoUtilWrapper;
 
-    //default constructor for maven.
+    // default constructor for maven.
     public WriteRefsetDescriptions() {
         termFactory = LocalVersionedTerminology.get();
         mojoUtilWrapper = new MojoUtilWrapperImpl();
@@ -81,9 +84,9 @@ public class WriteRefsetDescriptions extends AbstractMojo {
 
     @ForTesting
     WriteRefsetDescriptions(final File outputDirectory, final I_TermFactory termFactory,
-        final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder, final File targetDirectory,
-        final MojoUtilWrapper mojoUtilWrapper) {
-        
+            final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder, final File targetDirectory,
+            final MojoUtilWrapper mojoUtilWrapper) {
+
         this.outputDirectory = outputDirectory;
         this.targetDirectory = targetDirectory;
         this.termFactory = termFactory;
@@ -92,44 +95,41 @@ public class WriteRefsetDescriptions extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-		try {
+        try {
 
-			if (mojoUtilWrapper.alreadyRun(getLog(), outputDirectory.getAbsolutePath(), getClass(), targetDirectory)) {
-				return;
-			}
+            if (mojoUtilWrapper.alreadyRun(getLog(), outputDirectory.getAbsolutePath(), getClass(), targetDirectory)) {
+                return;
+            }
 
             Logger logger = new MojoLogger(getLog());
 
-            if (language != null) {           	
-            	cleanableProcessExtByRefBuilder.withLanguagePreference(
-            			new DescriptionSelector(new LanguagePreference(csvToArray(language))));
+            if (language != null) {
+                cleanableProcessExtByRefBuilder.withLanguagePreference(new DescriptionSelector(new LanguagePreference(
+                    csvToArray(language))));
             }
-            
-            CleanableProcessExtByRef refsetDescriptionWriter = cleanableProcessExtByRefBuilder.
-                                                                withTermFactory(termFactory).
-                                                                withLogger(logger).
-                                                                withSelectedDir(outputDirectory).
-                                                                build();
+
+            CleanableProcessExtByRef refsetDescriptionWriter = cleanableProcessExtByRefBuilder.withTermFactory(
+                termFactory).withLogger(logger).withSelectedDir(outputDirectory).build();
             try {
                 termFactory.iterateExtByRefs(refsetDescriptionWriter);
             } finally {
-                //close any open files.
+                // close any open files.
                 refsetDescriptionWriter.clean();
             }
         } catch (Exception e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
-	}
-    
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
+    }
+
     /**
-     * Convert a comma separated list of values into an array of values. 
+     * Convert a comma separated list of values into an array of values.
      */
     private String[] csvToArray(String csv) {
-    	ArrayList<String> values = new ArrayList<String>();
-    	StringTokenizer tokens = new StringTokenizer(csv, ",");
-    	while (tokens.hasMoreTokens()) {
-    		values.add(tokens.nextToken());
-    	}
-    	return values.toArray(new String[]{});
+        ArrayList<String> values = new ArrayList<String>();
+        StringTokenizer tokens = new StringTokenizer(csv, ",");
+        while (tokens.hasMoreTokens()) {
+            values.add(tokens.nextToken());
+        }
+        return values.toArray(new String[] {});
     }
 }

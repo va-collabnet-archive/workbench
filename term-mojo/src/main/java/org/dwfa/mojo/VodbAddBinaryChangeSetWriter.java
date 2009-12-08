@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,7 +47,8 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
     String changeSetFileName = "maven." + UUID.randomUUID().toString() + ".jcs";
 
     /**
-     * Indicates whether a timestamp should be added to the name of the changeset file
+     * Indicates whether a timestamp should be added to the name of the
+     * changeset file
      * 
      * @parameter
      */
@@ -70,7 +71,7 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -78,36 +79,30 @@ public class VodbAddBinaryChangeSetWriter extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (addTimestampToFileName) {
-            changeSetFileName =
-                    changeSetFileName.replaceAll(".jcs", "."
-                        + System.currentTimeMillis() + ".jcs");
+            changeSetFileName = changeSetFileName.replaceAll(".jcs", "." + System.currentTimeMillis() + ".jcs");
         }
 
         try {
             try {
-                if (MojoUtil.alreadyRun(getLog(), changeSetFileName, this
-                    .getClass(), targetDirectory)) {
+                if (MojoUtil.alreadyRun(getLog(), changeSetFileName, this.getClass(), targetDirectory)) {
 
                     return;
                 }
             } catch (NoSuchAlgorithmException e) {
                 throw new MojoExecutionException(e.getLocalizedMessage(), e);
             }
-            I_ConfigAceFrame activeConfig =
-                    LocalVersionedTerminology.get().getActiveAceFrameConfig();
+            I_ConfigAceFrame activeConfig = LocalVersionedTerminology.get().getActiveAceFrameConfig();
             if (!splitFiles) {
                 activeConfig.getChangeSetWriters().add(
-                    new BinaryChangeSetWriter(new File(changeSetFileName),
-                        new File(changeSetTempFileName)));
+                    new BinaryChangeSetWriter(new File(changeSetFileName), new File(changeSetTempFileName)));
 
             } else {
                 activeConfig.getChangeSetWriters().add(
-                    new WriteChangeSetToMultipleBinaryFiles(new File(
-                        changeSetFileName), new File(changeSetTempFileName)));
+                    new WriteChangeSetToMultipleBinaryFiles(new File(changeSetFileName),
+                        new File(changeSetTempFileName)));
 
             }
-            getLog().info(
-                "Change set writers: " + activeConfig.getChangeSetWriters());
+            getLog().info("Change set writers: " + activeConfig.getChangeSetWriters());
         } catch (TerminologyException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IOException e) {

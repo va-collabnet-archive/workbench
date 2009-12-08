@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.TerminologyRuntimeException;
-
 
 public class AceRelationshipReader extends IterableFileReader<AceRelationshipReader.AceRelationshipRow> {
     private Logger logger = Logger.getLogger(AceRelationshipReader.class.getName());
@@ -50,7 +49,7 @@ public class AceRelationshipReader extends IterableFileReader<AceRelationshipRea
 
     /**
      * Ace description file line.
-     *
+     * 
      */
     public class AceRelationshipRow {
         String relationshipId;
@@ -80,13 +79,13 @@ public class AceRelationshipReader extends IterableFileReader<AceRelationshipRea
 
         /**
          * Creates a AceDescriptionRow from an ace line.
-         *
+         * 
          * @param line From an ace concept file
          * @throws TerminologyException if not in the correct format.
          */
         public AceRelationshipRow(String line) throws TerminologyException {
-            String[] columns = line.split( "\t" );
-            if(columns.length != 18){
+            String[] columns = line.split("\t");
+            if (columns.length != 18) {
                 throw new TerminologyException("Invalid file format. Ace concept file must have 16 columns");
             }
 
@@ -362,148 +361,169 @@ public class AceRelationshipReader extends IterableFileReader<AceRelationshipRea
             this.statusUuid = statusUuid;
         }
 
-
         /**
-         *
-        <columnSpecs>
-            <!-- 0 -->
-            <transform implementation="org.dwfa.maven.transform.UuidToSctRelIdWithGeneration">
-                <name>
-                    RELATIONSHIPID
-                </name>
-            </transform>
-            <!-- 1 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    REL_STATUS
-                </name>
-            </transform>
-            <!-- 2 -->
-            <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-                <name>
-                    CONCEPTID1
-                </name>
-            </transform>
-            <!-- 3 -->
-            <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-                <name>
-                    RELATIONSHIPTYPE
-                </name>
-            </transform>
-            <!-- 4 -->
-            <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-                <name>
-                    CONCEPTID2
-                </name>
-            </transform>
-            <!-- 5 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    CHARACTERISTICTYPE
-                </name>
-            </transform>
-            <!-- 6 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    REFINABILITY
-                </name>
-            </transform>
-            <!-- 7 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    RELATIONSHIPGROUP
-                </name>
-            </transform>
-            <!-- 8 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    RELATIONSHIPUUID
-                </name>
-            </transform>
-            <!-- 9 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    CONCEPTUUID1
-                </name>
-            </transform>
-            <!-- 10 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    RELATIONSHIPTYPEUUID
-                </name>
-            </transform>
-            <!-- 10 again -->
-            <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-                <name>
-                    RELATIONSHIPTYPEID
-                </name>
-                <columnId>
-                    10
-                </columnId>
-            </transform>
-            <!-- 11 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    CONCEPTUUID2
-                </name>
-            </transform>
-            <!-- 12 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    CHARACTERISTICTYPEUUID
-                </name>
-            </transform>
-            <!-- 12 again -->
-            <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-                <name>
-                    CHARACTERISTICTYPEID
-                </name>
-                <columnId>
-                    12
-                </columnId>
-            </transform>
-            <!-- 13 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    REFINABILITYUUID
-                </name>
-            </transform>
-            <!-- 14 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    RELATIONSHIPSTATUSUUID
-                </name>
-            </transform>
-            <!-- 15 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    EFFECTIVETIME
-                </name>
-            </transform>
-            <!-- 16 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>
-                    PATHUUID
-                </name>
-            </transform>
-            <!-- 16 again -->
-            <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-                <name>PATHID</name>
-                <columnId>
-                    16
-                </columnId>
-            </transform>
-            <!-- 17 -->
-            <transform implementation="org.dwfa.maven.transform.IdentityTransform">
-                <name>STATUS_UUID</name>
-            </transform>
-            <!-- 17 again -->
-            <transform implementation="org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
-                <name>STATUS_SCTID</name>
-                <columnId>
-                    17
-                </columnId>
-            </transform>
+         * 
+         <columnSpecs>
+         * <!-- 0 -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctRelIdWithGeneration">
+         * <name>
+         * RELATIONSHIPID
+         * </name>
+         * </transform>
+         * <!-- 1 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * REL_STATUS
+         * </name>
+         * </transform>
+         * <!-- 2 -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>
+         * CONCEPTID1
+         * </name>
+         * </transform>
+         * <!-- 3 -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>
+         * RELATIONSHIPTYPE
+         * </name>
+         * </transform>
+         * <!-- 4 -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>
+         * CONCEPTID2
+         * </name>
+         * </transform>
+         * <!-- 5 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * CHARACTERISTICTYPE
+         * </name>
+         * </transform>
+         * <!-- 6 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * REFINABILITY
+         * </name>
+         * </transform>
+         * <!-- 7 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * RELATIONSHIPGROUP
+         * </name>
+         * </transform>
+         * <!-- 8 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * RELATIONSHIPUUID
+         * </name>
+         * </transform>
+         * <!-- 9 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * CONCEPTUUID1
+         * </name>
+         * </transform>
+         * <!-- 10 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * RELATIONSHIPTYPEUUID
+         * </name>
+         * </transform>
+         * <!-- 10 again -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>
+         * RELATIONSHIPTYPEID
+         * </name>
+         * <columnId>
+         * 10
+         * </columnId>
+         * </transform>
+         * <!-- 11 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * CONCEPTUUID2
+         * </name>
+         * </transform>
+         * <!-- 12 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * CHARACTERISTICTYPEUUID
+         * </name>
+         * </transform>
+         * <!-- 12 again -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>
+         * CHARACTERISTICTYPEID
+         * </name>
+         * <columnId>
+         * 12
+         * </columnId>
+         * </transform>
+         * <!-- 13 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * REFINABILITYUUID
+         * </name>
+         * </transform>
+         * <!-- 14 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * RELATIONSHIPSTATUSUUID
+         * </name>
+         * </transform>
+         * <!-- 15 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * EFFECTIVETIME
+         * </name>
+         * </transform>
+         * <!-- 16 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>
+         * PATHUUID
+         * </name>
+         * </transform>
+         * <!-- 16 again -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>PATHID</name>
+         * <columnId>
+         * 16
+         * </columnId>
+         * </transform>
+         * <!-- 17 -->
+         * <transform
+         * implementation="org.dwfa.maven.transform.IdentityTransform">
+         * <name>STATUS_UUID</name>
+         * </transform>
+         * <!-- 17 again -->
+         * <transform implementation=
+         * "org.dwfa.maven.transform.UuidToSctConIdWithGeneration">
+         * <name>STATUS_SCTID</name>
+         * <columnId>
+         * 17
+         * </columnId>
+         * </transform>
          */
     }
 }

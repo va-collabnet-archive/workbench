@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,8 +30,9 @@ import org.dwfa.mojo.relformat.xml.ReleaseFormat;
 import java.io.File;
 
 /**
- * This plugin exports ddl statements (Schema) from a release format config file.
- *
+ * This plugin exports ddl statements (Schema) from a release format config
+ * file.
+ * 
  * @goal export-release-format-ddl
  * @phase process-resources
  */
@@ -39,22 +40,20 @@ public final class ExportDDLMojo extends AbstractMojo {
 
     /**
      * The name of the file to export the ddl statements to.
-     *
+     * 
      * @parameter default-value="${project.build.directory}/ddl/schema.sql"
      */
     private String exportFile;
 
     /**
      * The location of the ReleaseConfig.xml file.
-     *
+     * 
      * @parameter expression="${basedir}/src/main/resources/ReleaseConfig.xml"
      */
     private File releaseFileLocation;
 
-    private final ReleaseConfigReader configReader =
-            new ReleaseConfigReaderImpl();
-    private final String lineSeparator =
-            new SystemPropertyReaderImpl().getLineSeparator();
+    private final ReleaseConfigReader configReader = new ReleaseConfigReaderImpl();
+    private final String lineSeparator = new SystemPropertyReaderImpl().getLineSeparator();
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         StringBuilder builder = new StringBuilder();

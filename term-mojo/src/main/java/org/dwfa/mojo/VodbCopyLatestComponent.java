@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,8 +43,9 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
  * Goal which copies the latest changes on a component to another branch.
+ * 
  * @goal vodb-copy-latest
- *
+ * 
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -53,24 +54,28 @@ public class VodbCopyLatestComponent extends AbstractMojo {
     /**
      * Branch to which the latest component of specified branch will be
      * copied to.
+     * 
      * @parameter
      */
     private ConceptDescriptor branchToCopyTo;
 
     /**
      * Branch which will be copied to new branch.
+     * 
      * @parameter
      */
     private ConceptDescriptor branchToCopy;
 
     /**
      * The html output file location.
+     * 
      * @parameter expression="${project.build.directory}/classes"
      */
     private File outputHtmlDirectory;
 
     /**
      * The html output file name.
+     * 
      * @parameter
      */
     private String outputHtmlFileName = "report.html";
@@ -91,11 +96,9 @@ public class VodbCopyLatestComponent extends AbstractMojo {
         public void processConcept(I_GetConceptData concept) throws Exception {
 
             // get origins
-            I_Path originPath = termFactory.getPath(ArchitectonicAuxiliary.
-                                Concept.ARCHITECTONIC_BRANCH.getUids());
+            I_Path originPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
-            I_Position originPosition = termFactory.newPosition(originPath,
-                                                    Integer.MAX_VALUE);
+            I_Position originPosition = termFactory.newPosition(originPath, Integer.MAX_VALUE);
 
             Set<I_Position> origins = new HashSet<I_Position>();
             origins.add(originPosition);
@@ -105,17 +108,15 @@ public class VodbCopyLatestComponent extends AbstractMojo {
 
             // get concept/path/position of the branch being copied
             I_Path oldPath = termFactory.getPath(branchToCopyConcept.getUids());
-            
-            I_Position oldPosition = termFactory.newPosition(oldPath,
-                    Integer.MAX_VALUE);
+
+            I_Position oldPosition = termFactory.newPosition(oldPath, Integer.MAX_VALUE);
             Set<I_Position> positions = new HashSet<I_Position>();
             positions.add(oldPosition);
 
             // get latest concept attributes
-            List<I_ConceptAttributeTuple> conceptAttributeTuples =
-                concept.getConceptAttributeTuples(null, positions);
+            List<I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null, positions);
             // copy latest attributes to new path/version
-            for (I_ConceptAttributeTuple tuple: conceptAttributeTuples) {
+            for (I_ConceptAttributeTuple tuple : conceptAttributeTuples) {
                 I_ConceptAttributePart newPart = tuple.duplicatePart();
                 newPart.setVersion(Integer.MAX_VALUE);
                 newPart.setPathId(copyToPath.getConceptId());
@@ -123,10 +124,9 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             }
 
             // get latest descriptions
-            List<I_DescriptionTuple> descriptionTuples =
-                concept.getDescriptionTuples(null, null, positions);
+            List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, positions);
             // copy latest descriptions to new path/version
-            for (I_DescriptionTuple tuple: descriptionTuples) {
+            for (I_DescriptionTuple tuple : descriptionTuples) {
                 I_DescriptionPart newPart = tuple.duplicatePart();
                 newPart.setVersion(Integer.MAX_VALUE);
                 newPart.setPathId(copyToPath.getConceptId());
@@ -134,10 +134,9 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             }
 
             // get latest relationships
-            List<I_RelTuple> relationshipTuples =
-                concept.getSourceRelTuples(null, null, positions, false);
+            List<I_RelTuple> relationshipTuples = concept.getSourceRelTuples(null, null, positions, false);
             // copy latest relationships to new path/version
-            for (I_RelTuple tuple: relationshipTuples) {
+            for (I_RelTuple tuple : relationshipTuples) {
                 I_RelPart newPart = tuple.duplicatePart();
                 newPart.setVersion(Integer.MAX_VALUE);
                 newPart.setPathId(copyToPath.getConceptId());
@@ -160,8 +159,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             return branchToCopyToConcept;
         }
 
-        public void setBranchToCopyToConcept(
-                I_GetConceptData branchToCopyToConcept) {
+        public void setBranchToCopyToConcept(I_GetConceptData branchToCopyToConcept) {
             this.branchToCopyToConcept = branchToCopyToConcept;
         }
 
@@ -179,18 +177,13 @@ public class VodbCopyLatestComponent extends AbstractMojo {
         try {
             CopyLatestComponent copy = new CopyLatestComponent();
             termFactory.iterateConcepts(copy);
-            String message =
-                    "Successfully copied " + copy.getNumberCopiedComponents()
-                        + " latest components on '"
-                        + branchToCopy.getDescription() + "' branch to '"
-                        + branchToCopyTo.getDescription() + "' branch.";
+            String message = "Successfully copied " + copy.getNumberCopiedComponents() + " latest components on '"
+                + branchToCopy.getDescription() + "' branch to '" + branchToCopyTo.getDescription() + "' branch.";
             getLog().info(message);
 
             outputHtmlDirectory.mkdirs();
-            BufferedWriter htmlWriter =
-                    new BufferedWriter(new BufferedWriter(new FileWriter(
-                        outputHtmlDirectory + File.separator
-                            + outputHtmlFileName)));
+            BufferedWriter htmlWriter = new BufferedWriter(new BufferedWriter(new FileWriter(outputHtmlDirectory
+                + File.separator + outputHtmlFileName)));
 
             htmlWriter.append(message);
             htmlWriter.close();

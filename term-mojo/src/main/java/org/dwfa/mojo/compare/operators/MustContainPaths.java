@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,31 +24,31 @@ import org.dwfa.mojo.compare.CompareOperator;
 import org.dwfa.mojo.compare.Match;
 
 public class MustContainPaths implements CompareOperator {
-	
-	private ConceptDescriptor[] paths;
-	
-	public boolean compare(List<Match> matches) {
 
-		int numberOfMatches = 0;
-		for (Match m : matches) {
-			try {
-				boolean matched = false;
-				for (int i = 0; i < paths.length && !matched; i++) {
-					ConceptDescriptor cd = paths[i];
-					I_GetConceptData concept = cd.getVerifiedConcept();														
-					if (m.getPath1().getPath().getConceptId()==concept.getConceptId() || 
-						m.getPath2().getPath().getConceptId()==concept.getConceptId()) {
-						// The match occurred on a required path
-						matched = true;
-						numberOfMatches++;
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return numberOfMatches==paths.length;
-	}
+    private ConceptDescriptor[] paths;
+
+    public boolean compare(List<Match> matches) {
+
+        int numberOfMatches = 0;
+        for (Match m : matches) {
+            try {
+                boolean matched = false;
+                for (int i = 0; i < paths.length && !matched; i++) {
+                    ConceptDescriptor cd = paths[i];
+                    I_GetConceptData concept = cd.getVerifiedConcept();
+                    if (m.getPath1().getPath().getConceptId() == concept.getConceptId()
+                        || m.getPath2().getPath().getConceptId() == concept.getConceptId()) {
+                        // The match occurred on a required path
+                        matched = true;
+                        numberOfMatches++;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return numberOfMatches == paths.length;
+    }
 
 }

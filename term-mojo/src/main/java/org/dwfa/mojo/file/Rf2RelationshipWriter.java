@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,7 @@ import java.io.IOException;
 import org.dwfa.ace.file.GenericFileWriter;
 import org.dwfa.tapi.TerminologyException;
 
-public class Rf2RelationshipWriter extends GenericFileWriter<Rf2RelationshipWriter.Rf2RelationshipRow>{
+public class Rf2RelationshipWriter extends GenericFileWriter<Rf2RelationshipWriter.Rf2RelationshipRow> {
 
     public Rf2RelationshipWriter(File file) throws IOException {
         newLineChars = "\r\n";
@@ -35,7 +35,8 @@ public class Rf2RelationshipWriter extends GenericFileWriter<Rf2RelationshipWrit
      * @see org.dwfa.ace.file.GenericFileWriter#serialize(java.lang.Object)
      */
     @Override
-    protected String serialize(Rf2RelationshipWriter.Rf2RelationshipRow replationshipRow) throws IOException, TerminologyException {
+    protected String serialize(Rf2RelationshipWriter.Rf2RelationshipRow replationshipRow) throws IOException,
+            TerminologyException {
         return replationshipRow.toString();
     }
 
@@ -57,12 +58,13 @@ public class Rf2RelationshipWriter extends GenericFileWriter<Rf2RelationshipWrit
 
         /**
          * Header row for this type.
-         *
+         * 
          * @return String header.
          */
         public String getHeader() {
-            return "id" + "\t" + "effectiveTime" + "\t" + "active" + "\t" + "moduleId" + "\t" + "sourceId" + "\t" + "destinationId"
-                    + "\t" + "relationshipGroup" + "\t" + "typeId" + "\t" + "characteristicTypeId" + "\t" + "modifierId";
+            return "id" + "\t" + "effectiveTime" + "\t" + "active" + "\t" + "moduleId" + "\t" + "sourceId" + "\t"
+                + "destinationId" + "\t" + "relationshipGroup" + "\t" + "typeId" + "\t" + "characteristicTypeId" + "\t"
+                + "modifierId";
         }
 
         /**

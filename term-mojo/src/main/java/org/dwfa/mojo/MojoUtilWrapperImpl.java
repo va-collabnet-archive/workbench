@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,12 +22,13 @@ import org.dwfa.maven.MojoUtil;
 import java.io.File;
 
 /**
- * Default implementation of <code>MojoUtilWrapper</code> which degelates to @{link org.dwfa.maven.MojoUtil}.
+ * Default implementation of <code>MojoUtilWrapper</code> which degelates to
+ * @{link org.dwfa.maven.MojoUtil}.
  */
 public final class MojoUtilWrapperImpl implements MojoUtilWrapper {
 
     public boolean alreadyRun(final Log logger, final String absolutePath, final Class<?> clazz,
-                              final File outputDirectory) throws Exception {
+            final File outputDirectory) throws Exception {
         return MojoUtil.alreadyRun(logger, absolutePath, clazz, outputDirectory);
     }
 }

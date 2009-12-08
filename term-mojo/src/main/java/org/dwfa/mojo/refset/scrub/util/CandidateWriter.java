@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,8 +33,7 @@ public final class CandidateWriter {
     private final PrintWriter reportWriter;
     private final I_TermFactory termFactory;
 
-    public CandidateWriter(final String reportFile,
-            final I_TermFactory termFactory) throws FileNotFoundException {
+    public CandidateWriter(final String reportFile, final I_TermFactory termFactory) throws FileNotFoundException {
         this.termFactory = termFactory;
         reportWriter = new PrintWriter(reportFile);
     }
@@ -42,12 +41,13 @@ public final class CandidateWriter {
     public void logCandidate(String refsetName, I_ThinExtByRefVersioned candidate) throws Exception {
         String conceptDesc = termFactory.getConcept(candidate.getComponentId()).getInitialText();
 
-        // First index the version parts so we can print back in chronological order
+        // First index the version parts so we can print back in chronological
+        // order
         TreeMap<Long, PartDescription> partIndex = new TreeMap<Long, PartDescription>();
         for (I_ThinExtByRefPart part : candidate.getVersions()) {
             if (part instanceof I_ThinExtByRefPartConcept) {
                 PartDescription partDesc = new PartDescription();
-                int inclusionType = ((I_ThinExtByRefPartConcept)part).getConceptId();
+                int inclusionType = ((I_ThinExtByRefPartConcept) part).getConceptId();
                 partDesc.typeDesc = termFactory.getConcept(inclusionType).getInitialText();
                 partDesc.statusDesc = termFactory.getConcept(part.getStatus()).getInitialText();
                 partDesc.pathDesc = termFactory.getConcept(part.getPathId()).getInitialText();
@@ -61,10 +61,10 @@ public final class CandidateWriter {
         for (Long version : partIndex.keySet()) {
             PartDescription partDesc = partIndex.get(version);
             String dateStr = dateFmt.format(new Date(version));
-            System.out.println("\t\t" + partDesc.typeDesc + "," + partDesc.statusDesc + "," +
-                    partDesc.pathDesc + "," + dateStr);
-            reportWriter.println(refsetName + "\t" + conceptDesc + "\t" + partDesc.typeDesc + "\t" +
-                    partDesc.statusDesc + "\t" + partDesc.pathDesc + "\t" + dateStr);
+            System.out.println("\t\t" + partDesc.typeDesc + "," + partDesc.statusDesc + "," + partDesc.pathDesc + ","
+                + dateStr);
+            reportWriter.println(refsetName + "\t" + conceptDesc + "\t" + partDesc.typeDesc + "\t"
+                + partDesc.statusDesc + "\t" + partDesc.pathDesc + "\t" + dateStr);
         }
         reportWriter.println();
     }

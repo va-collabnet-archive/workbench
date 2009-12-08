@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,10 +26,8 @@ public final class LineToSQLConverterImpl implements LineToSQLConverter {
     private final LineValueToSQLTypeConverter lineValueToSQLTypeConverter;
     private final SQLCreator sqlCreator;
 
-    public LineToSQLConverterImpl(
-            final LineToValuesExtractor lineToValuesExtractor,
-            final LineValueToSQLTypeConverter lineValueToSQLTypeConverter,
-            final SQLCreator sqlCreator) {
+    public LineToSQLConverterImpl(final LineToValuesExtractor lineToValuesExtractor,
+            final LineValueToSQLTypeConverter lineValueToSQLTypeConverter, final SQLCreator sqlCreator) {
         this.lineToValuesExtractor = lineToValuesExtractor;
         this.lineValueToSQLTypeConverter = lineValueToSQLTypeConverter;
         this.sqlCreator = sqlCreator;
@@ -37,8 +35,7 @@ public final class LineToSQLConverterImpl implements LineToSQLConverter {
 
     public String convert(final Table table, final String line) {
         String[] values = lineToValuesExtractor.extract(line);
-        String[] convertedValues =
-                lineValueToSQLTypeConverter.convert(table, values);
+        String[] convertedValues = lineValueToSQLTypeConverter.convert(table, values);
         return sqlCreator.createSQL(table, convertedValues);
     }
 }

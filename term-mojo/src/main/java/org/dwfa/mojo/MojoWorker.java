@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,33 +42,32 @@ import org.dwfa.bpa.process.NoSuchWorkspaceException;
 import org.dwfa.bpa.process.WorkspaceActiveException;
 import org.dwfa.bpa.worker.Worker;
 
-
 public class MojoWorker extends Worker {
 
     @Override
-	public ProxyPreparer getProxyPreparer() throws ConfigurationException {
-		
-		return new ProxyPreparer() {
+    public ProxyPreparer getProxyPreparer() throws ConfigurationException {
 
-			public Object prepareProxy(Object obj) throws RemoteException {
-				return obj;
-			}
-			
-		};
-	}
+        return new ProxyPreparer() {
 
-	/**
+            public Object prepareProxy(Object obj) throws RemoteException {
+                return obj;
+            }
+
+        };
+    }
+
+    /**
      * @param config
      * @param id
      * @param desc
      * @throws ConfigurationException
-     * @throws LoginException 
-     * @throws IOException 
+     * @throws LoginException
+     * @throws IOException
      */
-    public MojoWorker(Configuration config, UUID id, String desc) 
-    throws ConfigurationException, LoginException, IOException, PrivilegedActionException {
+    public MojoWorker(Configuration config, UUID id, String desc) throws ConfigurationException, LoginException,
+            IOException, PrivilegedActionException {
         super(config, id, desc);
-        
+
     }
 
     /**
@@ -79,7 +78,8 @@ public class MojoWorker extends Worker {
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_Work#createWorkspace(net.jini.id.UUID, java.lang.String, org.dwfa.bpa.gui.TerminologyConfiguration)
+     * @see org.dwfa.bpa.process.I_Work#createWorkspace(net.jini.id.UUID,
+     *      java.lang.String, org.dwfa.bpa.gui.TerminologyConfiguration)
      */
     public I_Workspace createWorkspace(UUID workspaceId, String name, File menuDir) throws WorkspaceActiveException,
             HeadlessException {
@@ -89,8 +89,7 @@ public class MojoWorker extends Worker {
     /**
      * @see org.dwfa.bpa.process.I_Work#getWorkspace(net.jini.id.UUID)
      */
-    public I_Workspace getWorkspace(UUID workspaceId)
-            throws NoSuchWorkspaceException {
+    public I_Workspace getWorkspace(UUID workspaceId) throws NoSuchWorkspaceException {
         throw new UnsupportedOperationException();
     }
 
@@ -116,34 +115,38 @@ public class MojoWorker extends Worker {
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_Work#selectFromList(java.lang.Object[], java.lang.String, java.lang.String)
+     * @see org.dwfa.bpa.process.I_Work#selectFromList(java.lang.Object[],
+     *      java.lang.String, java.lang.String)
      */
-    public Object selectFromList(Object[] list, String title,
-            String instructions) {
+    public Object selectFromList(Object[] list, String title, String instructions) {
         throw new UnsupportedOperationException();
     }
-    
 
     /**
-     * @see org.dwfa.bpa.process.I_Work#createHeadlessWorkspace(net.jini.id.UUID, org.dwfa.bpa.gui.TerminologyConfiguration)
+     * @see org.dwfa.bpa.process.I_Work#createHeadlessWorkspace(net.jini.id.UUID,
+     *      org.dwfa.bpa.gui.TerminologyConfiguration)
      */
     public I_Workspace createHeadlessWorkspace(UUID workspace_id) throws WorkspaceActiveException, HeadlessException {
         throw new UnsupportedOperationException();
     }
-    public I_Workspace createWorkspace(UUID arg0, String arg1, I_ManageUserTransactions arg2, File menuDir) throws WorkspaceActiveException, Exception {
+
+    public I_Workspace createWorkspace(UUID arg0, String arg1, I_ManageUserTransactions arg2, File menuDir)
+            throws WorkspaceActiveException, Exception {
         throw new UnsupportedOperationException();
     }
 
-	public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2, FilenameFilter arg3) throws IOException, ClassNotFoundException {
+    public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2, FilenameFilter arg3) throws IOException,
+            ClassNotFoundException {
         throw new UnsupportedOperationException();
-	}
+    }
 
-	public void writeObjToFilesystem(Frame arg0, String arg1, String arg2, String arg3, Object arg4) throws IOException {
+    public void writeObjToFilesystem(Frame arg0, String arg1, String arg2, String arg3, Object arg4) throws IOException {
         throw new UnsupportedOperationException();
-	}
+    }
 
-	public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException, PrivilegedActionException {
-		throw new UnsupportedOperationException();
-	}
+    public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException,
+            PrivilegedActionException {
+        throw new UnsupportedOperationException();
+    }
 
-}//End class MojoWorker
+}// End class MojoWorker

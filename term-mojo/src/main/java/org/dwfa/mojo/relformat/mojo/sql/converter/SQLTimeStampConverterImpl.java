@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,17 +21,17 @@ public final class SQLTimeStampConverterImpl implements SQLTypeConverter {
     private static final int TIMEZONE_FORMAT_LENGTH = 16;
 
     public String convert(final String value) {
-        //eg. 20081031T000000Z
+        // eg. 20081031T000000Z
         if (hasTimezoneInfo(value)) {
             return buildTimestamp(value.substring(0, 9));
         }
 
-        //20080725
+        // 20080725
         if (hasDateOnly(value)) {
             return buildTimestamp(value);
         }
 
-        //assume correct format.
+        // assume correct format.
         return value;
     }
 
@@ -41,8 +41,12 @@ public final class SQLTimeStampConverterImpl implements SQLTypeConverter {
 
     private String buildTimestamp(final String timestamp) {
         return new StringBuilder().append(timestamp.substring(0, 4))
-            .append("-").append(timestamp.substring(4, 6)).append("-").append(
-                timestamp.substring(6, 8)).append(" ").append(getDefaultTime())
+            .append("-")
+            .append(timestamp.substring(4, 6))
+            .append("-")
+            .append(timestamp.substring(6, 8))
+            .append(" ")
+            .append(getDefaultTime())
             .toString();
     }
 
@@ -51,7 +55,6 @@ public final class SQLTimeStampConverterImpl implements SQLTypeConverter {
     }
 
     private boolean hasTimezoneInfo(final String value) {
-        return value.length() == TIMEZONE_FORMAT_LENGTH
-            && value.indexOf('T') != -1 && value.indexOf('Z') != -1;
+        return value.length() == TIMEZONE_FORMAT_LENGTH && value.indexOf('T') != -1 && value.indexOf('Z') != -1;
     }
 }

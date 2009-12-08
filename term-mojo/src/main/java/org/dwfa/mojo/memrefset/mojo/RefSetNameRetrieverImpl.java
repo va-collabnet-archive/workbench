@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import java.util.UUID;
 
 public final class RefSetNameRetrieverImpl implements RefSetNameRetriever {
 
-    private static final Collection<UUID> CURRENT_STATUS_UUIDS  = Concept.CURRENT.getUids();
+    private static final Collection<UUID> CURRENT_STATUS_UUIDS = Concept.CURRENT.getUids();
     private static final Collection<UUID> FULLY_SPECIFIED_UUIDS = Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids();
 
     public String retrieveName(final UUID uuid) {
@@ -37,9 +37,9 @@ public final class RefSetNameRetrieverImpl implements RefSetNameRetriever {
             I_TermFactory termFactory = LocalVersionedTerminology.get();
             I_IntSet status = createCurrentStatus(termFactory);
             I_IntSet fsn = createFullySpecifiedUUIDs(termFactory);
-            List<I_DescriptionTuple> descriptions =
-                    termFactory.getConcept(new UUID[]{uuid}).getDescriptionTuples(status, fsn, null);
-            //TODO: may have to check for this.
+            List<I_DescriptionTuple> descriptions = termFactory.getConcept(new UUID[] { uuid }).getDescriptionTuples(
+                status, fsn, null);
+            // TODO: may have to check for this.
             return descriptions.get(0).getText();
         } catch (Exception e) {
             return "N/A";

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,42 +56,26 @@ import org.dwfa.util.LogWithAlerts;
 
 enum RefsetType {
 
-    CONCEPT(
-        Concept.CONCEPT_EXTENSION,
-        ConceptRefsetHandler.class,
-        new ConceptDescriptor("be7b2b7e-b397-4cb4-83e1-e443d3c53998", "Attribute value type reference set (foundation metadata concept)"),
-        new ConceptDescriptor("98ffd934-9564-49f3-93c3-954b56b5da89", "Language type reference set (foundation metadata concept)"),
-        new ConceptDescriptor("6298198d-dbe3-4343-893b-3e06d34330d7", "Association type reference set (foundation metadata concept)")),
+    CONCEPT(Concept.CONCEPT_EXTENSION, ConceptRefsetHandler.class, new ConceptDescriptor(
+        "be7b2b7e-b397-4cb4-83e1-e443d3c53998", "Attribute value type reference set (foundation metadata concept)"), new ConceptDescriptor(
+        "98ffd934-9564-49f3-93c3-954b56b5da89", "Language type reference set (foundation metadata concept)"), new ConceptDescriptor(
+        "6298198d-dbe3-4343-893b-3e06d34330d7", "Association type reference set (foundation metadata concept)")),
 
-    CONCEPT_CONCEPT(
-        Concept.CONCEPT_CONCEPT_EXTENSION,
-        ConceptConceptRefsetHandler.class),
+    CONCEPT_CONCEPT(Concept.CONCEPT_CONCEPT_EXTENSION, ConceptConceptRefsetHandler.class),
 
-    CONCEPT_CONCEPT_CONCEPT(
-        Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION,
-        ConceptConceptConceptRefsetHandler.class),
+    CONCEPT_CONCEPT_CONCEPT(Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION, ConceptConceptConceptRefsetHandler.class),
 
-    INTEGER(
-        Concept.INT_EXTENSION,
-        IntegerRefsetHandler.class),
+    INTEGER(Concept.INT_EXTENSION, IntegerRefsetHandler.class),
 
-    STRING(
-        Concept.STRING_EXTENSION,
-        StringRefsetHandler.class,
-        new ConceptDescriptor("c1a4d7ba-6861-4d2e-8e91-d5f721920d27", "Simple map type reference set (foundation metadata concept)"),
-        new ConceptDescriptor("63c8b731-a6a3-4f09-a7a2-9a02f2c0a918", "Annotation type reference set (foundation metadata concept)")),
+    STRING(Concept.STRING_EXTENSION, StringRefsetHandler.class, new ConceptDescriptor(
+        "c1a4d7ba-6861-4d2e-8e91-d5f721920d27", "Simple map type reference set (foundation metadata concept)"), new ConceptDescriptor(
+        "63c8b731-a6a3-4f09-a7a2-9a02f2c0a918", "Annotation type reference set (foundation metadata concept)")),
 
-    BOOLEAN(
-        Concept.BOOLEAN_EXTENSION,
-        BooleanRefsetHandler.class),
+    BOOLEAN(Concept.BOOLEAN_EXTENSION, BooleanRefsetHandler.class),
 
-    CONCEPT_INTEGER(
-        Concept.CONCEPT_INT_EXTENSION,
-        ConceptIntegerRefsetHandler.class),
+    CONCEPT_INTEGER(Concept.CONCEPT_INT_EXTENSION, ConceptIntegerRefsetHandler.class),
 
-    CONCEPT_DOUBLE(
-        Concept.MEASUREMENT_EXTENSION,
-        ConceptDoubleRefsetHandler.class);
+    CONCEPT_DOUBLE(Concept.MEASUREMENT_EXTENSION, ConceptDoubleRefsetHandler.class);
 
     private Class<? extends MemberRefsetHandler> refsetWriterClass;
     private MemberRefsetHandler refsetWriter = null;
@@ -168,7 +152,7 @@ enum RefsetType {
      * determine its structural type.
      * <p>
      * See {@link #refsetTypeParents}
-     *
+     * 
      * @param file
      * @return appropriate RefsetType for the passed file, or an exception if
      *         one can't be found
@@ -231,8 +215,8 @@ enum RefsetType {
 
         if (types == null) {
             types = iTermFactory.newIntSet();
-            types.add(new ConceptDescriptor("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25", "Is a (attribute)")
-                .getVerifiedConcept().getConceptId());
+            types.add(new ConceptDescriptor("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25", "Is a (attribute)").getVerifiedConcept()
+                .getConceptId());
         }
     }
 }

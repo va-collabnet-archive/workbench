@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,9 +34,9 @@ import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 
 /**
- *
+ * 
  * This mojo exports attribute value reference set from an ACE database
- *
+ * 
  * @goal export-attirbute-value-refset
  * @author Ean Dungey, Dion McMurtrie
  */
@@ -66,9 +66,11 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
             inActiveNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid();
             currentNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
             relationshipRefinability = ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION.localize().getNid();
-            relationshipRefinabilityExtension = ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION.localize().getNid();
+            relationshipRefinabilityExtension = ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION.localize()
+                .getNid();
             descriptionInactivationIndicator = ConceptConstants.DESCRIPTION_INACTIVATION_INDICATOR.localize().getNid();
-            relationshipInactivationIndicator = ConceptConstants.RELATIONSHIP_INACTIVATION_INDICATOR.localize().getNid();
+            relationshipInactivationIndicator = ConceptConstants.RELATIONSHIP_INACTIVATION_INDICATOR.localize()
+                .getNid();
             conceptInactivationIndicator = ConceptConstants.CONCEPT_INACTIVATION_INDICATOR.localize().getNid();
         } catch (Exception e) {
             throw new MojoExecutionException("", e);
@@ -80,11 +82,11 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
     /**
      * Check if the concept meets the <code>exportSpecifications</code>, is on
      * the <code>positions</code> and has the <code>allowedStatuses</code>
-     *
+     * 
      * @see org.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.I_GetConceptData)
      */
     public void processConcept(I_GetConceptData concept) throws Exception {
-        if(first){
+        if (first) {
             new ConceptProcessor(concept).run();
         } else {
             workQueue.execute(new ConceptProcessor(concept));
@@ -93,9 +95,9 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
 
     /**
      * Export the relationships for the concepts latest version
-     *
+     * 
      * @param versionedRel the concept to export the relationships for.
-     *
+     * 
      * @throws Exception DB errors.
      */
     private void processRelationship(I_RelVersioned versionedRel) throws Exception {
@@ -103,11 +105,10 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
             boolean exportableVersionFound = false;
             I_RelPart latest = null;
             for (I_RelPart part : versionedRel.getVersions()) {
-                if (checkPath(part.getPathId())
-                        && allowedStatuses.contains(part.getStatusId())
-                        && testSpecificationWithCache(part.getCharacteristicId())
-                        && testSpecificationWithCache(part.getPathId())
-                        && testSpecificationWithCache(part.getRefinabilityId())) {
+                if (checkPath(part.getPathId()) && allowedStatuses.contains(part.getStatusId())
+                    && testSpecificationWithCache(part.getCharacteristicId())
+                    && testSpecificationWithCache(part.getPathId())
+                    && testSpecificationWithCache(part.getRefinabilityId())) {
 
                     exportableVersionFound = true;
                     if (latest == null || latest.getVersion() < part.getVersion()) {
@@ -126,18 +127,18 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
 
     /**
      * Export the descriptions for the concepts latest version
-     *
-     * @param versionedDesc the description to export the inactivation status for.
-     *
+     * 
+     * @param versionedDesc the description to export the inactivation status
+     *            for.
+     * 
      * @throws Exception DB errors.
      */
     private void processDescription(I_DescriptionVersioned versionedDesc) throws Exception {
         boolean exportableVersionFound = false;
         I_DescriptionPart latest = null;
         for (I_DescriptionPart part : versionedDesc.getVersions()) {
-            if (checkPath(part.getPathId())
-                    && allowedStatuses.contains(part.getStatusId())
-                    && testSpecificationWithCache(part.getTypeId())) {
+            if (checkPath(part.getPathId()) && allowedStatuses.contains(part.getStatusId())
+                && testSpecificationWithCache(part.getTypeId())) {
 
                 exportableVersionFound = true;
                 if (latest == null || latest.getVersion() < part.getVersion()) {
@@ -154,9 +155,10 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
     }
 
     /**
-     * Create/update and export status concept extensions for all concepts that are not active, inactive
+     * Create/update and export status concept extensions for all concepts that
+     * are not active, inactive
      * or current as we want to know why they are active, inactive or current.
-     *
+     * 
      * @param latest I_AmPart latest version of the concept
      * @param relId concept id
      * @throws Exception cannot create or export the concept.
@@ -167,12 +169,11 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
         if (part == null) {
             // if the status is INACTIVE or ACTIVE there is no need for a
             // reason. For simplicity, CURRENT will be treated this way too,
-            if (latest.getStatusId() != activeNId
-                && latest.getStatusId() != inActiveNId
+            if (latest.getStatusId() != activeNId && latest.getStatusId() != inActiveNId
                 && latest.getStatusId() != currentNId) {
                 // no extension at all
-                //part = tf.newExtensionPart(ThinExtByRefPartConcept.class);
-                part = new ThinExtByRefPartConcept();//stunt extension part.
+                // part = tf.newExtensionPart(ThinExtByRefPartConcept.class);
+                part = new ThinExtByRefPartConcept();// stunt extension part.
                 part.setC1id(latest.getStatusId());
                 part.setPathId(latest.getPathId());
                 part.setStatusId(activeNId);
@@ -187,8 +188,9 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
     }
 
     /**
-     * Create/update and export concept extensions (relationships refinability reference) for all concepts.
-     *
+     * Create/update and export concept extensions (relationships refinability
+     * reference) for all concepts.
+     * 
      * @param latest I_AmPart latest version of the concept
      * @param relId concept id
      * @throws Exception cannot create or export the concept.
@@ -198,7 +200,7 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
         I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
         if (part == null) {
             // no extension at all
-            part = new ThinExtByRefPartConcept();//stunt extension part.
+            part = new ThinExtByRefPartConcept();// stunt extension part.
             part.setC1id(latest.getRefinabilityId());
             part.setPathId(latest.getPathId());
             part.setStatusId(activeNId);
@@ -251,7 +253,7 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
                 extractStatus(latest, concept.getConceptId(), conceptInactivationIndicator);
             }
 
-            if(processedConceptsCount % 1000 == 0){
+            if (processedConceptsCount % 1000 == 0) {
                 logger.info("Processed " + processedConceptsCount + " Concepts");
             }
         }

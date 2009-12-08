@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,9 +45,9 @@ import org.dwfa.mojo.refset.writers.MemberRefsetHandler;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- *
+ * 
  * This mojo exports refsets from an ACE database in subset format.
- *
+ * 
  * @goal subset-export
  * @author Christine Hill
  */
@@ -64,7 +64,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
      * A then none of the reference set will be exported. However if the export
      * spec does include A, but not C then the reference set will be exported
      * except it will only have members B and D - C will be omitted.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -73,7 +73,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
     /**
      * Defines the directory to which the SCTID based subsets are
      * exported.
-     *
+     * 
      * @parameter
      * @required
      */
@@ -81,7 +81,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
     /**
      * Directory where the fixed SCTID map is located
-     *
+     * 
      * @parameter
      * @required
      */
@@ -89,7 +89,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
     /**
      * Directory where the read/write SCTID maps are stored
-     *
+     * 
      * @parameter
      * @required
      */
@@ -98,14 +98,14 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
     /**
      * Release version used to embed in the subset file names - if not specified
      * then the "path version" reference set is used to determine the version
-     *
+     * 
      * @parameter
      */
     String releaseVersion;
 
     /**
      * Country code used to embed in the subset file names.
-     *
+     * 
      * @required
      * @parameter
      */
@@ -113,14 +113,14 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
     /**
      * Language code used to embed in the subset files.
-     *
+     * 
      * @parameter
      */
     String languageCode = "en";
 
     /**
      * File delimiter.
-     *
+     * 
      * @parameter
      */
     String FILE_DELIMITER = "\t";
@@ -230,8 +230,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             try {
                 refsetType = RefsetType.findByExtension(thinExtByRefPart);
             } catch (EnumConstantNotPresentException e) {
-                getLog()
-                    .warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
+                getLog().warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
                 return;
             }
             refsetTypeMap.put(refsetId, refsetType);
@@ -239,9 +238,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
         BufferedWriter subsetIndexFileWriter = writerMap.get("INDEX");
         if (subsetIndexFileWriter == null) {
-            subsetIndexFileWriter =
-                    new BufferedWriter(new FileWriter(new File(subsetOutputDirectory, "sct_subsets_" + countryCode
-                        + "_" + releaseVersion + ".txt")));
+            subsetIndexFileWriter = new BufferedWriter(new FileWriter(new File(subsetOutputDirectory, "sct_subsets_"
+                + countryCode + "_" + releaseVersion + ".txt")));
             subsetIndexFileWriter.write("SUBSETID" + FILE_DELIMITER + "SUBSETORIGINALID" + FILE_DELIMITER
                 + "SUBSETVERSION" + FILE_DELIMITER + "SUBSETNAME" + FILE_DELIMITER + "SUBSETTYPE" + FILE_DELIMITER
                 + "LANGUAGECODE" + FILE_DELIMITER + "REALMID" + FILE_DELIMITER + "CONTEXTID");
@@ -262,9 +260,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                 releaseVersion = referenceSetExport.getReleaseVersion(refsetConcept);
             }
 
-            subsetMemberFileWriter =
-                    new BufferedWriter(new FileWriter(new File(subsetOutputDirectory, "sct_subsetmembers_"
-                        + countryCode + "_" + refsetName + "_" + releaseVersion + ".txt")));
+            subsetMemberFileWriter = new BufferedWriter(new FileWriter(new File(subsetOutputDirectory,
+                "sct_subsetmembers_" + countryCode + "_" + refsetName + "_" + releaseVersion + ".txt")));
 
             writerMap.put(refsetId + "SCTID", subsetMemberFileWriter);
 
@@ -273,8 +270,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
             // first time this subset member has been found, so add to index
             // table as well
-            subsetIndexFileWriter.write(refsetType.getRefsetHandler().getRefsetSctID(tf, refsetId, TYPE.SUBSET) + FILE_DELIMITER
-                + "UNKNOWN" + FILE_DELIMITER + "UNKNOWN" + FILE_DELIMITER
+            subsetIndexFileWriter.write(refsetType.getRefsetHandler().getRefsetSctID(tf, refsetId, TYPE.SUBSET)
+                + FILE_DELIMITER + "UNKNOWN" + FILE_DELIMITER + "UNKNOWN" + FILE_DELIMITER
                 + referenceSetExport.getPreferredTerm(tf.getConcept(refsetId)) + FILE_DELIMITER + "UNKNOWN"
                 + FILE_DELIMITER + languageCode + FILE_DELIMITER + "UNKNOWN" + FILE_DELIMITER + "UNKNOWN");
             subsetIndexFileWriter.newLine();

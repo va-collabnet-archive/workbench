@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,25 +21,28 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.file.IterableFileReader;
 
 /**
- * Extends the abstract mojo to ensure a plug-able file handler is provided to the concrete implementation.
- * Any implementations can make use of the extensions created by the defined file handler.
+ * Extends the abstract mojo to ensure a plug-able file handler is provided to
+ * the concrete implementation.
+ * Any implementations can make use of the extensions created by the defined
+ * file handler.
  * 
  */
 public abstract class ImportFromFile extends AbstractMojo {
 
-	/**
-	 * Defines the FileHandler implementation to be used.
-	 *
-	 * <p>
-	 * Example configuration:
-	 * <pre>
-	 * &lt;fileHandler implementation="org.dwfa.mojo.refset.ExportedRefsetHandler"&gt;
-	 *    ...
-	 * &lt;/fileHandler&gt;
-	 * 
-	 * @parameter 
-	 * @required
-	 */
-	public IterableFileReader<I_ThinExtByRefVersioned> fileHandler;
+    /**
+     * Defines the FileHandler implementation to be used.
+     * 
+     * <p>
+     * Example configuration:
+     * 
+     * <pre>
+     * &lt;fileHandler implementation="org.dwfa.mojo.refset.ExportedRefsetHandler"&gt;
+     *    ...
+     * &lt;/fileHandler&gt;
+     * 
+     * @parameter
+     * @required
+     */
+    public IterableFileReader<I_ThinExtByRefVersioned> fileHandler;
 
 }

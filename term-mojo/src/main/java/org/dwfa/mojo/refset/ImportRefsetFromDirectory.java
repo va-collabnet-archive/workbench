@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,121 +30,126 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.process.I_ProcessQueue;
 import org.dwfa.ace.file.IterableFileReader;
 
-
 /**
  * Imports the contents of refset files from a directory
- *
- * @see https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/dataimport.html
+ * 
+ * @see https
+ *      ://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/dataimport
+ *      .html
  * @goal load-refset-files-from-directory
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
 public class ImportRefsetFromDirectory extends AbstractMojo {
 
-	/**
-	 * Directory the files are to read from
-	 *
-	 * @parameter
-	 * @required
-	 */
-	File refsetDirectory;
+    /**
+     * Directory the files are to read from
+     * 
+     * @parameter
+     * @required
+     */
+    File refsetDirectory;
 
-	/**
-	 * Indicates if the transactional ACE interface should be used - defaults to false
-	 *
-	 * @parameter
-	 */
-	boolean transactional;
+    /**
+     * Indicates if the transactional ACE interface should be used - defaults to
+     * false
+     * 
+     * @parameter
+     */
+    boolean transactional;
 
-	/**
-	 * Indicates if the files contain a header row or not. If true the first line of the file
-	 * will be skipped. Default value is true.
-	 *
-	 * @parameter
-	 */
-	boolean hasHeader = true;
+    /**
+     * Indicates if the files contain a header row or not. If true the first
+     * line of the file
+     * will be skipped. Default value is true.
+     * 
+     * @parameter
+     */
+    boolean hasHeader = true;
 
-	/**
-	 * List of filename expressions to exclude
-	 *
-	 * @parameter
-	 */
-	List<String> exclusions = new ArrayList<String>();
+    /**
+     * List of filename expressions to exclude
+     * 
+     * @parameter
+     */
+    List<String> exclusions = new ArrayList<String>();
 
-	private FilenameFilter filenameFilter;
+    private FilenameFilter filenameFilter;
 
+    /*
+     * Mojo execution method.
+     * 
+     * @see org.apache.maven.plugin.AbstractMojo#execute()
+     */
+    public void execute() throws MojoExecutionException, MojoFailureException {
 
-	/*
-	 * Mojo execution method.
-	 * @see org.apache.maven.plugin.AbstractMojo#execute()
-	 */
-	public void execute() throws MojoExecutionException, MojoFailureException {
+        try {
+            List<File> files = recursivelyGetFiles(refsetDirectory);
+            if (files.isEmpty()) {
+                throw new MojoExecutionException("No files found to import at specified directory " + refsetDirectory);
+            }
 
-		try {
-			List<File> files = recursivelyGetFiles(refsetDirectory);
-			if (files.isEmpty()) {
-			    throw new MojoExecutionException("No files found to import at specified directory " + refsetDirectory);
-			}
+            for (File file : files) {
+                if (notExcluded(file.getName())) {
+                    getLog().info("Processing refset file " + file);
 
-			for (File file : files) {
-				if (notExcluded(file.getName())) {
-		            getLog().info("Processing refset file " + file);
-		            
-		            try {
-		                IterableFileReader<I_ThinExtByRefPart> handler = RefsetType.getHandlerForFile(file);
-		                handler.setTransactional(transactional);
-		                handler.setSourceFile(file);
-		                handler.setHasHeader(hasHeader);
-		    
-		                int i = 0;
-		                for (I_ThinExtByRefPart thinExtByRefPart : handler) {
-		                    if (++i % 1000 == 0) {
-		                        getLog().info("Imported " + i + " extensions from file " + file);
-		                    }
-		                }
-		                getLog().info("Completed importing " + i + " extensions from file " + file);
-		            } catch (Exception e) {
-		                getLog().warn("Failed to import file " + file + " due to exception. Continuing to next file.", e);
-		            } 
-				} else {
-				    getLog().info("File " + file + " excluded from import");
-				}
-			}
+                    try {
+                        IterableFileReader<I_ThinExtByRefPart> handler = RefsetType.getHandlerForFile(file);
+                        handler.setTransactional(transactional);
+                        handler.setSourceFile(file);
+                        handler.setHasHeader(hasHeader);
 
-		} catch (Exception e) {
-			throw new MojoExecutionException("failed importing files from " + refsetDirectory, e);
-		}
-	}
+                        int i = 0;
+                        for (I_ThinExtByRefPart thinExtByRefPart : handler) {
+                            if (++i % 1000 == 0) {
+                                getLog().info("Imported " + i + " extensions from file " + file);
+                            }
+                        }
+                        getLog().info("Completed importing " + i + " extensions from file " + file);
+                    } catch (Exception e) {
+                        getLog().warn("Failed to import file " + file + " due to exception. Continuing to next file.",
+                            e);
+                    }
+                } else {
+                    getLog().info("File " + file + " excluded from import");
+                }
+            }
 
-	private boolean notExcluded(String name) {
-		for (String exclusion : exclusions) {
-			if (name.matches(exclusion)) {
-				return false;
-			}
-		}
-		return true;
-	}
+        } catch (Exception e) {
+            throw new MojoExecutionException("failed importing files from " + refsetDirectory, e);
+        }
+    }
 
-	private List<File> recursivelyGetFiles(File directory) {
-		if (filenameFilter == null) {
-			filenameFilter = RefsetType.getFileNameFilter();
-		}
+    private boolean notExcluded(String name) {
+        for (String exclusion : exclusions) {
+            if (name.matches(exclusion)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-		List<File> allFiles = new ArrayList<File>();;
-		if (!directory.isDirectory()) {
-		    if (filenameFilter.accept(directory.getParentFile(), directory.getName())) {
-		        allFiles.add(directory);
-		    }
-		    return allFiles;
-		}
-		for (File file : directory.listFiles(filenameFilter)) {
-			if (file.isDirectory()) {
-				allFiles.addAll(recursivelyGetFiles(file));
-			} else {
-				allFiles.add(file);
-			}
-		}
-		return allFiles;
-	}
+    private List<File> recursivelyGetFiles(File directory) {
+        if (filenameFilter == null) {
+            filenameFilter = RefsetType.getFileNameFilter();
+        }
+
+        List<File> allFiles = new ArrayList<File>();
+        ;
+        if (!directory.isDirectory()) {
+            if (filenameFilter.accept(directory.getParentFile(), directory.getName())) {
+                allFiles.add(directory);
+            }
+            return allFiles;
+        }
+        for (File file : directory.listFiles(filenameFilter)) {
+            if (file.isDirectory()) {
+                allFiles.addAll(recursivelyGetFiles(file));
+            } else {
+                allFiles.add(file);
+            }
+        }
+        return allFiles;
+    }
 
 }

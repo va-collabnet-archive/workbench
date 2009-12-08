@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,40 +29,46 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 public class ConceptDoubleRefsetHandler extends MemberRefsetHandler {
     @Override
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid, boolean useRf2) throws SQLException, ClassNotFoundException, Exception {
+    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid, boolean useRf2)
+            throws SQLException, ClassNotFoundException, Exception {
         I_ThinExtByRefPartMeasurement measurementPart = (I_ThinExtByRefPartMeasurement) tuple.getPart();
 
         return super.formatRefsetLine(tf, tuple, sctid, useRf2) + MemberRefsetHandler.COLUMN_DELIMITER
-                      + toId(tf, measurementPart.getUnitsOfMeasureId(), sctid, TYPE.CONCEPT) + MemberRefsetHandler.COLUMN_DELIMITER
-                      + measurementPart.getMeasurementValue();
+            + toId(tf, measurementPart.getUnitsOfMeasureId(), sctid, TYPE.CONCEPT)
+            + MemberRefsetHandler.COLUMN_DELIMITER + measurementPart.getMeasurementValue();
     }
 
-	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId, int componentId, boolean sctId, boolean useRf2) throws SQLException, ClassNotFoundException, Exception {
-		I_ThinExtByRefPartMeasurement measurementPart = (I_ThinExtByRefPartMeasurement) part;
+    @Override
+    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId,
+            int componentId, boolean sctId, boolean useRf2) throws SQLException, ClassNotFoundException, Exception {
+        I_ThinExtByRefPartMeasurement measurementPart = (I_ThinExtByRefPartMeasurement) part;
 
-		return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId, useRf2) + MemberRefsetHandler.COLUMN_DELIMITER
-					+ measurementPart.getMeasurementValue();
-	}
+        return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId, useRf2)
+            + MemberRefsetHandler.COLUMN_DELIMITER + measurementPart.getMeasurementValue();
+    }
 
     /**
      * @throws Exception
      * @throws ClassNotFoundException
      * @throws SQLException
-     * @see org.dwfa.mojo.refset.writers.MemberRefsetHandler#formatRefsetLineRF2(org.dwfa.ace.api.I_TermFactory, org.dwfa.ace.api.ebr.I_ThinExtByRefPart, java.lang.Integer, int, int, boolean, boolean)
+     * @see org.dwfa.mojo.refset.writers.MemberRefsetHandler#formatRefsetLineRF2(org.dwfa.ace.api.I_TermFactory,
+     *      org.dwfa.ace.api.ebr.I_ThinExtByRefPart, java.lang.Integer, int,
+     *      int, boolean, boolean)
      */
     @Override
     public String formatRefsetLineRF2(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetNid,
-            int componentId, boolean sctId, boolean useRf2, TYPE type) throws SQLException, ClassNotFoundException, Exception {
+            int componentId, boolean sctId, boolean useRf2, TYPE type) throws SQLException, ClassNotFoundException,
+            Exception {
         I_ThinExtByRefPartMeasurement measurementPart = (I_ThinExtByRefPartMeasurement) part;
 
         return super.formatRefsetLineRF2(tf, part, memberId, refsetNid, componentId, sctId, useRf2, type)
-                + MemberRefsetHandler.COLUMN_DELIMITER + measurementPart.getMeasurementValue();
+            + MemberRefsetHandler.COLUMN_DELIMITER + measurementPart.getMeasurementValue();
     }
 
     @Override
     public String getHeaderLine() {
-        return super.getHeaderLine() + MemberRefsetHandler.COLUMN_DELIMITER + "CONCEPT_VALUE" + MemberRefsetHandler.COLUMN_DELIMITER + "DOUBLE_VALUE";
+        return super.getHeaderLine() + MemberRefsetHandler.COLUMN_DELIMITER + "CONCEPT_VALUE"
+            + MemberRefsetHandler.COLUMN_DELIMITER + "DOUBLE_VALUE";
     }
 
     /**
@@ -78,7 +84,8 @@ public class ConceptDoubleRefsetHandler extends MemberRefsetHandler {
         I_ThinExtByRefPartMeasurement part;
         try {
 
-            I_ThinExtByRefVersioned versioned = getExtensionVersioned(line, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION);
+            I_ThinExtByRefVersioned versioned = getExtensionVersioned(line,
+                RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION);
 
             part = getTermFactory().newExtensionPart(I_ThinExtByRefPartMeasurement.class);
             setGenericExtensionPartFields(part);

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,38 +37,41 @@ public class VodbOpen extends AbstractMojo {
 
     /**
      * Location of the vodb directory.
-     *
+     * 
      * Only required if <code>useExistingDb</code> is null or set to false
-     *
-     * @parameter default-value="${project.build.directory}/generated-resources/berkeley-db"
+     * 
+     * @parameter default-value=
+     *            "${project.build.directory}/generated-resources/berkeley-db"
      * @required
      */
     File vodbDirectory;
 
     /**
      * True if the database is readonly.
-     *
+     * 
      * @parameter
      */
     Boolean readOnly = false;
 
     /**
      * Size of cache used by the database.
-     *
+     * 
      * @parameter
      */
     Long cacheSize = 600000000L;
 
     /**
      * Property is set to true to use existing LocalVersionedTerminology.
-     *
+     * 
      * @parameter default-value=false
-     *
+     * 
      */
     Boolean useExistingDb;
 
     /**
-     * This parameter specifies whether to rerun this mojo even if it has run before.
+     * This parameter specifies whether to rerun this mojo even if it has run
+     * before.
+     * 
      * @parameter default-value=false
      */
     boolean forceRerun;
@@ -80,7 +83,7 @@ public class VodbOpen extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -93,17 +96,16 @@ public class VodbOpen extends AbstractMojo {
             dbSetupConfig = new DatabaseSetupConfig();
         }
         try {
-            if (useExistingDb != null && useExistingDb
-                && LocalVersionedTerminology.get() != null) {
-                LocalVersionedTerminology.createFactory(vodbDirectory,
-                    readOnly, cacheSize, dbSetupConfig, useExistingDb);
+            if (useExistingDb != null && useExistingDb && LocalVersionedTerminology.get() != null) {
+                LocalVersionedTerminology.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig,
+                    useExistingDb);
                 return;
             }
 
             if (!forceRerun) {
                 try {
-                    if (MojoUtil.alreadyRun(getLog(), vodbDirectory
-                        .getCanonicalPath(), this.getClass(), targetDirectory)) {
+                    if (MojoUtil.alreadyRun(getLog(), vodbDirectory.getCanonicalPath(), this.getClass(),
+                        targetDirectory)) {
                         return;
                     }
                 } catch (NoSuchAlgorithmException e) {
@@ -112,8 +114,7 @@ public class VodbOpen extends AbstractMojo {
             }
 
             getLog().info("vodb dir: " + vodbDirectory);
-            LocalVersionedTerminology.createFactory(vodbDirectory, readOnly,
-                cacheSize, dbSetupConfig);
+            LocalVersionedTerminology.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
         } catch (InstantiationException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IllegalAccessException e) {

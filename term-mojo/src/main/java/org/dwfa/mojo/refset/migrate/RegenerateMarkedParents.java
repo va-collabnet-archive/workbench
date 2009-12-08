@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,29 +40,26 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 
 /**
- *
+ * 
  * @goal regenerate-marked-parents
  */
 public class RegenerateMarkedParents extends AbstractMojo {
-
 
     /**
      * @parameter
      * @required
      */
     public ConceptDescriptor editPath;
-	
+
     public final String PARENT_MEMBER_HIERARCHY_NAME = "parent members";
 
     public final String PARENT_MEMBER_REFSET_PURPOSE_NAME = "marked parent membership";
 
-    public final String PARENT_MEMBER_REFSET_RELATIONSHIP_NAME =
-            ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getDescription();
+    public final String PARENT_MEMBER_REFSET_RELATIONSHIP_NAME = ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getDescription();
 
     protected I_TermFactory termFactory;
 
     protected HashMap<String, I_GetConceptData> concepts = new HashMap<String, I_GetConceptData>();
-
 
     public RegenerateMarkedParents() throws Exception {
         termFactory = LocalVersionedTerminology.get();
@@ -75,17 +72,18 @@ public class RegenerateMarkedParents extends AbstractMojo {
         concepts.put("CURRENT", termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()));
         concepts.put("RETIRED", termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()));
         concepts.put("PARENT_MARKER", termFactory.getConcept(ConceptConstants.PARENT_MARKER.localize().getNid()));
-        concepts.put("NORMAL_MEMBER", new ConceptDescriptor("cc624429-b17d-4ac5-a69e-0b32448aaf3c", "normal member").getVerifiedConcept());
-        
-		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-		if (config == null) {
-			config = NewDefaultProfile.newProfile(null, null, null, null, null);
-			termFactory.setActiveAceFrameConfig(config);
-		}
-		config.getEditingPathSet().clear();
-		config.addEditingPath(termFactory.getPath(editPath.getVerifiedConcept().getUids()));
-		
-		config.setViewPositions(null);
+        concepts.put("NORMAL_MEMBER",
+            new ConceptDescriptor("cc624429-b17d-4ac5-a69e-0b32448aaf3c", "normal member").getVerifiedConcept());
+
+        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+        if (config == null) {
+            config = NewDefaultProfile.newProfile(null, null, null, null, null);
+            termFactory.setActiveAceFrameConfig(config);
+        }
+        config.getEditingPathSet().clear();
+        config.addEditingPath(termFactory.getPath(editPath.getVerifiedConcept().getUids()));
+
+        config.setViewPositions(null);
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -93,8 +91,8 @@ public class RegenerateMarkedParents extends AbstractMojo {
             init();
             Set<Integer> memberRefsets = MemberRefsetHelper.getMemberRefsets();
 
-            for (Integer memberRefsetId : memberRefsets) {      
-            	I_GetConceptData memberRefsetConcept = termFactory.getConcept(memberRefsetId);            	
+            for (Integer memberRefsetId : memberRefsets) {
+                I_GetConceptData memberRefsetConcept = termFactory.getConcept(memberRefsetId);
                 regenerateMarkedParentMembers(memberRefsetConcept);
             }
         } catch (Exception ex) {
@@ -112,8 +110,7 @@ public class RegenerateMarkedParents extends AbstractMojo {
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
 
-            List<I_ThinExtByRefTuple> extensions =
-                thinExtByRefVersioned.getTuples(null, null, true, false);
+            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(null, null, true, false);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
@@ -126,9 +123,7 @@ public class RegenerateMarkedParents extends AbstractMojo {
             }
         }
 
-        new MarkedParentRefsetHelper(refsetId, concepts.get("NORMAL_MEMBER").getConceptId())
-                .addParentMembers(normalMemberIds.toArray(new Integer[]{}));
+        new MarkedParentRefsetHelper(refsetId, concepts.get("NORMAL_MEMBER").getConceptId()).addParentMembers(normalMemberIds.toArray(new Integer[] {}));
     }
-
 
 }

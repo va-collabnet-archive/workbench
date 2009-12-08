@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,23 +35,24 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
 
 public class VodbCreateLuceneIndex extends AbstractMojo {
-	
-	private enum IndexerType {
-		Snowball, Standard, Fuzzy
-	}
-	
-	private IndexerType indexType = IndexerType.Fuzzy;
-	/**
-	 * Location of the lucene directory.
-	 * 
-	 * @parameter expression="${project.build.directory}/generated-resources/berkeley-db/lucene-custom"
-	 * @required
-	 */
-	private File luceneDir;
-	
+
+    private enum IndexerType {
+        Snowball, Standard, Fuzzy
+    }
+
+    private IndexerType indexType = IndexerType.Fuzzy;
+    /**
+     * Location of the lucene directory.
+     * 
+     * @parameter expression=
+     *            "${project.build.directory}/generated-resources/berkeley-db/lucene-custom"
+     * @required
+     */
+    private File luceneDir;
+
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -59,61 +60,53 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
 
     private class Indexer implements I_ProcessDescriptions {
 
-		
-		
-		private IndexWriter writer;
+        private IndexWriter writer;
 
-		public Indexer() throws IOException {
-			super();
-			luceneDir.mkdirs();
-			
-			switch (indexType) {
-			case Standard:
-			case Fuzzy:
-				writer = new IndexWriter(luceneDir, new StandardAnalyzer(), true);
-				break;
-			case Snowball:
-				writer = new IndexWriter(luceneDir, new StandardAnalyzer(), true);
-				break;
-			}
-		
-			writer.setUseCompoundFile(true);
-			writer.setMergeFactor(10000);
-		}
+        public Indexer() throws IOException {
+            super();
+            luceneDir.mkdirs();
 
-		public void processDescription(I_DescriptionVersioned desc) throws Exception {
-			Document doc = new Document();
-			doc.add(new Field("dnid", Integer.toString(desc
-					.getDescId()), Field.Store.YES,   
-					Field.Index.UN_TOKENIZED));
-			doc.add(new Field("cnid", Integer.toString(desc
-					.getConceptId()), Field.Store.YES,   
-					Field.Index.UN_TOKENIZED));
-			doc.add(new Field("tnid", Integer.toString(desc
-					.getFirstTuple().getTypeId()), Field.Store.YES,   
-					Field.Index.UN_TOKENIZED));
-			String lastDesc = null;
-			for (I_DescriptionTuple tuple : desc.getTuples()) {
-				if (lastDesc == null
-						|| lastDesc.equals(tuple.getText()) == false) {
-					doc.add(new Field("desc", tuple.getText(), Field.Store.NO,   
-							Field.Index.TOKENIZED));
-				}
+            switch (indexType) {
+            case Standard:
+            case Fuzzy:
+                writer = new IndexWriter(luceneDir, new StandardAnalyzer(), true);
+                break;
+            case Snowball:
+                writer = new IndexWriter(luceneDir, new StandardAnalyzer(), true);
+                break;
+            }
 
-			}
-			writer.addDocument(doc);
-		}
+            writer.setUseCompoundFile(true);
+            writer.setMergeFactor(10000);
+        }
 
-		public void close() throws IOException {
-			writer.optimize();
-			writer.close();
-		}
-				
-	}
-	public void execute() throws MojoExecutionException, MojoFailureException {
+        public void processDescription(I_DescriptionVersioned desc) throws Exception {
+            Document doc = new Document();
+            doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc.add(new Field("cnid", Integer.toString(desc.getConceptId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc.add(new Field("tnid", Integer.toString(desc.getFirstTuple().getTypeId()), Field.Store.YES,
+                Field.Index.UN_TOKENIZED));
+            String lastDesc = null;
+            for (I_DescriptionTuple tuple : desc.getTuples()) {
+                if (lastDesc == null || lastDesc.equals(tuple.getText()) == false) {
+                    doc.add(new Field("desc", tuple.getText(), Field.Store.NO, Field.Index.TOKENIZED));
+                }
+
+            }
+            writer.addDocument(doc);
+        }
+
+        public void close() throws IOException {
+            writer.optimize();
+            writer.close();
+        }
+
+    }
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + luceneDir.getCanonicalPath(),
-            		this.getClass(), targetDirectory)) {
+                this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -121,16 +114,16 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
-		I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-		try {
-			Indexer descIndexer = new Indexer();
-			termFactory.iterateDescriptions(descIndexer);
-			descIndexer.close();
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}		
-		
-	}
+        try {
+            Indexer descIndexer = new Indexer();
+            termFactory.iterateDescriptions(descIndexer);
+            descIndexer.close();
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
+
+    }
 
 }

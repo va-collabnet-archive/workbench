@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,19 +32,19 @@ public final class StringArrayCleanerTest {
 
     @Test
     public void shouldCleanAnArrayWithSpaces() {
-        String[] array = {"1", "", "2", "3", ""};
-        assertThat(cleaner.clean(array), equalTo(new String[] {"1", "2", "3"}));
+        String[] array = { "1", "", "2", "3", "" };
+        assertThat(cleaner.clean(array), equalTo(new String[] { "1", "2", "3" }));
     }
 
     @Test
     public void shouldCleanAnArrayWithPaddedElements() {
-        String[] array = {"  1" , "2   ", "3", "  4  "};
-        assertThat(cleaner.clean(array), equalTo(new String[] {"1", "2", "3", "4"}));
+        String[] array = { "  1", "2   ", "3", "  4  " };
+        assertThat(cleaner.clean(array), equalTo(new String[] { "1", "2", "3", "4" }));
     }
 
     @Test
     public void shouldCleanAnArrayWithSpacesAndPadding() {
-        String[] array = {"  1", "", " 2   ", "3", "     ", "   4      ", "5", "", "", "6   "};
-        assertThat(cleaner.clean(array), equalTo(new String[] {"1", "2", "3", "4", "5", "6"}));
+        String[] array = { "  1", "", " 2   ", "3", "     ", "   4      ", "5", "", "", "6   " };
+        assertThat(cleaner.clean(array), equalTo(new String[] { "1", "2", "3", "4", "5", "6" }));
     }
 }

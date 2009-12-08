@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,8 @@
 package org.dwfa.mojo.file;
 
 /**
- * Used in the Ace2Rf2 mojo this pojo holds the details of an identifier file to transform to RF2 format.
+ * Used in the Ace2Rf2 mojo this pojo holds the details of an identifier file to
+ * transform to RF2 format.
  */
 public class IdentifierFile {
 
@@ -25,14 +26,13 @@ public class IdentifierFile {
     String outputFileName;
     boolean headerLine;
 
-    public IdentifierFile(String inputFileName, String outputFileName,
-            boolean headerLine) {
+    public IdentifierFile(String inputFileName, String outputFileName, boolean headerLine) {
         this.inputFileName = inputFileName;
         this.outputFileName = outputFileName;
         this.headerLine = headerLine;
     }
 
-    //needed by Maven
+    // needed by Maven
     public IdentifierFile() {
     }
 

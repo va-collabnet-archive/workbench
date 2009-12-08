@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@
  */
 /**
  * Apache License.
- *
+ * 
  * Mojo to convert Ace file to rf2 file.
  */
 package org.dwfa.mojo.file;
@@ -65,8 +65,7 @@ import org.dwfa.util.AceDateFormat;
  */
 public class Ace2Rf2 extends AbstractMojo {
 
-
-	private static final Collection<UUID> HISTORICAL_CHARACTERISTIC_UUIDS = ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids();
+    private static final Collection<UUID> HISTORICAL_CHARACTERISTIC_UUIDS = ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids();
 
     /**
      * Class logger.
@@ -215,13 +214,14 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Parameter to allow translation of more than one identifier file
+     * 
      * @parameter
      */
-	private IdentifierFile[] additionalIdentifierFiles;
+    private IdentifierFile[] additionalIdentifierFiles;
 
     /**
      * Convert ace file to rf2.
-     *
+     * 
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -234,25 +234,28 @@ public class Ace2Rf2 extends AbstractMojo {
             uuidToSctIdDescription.setupImpl(new File(buildDirectory), new File(sourceDirectory));
             uuidToSctIdRelationship.setupImpl(new File(buildDirectory), new File(sourceDirectory));
 
-            primationSctId =
-                    uuidToSctIdConcept.transform(ArchitectonicAuxiliary.Concept.PRIMITIVE_DEFINITION.getUids()
-                        .iterator().next().toString(), NAMESPACE.SNOMED_META_DATA);
+            primationSctId = uuidToSctIdConcept.transform(ArchitectonicAuxiliary.Concept.PRIMITIVE_DEFINITION.getUids()
+                .iterator()
+                .next()
+                .toString(), NAMESPACE.SNOMED_META_DATA);
 
-            fullyDefinedSctId =
-                    uuidToSctIdConcept.transform(ArchitectonicAuxiliary.Concept.DEFINED_DEFINITION.getUids().iterator()
-                        .next().toString(), NAMESPACE.SNOMED_META_DATA);
+            fullyDefinedSctId = uuidToSctIdConcept.transform(
+                ArchitectonicAuxiliary.Concept.DEFINED_DEFINITION.getUids().iterator().next().toString(),
+                NAMESPACE.SNOMED_META_DATA);
 
-            fsnSctId =
-                    uuidToSctIdConcept.transform(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-                        .getUids().iterator().next().toString(), NAMESPACE.SNOMED_META_DATA);
+            fsnSctId = uuidToSctIdConcept.transform(
+                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next().toString(),
+                NAMESPACE.SNOMED_META_DATA);
 
-            synonymSctId =
-                    uuidToSctIdConcept.transform(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()
-                        .iterator().next().toString(), NAMESPACE.SNOMED_META_DATA);
+            synonymSctId = uuidToSctIdConcept.transform(
+                ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids().iterator().next().toString(),
+                NAMESPACE.SNOMED_META_DATA);
 
             activeConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getUids().iterator().next());
-            uuidIdentifierSchemeSctId = uuidToSctIdConcept.transform(ConceptConstants.UNIVERSALLY_UNIQUE_IDENTIFIER.getUuids()[0].toString(), NAMESPACE.SNOMED_META_DATA);
-            modifierSomeSctId = uuidToSctIdConcept.transform(ConceptConstants.MODIFIER_SOME.getUuids()[0].toString(), NAMESPACE.SNOMED_META_DATA);
+            uuidIdentifierSchemeSctId = uuidToSctIdConcept.transform(
+                ConceptConstants.UNIVERSALLY_UNIQUE_IDENTIFIER.getUuids()[0].toString(), NAMESPACE.SNOMED_META_DATA);
+            modifierSomeSctId = uuidToSctIdConcept.transform(ConceptConstants.MODIFIER_SOME.getUuids()[0].toString(),
+                NAMESPACE.SNOMED_META_DATA);
         } catch (IOException e) {
             logger.severe("ERROR: error accessing build and/or source directories " + e.getMessage());
             throw new MojoExecutionException(e.getMessage(), e);
@@ -263,9 +266,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
         convertIdFile(new IdentifierFile(idAceFile, identifierRf2File, Boolean.parseBoolean(hasHeader)));
         if (additionalIdentifierFiles != null) {
-	        for (IdentifierFile idFile : additionalIdentifierFiles) {
-				convertIdFile(idFile);
-			}
+            for (IdentifierFile idFile : additionalIdentifierFiles) {
+                convertIdFile(idFile);
+            }
         }
         convertConceptFile();
         convertDescriptionFile();
@@ -283,27 +286,27 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * THIS IS A HACK REMOVE.
-     *
+     * 
      * Get the namespace for the I_Path.
-     *
+     * 
      * @param forPath I_path
      * @return NAMESPACE
      */
-    private NAMESPACE getNamespace(I_Path forPath){
+    private NAMESPACE getNamespace(I_Path forPath) {
         NAMESPACE namespace = NAMESPACE.NEHTA;
 
-//        try{
-//            namespace = NAMESPACE.fromString(forPath.getNamespace());
-//        } catch (Exception e) {
-            if(forPath.toString().equals("SNOMED Core")){
-                namespace = NAMESPACE.SNOMED_META_DATA;
-//            }
+        // try{
+        // namespace = NAMESPACE.fromString(forPath.getNamespace());
+        // } catch (Exception e) {
+        if (forPath.toString().equals("SNOMED Core")) {
+            namespace = NAMESPACE.SNOMED_META_DATA;
+            // }
         }
 
         return namespace;
     }
 
-    private NAMESPACE getNamespace(String forPath) throws TerminologyException, IOException{
+    private NAMESPACE getNamespace(String forPath) throws TerminologyException, IOException {
         NAMESPACE namespace;
 
         if (namespaceCache.containsKey(forPath)) {
@@ -318,9 +321,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Convert the ace id file to rf2 format.
-     *
+     * 
      * Invalid rows will be skipped and logged.
-     *
+     * 
      * @throws MojoExecutionException on file open and write errors.
      */
     private void convertIdFile(IdentifierFile idFile) throws MojoExecutionException {
@@ -362,8 +365,8 @@ public class Ace2Rf2 extends AbstractMojo {
                 rf2IdentifierRow.setEffectiveTime(getRf2Time(aceIdentifierRow.getEffectiveTime()));
                 rf2IdentifierRow.setActive(getRF2ActiveFlag(aceIdentifierRow.getStatusUuid()));
 
-                rf2IdentifierRow.setModuleSctId(
-                        getSctIdWithGeneration(aceIdentifierRow.getPathUuid(), namespace, uuidToSctIdConcept));
+                rf2IdentifierRow.setModuleSctId(getSctIdWithGeneration(aceIdentifierRow.getPathUuid(), namespace,
+                    uuidToSctIdConcept));
 
                 rf2IdentifierRow.setReferencedComponentSctId(aceIdentifierRow.getSourceId());
 
@@ -375,10 +378,10 @@ public class Ace2Rf2 extends AbstractMojo {
                 logger.severe("ERROR: cannot process line." + lineCount + " " + tre.getMessage());
                 tre.printStackTrace();
             } catch (ParseException pe) {
-                logger.severe("ERROR: create RF2 time from ace time." + lineCount + " "  + pe.getMessage());
+                logger.severe("ERROR: create RF2 time from ace time." + lineCount + " " + pe.getMessage());
                 pe.printStackTrace();
             } catch (Exception e) {
-                logger.severe("ERROR: Transforming." + lineCount + " "  + e.getMessage());
+                logger.severe("ERROR: Transforming." + lineCount + " " + e.getMessage());
                 e.printStackTrace();
             }
         } while (identifierIterator.hasNext());
@@ -393,10 +396,10 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Writes the identifier row to file.
-     *
+     * 
      * @param rf2IdentifierWriter
      * @param rf2IdentifierRow
-     *
+     * 
      * @throws MojoExecutionException on write errors.
      */
     private void writeIdentifierRow(Rf2IdentifierWriter rf2IdentifierWriter, Rf2IdentifierRow rf2IdentifierRow)
@@ -414,9 +417,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Convert the ace concept file to rf2 format.
-     *
+     * 
      * Invalid rows will be skipped and logged.
-     *
+     * 
      * @throws MojoExecutionException on file open and write errors.
      */
     private void convertConceptFile() throws MojoExecutionException {
@@ -450,12 +453,12 @@ public class Ace2Rf2 extends AbstractMojo {
 
                 namespace = getNamespace(aceConceptRow.getPathUuid());
 
-                rf2ConceptRow.setConceptSctId(
-                        getSctIdWithGeneration(aceConceptRow.getConceptId(), namespace, uuidToSctIdConcept));
+                rf2ConceptRow.setConceptSctId(getSctIdWithGeneration(aceConceptRow.getConceptId(), namespace,
+                    uuidToSctIdConcept));
                 rf2ConceptRow.setEffectiveTime(getRf2Time(aceConceptRow.getEffectiveTime()));
                 rf2ConceptRow.setActive(getRF2ActiveFlag(aceConceptRow.getConceptStatusId()));
-                rf2ConceptRow.setModuleSctId(
-                        getSctIdWithGeneration(aceConceptRow.getPathUuid(), namespace, uuidToSctIdConcept));
+                rf2ConceptRow.setModuleSctId(getSctIdWithGeneration(aceConceptRow.getPathUuid(), namespace,
+                    uuidToSctIdConcept));
                 rf2ConceptRow.setDefiniationStatusSctId(getDefinitionSctId(aceConceptRow.getIsPrimative()));
 
                 writeConceptsRow(rf2ConceptWriter, rf2ConceptRow);
@@ -466,7 +469,7 @@ public class Ace2Rf2 extends AbstractMojo {
                 logger.severe("ERROR: cannot process line." + lineCount + " " + tre.getMessage());
                 tre.printStackTrace();
             } catch (Exception e) {
-                logger.severe("ERROR: Transforming." + lineCount + " "  + e.getMessage());
+                logger.severe("ERROR: Transforming." + lineCount + " " + e.getMessage());
                 e.printStackTrace();
             }
         } while (conceptIterator.hasNext());
@@ -481,10 +484,10 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Writes the concept row to file.
-     *
+     * 
      * @param rf2ConceptWriter file writer.
      * @param rf2ConceptRowList concept row to write.
-     *
+     * 
      * @throws MojoExecutionException on write errors.
      */
     private void writeConceptsRow(Rf2ConceptWriter rf2ConceptWriter, Rf2ConceptRow rf2ConceptRow)
@@ -502,9 +505,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Convert the ace description file to rf2 format.
-     *
+     * 
      * Invalid rows will be skipped (logged).
-     *
+     * 
      * @throws MojoExecutionException on file open and write errors.
      */
     private void convertDescriptionFile() throws MojoExecutionException {
@@ -540,20 +543,20 @@ public class Ace2Rf2 extends AbstractMojo {
 
                 namespace = getNamespace(aceDescriptionRow.getPathUuid());
 
-                rf2DescriptionRow.setDescriptionSctId(
-                        getSctIdWithGeneration(aceDescriptionRow.getDescriptionId(), namespace,  uuidToSctIdDescription));
+                rf2DescriptionRow.setDescriptionSctId(getSctIdWithGeneration(aceDescriptionRow.getDescriptionId(),
+                    namespace, uuidToSctIdDescription));
                 rf2DescriptionRow.setEffectiveTime(getRf2Time(aceDescriptionRow.getEffectiveTime()));
                 rf2DescriptionRow.setActive(getRF2ActiveFlag(aceDescriptionRow.getDescriptionStatusId()));
-                rf2DescriptionRow.setModuleSctId(
-                        getSctIdWithGeneration(aceDescriptionRow.getPathUuid(), namespace, uuidToSctIdConcept));
-                rf2DescriptionRow.setConceptSctId(
-                        getSctIdWithGeneration(aceDescriptionRow.getConceptId(), namespace, uuidToSctIdConcept));
+                rf2DescriptionRow.setModuleSctId(getSctIdWithGeneration(aceDescriptionRow.getPathUuid(), namespace,
+                    uuidToSctIdConcept));
+                rf2DescriptionRow.setConceptSctId(getSctIdWithGeneration(aceDescriptionRow.getConceptId(), namespace,
+                    uuidToSctIdConcept));
                 rf2DescriptionRow.setLanaguageCode(aceDescriptionRow.getLanguageCode().toLowerCase().substring(0, 2));
                 rf2DescriptionRow.setTypeSctId(getDescriptionTypeSctId(aceDescriptionRow.getDescriptionTypeId()));
                 rf2DescriptionRow.setTerm(aceDescriptionRow.getTerm());
                 rf2DescriptionRow.setCaseSignificaceSctId(uuidToSctIdConcept.transform(
-                        caseSensitivityToUuidTransform.transform(aceDescriptionRow.getCasesensitivityId()),
-                        getNamespace(tf.getPath(UUID.fromString(aceDescriptionRow.getPathUuid())))));
+                    caseSensitivityToUuidTransform.transform(aceDescriptionRow.getCasesensitivityId()),
+                    getNamespace(tf.getPath(UUID.fromString(aceDescriptionRow.getPathUuid())))));
 
                 writeDescriptionRow(rf2DescriptionWriter, rf2DescriptionRow);
                 if (lineCount % 10000 == 0) {
@@ -563,7 +566,7 @@ public class Ace2Rf2 extends AbstractMojo {
                 logger.severe("ERROR: cannot process line." + lineCount + " " + tre.getMessage());
                 tre.printStackTrace();
             } catch (Exception e) {
-                logger.severe("ERROR: Transforming." + lineCount + " "  + e.getMessage());
+                logger.severe("ERROR: Transforming." + lineCount + " " + e.getMessage());
                 e.printStackTrace();
             }
         } while (descriptionIterator.hasNext());
@@ -578,14 +581,14 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Writes the description row to file.
-     *
+     * 
      * @param rf2DescriptionWriter file writer.
      * @param Rf2DescriptionRow row.
-     *
+     * 
      * @throws MojoExecutionException on write errors.
      */
-    private void writeDescriptionRow(Rf2DescriptionWriter rf2DescriptionWriter,
-            Rf2DescriptionRow rf2DescriptionRow) throws MojoExecutionException {
+    private void writeDescriptionRow(Rf2DescriptionWriter rf2DescriptionWriter, Rf2DescriptionRow rf2DescriptionRow)
+            throws MojoExecutionException {
         try {
             rf2DescriptionWriter.write(rf2DescriptionRow);
         } catch (IOException e) {
@@ -599,9 +602,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Convert the ace relationship file to rf2 format.
-     *
+     * 
      * Invalid rows will be skipped (logged).
-     *
+     * 
      * @throws MojoExecutionException on file open and write errors.
      */
     private void convertRelationshipFile() throws MojoExecutionException {
@@ -633,14 +636,13 @@ public class Ace2Rf2 extends AbstractMojo {
                 lineCount++;
                 aceRelationshipRow = relationshipIterator.next();
 
-                //in RF2 historical relationships are part of a reference set
-                if (!HISTORICAL_CHARACTERISTIC_UUIDS.contains(
-                        UUID.fromString(aceRelationshipRow.getCharacteristicTypeId()))) {
+                // in RF2 historical relationships are part of a reference set
+                if (!HISTORICAL_CHARACTERISTIC_UUIDS.contains(UUID.fromString(aceRelationshipRow.getCharacteristicTypeId()))) {
 
                     namespace = getNamespace(aceRelationshipRow.getPathUuid());
 
-                    rf2RelationshipRow.setRelationshipSctId(getSctIdWithGeneration(aceRelationshipRow
-                        .getRelationshipId(), namespace, uuidToSctIdRelationship));
+                    rf2RelationshipRow.setRelationshipSctId(getSctIdWithGeneration(
+                        aceRelationshipRow.getRelationshipId(), namespace, uuidToSctIdRelationship));
                     rf2RelationshipRow.setEffectiveTime(getRf2Time(aceRelationshipRow.getEffectiveTime()));
                     rf2RelationshipRow.setActive(getRF2ActiveFlag(aceRelationshipRow.getRelationshipStatusUuid()));
                     rf2RelationshipRow.setModuleSctId(getSctIdWithGeneration(aceRelationshipRow.getPathUuid(),
@@ -652,8 +654,8 @@ public class Ace2Rf2 extends AbstractMojo {
                     rf2RelationshipRow.setRelationshipGroup(aceRelationshipRow.getRelationshipGroup());
                     rf2RelationshipRow.setTypeSctId(getSctIdWithGeneration(aceRelationshipRow.getRelationshipTypeId(),
                         namespace, uuidToSctIdConcept));
-                    rf2RelationshipRow.setCharacteristicSctId(getSctIdWithGeneration(aceRelationshipRow
-                        .getCharacteristicTypeId(), namespace, uuidToSctIdConcept));
+                    rf2RelationshipRow.setCharacteristicSctId(getSctIdWithGeneration(
+                        aceRelationshipRow.getCharacteristicTypeId(), namespace, uuidToSctIdConcept));
                     rf2RelationshipRow.setModifierSctId(modifierSomeSctId);
 
                     writeRelationshipRow(rf2RelationshipWriter, rf2RelationshipRow);
@@ -681,14 +683,14 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * writes the relationship row to file.
-     *
+     * 
      * @param rf2RelationshipWriter file writer.
      * @param Rf2RelationshipRow relationship to write to file.
-     *
+     * 
      * @throws MojoExecutionException on write errors.
      */
-    private void writeRelationshipRow(Rf2RelationshipWriter rf2RelationshipWriter,
-            Rf2RelationshipRow rf2RelationshipRow) throws MojoExecutionException {
+    private void writeRelationshipRow(Rf2RelationshipWriter rf2RelationshipWriter, Rf2RelationshipRow rf2RelationshipRow)
+            throws MojoExecutionException {
         try {
             rf2RelationshipWriter.write(rf2RelationshipRow);
         } catch (IOException e) {
@@ -703,7 +705,7 @@ public class Ace2Rf2 extends AbstractMojo {
     /**
      * Checks is the uuidStatus equals the Concept.ACTIVE uuid.
      * or is a child of Concept.ACTIVE
-     *
+     * 
      * @param uuid String
      * @return String 1 if the uuidStatus is active otherwise 0;
      * @throws TerminologyException DB error
@@ -723,15 +725,15 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Gets the sct id for the definition Uuid
-     *
+     * 
      * @param definitionInt String 0 = well defined 1 = primative
-     *
+     * 
      * @return sctid String
      */
     private String getDefinitionSctId(String definitionInt) {
         String definitionSctId;
 
-        if(definitionInt.equals("0")){
+        if (definitionInt.equals("0")) {
             definitionSctId = fullyDefinedSctId;
         } else {
             definitionSctId = primationSctId;
@@ -742,21 +744,35 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Convert the description type to a valid RF2 type
-     *
-     * Only FSN and Synonyms are allowed in RF2. If not a FSN the synonym type is returned.
-     *
+     * 
+     * Only FSN and Synonyms are allowed in RF2. If not a FSN the synonym type
+     * is returned.
+     * 
      * @param descriptionTypeUuid String
      * @return String SctId FSN or Synonym.
      */
     private String getDescriptionTypeSctId(String descriptionTypeUuid) throws MojoExecutionException {
         String descriptionTypeSctId;
 
-        if(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids().iterator().next().toString().equals(descriptionTypeUuid)
-                || ArchitectonicAuxiliary.Concept.UNSPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next().toString().equals(descriptionTypeUuid)){
+        if (ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids().iterator().next().toString().equals(
+            descriptionTypeUuid)
+            || ArchitectonicAuxiliary.Concept.UNSPECIFIED_DESCRIPTION_TYPE.getUids()
+                .iterator()
+                .next()
+                .toString()
+                .equals(descriptionTypeUuid)) {
             descriptionTypeSctId = synonymSctId;
-        } else if (ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids().iterator().next().toString().equals(descriptionTypeUuid)) {
+        } else if (ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next()
+            .toString()
+            .equals(descriptionTypeUuid)) {
             descriptionTypeSctId = synonymSctId;
-        } else if (ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next().toString().equals(descriptionTypeUuid)) {
+        } else if (ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next()
+            .toString()
+            .equals(descriptionTypeUuid)) {
             descriptionTypeSctId = fsnSctId;
         } else {
             throw new MojoExecutionException("Description type is not valid " + descriptionTypeUuid);
@@ -767,21 +783,21 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Attempts to return a valid RF2 time stamp from the parameter.
-     *
+     * 
      * @param timeStamp String
      * @return RF2 time stamp.
-     *
+     * 
      * @throws ParseException If a RF2 time stamp cannot be created.
      */
     public String getRf2Time(final String timeStamp) throws ParseException {
         String rf2Time = new String(timeStamp);
 
         try {
-        	if (rf2Time.contains(":")) {
-        		rf2Time = rf2DateFormat.format(exportDateFormat.parse(rf2Time.replace("Z", "-0000")));
-        	} else {
-        		rf2Time = rf2DateFormat.format(rf2DateFormat.parse(rf2Time));
-        	}
+            if (rf2Time.contains(":")) {
+                rf2Time = rf2DateFormat.format(exportDateFormat.parse(rf2Time.replace("Z", "-0000")));
+            } else {
+                rf2Time = rf2DateFormat.format(rf2DateFormat.parse(rf2Time));
+            }
         } catch (ParseException e) {
             rf2DateFormat.parse(rf2Time);
         }
@@ -790,7 +806,7 @@ public class Ace2Rf2 extends AbstractMojo {
     }
 
     /**
-     *
+     * 
      * @param uuid
      * @param namespace
      * @param idWithGeneration

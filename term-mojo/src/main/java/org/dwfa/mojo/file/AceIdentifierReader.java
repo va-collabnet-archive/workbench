@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,15 +24,16 @@ import org.dwfa.tapi.TerminologyRuntimeException;
 
 /**
  * Read ace identifier file rows into AceIdentifierRow
- *
+ * 
  * @author Ean Dungey
  */
 public class AceIdentifierReader extends IterableFileReader<AceIdentifierRow> {
-    private AceIdentifierReaderData data = new AceIdentifierReaderData(Logger.getLogger(AceIdentifierReader.class.getName()));
+    private AceIdentifierReaderData data = new AceIdentifierReaderData(
+        Logger.getLogger(AceIdentifierReader.class.getName()));
 
     /**
      * Create the reader for the file.
-     *
+     * 
      * @param file File to read.
      */
     public AceIdentifierReader(File file) {

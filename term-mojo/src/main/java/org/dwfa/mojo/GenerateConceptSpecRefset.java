@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,63 +61,32 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
      */
     protected I_GetConceptData createRefsetConcept() throws Exception {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        I_GetConceptData fully_specified_description_type =
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-                        .getUids());
-        I_GetConceptData preferred_description_type =
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-                        .getUids());
+        I_GetConceptData fully_specified_description_type = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        I_GetConceptData preferred_description_type = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
         I_ConfigAceFrame config = termFactory.newAceFrameConfig();
-        I_Path path =
-                termFactory
-                    .getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
-                        .getUids());
+        I_Path path = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
         config.addEditingPath(path);
-        config.setDefaultStatus(termFactory
-            .getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
+        config.setDefaultStatus(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
         // UUID uuid = UUID.randomUUID();
         UUID uuid = UUID.fromString(this.refsetUuid);
-        I_GetConceptData newConcept =
-                termFactory.newConcept(uuid, false, config);
+        I_GetConceptData newConcept = termFactory.newConcept(uuid, false, config);
         // Install the FSN
-        termFactory.newDescription(UUID.randomUUID(), newConcept, "en",
-            refsetName, fully_specified_description_type, config);
+        termFactory.newDescription(UUID.randomUUID(), newConcept, "en", refsetName, fully_specified_description_type,
+            config);
         // Install the preferred term
-        termFactory.newDescription(UUID.randomUUID(), newConcept, "en",
-            refsetName, preferred_description_type, config);
-        termFactory
-            .newRelationship(
-                UUID.randomUUID(),
-                newConcept,
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
-                    .getUids()),
-                termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY
-                    .getUids()),
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-                        .getUids()), termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-                        .getUids()),
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE
-                    .getUids()), 0, config);
-        termFactory
-            .newRelationship(
-                UUID.randomUUID(),
-                newConcept,
-                termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL
-                    .getUids()),
-                termFactory
-                    .getConcept(RefsetAuxiliary.Concept.CONCEPT_EXTENSION
-                        .getUids()),
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-                        .getUids()), termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-                        .getUids()),
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE
-                    .getUids()), 0, config);
+        termFactory.newDescription(UUID.randomUUID(), newConcept, "en", refsetName, preferred_description_type, config);
+        termFactory.newRelationship(UUID.randomUUID(), newConcept,
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
+            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids()),
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, config);
+        termFactory.newRelationship(UUID.randomUUID(), newConcept,
+            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.getUids()),
+            termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids()),
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, config);
         termFactory.commit();
         return newConcept;
     }
@@ -125,32 +94,20 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
     /*
      * Adds a concept to a refset
      */
-    private void addToRefset(I_TermFactory termFactory, int refsetId,
-            int conceptId) throws Exception {
-        I_GetConceptData include_individual =
-                termFactory
-                    .getConcept(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL
-                        .getUids());
+    private void addToRefset(I_TermFactory termFactory, int refsetId, int conceptId) throws Exception {
+        I_GetConceptData include_individual = termFactory.getConcept(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids());
         // System.out.println("Include: " +
         // include_individual.getUids().get(0));
         int typeId = include_individual.getConceptId();
-        I_GetConceptData active_status =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE
-                    .getUids());
+        I_GetConceptData active_status = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
         int statusId = active_status.getConceptId();
-        int memberId =
-                termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
-                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize()
-                        .getNid(), termFactory.getPaths(), Integer.MAX_VALUE);
-        I_ThinExtByRefVersioned newExtension =
-                termFactory.newExtension(refsetId, memberId, conceptId, typeId);
-        I_ThinExtByRefPartConcept conceptExtension =
-                termFactory.newConceptExtensionPart();
+        int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
+            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), termFactory.getPaths(),
+            Integer.MAX_VALUE);
+        I_ThinExtByRefVersioned newExtension = termFactory.newExtension(refsetId, memberId, conceptId, typeId);
+        I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
         conceptExtension.setConceptId(conceptId);
-        I_GetConceptData path =
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
-                        .getUids());
+        I_GetConceptData path = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
         // System.out.println("Path: " + path.getUids().get(0));
         conceptExtension.setPathId(path.getConceptId());
         conceptExtension.setStatusId(statusId);
@@ -164,33 +121,30 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
      * Iterate over the enums and add them to the refset
      */
     private void buildRefset() throws Exception {
-		I_TermFactory termFactory = LocalVersionedTerminology.get();
-		I_GetConceptData refset = createRefsetConcept();
-		getLog().info("Refset: " + refset.getInitialText());
-		getLog().info("Refset: " + refset.getUids().get(0));
-		for (ArchitectonicAuxiliary.Concept c : ArchitectonicAuxiliary.Concept
-				.values()) {
-			getLog().info("Processing concept:" + c.name());
-			try {
-				I_GetConceptData member = termFactory.getConcept(c.getUids());
-				addToRefset(termFactory, refset.getConceptId(), member
-						.getConceptId());
-			} catch (Exception ex) {
-				getLog().error("Skipping concept:" + c.name());
-			}
-		}
-		for (RefsetAuxiliary.Concept c : RefsetAuxiliary.Concept.values()) {
-			getLog().info("Processing concept:" + c.name());
-			try {
-				I_GetConceptData member = termFactory.getConcept(c.getUids());
-				addToRefset(termFactory, refset.getConceptId(), member
-						.getConceptId());
-			} catch (Exception ex) {
-				getLog().error("Skipping concept:" + c.name());
-			}
-		}
-		termFactory.commit();
-	}
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_GetConceptData refset = createRefsetConcept();
+        getLog().info("Refset: " + refset.getInitialText());
+        getLog().info("Refset: " + refset.getUids().get(0));
+        for (ArchitectonicAuxiliary.Concept c : ArchitectonicAuxiliary.Concept.values()) {
+            getLog().info("Processing concept:" + c.name());
+            try {
+                I_GetConceptData member = termFactory.getConcept(c.getUids());
+                addToRefset(termFactory, refset.getConceptId(), member.getConceptId());
+            } catch (Exception ex) {
+                getLog().error("Skipping concept:" + c.name());
+            }
+        }
+        for (RefsetAuxiliary.Concept c : RefsetAuxiliary.Concept.values()) {
+            getLog().info("Processing concept:" + c.name());
+            try {
+                I_GetConceptData member = termFactory.getConcept(c.getUids());
+                addToRefset(termFactory, refset.getConceptId(), member.getConceptId());
+            } catch (Exception ex) {
+                getLog().error("Skipping concept:" + c.name());
+            }
+        }
+        termFactory.commit();
+    }
 
     /*
      * 

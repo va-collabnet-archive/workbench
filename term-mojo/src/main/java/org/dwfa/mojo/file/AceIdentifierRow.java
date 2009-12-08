@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,7 @@ package org.dwfa.mojo.file;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- *
+ * 
  * Ace file identifier row.
  */
 public class AceIdentifierRow {
@@ -46,16 +46,15 @@ public class AceIdentifierRow {
 
     /**
      * Creates a AceIdentifierRow from an ace line.
-     *
+     * 
      * @param line From an ace concept file
      * @throws TerminologyException if not in the correct format.
      */
     public AceIdentifierRow(String line) throws TerminologyException {
         String[] columns = line.split("\t");
         if (columns.length != IDENTIFIER_COLUMNS) {
-            throw new TerminologyException(
-                "Invalid file format. Ace identifier file must have "
-                    + IDENTIFIER_COLUMNS + " columns");
+            throw new TerminologyException("Invalid file format. Ace identifier file must have " + IDENTIFIER_COLUMNS
+                + " columns");
         }
 
         primaryUuid = columns[0];
@@ -67,13 +66,13 @@ public class AceIdentifierRow {
     }
 
     /**
-     *
-     *
+     * 
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return primaryUuid + "\t" + sourceSystemUuid + "\t" + sourceId + "\t"
-            + statusUuid + "\t" + effectiveTime + "\t" + pathUuid;
+        return primaryUuid + "\t" + sourceSystemUuid + "\t" + sourceId + "\t" + statusUuid + "\t" + effectiveTime
+            + "\t" + pathUuid;
     }
 
     /**
@@ -106,7 +105,7 @@ public class AceIdentifierRow {
 
     /**
      * This may be a Uuid or a SctId.
-     *
+     * 
      * @return the sourceId
      */
     public final String getSourceId() {
@@ -136,7 +135,7 @@ public class AceIdentifierRow {
 
     /**
      * either yyyyMMdd or yyyyMMdd'T'hhmmss'Z'
-     *
+     * 
      * @return the effectiveTime
      */
     public final String getEffectiveTime() {

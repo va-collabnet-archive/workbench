@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,10 +24,8 @@ import java.util.List;
 public final class SQLCreatorImpl implements SQLCreator {
 
     public String createSQL(final Table table, final String[] values) {
-        return new StringBuilder().append("INSERT INTO ").append(
-            table.getName()).append(" (").append(buildColumnNames(table))
-            .append(") VALUES (").append(buildValues(values)).append(");")
-            .toString();
+        return new StringBuilder().append("INSERT INTO ").append(table.getName()).append(" (").append(
+            buildColumnNames(table)).append(") VALUES (").append(buildValues(values)).append(");").toString();
     }
 
     private String buildValues(final String[] values) {
@@ -38,11 +36,11 @@ public final class SQLCreatorImpl implements SQLCreator {
         List<TableColumn> columns = table.getColumns();
         String[] columnNames = new String[columns.size()];
 
-        for (int index=0; index < columns.size(); index++) {
+        for (int index = 0; index < columns.size(); index++) {
             columnNames[index] = columns.get(index).getName();
         }
 
-        return buildCommaDelimitedValues(columnNames);        
+        return buildCommaDelimitedValues(columnNames);
     }
 
     private String buildCommaDelimitedValues(final String[] values) {

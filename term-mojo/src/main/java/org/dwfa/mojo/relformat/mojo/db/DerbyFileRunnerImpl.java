@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,8 +74,9 @@ public final class DerbyFileRunnerImpl implements DerbyFileRunner {
             DriverManager.getConnection("jdbc:derby:;shutdown=true");
         } catch (SQLException e) {
             logger.info(e.getMessage());
-            //A clean shutdown always throws SQL exception XJ015, which can be ignored.
-            //http://db.apache.org/derby/papers/DerbyTut/embedded_intro.html
+            // A clean shutdown always throws SQL exception XJ015, which can be
+            // ignored.
+            // http://db.apache.org/derby/papers/DerbyTut/embedded_intro.html
         }
     }
 }

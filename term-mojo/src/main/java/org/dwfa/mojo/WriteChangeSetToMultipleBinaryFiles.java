@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,44 +30,45 @@ import org.dwfa.ace.cs.BinaryChangeSetWriter;
 
 public class WriteChangeSetToMultipleBinaryFiles implements org.dwfa.ace.api.cs.I_WriteChangeSet {
 
-	private static int changeCounter = 0;
-	private static int fileCounter = 0;
-	private String newfilename = "";
-	List<I_WriteChangeSet> files = new LinkedList<I_WriteChangeSet>();
+    private static int changeCounter = 0;
+    private static int fileCounter = 0;
+    private String newfilename = "";
+    List<I_WriteChangeSet> files = new LinkedList<I_WriteChangeSet>();
 
-	I_WriteChangeSet binaryWriter = null;
+    I_WriteChangeSet binaryWriter = null;
 
-	I_TermFactory tf = LocalVersionedTerminology.get();
-	private File changeSetFile = null;
+    I_TermFactory tf = LocalVersionedTerminology.get();
+    private File changeSetFile = null;
 
-	public WriteChangeSetToMultipleBinaryFiles(File changeSetFile, File tempFile) throws IOException {
-		this.changeSetFile = changeSetFile;
-	}
+    public WriteChangeSetToMultipleBinaryFiles(File changeSetFile, File tempFile) throws IOException {
+        this.changeSetFile = changeSetFile;
+    }
 
-	public void commit() throws IOException {
-		for (I_WriteChangeSet writer: files) {
-			writer.commit();
-		}
-		files.clear();
-		binaryWriter = null;
-	}
+    public void commit() throws IOException {
+        for (I_WriteChangeSet writer : files) {
+            writer.commit();
+        }
+        files.clear();
+        binaryWriter = null;
+    }
 
-	public void open() throws IOException {
-	}
+    public void open() throws IOException {
+    }
 
-	public void writeChanges(I_Transact change, long time) throws IOException {
+    public void writeChanges(I_Transact change, long time) throws IOException {
 
-		if (changeCounter%10000==0 || binaryWriter==null) {
-			newfilename = changeSetFile.getAbsolutePath().replace(".jcs", "["+fileCounter+"].jcs");
-			binaryWriter = tf.newBinaryChangeSetWriter(new File(newfilename));
-			files.add(binaryWriter);
-			binaryWriter.open();
-			fileCounter++;
-		}
-		changeCounter++;
-		/*
-		 * Each file must have a incremented timestamp on it, so that it gets read
-		 * */
-		binaryWriter.writeChanges(change,time+fileCounter);
-	}
+        if (changeCounter % 10000 == 0 || binaryWriter == null) {
+            newfilename = changeSetFile.getAbsolutePath().replace(".jcs", "[" + fileCounter + "].jcs");
+            binaryWriter = tf.newBinaryChangeSetWriter(new File(newfilename));
+            files.add(binaryWriter);
+            binaryWriter.open();
+            fileCounter++;
+        }
+        changeCounter++;
+        /*
+         * Each file must have a incremented timestamp on it, so that it gets
+         * read
+         */
+        binaryWriter.writeChanges(change, time + fileCounter);
+    }
 }

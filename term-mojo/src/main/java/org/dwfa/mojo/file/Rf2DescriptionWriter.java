@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,7 @@ import java.io.IOException;
 import org.dwfa.ace.file.GenericFileWriter;
 import org.dwfa.tapi.TerminologyException;
 
-public class Rf2DescriptionWriter extends GenericFileWriter<Rf2DescriptionWriter.Rf2DescriptionRow>{
+public class Rf2DescriptionWriter extends GenericFileWriter<Rf2DescriptionWriter.Rf2DescriptionRow> {
 
     public Rf2DescriptionWriter(File file) throws IOException {
         newLineChars = "\r\n";
@@ -35,7 +35,8 @@ public class Rf2DescriptionWriter extends GenericFileWriter<Rf2DescriptionWriter
      * @see org.dwfa.ace.file.GenericFileWriter#serialize(java.lang.Object)
      */
     @Override
-    protected String serialize(Rf2DescriptionWriter.Rf2DescriptionRow descriptionRow) throws IOException, TerminologyException {
+    protected String serialize(Rf2DescriptionWriter.Rf2DescriptionRow descriptionRow) throws IOException,
+            TerminologyException {
         return descriptionRow.toString();
     }
 
@@ -56,12 +57,12 @@ public class Rf2DescriptionWriter extends GenericFileWriter<Rf2DescriptionWriter
 
         /**
          * Header row for this type.
-         *
+         * 
          * @return String header.
          */
         public String getHeader() {
-            return "id" + "\t" + "effectiveTime" + "\t" + "active" + "\t" + "moduleId" + "\t"
-                    + "conceptId" + "\t" + "languageCode" + "\t" +  "typeId" + "\t" + "term" + "\t" + "caseSignificanceId";
+            return "id" + "\t" + "effectiveTime" + "\t" + "active" + "\t" + "moduleId" + "\t" + "conceptId" + "\t"
+                + "languageCode" + "\t" + "typeId" + "\t" + "term" + "\t" + "caseSignificanceId";
         }
 
         /**

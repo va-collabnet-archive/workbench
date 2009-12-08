@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,8 +19,8 @@ package org.dwfa.mojo.refset;
 import org.dwfa.mojo.ConceptDescriptor;
 
 /**
- * Describes a destination refset to be modified, including the path 
- * it should be modified on (at present this is singular).  
+ * Describes a destination refset to be modified, including the path
+ * it should be modified on (at present this is singular).
  */
 public class DestinationRefsetDescriptor {
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,20 +33,20 @@ import org.dwfa.maven.MojoUtil;
  * @goal classify
  * 
  * @author michaellawley
- *
+ * 
  */
 public class Classify extends AbstractMojo {
 
     /**
      * The classify factory name
-     *
+     * 
      * @parameter
      */
     String classifyFactory = "java.lang.String";
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -54,9 +54,8 @@ public class Classify extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass()
-                .getCanonicalName()
-                + classifyFactory, this.getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + classifyFactory, this.getClass(),
+                targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e) {
