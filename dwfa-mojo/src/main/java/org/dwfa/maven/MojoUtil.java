@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,11 +43,12 @@ import org.codehaus.plexus.util.StringOutputStream;
 
 public class MojoUtil {
 
-    private static final String fileSep = System.getProperty("file.separator",
-            "/");
+    private static final String fileSep = System.getProperty("file.separator", "/");
     // example snapshot pattern 2.0.2-20070925.004307-16
     private static Pattern snapshotPattern = Pattern.compile("[-]{1}[0-9]{8}\\.[0-9]{6}\\-[0-9]{1,3}$");
-    //private static Pattern snapshotPattern = Pattern.compile(".*[0-9]{1,3}$");
+
+    // private static Pattern snapshotPattern =
+    // Pattern.compile(".*[0-9]{1,3}$");
 
     public static String dependencyToPath(String localRepository, Dependency dep) {
         StringBuffer buff = new StringBuffer();
@@ -93,8 +94,7 @@ public class MojoUtil {
      * @return
      * @throws MojoExecutionException
      */
-    public static URLClassLoader getProjectClassLoader(
-            List<Dependency> dependencies, String localRepository)
+    public static URLClassLoader getProjectClassLoader(List<Dependency> dependencies, String localRepository)
             throws IOException {
         List<URL> libs = addDependencies(dependencies, localRepository);
         return new URLClassLoader(libs.toArray(new URL[libs.size()]));
@@ -105,8 +105,7 @@ public class MojoUtil {
      * @return
      * @throws MojoExecutionException
      */
-    public static URLClassLoader getProjectClassLoader(List<Artifact> artifacts)
-            throws IOException {
+    public static URLClassLoader getProjectClassLoader(List<Artifact> artifacts) throws IOException {
         List<URL> libs = new ArrayList<URL>(artifacts.size());
         for (Artifact a : artifacts) {
             libs.add(a.getFile().toURI().toURL());
@@ -115,12 +114,11 @@ public class MojoUtil {
         return new URLClassLoader(libs.toArray(new URL[libs.size()]));
     }
 
-    private static List<URL> addDependencies(List<Dependency> dependencies,
-            String localRepository) throws MalformedURLException {
+    private static List<URL> addDependencies(List<Dependency> dependencies, String localRepository)
+            throws MalformedURLException {
         List<URL> libs = new ArrayList<URL>();
         for (Dependency d : dependencies) {
-            String dependencyPath = MojoUtil.dependencyToPath(localRepository,
-                    d);
+            String dependencyPath = MojoUtil.dependencyToPath(localRepository, d);
             libs.add(new File(dependencyPath).toURI().toURL());
         }
         return libs;
@@ -131,17 +129,15 @@ public class MojoUtil {
      * @return
      * @throws MojoExecutionException
      */
-    public static URLClassLoader getProjectClassLoader(
-            List<Dependency> dependencies, String localRepository,
+    public static URLClassLoader getProjectClassLoader(List<Dependency> dependencies, String localRepository,
             String classesDir) throws IOException {
         List<URL> libs = addDependencies(dependencies, localRepository);
         libs.add(new File(classesDir).toURI().toURL());
         return new URLClassLoader(libs.toArray(new URL[libs.size()]));
     }
 
-    public static URLClassLoader getProjectClassLoaderWithoutProvided(
-            List<Dependency> dependencies, String localRepository,
-            String classesDir) throws IOException {
+    public static URLClassLoader getProjectClassLoaderWithoutProvided(List<Dependency> dependencies,
+            String localRepository, String classesDir) throws IOException {
 
         List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
         for (Dependency d : dependencies) {
@@ -155,12 +151,10 @@ public class MojoUtil {
                 dependencyWithoutProvided.add(d);
             }
         }
-        return getProjectClassLoader(dependencyWithoutProvided,
-                localRepository, classesDir);
+        return getProjectClassLoader(dependencyWithoutProvided, localRepository, classesDir);
     }
 
-    public static boolean allowedGoal(Log log, List<String> sessionGoals,
-            String[] allowedGoals) {
+    public static boolean allowedGoal(Log log, List<String> sessionGoals, String[] allowedGoals) {
         boolean allowedGoal = false;
         for (String goal : allowedGoals) {
             if (sessionGoals.contains(goal)) {
@@ -169,14 +163,14 @@ public class MojoUtil {
             }
         }
         if (allowedGoal == false) {
-            log.info("Skipping execution since session goals: " + sessionGoals +
-                    " do not contain one of the following allowed goals: " + Arrays.asList(allowedGoals));
+            log.info("Skipping execution since session goals: " + sessionGoals
+                + " do not contain one of the following allowed goals: " + Arrays.asList(allowedGoals));
         }
         return allowedGoal;
     }
 
-    public static boolean alreadyRun(Log l, String input, Class<?> targetClass, File targetDir) throws
-            NoSuchAlgorithmException, IOException {
+    public static boolean alreadyRun(Log l, String input, Class<?> targetClass, File targetDir)
+            throws NoSuchAlgorithmException, IOException {
         Sha1HashCodeGenerator generator = new Sha1HashCodeGenerator();
         if (input == null) {
             input = targetClass.getName();
@@ -208,16 +202,18 @@ public class MojoUtil {
 
     /**
      * Writes the name of a class to the mojoHashFile
-     *
-     * @param mojoHashFile the mojoHashFile that signifies that the mojo has already been run.
+     * 
+     * @param mojoHashFile the mojoHashFile that signifies that the mojo has
+     *            already been run.
      * @param targetClass the class to write to the mojoHashFile.
-     * @throws IOException if an Error has occured, produced by failed or interrupted I/O operations.
+     * @throws IOException if an Error has occured, produced by failed or
+     *             interrupted I/O operations.
      */
     public static void writeClassToMojoHashFile(File mojoHashFile, Class<?> targetClass) throws IOException {
         FileWriter fileWriter = new FileWriter(mojoHashFile);
         try {
-            Logger.getLogger(MojoUtil.class.getName()).info(String.format("Writing %1$s to %2$s", targetClass.
-                    getCanonicalName(), mojoHashFile.getAbsolutePath()));
+            Logger.getLogger(MojoUtil.class.getName()).info(
+                String.format("Writing %1$s to %2$s", targetClass.getCanonicalName(), mojoHashFile.getAbsolutePath()));
             fileWriter.write(targetClass.getCanonicalName());
         } finally {
             fileWriter.close();

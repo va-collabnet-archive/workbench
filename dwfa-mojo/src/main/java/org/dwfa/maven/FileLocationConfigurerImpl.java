@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,14 +27,11 @@ public final class FileLocationConfigurerImpl implements FileLocationConfigurer 
     private File sqlTargetDir;
     private File dbDir;
 
-    public FileLocationConfigurerImpl(final File sourceDirectory,
-            final File outputDirectory, final String dbName) {
+    public FileLocationConfigurerImpl(final File sourceDirectory, final File outputDirectory, final String dbName) {
         sqlSourceDir = new File(sourceDirectory.getParentFile(), SQL_SUBDIR);
         sqlTargetDir = new File(outputDirectory, SQL_SUBDIR);
         sqlTargetDir.mkdirs();
-        dbDir =
-                new File(outputDirectory, dbName.replace(FORWARD_SLASH,
-                    File.separatorChar));
+        dbDir = new File(outputDirectory, dbName.replace(FORWARD_SLASH, File.separatorChar));
     }
 
     public File getSqlSourceDir() {

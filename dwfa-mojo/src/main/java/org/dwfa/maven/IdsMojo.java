@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +50,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 /**
  * Goal which executes derby sql commands to generate a
  * database or perform other such tasks.
- *
+ * 
  * @goal generate-ids-file
  */
 public class IdsMojo extends AbstractMojo {
@@ -99,7 +99,7 @@ public class IdsMojo extends AbstractMojo {
     Set<UUID> allowedUuids = new HashSet<UUID>();
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -125,7 +125,6 @@ public class IdsMojo extends AbstractMojo {
 
         // check to see if this goal has been executed previously
         if (!goalFile.exists()) {
-
 
             try {
                 if (checkFile != null) {
@@ -164,8 +163,8 @@ public class IdsMojo extends AbstractMojo {
                     if (sctid != null) {
                         if (allowedUuids.contains(UUID.fromString(uuid))) {
                             String effective_date = map.getEffectiveDate(sctid);
-                            writer.write(uuid + "\t" + source + "\t" + sctid + "\t" + status + "\t" + effective_date +
-                                    "\t" + path);
+                            writer.write(uuid + "\t" + source + "\t" + sctid + "\t" + status + "\t" + effective_date
+                                + "\t" + path);
                             writer.newLine();
                         } else {
                             report.write("UUID Not in release: " + uuid);

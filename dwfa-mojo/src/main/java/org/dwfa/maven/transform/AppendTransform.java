@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ import org.dwfa.maven.Transform;
 
 /**
  * Transforms ingredient field into a Snomed FSD.
- *
+ * 
  */
 
 public class AppendTransform extends AbstractTransform {
@@ -38,8 +38,7 @@ public class AppendTransform extends AbstractTransform {
         sb.append(param);
 
         if (getChainedTransform() != null) {
-            return setLastTransform(getChainedTransform().transform(
-                sb.toString()));
+            return setLastTransform(getChainedTransform().transform(sb.toString()));
         } else {
             return setLastTransform(sb.toString());
         }

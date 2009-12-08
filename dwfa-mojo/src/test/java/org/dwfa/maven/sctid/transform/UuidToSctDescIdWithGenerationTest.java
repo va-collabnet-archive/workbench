@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,11 +54,11 @@ public class UuidToSctDescIdWithGenerationTest extends TestCase {
         String sctId = uuidToSctDescIdWithGeneration.transform(uuid.toString(), namespace);
 
         assertTrue("Must return the same sctId for the same UUID",
-                sctId.equals(uuidToSctDescIdWithGeneration.transform(uuid.toString(), namespace)));
+            sctId.equals(uuidToSctDescIdWithGeneration.transform(uuid.toString(), namespace)));
     }
 
     public void testLoad() throws Exception {
-        for(int i = 0; i < loadTestSize; i++){
+        for (int i = 0; i < loadTestSize; i++) {
             String sctId = uuidToSctDescIdWithGeneration.transform(UUID.randomUUID().toString(), getRandomNamespace());
             assertNotNull(sctId);
         }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,6 +51,7 @@ import org.dwfa.util.io.FileIO;
  * TODO Remove setMavenParameter() method, and replace with individual setters.
  * Problem occured when adding the method setOutputSpecs() - causes maven to
  * ignore the value specified in the pom and override the parameter with null.
+ * 
  * @goal transform
  * @phase generate-resources
  */
@@ -69,7 +70,7 @@ public class Transform extends AbstractMojo {
     private String idFileLoc;
     /**
      * @parameter
-     *
+     * 
      */
     private boolean appendIdFiles = false;
     /**
@@ -86,6 +87,7 @@ public class Transform extends AbstractMojo {
     private Character outputCharacterDelimiter = '"';
     /**
      * List of source roots containing non-test code.
+     * 
      * @parameter default-value="${project.compileSourceRoots}"
      * @required
      * @readonly
@@ -99,7 +101,7 @@ public class Transform extends AbstractMojo {
     private File buildDirectory;
     /**
      * Location of the source directory.
-     *
+     * 
      * @parameter expression="${project.build.sourceDirectory}"
      * @required
      */
@@ -109,14 +111,14 @@ public class Transform extends AbstractMojo {
      * Whether to use the DB mechanism for mapping SCT Id's. This replaces the
      * flat file mechanism, which is prone to memory issues with a large number
      * of Id's. Unless otherwise specified, the DB mechanism will be used
-     *
+     * 
      * @parameter
      */
     boolean useDbSctMap = Boolean.TRUE;
 
     /**
      * Namespace for sctid generation
-     *
+     * 
      * @parameter
      */
     private String namespace;
@@ -198,14 +200,12 @@ public class Transform extends AbstractMojo {
                     InputFileSpec[] inputSpecs = outSpec.getInputSpecs();
                     for (InputFileSpec spec : inputSpecs) {
                         nextColumnId = 0;
-                        Map<Integer, Set<I_ReadAndTransform>> columnTransformerMap =
-                                new HashMap<Integer, Set<I_ReadAndTransform>>();
+                        Map<Integer, Set<I_ReadAndTransform>> columnTransformerMap = new HashMap<Integer, Set<I_ReadAndTransform>>();
                         logger.info("Now processing file spec:\n\n" + spec);
 
                         for (I_ReadAndTransform t : spec.getColumnSpecs()) {
                             t.setup(this);
-                            Set<I_ReadAndTransform> transformerSet = (Set<I_ReadAndTransform>) columnTransformerMap.get(
-                                    (Integer) t.getColumnId());
+                            Set<I_ReadAndTransform> transformerSet = (Set<I_ReadAndTransform>) columnTransformerMap.get((Integer) t.getColumnId());
                             if (transformerSet == null) {
                                 transformerSet = new HashSet<I_ReadAndTransform>();
                                 columnTransformerMap.put((Integer) t.getColumnId(), transformerSet);
@@ -242,26 +242,41 @@ public class Transform extends AbstractMojo {
                         while (tokenType != StreamTokenizer.TT_EOF) {
                             int currentColumn = 0;
                             while (tokenType != '\r' && tokenType != '\n' && tokenType != StreamTokenizer.TT_EOF) {
-                                /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-                                getLog().info("Transforming column: " + currentColumn + " string token: " + st.sval);
-                                getLog().info("Current row:" + rowCount);
-                                }*/
+                                /*
+                                 * if (rowCount >= spec.getDebugRowStart() &&
+                                 * rowCount <= spec.getDebugRowEnd()) {
+                                 * getLog().info("Transforming column: " +
+                                 * currentColumn + " string token: " + st.sval);
+                                 * getLog().info("Current row:" + rowCount);
+                                 * }
+                                 */
 
                                 if (columnTransformerMap.get((Integer) currentColumn) == null) {
                                 } else {
                                     for (Object tObj : (Set) columnTransformerMap.get((Integer) currentColumn)) {
                                         I_ReadAndTransform t = (I_ReadAndTransform) tObj;
-                                        /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-                                        getLog().info("Transform for column: " + currentColumn + " is: " + t);
-                                        }*/
+                                        /*
+                                         * if (rowCount >=
+                                         * spec.getDebugRowStart() && rowCount
+                                         * <= spec.getDebugRowEnd()) {
+                                         * 
+                                         * getLog().info("Transform for column: "
+                                         * + currentColumn + " is: " + t);
+                                         * }
+                                         */
                                         if (tokenType == spec.getInputColumnDelimiter().charValue()) {
                                             t.transform(null);
                                         } else {
                                             t.transform(st.sval);
                                         }
-                                        /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-                                        getLog().info("Transform: " + t + " result: " + result);
-                                        }*/
+                                        /*
+                                         * if (rowCount >=
+                                         * spec.getDebugRowStart() && rowCount
+                                         * <= spec.getDebugRowEnd()) {
+                                         * getLog().info("Transform: " + t +
+                                         * " result: " + result);
+                                         * }
+                                         */
                                     }
                                 }
                                 tokenType = st.nextToken();
@@ -275,24 +290,21 @@ public class Transform extends AbstractMojo {
                                 currentColumn++;
                             }
 
-
                             for (I_TransformAndWrite tw : writers) {
                                 tw.processRec();
                             }
 
-
                             switch (tokenType) {
-                                case '\r': // is CR
-                                    // LF
-                                    tokenType = st.nextToken();
-                                    break;
-                                case '\n':  //LF
-                                    break;
-                                case StreamTokenizer.TT_EOF: // End of file
-                                    break;
-                                default:
-                                    throw new Exception("There are more columns than transformers. Tokentype: " +
-                                            tokenType);
+                            case '\r': // is CR
+                                // LF
+                                tokenType = st.nextToken();
+                                break;
+                            case '\n': // LF
+                                break;
+                            case StreamTokenizer.TT_EOF: // End of file
+                                break;
+                            default:
+                                throw new Exception("There are more columns than transformers. Tokentype: " + tokenType);
                             }
                             rowCount++;
                             if (rowCount % PROGRESS_LOGGING_SIZE == 0) {
@@ -325,8 +337,6 @@ public class Transform extends AbstractMojo {
 
                     logger.info("cleanup inputs - done");
                 }
-
-
 
                 if (uuidToNativeMap != null) {
                     logger.info("ID map is not null.");
@@ -495,11 +505,8 @@ public class Transform extends AbstractMojo {
         return sourceRoots;
     }
 
-    public void setMavenParameters(OutputSpec[] outputSpecs,
-            String idFileLoc, boolean appendIdFiles,
-            String idEncoding, Character outputColumnDelimiter,
-            Character outputCharacterDelimiter,
-            List sourceRoots) {
+    public void setMavenParameters(OutputSpec[] outputSpecs, String idFileLoc, boolean appendIdFiles,
+            String idEncoding, Character outputColumnDelimiter, Character outputCharacterDelimiter, List sourceRoots) {
         this.outputSpecs = outputSpecs;
         this.idFileLoc = idFileLoc;
         this.appendIdFiles = appendIdFiles;
@@ -509,13 +516,11 @@ public class Transform extends AbstractMojo {
         this.sourceRoots = sourceRoots;
     }
 
-    public void setMavenParameters(OutputSpec[] outputSpecs,
-            String idFileLoc, boolean appendIdFiles,
-            String idEncoding, Character outputColumnDelimiter,
-            Character outputCharacterDelimiter,
-            List sourceRoots, File buildDirectory) {
+    public void setMavenParameters(OutputSpec[] outputSpecs, String idFileLoc, boolean appendIdFiles,
+            String idEncoding, Character outputColumnDelimiter, Character outputCharacterDelimiter, List sourceRoots,
+            File buildDirectory) {
         this.setMavenParameters(outputSpecs, idFileLoc, appendIdFiles, idEncoding, outputColumnDelimiter,
-                outputCharacterDelimiter, sourceRoots);
+            outputCharacterDelimiter, sourceRoots);
         this.buildDirectory = buildDirectory;
     }
 
@@ -526,7 +531,7 @@ public class Transform extends AbstractMojo {
     public File getSourceDirectory() {
         return sourceDirectory;
     }
-    
+
     public boolean getUseDbSctMap() {
         return useDbSctMap;
     }

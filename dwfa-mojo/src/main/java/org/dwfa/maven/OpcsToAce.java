@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,9 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.id.Type5UuidFactory;
 
 /**
- * Convert an OPCS-4 file to a set of <a href='https://mgr.cubit.aceworkspace.net/apps/dwfa/ace-mojo/dataimport.html'>ACE formatted</a> files.
+ * Convert an OPCS-4 file to a set of <a href=
+ * 'https://mgr.cubit.aceworkspace.net/apps/dwfa/ace-mojo/dataimport.html'>ACE
+ * formatted</a> files.
  * 
  * @goal opcs-to-ace
  * @phase process-resources
@@ -54,7 +56,8 @@ public class OpcsToAce extends AbstractMojo {
     /**
      * Location of the opcs data directory to read from.
      * 
-     * @parameter expression="${project.build.directory}/generated-resources/net/nhs/uktc/opcs-4"
+     * @parameter expression=
+     *            "${project.build.directory}/generated-resources/net/nhs/uktc/opcs-4"
      * @required
      */
     private File opcsDir;
@@ -88,34 +91,21 @@ public class OpcsToAce extends AbstractMojo {
             getLog().info("OPCS dir: " + opcsDir);
             getLog().info("ACE dir: " + aceDir);
             aceDir.mkdirs();
-            BufferedReader r =
-                    new BufferedReader(new FileReader(new File(opcsDir,
-                        "OPCS Codes and titles v2.text")));
+            BufferedReader r = new BufferedReader(new FileReader(new File(opcsDir, "OPCS Codes and titles v2.text")));
 
-            Writer concepts =
-                    new BufferedWriter(new FileWriter(new File(aceDir,
-                        "concepts.txt")));
-            Writer descriptions =
-                    new BufferedWriter(new FileWriter(new File(aceDir,
-                        "descriptions.txt")));
-            Writer relationships =
-                    new BufferedWriter(new FileWriter(new File(aceDir,
-                        "relationships.txt")));
-            Writer ids =
-                    new BufferedWriter(new FileWriter(new File(aceDir,
-                        "ids.txt")));
+            Writer concepts = new BufferedWriter(new FileWriter(new File(aceDir, "concepts.txt")));
+            Writer descriptions = new BufferedWriter(new FileWriter(new File(aceDir, "descriptions.txt")));
+            Writer relationships = new BufferedWriter(new FileWriter(new File(aceDir, "relationships.txt")));
+            Writer ids = new BufferedWriter(new FileWriter(new File(aceDir, "ids.txt")));
 
-            UUID pathUUID =
-                    Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                        pathFsDesc);
+            UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc);
 
             writeRoot(concepts, descriptions, relationships, ids, pathUUID);
 
             while (r.ready()) {
                 String line = r.readLine();
                 if (line.length() > 0) {
-                    processRow(concepts, descriptions, relationships, ids,
-                        pathUUID, line);
+                    processRow(concepts, descriptions, relationships, ids, pathUUID, line);
                 }
             }
 
@@ -134,65 +124,58 @@ public class OpcsToAce extends AbstractMojo {
 
     }
 
-    private void processRow(Writer concepts, Writer descriptions,
-            Writer relationships, Writer ids, UUID pathUUID, String line)
-            throws IOException, NoSuchAlgorithmException,
-            UnsupportedEncodingException {
+    private void processRow(Writer concepts, Writer descriptions, Writer relationships, Writer ids, UUID pathUUID,
+            String line) throws IOException, NoSuchAlgorithmException, UnsupportedEncodingException {
 
         String id = line.substring(0, 8).trim();
         String desc = line.substring(8).trim();
 
-        ids.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, id)
-            .toString()); // concept id
+        ids.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, id).toString()); // concept
+                                                                                           // id
         ids.append("\t");
-        ids.append(ArchitectonicAuxiliary.Concept.UNSPECIFIED_STRING.getUids()
-            .iterator().next().toString()); //source
+        ids.append(ArchitectonicAuxiliary.Concept.UNSPECIFIED_STRING.getUids().iterator().next().toString()); // source
         ids.append("\t");
-        ids.append(id); //source id
+        ids.append(id); // source id
         ids.append("\t");
-        ids.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
-            .next().toString()); //status
+        ids.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next().toString()); // status
         ids.append("\t");
         ids.append(effectiveDate);
         ids.append("\t");
-        ids.append(pathUUID.toString()); //path id
+        ids.append(pathUUID.toString()); // path id
         ids.append("\n");
 
-        concepts.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID,
-            id).toString()); // concept id
+        concepts.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, id).toString()); // concept
+                                                                                                // id
         concepts.append("\t");
-        concepts.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids()
-            .iterator().next().toString()); //status
+        concepts.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next().toString()); // status
         concepts.append("\t");
         concepts.append("1"); // primitive
         concepts.append("\t");
         concepts.append(effectiveDate);
         concepts.append("\t");
-        concepts.append(pathUUID.toString()); //path id
+        concepts.append(pathUUID.toString()); // path id
         concepts.append("\n");
 
-        descriptions.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_DESC_ID,
-            id).toString());
+        descriptions.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_DESC_ID, id).toString());
         descriptions.append("\t");
-        descriptions.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids()
-            .iterator().next().toString());
+        descriptions.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next().toString());
         descriptions.append("\t");
-        descriptions.append(Type5UuidFactory.get(
-            Type5UuidFactory.OPCS_CONCEPT_ID, id).toString());
+        descriptions.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, id).toString());
         descriptions.append("\t");
         descriptions.append(desc);
         descriptions.append("\t");
         descriptions.append("1");
         descriptions.append("\t");
-        descriptions
-            .append(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-                .getUids().iterator().next().toString()); //status
+        descriptions.append(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next()
+            .toString()); // status
         descriptions.append("\t");
         descriptions.append("en"); // primitive
         descriptions.append("\t");
         descriptions.append(effectiveDate);
         descriptions.append("\t");
-        descriptions.append(pathUUID.toString()); //path id
+        descriptions.append(pathUUID.toString()); // path id
         descriptions.append("\n");
 
         String parentId = "opcs";
@@ -200,93 +183,79 @@ public class OpcsToAce extends AbstractMojo {
             parentId = id.substring(0, 3);
         }
 
-        relationships.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_REL_ID,
-            id + parentId).toString());
+        relationships.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_REL_ID, id + parentId).toString());
         relationships.append("\t");
-        relationships.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids()
-            .iterator().next().toString());
+        relationships.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next().toString());
         relationships.append("\t");
-        relationships.append(Type5UuidFactory.get(
-            Type5UuidFactory.OPCS_CONCEPT_ID, id).toString());
+        relationships.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, id).toString());
         relationships.append("\t");
-        relationships.append(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()
-            .iterator().next().toString());
+        relationships.append(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids().iterator().next().toString());
         relationships.append("\t");
-        relationships.append(Type5UuidFactory.get(
-            Type5UuidFactory.OPCS_CONCEPT_ID, parentId).toString());
+        relationships.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, parentId).toString());
         relationships.append("\t");
-        relationships.append(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP
-            .getUids().iterator().next().toString());
+        relationships.append(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids().iterator().next().toString());
         relationships.append("\t");
-        relationships.append(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-            .getUids().iterator().next().toString());
+        relationships.append(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids().iterator().next().toString());
         relationships.append("\t");
         relationships.append("0");
         relationships.append("\t");
         relationships.append(effectiveDate);
         relationships.append("\t");
-        relationships.append(pathUUID.toString()); //path id
+        relationships.append(pathUUID.toString()); // path id
         relationships.append("\n");
     }
 
-    private void writeRoot(Writer concepts, Writer descriptions,
-            Writer relationships, Writer ids, UUID pathUUID)
-            throws IOException, NoSuchAlgorithmException,
-            UnsupportedEncodingException {
+    private void writeRoot(Writer concepts, Writer descriptions, Writer relationships, Writer ids, UUID pathUUID)
+            throws IOException, NoSuchAlgorithmException, UnsupportedEncodingException {
         String id = "opcs";
         String desc = "OPCS Concept";
 
-        ids.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, id)
-            .toString()); // concept id
+        ids.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, id).toString()); // concept
+                                                                                           // id
         ids.append("\t");
-        ids.append(ArchitectonicAuxiliary.Concept.UNSPECIFIED_STRING.getUids()
-            .iterator().next().toString()); //source
+        ids.append(ArchitectonicAuxiliary.Concept.UNSPECIFIED_STRING.getUids().iterator().next().toString()); // source
         ids.append("\t");
-        ids.append(id); //source id
+        ids.append(id); // source id
         ids.append("\t");
-        ids.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
-            .next().toString()); //status
+        ids.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next().toString()); // status
         ids.append("\t");
         ids.append(effectiveDate);
         ids.append("\t");
-        ids.append(pathUUID.toString()); //path id
+        ids.append(pathUUID.toString()); // path id
         ids.append("\n");
 
-        concepts.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID,
-            id).toString()); // concept id
+        concepts.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, id).toString()); // concept
+                                                                                                // id
         concepts.append("\t");
-        concepts.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids()
-            .iterator().next().toString()); //status
+        concepts.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next().toString()); // status
         concepts.append("\t");
         concepts.append("1"); // primitive
         concepts.append("\t");
         concepts.append(effectiveDate);
         concepts.append("\t");
-        concepts.append(pathUUID.toString()); //path id
+        concepts.append(pathUUID.toString()); // path id
         concepts.append("\n");
 
-        descriptions.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_DESC_ID,
-            id).toString());
+        descriptions.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_DESC_ID, id).toString());
         descriptions.append("\t");
-        descriptions.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids()
-            .iterator().next().toString());
+        descriptions.append(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next().toString());
         descriptions.append("\t");
-        descriptions.append(Type5UuidFactory.get(
-            Type5UuidFactory.OPCS_CONCEPT_ID, id).toString());
+        descriptions.append(Type5UuidFactory.get(Type5UuidFactory.OPCS_CONCEPT_ID, id).toString());
         descriptions.append("\t");
         descriptions.append(desc);
         descriptions.append("\t");
         descriptions.append("1");
         descriptions.append("\t");
-        descriptions
-            .append(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-                .getUids().iterator().next().toString()); //status
+        descriptions.append(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next()
+            .toString()); // status
         descriptions.append("\t");
         descriptions.append("en"); // primitive
         descriptions.append("\t");
         descriptions.append(effectiveDate);
         descriptions.append("\t");
-        descriptions.append(pathUUID.toString()); //path id
+        descriptions.append(pathUUID.toString()); // path id
         descriptions.append("\n");
 
     }

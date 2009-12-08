@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,16 +32,15 @@ public class SctIdGeneratorTest extends TestCase {
 
     public void testGenerate() {
         try {
-            SctIdGenerator.generate(0, SctIdGenerator.PROJECT.AMT,
-                SctIdGenerator.NAMESPACE.NEHTA, SctIdGenerator.TYPE.CONCEPT);
+            SctIdGenerator.generate(0, SctIdGenerator.PROJECT.AMT, SctIdGenerator.NAMESPACE.NEHTA,
+                SctIdGenerator.TYPE.CONCEPT);
             fail("Generator should have thrown an error");
         } catch (Exception e) {
             // expected exception at 0 index;
         }
-        try { //SNAMESPCPRC
-            assertEquals("11000036103", SctIdGenerator.generate(1,
-                SctIdGenerator.PROJECT.AMT, SctIdGenerator.NAMESPACE.NEHTA,
-                SctIdGenerator.TYPE.CONCEPT));
+        try { // SNAMESPCPRC
+            assertEquals("11000036103", SctIdGenerator.generate(1, SctIdGenerator.PROJECT.AMT,
+                SctIdGenerator.NAMESPACE.NEHTA, SctIdGenerator.TYPE.CONCEPT));
         } catch (Exception e) {
             fail("exception: " + e.getLocalizedMessage());
         }

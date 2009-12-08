@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,7 +41,7 @@ import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 
 /**
  * Derby DB containing the Uuid-SctId mappings for an id mapping file.
- *
+ * 
  * @author Ean Dungey
  */
 public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
@@ -74,33 +74,32 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
     /** Used to remove lck files */
     private File dbFolder;
 
-
     /**
      * Reads the contents of a mapping file. IF no database exists then a new
      * database is created from the contents of the mapping file. If the
      * database does exist them the database in opened.
-     *
+     * 
      * @param mapFile id map file to create a DB from if no DB exits.
-     *
+     * 
      * @return DerbyBackedUuidSctidFixedMap
-     *
+     * 
      * @throws IOException if cannot read/create/open the mapping file/database.
      */
     public static DerbyBackedUuidSctidMap read(File mapFile, NAMESPACE namespace, PROJECT project) throws IOException {
 
-        return new DerbyBackedUuidSctidMap(new File(mapFile.getParent(), mapFile.getName() + ".bdb"),
-            mapFile, namespace, project);
+        return new DerbyBackedUuidSctidMap(new File(mapFile.getParent(), mapFile.getName() + ".bdb"), mapFile,
+            namespace, project);
     }
 
     /**
      * Reads the contents of a mapping file. IF no database exists then a new
      * database is created from the contents of the mapping file. If the
      * database does exist them the database in opened.
-     *
+     * 
      * @param fixedMapFile id map file to create a DB from if no DB exits.
-     *
+     * 
      * @return DerbyBackedUuidSctidFixedMap
-     *
+     * 
      * @throws IOException if cannot read/create/open the mapping file/database.
      */
     public static DerbyBackedUuidSctidMap read(File fixedMapFile) throws IOException {
@@ -111,15 +110,16 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
 
     /**
      * Creates or Opens a Derby DB.
-     *
+     * 
      * If the DB files exits it is simply opened other wise a new database is
      * created.
-     *
+     * 
      * @param dbFolder File
      * @param fixedMapFile File
      * @throws IOException error opening or creating the DB.
      */
-    private DerbyBackedUuidSctidMap(File dbFolder, File fixedMapFile, NAMESPACE namespace, PROJECT project) throws IOException {
+    private DerbyBackedUuidSctidMap(File dbFolder, File fixedMapFile, NAMESPACE namespace, PROJECT project)
+            throws IOException {
         super(project, namespace);
 
         File databaseFile = new File(fixedMapFile.getParent(), fixedMapFile.getName() + ".bdb");
@@ -133,9 +133,9 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
 
     /**
      * Open the exiting DB.
-     *
+     * 
      * Setup the PreparedStatement of the DB.
-     *
+     * 
      * @param dbFolder File
      * @throws IOException error opening the DB.
      */
@@ -155,7 +155,7 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
 
     /**
      * Create a new DB and load with the contents of the fixedMapFile
-     *
+     * 
      * @param dbFolder File
      * @param fixedMapFile File
      * @throws IOException reading the map file or creating the DB.
@@ -179,9 +179,9 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
                 String sctIdPart = parts[0];
                 String effectiveDatePart = "";
                 boolean update = false;
-                if (parts.length>1) {
+                if (parts.length > 1) {
                     effectiveDatePart = parts[1];
-                } else if (parts.length==1) {
+                } else if (parts.length == 1) {
                     effectiveDatePart = getCurrentEffectiveDate();
                     update = true;
                 }
@@ -199,7 +199,7 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
                         logger.info("Created " + insertCount + " rows");
                     }
                 }
-                putEffectiveDate(Long.parseLong(sctIdPart),effectiveDatePart,update);
+                putEffectiveDate(Long.parseLong(sctIdPart), effectiveDatePart, update);
             }
             br.close();
             conn.prepareStatement("CREATE INDEX UUID_IDX ON UUID_SCT_MAP (MSB, LSB)").execute();
@@ -215,16 +215,17 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
 
     /**
      * Create the DB tables and indexes.
-     *
+     * 
      * @throws SQLException creating the tables/indexes.
      */
     private void createTables() throws SQLException {
-        conn.prepareStatement("CREATE TABLE UUID_SCT_MAP (MSB BIGINT, LSB BIGINT, SCTID BIGINT, SCTID_DATE VARCHAR(19))").execute();
+        conn.prepareStatement(
+            "CREATE TABLE UUID_SCT_MAP (MSB BIGINT, LSB BIGINT, SCTID BIGINT, SCTID_DATE VARCHAR(19))").execute();
     }
 
     /**
      * Creates the prepare statements for this DB.
-     *
+     * 
      * @throws SQLException creating the prepare statements
      */
     private void createStatements() throws SQLException {
@@ -242,7 +243,7 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
     /**
      * Connects to the database, if no database exists then a new one is
      * created.
-     *
+     * 
      * @param dbFolder File
      * @param autoCommit boolean
      * @throws SQLException connecting to the DB.
@@ -264,7 +265,7 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
 
     /**
      * Exception wrapper.
-     *
+     * 
      * @param ex Exception
      * @throws RuntimeException always thrown
      */
@@ -329,7 +330,7 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
 
     /**
      * @see java.util.Map#entrySet()
-     *
+     * 
      * @throws UnsupportedOperationException
      */
     public Set<java.util.Map.Entry<UUID, Long>> entrySet() {
@@ -403,7 +404,7 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
      */
     public Long put(UUID key, Long value) {
         Long oldValue = uuidSnomedMap.put(key, value);
-        if(uuidSnomedMap.size() > MAX_CACHE_SIZE){
+        if (uuidSnomedMap.size() > MAX_CACHE_SIZE) {
             for (UUID currentUuid : uuidSnomedMap.keySet()) {
                 put(currentUuid, uuidSnomedMap.get(currentUuid), false);
             }
@@ -420,7 +421,7 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
 
     /**
      * Execute the insert/update SQL and optionally commit the changes.
-     *
+     * 
      * @param key UUID
      * @param sctId Long
      * @param commit commit after putting
@@ -430,7 +431,7 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
         Long currentValue = get(uuid);
 
         String effectiveDate = getEffectiveDate(sctId);
-        if(effectiveDate == null){
+        if (effectiveDate == null) {
             effectiveDate = getCurrentEffectiveDate();
         }
 
@@ -527,17 +528,17 @@ public class DerbyBackedUuidSctidMap extends UuidSnomedMap {
 
     /**
      * This is a workaround for derby not removing lock files at runtime.
-     *
+     * 
      * deletes the lock files.
      */
     private void deleteLockFiles() {
         File lockFile = new File(dbFolder, "db.lck");
-        if(lockFile.exists()){
+        if (lockFile.exists()) {
             lockFile.delete();
         }
 
         lockFile = new File(dbFolder, "dbex.lck");
-        if(lockFile.exists()){
+        if (lockFile.exists()) {
             lockFile.delete();
         }
     }

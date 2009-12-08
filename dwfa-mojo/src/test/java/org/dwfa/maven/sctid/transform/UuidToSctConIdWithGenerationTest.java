@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,8 +54,8 @@ public class UuidToSctConIdWithGenerationTest extends TestCase {
         NAMESPACE namespace = getRandomNamespace();
         String sctId = uuidToSctConIdWithGeneration.transform(uuid.toString(), namespace);
 
-        assertTrue("Must return the same sctId for the same UUID",
-                sctId.equals(uuidToSctConIdWithGeneration.transform(uuid.toString(), namespace)));
+        assertTrue("Must return the same sctId for the same UUID", sctId.equals(uuidToSctConIdWithGeneration.transform(
+            uuid.toString(), namespace)));
     }
 
     public void testConceptIdTypeValidationGeneration() throws Exception {
@@ -66,10 +66,10 @@ public class UuidToSctConIdWithGenerationTest extends TestCase {
 
         String sctId = uuidToSctConIdWithGeneration.transform(uuid.toString(), namespace);
 
-        assertTrue("Must return the same sctId for the same UUID",
-                sctId.equals(uuidToSctConIdWithGeneration.transform(uuid.toString(), namespace)));
+        assertTrue("Must return the same sctId for the same UUID", sctId.equals(uuidToSctConIdWithGeneration.transform(
+            uuid.toString(), namespace)));
 
-        try{
+        try {
             uuidToSctDescIdWithGeneration.transform(uuid.toString(), namespace);
             Assert.fail("Cannot gernerate the same UUID for difference sct id types.");
         } catch (Exception e) {
@@ -86,13 +86,14 @@ public class UuidToSctConIdWithGenerationTest extends TestCase {
 
         String sctId = uuidToSctConIdWithGeneration.transform(uuid.toString(), namespace);
 
-        assertTrue("Must return the same sctId for the same UUID",
-                sctId.equals(uuidToSctConIdWithGeneration.transform(uuid.toString(), namespace)));
+        assertTrue("Must return the same sctId for the same UUID", sctId.equals(uuidToSctConIdWithGeneration.transform(
+            uuid.toString(), namespace)));
 
-        //namespace can be different as the uuid may have been release with another namespace.
+        // namespace can be different as the uuid may have been release with
+        // another namespace.
         uuidToSctConIdWithGeneration.transform(uuid.toString(), namespace);
 
-        try{
+        try {
             uuidToSctDescIdWithGeneration.transform(uuid.toString(), alternateNamespace);
             Assert.fail("Cannot gernerate the same UUID for difference sct id types and namespace.");
         } catch (Exception e) {
@@ -101,7 +102,7 @@ public class UuidToSctConIdWithGenerationTest extends TestCase {
     }
 
     public void testLoad() throws Exception {
-        for(int i = 0; i < loadTestSize; i++){
+        for (int i = 0; i < loadTestSize; i++) {
             String sctId = uuidToSctConIdWithGeneration.transform(UUID.randomUUID().toString(), getRandomNamespace());
             assertNotNull(sctId);
         }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ public class UuidSctidMapDbTest extends TestCase {
     private Random random = new Random(new Date().getTime());
 
     private void generateTestMap() throws IOException, NoSuchAlgorithmException {
-        if(testFixedMap.getParentFile().mkdirs()){
+        if (testFixedMap.getParentFile().mkdirs()) {
             BufferedWriter bw = new BufferedWriter(new FileWriter(testFixedMap));
             for (int i = 1; i < mapSize; i++) {
                 bw.append(Type5UuidFactory.get("first" + Integer.toString(i)).toString());
@@ -130,7 +130,7 @@ public class UuidSctidMapDbTest extends TestCase {
 
     public void testAddUUIDSctIdEntry() throws Exception {
         mapDb.addUUIDSctIdEntry(Type5UuidFactory.get("new" + Integer.toString(1)),
-                Long.valueOf(SctIdGenerator.generate(mapSize + 1, getRandomNamespace(), getRandomType())));
+            Long.valueOf(SctIdGenerator.generate(mapSize + 1, getRandomNamespace(), getRandomType())));
         assertTrue(mapDb.getSctId(Type5UuidFactory.get("new" + Integer.toString(1))) != null);
     }
 
@@ -154,7 +154,7 @@ public class UuidSctidMapDbTest extends TestCase {
 
         testDBMap = new File(new File("target", "test"), "sample2.ValidationOn.map.db");
 
-        if(!testFixedMap.getParentFile().exists()){
+        if (!testFixedMap.getParentFile().exists()) {
             testFixedMap.getParentFile().mkdirs();
         }
 
@@ -195,8 +195,9 @@ public class UuidSctidMapDbTest extends TestCase {
 
         Long sctId = mapDb.getSctId(Type5UuidFactory.get("first" + Integer.toString(1)));
         assertTrue(sctId.toString() + " must start with 1", sctId.toString().startsWith("1"));
-        sctId = mapDb.getSctId(Type5UuidFactory.get("first90000000000000" ));
-        assertTrue(sctId.toString() + " must start with 900000000000000", sctId.toString().startsWith("900000000000000"));
+        sctId = mapDb.getSctId(Type5UuidFactory.get("first90000000000000"));
+        assertTrue(sctId.toString() + " must start with 900000000000000", sctId.toString()
+            .startsWith("900000000000000"));
     }
 
     public void testUpdateDbWithValidationOn() throws Exception {
@@ -205,7 +206,7 @@ public class UuidSctidMapDbTest extends TestCase {
 
         testDBMap = new File(new File("target", "test"), "sample2.ValidationOn.map.db");
 
-        if(!testFixedMap.getParentFile().exists()){
+        if (!testFixedMap.getParentFile().exists()) {
             testFixedMap.getParentFile().mkdirs();
         }
 
@@ -227,13 +228,14 @@ public class UuidSctidMapDbTest extends TestCase {
 
         Long sctId = mapDb.getSctId(Type5UuidFactory.get("first" + Integer.toString(1)));
         assertTrue(sctId.toString() + " must start with 1", sctId.toString().startsWith("1"));
-        sctId = mapDb.getSctId(Type5UuidFactory.get("first90000000000000" ));
-        assertTrue(sctId.toString() + " must start with 900000000000000", sctId.toString().startsWith("900000000000000"));
+        sctId = mapDb.getSctId(Type5UuidFactory.get("first90000000000000"));
+        assertTrue(sctId.toString() + " must start with 900000000000000", sctId.toString()
+            .startsWith("900000000000000"));
     }
 
     public void testGetSequence() throws Exception {
-        assertTrue("SNOMED_META_DATA sequence should start at 900000000000000 not " +
-            mapDb.getSctSequenceId(NAMESPACE.SNOMED_META_DATA, TYPE.CONCEPT),
-            mapDb.getSctSequenceId(NAMESPACE.SNOMED_META_DATA, TYPE.CONCEPT).equals(900000000000000l));
+        assertTrue("SNOMED_META_DATA sequence should start at 900000000000000 not "
+            + mapDb.getSctSequenceId(NAMESPACE.SNOMED_META_DATA, TYPE.CONCEPT), mapDb.getSctSequenceId(
+            NAMESPACE.SNOMED_META_DATA, TYPE.CONCEPT).equals(900000000000000l));
     }
 }

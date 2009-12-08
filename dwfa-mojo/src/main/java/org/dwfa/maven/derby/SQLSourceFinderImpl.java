@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,8 +26,7 @@ public final class SQLSourceFinderImpl implements SQLSourceFinder {
 
     private static final String SQL_EXTENSION = ".sql";
 
-    public File[] find(final File targetDir, final String[] sources,
-            final String[] sqlLocations) {
+    public File[] find(final File targetDir, final String[] sources, final String[] sqlLocations) {
         if (hasSources(sources)) {
             return findBySources(targetDir, sources);
         }

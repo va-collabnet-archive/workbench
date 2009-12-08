@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,143 +38,145 @@ import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 
 public class UuidSnomedFixedMap implements Map<UUID, Long> {
 
-   private Map<UUID, Long> uuidSnomedMap = new HashMap<UUID, Long>();
-   
-   private List<Map<UUID, Long>> fixedMaps = new ArrayList<Map<UUID,Long>>();
-   
-   private UuidSnomedFixedMap() {
-      super();
-   }
+    private Map<UUID, Long> uuidSnomedMap = new HashMap<UUID, Long>();
 
-   public void addFixedMap(Map<UUID, Long> fixedMap) {
-      fixedMaps.add(fixedMap);
-   }
+    private List<Map<UUID, Long>> fixedMaps = new ArrayList<Map<UUID, Long>>();
 
-   public Map<Long, List<UUID>> getSnomedUuidListMap() {
-      Map<Long, List<UUID>> snomedUuidListMap = new HashMap<Long, List<UUID>>();
-      for (Entry<UUID, Long> entry : uuidSnomedMap.entrySet()) {
-         if (snomedUuidListMap.get(entry.getValue()) == null) {
-            List<UUID> uuidList = new ArrayList<UUID>(1);
-            uuidList.add(entry.getKey());
-            snomedUuidListMap.put(entry.getValue(), uuidList);
-         } else {
-            snomedUuidListMap.get(entry.getValue()).add(entry.getKey());
-         }
-      }
-      return snomedUuidListMap;
-   }
+    private UuidSnomedFixedMap() {
+        super();
+    }
 
-   public void clear() {
-      throw new UnsupportedOperationException();
-   }
+    public void addFixedMap(Map<UUID, Long> fixedMap) {
+        fixedMaps.add(fixedMap);
+    }
 
-   public boolean containsKey(Object arg0) {
-      return uuidSnomedMap.containsKey(arg0);
-   }
-
-   public boolean containsValue(Object arg0) {
-      return uuidSnomedMap.containsValue(arg0);
-   }
-
-   public Set<Entry<UUID, Long>> entrySet() {
-      return uuidSnomedMap.entrySet();
-   }
-
-   public boolean equals(Object obj) {
-      return uuidSnomedMap.equals(obj);
-   }
-
-   public Long get(Object key) {
-      for (Map<UUID, Long> fixed: fixedMaps) {
-         if (fixed.containsKey(key)) {
-            return fixed.get(key);
-         }
-      }
-      return uuidSnomedMap.get(key);
-   }
-
-   public int hashCode() {
-      return uuidSnomedMap.hashCode();
-   }
-
-   public boolean isEmpty() {
-      return uuidSnomedMap.isEmpty();
-   }
-
-   public Set<UUID> keySet() {
-      return uuidSnomedMap.keySet();
-   }
-
-   public Long put(UUID key, Long sctId) {
-      return uuidSnomedMap.put(key, sctId);
-   }
-
-   public void putAll(Map<? extends UUID, ? extends Long> map) {
-      for (Entry<? extends UUID, ? extends Long> entry : map.entrySet()) {
-          put(entry.getKey(), entry.getValue());
-      }
-   }
-
-   public Long remove(Object key) {
-      throw new UnsupportedOperationException();
-   }
-
-   public int size() {
-      return uuidSnomedMap.size();
-   }
-
-   public Collection<Long> values() {
-      return uuidSnomedMap.values();
-   }
-   
-   public void write(File f) throws IOException {
-      BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-
-      Map<Long, List<UUID>> snomedUuidMap = this.getSnomedUuidListMap();
-      SortedSet<Long> sortedKeys = new TreeSet<Long>(snomedUuidMap.keySet());
-      for (Long sctId : sortedKeys) {
-         List<UUID> idList = snomedUuidMap.get(sctId);
-         for (int i = 0; i < idList.size(); i++) {
-            UUID id = idList.get(i);
-            bw.append(id.toString());
-            if (i < idList.size() - 1) {
-               bw.append("\t");
+    public Map<Long, List<UUID>> getSnomedUuidListMap() {
+        Map<Long, List<UUID>> snomedUuidListMap = new HashMap<Long, List<UUID>>();
+        for (Entry<UUID, Long> entry : uuidSnomedMap.entrySet()) {
+            if (snomedUuidListMap.get(entry.getValue()) == null) {
+                List<UUID> uuidList = new ArrayList<UUID>(1);
+                uuidList.add(entry.getKey());
+                snomedUuidListMap.put(entry.getValue(), uuidList);
+            } else {
+                snomedUuidListMap.get(entry.getValue()).add(entry.getKey());
             }
-         }
-         bw.append("\n");
-         bw.append(sctId.toString());
-         bw.append("\n");
-      }
-      bw.close();
-   }
+        }
+        return snomedUuidListMap;
+    }
 
-   public static UuidSnomedFixedMap read(File f) throws IOException {
-      UuidSnomedFixedMap map = new UuidSnomedFixedMap();
-      readData(f, map);
-      return map;
-   }
-   public static UuidSnomedFixedMap read(File f, NAMESPACE namespace, PROJECT project) throws IOException {
-      UuidSnomedFixedMap map = new UuidSnomedFixedMap();
-      readData(f, map);
-      return map;
-   }
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
 
-   private static void readData(File f, UuidSnomedFixedMap map) throws FileNotFoundException, IOException {
-      System.out.println("Reading map file: " + f.getAbsolutePath());
-      BufferedReader br = new BufferedReader(new FileReader(f));
+    public boolean containsKey(Object arg0) {
+        return uuidSnomedMap.containsKey(arg0);
+    }
 
-      String uuidLineStr;
-      String sctIdLineStr;
+    public boolean containsValue(Object arg0) {
+        return uuidSnomedMap.containsValue(arg0);
+    }
 
-      while ((uuidLineStr = br.readLine()) != null) { // while loop begins here
-         sctIdLineStr = br.readLine();
-         Long sctId = Long.parseLong(sctIdLineStr);
-         for (String uuidStr : uuidLineStr.split("\t")) {
-            UUID uuid = UUID.fromString(uuidStr);
-            map.put(uuid, sctId);
-         }
-      } // end while
-      br.close();
-   }
+    public Set<Entry<UUID, Long>> entrySet() {
+        return uuidSnomedMap.entrySet();
+    }
+
+    public boolean equals(Object obj) {
+        return uuidSnomedMap.equals(obj);
+    }
+
+    public Long get(Object key) {
+        for (Map<UUID, Long> fixed : fixedMaps) {
+            if (fixed.containsKey(key)) {
+                return fixed.get(key);
+            }
+        }
+        return uuidSnomedMap.get(key);
+    }
+
+    public int hashCode() {
+        return uuidSnomedMap.hashCode();
+    }
+
+    public boolean isEmpty() {
+        return uuidSnomedMap.isEmpty();
+    }
+
+    public Set<UUID> keySet() {
+        return uuidSnomedMap.keySet();
+    }
+
+    public Long put(UUID key, Long sctId) {
+        return uuidSnomedMap.put(key, sctId);
+    }
+
+    public void putAll(Map<? extends UUID, ? extends Long> map) {
+        for (Entry<? extends UUID, ? extends Long> entry : map.entrySet()) {
+            put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    public Long remove(Object key) {
+        throw new UnsupportedOperationException();
+    }
+
+    public int size() {
+        return uuidSnomedMap.size();
+    }
+
+    public Collection<Long> values() {
+        return uuidSnomedMap.values();
+    }
+
+    public void write(File f) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+
+        Map<Long, List<UUID>> snomedUuidMap = this.getSnomedUuidListMap();
+        SortedSet<Long> sortedKeys = new TreeSet<Long>(snomedUuidMap.keySet());
+        for (Long sctId : sortedKeys) {
+            List<UUID> idList = snomedUuidMap.get(sctId);
+            for (int i = 0; i < idList.size(); i++) {
+                UUID id = idList.get(i);
+                bw.append(id.toString());
+                if (i < idList.size() - 1) {
+                    bw.append("\t");
+                }
+            }
+            bw.append("\n");
+            bw.append(sctId.toString());
+            bw.append("\n");
+        }
+        bw.close();
+    }
+
+    public static UuidSnomedFixedMap read(File f) throws IOException {
+        UuidSnomedFixedMap map = new UuidSnomedFixedMap();
+        readData(f, map);
+        return map;
+    }
+
+    public static UuidSnomedFixedMap read(File f, NAMESPACE namespace, PROJECT project) throws IOException {
+        UuidSnomedFixedMap map = new UuidSnomedFixedMap();
+        readData(f, map);
+        return map;
+    }
+
+    private static void readData(File f, UuidSnomedFixedMap map) throws FileNotFoundException, IOException {
+        System.out.println("Reading map file: " + f.getAbsolutePath());
+        BufferedReader br = new BufferedReader(new FileReader(f));
+
+        String uuidLineStr;
+        String sctIdLineStr;
+
+        while ((uuidLineStr = br.readLine()) != null) { // while loop begins
+                                                        // here
+            sctIdLineStr = br.readLine();
+            Long sctId = Long.parseLong(sctIdLineStr);
+            for (String uuidStr : uuidLineStr.split("\t")) {
+                UUID uuid = UUID.fromString(uuidStr);
+                map.put(uuid, sctId);
+            }
+        } // end while
+        br.close();
+    }
 
 }

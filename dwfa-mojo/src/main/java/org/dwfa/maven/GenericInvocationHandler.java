@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,44 +32,38 @@ public class GenericInvocationHandler implements InvocationHandler {
         this.objClass = obj.getClass();
     }
 
-    public Object invoke(Object proxy, Method method, Object[] args)
-			throws Throwable {
-		for (Method m : objClass.getMethods()) {
-			if (m.getName().equals(method.getName())) {
-				Class returnType = method.getReturnType();
-				Object returnValue = m.invoke(obj, args);
-				Class componentType = returnType.getComponentType();
-				if (returnType.isArray()) {
-					Object[] returnValues = (Object[]) returnValue;
-					Object[] returnArray = (Object[]) Array.newInstance(
-							componentType, returnValues.length);
-					for (int i = 0; i < returnValues.length; i++) {
-						returnArray[i] = Proxy.newProxyInstance(getClass()
-								.getClassLoader(),
-								new Class[] { componentType },
-								new GenericInvocationHandler(returnValues[i]));
-					}
-					return returnArray;
-				}
-				if (returnValue != null) {
-					if (returnType.isPrimitive()) {
-						return returnValue;
-					} else if (String.class.isAssignableFrom(returnValue
-							.getClass())) {
-						return returnValue;
-					} else if (returnType.isEnum()) {
-				           Method valueOfMethod = returnType.getMethod("valueOf", new Class[] { String.class});
-				           return valueOfMethod.invoke(null, new Object[] { returnValue.toString() });
-					}
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        for (Method m : objClass.getMethods()) {
+            if (m.getName().equals(method.getName())) {
+                Class returnType = method.getReturnType();
+                Object returnValue = m.invoke(obj, args);
+                Class componentType = returnType.getComponentType();
+                if (returnType.isArray()) {
+                    Object[] returnValues = (Object[]) returnValue;
+                    Object[] returnArray = (Object[]) Array.newInstance(componentType, returnValues.length);
+                    for (int i = 0; i < returnValues.length; i++) {
+                        returnArray[i] = Proxy.newProxyInstance(getClass().getClassLoader(),
+                            new Class[] { componentType }, new GenericInvocationHandler(returnValues[i]));
+                    }
+                    return returnArray;
+                }
+                if (returnValue != null) {
+                    if (returnType.isPrimitive()) {
+                        return returnValue;
+                    } else if (String.class.isAssignableFrom(returnValue.getClass())) {
+                        return returnValue;
+                    } else if (returnType.isEnum()) {
+                        Method valueOfMethod = returnType.getMethod("valueOf", new Class[] { String.class });
+                        return valueOfMethod.invoke(null, new Object[] { returnValue.toString() });
+                    }
 
-					return Proxy.newProxyInstance(getClass().getClassLoader(),
-							new Class[] { returnType },
-							new GenericInvocationHandler(returnValue));
+                    return Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { returnType },
+                        new GenericInvocationHandler(returnValue));
 
-				}
-			}
-		}
-		System.out.println("Method not found: " + method);
-		return null;
-	}
+                }
+            }
+        }
+        System.out.println("Method not found: " + method);
+        return null;
+    }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,38 +68,38 @@ public class InputFileSpec {
     }
 
     public String toString() {
-		StringBuffer b = new StringBuffer();
-		b.append("Input file: ");
-		b.append(inputFile);
-		b.append("\nSkip first line: ");
-		b.append(skipFirstLine);
-		b.append("\nColumn delimiter: ");
-		if (Character.isWhitespace(inputColumnDelimiter)) {
-			b.append(whiteSpaceCharToUnicode(inputColumnDelimiter));
-		} else {
-			b.append(inputColumnDelimiter);
-		}
-		b.append("\nCharacter delimiter: ");
-		if (Character.isWhitespace(inputCharacterDelimiter)) {
-			b.append(whiteSpaceCharToUnicode(inputCharacterDelimiter));
-		} else {
-			b.append(inputCharacterDelimiter);
-		}
-		b.append("\nEncoding: ");
-		b.append(inputEncoding);
-		b.append("\nTransforms: \n");
-		int col = 1;
-		if(columnSpecs != null) {
-			for (I_ReadAndTransform t: columnSpecs) {
-				b.append("  ");
-				b.append(col++);
-				b.append(". ");
-				b.append(t);
-				b.append("\n");
-			}
-		}
-		return b.toString();
-	}
+        StringBuffer b = new StringBuffer();
+        b.append("Input file: ");
+        b.append(inputFile);
+        b.append("\nSkip first line: ");
+        b.append(skipFirstLine);
+        b.append("\nColumn delimiter: ");
+        if (Character.isWhitespace(inputColumnDelimiter)) {
+            b.append(whiteSpaceCharToUnicode(inputColumnDelimiter));
+        } else {
+            b.append(inputColumnDelimiter);
+        }
+        b.append("\nCharacter delimiter: ");
+        if (Character.isWhitespace(inputCharacterDelimiter)) {
+            b.append(whiteSpaceCharToUnicode(inputCharacterDelimiter));
+        } else {
+            b.append(inputCharacterDelimiter);
+        }
+        b.append("\nEncoding: ");
+        b.append(inputEncoding);
+        b.append("\nTransforms: \n");
+        int col = 1;
+        if (columnSpecs != null) {
+            for (I_ReadAndTransform t : columnSpecs) {
+                b.append("  ");
+                b.append(col++);
+                b.append(". ");
+                b.append(t);
+                b.append("\n");
+            }
+        }
+        return b.toString();
+    }
 
     public static String whiteSpaceCharToUnicode(Character ws) {
         switch ((int) ws.charValue()) {

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ public class CreateUuidSctidMapDb extends AbstractMojo {
 
     /**
      * DB file
-     *
+     * 
      * @parameter
      * @required
      */
@@ -39,7 +39,7 @@ public class CreateUuidSctidMapDb extends AbstractMojo {
 
     /**
      * Fixed id map file
-     *
+     * 
      * @parameter
      * @required
      */
@@ -47,21 +47,22 @@ public class CreateUuidSctidMapDb extends AbstractMojo {
 
     /**
      * List of read write map File
-     *
+     * 
      * @parameter
      */
     File readWriteMapDirectory;
 
     /**
-     * Validates the map files and logs error message if duplicate UUIDs are found.
-     *
+     * Validates the map files and logs error message if duplicate UUIDs are
+     * found.
+     * 
      * @parameter
      */
     boolean validate = false;;
 
     /**
      * Append files to database.
-     *
+     * 
      * @parameter
      */
     boolean appendToDb = false;;
@@ -69,7 +70,8 @@ public class CreateUuidSctidMapDb extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            UuidSctidMapDb.getInstance().openDb(dbMapDirectory, fixIdMapDirectory, readWriteMapDirectory, validate, appendToDb);
+            UuidSctidMapDb.getInstance().openDb(dbMapDirectory, fixIdMapDirectory, readWriteMapDirectory, validate,
+                appendToDb);
         } catch (SQLException e) {
             throw new MojoExecutionException("SQLException ", e);
         } catch (IOException e) {

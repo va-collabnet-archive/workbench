@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ public final class SctIdValidator {
     /** Class logger */
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-    /** Signlton instance.*/
+    /** Signlton instance. */
     private static SctIdValidator instance;
 
     private SctIdValidator() {
@@ -42,7 +42,7 @@ public final class SctIdValidator {
 
     /**
      * Tests if the sctid is correct for the namespace and type.
-     *
+     * 
      * @param sctId String
      * @param namespace NAMESPACE
      * @param type TYPE
@@ -52,8 +52,7 @@ public final class SctIdValidator {
         boolean isValid = true;
 
         if (!getSctIdNamespace(sctId).equals(namespace)) {
-            logger.severe("Invalid sctid " + sctId + " for namespace "
-                + namespace);
+            logger.severe("Invalid sctid " + sctId + " for namespace " + namespace);
             isValid = false;
         }
         if (!getSctIdType(sctId).equals(type)) {
@@ -66,18 +65,15 @@ public final class SctIdValidator {
 
     /**
      * Gets the namespace from the sctid.
-     *
+     * 
      * @param sctId String SctId
      * @return NAMESPACE
      */
     public NAMESPACE getSctIdNamespace(String sctId) {
         int namespace = 0;
 
-        if (!sctId.substring(sctId.length() - 3, sctId.length() - 2).equals(
-            NAMESPACE.SNOMED_META_DATA.getDigits())) {
-            namespace =
-                    Integer.parseInt(sctId.substring(sctId.length() - 10, sctId
-                        .length() - 2));
+        if (!sctId.substring(sctId.length() - 3, sctId.length() - 2).equals(NAMESPACE.SNOMED_META_DATA.getDigits())) {
+            namespace = Integer.parseInt(sctId.substring(sctId.length() - 10, sctId.length() - 2));
         }
 
         return NAMESPACE.fromString("" + namespace);
@@ -85,18 +81,17 @@ public final class SctIdValidator {
 
     /**
      * Get the TYPE from the sctid string
-     *
-     * Type for our purposes is the second last number ie 0=concept 1=description etc.
-     *
+     * 
+     * Type for our purposes is the second last number ie 0=concept
+     * 1=description etc.
+     * 
      * @param sctId String
      * @return TYPE
      * @throws SQLException
      * @throws NoSuchElementException
      */
     public TYPE getSctIdType(String sctId) {
-        int type =
-                Integer.parseInt(sctId.substring(sctId.length() - 2, sctId
-                    .length() - 1));
+        int type = Integer.parseInt(sctId.substring(sctId.length() - 2, sctId.length() - 1));
 
         return TYPE.fromString("" + type);
     }

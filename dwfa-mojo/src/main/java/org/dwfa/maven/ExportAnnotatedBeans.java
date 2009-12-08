@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,16 +51,19 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Goal which writes tasks as java beans for the builder application.<p>
- *
- * This goal exports beans using the same annotations as the export-annotated-beans  goal,
- * but relies on standard maven class loader, instead of a custom class loader that is
- * installed on top of maven class loader. Since this goal does not rely on a custom class loader,
- * it can automatically manage the transitive dependencies, and they do not have to be declared
- * in the project dependency section. However, the primary dependencies must be declared as part
- * of the dwfa-mojo plugin entry so that the maven class loader can load the dependencies prior
- * to efforts to export the beans. </p>
- *
+ * Goal which writes tasks as java beans for the builder application.
+ * <p>
+ * 
+ * This goal exports beans using the same annotations as the
+ * export-annotated-beans goal, but relies on standard maven class loader,
+ * instead of a custom class loader that is installed on top of maven class
+ * loader. Since this goal does not rely on a custom class loader, it can
+ * automatically manage the transitive dependencies, and they do not have to be
+ * declared in the project dependency section. However, the primary dependencies
+ * must be declared as part of the dwfa-mojo plugin entry so that the maven
+ * class loader can load the dependencies prior to efforts to export the beans.
+ * </p>
+ * 
  * @goal export-beans
  * @requiresDependencyResolution compile
  */
@@ -68,7 +71,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -76,22 +79,21 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
 
     /**
      * Location of the source directory.
-     *
+     * 
      * @parameter expression="${project.build.sourceDirectory}"
      * @required
      */
     private File sourceDirectory;
 
-
     /**
      * The dependency artifacts of this project, for resolving
-     *
+     * 
      * @pathOf(..)@ expressions. These are of type
      *              org.apache.maven.artifact.Artifact, and are keyed by
      *              groupId:artifactId, using
      *              org.apache.maven.artifact.ArtifactUtils.versionlessKey(..)
      *              for consistent formatting.
-     *
+     * 
      * @parameter expression="${project.artifacts}"
      * @required
      * @readonly
@@ -106,7 +108,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     /**
      * @parameter
      */
-    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta","au.com.ncch", "org.aao" };
+    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta", "au.com.ncch", "org.aao" };
 
     /**
      * @parameter
@@ -125,7 +127,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
 
     /**
      * The maven session
-     *
+     * 
      * @parameter expression="${session}"
      * @required
      */
@@ -135,7 +137,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -149,8 +151,8 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         try {
-            if (MojoUtil.alreadyRun(getLog(), Arrays.toString(allowedRoots)+Arrays.toString(forbiddenRoots), 
-            		this.getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), Arrays.toString(allowedRoots) + Arrays.toString(forbiddenRoots),
+                this.getClass(), targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e1) {
@@ -199,7 +201,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                         continue;
                     }
 
-                     File dependencyFile = artifact.getFile();
+                    File dependencyFile = artifact.getFile();
                     if (dependencyFile.exists()) {
                         getLog().info("writing annotated beans for: " + dependencyFile.getAbsolutePath());
                         JarFile jf = new JarFile(dependencyFile);
@@ -230,25 +232,25 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                         Annotation annotation = c.getAnnotation(BeanList.class);
                                         if (c.getAnnotation(BeanList.class) != null) {
                                             // getLog().info("Writing annotation
-                                                    // for: " + c.getCanonicalName());
+                                            // for: " + c.getCanonicalName());
 
-                                            BeanList bl = (BeanList) Proxy
-                                            .newProxyInstance(c.getClassLoader(),
-                                                    new Class[] { BeanList.class },
-                                                    new GenericInvocationHandler(annotation));
+                                            BeanList bl = (BeanList) Proxy.newProxyInstance(c.getClassLoader(),
+                                                new Class[] { BeanList.class },
+                                                new GenericInvocationHandler(annotation));
                                             for (Spec s : bl.specs()) {
                                                 if (s.type().equals(BeanType.GENERIC_BEAN)) {
                                                     writeGenericBean(c, s);
                                                 } else if (s.type().equals(BeanType.TASK_BEAN)) {
                                                     writeTaskBean(c, s);
                                                 } else {
-                                                    throw new UnsupportedOperationException("Data beans are deprecated. " + s);
+                                                    throw new UnsupportedOperationException(
+                                                        "Data beans are deprecated. " + s);
                                                 }
                                             }
                                         }
 
                                     } catch (HeadlessException e) {
-                                    	getLog().info(e.toString());
+                                        getLog().info(e.toString());
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -269,28 +271,28 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
         }
     }
 
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     private void writeTaskBean(Class c, Spec spec) throws MojoExecutionException {
         try {
             String suffix = ".task";
             writeBean(c, spec, rootDir, suffix);
         } catch (Throwable e) {
             if (throwWriteBeansExceptions) {
-            	throw new MojoExecutionException("Problem writing bean class "+ c.getName() + ": " + spec, e);
+                throw new MojoExecutionException("Problem writing bean class " + c.getName() + ": " + spec, e);
             } else {
                 e.printStackTrace();
             }
         }
     }
 
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     private void writeGenericBean(Class c, Spec spec) throws MojoExecutionException {
         try {
             String suffix = ".bean";
             writeBean(c, spec, rootDir, suffix);
 
         } catch (Exception e) {
-            throw new MojoExecutionException("Problem writing bean class "+ c.getName() + ": " + spec, e);
+            throw new MojoExecutionException("Problem writing bean class " + c.getName() + ": " + spec, e);
         }
     }
 
@@ -306,10 +308,10 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
      * @throws InvocationTargetException
      * @throws FileNotFoundException
      */
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     private void writeBean(Class beanClass, Spec s, File rootDir, String suffix) throws IOException,
-    ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-    InvocationTargetException, FileNotFoundException {
+            ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+            InvocationTargetException, FileNotFoundException {
         rootDir.mkdirs();
         Object obj;
         if (beanClass.isEnum()) {
@@ -351,7 +353,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
             rootDir.mkdirs();
 
             File xmlSourceFile = new File(sourceDirectory.getAbsolutePath() + "/../process/" + spec.getSourceName()
-                    + ".xml");
+                + ".xml");
 
             XMLDecoder d = new XMLDecoder(new BufferedInputStream(new FileInputStream(xmlSourceFile)));
 

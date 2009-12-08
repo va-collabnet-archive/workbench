@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,8 +21,7 @@ import java.util.UUID;
 import org.dwfa.maven.I_ReadAndTransform;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
-public abstract class UuidToSctIdNoGeneration extends UuidToSctIdWithGeneration
-        implements I_ReadAndTransform {
+public abstract class UuidToSctIdNoGeneration extends UuidToSctIdWithGeneration implements I_ReadAndTransform {
 
     public String transform(String input) throws Exception {
         UUID id = UUID.fromString(input);

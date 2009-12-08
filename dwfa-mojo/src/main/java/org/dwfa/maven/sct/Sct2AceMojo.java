@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,31 +49,35 @@ import org.dwfa.util.id.Type5UuidFactory;
 
 /**
  * <b>DESCRIPTION: </b><br>
- *
+ * 
  * Sct2AceMojo is a maven mojo which converts SNOMED release files to IHTSDO
  * (ACE) Workbench versioned import files in historical sequence.
  * <p>
- *
+ * 
  * <b>INPUTS:</b><br>
- *
- * The POM needs to specify mutually exclusive extensions in separate directories in the array
- * <code>sctInputDirArray</code> parameter. Each directory entry will be parsed to locate SNOMED formated text files in
- * any sub-directories. <br>
+ * 
+ * The POM needs to specify mutually exclusive extensions in separate
+ * directories in the array <code>sctInputDirArray</code> parameter. Each
+ * directory entry will be parsed to locate SNOMED formated text files in any
+ * sub-directories. <br>
  * <br>
- *
- * Each SNOMED file should contain a version date in the file name <code>"sct_*yyyyMMdd.txt"</code>. If a valid date is
- * not found in the file name then the parent directory name will be checked for a date in the format
+ * 
+ * Each SNOMED file should contain a version date in the file name
+ * <code>"sct_*yyyyMMdd.txt"</code>. If a valid date is not found in the file
+ * name then the parent directory name will be checked for a date in the format
  * <code>"yyyy-MM-dd"</code>.
- *
- * Versioning is performed for the files under the SAME <code>sctInputDirArray[a]</code> directory. Records of the same
- * primary ids are compared in historical sequence to other records of the same primary ids for all applicable files
- * under directory <code>sctInputDirArray[a]</code>.
+ * 
+ * Versioning is performed for the files under the SAME
+ * <code>sctInputDirArray[a]</code> directory. Records of the same primary ids
+ * are compared in historical sequence to other records of the same primary ids
+ * for all applicable files under directory <code>sctInputDirArray[a]</code>.
  * <p>
- *
- * Set <code>includeCTV3ID</code> and/or <code>includeSNOMEDRTID</code> to true to have the corresponding CTV3 IDs and
- * SNOMED RT IDs to be included in <code>ids.txt</code> output file. The default value is false to not include the CTV3
- * IDs and SNOMED RT IDs.
- *
+ * 
+ * Set <code>includeCTV3ID</code> and/or <code>includeSNOMEDRTID</code> to true
+ * to have the corresponding CTV3 IDs and SNOMED RT IDs to be included in
+ * <code>ids.txt</code> output file. The default value is false to not include
+ * the CTV3 IDs and SNOMED RT IDs.
+ * 
  * <b>OUTPUTS:</b><br>
  * The following files are generated in {project.build.directory}/classes/ace:
  * <p>
@@ -81,27 +85,29 @@ import org.dwfa.util.id.Type5UuidFactory;
  * &#160;&#160;&#160;&#160;concepts.txt, descriptions.txt, descriptions_report.txt<br>
  * &#160;&#160;&#160;&#160;ids.txt, relationships.txt, relationships_report.txt</code>
  * <p>
- *
+ * 
  * <b>REQUIRMENTS:</b><br>
- *
- * 1. RELEASE DATE must be in either the SNOMED file name or the parent folder name. The date must have the format of
- * <code>yyyy-MM-dd</code> or <code>yyyyMMdd</code>. <br>
- *
- * 2. SNOMED EXTENSIONS must be mutually exclusive from SNOMED CORE and each other; and, placed under separate
- * <code>sctInputDirArray</code> directories.
+ * 
+ * 1. RELEASE DATE must be in either the SNOMED file name or the parent folder
+ * name. The date must have the format of <code>yyyy-MM-dd</code> or
+ * <code>yyyyMMdd</code>. <br>
+ * 
+ * 2. SNOMED EXTENSIONS must be mutually exclusive from SNOMED CORE and each
+ * other; and, placed under separate <code>sctInputDirArray</code> directories.
  * <p>
- *
+ * 
  * <b>NOTES:</b><br>
- * Records are NOT VERSIONED between files under DIFFERENT <code>sctInputDirArray</code> directories. The versioned
- * output from <code>sctInputDirArray[a+1]</code> is appended to the versioned output from
+ * Records are NOT VERSIONED between files under DIFFERENT
+ * <code>sctInputDirArray</code> directories. The versioned output from
+ * <code>sctInputDirArray[a+1]</code> is appended to the versioned output from
  * <code>sctInputDirArray[a]</code>. <br>
- *
+ * 
  * @author Marc E. Campbell
- *
+ * 
  * @goal sct2ace
  * @requiresDependencyResolution compile
  * @requiresProject false
- *
+ * 
  */
 
 public class Sct2AceMojo extends AbstractMojo {
@@ -115,17 +121,17 @@ public class Sct2AceMojo extends AbstractMojo {
 
     private static final String TAB_CHARACTER = "\t";
 
-    private static final String NHS_UK_DRUG_EXTENSION_FILE_PATH =
-            FILE_SEPERATOR + "net" + FILE_SEPERATOR + "nhs" + FILE_SEPERATOR + "uktc" + FILE_SEPERATOR + "ukde";
+    private static final String NHS_UK_DRUG_EXTENSION_FILE_PATH = FILE_SEPERATOR + "net" + FILE_SEPERATOR + "nhs"
+        + FILE_SEPERATOR + "uktc" + FILE_SEPERATOR + "ukde";
 
-    private static final String NHS_UK_EXTENSION_FILE_PATH =
-            FILE_SEPERATOR + "net" + FILE_SEPERATOR + "nhs" + FILE_SEPERATOR + "uktc" + FILE_SEPERATOR + "uke";
+    private static final String NHS_UK_EXTENSION_FILE_PATH = FILE_SEPERATOR + "net" + FILE_SEPERATOR + "nhs"
+        + FILE_SEPERATOR + "uktc" + FILE_SEPERATOR + "uke";
 
     private static final String SNOMED_FILE_PATH = FILE_SEPERATOR + "org" + FILE_SEPERATOR + "snomed";
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -133,7 +139,7 @@ public class Sct2AceMojo extends AbstractMojo {
 
     /**
      * Applicable input sub directory under the build directory.
-     *
+     * 
      * @parameter
      */
     private String targetSubDir = "";
@@ -141,33 +147,33 @@ public class Sct2AceMojo extends AbstractMojo {
     /**
      * SCT Input Directories Array. The directory array parameter supported
      * extensions via separate directories in the array.
-     *
+     * 
      * Files under the SAME directory entry in the array will be versioned
      * relative each other. Each input directory in the array is treated as
      * mutually exclusive to others directories in the array.
-     *
+     * 
      * @parameter
      * @required
      */
     private String[] sctInputDirArray;
 
     /**
-     *
+     * 
      * @parameter default-value="false"
-     *
+     * 
      */
     private boolean includeCTV3ID;
 
     /**
-     *
+     * 
      * @parameter default-value="false"
-     *
+     * 
      */
     private boolean includeSNOMEDRTID;
 
     /**
      * Appends to the ace output files if they exist.
-     *
+     * 
      * @parameter default-value="false"
      */
     private boolean appendToAceFiles;
@@ -175,15 +181,19 @@ public class Sct2AceMojo extends AbstractMojo {
     /**
      * Directory used to output the ACE format files
      * Default value "/classes/ace" set programmatically due to file separator
-     *
+     * 
      * @parameter
      */
     private String outputDirectory = FILE_SEPERATOR + "classes" + FILE_SEPERATOR + "ace";
 
-    private static String sourceCtv3Uuid =
-            ArchitectonicAuxiliary.Concept.CTV3_ID.getUids().iterator().next().toString();
-    private static String sourceSnomedRtUuid =
-            ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.getUids().iterator().next().toString();
+    private static String sourceCtv3Uuid = ArchitectonicAuxiliary.Concept.CTV3_ID.getUids()
+        .iterator()
+        .next()
+        .toString();
+    private static String sourceSnomedRtUuid = ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.getUids()
+        .iterator()
+        .next()
+        .toString();
 
     private class SCTConceptRecord implements Comparable<Object> {
         private long id; // CONCEPTID
@@ -239,29 +249,37 @@ public class Sct2AceMojo extends AbstractMojo {
                 // STATUS IS SET TO CURRENT '0' FOR ALL CASES
                 + TAB_CHARACTER + getStatusString(0) // (canonical) status uuid
                 + TAB_CHARACTER + date // (yyyyMMdd HH:mm:ss) effective date
-                + TAB_CHARACTER + path + LINE_TERMINATOR; // (canonical) path uuid
+                + TAB_CHARACTER + path + LINE_TERMINATOR; // (canonical) path
+                                                          // uuid
 
             if (ctv3id != null) {
                 outputStr = outputStr + u // (canonical) primary uuid
                     + TAB_CHARACTER + sourceCtv3Uuid // (canonical UUID) source
                     // system uuid
                     + TAB_CHARACTER + ctv3id // (original primary) source id
-                    // + TAB_CHARACTER + getStatusString(status) -- PARSED STATUS
+                    // + TAB_CHARACTER + getStatusString(status) -- PARSED
+                    // STATUS
                     // STATUS IS SET TO CURRENT '0' FOR ALL CASES
-                    + TAB_CHARACTER + getStatusString(0) // (canonical) status uuid
+                    + TAB_CHARACTER + getStatusString(0) // (canonical) status
+                                                         // uuid
                     + TAB_CHARACTER + date // (yyyyMMdd HH:mm:ss) effective date
-                    + TAB_CHARACTER + path + LINE_TERMINATOR; // (canonical) path uuid
+                    + TAB_CHARACTER + path + LINE_TERMINATOR; // (canonical)
+                                                              // path uuid
             }
             if (snomedrtid != null) {
                 outputStr = outputStr + u // (canonical) primary uuid
-                    + TAB_CHARACTER + sourceSnomedRtUuid // (canonical UUID) source
+                    + TAB_CHARACTER + sourceSnomedRtUuid // (canonical UUID)
+                                                         // source
                     // system uuid
                     + TAB_CHARACTER + snomedrtid // (original primary) source id
-                    // + TAB_CHARACTER + getStatusString(status) -- PARSED STATUS
+                    // + TAB_CHARACTER + getStatusString(status) -- PARSED
+                    // STATUS
                     // STATUS IS SET TO CURRENT '0' FOR ALL CASES
-                    + TAB_CHARACTER + getStatusString(0) // (canonical) status uuid
+                    + TAB_CHARACTER + getStatusString(0) // (canonical) status
+                                                         // uuid
                     + TAB_CHARACTER + date // (yyyyMMdd HH:mm:ss) effective date
-                    + TAB_CHARACTER + path + LINE_TERMINATOR; // (canonical) path uuid
+                    + TAB_CHARACTER + path + LINE_TERMINATOR; // (canonical)
+                                                              // path uuid
             }
             return outputStr;
         }
@@ -309,9 +327,11 @@ public class Sct2AceMojo extends AbstractMojo {
             UUID u = Type3UuidFactory.fromSNOMED(id);
             UUID c = Type3UuidFactory.fromSNOMED(conceptId);
 
-            String descType =
-                    ArchitectonicAuxiliary.getSnomedDescriptionType(descriptionType).getUids().iterator().next()
-                        .toString();
+            String descType = ArchitectonicAuxiliary.getSnomedDescriptionType(descriptionType)
+                .getUids()
+                .iterator()
+                .next()
+                .toString();
 
             return u + TAB_CHARACTER // description uuid
                 + getStatusString(status) + TAB_CHARACTER // status uuid
@@ -337,7 +357,8 @@ public class Sct2AceMojo extends AbstractMojo {
                 // STATUS IS SET TO CURRENT '0' FOR ALL CASES
                 + TAB_CHARACTER + getStatusString(0) // (canonical) status uuid
                 + TAB_CHARACTER + date // (yyyyMMdd HH:mm:ss) effective date
-                + TAB_CHARACTER + path + LINE_TERMINATOR; // (canonical) path uuid
+                + TAB_CHARACTER + path + LINE_TERMINATOR; // (canonical) path
+                                                          // uuid
         }
     }
 
@@ -397,12 +418,16 @@ public class Sct2AceMojo extends AbstractMojo {
             UUID relType = Type3UuidFactory.fromSNOMED(relationshipType);
             UUID cTwo = Type3UuidFactory.fromSNOMED(conceptTwoID);
 
-            String chType =
-                    ArchitectonicAuxiliary.getSnomedCharacteristicType(characteristic).getUids().iterator().next()
-                        .toString();
-            String reType =
-                    ArchitectonicAuxiliary.getSnomedRefinabilityType(refinability).getUids().iterator().next()
-                        .toString();
+            String chType = ArchitectonicAuxiliary.getSnomedCharacteristicType(characteristic)
+                .getUids()
+                .iterator()
+                .next()
+                .toString();
+            String reType = ArchitectonicAuxiliary.getSnomedRefinabilityType(refinability)
+                .getUids()
+                .iterator()
+                .next()
+                .toString();
 
             return u + TAB_CHARACTER // relationship uuid
                 + getStatusString(status) + TAB_CHARACTER // status uuid
@@ -430,7 +455,8 @@ public class Sct2AceMojo extends AbstractMojo {
                 // STATUS IS SET TO CURRENT '0' FOR ALL CASES
                 + TAB_CHARACTER + getStatusString(0) // (canonical) status uuid
                 + TAB_CHARACTER + date // (yyyyMMdd HH:mm:ss) effective date
-                + TAB_CHARACTER + path + LINE_TERMINATOR; // (canonical) path uuid
+                + TAB_CHARACTER + path + LINE_TERMINATOR; // (canonical) path
+                                                          // uuid
         }
     }
 
@@ -588,7 +614,8 @@ public class Sct2AceMojo extends AbstractMojo {
         }
         getLog().info("ids.txt OUTPUT: " + idsFileName);
         // if (writeHeader) {
-        // idstxtWriter.write("primary uuid" + TAB_CHARACTER + "source" + TAB_CHARACTER + "source id" + TAB_CHARACTER +
+        // idstxtWriter.write("primary uuid" + TAB_CHARACTER + "source" +
+        // TAB_CHARACTER + "source id" + TAB_CHARACTER +
         // "status uuid" + TAB_CHARACTER + ""
         // + "effective date" + TAB_CHARACTER + "path uuid" + LINE_TERMINATOR);
         // }
@@ -630,9 +657,9 @@ public class Sct2AceMojo extends AbstractMojo {
     /*
      * ORDER: CONCEPTID CONCEPTSTATUS FULLYSPECIFIEDNAME CTV3ID SNOMEDID
      * ISPRIMITIVE
-     *
+     * 
      * KEEP: CONCEPTID CONCEPTSTATUS ISPRIMITIVE
-     *
+     * 
      * IGNORE: FULLYSPECIFIEDNAME CTV3ID SNOMEDID
      */
     protected void processConceptsFiles(String wDir, List<List<SCTFile>> sctv, Writer idstxt, boolean ctv3idTF,
@@ -650,7 +677,8 @@ public class Sct2AceMojo extends AbstractMojo {
         bw = new BufferedWriter(new FileWriter(outFileName, appendToAceFiles));
         getLog().info("ACE CONCEPTS OUTPUT: " + outFileName);
         // if (writeHeader) {
-        // bw.write("concept uuid" + TAB_CHARACTER + "status uuid" + TAB_CHARACTER + "primitive" + TAB_CHARACTER + ""
+        // bw.write("concept uuid" + TAB_CHARACTER + "status uuid" +
+        // TAB_CHARACTER + "primitive" + TAB_CHARACTER + ""
         // + "effective date" + TAB_CHARACTER + "path uuid" + LINE_TERMINATOR);
         // }
 
@@ -797,10 +825,13 @@ public class Sct2AceMojo extends AbstractMojo {
         bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileName, appendToAceFiles), "UTF-8"));
         getLog().info("ACE DESCRIPTIONS OUTPUT: " + outFileName);
         // if (writeHeader) {
-        // bw.write("description uuid" + TAB_CHARACTER + "status uuid" + TAB_CHARACTER + "" + "concept uuid" +
+        // bw.write("description uuid" + TAB_CHARACTER + "status uuid" +
+        // TAB_CHARACTER + "" + "concept uuid" +
         // TAB_CHARACTER + ""
-        // + "term" + TAB_CHARACTER + "" + "capitalization status" + TAB_CHARACTER + ""
-        // + "description type uuid" + TAB_CHARACTER + "" + "language code" + TAB_CHARACTER + ""
+        // + "term" + TAB_CHARACTER + "" + "capitalization status" +
+        // TAB_CHARACTER + ""
+        // + "description type uuid" + TAB_CHARACTER + "" + "language code" +
+        // TAB_CHARACTER + ""
         // + "effective date" + TAB_CHARACTER + "path uuid" + LINE_TERMINATOR);
         // }
 
@@ -960,11 +991,16 @@ public class Sct2AceMojo extends AbstractMojo {
         bw = new BufferedWriter(new FileWriter(outFileName, appendToAceFiles));
         getLog().info("ACE RELATIONSHIPS OUTPUT: " + outFileName);
         // if (writeHeader) {
-        // bw.write("relationship uuid" + TAB_CHARACTER + "" + "status uuid" + TAB_CHARACTER + ""
-        // + "source concept uuid" + TAB_CHARACTER + "" + "relationship type uuid" + TAB_CHARACTER + ""
-        // + "destination concept uuid" + TAB_CHARACTER + "" + "characteristic type uuid" + TAB_CHARACTER + ""
-        // + "refinability uuid" + TAB_CHARACTER + "" + "relationship group" + TAB_CHARACTER + ""
-        // + "effective date" + TAB_CHARACTER + "" + "path uuid" + LINE_TERMINATOR);
+        // bw.write("relationship uuid" + TAB_CHARACTER + "" + "status uuid" +
+        // TAB_CHARACTER + ""
+        // + "source concept uuid" + TAB_CHARACTER + "" +
+        // "relationship type uuid" + TAB_CHARACTER + ""
+        // + "destination concept uuid" + TAB_CHARACTER + "" +
+        // "characteristic type uuid" + TAB_CHARACTER + ""
+        // + "refinability uuid" + TAB_CHARACTER + "" + "relationship group" +
+        // TAB_CHARACTER + ""
+        // + "effective date" + TAB_CHARACTER + "" + "path uuid" +
+        // LINE_TERMINATOR);
         // }
 
         Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator
@@ -1248,8 +1284,7 @@ public class Sct2AceMojo extends AbstractMojo {
             String lang = st.sval;
 
             // Save to sortable array
-            a[descriptions] =
-                    new SCTDescriptionRecord(descriptionId, status, conceptId, text, capStatus, typeInt, lang);
+            a[descriptions] = new SCTDescriptionRecord(descriptionId, status, conceptId, text, capStatus, typeInt, lang);
             descriptions++;
 
             // CR
@@ -1307,9 +1342,8 @@ public class Sct2AceMojo extends AbstractMojo {
             int group = Integer.parseInt(st.sval);
 
             // Save to sortable array
-            a[relationships] =
-                    new SCTRelationshipRecord(relID, status, conceptOneID, relationshipTypeConceptID, conceptTwoID,
-                        characteristic, refinability, group);
+            a[relationships] = new SCTRelationshipRecord(relID, status, conceptOneID, relationshipTypeConceptID,
+                conceptTwoID, characteristic, refinability, group);
             relationships++;
 
             // CR

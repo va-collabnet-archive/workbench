@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 
 /**
  * Derby DB containing the Uuid-SctId mappings for an id mapping file.
- *
+ * 
  * @author Keith Camble, Ean Dungey
  */
 public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
@@ -69,11 +69,11 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
      * Reads the contents of a mapping file. IF no database exists then a new
      * database is created from the contents of the mapping file. If the
      * database does exist them the database in opened.
-     *
+     * 
      * @param fixedMapFile id map file to create a DB from if no DB exits.
-     *
+     * 
      * @return DerbyBackedUuidSctidFixedMap
-     *
+     * 
      * @throws IOException if cannot read/create/open the mapping file/database.
      */
     public static DerbyBackedUuidSctidFixedMap read(File fixedMapFile) throws IOException {
@@ -83,10 +83,10 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
 
     /**
      * Creates or Opens a Derby DB.
-     *
+     * 
      * If the DB files exits it is simply opened other wise a new database is
      * created.
-     *
+     * 
      * @param dbFolder File
      * @param fixedMapFile File
      * @throws IOException error opening or creating the DB.
@@ -105,9 +105,9 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
 
     /**
      * Open the exiting DB.
-     *
+     * 
      * Setup the PreparedStatement of the DB.
-     *
+     * 
      * @param dbFolder File
      * @throws IOException error opening the DB.
      */
@@ -123,7 +123,7 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
 
     /**
      * Create a new DB and load with the contents of the fixedMapFile
-     *
+     * 
      * @param dbFolder File
      * @param fixedMapFile File
      * @throws IOException reading the map file or creating the DB.
@@ -171,7 +171,7 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
 
     /**
      * Create the DB tables and indexes.
-     *
+     * 
      * @throws SQLException creating the tables/indexes.
      */
     private void createTables() throws SQLException {
@@ -180,7 +180,7 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
 
     /**
      * Creates the prepare statements for this DB.
-     *
+     * 
      * @throws SQLException creating the prepare statements
      */
     private void createStatements() throws SQLException {
@@ -198,7 +198,7 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
     /**
      * Connects to the database, if no database exists then a new one is
      * created.
-     *
+     * 
      * @param dbFolder File
      * @param autoCommit boolean
      * @throws SQLException connecting to the DB.
@@ -220,7 +220,7 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
 
     /**
      * Exception wrapper.
-     *
+     * 
      * @param ex Exception
      * @throws RuntimeException always thrown
      */
@@ -286,7 +286,7 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
 
     /**
      * @see java.util.Map#entrySet()
-     *
+     * 
      * @throws UnsupportedOperationException
      */
     public Set<java.util.Map.Entry<UUID, Long>> entrySet() {
@@ -363,7 +363,7 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
 
     /**
      * Execute the insert/update SQL and optionally commit the changes.
-     *
+     * 
      * @param key UUID
      * @param value Long
      * @param commit commit after putting
@@ -475,17 +475,17 @@ public class DerbyBackedUuidSctidFixedMap implements Map<UUID, Long> {
 
     /**
      * This is a workaround for derby not removing lock files at runtime.
-     *
+     * 
      * deletes the lock files.
      */
     private void deleteLockFiles() {
         File lockFile = new File(dbFolder, "db.lck");
-        if(lockFile.exists()){
+        if (lockFile.exists()) {
             lockFile.delete();
         }
 
         lockFile = new File(dbFolder, "dbex.lck");
-        if(lockFile.exists()){
+        if (lockFile.exists()) {
             lockFile.delete();
         }
     }

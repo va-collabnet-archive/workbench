@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,8 @@ import org.apache.maven.plugin.logging.Log;
 import org.dwfa.util.io.FileIO;
 
 /**
- * Goal which copies a directory to the specified location (including hidden files).
+ * Goal which copies a directory to the specified location (including hidden
+ * files).
  * 
  * @goal copy-dir
  * @requiresDependencyResolution compile
@@ -59,7 +60,7 @@ public class CopyDirectory extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -68,17 +69,15 @@ public class CopyDirectory extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Log l = getLog();
-            l.info("Now executing CopyDirectory from: " + inputDirectory
-                + " to: " + outputDirectory + " invisibles: " + copyInvisibles);
+            l.info("Now executing CopyDirectory from: " + inputDirectory + " to: " + outputDirectory + " invisibles: "
+                + copyInvisibles);
 
             // calculate the SHA-1 hashcode for this mojo based on input
-            if (MojoUtil.alreadyRun(l, inputDirectory.getAbsolutePath()
-                + outputDirectory.getAbsolutePath(), this.getClass(),
-                targetDirectory)) {
+            if (MojoUtil.alreadyRun(l, inputDirectory.getAbsolutePath() + outputDirectory.getAbsolutePath(),
+                this.getClass(), targetDirectory)) {
                 return;
             }
-            FileIO.recursiveCopy(inputDirectory, outputDirectory,
-                copyInvisibles);
+            FileIO.recursiveCopy(inputDirectory, outputDirectory, copyInvisibles);
 
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,8 +22,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.maven.I_ReadAndTransform;
 import org.dwfa.maven.Transform;
 
-public class LanguageCodeToUuidTransform extends AbstractTransform implements
-        I_ReadAndTransform {
+public class LanguageCodeToUuidTransform extends AbstractTransform implements I_ReadAndTransform {
 
     public void setupImpl(Transform transformer) {
 
@@ -32,9 +31,8 @@ public class LanguageCodeToUuidTransform extends AbstractTransform implements
     public String transform(String input) throws Exception {
         String languageCode = input.toUpperCase();
 
-        ArchitectonicAuxiliary.Concept concept =
-                Enum.valueOf(ArchitectonicAuxiliary.Concept.class, languageCode
-                    .replace('-', '_'));
+        ArchitectonicAuxiliary.Concept concept = Enum.valueOf(ArchitectonicAuxiliary.Concept.class,
+            languageCode.replace('-', '_'));
 
         UUID uuid = concept.getUids().iterator().next();
 
