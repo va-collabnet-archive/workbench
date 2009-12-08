@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -77,22 +77,21 @@ public class CollectionEditorContainer extends JPanel {
     public class ImportListButtonListener implements ActionListener {
 
         public void actionPerformed(ActionEvent arg0) {
-			FileDialog dialog = new FileDialog(new Frame(),
-					"Open file: ");
-			dialog.setMode(FileDialog.LOAD);
-			dialog.setDirectory(System.getProperty("user.dir"));
-			dialog.setVisible(true);
-			if (dialog.getFile() != null) {
-				ConceptListReader reader = new ConceptListReader();
-				reader.setSourceFile(new File(dialog.getDirectory(), dialog.getFile()));
-				
-				I_ModelTerminologyList model = (I_ModelTerminologyList) list.getModel();
-				
-				for (I_GetConceptData concept : reader) {
-					model.addElement(concept);
-				}
-			}
-		}
+            FileDialog dialog = new FileDialog(new Frame(), "Open file: ");
+            dialog.setMode(FileDialog.LOAD);
+            dialog.setDirectory(System.getProperty("user.dir"));
+            dialog.setVisible(true);
+            if (dialog.getFile() != null) {
+                ConceptListReader reader = new ConceptListReader();
+                reader.setSourceFile(new File(dialog.getDirectory(), dialog.getFile()));
+
+                I_ModelTerminologyList model = (I_ModelTerminologyList) list.getModel();
+
+                for (I_GetConceptData concept : reader) {
+                    model.addElement(concept);
+                }
+            }
+        }
     }
 
     public class ExportListButtonListener implements ActionListener {
@@ -100,8 +99,7 @@ public class CollectionEditorContainer extends JPanel {
         private static final String EXTENSION = ".txt";
 
         public void actionPerformed(ActionEvent arg0) {
-            FileDialog dialog =
-                    new FileDialog(new Frame(), "Enter file name: ");
+            FileDialog dialog = new FileDialog(new Frame(), "Enter file name: ");
             dialog.setMode(FileDialog.SAVE);
             dialog.setDirectory(System.getProperty("user.dir"));
             dialog.setVisible(true);
@@ -112,8 +110,7 @@ public class CollectionEditorContainer extends JPanel {
 
                 ConceptListWriter writer = new ConceptListWriter();
                 try {
-                    writer.open(new File(dialog.getDirectory(), dialog
-                        .getFile()), false);
+                    writer.open(new File(dialog.getDirectory(), dialog.getFile()), false);
 
                     ListModel model = list.getModel();
 
@@ -127,8 +124,7 @@ public class CollectionEditorContainer extends JPanel {
 
                     final JDialog alert = new JDialog();
                     JPanel panel = new JPanel(new GridLayout(2, 1));
-                    panel.add(new JLabel("Failed to write to file "
-                        + dialog.getFile() + " due to "
+                    panel.add(new JLabel("Failed to write to file " + dialog.getFile() + " due to "
                         + e.getLocalizedMessage()));
                     JButton button = new JButton("OK");
                     button.addActionListener(new ActionListener() {
@@ -147,11 +143,8 @@ public class CollectionEditorContainer extends JPanel {
     public class EraseListActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            int option =
-                    JOptionPane.showConfirmDialog(
-                        CollectionEditorContainer.this,
-                        "Are you sure you want to erase the list?",
-                        "Erase the list?", JOptionPane.YES_NO_OPTION);
+            int option = JOptionPane.showConfirmDialog(CollectionEditorContainer.this,
+                "Are you sure you want to erase the list?", "Erase the list?", JOptionPane.YES_NO_OPTION);
             if (option == JOptionPane.YES_OPTION) {
                 ((TerminologyListModel) list.getModel()).clear();
             }
@@ -207,8 +200,7 @@ public class CollectionEditorContainer extends JPanel {
     }
 
     private boolean showOnlyList() {
-        return showComponentView.isSelected() == false
-            && showProcessBuilder.isSelected() == false;
+        return showComponentView.isSelected() == false && showProcessBuilder.isSelected() == false;
     }
 
     int lastDividerLocation = -1;
@@ -229,16 +221,14 @@ public class CollectionEditorContainer extends JPanel {
         return ace.getAceFrameConfig();
     }
 
-    public CollectionEditorContainer(TerminologyList list, ACE ace,
-            JPanel descListProcessBuilderPanel) throws DatabaseException,
-            IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    public CollectionEditorContainer(TerminologyList list, ACE ace, JPanel descListProcessBuilderPanel)
+            throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         super(new GridBagLayout());
         this.ace = ace;
         this.list = list;
         this.processBuilder = descListProcessBuilderPanel;
-        conceptPanel =
-                new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace,
-                    LINK_TYPE.LIST_LINK, true, Integer.MIN_VALUE);
+        conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace, LINK_TYPE.LIST_LINK, true,
+            Integer.MIN_VALUE);
         conceptPanel.setLinkedList(list);
         conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
         GridBagConstraints c = new GridBagConstraints();
@@ -254,12 +244,10 @@ public class CollectionEditorContainer extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         add(getListSplit(list, ace), c);
         showComponentView.setSelected(true);
-        showComponentActionListener.actionPerformed(new ActionEvent(
-            showComponentView, 0, "show"));
+        showComponentActionListener.actionPerformed(new ActionEvent(showComponentView, 0, "show"));
     }
 
-    private JSplitPane getListSplit(JList list, ACE ace)
-            throws DatabaseException, IOException, ClassNotFoundException {
+    private JSplitPane getListSplit(JList list, ACE ace) throws DatabaseException, IOException, ClassNotFoundException {
         listSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         listSplit.setOneTouchExpandable(true);
         listSplit.setTopComponent(new JScrollPane(list));
@@ -268,125 +256,110 @@ public class CollectionEditorContainer extends JPanel {
         return listSplit;
     }
 
-    private JPanel getListEditorTopPanel() throws IOException,
-			ClassNotFoundException {
-		JPanel listEditorTopPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 0;
-		c.weighty = 0;
-		c.gridheight = 1;
-		c.fill = GridBagConstraints.BOTH;
-		showComponentView = new Toggle32x32(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/component.png")));
-		showComponentActionListener = new ShowComponentActionListener();
-		showComponentView.setVisible(ACE.editMode);
-		showComponentView.addActionListener(showComponentActionListener);
-		showComponentView
-				.setToolTipText("Show component view associated with list view");
-		listEditorTopPanel.add(showComponentView, c);
-		c.gridx++;
-		showProcessBuilder = new Toggle32x32(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/cube_molecule.png")));
-		listEditorTopPanel.add(showProcessBuilder, c);
-		showProcessBuilder.setVisible(ACE.editMode);
-		showProcessBuilder
-				.setToolTipText("Show process builder associated with list view");
-		showProcessBuilder
-				.addActionListener(new ShowProcessBuilderActionListener());
-		c.gridx++;
+    private JPanel getListEditorTopPanel() throws IOException, ClassNotFoundException {
+        JPanel listEditorTopPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0;
+        c.weighty = 0;
+        c.gridheight = 1;
+        c.fill = GridBagConstraints.BOTH;
+        showComponentView = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/component.png")));
+        showComponentActionListener = new ShowComponentActionListener();
+        showComponentView.setVisible(ACE.editMode);
+        showComponentView.addActionListener(showComponentActionListener);
+        showComponentView.setToolTipText("Show component view associated with list view");
+        listEditorTopPanel.add(showComponentView, c);
+        c.gridx++;
+        showProcessBuilder = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/cube_molecule.png")));
+        listEditorTopPanel.add(showProcessBuilder, c);
+        showProcessBuilder.setVisible(ACE.editMode);
+        showProcessBuilder.setToolTipText("Show process builder associated with list view");
+        showProcessBuilder.addActionListener(new ShowProcessBuilderActionListener());
+        c.gridx++;
 
-		JButton eraseListButton = new JButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/notebook_delete.png")));
-		eraseListButton.setVisible(ACE.editMode);
-		eraseListButton.addActionListener(new EraseListActionListener());
-		eraseListButton.setToolTipText("clear the list");
-		listEditorTopPanel.add(eraseListButton, c);
-		
-		c.gridx++;
+        JButton eraseListButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/notebook_delete.png")));
+        eraseListButton.setVisible(ACE.editMode);
+        eraseListButton.addActionListener(new EraseListActionListener());
+        eraseListButton.setToolTipText("clear the list");
+        listEditorTopPanel.add(eraseListButton, c);
 
-		JButton exportListButton = new JButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/notebook_save.png")));
-		exportListButton.setVisible(ACE.editMode);
-		exportListButton.addActionListener(new ExportListButtonListener());
-		exportListButton.setToolTipText("save the list to a file");
-		listEditorTopPanel.add(exportListButton, c);
+        c.gridx++;
 
-		c.gridx++;
+        JButton exportListButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/notebook_save.png")));
+        exportListButton.setVisible(ACE.editMode);
+        exportListButton.addActionListener(new ExportListButtonListener());
+        exportListButton.setToolTipText("save the list to a file");
+        listEditorTopPanel.add(exportListButton, c);
 
-		JButton importListButton = new JButton(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/notebook_read.png")));
-		importListButton.setVisible(ACE.editMode);
-		importListButton.addActionListener(new ImportListButtonListener());
-		importListButton.setToolTipText("read a list from a file");
-		listEditorTopPanel.add(importListButton, c);
+        c.gridx++;
 
-		c.gridx++;
+        JButton importListButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/notebook_read.png")));
+        importListButton.setVisible(ACE.editMode);
+        importListButton.addActionListener(new ImportListButtonListener());
+        importListButton.setToolTipText("read a list from a file");
+        listEditorTopPanel.add(importListButton, c);
 
-		c.weightx = 1.0;
-		listEditorTopPanel.add(new JLabel(" "), c);
-		c.gridx++;
-		c.weightx = 0.0;
+        c.gridx++;
 
-		File componentPluginDir = new File(ace.getPluginRoot() + File.separator
-				+ "list");
-		File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
-			public boolean accept(File arg0, String fileName) {
-				return fileName.toLowerCase().endsWith(".bp");
-			}
+        c.weightx = 1.0;
+        listEditorTopPanel.add(new JLabel(" "), c);
+        c.gridx++;
+        c.weightx = 0.0;
 
-		});
+        File componentPluginDir = new File(ace.getPluginRoot() + File.separator + "list");
+        File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
+            public boolean accept(File arg0, String fileName) {
+                return fileName.toLowerCase().endsWith(".bp");
+            }
 
-		if (plugins != null) {
-			c.weightx = 0.0;
-			c.weightx = 0.0;
-			c.fill = GridBagConstraints.NONE;
-			for (File f : plugins) {
-				try {
-					FileInputStream fis = new FileInputStream(f);
-					BufferedInputStream bis = new BufferedInputStream(fis);
-					ObjectInputStream ois = new ObjectInputStream(bis);
-					try {
-						BusinessProcess bp = (BusinessProcess) ois.readObject();
-						byte[] iconBytes = (byte[]) bp
-								.readAttachement("button_icon");
-						if (iconBytes != null) {
-							ImageIcon icon = new ImageIcon(iconBytes);
-							JButton pluginButton = new Button32x32(icon);
-							pluginButton.setToolTipText(bp.getSubject());
-							pluginButton
-									.addActionListener(new PluginListener(f));
-							c.gridx++;
-							listEditorTopPanel.add(pluginButton, c);
-							AceLog.getAppLog().info(
-									"adding collection plugin: " + f.getName());
-						} else {
-							JButton pluginButton = new Button32x32(bp.getName());
-							pluginButton.setToolTipText(bp.getSubject());
-							pluginButton
-									.addActionListener(new PluginListener(f));
-							c.gridx++;
-							listEditorTopPanel.add(pluginButton, c);
-							AceLog.getAppLog().info(
-									"adding collection plugin: " + f.getName());
-						}
-					} catch (Exception ex) {
-						TaskFailedException ex2 = new TaskFailedException("Exception processing file: " + f, ex);
-						AceLog.getAppLog().alertAndLogException(ex2);
-					}
-					ois.close();
-				} catch (IOException ex) {
-					AceLog.getAppLog().alertAndLogException(ex);
-				}
-			}
-		}
+        });
 
-		listEditorTopPanel.add(new Toggle32x32(new ImageIcon(ACE.class
-				.getResource("/32x32/plain/branch_delete.png"))), c);
-		return listEditorTopPanel;
+        if (plugins != null) {
+            c.weightx = 0.0;
+            c.weightx = 0.0;
+            c.fill = GridBagConstraints.NONE;
+            for (File f : plugins) {
+                try {
+                    FileInputStream fis = new FileInputStream(f);
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+                    ObjectInputStream ois = new ObjectInputStream(bis);
+                    try {
+                        BusinessProcess bp = (BusinessProcess) ois.readObject();
+                        byte[] iconBytes = (byte[]) bp.readAttachement("button_icon");
+                        if (iconBytes != null) {
+                            ImageIcon icon = new ImageIcon(iconBytes);
+                            JButton pluginButton = new Button32x32(icon);
+                            pluginButton.setToolTipText(bp.getSubject());
+                            pluginButton.addActionListener(new PluginListener(f));
+                            c.gridx++;
+                            listEditorTopPanel.add(pluginButton, c);
+                            AceLog.getAppLog().info("adding collection plugin: " + f.getName());
+                        } else {
+                            JButton pluginButton = new Button32x32(bp.getName());
+                            pluginButton.setToolTipText(bp.getSubject());
+                            pluginButton.addActionListener(new PluginListener(f));
+                            c.gridx++;
+                            listEditorTopPanel.add(pluginButton, c);
+                            AceLog.getAppLog().info("adding collection plugin: " + f.getName());
+                        }
+                    } catch (Exception ex) {
+                        TaskFailedException ex2 = new TaskFailedException("Exception processing file: " + f, ex);
+                        AceLog.getAppLog().alertAndLogException(ex2);
+                    }
+                    ois.close();
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+        }
 
-	}
+        listEditorTopPanel.add(new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/branch_delete.png"))),
+            c);
+        return listEditorTopPanel;
+
+    }
 
     private class PluginListener implements ActionListener {
         File pluginProcessFile;
@@ -398,89 +371,75 @@ public class CollectionEditorContainer extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-			try {
-				FileInputStream fis = new FileInputStream(pluginProcessFile);
-				BufferedInputStream bis = new BufferedInputStream(fis);
-				ObjectInputStream ois = new ObjectInputStream(bis);
-				final BusinessProcess bp = (BusinessProcess) ois.readObject();
-				ois.close();
-				getConfig().setStatusMessage("Executing: " + bp.getName());
-				final MasterWorker worker = getConfig().getWorker();
-				// Set concept bean
-				// Set config
-				JList conceptList = getConfig().getBatchConceptList();
-				I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList
-						.getModel();
+            try {
+                FileInputStream fis = new FileInputStream(pluginProcessFile);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                ObjectInputStream ois = new ObjectInputStream(bis);
+                final BusinessProcess bp = (BusinessProcess) ois.readObject();
+                ois.close();
+                getConfig().setStatusMessage("Executing: " + bp.getName());
+                final MasterWorker worker = getConfig().getWorker();
+                // Set concept bean
+                // Set config
+                JList conceptList = getConfig().getBatchConceptList();
+                I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 
-				I_GetConceptData concept = null;
-				if (conceptList.getSelectedIndex() != -1) {
-					concept = (I_GetConceptData) model.getElementAt(conceptList
-							.getSelectedIndex());
-				}
+                I_GetConceptData concept = null;
+                if (conceptList.getSelectedIndex() != -1) {
+                    concept = (I_GetConceptData) model.getElementAt(conceptList.getSelectedIndex());
+                }
 
-				worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-						.name(), getConfig());
-				bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA
-						.name(), concept);
-				worker.writeAttachment(
-						WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(),
-						conceptPanel);
-				Runnable r = new Runnable() {
-					public void run() {
-						I_EncodeBusinessProcess process = bp;
-						try {
-							worker.getLogger().info(
-									"Worker: " + worker.getWorkerDesc() + " ("
-											+ worker.getId()
-											+ ") executing process: "
-											+ process.getName());
-							worker.execute(process);
-							SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(
-									process.getExecutionRecords());
-							Iterator<ExecutionRecord> recordItr = sortedRecords
-									.iterator();
-							StringBuffer buff = new StringBuffer();
-							while (recordItr.hasNext()) {
-								ExecutionRecord rec = recordItr.next();
-								buff.append("\n");
-								buff.append(rec.toString());
-							}
-							worker.getLogger().info(buff.toString());
-							exceptionMessage = "";
-						} catch (Throwable e1) {
-							worker.getLogger().log(Level.WARNING,
-									e1.toString(), e1);
-							exceptionMessage = e1.toString();
-						}
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								getConfig().setStatusMessage(
-										"<html><font color='#006400'>execute");
-								I_GetConceptData conceptInPanel = (I_GetConceptData) conceptPanel
-										.getTermComponent();
-								conceptPanel.setTermComponent(null);
-								conceptPanel.setTermComponent(conceptInPanel);
-								if (exceptionMessage.equals("")) {
-									getConfig().setStatusMessage(
-											"<html>Execution of <font color='blue'>"
-													+ bp.getName()
-													+ "</font> complete.");
-								} else {
-									getConfig().setStatusMessage(
-											"<html><font color='blue'>Process complete: <font color='red'>"
-													+ exceptionMessage);
-								}
-							}
-						});
-					}
+                worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), getConfig());
+                bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), concept);
+                worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(), conceptPanel);
+                Runnable r = new Runnable() {
+                    public void run() {
+                        I_EncodeBusinessProcess process = bp;
+                        try {
+                            worker.getLogger().info(
+                                "Worker: " + worker.getWorkerDesc() + " (" + worker.getId() + ") executing process: "
+                                    + process.getName());
+                            worker.execute(process);
+                            SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(
+                                process.getExecutionRecords());
+                            Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
+                            StringBuffer buff = new StringBuffer();
+                            while (recordItr.hasNext()) {
+                                ExecutionRecord rec = recordItr.next();
+                                buff.append("\n");
+                                buff.append(rec.toString());
+                            }
+                            worker.getLogger().info(buff.toString());
+                            exceptionMessage = "";
+                        } catch (Throwable e1) {
+                            worker.getLogger().log(Level.WARNING, e1.toString(), e1);
+                            exceptionMessage = e1.toString();
+                        }
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getConfig().setStatusMessage("<html><font color='#006400'>execute");
+                                I_GetConceptData conceptInPanel = (I_GetConceptData) conceptPanel.getTermComponent();
+                                conceptPanel.setTermComponent(null);
+                                conceptPanel.setTermComponent(conceptInPanel);
+                                if (exceptionMessage.equals("")) {
+                                    getConfig().setStatusMessage(
+                                        "<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
+                                } else {
+                                    getConfig().setStatusMessage(
+                                        "<html><font color='blue'>Process complete: <font color='red'>"
+                                            + exceptionMessage);
+                                }
+                            }
+                        });
+                    }
 
-				};
-				new Thread(r).start();
-			} catch (Exception e1) {
-				getConfig().setStatusMessage("Exception during execution.");
-				AceLog.getAppLog().alertAndLogException(e1);
-			}
-		}
+                };
+                new Thread(r).start();
+            } catch (Exception e1) {
+                getConfig().setStatusMessage("Exception during execution.");
+                AceLog.getAppLog().alertAndLogException(e1);
+            }
+        }
     }
 
     public ConceptPanel getConceptPanel() {

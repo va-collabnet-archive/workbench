@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,25 +28,26 @@ public class StringWithExtTuple extends StringWithTuple implements Comparable<St
     public StringWithExtTuple(String cellText, I_ThinExtByRefTuple tuple, int id) {
         this(cellText, tuple, id, false);
     }
-    
+
     public StringWithExtTuple(String cellText, I_ThinExtByRefTuple tuple, int id, boolean isInConflict) {
-       super(cellText, isInConflict);
-       this.tuple = tuple;
-       this.id = id;
+        super(cellText, isInConflict);
+        this.tuple = tuple;
+        this.id = id;
     }
 
     public I_ThinExtByRefTuple getTuple() {
-       return tuple;
+        return tuple;
     }
 
     public int compareTo(StringWithExtTuple another) {
-       return getCellText().compareTo(another.getCellText());
+        return getCellText().compareTo(another.getCellText());
     }
 
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
- }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+}

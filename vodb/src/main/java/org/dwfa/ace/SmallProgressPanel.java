@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,9 +32,7 @@ public class SmallProgressPanel extends JPanel implements I_DisplayProgress {
      */
     private static final long serialVersionUID = 1L;
     JProgressBar progressBar = new JProgressBar();
-    JButton stopButton =
-            new JButton(new ImageIcon(ACE.class
-                .getResource("/16x16/plain/stop.png")));
+    JButton stopButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/stop.png")));
     JLabel progressLabel = new JLabel();
 
     public SmallProgressPanel() {
@@ -57,14 +55,18 @@ public class SmallProgressPanel extends JPanel implements I_DisplayProgress {
         setActive(false);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.I_DisplayProgress#getProgressBar()
      */
     public JProgressBar getProgressBar() {
         return progressBar;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.I_DisplayProgress#setProgressInfo(java.lang.String)
      */
     public void setProgressInfo(final String info) {
@@ -80,7 +82,9 @@ public class SmallProgressPanel extends JPanel implements I_DisplayProgress {
         });
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.I_DisplayProgress#getStopButton()
      */
     public JButton getStopButton() {

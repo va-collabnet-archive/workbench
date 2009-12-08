@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,24 +41,18 @@ public class ChangeFramePassword implements ActionListener {
             I_ConfigAceFrame frameConfig = acePanel.getAceFrameConfig();
             SvnPrompter prompter = new SvnPrompter();
             prompter.setParentContainer(acePanel);
-            if (prompter.prompt("Current username/password", frameConfig
-                .getUsername())) {
+            if (prompter.prompt("Current username/password", frameConfig.getUsername())) {
                 if (prompter.getUsername() != null) {
-                    if (prompter.getUsername()
-                        .equals(frameConfig.getUsername()) == false) {
-                        throw new AuthenticationFailedException(
-                            "username does not match");
+                    if (prompter.getUsername().equals(frameConfig.getUsername()) == false) {
+                        throw new AuthenticationFailedException("username does not match");
                     }
                 }
                 if (prompter.getPassword() != null) {
-                    if (prompter.getPassword()
-                        .equals(frameConfig.getPassword()) == false) {
-                        throw new AuthenticationFailedException(
-                            "password does not match");
+                    if (prompter.getPassword().equals(frameConfig.getPassword()) == false) {
+                        throw new AuthenticationFailedException("password does not match");
                     }
                 }
-                if (prompter.prompt("New username/password", AceConfig.config
-                    .getUsername())) {
+                if (prompter.prompt("New username/password", AceConfig.config.getUsername())) {
                     frameConfig.setUsername(prompter.getUsername());
                     frameConfig.setPassword(prompter.getPassword());
                 }

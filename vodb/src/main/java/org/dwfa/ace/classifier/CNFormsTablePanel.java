@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,8 +51,7 @@ public class CNFormsTablePanel extends JPanel {
         this.theSnoTable = st;
         this.config = caf;
         this.setLayout(new GridBagLayout());
-        this
-            .setBorder(BorderFactory.createTitledBorder("Normal Forms Table: "));
+        this.setBorder(BorderFactory.createTitledBorder("Normal Forms Table: "));
     }
 
     public void update() {
@@ -105,8 +104,7 @@ public class CNFormsTablePanel extends JPanel {
             table.setRowHeight(i, 18 * lineCount);
             totalRowHeight += 18 * lineCount;
         }
-        table.setPreferredScrollableViewportSize(new Dimension(900,
-            totalRowHeight));
+        table.setPreferredScrollableViewportSize(new Dimension(900, totalRowHeight));
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.FIRST_LINE_START;

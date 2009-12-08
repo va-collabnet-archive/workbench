@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,16 +43,23 @@ import edu.uci.ics.jung.visualization.SpringLayout;
 /**
  * @author John Yesberg
  * 
- * DAGLayout is a layout algorithm which is suitable for tree-like directed
- * acyclic graphs. Parts of it will probably not terminate if the graph is
- * cyclic! The layout will result in directed edges pointing generally upwards.
- * Any vertices with no successors are considered to be level 0, and tend
- * towards the top of the layout. Any vertex has a level one greater than the
- * maximum level of all its successors.
+ *         DAGLayout is a layout algorithm which is suitable for tree-like
+ *         directed
+ *         acyclic graphs. Parts of it will probably not terminate if the graph
+ *         is
+ *         cyclic! The layout will result in directed edges pointing generally
+ *         upwards.
+ *         Any vertices with no successors are considered to be level 0, and
+ *         tend
+ *         towards the top of the layout. Any vertex has a level one greater
+ *         than the
+ *         maximum level of all its successors.
  * 
- * Note: had to make minor access changes to SpringLayout to make this work.
- * FORCE_CONSTANT, LengthFunction, SpringVertexData, and SpringEdgeData were
- * all made "protected".
+ *         Note: had to make minor access changes to SpringLayout to make this
+ *         work.
+ *         FORCE_CONSTANT, LengthFunction, SpringVertexData, and SpringEdgeData
+ *         were
+ *         all made "protected".
  */
 
 public class AceGraphLayout extends SpringLayout {
@@ -108,20 +115,20 @@ public class AceGraphLayout extends SpringLayout {
      */
 
     public static void setRoot(Graph g) {
-		numRoots = 0;
-		Set<?> verts = g.getVertices();
-		Iterator<?> iter = verts.iterator();
-		Vertex v;
-		Set<?> successors;
-		while (iter.hasNext()) {
-			v = (Vertex) iter.next();
-			successors = v.getSuccessors();
-			if (successors.size() == 0) {
-				setRoot(v);
-				numRoots++;
-			}
-		}
-	}
+        numRoots = 0;
+        Set<?> verts = g.getVertices();
+        Iterator<?> iter = verts.iterator();
+        Vertex v;
+        Set<?> successors;
+        while (iter.hasNext()) {
+            v = (Vertex) iter.next();
+            successors = v.getSuccessors();
+            if (successors.size() == 0) {
+                setRoot(v);
+                numRoots++;
+            }
+        }
+    }
 
     /**
      * Set vertex v to be level 0.
@@ -143,28 +150,25 @@ public class AceGraphLayout extends SpringLayout {
      */
 
     public static void propagateMinimumLevel(Vertex v) {
-		int level = ((Integer) v.getUserDatum(MINIMUMLEVELKEY)).intValue();
-		Set<?> predecessors = v.getPredecessors();
-		Iterator<?> iter = predecessors.iterator();
-		Vertex child; // odd to use predecessors for child, isn't it. Sorry!
-		while (iter.hasNext()) {
-			child = (Vertex) iter.next();
-			int oldLevel, newLevel;
-			Object o = child.getUserDatum(MINIMUMLEVELKEY);
-			if (o != null)
-				oldLevel = ((Integer) o).intValue();
-			else
-				oldLevel = 0;
-			newLevel = Math.max(oldLevel, level + 1);
-			child.setUserDatum(
-				MINIMUMLEVELKEY,
-				new Integer(newLevel),
-				UserData.REMOVE);
-			if (newLevel > graphHeight)
-				graphHeight = newLevel;
-			propagateMinimumLevel(child);
-		}
-	}
+        int level = ((Integer) v.getUserDatum(MINIMUMLEVELKEY)).intValue();
+        Set<?> predecessors = v.getPredecessors();
+        Iterator<?> iter = predecessors.iterator();
+        Vertex child; // odd to use predecessors for child, isn't it. Sorry!
+        while (iter.hasNext()) {
+            child = (Vertex) iter.next();
+            int oldLevel, newLevel;
+            Object o = child.getUserDatum(MINIMUMLEVELKEY);
+            if (o != null)
+                oldLevel = ((Integer) o).intValue();
+            else
+                oldLevel = 0;
+            newLevel = Math.max(oldLevel, level + 1);
+            child.setUserDatum(MINIMUMLEVELKEY, new Integer(newLevel), UserData.REMOVE);
+            if (newLevel > graphHeight)
+                graphHeight = newLevel;
+            propagateMinimumLevel(child);
+        }
+    }
 
     /**
      * Sets random locations for a vertex within the dimensions of the space.
@@ -174,7 +178,7 @@ public class AceGraphLayout extends SpringLayout {
      * @param d
      */
     protected void initializeLocation(Vertex v, Coordinates coord, Dimension d) {
-        //if (v.getUserDatum(MINIMUMLEVELKEY)==null) setRoot(getGraph());
+        // if (v.getUserDatum(MINIMUMLEVELKEY)==null) setRoot(getGraph());
         int level = ((Integer) v.getUserDatum(MINIMUMLEVELKEY)).intValue();
         int minY = (int) (level * d.getHeight() / (graphHeight * SPACEFACTOR));
         double x = Math.random() * d.getWidth();
@@ -187,19 +191,17 @@ public class AceGraphLayout extends SpringLayout {
      * Had to override this one as well, to ensure that setRoot() is called.
      */
     protected void initialize_local() {
-		for (Iterator<?> iter = getGraph().getEdges().iterator();
-			iter.hasNext();
-			) {
-			Edge e = (Edge) iter.next();
-			SpringEdgeData sed = getSpringData(e);
-			if (sed == null) {
-				sed = new SpringEdgeData(e);
-				e.addUserDatum(getSpringKey(), sed, UserData.REMOVE);
-			}
-			calcEdgeLength(sed, lengthFunction);
-		}
-		setRoot(getGraph());
-	}
+        for (Iterator<?> iter = getGraph().getEdges().iterator(); iter.hasNext();) {
+            Edge e = (Edge) iter.next();
+            SpringEdgeData sed = getSpringData(e);
+            if (sed == null) {
+                sed = new SpringEdgeData(e);
+                e.addUserDatum(getSpringKey(), sed, UserData.REMOVE);
+            }
+            calcEdgeLength(sed, lengthFunction);
+        }
+        setRoot(getGraph());
+    }
 
     /**
      * Override the moveNodes() method from SpringLayout. The only change we
@@ -207,88 +209,81 @@ public class AceGraphLayout extends SpringLayout {
      * coordinate, as calculated by their minimumLevel.
      */
     protected void moveNodes() {
-		// Dimension d = currentSize;
-		double oldMSV = meanSquareVel;
-		meanSquareVel = 0;
+        // Dimension d = currentSize;
+        double oldMSV = meanSquareVel;
+        meanSquareVel = 0;
 
-		synchronized (getCurrentSize()) {
+        synchronized (getCurrentSize()) {
 
-			// int showingNodes = 0;
+            // int showingNodes = 0;
 
-			for (Iterator<?> i = getVisibleVertices().iterator(); i.hasNext();) {
-				Vertex v = (Vertex) i.next();
-				if (isLocked(v))
-					continue;
-				SpringLayout.SpringVertexData vd = getSpringData(v);
-				Coordinates xyd = getCoordinates(v);
+            for (Iterator<?> i = getVisibleVertices().iterator(); i.hasNext();) {
+                Vertex v = (Vertex) i.next();
+                if (isLocked(v))
+                    continue;
+                SpringLayout.SpringVertexData vd = getSpringData(v);
+                Coordinates xyd = getCoordinates(v);
 
-				int width = getCurrentSize().width;
-				int height = getCurrentSize().height;
+                int width = getCurrentSize().width;
+                int height = getCurrentSize().height;
 
-				// (JY addition: three lines are new)
-				int level =
-					((Integer) v.getUserDatum(MINIMUMLEVELKEY)).intValue();
-				int minY = (int) (level * height / (graphHeight * SPACEFACTOR));
-				int maxY =
-					level == 0
-						? (int) (height / (graphHeight * SPACEFACTOR * 2))
-						: height;
+                // (JY addition: three lines are new)
+                int level = ((Integer) v.getUserDatum(MINIMUMLEVELKEY)).intValue();
+                int minY = (int) (level * height / (graphHeight * SPACEFACTOR));
+                int maxY = level == 0 ? (int) (height / (graphHeight * SPACEFACTOR * 2)) : height;
 
-				// JY added 2* - double the sideways repulsion.
-				vd.dx += 2 * vd.repulsiondx + vd.edgedx;
-				vd.dy += vd.repulsiondy + vd.edgedy;
+                // JY added 2* - double the sideways repulsion.
+                vd.dx += 2 * vd.repulsiondx + vd.edgedx;
+                vd.dy += vd.repulsiondy + vd.edgedy;
 
-				// JY Addition: Attract the vertex towards it's minimumLevel
-				// height.
-				double delta = xyd.getY() - minY;
-				vd.dy -= delta * LEVELATTRACTIONRATE;
-				if (level == 0)
-					vd.dy -= delta * LEVELATTRACTIONRATE;
-				// twice as much at the top.
+                // JY Addition: Attract the vertex towards it's minimumLevel
+                // height.
+                double delta = xyd.getY() - minY;
+                vd.dy -= delta * LEVELATTRACTIONRATE;
+                if (level == 0)
+                    vd.dy -= delta * LEVELATTRACTIONRATE;
+                // twice as much at the top.
 
-				// JY addition:
-				meanSquareVel += (vd.dx * vd.dx + vd.dy * vd.dy);
+                // JY addition:
+                meanSquareVel += (vd.dx * vd.dx + vd.dy * vd.dy);
 
-				// keeps nodes from moving any faster than 5 per time unit
-				xyd.addX(Math.max(-5, Math.min(5, vd.dx)));
-				xyd.addY(Math.max(-5, Math.min(5, vd.dy)));
+                // keeps nodes from moving any faster than 5 per time unit
+                xyd.addX(Math.max(-5, Math.min(5, vd.dx)));
+                xyd.addY(Math.max(-5, Math.min(5, vd.dy)));
 
-				if (xyd.getX() < 0) {
-					xyd.setX(0);
-				} else if (xyd.getX() > width) {
-					xyd.setX(width);
-				}
+                if (xyd.getX() < 0) {
+                    xyd.setX(0);
+                } else if (xyd.getX() > width) {
+                    xyd.setX(width);
+                }
 
-				// (JY addition: These two lines replaced 0 with minY)
-				if (xyd.getY() < minY) {
-					xyd.setY(minY);
-					// (JY addition: replace height with maxY)
-				} else if (xyd.getY() > maxY) {
-					xyd.setY(maxY);
-				}
+                // (JY addition: These two lines replaced 0 with minY)
+                if (xyd.getY() < minY) {
+                    xyd.setY(minY);
+                    // (JY addition: replace height with maxY)
+                } else if (xyd.getY() > maxY) {
+                    xyd.setY(maxY);
+                }
 
-				// (JY addition: if there's only one root, anchor it in the
-				// middle-top of the screen)
-				if (numRoots == 1 && level == 0) {
-					xyd.setX(width / 2);
-					//xyd.setY(0);
-				}
+                // (JY addition: if there's only one root, anchor it in the
+                // middle-top of the screen)
+                if (numRoots == 1 && level == 0) {
+                    xyd.setX(width / 2);
+                    // xyd.setY(0);
+                }
 
-			}
-		}
-		//System.out.println("MeanSquareAccel="+meanSquareVel);
-		if (!stoppingIncrements
-			&& Math.abs(meanSquareVel - oldMSV) < MSV_THRESHOLD) {
-			stoppingIncrements = true;
-			incrementsLeft = COOL_DOWN_INCREMENTS;
-		} else if (
-			stoppingIncrements
-				&& Math.abs(meanSquareVel - oldMSV) <= MSV_THRESHOLD) {
-			incrementsLeft--;
-			if (incrementsLeft <= 0)
-				incrementsLeft = 0;
-		}
-	}
+            }
+        }
+        // System.out.println("MeanSquareAccel="+meanSquareVel);
+        if (!stoppingIncrements && Math.abs(meanSquareVel - oldMSV) < MSV_THRESHOLD) {
+            stoppingIncrements = true;
+            incrementsLeft = COOL_DOWN_INCREMENTS;
+        } else if (stoppingIncrements && Math.abs(meanSquareVel - oldMSV) <= MSV_THRESHOLD) {
+            incrementsLeft--;
+            if (incrementsLeft <= 0)
+                incrementsLeft = 0;
+        }
+    }
 
     /**
      * Override incrementsAreDone so that we can eventually stop.
@@ -314,65 +309,63 @@ public class AceGraphLayout extends SpringLayout {
     /**
      * Overridden relaxEdges. This one reduces the effect of edges between
      * greatly different levels.
-     *  
+     * 
      */
 
     protected void relaxEdges() {
-		for (Iterator<?> i = getVisibleEdges().iterator(); i.hasNext();) {
-			Edge e = (Edge) i.next();
+        for (Iterator<?> i = getVisibleEdges().iterator(); i.hasNext();) {
+            Edge e = (Edge) i.next();
 
-			Vertex v1 = getAVertex(e);
-			Vertex v2 = e.getOpposite(v1);
+            Vertex v1 = getAVertex(e);
+            Vertex v2 = e.getOpposite(v1);
 
-			Point2D p1 = getLocation(v1);
-			Point2D p2 = getLocation(v2);
-			double vx = p1.getX() - p2.getX();
-			double vy = p1.getY() - p2.getY();
-			double len = Math.sqrt(vx * vx + vy * vy);
+            Point2D p1 = getLocation(v1);
+            Point2D p2 = getLocation(v2);
+            double vx = p1.getX() - p2.getX();
+            double vy = p1.getY() - p2.getY();
+            double len = Math.sqrt(vx * vx + vy * vy);
 
-			// JY addition.
-			int level1 =
-				((Integer) v1.getUserDatum(MINIMUMLEVELKEY)).intValue();
-			int level2 =
-				((Integer) v2.getUserDatum(MINIMUMLEVELKEY)).intValue();
+            // JY addition.
+            int level1 = ((Integer) v1.getUserDatum(MINIMUMLEVELKEY)).intValue();
+            int level2 = ((Integer) v2.getUserDatum(MINIMUMLEVELKEY)).intValue();
 
-			double desiredLen = getLength(e);
-			// desiredLen *= Math.pow( 1.1, (v1.degree() + v2.degree()) );
+            double desiredLen = getLength(e);
+            // desiredLen *= Math.pow( 1.1, (v1.degree() + v2.degree()) );
 
-			// round from zero, if needed [zero would be Bad.].
-			len = (len == 0) ? .0001 : len;
+            // round from zero, if needed [zero would be Bad.].
+            len = (len == 0) ? .0001 : len;
 
-			// force factor: optimal length minus actual length,
-			// is made smaller as the current actual length gets larger.
-			// why?
+            // force factor: optimal length minus actual length,
+            // is made smaller as the current actual length gets larger.
+            // why?
 
-			// System.out.println("Desired : " + getLength( e ));
-			double f = force_multiplier * (desiredLen - len) / len;
+            // System.out.println("Desired : " + getLength( e ));
+            double f = force_multiplier * (desiredLen - len) / len;
 
-			f = f * Math.pow(stretch / 100.0, (v1.degree() + v2.degree() - 2));
+            f = f * Math.pow(stretch / 100.0, (v1.degree() + v2.degree() - 2));
 
-			// JY addition. If this is an edge which stretches a long way,
-			// don't be so concerned about it.
-			if (level1 != level2)
-				f = f / Math.pow(Math.abs(level2 - level1), 1.5);
+            // JY addition. If this is an edge which stretches a long way,
+            // don't be so concerned about it.
+            if (level1 != level2)
+                f = f / Math.pow(Math.abs(level2 - level1), 1.5);
 
-			// f= Math.min( 0, f );
+            // f= Math.min( 0, f );
 
-			// the actual movement distance 'dx' is the force multiplied by the
-			// distance to go.
-			double dx = f * vx;
-			double dy = f * vy;
-			SpringVertexData v1D, v2D;
-			v1D = getSpringData(v1);
-			v2D = getSpringData(v2);
+            // the actual movement distance 'dx' is the force multiplied by the
+            // distance to go.
+            double dx = f * vx;
+            double dy = f * vy;
+            SpringVertexData v1D, v2D;
+            v1D = getSpringData(v1);
+            v2D = getSpringData(v2);
 
-			SpringEdgeData sed = getSpringData(e);
-			sed.f = f;
+            SpringEdgeData sed = getSpringData(e);
+            sed.f = f;
 
-			v1D.edgedx += dx;
-			v1D.edgedy += dy;
-			v2D.edgedx += -dx;
-			v2D.edgedy += -dy;
-		}
-	}
+            v1D.edgedx += dx;
+            v1D.edgedy += dy;
+            v2D.edgedx += -dx;
+            v2D.edgedy += -dy;
+        }
+    }
 }

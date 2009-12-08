@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,7 +64,7 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
         IntList.writeIntList(out, statusPopupIds);
     }
 
-     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             defaultRefset = readConcept(in);
@@ -85,10 +85,10 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
             return ConceptBean.get(uids);
         } catch (NoMappingException e) {
             try {
-				return ConceptBean.get(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
-			} catch (TerminologyException e1) {
-	            throw new ToIoException(e1);
-			}
+                return ConceptBean.get(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
+            } catch (TerminologyException e1) {
+                throw new ToIoException(e1);
+            }
         } catch (TerminologyException e) {
             throw new ToIoException(e);
         }

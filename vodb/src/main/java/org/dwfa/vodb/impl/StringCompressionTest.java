@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,110 +36,107 @@ public class StringCompressionTest {
 
     /**
      * @param args
-     * @throws IOException 
+     * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-		
-		File descFile = new File("/Users/kec/acews/ace-sub/ace-db/dev/src/main/resources/org/snomed/2006-07-31/sct_descriptions_20060731.txt");
-		FileReader descFileReader = new FileReader(descFile);
-		LineNumberReader descReader = new LineNumberReader(descFileReader);
-		
-		int lines = 0;
-		int tags = 0;
-		int tokens = 0;
-		long tokenBytes = 0;
-		long bytesSaved = 0;
-		Map<String, Integer> uniqueTokens = new TreeMap<String, Integer>();
-		ArrayList<String> tokenList = new ArrayList<String>();
-		Set<String> semanticTags = new HashSet<String>();
-		descReader.readLine(); // skip first line. 
-		while (descReader.ready()) {
-			String line = descReader.readLine();
-			List<Integer> encoding = new ArrayList<Integer>();
-			String[] fields = line.split("\t");
-			if (fields[3].endsWith(")")) {
-				int tagStart = fields[3].lastIndexOf(" (");
-				if (tagStart > 0) {
-					String semanticTag = fields[3].substring(tagStart);
-					semanticTags.add(semanticTag);
-					tags++;
-				} else {
-					System.out.println("messed up tag: " + fields[3]);
-				}
-				
-			}
-			for (String fieldToken: fields[3].split(" ")) {
-				tokens++;
-				tokenBytes = tokenBytes + fieldToken.getBytes().length;
-				if (uniqueTokens.containsKey(fieldToken) == false) {
-					Integer id = tokenList.size();
-					tokenList.add(fieldToken);
-					uniqueTokens.put(fieldToken, id);
-					encoding.add(id);
-				} else {
-					Integer id = uniqueTokens.get(fieldToken);
-					encoding.add(id);
-				}
-			}
-			bytesSaved = bytesSaved + (fields[3].getBytes().length - (encoding.size() * 4));
-			lines++;
-			
-		}
-		descReader.close();
-		long uniqueTokenBytes = 0;
-		for (String uniqueToken: uniqueTokens.keySet()) {
-			uniqueTokenBytes = uniqueTokenBytes + uniqueToken.getBytes().length;
-		}
-		System.out.println("Read " + lines + " lines. ");
-		System.out.println("Found " + tokens + " tokens. ");
-		System.out.println("Found " + tokenBytes + " token bytes. ");
-		System.out.println("Found " + uniqueTokens.size() + " unique tokens. ");
-		System.out.println("Found " + uniqueTokenBytes + " unique token bytes. ");
-		System.out.println("Found " + tags + " tags. ");
-		System.out.println("Found unique " + semanticTags.size() + " tags. ");
-		System.out.println(semanticTags);
-		System.out.println("Bytes saved " + bytesSaved + " bytesSaved. ");
-		
-		String one = "Anatomical organisational pattern";
-		String two = "Anatomical organizational pattern";
-		String three = "Anatomical organizational pattern (body structure)";
-		
-		int bytes = one.getBytes().length + two.getBytes().length + three.getBytes().length;
-		
-		
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		baos.write(one.getBytes("UTF-8"));
-		baos.write('\0');
-		baos.write(two.getBytes("UTF-8"));
-		baos.write('\0');
-		baos.write(three.getBytes("UTF-8"));
-		baos.write('\0');
-		byte[] toCompress = baos.toByteArray();
-		
-		
-		System.out.println("Uncompressed size: " + bytes);
-		
-		byte[] deflateCompressArray = compressArray(toCompress, Deflater.BEST_COMPRESSION);
-		System.out.println("deflate size, best compression: " + deflateCompressArray.length);
-		deflateCompressArray = compressArray(toCompress, Deflater.BEST_SPEED);
-		System.out.println("deflate size, BEST_SPEED: " + deflateCompressArray.length);
-		deflateCompressArray = compressArray(toCompress, Deflater.HUFFMAN_ONLY);
-		System.out.println("deflate size, HUFFMAN_ONLY: " + deflateCompressArray.length);
-		deflateCompressArray = compressArray(toCompress, Deflater.DEFAULT_STRATEGY);
-		System.out.println("deflate size, DEFAULT_STRATEGY: " + deflateCompressArray.length);
-		deflateCompressArray = compressArray(toCompress, Deflater.DEFAULT_COMPRESSION);
-		System.out.println("deflate size, DEFAULT_COMPRESSION: " + deflateCompressArray.length);
-		
-		
 
-		bytes = compressString(one).length + compressString(two).length + compressString(three).length;
+        File descFile = new File(
+            "/Users/kec/acews/ace-sub/ace-db/dev/src/main/resources/org/snomed/2006-07-31/sct_descriptions_20060731.txt");
+        FileReader descFileReader = new FileReader(descFile);
+        LineNumberReader descReader = new LineNumberReader(descFileReader);
 
-		System.out.println("Compressed size: " + bytes);
+        int lines = 0;
+        int tags = 0;
+        int tokens = 0;
+        long tokenBytes = 0;
+        long bytesSaved = 0;
+        Map<String, Integer> uniqueTokens = new TreeMap<String, Integer>();
+        ArrayList<String> tokenList = new ArrayList<String>();
+        Set<String> semanticTags = new HashSet<String>();
+        descReader.readLine(); // skip first line.
+        while (descReader.ready()) {
+            String line = descReader.readLine();
+            List<Integer> encoding = new ArrayList<Integer>();
+            String[] fields = line.split("\t");
+            if (fields[3].endsWith(")")) {
+                int tagStart = fields[3].lastIndexOf(" (");
+                if (tagStart > 0) {
+                    String semanticTag = fields[3].substring(tagStart);
+                    semanticTags.add(semanticTag);
+                    tags++;
+                } else {
+                    System.out.println("messed up tag: " + fields[3]);
+                }
 
-		bytes = compressString(one + two + three).length;
+            }
+            for (String fieldToken : fields[3].split(" ")) {
+                tokens++;
+                tokenBytes = tokenBytes + fieldToken.getBytes().length;
+                if (uniqueTokens.containsKey(fieldToken) == false) {
+                    Integer id = tokenList.size();
+                    tokenList.add(fieldToken);
+                    uniqueTokens.put(fieldToken, id);
+                    encoding.add(id);
+                } else {
+                    Integer id = uniqueTokens.get(fieldToken);
+                    encoding.add(id);
+                }
+            }
+            bytesSaved = bytesSaved + (fields[3].getBytes().length - (encoding.size() * 4));
+            lines++;
 
-		System.out.println("Compresseds size: " + bytes);
-	}
+        }
+        descReader.close();
+        long uniqueTokenBytes = 0;
+        for (String uniqueToken : uniqueTokens.keySet()) {
+            uniqueTokenBytes = uniqueTokenBytes + uniqueToken.getBytes().length;
+        }
+        System.out.println("Read " + lines + " lines. ");
+        System.out.println("Found " + tokens + " tokens. ");
+        System.out.println("Found " + tokenBytes + " token bytes. ");
+        System.out.println("Found " + uniqueTokens.size() + " unique tokens. ");
+        System.out.println("Found " + uniqueTokenBytes + " unique token bytes. ");
+        System.out.println("Found " + tags + " tags. ");
+        System.out.println("Found unique " + semanticTags.size() + " tags. ");
+        System.out.println(semanticTags);
+        System.out.println("Bytes saved " + bytesSaved + " bytesSaved. ");
+
+        String one = "Anatomical organisational pattern";
+        String two = "Anatomical organizational pattern";
+        String three = "Anatomical organizational pattern (body structure)";
+
+        int bytes = one.getBytes().length + two.getBytes().length + three.getBytes().length;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(one.getBytes("UTF-8"));
+        baos.write('\0');
+        baos.write(two.getBytes("UTF-8"));
+        baos.write('\0');
+        baos.write(three.getBytes("UTF-8"));
+        baos.write('\0');
+        byte[] toCompress = baos.toByteArray();
+
+        System.out.println("Uncompressed size: " + bytes);
+
+        byte[] deflateCompressArray = compressArray(toCompress, Deflater.BEST_COMPRESSION);
+        System.out.println("deflate size, best compression: " + deflateCompressArray.length);
+        deflateCompressArray = compressArray(toCompress, Deflater.BEST_SPEED);
+        System.out.println("deflate size, BEST_SPEED: " + deflateCompressArray.length);
+        deflateCompressArray = compressArray(toCompress, Deflater.HUFFMAN_ONLY);
+        System.out.println("deflate size, HUFFMAN_ONLY: " + deflateCompressArray.length);
+        deflateCompressArray = compressArray(toCompress, Deflater.DEFAULT_STRATEGY);
+        System.out.println("deflate size, DEFAULT_STRATEGY: " + deflateCompressArray.length);
+        deflateCompressArray = compressArray(toCompress, Deflater.DEFAULT_COMPRESSION);
+        System.out.println("deflate size, DEFAULT_COMPRESSION: " + deflateCompressArray.length);
+
+        bytes = compressString(one).length + compressString(two).length + compressString(three).length;
+
+        System.out.println("Compressed size: " + bytes);
+
+        bytes = compressString(one + two + three).length;
+
+        System.out.println("Compresseds size: " + bytes);
+    }
 
     private static byte[] compressString(String str) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -152,12 +149,11 @@ public class StringCompressionTest {
         return compressed;
     }
 
-    // example at http://java.sun.com/j2se/1.5.0/docs/api/java/util/zip/Deflater.html
-    private static byte[] compressArray(byte[] toCompress, int level)
-            throws IOException {
+    // example at
+    // http://java.sun.com/j2se/1.5.0/docs/api/java/util/zip/Deflater.html
+    private static byte[] compressArray(byte[] toCompress, int level) throws IOException {
         ByteArrayOutputStream compressedOut = new ByteArrayOutputStream();
-        DeflaterOutputStream dout =
-                new DeflaterOutputStream(compressedOut, new Deflater(level));
+        DeflaterOutputStream dout = new DeflaterOutputStream(compressedOut, new Deflater(level));
         dout.write(toCompress);
         dout.close();
         return compressedOut.toByteArray();
@@ -165,9 +161,10 @@ public class StringCompressionTest {
 
 }
 /*
- Body structure, altered from its original anatomical structure
- Body structure, altered from its original anatomical structure (morphologic abnormality)
- Morphologically altered structure
- Morphologic change
- Morphologic alteration
+ * Body structure, altered from its original anatomical structure
+ * Body structure, altered from its original anatomical structure (morphologic
+ * abnormality)
+ * Morphologically altered structure
+ * Morphologic change
+ * Morphologic alteration
  */

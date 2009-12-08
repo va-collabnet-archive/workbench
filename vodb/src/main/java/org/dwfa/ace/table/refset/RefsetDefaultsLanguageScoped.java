@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,8 +28,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
-public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage
-        implements I_RefsetDefaultsLanguageScoped {
+public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage implements I_RefsetDefaultsLanguageScoped {
 
     private I_GetConceptData defaultScopeForScopedLanguageRefset;
     private I_IntList scopePopupIds = new IntList();
@@ -57,8 +56,7 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage
         out.writeObject(priorityPopupItems);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             defaultScopeForScopedLanguageRefset = readConcept(in);
@@ -73,17 +71,12 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage
 
     }
 
-    public RefsetDefaultsLanguageScoped() throws TerminologyException,
-            IOException {
+    public RefsetDefaultsLanguageScoped() throws TerminologyException, IOException {
         super();
-        defaultScopeForScopedLanguageRefset =
-                ConceptBean.get(RefsetAuxiliary.Concept.REFSET_AUXILIARY
-                    .getUids());
+        defaultScopeForScopedLanguageRefset = ConceptBean.get(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
         scopePopupIds.add(defaultScopeForScopedLanguageRefset.getConceptId());
 
-        defaultTagForScopedLanguageRefset =
-                ConceptBean.get(RefsetAuxiliary.Concept.REFSET_AUXILIARY
-                    .getUids());
+        defaultTagForScopedLanguageRefset = ConceptBean.get(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
         tagPopupIds.add(defaultTagForScopedLanguageRefset.getConceptId());
 
         defaultPriorityForScopedLanguageRefset = 1;
@@ -94,39 +87,31 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage
         return defaultPriorityForScopedLanguageRefset;
     }
 
-    public void setDefaultPriorityForScopedLanguageRefset(
-            int defaultPriorityForScopedLanguageRefset) {
+    public void setDefaultPriorityForScopedLanguageRefset(int defaultPriorityForScopedLanguageRefset) {
         Object oldValue = this.defaultPriorityForScopedLanguageRefset;
-        this.defaultPriorityForScopedLanguageRefset =
-                defaultPriorityForScopedLanguageRefset;
-        pcs.firePropertyChange("defaultPriorityForScopedLanguageRefset",
-            oldValue, defaultPriorityForScopedLanguageRefset);
+        this.defaultPriorityForScopedLanguageRefset = defaultPriorityForScopedLanguageRefset;
+        pcs.firePropertyChange("defaultPriorityForScopedLanguageRefset", oldValue,
+            defaultPriorityForScopedLanguageRefset);
     }
 
     public I_GetConceptData getDefaultScopeForScopedLanguageRefset() {
         return defaultScopeForScopedLanguageRefset;
     }
 
-    public void setDefaultScopeForScopedLanguageRefset(
-            I_GetConceptData defaultScopeForScopedLanguageRefset) {
+    public void setDefaultScopeForScopedLanguageRefset(I_GetConceptData defaultScopeForScopedLanguageRefset) {
         Object oldValue = this.defaultScopeForScopedLanguageRefset;
-        this.defaultScopeForScopedLanguageRefset =
-                defaultScopeForScopedLanguageRefset;
-        pcs.firePropertyChange("defaultScopeForScopedLanguageRefset", oldValue,
-            defaultScopeForScopedLanguageRefset);
+        this.defaultScopeForScopedLanguageRefset = defaultScopeForScopedLanguageRefset;
+        pcs.firePropertyChange("defaultScopeForScopedLanguageRefset", oldValue, defaultScopeForScopedLanguageRefset);
     }
 
     public I_GetConceptData getDefaultTagForScopedLanguageRefset() {
         return defaultTagForScopedLanguageRefset;
     }
 
-    public void setDefaultTagForScopedLanguageRefset(
-            I_GetConceptData defaultTagForScopedLanguageRefset) {
+    public void setDefaultTagForScopedLanguageRefset(I_GetConceptData defaultTagForScopedLanguageRefset) {
         Object oldValue = this.defaultTagForScopedLanguageRefset;
-        this.defaultTagForScopedLanguageRefset =
-                defaultTagForScopedLanguageRefset;
-        pcs.firePropertyChange("defaultTagForScopedLanguageRefset", oldValue,
-            defaultTagForScopedLanguageRefset);
+        this.defaultTagForScopedLanguageRefset = defaultTagForScopedLanguageRefset;
+        pcs.firePropertyChange("defaultTagForScopedLanguageRefset", oldValue, defaultTagForScopedLanguageRefset);
     }
 
     public Integer[] getPriorityPopupItems() {
@@ -136,8 +121,7 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage
     public void setPriorityPopupItems(Integer[] priorityPopupItems) {
         Object oldValue = this.priorityPopupItems;
         this.priorityPopupItems = priorityPopupItems;
-        pcs.firePropertyChange("priorityPopupItems", oldValue,
-            priorityPopupItems);
+        pcs.firePropertyChange("priorityPopupItems", oldValue, priorityPopupItems);
     }
 
     public I_IntList getScopePopupIds() {

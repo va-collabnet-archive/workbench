@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,13 +24,13 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class UuidBinding extends TupleBinding<UUID> {
 
-	public UUID entryToObject(TupleInput ti) {
-		return new UUID(ti.readLong(),ti.readLong());
-	}
+    public UUID entryToObject(TupleInput ti) {
+        return new UUID(ti.readLong(), ti.readLong());
+    }
 
-	public void objectToEntry(UUID id, TupleOutput to) {
-		to.writeLong(id.getMostSignificantBits());
-		to.writeLong(id.getLeastSignificantBits());
-	}
+    public void objectToEntry(UUID id, TupleOutput to) {
+        to.writeLong(id.getMostSignificantBits());
+        to.writeLong(id.getLeastSignificantBits());
+    }
 
 }

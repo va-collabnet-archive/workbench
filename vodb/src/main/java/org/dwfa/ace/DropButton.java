@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,8 +51,11 @@ public class DropButton extends JButton implements I_DoConceptDrop {
         this.dropObject = dropObject;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.ace.I_DoConceptDrop#doDrop(org.dwfa.vodb.types.I_GetConceptData)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.I_DoConceptDrop#doDrop(org.dwfa.vodb.types.I_GetConceptData)
      */
     public void doDrop(I_GetConceptData obj) {
         dropObject.doDrop(obj);

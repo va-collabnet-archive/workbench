@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,53 +40,42 @@ import com.sleepycat.je.DatabaseException;
 
 public interface I_StoreDescriptions extends I_StoreInBdb {
 
-	public Iterator<I_DescriptionVersioned> getDescriptionIterator()
-			throws IOException;
+    public Iterator<I_DescriptionVersioned> getDescriptionIterator() throws IOException;
 
-	public void writeDescription(I_DescriptionVersioned desc)
-		throws DatabaseException, IOException;
+    public void writeDescription(I_DescriptionVersioned desc) throws DatabaseException, IOException;
 
-	public void writeDescriptionNoLuceneUpdate(I_DescriptionVersioned desc)
-		throws DatabaseException, IOException;
+    public void writeDescriptionNoLuceneUpdate(I_DescriptionVersioned desc) throws DatabaseException, IOException;
 
-	public boolean hasDescription(int descId, int concId) throws DatabaseException, IOException;
+    public boolean hasDescription(int descId, int concId) throws DatabaseException, IOException;
 
-	public I_DescriptionVersioned getDescription(int descId, int concId)
-			throws IOException, DatabaseException;
+    public I_DescriptionVersioned getDescription(int descId, int concId) throws IOException, DatabaseException;
 
-	public List<I_DescriptionVersioned> getDescriptions(int conceptId)
-			throws DatabaseException, IOException;
+    public List<I_DescriptionVersioned> getDescriptions(int conceptId) throws DatabaseException, IOException;
 
-	/**
-	 * This method is multithreaded hot.
-	 * 
-	 * @param continueWork
-	 * @param p
-	 * @param matches
-	 * @param latch
-	 * @throws DatabaseException
-	 * @throws IOException 
-	 */
-	public void searchRegex(I_TrackContinuation tracker, Pattern p,
-			Collection<I_DescriptionVersioned> matches, CountDownLatch latch,
-			List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
-			throws DatabaseException, IOException;
+    /**
+     * This method is multithreaded hot.
+     * 
+     * @param continueWork
+     * @param p
+     * @param matches
+     * @param latch
+     * @throws DatabaseException
+     * @throws IOException
+     */
+    public void searchRegex(I_TrackContinuation tracker, Pattern p, Collection<I_DescriptionVersioned> matches,
+            CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
+            throws DatabaseException, IOException;
 
-	public CountDownLatch searchLucene(I_TrackContinuation tracker,
-			String query, Collection<LuceneMatch> matches,
-			CountDownLatch latch, List<I_TestSearchResults> checkList,
-			I_ConfigAceFrame config, LuceneProgressUpdator updater)
-			throws DatabaseException, IOException, ParseException;
-	
+    public CountDownLatch searchLucene(I_TrackContinuation tracker, String query, Collection<LuceneMatch> matches,
+            CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config,
+            LuceneProgressUpdator updater) throws DatabaseException, IOException, ParseException;
 
-	public void createLuceneDescriptionIndex() throws IOException;
+    public void createLuceneDescriptionIndex() throws IOException;
 
-	public void iterateDescriptionEntries(
-			I_ProcessDescriptionEntries processor) throws Exception;
+    public void iterateDescriptionEntries(I_ProcessDescriptionEntries processor) throws Exception;
 
-	public Hits doLuceneSearch(String query) throws IOException,
-			ParseException;
+    public Hits doLuceneSearch(String query) throws IOException, ParseException;
 
-	public I_DescriptionVersioned descEntryToObject(DatabaseEntry key, DatabaseEntry value);
+    public I_DescriptionVersioned descEntryToObject(DatabaseEntry key, DatabaseEntry value);
 
 }

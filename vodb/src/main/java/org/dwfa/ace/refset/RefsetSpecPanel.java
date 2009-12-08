@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -93,36 +93,26 @@ public class RefsetSpecPanel extends JPanel {
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         split.setOneTouchExpandable(true);
 
-        TermTreeHelper hierarchicalTreeHelper =
-                new TermTreeHelper(new RefsetSpecFrameConfig(ace
-                    .getAceFrameConfig(), new IntSet(), false), ace);
+        TermTreeHelper hierarchicalTreeHelper = new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(),
+            new IntSet(), false), ace);
 
-        TermTreeHelper refsetAndParentOnlyTreeHelper =
-                new TermTreeHelper(new RefsetSpecFrameConfig(ace
-                    .getAceFrameConfig(), new IntSet(), true), ace);
+        TermTreeHelper refsetAndParentOnlyTreeHelper = new TermTreeHelper(new RefsetSpecFrameConfig(
+            ace.getAceFrameConfig(), new IntSet(), true), ace);
 
-        editor =
-                new RefsetSpecEditor(ace, hierarchicalTreeHelper,
-                    refsetAndParentOnlyTreeHelper, this);
+        editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper, this);
         split.setTopComponent(editor.getContentPanel());
 
-        ace.getAceFrameConfig().addPropertyChangeListener("viewPositions",
-            refsetAndParentOnlyTreeHelper);
-        ace.getAceFrameConfig().addPropertyChangeListener("commit",
-            refsetAndParentOnlyTreeHelper);
+        ace.getAceFrameConfig().addPropertyChangeListener("viewPositions", refsetAndParentOnlyTreeHelper);
+        ace.getAceFrameConfig().addPropertyChangeListener("commit", refsetAndParentOnlyTreeHelper);
         editor.getLabel().addTermChangeListener(refsetAndParentOnlyTreeHelper);
 
-        ace.getAceFrameConfig().addPropertyChangeListener("viewPositions",
-            hierarchicalTreeHelper);
-        ace.getAceFrameConfig().addPropertyChangeListener("commit",
-            hierarchicalTreeHelper);
+        ace.getAceFrameConfig().addPropertyChangeListener("viewPositions", hierarchicalTreeHelper);
+        ace.getAceFrameConfig().addPropertyChangeListener("commit", hierarchicalTreeHelper);
         editor.getLabel().addTermChangeListener(hierarchicalTreeHelper);
 
         bottomTabs = new JTabbedPane();
-        bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper
-            .getHierarchyPanel());
-        bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW,
-            refsetAndParentOnlyTreeHelper.getHierarchyPanel());
+        bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
+        bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
 
         bottomTabs.addTab(TABLE_VIEW, new JScrollPane());
         bottomTabs.addTab(COMMENT_VIEW, new JScrollPane());
@@ -150,14 +140,11 @@ public class RefsetSpecPanel extends JPanel {
         refsetTableModel.propertyChange(null);
     }
 
-    public ReflexiveRefsetCommentTableModel setupCommentTable()
-            throws NoSuchMethodException, Exception {
-        JTableWithDragImage commentTable =
-                createCommentTable(aceFrameConfig, editor);
+    public ReflexiveRefsetCommentTableModel setupCommentTable() throws NoSuchMethodException, Exception {
+        JTableWithDragImage commentTable = createCommentTable(aceFrameConfig, editor);
         for (int i = 0; i < bottomTabs.getTabCount(); i++) {
             if (bottomTabs.getTitleAt(i).equals(COMMENT_VIEW)) {
-                JScrollPane tableScroller =
-                        (JScrollPane) bottomTabs.getComponentAt(i);
+                JScrollPane tableScroller = (JScrollPane) bottomTabs.getComponentAt(i);
                 tableScroller.setViewportView(commentTable);
                 break;
             }
@@ -167,8 +154,8 @@ public class RefsetSpecPanel extends JPanel {
     }
 
     protected static JTableWithDragImage createCommentTable(I_ConfigAceFrame aceFrameConfig, RefsetSpecEditor editor)
-			throws NoSuchMethodException, Exception {
-		List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
+            throws NoSuchMethodException, Exception {
+        List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
         column1.setColumnName("referenced component");
         column1.setCreationEditable(true);
@@ -194,10 +181,8 @@ public class RefsetSpecPanel extends JPanel {
         column2.setPref(50);
         column2.setMax(150);
         column2.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-        column2.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod(
-                "getStringValue"));
-        column2.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod(
-                "setStringValue", String.class));
+        column2.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod("getStringValue"));
+        column2.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod("setStringValue", String.class));
         column2.setType(REFSET_FIELD_TYPE.STRING);
         columns.add(column2);
 
@@ -210,10 +195,8 @@ public class RefsetSpecPanel extends JPanel {
         column3.setPref(150);
         column3.setMax(150);
         column3.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-        column3.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod(
-                "getStatusId"));
-        column3.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod(
-                "setStatusId", int.class));
+        column3.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod("getStatusId"));
+        column3.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod("setStatusId", int.class));
         column3.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
         columns.add(column3);
 
@@ -227,10 +210,8 @@ public class RefsetSpecPanel extends JPanel {
             column4.setPref(150);
             column4.setMax(150);
             column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-            column4.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod(
-                    "getVersion"));
-            column4.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod(
-                    "setVersion", int.class));
+            column4.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod("getVersion"));
+            column4.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod("setVersion", int.class));
             column4.setType(REFSET_FIELD_TYPE.VERSION);
             columns.add(column4);
 
@@ -243,21 +224,17 @@ public class RefsetSpecPanel extends JPanel {
             column5.setPref(150);
             column5.setMax(150);
             column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-            column5.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod(
-                    "getPathId"));
-            column5.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod(
-                    "setPathId", int.class));
+            column5.setReadMethod(EXT_TYPE.STRING.getPartClass().getMethod("getPathId"));
+            column5.setWriteMethod(EXT_TYPE.STRING.getPartClass().getMethod("setPathId", int.class));
             column5.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
             columns.add(column5);
         }
 
-        ReflexiveRefsetCommentTableModel commentTableModel = new ReflexiveRefsetCommentTableModel(
-                editor, columns.toArray(new ReflexiveRefsetFieldData[columns
-                        .size()]));
+        ReflexiveRefsetCommentTableModel commentTableModel = new ReflexiveRefsetCommentTableModel(editor,
+            columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
         aceFrameConfig.addPropertyChangeListener("viewPositions", commentTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", commentTableModel);
         editor.getLabel().addTermChangeListener(commentTableModel);
-        
 
         commentTableModel.setComponentId(Integer.MIN_VALUE);
         commentTableModel.getRowCount();
@@ -268,10 +245,8 @@ public class RefsetSpecPanel extends JPanel {
         commentTable.getColumnModel().getColumn(1).setIdentifier(column2);
 
         sortingTable.setTableHeader(commentTable.getTableHeader());
-        sortingTable
-                .getTableHeader()
-                .setToolTipText(
-                        "Click to specify sorting; Control-Click to specify secondary sorting");
+        sortingTable.getTableHeader().setToolTipText(
+            "Click to specify sorting; Control-Click to specify secondary sorting");
 
         ExtTableRenderer renderer = new ExtTableRenderer();
         commentTable.setDefaultRenderer(StringWithExtTuple.class, renderer);
@@ -280,10 +255,11 @@ public class RefsetSpecPanel extends JPanel {
         commentTable.setDefaultRenderer(Integer.class, renderer);
         commentTable.setDefaultRenderer(Double.class, renderer);
         commentTable.setDefaultRenderer(String.class, renderer);
-		return commentTable;
-	}
+        return commentTable;
+    }
 
-    public void setupRefsetMemberTable(ReflexiveRefsetCommentTableModel commentTableModel) throws NoSuchMethodException, Exception {
+    public void setupRefsetMemberTable(ReflexiveRefsetCommentTableModel commentTableModel)
+            throws NoSuchMethodException, Exception {
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
         column1.setColumnName("referenced concept");
@@ -294,8 +270,7 @@ public class RefsetSpecPanel extends JPanel {
         column1.setPref(150);
         column1.setMax(1000);
         column1.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.CONCEPT_COMPONENT);
-        column1.setReadMethod(I_GetConceptData.class.getMethod("getDescTuple",
-                I_IntList.class, I_ConfigAceFrame.class));
+        column1.setReadMethod(I_GetConceptData.class.getMethod("getDescTuple", I_IntList.class, I_ConfigAceFrame.class));
         List<Object> parameters = new ArrayList<Object>();
         parameters.add(aceFrameConfig.getTableDescPreferenceList());
         parameters.add(aceFrameConfig);
@@ -312,10 +287,8 @@ public class RefsetSpecPanel extends JPanel {
         column2.setPref(50);
         column2.setMax(150);
         column2.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-        column2.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                "getConceptId"));
-        column2.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                "setConceptId", int.class));
+        column2.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("getConceptId"));
+        column2.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("setConceptId", int.class));
         column2.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
         columns.add(column2);
 
@@ -328,10 +301,8 @@ public class RefsetSpecPanel extends JPanel {
         column3.setPref(150);
         column3.setMax(150);
         column3.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-        column3.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                "getStatusId"));
-        column3.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                "setStatusId", int.class));
+        column3.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("getStatusId"));
+        column3.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("setStatusId", int.class));
         column3.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
         columns.add(column3);
 
@@ -344,10 +315,8 @@ public class RefsetSpecPanel extends JPanel {
         column4.setPref(150);
         column4.setMax(150);
         column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PROMOTION_REFSET_PART);
-        column4.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                "getC1id"));
-        column4.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                "setC1id", int.class));
+        column4.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("getC1id"));
+        column4.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("setC1id", int.class));
         column4.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
         columns.add(column4);
 
@@ -361,10 +330,8 @@ public class RefsetSpecPanel extends JPanel {
             column5.setPref(150);
             column5.setMax(150);
             column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-            column5.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                    "getVersion"));
-            column5.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                    "setVersion", int.class));
+            column5.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("getVersion"));
+            column5.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("setVersion", int.class));
             column5.setType(REFSET_FIELD_TYPE.VERSION);
             columns.add(column5);
 
@@ -377,21 +344,17 @@ public class RefsetSpecPanel extends JPanel {
             column6.setPref(150);
             column6.setMax(150);
             column6.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-            column6.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                    "getPathId"));
-            column6.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod(
-                    "setPathId", int.class));
+            column6.setReadMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("getPathId"));
+            column6.setWriteMethod(EXT_TYPE.CONCEPT.getPartClass().getMethod("setPathId", int.class));
             column6.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
             columns.add(column6);
         }
 
-        refsetTableModel = new ReflexiveRefsetTableModel(
-                editor, columns.toArray(new ReflexiveRefsetFieldData[columns
-                        .size()]));
+        refsetTableModel = new ReflexiveRefsetTableModel(editor,
+            columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
         aceFrameConfig.addPropertyChangeListener("viewPositions", refsetTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", refsetTableModel);
         editor.getLabel().addTermChangeListener(refsetTableModel);
-        
 
         refsetTableModel.setComponentId(Integer.MIN_VALUE);
         refsetTableModel.getRowCount();
@@ -402,10 +365,8 @@ public class RefsetSpecPanel extends JPanel {
         refsetTable.getColumnModel().getColumn(1).setIdentifier(column2);
 
         sortingTable.setTableHeader(refsetTable.getTableHeader());
-        sortingTable
-                .getTableHeader()
-                .setToolTipText(
-                        "Click to specify sorting; Control-Click to specify secondary sorting");
+        sortingTable.getTableHeader().setToolTipText(
+            "Click to specify sorting; Control-Click to specify secondary sorting");
 
         ExtTableRenderer renderer = new ExtTableRenderer();
         refsetTable.setDefaultRenderer(StringWithExtTuple.class, renderer);
@@ -416,8 +377,7 @@ public class RefsetSpecPanel extends JPanel {
         refsetTable.setDefaultRenderer(String.class, renderer);
         for (int i = 0; i < bottomTabs.getTabCount(); i++) {
             if (bottomTabs.getTitleAt(i).equals(TABLE_VIEW)) {
-                JScrollPane tableScroller = (JScrollPane) bottomTabs
-                        .getComponentAt(i);
+                JScrollPane tableScroller = (JScrollPane) bottomTabs.getComponentAt(i);
                 tableScroller.setViewportView(refsetTable);
                 break;
             }
@@ -425,8 +385,7 @@ public class RefsetSpecPanel extends JPanel {
         List<ReflexiveTableModel> commentTableModels = new ArrayList<ReflexiveTableModel>();
         commentTableModels.add(editor.getCommentTableModel());
         commentTableModels.add(commentTableModel);
-        refsetTable.addMouseListener(new MemberTablePopupListener(refsetTable, 
-        		aceFrameConfig, commentTableModels));
+        refsetTable.addMouseListener(new MemberTablePopupListener(refsetTable, aceFrameConfig, commentTableModels));
     }
 
     public I_GetConceptData getRefsetInSpecEditor() {
@@ -441,8 +400,7 @@ public class RefsetSpecPanel extends JPanel {
         return editor.getTreeInSpecEditor();
     }
 
-    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException,
-            TerminologyException {
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         return editor.getRefsetSpecInSpecEditor();
     }
 

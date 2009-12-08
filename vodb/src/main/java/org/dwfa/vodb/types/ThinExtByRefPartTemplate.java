@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,45 +31,57 @@ public class ThinExtByRefPartTemplate extends ThinExtByRefPartTemplateForRel imp
 
     int attributeId;
     int targetCodeId;
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplate#getAttributeId()
      */
     public int getAttributeId() {
         return attributeId;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplate#setAttributeId(int)
      */
     public void setAttributeId(int attributeId) {
         this.attributeId = attributeId;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplate#getTargetCodeId()
      */
     public int getTargetCodeId() {
         return targetCodeId;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplate#setTargetCodeId(int)
      */
     public void setTargetCodeId(int targetCodeId) {
         this.targetCodeId = targetCodeId;
     }
+
     public ThinExtByRefPartTemplate(ThinExtByRefPartTemplate another) {
         super(another);
         this.attributeId = another.attributeId;
         this.targetCodeId = another.targetCodeId;
     }
 
-
-	public I_ThinExtByRefPart duplicate() {
+    public I_ThinExtByRefPart duplicate() {
         return new ThinExtByRefPartTemplate(this);
     }
 
     public ThinExtByRefPartTemplate() {
         super();
     }
+
     @Override
     public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
         I_TermFactory tf = LocalVersionedTerminology.get();

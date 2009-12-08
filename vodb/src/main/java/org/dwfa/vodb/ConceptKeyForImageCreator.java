@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,11 +30,9 @@ public class ConceptKeyForImageCreator implements SecondaryKeyCreator {
     ThinImageBinder imageBinder = new ThinImageBinder();
     EntryBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 
-    public boolean createSecondaryKey(SecondaryDatabase secDb,
-            DatabaseEntry keyEntry, DatabaseEntry dataEntry,
+    public boolean createSecondaryKey(SecondaryDatabase secDb, DatabaseEntry keyEntry, DatabaseEntry dataEntry,
             DatabaseEntry resultEntry) throws DatabaseException {
-        I_ImageVersioned image =
-                (I_ImageVersioned) imageBinder.entryToObject(dataEntry);
+        I_ImageVersioned image = (I_ImageVersioned) imageBinder.entryToObject(dataEntry);
         intBinder.objectToEntry(image.getConceptId(), resultEntry);
         return true;
     }

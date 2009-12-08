@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,8 +62,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
     private I_ConfigAceFrame aceConfig;
     private RefsetSpecEditor specEditor;
 
-    public RefsetSpecTreeMouseListener(I_ConfigAceFrame aceConfig,
-            RefsetSpecEditor specEditor) {
+    public RefsetSpecTreeMouseListener(I_ConfigAceFrame aceConfig, RefsetSpecEditor specEditor) {
         super();
         this.aceConfig = aceConfig;
         this.specEditor = specEditor;
@@ -100,56 +99,35 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
                 JTree tree = (JTree) e.getSource();
                 int rowForLocation = tree.getRowForLocation(e.getX(), e.getY());
                 int[] selectedRow = tree.getSelectionRows();
-                if (rowForLocation < 0 || selectedRow == null
-                    || selectedRow[0] != rowForLocation) {
+                if (rowForLocation < 0 || selectedRow == null || selectedRow[0] != rowForLocation) {
                     tree.clearSelection();
-                    popup =
-                            makePopup(e, new File(AceFrame.pluginRoot,
-                                "refsetspec/spec-popup"), null);
+                    popup = makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/spec-popup"), null);
                 } else {
-                    TreePath selPath =
-                            tree.getPathForLocation(e.getX(), e.getY());
+                    TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
                     if (selPath != null) {
                         if (rowForLocation != -1) {
-                            DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) selPath
-                                        .getLastPathComponent();
-                            I_ThinExtByRefVersioned specPart =
-                                    (I_ThinExtByRefVersioned) node
-                                        .getUserObject();
+                            DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
+                            I_ThinExtByRefVersioned specPart = (I_ThinExtByRefVersioned) node.getUserObject();
                             switch (ThinExtBinder.getExtensionType(specPart)) {
                             case CONCEPT_CONCEPT:
-                                popup =
-                                        makePopup(e, new File(
-                                            AceFrame.pluginRoot,
-                                            "refsetspec/branch-popup"),
-                                            specPart);
+                                popup = makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart);
                                 break;
 
                             case CONCEPT_CONCEPT_CONCEPT:
-                                popup =
-                                        makePopup(
-                                            e,
-                                            new File(AceFrame.pluginRoot,
-                                                "refsetspec/structural-query-popup"),
-                                            specPart);
+                                popup = makePopup(e,
+                                    new File(AceFrame.pluginRoot, "refsetspec/structural-query-popup"), specPart);
                                 break;
 
                             case CONCEPT_CONCEPT_STRING:
-                                popup =
-                                        makePopup(e, new File(
-                                            AceFrame.pluginRoot,
-                                            "refsetspec/text-query-popup"),
-                                            specPart);
+                                popup = makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/text-query-popup"),
+                                    specPart);
                                 break;
                             default:
                                 popup = null;
                             }
                         }
                     } else {
-                        popup =
-                                makePopup(e, new File(AceFrame.pluginRoot,
-                                    "refsetspec/spec-popup"), null);
+                        popup = makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/spec-popup"), null);
                     }
                 }
                 if (popup != null) {
@@ -166,113 +144,103 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
     }
 
     private JPopupMenu makePopup(MouseEvent e, File directory, I_ThinExtByRefVersioned specPart)
-			throws FileNotFoundException, IOException, ClassNotFoundException {
-		JPopupMenu popup = new JPopupMenu();
-		JMenuItem noActionItem = new JMenuItem("");
-		popup.add(noActionItem);
-		ProcessPopupUtil.addSubmenMenuItems(popup, directory, this.aceConfig
-				.getWorker());
-		if (specPart != null) {
-			popup.addSeparator();
-			
-			boolean uncommitted = false;
-			for (I_ThinExtByRefPart part: specPart.getVersions()) {
-				if (part.getVersion() == Integer.MAX_VALUE) {
-					uncommitted = true;
-					break;
-				}
-			}
-			if (uncommitted) {
-				JMenuItem cancelActionItem = new JMenuItem("Cancel change");
-				cancelActionItem.addActionListener(new CancelChangeAction(specPart));
-				popup.add(cancelActionItem);
-			} else {
-				List<I_ThinExtByRefTuple> tuples = specPart.getTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(), true);
-				
-				if (tuples.iterator().hasNext()) {
-					I_ThinExtByRefTuple firstTuple = tuples.iterator().next();
-					ConceptBean refsetConcept = ConceptBean.get(firstTuple.getRefsetId());
-					I_DescriptionTuple refsetDesc = refsetConcept.getDescTuple(aceConfig.getTableDescPreferenceList(), 
-							aceConfig);
-					String prompt = "Add comment for '" + refsetDesc.getText() + "'";
-					JMenuItem commentActionItem = new JMenuItem(prompt + "...");
-					commentActionItem.addActionListener(new CommentSpecAction(firstTuple, prompt));
-					popup.add(commentActionItem);
-					popup.addSeparator();
-					JMenuItem retireActionItem = new JMenuItem("Retire");
-					retireActionItem.addActionListener(new RetireSpecAction(firstTuple));
-					popup.add(retireActionItem);
-					
-					JMenuItem changeActionItem = new JMenuItem("Change...");
-					changeActionItem.addActionListener(new ChangeSpecAction(firstTuple));
-					popup.add(changeActionItem);
-				} else {
-					tuples = specPart.getTuples(null, aceConfig.getViewPositionSet(), true);
-				} 
-			}
-			
-		}
-		
-		return popup;
-	}
+            throws FileNotFoundException, IOException, ClassNotFoundException {
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem noActionItem = new JMenuItem("");
+        popup.add(noActionItem);
+        ProcessPopupUtil.addSubmenMenuItems(popup, directory, this.aceConfig.getWorker());
+        if (specPart != null) {
+            popup.addSeparator();
+
+            boolean uncommitted = false;
+            for (I_ThinExtByRefPart part : specPart.getVersions()) {
+                if (part.getVersion() == Integer.MAX_VALUE) {
+                    uncommitted = true;
+                    break;
+                }
+            }
+            if (uncommitted) {
+                JMenuItem cancelActionItem = new JMenuItem("Cancel change");
+                cancelActionItem.addActionListener(new CancelChangeAction(specPart));
+                popup.add(cancelActionItem);
+            } else {
+                List<I_ThinExtByRefTuple> tuples = specPart.getTuples(aceConfig.getAllowedStatus(),
+                    aceConfig.getViewPositionSet(), true);
+
+                if (tuples.iterator().hasNext()) {
+                    I_ThinExtByRefTuple firstTuple = tuples.iterator().next();
+                    ConceptBean refsetConcept = ConceptBean.get(firstTuple.getRefsetId());
+                    I_DescriptionTuple refsetDesc = refsetConcept.getDescTuple(aceConfig.getTableDescPreferenceList(),
+                        aceConfig);
+                    String prompt = "Add comment for '" + refsetDesc.getText() + "'";
+                    JMenuItem commentActionItem = new JMenuItem(prompt + "...");
+                    commentActionItem.addActionListener(new CommentSpecAction(firstTuple, prompt));
+                    popup.add(commentActionItem);
+                    popup.addSeparator();
+                    JMenuItem retireActionItem = new JMenuItem("Retire");
+                    retireActionItem.addActionListener(new RetireSpecAction(firstTuple));
+                    popup.add(retireActionItem);
+
+                    JMenuItem changeActionItem = new JMenuItem("Change...");
+                    changeActionItem.addActionListener(new ChangeSpecAction(firstTuple));
+                    popup.add(changeActionItem);
+                } else {
+                    tuples = specPart.getTuples(null, aceConfig.getViewPositionSet(), true);
+                }
+            }
+
+        }
+
+        return popup;
+    }
 
     private class CommentSpecAction implements ActionListener {
         private I_ThinExtByRefTuple thinExtByRefTuple;
         private String prompt;
 
-        private CommentSpecAction(I_ThinExtByRefTuple thinExtByRefTuple,
-                String prompt) {
+        private CommentSpecAction(I_ThinExtByRefTuple thinExtByRefTuple, String prompt) {
             super();
             this.thinExtByRefTuple = thinExtByRefTuple;
             this.prompt = prompt;
         }
 
         public void actionPerformed(ActionEvent arg0) {
-			String commentText = (String)JOptionPane.showInputDialog(
-						aceConfig.getTreeInSpecEditor().getRootPane(),
-			                    "",
-			                    prompt + ":             ",
-			                    JOptionPane.PLAIN_MESSAGE,
-			                    null,
-			                    null,
-			                    "");
-			if (commentText != null && commentText.length() > 2) {
-				try {
-					I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
-					I_TermFactory tf = LocalVersionedTerminology.get();
-					I_IntSet allowedTypes = new IntSet();
-					allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
-					Set<I_GetConceptData> commentRefsets = 
-						refsetIdentityConcept.getSourceRelTargets(aceConfig.getAllowedStatus(), 
-							allowedTypes, 
-							aceConfig.getViewPositionSet(), false);
-					int newMemberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(), 
-							ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), 
-							aceConfig.getEditingPathSet(), 
-							Integer.MAX_VALUE);
-					if (commentRefsets.size() > 0) {
-						I_GetConceptData commentRefsetIdentityConcept = commentRefsets.iterator().next();
-						I_ThinExtByRefVersioned commentExt = tf.newExtension(
-								commentRefsetIdentityConcept.getConceptId(), 
-								newMemberId, 
-								thinExtByRefTuple.getMemberId(), 
-								RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
-						LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
-						for (I_Path p: aceConfig.getEditingPathSet()) {
-							I_ThinExtByRefPartString commentPart = LocalVersionedTerminology.get().newStringExtensionPart();
-							commentPart.setStringValue(commentText);
-							commentPart.setPathId(p.getConceptId());
-							commentPart.setStatusId(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-							commentPart.setVersion(Integer.MAX_VALUE);
-							commentExt.addVersion(commentPart);
-						}
-						tf.addUncommitted(commentExt);
-					}
-				} catch (Exception e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
-			}
-		}    }
+            String commentText = (String) JOptionPane.showInputDialog(aceConfig.getTreeInSpecEditor().getRootPane(),
+                "", prompt + ":             ", JOptionPane.PLAIN_MESSAGE, null, null, "");
+            if (commentText != null && commentText.length() > 2) {
+                try {
+                    I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
+                    I_TermFactory tf = LocalVersionedTerminology.get();
+                    I_IntSet allowedTypes = new IntSet();
+                    allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
+                    Set<I_GetConceptData> commentRefsets = refsetIdentityConcept.getSourceRelTargets(
+                        aceConfig.getAllowedStatus(), allowedTypes, aceConfig.getViewPositionSet(), false);
+                    int newMemberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(),
+                        ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
+                        aceConfig.getEditingPathSet(), Integer.MAX_VALUE);
+                    if (commentRefsets.size() > 0) {
+                        I_GetConceptData commentRefsetIdentityConcept = commentRefsets.iterator().next();
+                        I_ThinExtByRefVersioned commentExt = tf.newExtension(
+                            commentRefsetIdentityConcept.getConceptId(), newMemberId, thinExtByRefTuple.getMemberId(),
+                            RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
+                        LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
+                        for (I_Path p : aceConfig.getEditingPathSet()) {
+                            I_ThinExtByRefPartString commentPart = LocalVersionedTerminology.get()
+                                .newStringExtensionPart();
+                            commentPart.setStringValue(commentText);
+                            commentPart.setPathId(p.getConceptId());
+                            commentPart.setStatusId(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+                            commentPart.setVersion(Integer.MAX_VALUE);
+                            commentExt.addVersion(commentPart);
+                        }
+                        tf.addUncommitted(commentExt);
+                    }
+                } catch (Exception e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                }
+            }
+        }
+    }
 
     private class RetireSpecAction implements ActionListener {
         private I_ThinExtByRefTuple thinExtByRefTuple;
@@ -283,20 +251,17 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            I_ThinExtByRefPart newPart =
-                    thinExtByRefTuple.getPart().duplicate();
+            I_ThinExtByRefPart newPart = thinExtByRefTuple.getPart().duplicate();
             newPart.setVersion(Integer.MAX_VALUE);
             try {
-                newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED
-                    .localize().getNid());
+                newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
             } catch (IOException e) {
                 throw new RuntimeException();
             } catch (TerminologyException e) {
                 throw new RuntimeException();
             }
             thinExtByRefTuple.getCore().addVersion(newPart);
-            LocalVersionedTerminology.get().addUncommitted(
-                thinExtByRefTuple.getCore());
+            LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
             specEditor.updateSpecTree(false);
         }
     }
@@ -310,28 +275,29 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-			try {
-				List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
-				for (I_ThinExtByRefPart part : specPart.getVersions()) {
-					if (part.getVersion() == Integer.MAX_VALUE) {
-						partsToRemove.add(part);
-					}
-				}
-				ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) LocalVersionedTerminology
-						.get().getExtensionWrapper(specPart.getMemberId());
-				specPart.getVersions().removeAll(partsToRemove);
-				if (specPart.getVersions().size() == 0) {
-					ebrBean.discard();
-				}
-				LocalVersionedTerminology.get().addUncommitted(specPart);
-				if (specPart.getVersions().size() == 0) {
-					ebrBean.abort();
-				}
-				specEditor.updateSpecTree(false);
-			} catch (IOException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-		}    }
+            try {
+                List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
+                for (I_ThinExtByRefPart part : specPart.getVersions()) {
+                    if (part.getVersion() == Integer.MAX_VALUE) {
+                        partsToRemove.add(part);
+                    }
+                }
+                ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) LocalVersionedTerminology.get()
+                    .getExtensionWrapper(specPart.getMemberId());
+                specPart.getVersions().removeAll(partsToRemove);
+                if (specPart.getVersions().size() == 0) {
+                    ebrBean.discard();
+                }
+                LocalVersionedTerminology.get().addUncommitted(specPart);
+                if (specPart.getVersions().size() == 0) {
+                    ebrBean.abort();
+                }
+                specEditor.updateSpecTree(false);
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+    }
 
     private class ChangeSpecAction implements ActionListener {
         private I_ThinExtByRefTuple thinExtByRefTuple;
@@ -342,12 +308,10 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            I_ThinExtByRefPart newPart =
-                    thinExtByRefTuple.getPart().duplicate();
+            I_ThinExtByRefPart newPart = thinExtByRefTuple.getPart().duplicate();
             newPart.setVersion(Integer.MAX_VALUE);
             thinExtByRefTuple.getCore().addVersion(newPart);
-            LocalVersionedTerminology.get().addUncommitted(
-                thinExtByRefTuple.getCore());
+            LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
             specEditor.updateSpecTree(false);
         }
     }

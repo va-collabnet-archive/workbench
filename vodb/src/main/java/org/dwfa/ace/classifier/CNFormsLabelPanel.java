@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,13 +68,11 @@ import org.dwfa.vodb.types.ThinRelTuple;
  * 
  */
 
-/* :NYI:
- *  1. clarify minmax !!! 
- *  2. handle path comparison
- *  3. 
- * 
- * 
- * 
+/*
+ * :NYI:
+ * 1. clarify minmax !!!
+ * 2. handle path comparison
+ * 3.
  */
 
 public class CNFormsLabelPanel extends JPanel implements ActionListener {
@@ -157,10 +155,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     private List<I_ImplementActiveLabel> commonLabels;
 
     // AWT: Dimension(int Width, int Height) in pixels(???)
-    private Dimension maxPartPanelSize = new Dimension(
-            TermLabelMaker.LABEL_WIDTH + 20, 4000);
-    private Dimension minPartPanelSize = new Dimension(
-            TermLabelMaker.LABEL_WIDTH + 20, 100);
+    private Dimension maxPartPanelSize = new Dimension(TermLabelMaker.LABEL_WIDTH + 20, 4000);
+    private Dimension minPartPanelSize = new Dimension(TermLabelMaker.LABEL_WIDTH + 20, 100);
 
     private void setMinMaxSize(JPanel panel) {
         panel.setMinimumSize(minPartPanelSize);
@@ -189,8 +185,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         return p;
     }
 
-    public CNFormsLabelPanel(ConceptBean conceptIn,
-            List<I_Position> cEditPathPos, List<I_Position> cClassPathPos,
+    public CNFormsLabelPanel(ConceptBean conceptIn, List<I_Position> cEditPathPos, List<I_Position> cClassPathPos,
             SnoTable cSnoTable) {
         super();
         this.theCBean = conceptIn;
@@ -285,8 +280,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         formsJPanel.setName("Forms Panel");
         formsJPanel.setBorder(BorderFactory.createTitledBorder("Forms: "));
         JScrollPane formJScrollPane = new JScrollPane(formsJPanel);
-        formJScrollPane
-                .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        formJScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         add(formJScrollPane, c);
 
     }
@@ -296,13 +290,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             setConcept(theCBean, config);
             revalidate();
         } catch (IOException e1) {
-            AceLog.getAppLog().alertAndLog(this, Level.SEVERE,
-                    "Database Exception: " + e1.getLocalizedMessage(), e1);
+            AceLog.getAppLog().alertAndLog(this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
         }
     }
 
-    public void setConcept(ConceptBean conceptIn, I_ConfigAceFrame config)
-            throws IOException {
+    public void setConcept(ConceptBean conceptIn, I_ConfigAceFrame config) throws IOException {
         this.theCBean = conceptIn;
         this.config = config;
 
@@ -315,12 +307,10 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         // COMMON & DIFFERENT SECTION
         // COMMON PANEL
-        commonLabels = getCommonLabels(showDetailCB.isSelected(), showStatusCB
-                .isSelected(), config); // ####
+        commonLabels = getCommonLabels(showDetailCB.isSelected(), showStatusCB.isSelected(), config); // ####
         commonPartJPanel = new JPanel();
         setMinMaxSize(commonPartJPanel);
-        commonPartJPanel.setLayout(new BoxLayout(commonPartJPanel,
-                BoxLayout.Y_AXIS));
+        commonPartJPanel.setLayout(new BoxLayout(commonPartJPanel, BoxLayout.Y_AXIS));
         for (I_ImplementActiveLabel l : commonLabels) {
             commonPartJPanel.add(l.getLabel());
         }
@@ -341,12 +331,10 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         Map<I_DescriptionTuple, Color> desColorMap = new HashMap<I_DescriptionTuple, Color>();
         Map<I_RelTuple, Color> relColorMap = new HashMap<I_RelTuple, Color>();
         colors.reset();
-        Collection<I_ImplementActiveLabel> deltaLabels = getDeltaLabels(
-                showDetailCB.isSelected(), showStatusCB.isSelected(), config,
-                colors, conAttrColorMap, desColorMap, relColorMap); // ####
+        Collection<I_ImplementActiveLabel> deltaLabels = getDeltaLabels(showDetailCB.isSelected(),
+            showStatusCB.isSelected(), config, colors, conAttrColorMap, desColorMap, relColorMap); // ####
         deltaPartJPanel = new JPanel();
-        deltaPartJPanel.setLayout(new BoxLayout(deltaPartJPanel,
-                BoxLayout.Y_AXIS));
+        deltaPartJPanel.setLayout(new BoxLayout(deltaPartJPanel, BoxLayout.Y_AXIS));
         for (I_ImplementActiveLabel l : deltaLabels) {
             deltaPartJPanel.add(l.getLabel());
         }
@@ -362,8 +350,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         c.gridy = 0;
 
         JPanel tmpJPanel;
-        tmpJPanel = newFormStatedJPanel("Stated Form:", config,
-                conAttrColorMap, desColorMap, relColorMap); // ####
+        tmpJPanel = newFormStatedJPanel("Stated Form:", config, conAttrColorMap, desColorMap, relColorMap); // ####
         setMinMaxSize(tmpJPanel);
         formsJPanel.add(tmpJPanel, c);
 
@@ -374,8 +361,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 c.gridx = 0;
                 c.gridy++;
             }
-            tmpJPanel = newFormDistJPanel("Distribution Normal Form:", config,
-                    conAttrColorMap, desColorMap, relColorMap); // ####
+            tmpJPanel = newFormDistJPanel("Distribution Normal Form:", config, conAttrColorMap, desColorMap,
+                relColorMap); // ####
             setMinMaxSize(tmpJPanel);
             formsJPanel.add(tmpJPanel, c);
         }
@@ -387,8 +374,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 c.gridx = 0;
                 c.gridy++;
             }
-            tmpJPanel = newFormAuthJPanel("Authoring Normal Form:", config,
-                    conAttrColorMap, desColorMap, relColorMap); // ####
+            tmpJPanel = newFormAuthJPanel("Authoring Normal Form:", config, conAttrColorMap, desColorMap, relColorMap); // ####
             setMinMaxSize(tmpJPanel);
             formsJPanel.add(tmpJPanel, c);
         }
@@ -400,8 +386,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 c.gridx = 0;
                 c.gridy++;
             }
-            tmpJPanel = newFormLongJPanel("Long Canonical Form:", config,
-                    conAttrColorMap, desColorMap, relColorMap); // ####
+            tmpJPanel = newFormLongJPanel("Long Canonical Form:", config, conAttrColorMap, desColorMap, relColorMap); // ####
             setMinMaxSize(tmpJPanel);
             formsJPanel.add(tmpJPanel, c);
         }
@@ -413,38 +398,37 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 c.gridx = 0;
                 c.gridy++;
             }
-            tmpJPanel = newFormShortJPanel("Short Canonical Form:", config,
-                    conAttrColorMap, desColorMap, relColorMap); // ####
+            tmpJPanel = newFormShortJPanel("Short Canonical Form:", config, conAttrColorMap, desColorMap, relColorMap); // ####
             setMinMaxSize(tmpJPanel);
             formsJPanel.add(tmpJPanel, c);
         }
     }
 
-    public List<I_ImplementActiveLabel> getCommonLabels(boolean showLongForm,
-            boolean showStatus, I_ConfigAceFrame config) throws IOException {
+    public List<I_ImplementActiveLabel> getCommonLabels(boolean showLongForm, boolean showStatus,
+            I_ConfigAceFrame config) throws IOException {
         List<I_ImplementActiveLabel> labelList = new ArrayList<I_ImplementActiveLabel>();
 
         // GET CONCEPT ATTRIBUTES
-        Set<I_ConceptAttributeTuple> commonConTuples = this.theCBean
-                .getCommonConceptAttributeTuples(config); // #### COMMON CON
+        Set<I_ConceptAttributeTuple> commonConTuples = this.theCBean.getCommonConceptAttributeTuples(config); // ####
+        // COMMON
+        // CON
         // CREATE CONCEPT ATTRIBUTE LABELS
         if (commonConTuples != null) {
             for (I_ConceptAttributeTuple t : commonConTuples) {
-                I_ImplementActiveLabel conAttrLabel = TermLabelMaker.newLabel(
-                        t, showLongForm, showStatus);
+                I_ImplementActiveLabel conAttrLabel = TermLabelMaker.newLabel(t, showLongForm, showStatus);
                 setBorder(conAttrLabel.getLabel(), null);
                 labelList.add(conAttrLabel);
             }
         }
 
         // GET SOURCE RELATIONSHIPS
-        Set<I_RelTuple> commonRelTuples = this.theCBean
-                .getCommonRelTuples(config); // #### COMMON REL
+        Set<I_RelTuple> commonRelTuples = this.theCBean.getCommonRelTuples(config); // ####
+        // COMMON
+        // REL
         // CREATE RELATIONSHIP LABELS
         if (commonRelTuples != null) {
             for (I_RelTuple t : commonRelTuples) {
-                I_ImplementActiveLabel relLabel = TermLabelMaker.newLabel(t,
-                        showLongForm, showStatus);
+                I_ImplementActiveLabel relLabel = TermLabelMaker.newLabel(t, showLongForm, showStatus);
                 setBorder(relLabel.getLabel(), null);
                 labelList.add(relLabel);
             }
@@ -453,12 +437,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         return labelList;
     } // getCommonLabels
 
-    public Collection<I_ImplementActiveLabel> getDeltaLabels(
-            boolean showLongForm, boolean showStatus, I_ConfigAceFrame config,
-            DeltaColors colors,
-            Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
-            Map<I_DescriptionTuple, Color> descColorMap,
-            Map<I_RelTuple, Color> relColorMap) throws IOException {
+    public Collection<I_ImplementActiveLabel> getDeltaLabels(boolean showLongForm, boolean showStatus,
+            I_ConfigAceFrame config, DeltaColors colors, Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
+            Map<I_DescriptionTuple, Color> descColorMap, Map<I_RelTuple, Color> relColorMap) throws IOException {
 
         Set<I_ConceptAttributeTuple> allConAttrTuples = new HashSet<I_ConceptAttributeTuple>();
         Set<I_RelTuple> allRelTuples = new HashSet<I_RelTuple>();
@@ -469,31 +450,35 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             posSet.add(p);
 
             // concept attributes
-            List<I_ConceptAttributeTuple> conTuplesForPosition = this.theCBean
-                    .getConceptAttributeTuples(config.getAllowedStatus(),
-                            posSet, false); // #### ALL COMMON CON
+            List<I_ConceptAttributeTuple> conTuplesForPosition = this.theCBean.getConceptAttributeTuples(
+                config.getAllowedStatus(), posSet, false); // ####
+            // ALL
+            // COMMON
+            // CON
             allConAttrTuples.addAll(conTuplesForPosition);
 
             // relationships
-            List<I_RelTuple> relTuplesForPosition = this.theCBean
-                    .getSourceRelTuples(config.getAllowedStatus(), null,
-                            posSet, false); // #### ALL REL
+            List<I_RelTuple> relTuplesForPosition = this.theCBean.getSourceRelTuples(config.getAllowedStatus(), null,
+                posSet, false); // ####
+            // ALL
+            // REL
             allRelTuples.addAll(relTuplesForPosition);
         }
 
         // FIND & REMOVE COMMON...
-        Set<I_ConceptAttributeTuple> commonConAttrTuples = this.theCBean
-                .getCommonConceptAttributeTuples(config); // #### COMMON CON
+        Set<I_ConceptAttributeTuple> commonConAttrTuples = this.theCBean.getCommonConceptAttributeTuples(config); // ####
+        // COMMON
+        // CON
         allConAttrTuples.removeAll(commonConAttrTuples);
-        Set<I_RelTuple> commonRelTuples = this.theCBean
-                .getCommonRelTuples(config); // #### COMMON REL
+        Set<I_RelTuple> commonRelTuples = this.theCBean.getCommonRelTuples(config); // ####
+        // COMMON
+        // REL
         allRelTuples.removeAll(commonRelTuples);
 
         Collection<I_ImplementActiveLabel> labelList = new ArrayList<I_ImplementActiveLabel>();
         // CREATE CONCEPT ATTRIBUTE LABELS
         for (I_ConceptAttributeTuple t : allConAttrTuples) {
-            I_ImplementActiveLabel conAttrLabel = TermLabelMaker.newLabel(t,
-                    showLongForm, showStatus);
+            I_ImplementActiveLabel conAttrLabel = TermLabelMaker.newLabel(t, showLongForm, showStatus);
             Color deltaColor = colors.getNextColor();
             conAttrColorMap.put(t, deltaColor);
             setBorder(conAttrLabel.getLabel(), deltaColor);
@@ -501,8 +486,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
         // CREATE RELATIONSHIP LABELS
         for (I_RelTuple t : allRelTuples) {
-            I_ImplementActiveLabel relLabel = TermLabelMaker.newLabel(t,
-                    showLongForm, showStatus);
+            I_ImplementActiveLabel relLabel = TermLabelMaker.newLabel(t, showLongForm, showStatus);
             Color deltaColor = colors.getNextColor();
             relColorMap.put(t, deltaColor);
             setBorder(relLabel.getLabel(), deltaColor);
@@ -516,8 +500,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
      * <b>Authoring Normal Form</b><li>Most Proximate Supertypes (IS-A)</li>
      */
     public JPanel newFormAuthJPanel(String label, I_ConfigAceFrame config,
-            Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
-            Map<I_DescriptionTuple, Color> desColorMap,
+            Map<I_ConceptAttributeTuple, Color> conAttrColorMap, Map<I_DescriptionTuple, Color> desColorMap,
             Map<I_RelTuple, Color> relColorMap) throws IOException {
         JPanel formJPanel = newMinMaxJPanel();
         formJPanel.setLayout(new GridBagLayout());
@@ -536,8 +519,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         // SHOW SELF CONCEPT
         I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
-        I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple,
-                showDetailCB.isSelected(), showStatusCB.isSelected());
+        I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple, showDetailCB.isSelected(),
+            showStatusCB.isSelected());
         tLabelList.add((LabelForTuple) tmpTLabel);
         Color tmpDeltaColor = conAttrColorMap.get(cTuple);
         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -551,8 +534,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             for (SnoRel sr : sg)
                 isaList.add(new ThinRelTuple(sr.relVers, sr.relPart));
         for (I_RelTuple t : isaList) {
-            I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t,
-                    showDetailCB.isSelected(), showStatusCB.isSelected());
+            I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t, showDetailCB.isSelected(),
+                showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tLabel);
             Color deltaColor = relColorMap.get(t);
             setBorder(tLabel.getLabel(), deltaColor);
@@ -570,9 +553,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             if (sg.size() > 0 && sg.get(0).group == 0) {
                 for (SnoRel sr : sg) {
                     I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
-                    tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
-                            showDetailCB.isSelected(), showStatusCB
-                                    .isSelected());
+                    tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
+                        showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(rTuple);
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -592,8 +574,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     for (SnoRel sr : sg) {
                         grpTuple.add(new ThinRelTuple(sr.relVers, sr.relPart));
                     }
-                    tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB
-                            .isSelected(), showStatusCB.isSelected());
+                    tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(grpTuple.get(0));
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -601,11 +582,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     c.gridy++;
                 } else { // if false, show 1 rel per label
                     for (SnoRel sr : sg) {
-                        I_RelTuple rTuple = new ThinRelTuple(sr.relVers,
-                                sr.relPart);
-                        tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
-                                showDetailCB.isSelected(), showStatusCB
-                                        .isSelected());
+                        I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
+                        tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
+                            showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
                         tmpDeltaColor = relColorMap.get(rTuple);
                         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -630,8 +609,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
      * <b>Distribution Normal Form</b><li>Most Proximate Supertypes (IS-A)</li>
      */
     public JPanel newFormDistJPanel(String label, I_ConfigAceFrame config,
-            Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
-            Map<I_DescriptionTuple, Color> desColorMap,
+            Map<I_ConceptAttributeTuple, Color> conAttrColorMap, Map<I_DescriptionTuple, Color> desColorMap,
             Map<I_RelTuple, Color> relColorMap) throws IOException {
         JPanel formJPanel = newMinMaxJPanel();
         formJPanel.setLayout(new GridBagLayout());
@@ -650,8 +628,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         // SHOW SELF CONCEPT
         I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
-        I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple,
-                showDetailCB.isSelected(), showStatusCB.isSelected());
+        I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple, showDetailCB.isSelected(),
+            showStatusCB.isSelected());
         tLabelList.add((LabelForTuple) tmpTLabel);
         Color tmpDeltaColor = conAttrColorMap.get(cTuple);
         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -665,8 +643,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             for (SnoRel sr : sg)
                 isaList.add(new ThinRelTuple(sr.relVers, sr.relPart));
         for (I_RelTuple rTuple : isaList) {
-            tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB
-                    .isSelected(), showStatusCB.isSelected());
+            tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tmpTLabel);
             tmpDeltaColor = relColorMap.get(rTuple);
             setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -683,9 +660,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             if (sg.size() > 0 && sg.get(0).group == 0) {
                 for (SnoRel sr : sg) {
                     I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
-                    tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
-                            showDetailCB.isSelected(), showStatusCB
-                                    .isSelected());
+                    tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
+                        showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(rTuple);
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -705,8 +681,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     for (SnoRel sr : sg) {
                         grpTuple.add(new ThinRelTuple(sr.relVers, sr.relPart));
                     }
-                    tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB
-                            .isSelected(), showStatusCB.isSelected());
+                    tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(grpTuple.get(0));
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -714,11 +689,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     c.gridy++;
                 } else { // if false, show 1 rel per label
                     for (SnoRel sr : sg) {
-                        I_RelTuple rTuple = new ThinRelTuple(sr.relVers,
-                                sr.relPart);
-                        tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
-                                showDetailCB.isSelected(), showStatusCB
-                                        .isSelected());
+                        I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
+                        tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
+                            showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
                         tmpDeltaColor = relColorMap.get(rTuple);
                         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -743,8 +716,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
      * 
      */
     public JPanel newFormLongJPanel(String label, I_ConfigAceFrame config,
-            Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
-            Map<I_DescriptionTuple, Color> desColorMap,
+            Map<I_ConceptAttributeTuple, Color> conAttrColorMap, Map<I_DescriptionTuple, Color> desColorMap,
             Map<I_RelTuple, Color> relColorMap) throws IOException {
         JPanel formJPanel = newMinMaxJPanel();
         formJPanel.setLayout(new GridBagLayout());
@@ -763,8 +735,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         // SHOW SELF CONCEPT
         I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
-        I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabel(cTuple,
-                showDetailCB.isSelected(), showStatusCB.isSelected());
+        I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabel(cTuple, showDetailCB.isSelected(),
+            showStatusCB.isSelected());
         tLabelList.add((LabelForTuple) tmpTLabel);
         Color tmpDeltaColor = conAttrColorMap.get(cTuple);
         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -778,8 +750,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             for (SnoRel sr : sg)
                 isaList.add(new ThinRelTuple(sr.relVers, sr.relPart));
         for (I_RelTuple rTuple : isaList) {
-            tmpTLabel = TermLabelMaker.newLabel(rTuple, showDetailCB
-                    .isSelected(), showStatusCB.isSelected());
+            tmpTLabel = TermLabelMaker.newLabel(rTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tmpTLabel);
             tmpDeltaColor = relColorMap.get(rTuple);
             setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -796,9 +767,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             if (sg.size() > 0 && sg.get(0).group == 0) {
                 for (SnoRel sr : sg) {
                     I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
-                    tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
-                            showDetailCB.isSelected(), showStatusCB
-                                    .isSelected());
+                    tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
+                        showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(rTuple);
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -819,8 +789,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     for (SnoRel sr : sg) {
                         grpTuple.add(new ThinRelTuple(sr.relVers, sr.relPart));
                     }
-                    tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB
-                            .isSelected(), showStatusCB.isSelected());
+                    tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(grpTuple.get(0));
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -828,11 +797,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     c.gridy++;
                 } else { // if false, show 1 relationship per label
                     for (SnoRel sr : sg) {
-                        I_RelTuple rTuple = new ThinRelTuple(sr.relVers,
-                                sr.relPart);
-                        tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
-                                showDetailCB.isSelected(), showStatusCB
-                                        .isSelected());
+                        I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
+                        tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
+                            showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
                         tmpDeltaColor = relColorMap.get(rTuple);
                         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -858,8 +825,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
      * </li>
      */
     public JPanel newFormShortJPanel(String label, I_ConfigAceFrame config,
-            Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
-            Map<I_DescriptionTuple, Color> desColorMap,
+            Map<I_ConceptAttributeTuple, Color> conAttrColorMap, Map<I_DescriptionTuple, Color> desColorMap,
             Map<I_RelTuple, Color> relColorMap) throws IOException {
         JPanel formJPanel = newMinMaxJPanel();
         formJPanel.setLayout(new GridBagLayout());
@@ -878,8 +844,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         // SHOW SELF CONCEPT
         I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
-        I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple,
-                showDetailCB.isSelected(), showStatusCB.isSelected());
+        I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple, showDetailCB.isSelected(),
+            showStatusCB.isSelected());
         tLabelList.add((LabelForTuple) tmpTLabel);
         Color tmpDeltaColor = conAttrColorMap.get(cTuple);
         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -893,8 +859,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             for (SnoRel sr : sg)
                 isaList.add(new ThinRelTuple(sr.relVers, sr.relPart));
         for (I_RelTuple t : isaList) {
-            I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t,
-                    showDetailCB.isSelected(), showStatusCB.isSelected());
+            I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t, showDetailCB.isSelected(),
+                showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tLabel);
             Color deltaColor = relColorMap.get(t);
             setBorder(tLabel.getLabel(), deltaColor);
@@ -911,9 +877,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             if (sg.size() > 0 && sg.get(0).group == 0) {
                 for (SnoRel sr : sg) {
                     I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
-                    tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
-                            showDetailCB.isSelected(), showStatusCB
-                                    .isSelected());
+                    tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
+                        showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(rTuple);
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -933,8 +898,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     for (SnoRel sr : sg) {
                         grpTuple.add(new ThinRelTuple(sr.relVers, sr.relPart));
                     }
-                    tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB
-                            .isSelected(), showStatusCB.isSelected());
+                    tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(grpTuple.get(0));
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -942,11 +906,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     c.gridy++;
                 } else { // if false, show 1 rel per label
                     for (SnoRel sr : sg) {
-                        I_RelTuple rTuple = new ThinRelTuple(sr.relVers,
-                                sr.relPart);
-                        tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
-                                showDetailCB.isSelected(), showStatusCB
-                                        .isSelected());
+                        I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
+                        tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
+                            showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
                         tmpDeltaColor = relColorMap.get(rTuple);
                         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -968,8 +930,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     }
 
     public JPanel newFormStatedJPanel(String label, I_ConfigAceFrame config,
-            Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
-            Map<I_DescriptionTuple, Color> desColorMap,
+            Map<I_ConceptAttributeTuple, Color> conAttrColorMap, Map<I_DescriptionTuple, Color> desColorMap,
             Map<I_RelTuple, Color> relColorMap) throws IOException {
         JPanel formJPanel = newMinMaxJPanel();
         formJPanel.setLayout(new GridBagLayout());
@@ -988,8 +949,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         // SHOW SELF CONCEPT
         I_ConceptAttributeTuple cTuple = findSelf(theCBean, cEditPathPos);
-        I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple,
-                showDetailCB.isSelected(), showStatusCB.isSelected());
+        I_ImplementActiveLabel tmpTLabel = TermLabelMaker.newLabelForm(cTuple, showDetailCB.isSelected(),
+            showStatusCB.isSelected());
         tLabelList.add((LabelForTuple) tmpTLabel);
         Color tmpDeltaColor = conAttrColorMap.get(cTuple);
         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1003,8 +964,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             for (SnoRel sr : sg)
                 isaList.add(new ThinRelTuple(sr.relVers, sr.relPart));
         for (I_RelTuple rTuple : isaList) {
-            tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB
-                    .isSelected(), showStatusCB.isSelected());
+            tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tmpTLabel);
             tmpDeltaColor = relColorMap.get(rTuple);
             setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1022,9 +982,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             if (sg.size() > 0 && sg.get(0).group == 0) {
                 for (SnoRel sr : sg) {
                     I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
-                    tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
-                            showDetailCB.isSelected(), showStatusCB
-                                    .isSelected());
+                    tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
+                        showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(rTuple);
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1044,8 +1003,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     for (SnoRel sr : sg) {
                         grpTuple.add(new ThinRelTuple(sr.relVers, sr.relPart));
                     }
-                    tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB
-                            .isSelected(), showStatusCB.isSelected());
+                    tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
                     tmpDeltaColor = relColorMap.get(grpTuple.get(0));
                     setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1053,11 +1011,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     c.gridy++;
                 } else { // if false, show 1 rel per label
                     for (SnoRel sr : sg) {
-                        I_RelTuple rTuple = new ThinRelTuple(sr.relVers,
-                                sr.relPart);
-                        tmpTLabel = TermLabelMaker.newLabelForm(rTuple,
-                                showDetailCB.isSelected(), showStatusCB
-                                        .isSelected());
+                        I_RelTuple rTuple = new ThinRelTuple(sr.relVers, sr.relPart);
+                        tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
+                            showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
                         tmpDeltaColor = relColorMap.get(rTuple);
                         setBorder(tmpTLabel.getLabel(), tmpDeltaColor);
@@ -1082,9 +1038,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             deltaColor = Color.white;
         }
         Dimension size = tLabel.getSize();
-        tLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-                .createRaisedBevelBorder(), BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(1, 5, 1, 5, deltaColor),
+        tLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(),
+            BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 5, 1, 5, deltaColor),
                 BorderFactory.createEmptyBorder(1, 3, 1, 3))));
         size.width = size.width + 18;
         size.height = size.height + 6;
@@ -1094,8 +1049,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         tLabel.setMinimumSize(size);
     }
 
-    private I_ConceptAttributeTuple findSelf(ConceptBean cBean,
-            List<I_Position> posList) {
+    private I_ConceptAttributeTuple findSelf(ConceptBean cBean, List<I_Position> posList) {
         try {
             I_ConceptAttributeVersioned cv = cBean.getConceptAttributes();
             List<I_ConceptAttributePart> cvList = cv.getVersions();

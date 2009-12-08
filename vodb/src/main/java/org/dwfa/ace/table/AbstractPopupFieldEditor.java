@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,19 +55,17 @@ public abstract class AbstractPopupFieldEditor extends DefaultCellEditor {
     public abstract ConceptBean getSelectedItem(Object value);
 
     private void populatePopup() {
-		combo.removeAllItems();
-		for (int id: getPopupValues()) {
-			combo.addItem(ConceptBean.get(id));
-		}
-	}
+        combo.removeAllItems();
+        for (int id : getPopupValues()) {
+            combo.addItem(ConceptBean.get(id));
+        }
+    }
 
     public abstract int[] getPopupValues();
 
-    public Component getTableCellEditorComponent(JTable table, Object value,
-            boolean isSelected, int row, int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         populatePopup();
-        return super.getTableCellEditorComponent(table, value, isSelected, row,
-            column);
+        return super.getTableCellEditorComponent(table, value, isSelected, row, column);
     }
 
 }

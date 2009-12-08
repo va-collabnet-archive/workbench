@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,13 +25,10 @@ import com.sleepycat.je.DatabaseException;
 
 public interface I_StorePositions extends I_StoreInBdb {
 
-	public abstract void addTimeBranchValues(Set<TimePathId> values)
-			throws DatabaseException;
+    public abstract void addTimeBranchValues(Set<TimePathId> values) throws DatabaseException;
 
-	public abstract void writeTimePath(TimePathId jarTimePath)
-			throws DatabaseException;
+    public abstract void writeTimePath(TimePathId jarTimePath) throws DatabaseException;
 
-	public abstract void iterateTimeBranch(I_ProcessTimeBranchEntries processor)
-			throws Exception;
+    public abstract void iterateTimeBranch(I_ProcessTimeBranchEntries processor) throws Exception;
 
 }

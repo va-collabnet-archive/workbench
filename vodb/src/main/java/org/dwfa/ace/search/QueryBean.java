@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,11 +26,11 @@ import java.util.List;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 
 public class QueryBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
-    
+
     private String queryString;
     private List<I_TestSearchResults> extraCriterion;
 
@@ -38,21 +38,19 @@ public class QueryBean implements Serializable {
         out.writeInt(dataVersion);
         out.writeObject(this.queryString);
         out.writeObject(this.extraCriterion);
-     }
+    }
 
     @SuppressWarnings("unchecked")
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             this.queryString = (String) in.readObject();
             this.extraCriterion = (List<I_TestSearchResults>) in.readObject();
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    
     QueryBean(String queryString, List<I_TestSearchResults> extraCriterion) {
         super();
         this.queryString = queryString;

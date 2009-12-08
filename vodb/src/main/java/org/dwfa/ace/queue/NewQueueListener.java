@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,107 +55,96 @@ public class NewQueueListener implements ActionListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-			try {
-				File queueDir = new File("queues", "dynamic");
-				if (queueDir.exists() == false) {
-					queueDir.mkdirs();
-					File staticQueueDir = new File("queues", "static");
-					staticQueueDir.mkdirs();
-				}
+            try {
+                File queueDir = new File("queues", "dynamic");
+                if (queueDir.exists() == false) {
+                    queueDir.mkdirs();
+                    File staticQueueDir = new File("queues", "static");
+                    staticQueueDir.mkdirs();
+                }
 
-				FileDialog dialog = new FileDialog(new Frame(), "Specify new Queue");
-				dialog.setMode(FileDialog.SAVE);
-				dialog.setDirectory(queueDir.getAbsolutePath());
-				dialog.setFile(ace.getAceFrameConfig().getUsername() + " " + queueType);
-				dialog.setVisible(true);
-				if (dialog.getFile() != null) {
+                FileDialog dialog = new FileDialog(new Frame(), "Specify new Queue");
+                dialog.setMode(FileDialog.SAVE);
+                dialog.setDirectory(queueDir.getAbsolutePath());
+                dialog.setFile(ace.getAceFrameConfig().getUsername() + " " + queueType);
+                dialog.setVisible(true);
+                if (dialog.getFile() != null) {
 
-					File queueDirectory = new File(dialog.getDirectory(), dialog
-							.getFile());
-					String username = ace.getAceFrameConfig().getUsername();
-					if (queueDirectory.getName().startsWith(username) == false) {
-						queueDirectory = new File(queueDirectory.getParent(), username + "." + dialog.getFile());
-					}
-					
-					queueDirectory.mkdirs();
-					
-					String nodeInboxAddress = queueDirectory.getName().toLowerCase().replace(' ', '.');
-					nodeInboxAddress = nodeInboxAddress.replace("....", ".");
-					nodeInboxAddress = nodeInboxAddress.replace("...", ".");
-					nodeInboxAddress = nodeInboxAddress.replace("..", ".");
+                    File queueDirectory = new File(dialog.getDirectory(), dialog.getFile());
+                    String username = ace.getAceFrameConfig().getUsername();
+                    if (queueDirectory.getName().startsWith(username) == false) {
+                        queueDirectory = new File(queueDirectory.getParent(), username + "." + dialog.getFile());
+                    }
 
-					
-					Map<String, String> substutionMap = new TreeMap<String, String>();
-					substutionMap.put("**queueName**", queueDirectory.getName());
-					substutionMap.put("**directory**", FileIO.getRelativePath(queueDirectory).replace('\\', '/'));
-					substutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
-					
-					String fileName = "template.queue.config";
-					if (queueType.equals("aging")) {
-						fileName = "template.queueAging.config";
-					} else if (queueType.equals("archival")) {
-						fileName = "template.queueArchival.config";
-					} else if (queueType.equals("compute")) {
-						fileName = "template.queueCompute.config";
-					} else if (queueType.equals("inbox")) {
-						substutionMap.put("**mailPop3Host**", "**mailPop3Host**");
-						substutionMap.put("**mailUsername**", "**mailUsername**");
-						fileName = "template.queueInbox.config";
-					} else if (queueType.equals("launcher")) {
-						fileName = "template.queueLauncher.config";
-					} else if (queueType.equals("outbox")) {
-						substutionMap.put("//**allGroups**mailHost", "//**allGroups**mailHost");
-						substutionMap.put("//**outbox**mailHost", "//**outbox**mailHost");
-						substutionMap.put("**mailHost**", "**mailHost**");
-						fileName = "template.queueOutbox.config";
-					} 
-					
-					File queueConfigTemplate = new File("config", fileName);
-					String configTemplateString = FileIO.readerToString(new FileReader(queueConfigTemplate));
-					
-					for (String key: substutionMap.keySet()) {
-						configTemplateString = configTemplateString.replace(key, substutionMap.get(key));
-					}
-										
-					
-					File newQueueConfig = new File(queueDirectory, "queue.config");
-					FileWriter fw = new FileWriter(newQueueConfig);
-					fw.write(configTemplateString);
-					fw.close();
+                    queueDirectory.mkdirs();
 
-					ace.getAceFrameConfig().getDbConfig().getQueues().add(
-							FileIO.getRelativePath(newQueueConfig));
-					Configuration queueConfig = ConfigurationProvider
-							.getInstance(new String[] { newQueueConfig.getAbsolutePath() });
-					Entry[] entries = (Entry[]) queueConfig.getEntry(
-							"org.dwfa.queue.QueueServer", "entries", Entry[].class,
-							new Entry[] {});
-					for (Entry entry : entries) {
-						if (ElectronicAddress.class.isAssignableFrom(entry
-								.getClass())) {
-							ElectronicAddress ea = (ElectronicAddress) entry;
-							ace.getAceFrameConfig().getQueueAddressesToShow()
-									.add(ea.address);
-							break;
-						}
-					}
-					if (QueueServer.started(newQueueConfig)) {
-						AceLog.getAppLog().info(
-								"Queue already started: "
-										+ newQueueConfig.toURI().toURL()
-												.toExternalForm());
-					} else {
-						new QueueServer(
-								new String[] { newQueueConfig.getCanonicalPath() }, null);
-					}
+                    String nodeInboxAddress = queueDirectory.getName().toLowerCase().replace(' ', '.');
+                    nodeInboxAddress = nodeInboxAddress.replace("....", ".");
+                    nodeInboxAddress = nodeInboxAddress.replace("...", ".");
+                    nodeInboxAddress = nodeInboxAddress.replace("..", ".");
 
-				}
+                    Map<String, String> substutionMap = new TreeMap<String, String>();
+                    substutionMap.put("**queueName**", queueDirectory.getName());
+                    substutionMap.put("**directory**", FileIO.getRelativePath(queueDirectory).replace('\\', '/'));
+                    substutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
 
-				ace.getQueueViewer().refreshQueues();
-			} catch (Exception e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-		}
+                    String fileName = "template.queue.config";
+                    if (queueType.equals("aging")) {
+                        fileName = "template.queueAging.config";
+                    } else if (queueType.equals("archival")) {
+                        fileName = "template.queueArchival.config";
+                    } else if (queueType.equals("compute")) {
+                        fileName = "template.queueCompute.config";
+                    } else if (queueType.equals("inbox")) {
+                        substutionMap.put("**mailPop3Host**", "**mailPop3Host**");
+                        substutionMap.put("**mailUsername**", "**mailUsername**");
+                        fileName = "template.queueInbox.config";
+                    } else if (queueType.equals("launcher")) {
+                        fileName = "template.queueLauncher.config";
+                    } else if (queueType.equals("outbox")) {
+                        substutionMap.put("//**allGroups**mailHost", "//**allGroups**mailHost");
+                        substutionMap.put("//**outbox**mailHost", "//**outbox**mailHost");
+                        substutionMap.put("**mailHost**", "**mailHost**");
+                        fileName = "template.queueOutbox.config";
+                    }
+
+                    File queueConfigTemplate = new File("config", fileName);
+                    String configTemplateString = FileIO.readerToString(new FileReader(queueConfigTemplate));
+
+                    for (String key : substutionMap.keySet()) {
+                        configTemplateString = configTemplateString.replace(key, substutionMap.get(key));
+                    }
+
+                    File newQueueConfig = new File(queueDirectory, "queue.config");
+                    FileWriter fw = new FileWriter(newQueueConfig);
+                    fw.write(configTemplateString);
+                    fw.close();
+
+                    ace.getAceFrameConfig().getDbConfig().getQueues().add(FileIO.getRelativePath(newQueueConfig));
+                    Configuration queueConfig = ConfigurationProvider.getInstance(new String[] { newQueueConfig.getAbsolutePath() });
+                    Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries",
+                        Entry[].class, new Entry[] {});
+                    for (Entry entry : entries) {
+                        if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
+                            ElectronicAddress ea = (ElectronicAddress) entry;
+                            ace.getAceFrameConfig().getQueueAddressesToShow().add(ea.address);
+                            break;
+                        }
+                    }
+                    if (QueueServer.started(newQueueConfig)) {
+                        AceLog.getAppLog().info(
+                            "Queue already started: " + newQueueConfig.toURI().toURL().toExternalForm());
+                    } else {
+                        new QueueServer(new String[] { newQueueConfig.getCanonicalPath() }, null);
+                    }
+
+                }
+
+                ace.getQueueViewer().refreshQueues();
+            } catch (Exception e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
     }
 
     /**
@@ -169,16 +158,16 @@ public class NewQueueListener implements ActionListener {
      * @param ace
      */
     public NewQueueListener(ACE ace) {
-		this.ace = ace;
-		String[] QueueTypes = new String[] {"aging", "archival", "compute", "inbox", "launcher", "outbox" };
-		
-		queueTypePopup = new JPopupMenu();
-		for (String type: QueueTypes) {
-			JMenuItem item = new JMenuItem(type);
-			queueTypePopup.add(item);
-			item.addActionListener(new CreateNewQueueActionListener(type));
-		}
-	}
+        this.ace = ace;
+        String[] QueueTypes = new String[] { "aging", "archival", "compute", "inbox", "launcher", "outbox" };
+
+        queueTypePopup = new JPopupMenu();
+        for (String type : QueueTypes) {
+            JMenuItem item = new JMenuItem(type);
+            queueTypePopup.add(item);
+            item.addActionListener(new CreateNewQueueActionListener(type));
+        }
+    }
 
     public void actionPerformed(ActionEvent evt) {
 

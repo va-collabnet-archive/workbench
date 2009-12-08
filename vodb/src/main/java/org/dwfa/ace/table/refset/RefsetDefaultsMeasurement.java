@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,8 +28,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
-public class RefsetDefaultsMeasurement extends RefsetDefaults implements
-        I_RefsetDefaultsMeasurement {
+public class RefsetDefaultsMeasurement extends RefsetDefaults implements I_RefsetDefaultsMeasurement {
 
     private I_GetConceptData defaultUnitsOfMeasureForMeasurementRefset;
     private I_IntList unitsOfMeasurePopupIds = new IntList();
@@ -52,8 +51,7 @@ public class RefsetDefaultsMeasurement extends RefsetDefaults implements
         out.writeObject(measurementValuePopupItems);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             defaultUnitsOfMeasureForMeasurementRefset = readConcept(in);
@@ -68,26 +66,20 @@ public class RefsetDefaultsMeasurement extends RefsetDefaults implements
 
     public RefsetDefaultsMeasurement() throws TerminologyException, IOException {
         super();
-        defaultUnitsOfMeasureForMeasurementRefset =
-                ConceptBean.get(RefsetAuxiliary.Concept.REFSET_AUXILIARY
-                    .getUids());
-        unitsOfMeasurePopupIds.add(defaultUnitsOfMeasureForMeasurementRefset
-            .getConceptId());
+        defaultUnitsOfMeasureForMeasurementRefset = ConceptBean.get(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
+        unitsOfMeasurePopupIds.add(defaultUnitsOfMeasureForMeasurementRefset.getConceptId());
 
         defaultMeasurementValueForMeasurementRefset = 1.0;
-        measurementValuePopupItems =
-                new Double[] { 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0 };
+        measurementValuePopupItems = new Double[] { 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0 };
     }
 
     public double getDefaultMeasurementValueForMeasurementRefset() {
         return defaultMeasurementValueForMeasurementRefset;
     }
 
-    public void setDefaultMeasurementValueForMeasurementRefset(
-            double defaultMeasurementValueForMeasurementRefset) {
+    public void setDefaultMeasurementValueForMeasurementRefset(double defaultMeasurementValueForMeasurementRefset) {
         Object oldValue = this.defaultMeasurementValueForMeasurementRefset;
-        this.defaultMeasurementValueForMeasurementRefset =
-                defaultMeasurementValueForMeasurementRefset;
+        this.defaultMeasurementValueForMeasurementRefset = defaultMeasurementValueForMeasurementRefset;
         pcs.firePropertyChange("defaultTagForScopedLanguageRefset", oldValue,
             defaultMeasurementValueForMeasurementRefset);
     }
@@ -96,25 +88,21 @@ public class RefsetDefaultsMeasurement extends RefsetDefaults implements
         return defaultUnitsOfMeasureForMeasurementRefset;
     }
 
-    public void setDefaultUnitsOfMeasureForMeasurementRefset(
-            I_GetConceptData defaultUnitsOfMeasureForMeasurementRefset) {
+    public void setDefaultUnitsOfMeasureForMeasurementRefset(I_GetConceptData defaultUnitsOfMeasureForMeasurementRefset) {
         Object oldValue = this.defaultUnitsOfMeasureForMeasurementRefset;
-        this.defaultUnitsOfMeasureForMeasurementRefset =
-                defaultUnitsOfMeasureForMeasurementRefset;
-        pcs.firePropertyChange("defaultUnitsOfMeasureForMeasurementRefset",
-            oldValue, defaultUnitsOfMeasureForMeasurementRefset);
+        this.defaultUnitsOfMeasureForMeasurementRefset = defaultUnitsOfMeasureForMeasurementRefset;
+        pcs.firePropertyChange("defaultUnitsOfMeasureForMeasurementRefset", oldValue,
+            defaultUnitsOfMeasureForMeasurementRefset);
     }
 
     public Double[] getMeasurementValuePopupItems() {
         return measurementValuePopupItems;
     }
 
-    public void setMeasurementValuePopupItems(
-            Double[] measurementValuePopupItems) {
+    public void setMeasurementValuePopupItems(Double[] measurementValuePopupItems) {
         Object oldValue = this.measurementValuePopupItems;
         this.measurementValuePopupItems = measurementValuePopupItems;
-        pcs.firePropertyChange("measurementValuePopupItems", oldValue,
-            measurementValuePopupItems);
+        pcs.firePropertyChange("measurementValuePopupItems", oldValue, measurementValuePopupItems);
     }
 
     public I_IntList getUnitsOfMeasurePopupIds() {

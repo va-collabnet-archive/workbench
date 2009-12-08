@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,22 +65,23 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
     private class ShowStopAndProgress extends SwingTask {
 
-         private ShowStopAndProgress() {
-			super();
-		}
-		@Override
+        private ShowStopAndProgress() {
+            super();
+        }
+
+        @Override
         public void doRun() {
-			if (isComplete()) {
-	        	stopButton.setVisible(false);
-	        	progressBar.setVisible(false);
-	        	if (eraseWhenFinishedEnabled) {
-	        		progressInfoLower.setText("");
-	        		progressInfoUpper.setText("");
-	        	}
-			} else {
-	        	stopButton.setVisible(true);
-	        	progressBar.setVisible(true);
-			}
+            if (isComplete()) {
+                stopButton.setVisible(false);
+                progressBar.setVisible(false);
+                if (eraseWhenFinishedEnabled) {
+                    progressInfoLower.setText("");
+                    progressInfoUpper.setText("");
+                }
+            } else {
+                stopButton.setVisible(true);
+                progressBar.setVisible(true);
+            }
         }
 
     }
@@ -136,31 +137,30 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
     JProgressBar progressBar = new ActivityProgress(100);
 
-    JButton stopButton = new JButton(new ImageIcon(ACE.class
-            .getResource("/24x24/plain/stop.png")));
+    JButton stopButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/stop.png")));
 
     JLabel progressInfoUpper = new JLabel();
 
     JLabel progressInfoLower = new JLabel();
-	private boolean complete = false;
-     
+    private boolean complete = false;
+
     public void syncWith(I_ShowActivity another) {
-		this.complete = another.isComplete();
-		stopButton.setVisible(false);
-   		setIndeterminate(another.isIndeterminate());
-		setMaximum(another.getMaximum());
-		setValue(another.getValue());
-		setProgressInfoUpper(another.getProgressInfoUpper());
-		setProgressInfoLower(another.getProgressInfoLower());
-		ActionListener[] stopListeners = getStopButton().getActionListeners();
-		setStartTime(another.getStartTime());
-		for (ActionListener l: stopListeners) {
-			getStopButton().removeActionListener(l);
-		}
-		for (ActionListener l: another.getStopButton().getActionListeners()) {
-			getStopButton().addActionListener(l);
-		}
-		setStringPainted(another.isStringPainted());
+        this.complete = another.isComplete();
+        stopButton.setVisible(false);
+        setIndeterminate(another.isIndeterminate());
+        setMaximum(another.getMaximum());
+        setValue(another.getValue());
+        setProgressInfoUpper(another.getProgressInfoUpper());
+        setProgressInfoLower(another.getProgressInfoLower());
+        ActionListener[] stopListeners = getStopButton().getActionListeners();
+        setStartTime(another.getStartTime());
+        for (ActionListener l : stopListeners) {
+            getStopButton().removeActionListener(l);
+        }
+        for (ActionListener l : another.getStopButton().getActionListeners()) {
+            getStopButton().addActionListener(l);
+        }
+        setStringPainted(another.isStringPainted());
         ACE.timer.schedule(new ShowStopAndProgress(), 1);
     }
 
@@ -196,8 +196,7 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         add(stopButton, c);
         stopButton.addActionListener(new StopActionListener());
         if (showBorder) {
-            setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
-                    Color.lightGray));
+            setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray));
         }
     }
 
@@ -261,7 +260,7 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     }
 
     public void complete() {
-    	this.complete = true;
+        this.complete = true;
         ACE.timer.schedule(new ShowStopAndProgress(), 1);
         for (I_ShowActivity shower : showActivityListeners) {
             shower.complete();
@@ -325,9 +324,9 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     public void setSecondaryPanel(I_ShowActivity panel) {
         this.secondaryPanel = panel;
     }
-    
+
     public boolean isStringPainted() {
-    	return progressBar.isStringPainted();
+        return progressBar.isStringPainted();
     }
 
     public void setStringPainted(final boolean stringPainted) {
@@ -349,23 +348,23 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         this.stopButton = stopButton;
     }
 
-	public I_ConfigAceFrame getAceFrameConfig() {
-		return aceFrameConfig;
-	}
+    public I_ConfigAceFrame getAceFrameConfig() {
+        return aceFrameConfig;
+    }
 
-	public String getProgressInfoLower() {
-		return progressInfoLower.getText();
-	}
+    public String getProgressInfoLower() {
+        return progressInfoLower.getText();
+    }
 
-	public String getProgressInfoUpper() {
-		return progressInfoUpper.getText();
-	}
+    public String getProgressInfoUpper() {
+        return progressInfoUpper.getText();
+    }
 
-	public boolean isEraseWhenFinishedEnabled() {
-		return eraseWhenFinishedEnabled;
-	}
+    public boolean isEraseWhenFinishedEnabled() {
+        return eraseWhenFinishedEnabled;
+    }
 
-	public void setEraseWhenFinishedEnabled(boolean eraseWhenFinishedEnabled) {
-		this.eraseWhenFinishedEnabled = eraseWhenFinishedEnabled;
-	}
+    public void setEraseWhenFinishedEnabled(boolean eraseWhenFinishedEnabled) {
+        this.eraseWhenFinishedEnabled = eraseWhenFinishedEnabled;
+    }
 }

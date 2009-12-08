@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,8 +28,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
-public class RefsetDefaultsLanguage extends RefsetDefaults implements
-        I_RefsetDefaultsLanguage {
+public class RefsetDefaultsLanguage extends RefsetDefaults implements I_RefsetDefaultsLanguage {
 
     private I_GetConceptData defaultAcceptabilityForLanguageRefset;
     private I_IntList acceptabilityPopupIds = new IntList();
@@ -57,8 +56,7 @@ public class RefsetDefaultsLanguage extends RefsetDefaults implements
         IntList.writeIntList(out, degreeOfSynonymyPopupIds);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             defaultAcceptabilityForLanguageRefset = readConcept(in);
@@ -75,40 +73,21 @@ public class RefsetDefaultsLanguage extends RefsetDefaults implements
 
     public RefsetDefaultsLanguage() throws TerminologyException, IOException {
         super();
-        defaultAcceptabilityForLanguageRefset =
-                ConceptBean.get(ArchitectonicAuxiliary.Concept.ACCEPTABLE
-                    .getUids());
-        acceptabilityPopupIds.add(defaultAcceptabilityForLanguageRefset
-            .getConceptId());
-        acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_SPECIFIED
-            .localize().getNid());
-        acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.INVALID
-            .localize().getNid());
-        acceptabilityPopupIds
-            .add(ArchitectonicAuxiliary.Concept.NOT_RECOMMENDED.localize()
-                .getNid());
-        acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE
-            .localize().getNid());
+        defaultAcceptabilityForLanguageRefset = ConceptBean.get(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
+        acceptabilityPopupIds.add(defaultAcceptabilityForLanguageRefset.getConceptId());
+        acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_SPECIFIED.localize().getNid());
+        acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.INVALID.localize().getNid());
+        acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_RECOMMENDED.localize().getNid());
+        acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.localize().getNid());
 
-        defaultCorrectnessForLanguageRefset =
-                ConceptBean.get(ArchitectonicAuxiliary.Concept.RECOMMENDED
-                    .getUids());
-        correctnessPopupIds.add(defaultCorrectnessForLanguageRefset
-            .getConceptId());
-        correctnessPopupIds.add(ArchitectonicAuxiliary.Concept.INCORRECT
-            .localize().getNid());
+        defaultCorrectnessForLanguageRefset = ConceptBean.get(ArchitectonicAuxiliary.Concept.RECOMMENDED.getUids());
+        correctnessPopupIds.add(defaultCorrectnessForLanguageRefset.getConceptId());
+        correctnessPopupIds.add(ArchitectonicAuxiliary.Concept.INCORRECT.localize().getNid());
 
-        defaultDegreeOfSynonymyForLanguageRefset =
-                ConceptBean.get(ArchitectonicAuxiliary.Concept.SYNONYMOUS
-                    .getUids());
-        degreeOfSynonymyPopupIds.add(defaultDegreeOfSynonymyForLanguageRefset
-            .getConceptId());
-        degreeOfSynonymyPopupIds
-            .add(ArchitectonicAuxiliary.Concept.NEAR_SYNONYMOUS.localize()
-                .getNid());
-        degreeOfSynonymyPopupIds
-            .add(ArchitectonicAuxiliary.Concept.NON_SYNONYMOUS.localize()
-                .getNid());
+        defaultDegreeOfSynonymyForLanguageRefset = ConceptBean.get(ArchitectonicAuxiliary.Concept.SYNONYMOUS.getUids());
+        degreeOfSynonymyPopupIds.add(defaultDegreeOfSynonymyForLanguageRefset.getConceptId());
+        degreeOfSynonymyPopupIds.add(ArchitectonicAuxiliary.Concept.NEAR_SYNONYMOUS.localize().getNid());
+        degreeOfSynonymyPopupIds.add(ArchitectonicAuxiliary.Concept.NON_SYNONYMOUS.localize().getNid());
     }
 
     public I_IntList getAcceptabilityPopupIds() {
@@ -123,39 +102,31 @@ public class RefsetDefaultsLanguage extends RefsetDefaults implements
         return defaultAcceptabilityForLanguageRefset;
     }
 
-    public void setDefaultAcceptabilityForLanguageRefset(
-            I_GetConceptData defaultAcceptabilityForLanguageRefset) {
+    public void setDefaultAcceptabilityForLanguageRefset(I_GetConceptData defaultAcceptabilityForLanguageRefset) {
         Object oldValue = this.defaultAcceptabilityForLanguageRefset;
-        this.defaultAcceptabilityForLanguageRefset =
-                defaultAcceptabilityForLanguageRefset;
-        pcs.firePropertyChange("defaultAcceptabilityForLanguageRefset",
-            oldValue, defaultAcceptabilityForLanguageRefset);
+        this.defaultAcceptabilityForLanguageRefset = defaultAcceptabilityForLanguageRefset;
+        pcs.firePropertyChange("defaultAcceptabilityForLanguageRefset", oldValue, defaultAcceptabilityForLanguageRefset);
     }
 
     public I_GetConceptData getDefaultCorrectnessForLanguageRefset() {
         return defaultCorrectnessForLanguageRefset;
     }
 
-    public void setDefaultCorrectnessForLanguageRefset(
-            I_GetConceptData defaultCorrectnessForLanguageRefset) {
+    public void setDefaultCorrectnessForLanguageRefset(I_GetConceptData defaultCorrectnessForLanguageRefset) {
         Object oldValue = this.defaultCorrectnessForLanguageRefset;
-        this.defaultCorrectnessForLanguageRefset =
-                defaultCorrectnessForLanguageRefset;
-        pcs.firePropertyChange("defaultCorrectnessForLanguageRefset", oldValue,
-            defaultCorrectnessForLanguageRefset);
+        this.defaultCorrectnessForLanguageRefset = defaultCorrectnessForLanguageRefset;
+        pcs.firePropertyChange("defaultCorrectnessForLanguageRefset", oldValue, defaultCorrectnessForLanguageRefset);
     }
 
     public I_GetConceptData getDefaultDegreeOfSynonymyForLanguageRefset() {
         return defaultDegreeOfSynonymyForLanguageRefset;
     }
 
-    public void setDefaultDegreeOfSynonymyForLanguageRefset(
-            I_GetConceptData defaultDegreeOfSynonymyForLanguageRefset) {
+    public void setDefaultDegreeOfSynonymyForLanguageRefset(I_GetConceptData defaultDegreeOfSynonymyForLanguageRefset) {
         Object oldValue = this.defaultDegreeOfSynonymyForLanguageRefset;
-        this.defaultDegreeOfSynonymyForLanguageRefset =
-                defaultDegreeOfSynonymyForLanguageRefset;
-        pcs.firePropertyChange("defaultDegreeOfSynonymyForLanguageRefset",
-            oldValue, defaultDegreeOfSynonymyForLanguageRefset);
+        this.defaultDegreeOfSynonymyForLanguageRefset = defaultDegreeOfSynonymyForLanguageRefset;
+        pcs.firePropertyChange("defaultDegreeOfSynonymyForLanguageRefset", oldValue,
+            defaultDegreeOfSynonymyForLanguageRefset);
     }
 
     public I_IntList getDegreeOfSynonymyPopupIds() {

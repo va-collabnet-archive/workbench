@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -168,7 +168,7 @@ import com.sleepycat.je.Transaction;
 
 /**
  * @author kec
- *
+ * 
  */
 public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_WriteDirectToDb {
     private static Logger logger = Logger.getLogger(VodbEnv.class.getName());
@@ -299,14 +299,14 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
             AceLog.getAppLog().info("Berkeley DB info: " + JEVersion.CURRENT_VERSION.getVersionString());
 
-            if (this.stealth ) {
-               	bdbEnv = new BdbEnv(this, envHome, readOnly, null, luceneDir, dbSetupConfig);
-           } else 	{
-            	bdbEnv = new BdbEnv(this, envHome, readOnly, null, luceneDir, dbSetupConfig);
+            if (this.stealth) {
+                bdbEnv = new BdbEnv(this, envHome, readOnly, null, luceneDir, dbSetupConfig);
+            } else {
+                bdbEnv = new BdbEnv(this, envHome, readOnly, null, luceneDir, dbSetupConfig);
                 LocalVersionedTerminology.set(this);
             }
 
-                LocalFixedTerminology.setStore(new VodbFixedServer(this));
+            LocalFixedTerminology.setStore(new VodbFixedServer(this));
 
             activityFrame.setProgressInfoLower("complete");
             activityFrame.complete();
@@ -426,7 +426,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     private void removeFromExtensionCache(final int memberId) throws IOException {
-        ((ExtensionByReferenceBean)getExtensionWrapper(memberId)).removeFromCache();
+        ((ExtensionByReferenceBean) getExtensionWrapper(memberId)).removeFromCache();
     }
 
     public boolean hasExtension(int memberId) throws IOException {
@@ -505,7 +505,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     /**
      * This method is multithreaded hot.
-     *
+     * 
      * @param continueWork
      * @param p
      * @param matches
@@ -521,7 +521,14 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     /*
      * For issues upgrading to lucene 2.x, see this link:
-     * http://www.nabble.com/Lucene-in-Action-examples-complie-problem-tf2418478.html#a6743189
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * http://www.nabble.com/Lucene-in-Action-examples-complie-problem-tf2418478.
+     * html#a6743189
      */
 
     public CountDownLatch searchLucene(I_TrackContinuation tracker, String query, Collection<LuceneMatch> matches,
@@ -690,8 +697,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     public void writePathOrigin(I_Path path, I_Position origin) throws TerminologyException {
         new PathManager().writeOrigin(path, origin);
-    }    
-    
+    }
+
     public I_Path getPath(int nativeId) throws TerminologyException {
         return new PathManager().get(nativeId);
     }
@@ -777,9 +784,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             throws TerminologyException, IOException {
         canEdit(aceFrameConfig);
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        int nid =
-                uuidToNativeWithGeneration(newConceptId, idSource, aceFrameConfig.getEditingPathSet(),
-                    Integer.MAX_VALUE);
+        int nid = uuidToNativeWithGeneration(newConceptId, idSource, aceFrameConfig.getEditingPathSet(),
+            Integer.MAX_VALUE);
         AceLog.getEditLog().info("Creating new concept: " + newConceptId + " (" + nid + ") defined: " + defined);
         ConceptBean newBean = ConceptBean.get(nid);
         newBean.setPrimordial(true);
@@ -809,14 +815,13 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         canEdit(aceFrameConfig);
         addUncommitted((I_Transact) concept);
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        int descId =
-                uuidToNativeWithGeneration(newDescriptionId, idSource, aceFrameConfig.getEditingPathSet(),
-                    Integer.MAX_VALUE);
+        int descId = uuidToNativeWithGeneration(newDescriptionId, idSource, aceFrameConfig.getEditingPathSet(),
+            Integer.MAX_VALUE);
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
             AceLog.getEditLog().fine("Creating new description: " + newDescriptionId + " (" + descId + "): " + text);
         }
-        ThinDescVersioned desc =
-                new ThinDescVersioned(descId, concept.getConceptId(), aceFrameConfig.getEditingPathSet().size());
+        ThinDescVersioned desc = new ThinDescVersioned(descId, concept.getConceptId(),
+            aceFrameConfig.getEditingPathSet().size());
         boolean capStatus = false;
         int status = aceFrameConfig.getDefaultStatus().getConceptId();
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
@@ -857,16 +862,15 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
         ACE.commitSequence++;
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        int relId =
-                uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
+        int relId = uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig.getEditingPathSet(),
+            Integer.MAX_VALUE);
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
             AceLog.getEditLog().fine(
                 "Creating new relationship 1: " + newRelUid + " (" + relId + ") from " + concept.getUids() + " to "
                     + aceFrameConfig.getHierarchySelection().getUids());
         }
-        ThinRelVersioned rel =
-                new ThinRelVersioned(relId, concept.getConceptId(), aceFrameConfig.getHierarchySelection()
-                    .getConceptId(), 1);
+        ThinRelVersioned rel = new ThinRelVersioned(relId, concept.getConceptId(),
+            aceFrameConfig.getHierarchySelection().getConceptId(), 1);
         int status = aceFrameConfig.getDefaultStatus().getConceptId();
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
             ThinRelPart relPart = new ThinRelPart();
@@ -894,16 +898,15 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         ACE.commitSequence++;
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 
-        int relId =
-                uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
+        int relId = uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig.getEditingPathSet(),
+            Integer.MAX_VALUE);
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
             AceLog.getEditLog().fine(
                 "Creating new relationship 2: " + newRelUid + " (" + relId + ") from " + concept.getUids() + " to "
                     + relDestination.getUids());
         }
-        ThinRelVersioned rel =
-                new ThinRelVersioned(relId, concept.getConceptId(), relDestination.getConceptId(), aceFrameConfig
-                    .getEditingPathSet().size());
+        ThinRelVersioned rel = new ThinRelVersioned(relId, concept.getConceptId(), relDestination.getConceptId(),
+            aceFrameConfig.getEditingPathSet().size());
 
         ThinRelPart relPart = new ThinRelPart();
 
@@ -980,7 +983,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     /**
-     *
+     * 
      * @param args
      * @throws Exception
      * @deprecated use loadFromSingleJar
@@ -1001,7 +1004,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         I_ProcessIds idProcessor;
 
         I_ProcessImages imageProcessor;
-
 
         I_ProcessExtByRef extProcessor;
 
@@ -1080,8 +1082,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         public void processImages(DatabaseEntry key, DatabaseEntry value) throws Exception {
             I_ImageVersioned imageV = bdbEnv.imageEntryToObject(key, value);
             this.imageProcessor.processImages(imageV);
-
-
 
         }
 
@@ -1204,7 +1204,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return getPath(uuidToNative(Arrays.asList(uuids)));
     }
 
-    public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException, IOException {
+    public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException,
+            IOException {
         ArrayList<I_Position> originList = new ArrayList<I_Position>();
         if (origins != null) {
             originList.addAll(origins);
@@ -1270,7 +1271,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
                 newFrame.setVisible(true);
                 AceFrameConfig nativeConfig = (AceFrameConfig) frameConfig;
                 nativeConfig.setAceFrame(newFrame);
-                
+
             } catch (Exception e) {
                 ex = e;
             }
@@ -1339,7 +1340,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return new ThinRelPart();
     }
 
-
     public <T extends I_ThinExtByRefPart> T newExtensionPart(Class<T> t) {
         return VodbTypeFactory.create(t);
     }
@@ -1356,6 +1356,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         int typeId = ThinExtBinder.getExtensionType(partType).getNid();
         return newExtension(refsetId, memberId, componentId, typeId);
     }
+
     @Deprecated
     public I_ThinExtByRefVersioned newExtensionNoChecks(int refsetId, int memberId, int componentId, int typeId) {
 
@@ -1431,6 +1432,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     public I_ThinExtByRefPartConceptString newConceptStringExtensionPart() {
         return new ThinExtByRefPartConceptString();
     }
+
     public Set<I_Transact> getUncommitted() {
         return ACE.getUncommitted();
     }
@@ -1793,8 +1795,10 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     /**
-     * If a class that is calling a method in this class defines the {@link AllowDataCheckSuppression} annotation then
-     * we will traverse back up the the call stack for a method that declares the {@link SuppressDataChecks} annotation.
+     * If a class that is calling a method in this class defines the
+     * {@link AllowDataCheckSuppression} annotation then
+     * we will traverse back up the the call stack for a method that declares
+     * the {@link SuppressDataChecks} annotation.
      * If found returns true.
      */
     private boolean isDataChecksSuppressed() {
@@ -1805,7 +1809,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             try {
                 elementClass = Class.forName(e.getClassName());
             } catch (ClassNotFoundException ex) {
-                // We have encountered a class on the call stack which is not available to our classloader
+                // We have encountered a class on the call stack which is not
+                // available to our classloader
                 // so we will stop here and assert we can check no further.
                 return false;
             }
@@ -1815,7 +1820,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
                 continue;
             }
 
-            // Verify the immediate calling class (first time only) allows suppression
+            // Verify the immediate calling class (first time only) allows
+            // suppression
             if (!suppressAllowed) {
                 AllowDataCheckSuppression allowAnnotation = elementClass.getAnnotation(AllowDataCheckSuppression.class);
 
@@ -1835,7 +1841,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
                         }
                     }
                 }
-                // Check the superclass, if it exists, in case the method in inherited
+                // Check the superclass, if it exists, in case the method in
+                // inherited
                 elementClass = elementClass.getSuperclass();
             } while (elementClass != null);
 
@@ -1844,50 +1851,43 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return false;
     }
 
-	public void searchConcepts(I_TrackContinuation tracker,
-			org.apache.commons.collections.primitives.IntList matches,
-			CountDownLatch latch, List<I_TestSearchResults> checkList,
-			I_ConfigAceFrame config) throws DatabaseException, IOException,
-			ParseException {
-		bdbEnv.searchConcepts(tracker, matches, latch, checkList, config);
-	}
+    public void searchConcepts(I_TrackContinuation tracker, org.apache.commons.collections.primitives.IntList matches,
+            CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
+            throws DatabaseException, IOException, ParseException {
+        bdbEnv.searchConcepts(tracker, matches, latch, checkList, config);
+    }
 
-	public List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
-		return ACE.getCommitErrorsAndWarnings();
-	}
+    public List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
+        return ACE.getCommitErrorsAndWarnings();
+    }
 
-	public TransferHandler makeTerminologyTransferHandler(
-			JComponent thisComponent) {
-		return new TerminologyTransferHandler(thisComponent);
-	}
+    public TransferHandler makeTerminologyTransferHandler(JComponent thisComponent) {
+        return new TerminologyTransferHandler(thisComponent);
+    }
 
-	public I_IntSet getConceptNids() throws IOException {
-		return bdbEnv.getConceptNids();
-	}
+    public I_IntSet getConceptNids() throws IOException {
+        return bdbEnv.getConceptNids();
+    }
 
-	public I_RepresentIdSet getConceptIdSet() throws IOException {
-		return bdbEnv.getConceptIdSet();
-	}
+    public I_RepresentIdSet getConceptIdSet() throws IOException {
+        return bdbEnv.getConceptIdSet();
+    }
 
-	public I_RepresentIdSet getEmptyIdSet() throws IOException {
-		return bdbEnv.getEmptyIdSet();
-	}
+    public I_RepresentIdSet getEmptyIdSet() throws IOException {
+        return bdbEnv.getEmptyIdSet();
+    }
 
-	public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids)
-			throws IOException {
-		return bdbEnv.getIdSetFromIntCollection(ids);
-	}
+    public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids) throws IOException {
+        return bdbEnv.getIdSetFromIntCollection(ids);
+    }
 
-	public I_RepresentIdSet getIdSetfromTermCollection(
-			Collection<? extends I_AmTermComponent> components)
-			throws IOException {
-		return bdbEnv.getIdSetfromTermCollection(components);
-	}
+    public I_RepresentIdSet getIdSetfromTermCollection(Collection<? extends I_AmTermComponent> components)
+            throws IOException {
+        return bdbEnv.getIdSetfromTermCollection(components);
+    }
 
-	public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
-		return bdbEnv.getReadOnlyConceptIdSet();
-	}
-    
-	
-    
+    public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
+        return bdbEnv.getReadOnlyConceptIdSet();
+    }
+
 }

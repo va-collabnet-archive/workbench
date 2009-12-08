@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,32 +65,32 @@ public class ThinIdVersionedBinding extends TupleBinding {
     }
 
     public void objectToEntry(Object obj, TupleOutput to) {
-		I_IdVersioned versioned = (I_IdVersioned) obj;
-		to.writeInt(versioned.getNativeId());
-		to.writeInt(versioned.getVersions().size());
-		for (I_IdPart id: versioned.getVersions()) {
-			to.writeInt(id.getPathId());
-			to.writeInt(id.getVersion());
-			to.writeInt(id.getIdStatus());
-			to.writeInt(id.getSource());
-			if (Integer.class.isAssignableFrom(id.getSourceId().getClass())) {
-				to.writeByte(INTEGER_ID);
-				Integer sourceId = (Integer) id.getSourceId();
-				to.writeInt(sourceId);
-			} else if (Long.class.isAssignableFrom(id.getSourceId().getClass())) {
-				to.writeByte(LONG_ID);
-				Long sourceId = (Long) id.getSourceId();
-				to.writeLong(sourceId);
-			} else if (UUID.class.isAssignableFrom(id.getSourceId().getClass())) {
-				to.writeByte(UUID_ID);
-				UUID sourceId = (UUID) id.getSourceId();
-				to.writeLong(sourceId.getMostSignificantBits());
-				to.writeLong(sourceId.getLeastSignificantBits());
-			} else if (String.class.isAssignableFrom(id.getSourceId().getClass())) {
-				to.writeByte(STRING_ID);
-				String sourceId = (String) id.getSourceId();
-				to.writeString(sourceId);
-			} 
-		}
-	}
+        I_IdVersioned versioned = (I_IdVersioned) obj;
+        to.writeInt(versioned.getNativeId());
+        to.writeInt(versioned.getVersions().size());
+        for (I_IdPart id : versioned.getVersions()) {
+            to.writeInt(id.getPathId());
+            to.writeInt(id.getVersion());
+            to.writeInt(id.getIdStatus());
+            to.writeInt(id.getSource());
+            if (Integer.class.isAssignableFrom(id.getSourceId().getClass())) {
+                to.writeByte(INTEGER_ID);
+                Integer sourceId = (Integer) id.getSourceId();
+                to.writeInt(sourceId);
+            } else if (Long.class.isAssignableFrom(id.getSourceId().getClass())) {
+                to.writeByte(LONG_ID);
+                Long sourceId = (Long) id.getSourceId();
+                to.writeLong(sourceId);
+            } else if (UUID.class.isAssignableFrom(id.getSourceId().getClass())) {
+                to.writeByte(UUID_ID);
+                UUID sourceId = (UUID) id.getSourceId();
+                to.writeLong(sourceId.getMostSignificantBits());
+                to.writeLong(sourceId.getLeastSignificantBits());
+            } else if (String.class.isAssignableFrom(id.getSourceId().getClass())) {
+                to.writeByte(STRING_ID);
+                String sourceId = (String) id.getSourceId();
+                to.writeString(sourceId);
+            }
+        }
+    }
 }

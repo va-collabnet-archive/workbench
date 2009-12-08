@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -75,70 +75,64 @@ public class DiffPathPanel extends JPanel {
             table.setDragEnabled(true);
             table.setTransferHandler(new TerminologyTransferHandler(table));
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                        
-            //table.setSize(tWide, (SnoQuery.getIsaAdded().size() + 1) * tHeight);
+
+            // table.setSize(tWide, (SnoQuery.getIsaAdded().size() + 1) *
+            // tHeight);
             table.setRowHeight(rowHeight);
-            table.setPreferredScrollableViewportSize(new Dimension(tWide,
-                    rowHeight * table.getRowCount()));
-            
+            table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
+
             c.gridy += 1;
             this.add(new JScrollPane(table), c);
         } else {
             c.gridy += 1;
-            this.add(new JLabel(
-                    "<HTML><FONT COLOR='gray'><I> -- No ISAs added. --"), c);
+            this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No ISAs added. --"), c);
         }
 
         // DROPPED ISAs
         c.gridy += 1;
         this.add(new JLabel("Dropped ISAs:"), c);
-        if (SnoQuery.getIsaDropped() != null
-                && SnoQuery.getIsaDropped().size() > 0) {
+        if (SnoQuery.getIsaDropped() != null && SnoQuery.getIsaDropped().size() > 0) {
             table = updateTable(SnoQuery.getIsaDropped());
             table.setDragEnabled(true);
             table.setTransferHandler(new TerminologyTransferHandler(table));
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-            // table.setSize(tWide, (SnoQuery.getIsaDropped().size() + 1) * tHeight);
+            // table.setSize(tWide, (SnoQuery.getIsaDropped().size() + 1) *
+            // tHeight);
             table.setRowHeight(rowHeight);
-            table.setPreferredScrollableViewportSize(new Dimension(tWide,
-                    rowHeight * table.getRowCount()));
+            table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
             c.gridy += 1;
             this.add(new JScrollPane(table), c);
         } else {
             c.gridy += 1;
-            this.add(new JLabel(
-                    "<HTML><FONT COLOR='gray'><I> -- No ISAs dropped. --"), c);
+            this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No ISAs dropped. --"), c);
         }
         // ADDED ROLES
         c.gridy += 1;
         this.add(new JLabel("Added Roles:"), c);
-        if (SnoQuery.getRoleAdded() != null
-                && SnoQuery.getRoleAdded().size() > 0) {
+        if (SnoQuery.getRoleAdded() != null && SnoQuery.getRoleAdded().size() > 0) {
             table = updateTable(SnoQuery.getRoleAdded());
             table.setDragEnabled(true);
             table.setTransferHandler(new TerminologyTransferHandler(table));
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            
-            // table.setSize(tWide, (SnoQuery.getRoleAdded().size() + 1) * tHeight);
+
+            // table.setSize(tWide, (SnoQuery.getRoleAdded().size() + 1) *
+            // tHeight);
             table.setRowHeight(rowHeight);
-            table.setPreferredScrollableViewportSize(new Dimension(tWide,
-                    rowHeight * table.getRowCount()));
+            table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
             c.gridy += 1;
             this.add(new JScrollPane(table), c);
         } else {
             c.gridy += 1;
-            this.add(new JLabel(
-                    "<HTML><FONT COLOR='gray'><I> -- No roles added. --"), c);
+            this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No roles added. --"), c);
         }
 
         // DROPPED ROLES
         c.gridy += 1;
         this.add(new JLabel("Dropped Roles:"), c);
-        if (SnoQuery.getRoleDropped() != null
-                && SnoQuery.getRoleDropped().size() > 0) {
+        if (SnoQuery.getRoleDropped() != null && SnoQuery.getRoleDropped().size() > 0) {
             c.gridy += 1;
             c.weightx = 0.5;
             c.weighty = 0.5;
@@ -147,18 +141,17 @@ public class DiffPathPanel extends JPanel {
             table.setTransferHandler(new TerminologyTransferHandler(table));
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-            //table.setSize(tWide, (SnoQuery.getRoleDropped().size() + 1) * tHeight);
+            // table.setSize(tWide, (SnoQuery.getRoleDropped().size() + 1) *
+            // tHeight);
             table.setRowHeight(rowHeight);
-            table.setPreferredScrollableViewportSize(new Dimension(tWide,
-                    rowHeight * table.getRowCount()));
+            table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
             this.add(new JScrollPane(table), c);
         } else {
             c.gridy += 1;
             c.weightx = 0.5;
             c.weighty = 0.5;
-            this.add(new JLabel(
-                    "<HTML><FONT COLOR='gray'><I> -- No roles dropped. --"), c);
+            this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No roles dropped. --"), c);
         }
 
     }
@@ -190,13 +183,11 @@ public class DiffPathPanel extends JPanel {
         tc.setPreferredWidth(400 + 368);
 
         int totalRowHeight = 18;
-        table.setPreferredScrollableViewportSize(new Dimension(900,
-                totalRowHeight));
+        table.setPreferredScrollableViewportSize(new Dimension(900, totalRowHeight));
         return table;
     }
 
-    private String[][] getTableStrings(ArrayList<SnoRel> srl)
-            throws TerminologyException, IOException {
+    private String[][] getTableStrings(ArrayList<SnoRel> srl) throws TerminologyException, IOException {
         int totalCol = 1;
         int totalRows = srl.size();
         String tableStrings[][] = new String[totalRows][totalCol];

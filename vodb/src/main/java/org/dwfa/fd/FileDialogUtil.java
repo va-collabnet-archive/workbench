@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 
 public class FileDialogUtil {
 
-    public static File getNewFile(String frameTitle, File defaultFile,
-            Frame parentFrame) throws TaskFailedException {
+    public static File getNewFile(String frameTitle, File defaultFile, Frame parentFrame) throws TaskFailedException {
         // Create a file dialog box to prompt for a new file to display
         FileDialog f = new FileDialog(parentFrame, frameTitle, FileDialog.SAVE);
         if (defaultFile != null) {
@@ -46,9 +45,8 @@ public class FileDialogUtil {
 
     }
 
-    public static File getExistingFile(String frameTitle,
-            FilenameFilter filter, File defaultDirectory, Frame parentFrame)
-            throws TaskFailedException {
+    public static File getExistingFile(String frameTitle, FilenameFilter filter, File defaultDirectory,
+            Frame parentFrame) throws TaskFailedException {
         // Create a file dialog box to prompt for a new file to display
         FileDialog f = new FileDialog(parentFrame, frameTitle, FileDialog.LOAD);
         if (defaultDirectory != null) {

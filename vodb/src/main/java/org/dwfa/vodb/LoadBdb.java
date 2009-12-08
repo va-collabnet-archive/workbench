@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,14 +47,11 @@ public class LoadBdb {
         AceLog.getAppLog().info(end.toString());
     }
 
-    public static void loadFromDirectory(File dataDir, String encoding)
-            throws Exception {
+    public static void loadFromDirectory(File dataDir, String encoding) throws Exception {
         ProcessAceFormatSourcesBerkeley loadConstants = null;
         timer = new Stopwatch();
         timer.start();
-        loadConstants =
-                new ProcessAceFormatSourcesBerkeley(
-                    (VodbEnv) LocalVersionedTerminology.get());
+        loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) LocalVersionedTerminology.get());
         AceLog.getAppLog().info("Starting to process " + dataDir);
         loadConstants.executeFromDir(dataDir, encoding);
         Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
@@ -63,30 +60,23 @@ public class LoadBdb {
         } catch (NoMappingException e) {
             AceLog.getAppLog().info(e.getLocalizedMessage());
         }
-        AceLog.getAppLog().info(
-            "Finished loading " + dataDir + ". Elapsed time: "
-                + timer.getElapsedTime());
+        AceLog.getAppLog().info("Finished loading " + dataDir + ". Elapsed time: " + timer.getElapsedTime());
         printElapsedTime();
         // Update the history records for the relationships...
         AceLog.getAppLog().info("Starting populateTimeBranchDb()");
         ((VodbEnv) LocalVersionedTerminology.get()).populatePositions();
         printElapsedTime();
         AceLog.getAppLog().info("Starting createLuceneDescriptionIndex()");
-        ((VodbEnv) LocalVersionedTerminology.get())
-            .createLuceneDescriptionIndex();
+        ((VodbEnv) LocalVersionedTerminology.get()).createLuceneDescriptionIndex();
         printElapsedTime();
     }
 
-    public static void loadFromSingleJar(String jarFile, String dataPrefix)
-            throws Exception {
+    public static void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception {
         ProcessAceFormatSourcesBerkeley loadConstants = null;
         timer = new Stopwatch();
         timer.start();
-        loadConstants =
-                new ProcessAceFormatSourcesBerkeley(
-                    (VodbEnv) LocalVersionedTerminology.get());
-        AceLog.getAppLog().info(
-            "Starting to process " + jarFile + ": " + dataPrefix);
+        loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) LocalVersionedTerminology.get());
+        AceLog.getAppLog().info("Starting to process " + jarFile + ": " + dataPrefix);
         loadConstants.execute(new File(jarFile), dataPrefix, FORMAT.ACE);
         Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
         try {
@@ -94,9 +84,7 @@ public class LoadBdb {
         } catch (NoMappingException e) {
             AceLog.getAppLog().info(e.getLocalizedMessage());
         }
-        AceLog.getAppLog().info(
-            "Finished loading " + jarFile + ". Elapsed time: "
-                + timer.getElapsedTime());
+        AceLog.getAppLog().info("Finished loading " + jarFile + ". Elapsed time: " + timer.getElapsedTime());
         printElapsedTime();
         AceLog.getAppLog().info("Starting populateTimeBranchDb()");
         // monitor.setProgressInfoUpper("Starting populateTimeBranchDb().");
@@ -104,8 +92,7 @@ public class LoadBdb {
         printElapsedTime();
         // AceConfig.monitor.setProgressInfoUpper("Starting
         // makeLuceneIndex().");
-        ((VodbEnv) LocalVersionedTerminology.get())
-            .createLuceneDescriptionIndex();
+        ((VodbEnv) LocalVersionedTerminology.get()).createLuceneDescriptionIndex();
         // AceConfig.monitor.setProgressInfoUpper("Starting cleanup.");
         printElapsedTime();
         // ((VodbEnv) LocalVersionedTerminology.get()).close();
@@ -139,7 +126,7 @@ public class LoadBdb {
         I_IntSet releaseDates = loadConstants.getReleaseDates();
         for (String arg : argSet) {
             ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley((VodbEnv) LocalVersionedTerminology.get(),
-                                                                         releaseDates.getSetValues()[0]);
+                releaseDates.getSetValues()[0]);
             AceLog.getAppLog().info("(1) Starting to process SNOMED: " + arg);
             loadSnomed.execute(new JarFile(arg));
             AceLog.getAppLog().info("Finished loading terminologies. Elapsed time: " + timer.getElapsedTime());

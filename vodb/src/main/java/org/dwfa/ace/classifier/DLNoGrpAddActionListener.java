@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,8 +31,7 @@ public class DLNoGrpAddActionListener implements ActionListener {
     private I_ContainTermComponent termContainer; // :!!!:
     private I_ConfigAceFrame config; // :!!!:
 
-    public DLNoGrpAddActionListener(I_ContainTermComponent termContainer,
-            I_ConfigAceFrame config) {
+    public DLNoGrpAddActionListener(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
         super();
         this.termContainer = termContainer;
         this.config = config;
@@ -42,8 +41,7 @@ public class DLNoGrpAddActionListener implements ActionListener {
         try {
             if (termContainer.getConfig().getClassifierInputPath() == null) {
 
-                JOptionPane.showMessageDialog(new JFrame(),
-                    "Please set the Classifier Edit Path ...");
+                JOptionPane.showMessageDialog(new JFrame(), "Please set the Classifier Edit Path ...");
                 return;
             }
             doEdit(termContainer, e, config);
@@ -52,8 +50,7 @@ public class DLNoGrpAddActionListener implements ActionListener {
         }
     }
 
-    void doEdit(I_ContainTermComponent termContainer, ActionEvent e,
-            I_ConfigAceFrame config) {
+    void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config) {
         ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
 
         int parentId = Integer.MAX_VALUE;

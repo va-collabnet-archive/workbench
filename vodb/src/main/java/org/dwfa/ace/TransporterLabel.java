@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -67,9 +67,9 @@ import org.dwfa.vodb.types.ConceptBean;
 
 public class TransporterLabel extends JLabel implements I_ContainTermComponent, ActionListener {
 
-	private I_AmTermComponent termComponent;
+    private I_AmTermComponent termComponent;
 
-	private ACE ace;
+    private ACE ace;
 
     private class MyFocusListener implements FocusListener {
 
@@ -83,48 +83,48 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
 
     }
 
-	private class TermLabelDragSourceListener implements DragSourceListener {
+    private class TermLabelDragSourceListener implements DragSourceListener {
 
-		public void dragDropEnd(DragSourceDropEvent dsde) {
-			// TODO Auto-generated method stub
-		}
+        public void dragDropEnd(DragSourceDropEvent dsde) {
+            // TODO Auto-generated method stub
+        }
 
-		public void dragEnter(DragSourceDragEvent dsde) {
-			// TODO Auto-generated method stub
-		}
+        public void dragEnter(DragSourceDragEvent dsde) {
+            // TODO Auto-generated method stub
+        }
 
-		public void dragExit(DragSourceEvent dse) {
-			// TODO Auto-generated method stub
-		}
+        public void dragExit(DragSourceEvent dse) {
+            // TODO Auto-generated method stub
+        }
 
-		public void dragOver(DragSourceDragEvent dsde) {
-			// TODO Auto-generated method stub
-		}
+        public void dragOver(DragSourceDragEvent dsde) {
+            // TODO Auto-generated method stub
+        }
 
-		public void dropActionChanged(DragSourceDragEvent dsde) {
-			// TODO Auto-generated method stub
-		}
-	}
+        public void dropActionChanged(DragSourceDragEvent dsde) {
+            // TODO Auto-generated method stub
+        }
+    }
 
-	private class DragGestureListenerWithImage implements DragGestureListener {
+    private class DragGestureListenerWithImage implements DragGestureListener {
 
-		DragSourceListener dsl;
-		
-		public DragGestureListenerWithImage(DragSourceListener dsl) {
-			super();
-			this.dsl = dsl;
-		}
+        DragSourceListener dsl;
 
-		public void dragGestureRecognized(DragGestureEvent dge) {
-			if (termComponent == null) {
-				return;
-			}
-			Image dragImage = getDragImage();
-			Point imageOffset = new Point(0,0);
-			dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, 
-					new ConceptTransferable((ConceptBean) termComponent), dsl);
-		}
-	}
+        public DragGestureListenerWithImage(DragSourceListener dsl) {
+            super();
+            this.dsl = dsl;
+        }
+
+        public void dragGestureRecognized(DragGestureEvent dge) {
+            if (termComponent == null) {
+                return;
+            }
+            Image dragImage = getDragImage();
+            Point imageOffset = new Point(0, 0);
+            dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
+                (ConceptBean) termComponent), dsl);
+        }
+    }
 
     /**
      * 
@@ -134,76 +134,74 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
     Border focusBorder = BorderFactory.createLoweredBevelBorder();
 
     Border plainBorder = BorderFactory.createRaisedBevelBorder();
-    
+
     JPopupMenu popup;
 
-
     public TransporterLabel(Icon image, ACE ace) {
-		super(image);
-		this.ace = ace;
+        super(image);
+        this.ace = ace;
         this.setFocusable(true);
         this.setEnabled(true);
         this.setBorder(plainBorder);
         this.addFocusListener(new MyFocusListener());
         this.addMouseListener(new MouseListener() {
 
-			public void mouseClicked(MouseEvent e) {
-				TransporterLabel.this.requestFocusInWindow();
-			}
+            public void mouseClicked(MouseEvent e) {
+                TransporterLabel.this.requestFocusInWindow();
+            }
 
-			public void mouseEntered(MouseEvent e) {
-			}
+            public void mouseEntered(MouseEvent e) {
+            }
 
-			public void mouseExited(MouseEvent e) {
-			}
+            public void mouseExited(MouseEvent e) {
+            }
 
-			public void mousePressed(MouseEvent e) {
-			}
+            public void mousePressed(MouseEvent e) {
+            }
 
-			public void mouseReleased(MouseEvent e) {
-				TransporterLabel.this.requestFocusInWindow();
-			}
-        	
+            public void mouseReleased(MouseEvent e) {
+                TransporterLabel.this.requestFocusInWindow();
+            }
+
         });
-		setTransferHandler(new TerminologyTransferHandler(this));
-		
-		DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
-                new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
-		
-		ActionMap map = this.getActionMap();
-		map.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
-		map.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
-		map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
+        setTransferHandler(new TerminologyTransferHandler(this));
 
-		popup = new JPopupMenu();
-		JMenuItem menuItem = new JMenuItem("Show in taxonomy");
-	    popup.add(menuItem);
-	    menuItem.addActionListener(this);
-	    menuItem = new JMenuItem("Put in Concept Tab L-1");
-	    popup.add(menuItem);
-	    menuItem.addActionListener(this);
-	    popup.addSeparator();
-	    menuItem = new JMenuItem("Put in Concept Tab R-1");
-	    popup.add(menuItem);
-	    menuItem.addActionListener(this);
-	    menuItem = new JMenuItem("Put in Concept Tab R-2");
-	    popup.add(menuItem);
-	    menuItem.addActionListener(this);
-	    menuItem = new JMenuItem("Put in Concept Tab R-3");
-	    popup.add(menuItem);
-	    menuItem.addActionListener(this);
-	    menuItem = new JMenuItem("Put in Concept Tab R-4");
-	    popup.add(menuItem);
-	    popup.addSeparator();
-	    menuItem.addActionListener(this);
-	    menuItem = new JMenuItem("Add to list");
-	    menuItem.addActionListener(this);
-	    popup.add(menuItem);
-	    
-	    this.setToolTipText("drag and drop--or click then paste--concepts transport to the selected location");
-	    
-	}
+        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
+            new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
 
+        ActionMap map = this.getActionMap();
+        map.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
+        map.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
+        map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
+
+        popup = new JPopupMenu();
+        JMenuItem menuItem = new JMenuItem("Show in taxonomy");
+        popup.add(menuItem);
+        menuItem.addActionListener(this);
+        menuItem = new JMenuItem("Put in Concept Tab L-1");
+        popup.add(menuItem);
+        menuItem.addActionListener(this);
+        popup.addSeparator();
+        menuItem = new JMenuItem("Put in Concept Tab R-1");
+        popup.add(menuItem);
+        menuItem.addActionListener(this);
+        menuItem = new JMenuItem("Put in Concept Tab R-2");
+        popup.add(menuItem);
+        menuItem.addActionListener(this);
+        menuItem = new JMenuItem("Put in Concept Tab R-3");
+        popup.add(menuItem);
+        menuItem.addActionListener(this);
+        menuItem = new JMenuItem("Put in Concept Tab R-4");
+        popup.add(menuItem);
+        popup.addSeparator();
+        menuItem.addActionListener(this);
+        menuItem = new JMenuItem("Add to list");
+        menuItem.addActionListener(this);
+        popup.add(menuItem);
+
+        this.setToolTipText("drag and drop--or click then paste--concepts transport to the selected location");
+
+    }
 
     public JComponent getComponent() {
         return this;
@@ -212,85 +210,75 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
     public JToggleButton getToggle() {
         return null;
     }
- 
-    private boolean onByDefault = true;
 
+    private boolean onByDefault = true;
 
     public boolean isOnByDefault() {
         return onByDefault;
     }
 
+    public I_AmTermComponent getTermComponent() {
+        return termComponent;
+    }
 
-	public I_AmTermComponent getTermComponent() {
-		return termComponent;
-	}
+    public void setTermComponent(I_AmTermComponent termComponent) {
+        this.termComponent = termComponent;
+        Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+        SwingUtilities.convertPointFromScreen(mouseLocation, this);
+        popup.show(this, mouseLocation.x, mouseLocation.y);
+    }
 
+    @Override
+    public void setText(String text) {
 
-	public void setTermComponent(I_AmTermComponent termComponent) {
-		this.termComponent = termComponent;
-		Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
-		SwingUtilities.convertPointFromScreen(mouseLocation, this);
-		popup.show(this,
-				mouseLocation.x, mouseLocation.y);
-	}
-	
-	
+    }
 
+    public I_ConfigAceFrame getConfig() {
+        return this.ace.getAceFrameConfig();
+    }
 
-	@Override
-	public void setText(String text) {
+    public Image getDragImage() {
+        JLabel dragLabel = TermLabelMaker.makeLabel(termComponent.toString());
+        dragLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        Image dragImage = createImage(dragLabel.getWidth(), dragLabel.getHeight());
+        dragLabel.setVisible(true);
+        Graphics og = dragImage.getGraphics();
+        og.setClip(dragLabel.getBounds());
+        dragLabel.paint(og);
+        og.dispose();
+        FilteredImageSource fis = new FilteredImageSource(dragImage.getSource(), TermLabelMaker.getTransparentFilter());
+        dragImage = Toolkit.getDefaultToolkit().createImage(fis);
+        return dragImage;
+    }
 
-	}
-
-
-	public I_ConfigAceFrame getConfig() {
-		return this.ace.getAceFrameConfig();
-	}
-
-
-
-	public Image getDragImage() {
-		JLabel dragLabel = TermLabelMaker.makeLabel(termComponent.toString());
-		dragLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		Image dragImage = createImage(dragLabel.getWidth(), dragLabel.getHeight());
-		dragLabel.setVisible(true);
-		Graphics og = dragImage.getGraphics();
-		og.setClip(dragLabel.getBounds());
-		dragLabel.paint(og);
-		og.dispose();
-		FilteredImageSource fis = new FilteredImageSource(dragImage.getSource(), TermLabelMaker.getTransparentFilter());
-		dragImage = Toolkit.getDefaultToolkit().createImage(fis);
-		return dragImage;
-	}
-
-
-	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Show in taxonomy")) {
-			try {
-				new ExpandPathToNodeStateListener(this.ace.getTree(), this.ace.getAceFrameConfig(), (I_GetConceptData) termComponent);
-				this.ace.getAceFrameConfig().setHierarchySelection((I_GetConceptData) termComponent);
-			} catch (IOException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			}
-		} else if (e.getActionCommand().equals("Put in Concept Tab L-1")) {
-			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(5);
-			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Put in Concept Tab R-1")) {
-			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(1);
-			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Put in Concept Tab R-2")) {
-			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(2);
-			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Put in Concept Tab R-3")) {
-			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(3);
-			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Put in Concept Tab R-4")) {
-			I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(4);
-			viewer.setTermComponent(termComponent);
-		} else if (e.getActionCommand().equals("Add to list")) {
-	         JList conceptList = this.ace.getAceFrameConfig().getBatchConceptList();
-	         I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-	         model.addElement((I_GetConceptData) termComponent);
-		} 
-	}
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("Show in taxonomy")) {
+            try {
+                new ExpandPathToNodeStateListener(this.ace.getTree(), this.ace.getAceFrameConfig(),
+                    (I_GetConceptData) termComponent);
+                this.ace.getAceFrameConfig().setHierarchySelection((I_GetConceptData) termComponent);
+            } catch (IOException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            }
+        } else if (e.getActionCommand().equals("Put in Concept Tab L-1")) {
+            I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(5);
+            viewer.setTermComponent(termComponent);
+        } else if (e.getActionCommand().equals("Put in Concept Tab R-1")) {
+            I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(1);
+            viewer.setTermComponent(termComponent);
+        } else if (e.getActionCommand().equals("Put in Concept Tab R-2")) {
+            I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(2);
+            viewer.setTermComponent(termComponent);
+        } else if (e.getActionCommand().equals("Put in Concept Tab R-3")) {
+            I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(3);
+            viewer.setTermComponent(termComponent);
+        } else if (e.getActionCommand().equals("Put in Concept Tab R-4")) {
+            I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(4);
+            viewer.setTermComponent(termComponent);
+        } else if (e.getActionCommand().equals("Add to list")) {
+            JList conceptList = this.ace.getAceFrameConfig().getBatchConceptList();
+            I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
+            model.addElement((I_GetConceptData) termComponent);
+        }
+    }
 }

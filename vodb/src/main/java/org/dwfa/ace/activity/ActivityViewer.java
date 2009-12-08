@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -132,26 +132,25 @@ public class ActivityViewer {
 
         }
 
-		public I_ConfigAceFrame getAceFrameConfig() {
-			return null;
-		}
+        public I_ConfigAceFrame getAceFrameConfig() {
+            return null;
+        }
 
+        public void syncWith(I_ShowActivity another) {
 
-		public void syncWith(I_ShowActivity another) {
-			
-		}
+        }
 
-		public String getProgressInfoLower() {
-			return null;
-		}
+        public String getProgressInfoLower() {
+            return null;
+        }
 
-		public String getProgressInfoUpper() {
-			return null;
-		}
+        public String getProgressInfoUpper() {
+            return null;
+        }
 
-		public boolean isStringPainted() {
-			return false;
-		}
+        public boolean isStringPainted() {
+            return false;
+        }
 
     }
 
@@ -329,39 +328,39 @@ public class ActivityViewer {
                     }
                 }
 
-
             });
         }
     }
 
-	private static void linkToSourceFrameActivityPanel() {
-		Set<I_ShowActivity> activeActivityListeners = new HashSet<I_ShowActivity>();
-		for (I_ShowActivity a: viewer.activitiesList) {
-			if (a.getAceFrameConfig() != null) {
-				if (a.getAceFrameConfig().getTopActivityListener() != null) {
-					a.removeShowActivityListener(a.getAceFrameConfig().getTopActivityListener());
-					ActionListener[] stopListeners = a.getAceFrameConfig().getTopActivityListener()
-							.getStopButton().getActionListeners();
-					for (ActionListener l: stopListeners) {
-						a.getAceFrameConfig().getTopActivityListener()
-						.getStopButton().removeActionListener(l);
-					}
-				}
-			}
-		}
-		for (I_ShowActivity a : viewer.activitiesList) {
-			if (a.getAceFrameConfig() != null) {
-				I_ShowActivity frameActivity = a.getAceFrameConfig().getTopActivityListener();
-				if (frameActivity != null) {
-			    	if (activeActivityListeners.contains(frameActivity) == false) {
-			    		a.addShowActivityListener(frameActivity);
-			    		activeActivityListeners.add(frameActivity);
-				     	frameActivity.syncWith(a);
-			    	}
-				}
-			}
-		}
-	}
+    private static void linkToSourceFrameActivityPanel() {
+        Set<I_ShowActivity> activeActivityListeners = new HashSet<I_ShowActivity>();
+        for (I_ShowActivity a : viewer.activitiesList) {
+            if (a.getAceFrameConfig() != null) {
+                if (a.getAceFrameConfig().getTopActivityListener() != null) {
+                    a.removeShowActivityListener(a.getAceFrameConfig().getTopActivityListener());
+                    ActionListener[] stopListeners = a.getAceFrameConfig()
+                        .getTopActivityListener()
+                        .getStopButton()
+                        .getActionListeners();
+                    for (ActionListener l : stopListeners) {
+                        a.getAceFrameConfig().getTopActivityListener().getStopButton().removeActionListener(l);
+                    }
+                }
+            }
+        }
+        for (I_ShowActivity a : viewer.activitiesList) {
+            if (a.getAceFrameConfig() != null) {
+                I_ShowActivity frameActivity = a.getAceFrameConfig().getTopActivityListener();
+                if (frameActivity != null) {
+                    if (activeActivityListeners.contains(frameActivity) == false) {
+                        a.addShowActivityListener(frameActivity);
+                        activeActivityListeners.add(frameActivity);
+                        frameActivity.syncWith(a);
+                    }
+                }
+            }
+        }
+    }
 
     public static void reSort() {
         if (VodbEnv.isHeadless() == false) {
@@ -406,7 +405,7 @@ public class ActivityViewer {
     }
 
     private static void addSecondaryActivityPanel(final Set<I_ShowActivity> secondaryPanels, final I_ShowActivity a) {
-       	if (VodbEnv.isHeadless() == false) {
+        if (VodbEnv.isHeadless() == false) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
@@ -423,11 +422,11 @@ public class ActivityViewer {
                     }
                 }
             });
-       	}
+        }
     }
 
     public static void removeActivity(final I_ShowActivity activity) {
-    	if (VodbEnv.isHeadless() == false) {
+        if (VodbEnv.isHeadless() == false) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
@@ -449,7 +448,7 @@ public class ActivityViewer {
                     tickleSize();
                 }
             });
-    	}
+        }
     }
 
     private static void tickleSize() {

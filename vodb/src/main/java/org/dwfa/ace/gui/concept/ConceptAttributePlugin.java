@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,28 +58,26 @@ import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public class ConceptAttributePlugin extends AbstractPlugin implements TableModelListener {
 
+    private static final long serialVersionUID = 1L;
+    private static final int dataVersion = 1;
 
-   private static final long serialVersionUID = 1L;
-   private static final int dataVersion = 1;
+    private transient JPanel conceptAttributes;
+    private transient ConceptAttributeTableModel conceptTableModel;
+    private transient JTableWithDragImage conceptTable;
+    protected transient Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
 
-   private transient JPanel conceptAttributes;
-   private transient ConceptAttributeTableModel conceptTableModel;
-   private transient JTableWithDragImage conceptTable;
-   protected transient Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-   private void writeObject(ObjectOutputStream out) throws IOException {
-       out.writeInt(dataVersion);
-   }
-
-   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-       int objDataVersion = in.readInt();
-       if (objDataVersion == dataVersion) {
-    	   visibleExtensions = new HashSet<EXT_TYPE>();
-       } else {
-           throw new IOException("Can't handle dataversion: " + objDataVersion);
-       }
-   }
-
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            visibleExtensions = new HashSet<EXT_TYPE>();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
     public ConceptAttributePlugin(boolean shownByDefault, int sequence) {
         super(shownByDefault, sequence);
@@ -98,7 +96,8 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
                 createPluginComponent(getHost());
             }
 
-            PropertyChangeEvent evt = new PropertyChangeEvent(getHost(), "termComponent", null, getHost().getTermComponent());
+            PropertyChangeEvent evt = new PropertyChangeEvent(getHost(), "termComponent", null,
+                getHost().getTermComponent());
             CONCEPT_FIELD[] columnEnums = getConceptColumns(getHost());
             conceptTableModel.setColumns(getConceptColumns(getHost()));
             for (int i = 0; i < conceptTableModel.getColumnCount(); i++) {
@@ -121,7 +120,7 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
     }
 
     private void createPluginComponent(I_HostConceptPlugins host) {
-    	setHost(host);
+        setHost(host);
         conceptAttributes = getConceptAttributesPanel(host);
         host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
         host.addPropertyChangeListener("commit", this);
@@ -206,8 +205,8 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
         }
 
         // Set up tool tips for column headers.
-        sortingTable.getTableHeader()
-                .setToolTipText("Click to specify sorting; Control-Click to specify secondary sorting");
+        sortingTable.getTableHeader().setToolTipText(
+            "Click to specify sorting; Control-Click to specify secondary sorting");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         conceptPanel.add(conceptTable.getTableHeader(), c);
@@ -241,8 +240,8 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
         comboBox.addItem(new Boolean(false));
         conceptTable.getColumn(CONCEPT_FIELD.DEFINED).setCellEditor(new DefaultCellEditor(comboBox));
 
-        conceptTable.getColumn(CONCEPT_FIELD.STATUS)
-                .setCellEditor(new ConceptAttributeTableModel.ConceptStatusFieldEditor(host.getConfig()));
+        conceptTable.getColumn(CONCEPT_FIELD.STATUS).setCellEditor(
+            new ConceptAttributeTableModel.ConceptStatusFieldEditor(host.getConfig()));
 
         conceptTable.setDefaultRenderer(String.class, renderer);
         conceptTable.setDefaultRenderer(Boolean.class, renderer);
@@ -257,7 +256,7 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
         visibleExtensions.clear();
         RefsetUtil.addRefsetTables(host, this, TOGGLES.ATTRIBUTES, c, visibleExtensions, conceptPanel);
         conceptPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3),
-                                                                  BorderFactory.createLineBorder(Color.GRAY)));
+            BorderFactory.createLineBorder(Color.GRAY)));
         return conceptPanel;
     }
 
@@ -271,8 +270,7 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
         if (conceptTable.getSelectedRow() < 0) {
             return Integer.MIN_VALUE;
         }
-        StringWithConceptTuple swct = (StringWithConceptTuple) conceptTable
-                .getValueAt(conceptTable.getSelectedRow(), 0);
+        StringWithConceptTuple swct = (StringWithConceptTuple) conceptTable.getValueAt(conceptTable.getSelectedRow(), 0);
         if (swct != null && swct.getTuple() != null) {
             return swct.getTuple().getConId();
         }
@@ -282,15 +280,15 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
     public void tableChanged(TableModelEvent tme) {
         if (conceptTable.getSelectedRow() == -1) {
             if (conceptTable.getRowCount() > 0) {
-                int rowToSelect = conceptTable.getRowCount() -1;
+                int rowToSelect = conceptTable.getRowCount() - 1;
                 conceptTable.setRowSelectionInterval(rowToSelect, rowToSelect);
             }
         }
-        
+
     }
 
-	public UUID getId() {
-		return I_HostConceptPlugins.TOGGLES.ATTRIBUTES.getPluginId();
-	}
+    public UUID getId() {
+        return I_HostConceptPlugins.TOGGLES.ATTRIBUTES.getPluginId();
+    }
 
 }
