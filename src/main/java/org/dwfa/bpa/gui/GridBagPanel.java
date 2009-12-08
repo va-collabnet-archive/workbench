@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,8 +38,7 @@ import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
  * 
  */
 public class GridBagPanel extends JPanel {
-    private static Logger logger =
-            Logger.getLogger(GridBagPanel.class.getName());
+    private static Logger logger = Logger.getLogger(GridBagPanel.class.getName());
 
     public static class GridBagPanelConstraints extends GridBagConstraints {
         /**
@@ -71,12 +70,10 @@ public class GridBagPanel extends JPanel {
          * @param ipadx
          * @param ipady
          */
-        public GridBagPanelConstraints(int gridx, int gridy, int gridwidth,
-                int gridheight, double weightx, double weighty, int anchor,
-                int fill, Insets insets, int ipadx, int ipady,
-                boolean showInLayout, int layer, int positionInLayer) {
-            super(gridx, gridy, gridwidth, gridheight, weightx, weighty,
-                anchor, fill, insets, ipadx, ipady);
+        public GridBagPanelConstraints(int gridx, int gridy, int gridwidth, int gridheight, double weightx,
+                double weighty, int anchor, int fill, Insets insets, int ipadx, int ipady, boolean showInLayout,
+                int layer, int positionInLayer) {
+            super(gridx, gridy, gridwidth, gridheight, weightx, weighty, anchor, fill, insets, ipadx, ipady);
             this.showInLayout = showInLayout;
             this.layer = layer;
             this.positionInLayer = positionInLayer;
@@ -93,11 +90,9 @@ public class GridBagPanel extends JPanel {
      */
     private static final long serialVersionUID = 2485090515541759981L;
 
-    private GridBagPanelConstraints gb =
-            new GridBagPanelConstraints(0, 0, 1, 1, 1.0, 1.0,
-                GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
-                new Insets(4, 4, 4, 4), 1, 1, true, JLayeredPane.DEFAULT_LAYER,
-                0);
+    private GridBagPanelConstraints gb = new GridBagPanelConstraints(0, 0, 1, 1, 1.0, 1.0,
+        GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(4, 4, 4, 4), 1, 1, true,
+        JLayeredPane.DEFAULT_LAYER, 0);
 
     private String title;
 
@@ -116,12 +111,10 @@ public class GridBagPanel extends JPanel {
     /**
      * @param layout
      */
-    public GridBagPanel(LayoutManager layout, String title,
-            I_Workspace workspace) {
+    public GridBagPanel(LayoutManager layout, String title, I_Workspace workspace) {
         super(layout);
         this.workspace = workspace;
-        gridBagPropertySupport =
-                new PropertyChangeSupportWithPropagationId(this);
+        gridBagPropertySupport = new PropertyChangeSupportWithPropagationId(this);
         this.setTitle(title);
         this.setName(title);
         this.setOpaque(true);
@@ -156,8 +149,7 @@ public class GridBagPanel extends JPanel {
     public void setTitle(String title) {
         String oldTitle = this.title;
         this.title = title;
-        this.gridBagPropertySupport.firePropertyChange("title", oldTitle,
-            this.title);
+        this.gridBagPropertySupport.firePropertyChange("title", oldTitle, this.title);
     }
 
     /**
@@ -174,8 +166,7 @@ public class GridBagPanel extends JPanel {
     public void setShowInLayout(boolean includedInLayout) {
         Boolean oldValue = new Boolean(this.gb.showInLayout);
         this.gb.showInLayout = includedInLayout;
-        this.gridBagPropertySupport.firePropertyChange("showInLayout",
-            oldValue, new Boolean(includedInLayout));
+        this.gridBagPropertySupport.firePropertyChange("showInLayout", oldValue, new Boolean(includedInLayout));
     }
 
     public String toString() {
@@ -185,27 +176,21 @@ public class GridBagPanel extends JPanel {
     public GridBagPanelConstraints getConstraints() {
         if (this.getInternalFrame() != null) {
             JInternalFrame intFrm = this.getInternalFrame();
-            if ((intFrm.getParent() != null)
-                && (JLayeredPane.class.isAssignableFrom(intFrm.getParent()
-                    .getClass()))) {
+            if ((intFrm.getParent() != null) && (JLayeredPane.class.isAssignableFrom(intFrm.getParent().getClass()))) {
                 JLayeredPane parent = (JLayeredPane) intFrm.getParent();
                 this.gb.layer = JLayeredPane.getLayer(intFrm);
                 this.gb.positionInLayer = parent.getPosition(intFrm);
             }
         } else {
-            if ((this.getParent() != null)
-                && (JLayeredPane.class.isAssignableFrom(this.getParent()
-                    .getClass()))) {
+            if ((this.getParent() != null) && (JLayeredPane.class.isAssignableFrom(this.getParent().getClass()))) {
                 JLayeredPane parent = (JLayeredPane) this.getParent();
                 this.gb.layer = JLayeredPane.getLayer(this);
                 this.gb.positionInLayer = parent.getPosition(this);
             }
         }
-        return new GridBagPanelConstraints(this.gb.gridx, this.gb.gridy,
-            this.gb.gridwidth, this.gb.gridheight, this.gb.weightx,
-            this.gb.weighty, this.gb.anchor, this.gb.fill, this.gb.insets,
-            this.gb.ipadx, this.gb.ipady, this.gb.showInLayout, this.gb.layer,
-            this.gb.positionInLayer);
+        return new GridBagPanelConstraints(this.gb.gridx, this.gb.gridy, this.gb.gridwidth, this.gb.gridheight,
+            this.gb.weightx, this.gb.weighty, this.gb.anchor, this.gb.fill, this.gb.insets, this.gb.ipadx,
+            this.gb.ipady, this.gb.showInLayout, this.gb.layer, this.gb.positionInLayer);
 
     }
 
@@ -249,8 +234,7 @@ public class GridBagPanel extends JPanel {
         if (this.gb.showInLayout != gb.showInLayout) {
             this.setShowInLayout(gb.showInLayout);
         }
-        if ((this.gb.layer != gb.layer)
-            || (this.gb.positionInLayer != gb.positionInLayer)) {
+        if ((this.gb.layer != gb.layer) || (this.gb.positionInLayer != gb.positionInLayer)) {
             this.gb.layer = gb.layer;
             this.gb.positionInLayer = gb.positionInLayer;
             if (this.getInternalFrame() != null) {
@@ -259,31 +243,24 @@ public class GridBagPanel extends JPanel {
                     logger.fine("setConstraints internalFrame != null");
                 }
                 if ((intFrm.getParent() != null)
-                    && (JLayeredPane.class.isAssignableFrom(intFrm.getParent()
-                        .getClass()))) {
+                    && (JLayeredPane.class.isAssignableFrom(intFrm.getParent().getClass()))) {
                     JLayeredPane parent = (JLayeredPane) intFrm.getParent();
-                    parent.setLayer(intFrm, this.gb.layer,
-                        this.gb.positionInLayer);
+                    parent.setLayer(intFrm, this.gb.layer, this.gb.positionInLayer);
                     if (logger.isLoggable(Level.FINE)) {
                         logger.fine("setConstraints set layer and position.");
                     }
                 } else {
                     if (logger.isLoggable(Level.FINE)) {
-                        logger
-                            .fine("setConstraints failed to set layer and position.");
+                        logger.fine("setConstraints failed to set layer and position.");
                     }
 
                 }
             } else {
-                if ((this.getParent() != null)
-                    && (JLayeredPane.class.isAssignableFrom(this.getParent()
-                        .getClass()))) {
+                if ((this.getParent() != null) && (JLayeredPane.class.isAssignableFrom(this.getParent().getClass()))) {
                     JLayeredPane parent = (JLayeredPane) this.getParent();
-                    parent.setLayer(this, this.gb.layer,
-                        this.gb.positionInLayer);
+                    parent.setLayer(this, this.gb.layer, this.gb.positionInLayer);
                     if (logger.isLoggable(Level.FINE)) {
-                        logger
-                            .fine("setConstraints set layer and position (no internal frame).");
+                        logger.fine("setConstraints set layer and position (no internal frame).");
                     }
                 }
             }
@@ -304,8 +281,7 @@ public class GridBagPanel extends JPanel {
     public void setAnchor(int anchor) {
         Integer oldValue = new Integer(this.gb.anchor);
         this.gb.anchor = anchor;
-        this
-            .firePropertyChange("anchor", oldValue, new Integer(this.gb.anchor));
+        this.firePropertyChange("anchor", oldValue, new Integer(this.gb.anchor));
     }
 
     /**
@@ -322,8 +298,7 @@ public class GridBagPanel extends JPanel {
     public void setFill(int fill) {
         Integer oldValue = new Integer(this.gb.fill);
         this.gb.fill = fill;
-        this.gridBagPropertySupport.firePropertyChange("fill", oldValue,
-            new Integer(this.gb.fill));
+        this.gridBagPropertySupport.firePropertyChange("fill", oldValue, new Integer(this.gb.fill));
     }
 
     /**
@@ -340,8 +315,7 @@ public class GridBagPanel extends JPanel {
     public void setGridheight(int gridheight) {
         Integer oldValue = new Integer(this.gb.gridheight);
         this.gb.gridheight = gridheight;
-        this.gridBagPropertySupport.firePropertyChange("gridheight", oldValue,
-            new Integer(this.gb.gridheight));
+        this.gridBagPropertySupport.firePropertyChange("gridheight", oldValue, new Integer(this.gb.gridheight));
     }
 
     /**
@@ -358,8 +332,7 @@ public class GridBagPanel extends JPanel {
     public void setGridwidth(int gridwidth) {
         Integer oldValue = new Integer(this.gb.gridwidth);
         this.gb.gridwidth = gridwidth;
-        this.gridBagPropertySupport.firePropertyChange("gridwidth", oldValue,
-            new Integer(this.gb.gridwidth));
+        this.gridBagPropertySupport.firePropertyChange("gridwidth", oldValue, new Integer(this.gb.gridwidth));
     }
 
     /**
@@ -376,8 +349,7 @@ public class GridBagPanel extends JPanel {
     public void setGridx(int gridx) {
         Integer oldValue = new Integer(this.gb.gridx);
         this.gb.gridx = gridx;
-        this.gridBagPropertySupport.firePropertyChange("gridx", oldValue,
-            new Integer(this.gb.gridx));
+        this.gridBagPropertySupport.firePropertyChange("gridx", oldValue, new Integer(this.gb.gridx));
     }
 
     /**
@@ -394,8 +366,7 @@ public class GridBagPanel extends JPanel {
     public void setGridy(int gridy) {
         Integer oldValue = new Integer(this.gb.gridy);
         this.gb.gridy = gridy;
-        this.gridBagPropertySupport.firePropertyChange("gridy", oldValue,
-            new Integer(this.gb.gridy));
+        this.gridBagPropertySupport.firePropertyChange("gridy", oldValue, new Integer(this.gb.gridy));
     }
 
     /**
@@ -412,8 +383,7 @@ public class GridBagPanel extends JPanel {
     public void setInsets(Insets insets) {
         Insets oldValue = this.gb.insets;
         this.gb.insets = insets;
-        this.gridBagPropertySupport.firePropertyChange("insets", oldValue,
-            insets);
+        this.gridBagPropertySupport.firePropertyChange("insets", oldValue, insets);
     }
 
     /**
@@ -430,8 +400,7 @@ public class GridBagPanel extends JPanel {
     public void setIpadx(int ipadx) {
         Integer oldValue = new Integer(this.gb.ipadx);
         this.gb.ipadx = ipadx;
-        this.gridBagPropertySupport.firePropertyChange("ipadx", oldValue,
-            new Integer(this.gb.ipadx));
+        this.gridBagPropertySupport.firePropertyChange("ipadx", oldValue, new Integer(this.gb.ipadx));
     }
 
     /**
@@ -448,8 +417,7 @@ public class GridBagPanel extends JPanel {
     public void setIpady(int ipady) {
         Integer oldValue = new Integer(this.gb.ipady);
         this.gb.ipady = ipady;
-        this.gridBagPropertySupport.firePropertyChange("ipady", oldValue,
-            new Integer(this.gb.ipady));
+        this.gridBagPropertySupport.firePropertyChange("ipady", oldValue, new Integer(this.gb.ipady));
     }
 
     /**
@@ -466,8 +434,7 @@ public class GridBagPanel extends JPanel {
     public void setWeightx(double weightx) {
         Double oldValue = new Double(this.gb.weightx);
         this.gb.weightx = weightx;
-        this.gridBagPropertySupport.firePropertyChange("weightx", oldValue,
-            new Double(this.gb.weightx));
+        this.gridBagPropertySupport.firePropertyChange("weightx", oldValue, new Double(this.gb.weightx));
     }
 
     /**
@@ -484,8 +451,7 @@ public class GridBagPanel extends JPanel {
     public void setWeighty(double weighty) {
         Double oldValue = new Double(this.gb.weighty);
         this.gb.weighty = weighty;
-        this.gridBagPropertySupport.firePropertyChange("weighty", oldValue,
-            new Double(this.gb.weighty));
+        this.gridBagPropertySupport.firePropertyChange("weighty", oldValue, new Double(this.gb.weighty));
     }
 
     /**

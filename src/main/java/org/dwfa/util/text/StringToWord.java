@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class StringToWord {
-	public static final String WORD_DELIMITERS = " \t\n\r\f,()[]\"'.-:?/{}|=&;<>";
+    public static final String WORD_DELIMITERS = " \t\n\r\f,()[]\"'.-:?/{}|=&;<>";
 
-	public static List<String> get(String s) {
-		List<String> wordList = new ArrayList<String>();
-		StringTokenizer st=new StringTokenizer(s, StringToWord.WORD_DELIMITERS);
-		while(st.hasMoreTokens()){
-			wordList.add(st.nextToken());
-		}
-		return wordList;
-	}
+    public static List<String> get(String s) {
+        List<String> wordList = new ArrayList<String>();
+        StringTokenizer st = new StringTokenizer(s, StringToWord.WORD_DELIMITERS);
+        while (st.hasMoreTokens()) {
+            wordList.add(st.nextToken());
+        }
+        return wordList;
+    }
 }

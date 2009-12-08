@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,22 +26,19 @@ public class FixedDescriptionTransferable extends FixedTerminologyTransferable {
 
     private I_DescribeConceptLocally description;
 
-    private static DataFlavor[] supportedFlavors =
-            new DataFlavor[] { universalFixedDescFlavor,
-                              universalFixedDescInterfaceFlavor,
-                              universalFixedConceptFlavor,
-                              universalFixedConceptInterfaceFlavor,
-                              DataFlavor.stringFlavor };
+    private static DataFlavor[] supportedFlavors = new DataFlavor[] { universalFixedDescFlavor,
+                                                                     universalFixedDescInterfaceFlavor,
+                                                                     universalFixedConceptFlavor,
+                                                                     universalFixedConceptInterfaceFlavor,
+                                                                     DataFlavor.stringFlavor };
 
     public FixedDescriptionTransferable(I_DescribeConceptLocally concept) {
         super();
         this.description = concept;
     }
 
-    public Object getTransferData(DataFlavor flavor)
-            throws UnsupportedFlavorException, IOException {
-        if ((universalFixedDescFlavor.equals(flavor))
-            || (universalFixedDescInterfaceFlavor.equals(flavor))) {
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+        if ((universalFixedDescFlavor.equals(flavor)) || (universalFixedDescInterfaceFlavor.equals(flavor))) {
             try {
                 return description.universalize();
             } catch (Exception e) {

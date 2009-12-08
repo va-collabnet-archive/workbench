@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,12 +56,11 @@ import org.dwfa.bpa.gui.action.BringWindowToFront;
 
 /**
  * @author kec
- *
+ * 
  */
-public class FrameWithOpenFramesListener extends JFrame implements
-        I_ManageStandardAppFunctions, ListDataListener, ActionListener {
-    protected static Logger logger =
-            Logger.getLogger(FrameWithOpenFramesListener.class.getName());
+public class FrameWithOpenFramesListener extends JFrame implements I_ManageStandardAppFunctions, ListDataListener,
+        ActionListener {
+    protected static Logger logger = Logger.getLogger(FrameWithOpenFramesListener.class.getName());
     /**
      * 
      */
@@ -75,8 +74,7 @@ public class FrameWithOpenFramesListener extends JFrame implements
         public void actionPerformed(ActionEvent e) {
             try {
                 String userDir = System.getProperty("user.dir");
-                PlatformWebBrowser.openURL(new URL("file://" + userDir
-                    + "/site/index.html"));
+                PlatformWebBrowser.openURL(new URL("file://" + userDir + "/site/index.html"));
 
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -101,16 +99,14 @@ public class FrameWithOpenFramesListener extends JFrame implements
 
     // Check that we are on Mac OS X. This is crucial to loading and using the
     // OSXAdapter class.
-    public static boolean MAC_OS_X =
-            (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
+    public static boolean MAC_OS_X = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
 
-    public FrameWithOpenFramesListener(String title, String menuName,
-            JComponent content) throws Exception {
+    public FrameWithOpenFramesListener(String title, String menuName, JComponent content) throws Exception {
         super();
         this.setTitle(title);
         OpenFrames.addFrame(this);
         OpenFrames.addFrameListener(this);
-        //;
+        // ;
         this.getContentPane().setLayout(new GridLayout(1, 1));
         this.getContentPane().add(content);
         addMenus(menuName);
@@ -130,20 +126,26 @@ public class FrameWithOpenFramesListener extends JFrame implements
         if (MAC_OS_X) {
             try {
                 Class<?> osxAdapterClass = ClassLoader.getSystemClassLoader().loadClass("org.dwfa.app.OSXAdapter");
-                Constructor<?> c = osxAdapterClass.getConstructor(new Class[] {I_ManageStandardAppFunctions.class });
+                Constructor<?> c = osxAdapterClass.getConstructor(new Class[] { I_ManageStandardAppFunctions.class });
                 c.newInstance(new Object[] { this });
             } catch (NoClassDefFoundError e) {
                 // This will be thrown first if the OSXAdapter is loaded on a
                 // system without the EAWT
                 // because OSXAdapter extends ApplicationAdapter in its def
-                logger.log(Level.SEVERE, "This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled.", e);   
+                logger.log(
+                    Level.SEVERE,
+                    "This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled.",
+                    e);
             } catch (ClassNotFoundException e) {
                 // This shouldn't be reached; if there's a problem with the
                 // OSXAdapter we should get the
                 // above NoClassDefFoundError first.
-                logger.log(Level.SEVERE, "This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled.", e);   
+                logger.log(
+                    Level.SEVERE,
+                    "This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled.",
+                    e);
             } catch (Exception e) {
-                logger.log(Level.SEVERE, e.getMessage(), e);   
+                logger.log(Level.SEVERE, e.getMessage(), e);
             }
         }
     }
@@ -162,11 +164,10 @@ public class FrameWithOpenFramesListener extends JFrame implements
     private void setupPrefs() {
         prefs = new JDialog(this, "Architectonic Preferences");
 
-        UIManager.LookAndFeelInfo[] lookAndFeels =
-                UIManager.getInstalledLookAndFeels();
+        UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
 
-        //      Create the combo box, select item at index 4.
-        //      Indices start at 0, so 4 specifies the pig.
+        // Create the combo box, select item at index 4.
+        // Indices start at 0, so 4 specifies the pig.
         JComboBox lookAndFeelList = new JComboBox(lookAndFeels);
         lookAndFeelList.setRenderer(new DefaultListCellRenderer() {
 
@@ -175,13 +176,10 @@ public class FrameWithOpenFramesListener extends JFrame implements
              */
             private static final long serialVersionUID = 1L;
 
-            public Component getListCellRendererComponent(JList list,
-                    Object value, int index, boolean isSelected,
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
                     boolean cellHasFocus) {
-                UIManager.LookAndFeelInfo lafValue =
-                        (UIManager.LookAndFeelInfo) value;
-                super.getListCellRendererComponent(list, lafValue.getName(),
-                    index, isSelected, cellHasFocus);
+                UIManager.LookAndFeelInfo lafValue = (UIManager.LookAndFeelInfo) value;
+                super.getListCellRendererComponent(list, lafValue.getName(), index, isSelected, cellHasFocus);
                 return this;
             }
 
@@ -192,12 +190,10 @@ public class FrameWithOpenFramesListener extends JFrame implements
             public void actionPerformed(ActionEvent e) {
                 try {
                     JComboBox comboBox = (JComboBox) e.getSource();
-                    UIManager.LookAndFeelInfo lafInfo =
-                            (LookAndFeelInfo) comboBox.getSelectedItem();
+                    UIManager.LookAndFeelInfo lafInfo = (LookAndFeelInfo) comboBox.getSelectedItem();
                     UIManager.setLookAndFeel(lafInfo.getClassName());
 
-                    SwingUtilities
-                        .updateComponentTreeUI(FrameWithOpenFramesListener.this);
+                    SwingUtilities.updateComponentTreeUI(FrameWithOpenFramesListener.this);
 
                 } catch (ClassNotFoundException e1) {
                     logger.log(Level.SEVERE, e1.getMessage(), e1);
@@ -211,7 +207,7 @@ public class FrameWithOpenFramesListener extends JFrame implements
             }
         });
         lookAndFeelList.setSelectedItem(UIManager.getLookAndFeel());
-        //petList.addActionListener(this);
+        // petList.addActionListener(this);
 
         prefs.getContentPane().setLayout(new GridLayout(2, 1));
         prefs.getContentPane().add(lookAndFeelList);
@@ -229,8 +225,7 @@ public class FrameWithOpenFramesListener extends JFrame implements
             bundleMenu.addSeparator();
             bundleMenu.addSeparator();
             bundleMenu.add(quitMI = new JMenuItem("Quit"));
-            quitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-                    MENU_MASK));
+            quitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, MENU_MASK));
             quitMI.addActionListener(this);
         }
 
@@ -262,8 +257,7 @@ public class FrameWithOpenFramesListener extends JFrame implements
     public void about() {
         aboutBox = AboutBox.getAboutBox(this);
         aboutBox.pack();
-        aboutBox.setLocation((int) this.getLocation().getX() + 22, (int) this
-            .getLocation().getY() + 22);
+        aboutBox.setLocation((int) this.getLocation().getX() + 22, (int) this.getLocation().getY() + 22);
         aboutBox.setResizable(false);
         aboutBox.setVisible(true);
         aboutBox.toFront();
@@ -274,8 +268,7 @@ public class FrameWithOpenFramesListener extends JFrame implements
     // is selected from the application menu.
     public void preferences() {
         prefs.setSize(320, 240);
-        prefs.setLocation((int) this.getLocation().getX() + 22, (int) this
-            .getLocation().getY() + 22);
+        prefs.setLocation((int) this.getLocation().getX() + 22, (int) this.getLocation().getY() + 22);
         prefs.setResizable(false);
         prefs.setVisible(true);
     }
@@ -285,10 +278,8 @@ public class FrameWithOpenFramesListener extends JFrame implements
     // is selected from the application menu, Cmd-Q is pressed, or "Quit" is
     // selected from the Dock.
     public boolean quit() {
-        int option =
-                JOptionPane.showConfirmDialog(this,
-                    "Are you sure you want to quit?", "[b] Quit?",
-                    JOptionPane.YES_NO_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, "Are you sure you want to quit?", "[b] Quit?",
+            JOptionPane.YES_NO_OPTION);
         if (option == JOptionPane.YES_OPTION) {
             System.out.println("[b] Quit option selected...");
             if (MAC_OS_X) {
@@ -319,19 +310,19 @@ public class FrameWithOpenFramesListener extends JFrame implements
         windowMenu.addSeparator();
         Collection<JFrame> openFrames = OpenFrames.getFrames();
         synchronized (openFrames) {
-            for (JFrame frame: openFrames) {
+            for (JFrame frame : openFrames) {
                 JMenuItem menuItem = new JMenuItem(frame.getTitle());
                 menuItem.addActionListener(new BringWindowToFront(frame));
                 windowMenu.add(menuItem);
-            }           
+            }
         }
         Collection<JMenuItem> newWindowMenuItems = OpenFrames.getNewWindowMenuItems();
         synchronized (newWindowMenuItems) {
-            for (JMenuItem newWindowMenu: newWindowMenuItems) {
+            for (JMenuItem newWindowMenu : newWindowMenuItems) {
                 submenu.add(newWindowMenu);
             }
         }
-        
+
     }
 
     /**

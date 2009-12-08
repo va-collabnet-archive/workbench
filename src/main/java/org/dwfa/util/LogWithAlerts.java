@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,8 +60,7 @@ public class LogWithAlerts {
         alertAndLog(null, level, message, ex);
     }
 
-    public void alertAndLog(final Component parent, final Level level,
-            final String message, final Throwable ex) {
+    public void alertAndLog(final Component parent, final Level level, final String message, final Throwable ex) {
         if (DwfaEnv.isHeadless() == false) {
             if (SwingUtilities.isEventDispatchThread()) {
                 alertAndLogPrivate(getActiveFrame(parent), level, message, ex);
@@ -69,8 +68,7 @@ public class LogWithAlerts {
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
                         public void run() {
-                            alertAndLogPrivate(getActiveFrame(parent), level,
-                                message, ex);
+                            alertAndLogPrivate(getActiveFrame(parent), level, message, ex);
                         }
 
                     });
@@ -85,20 +83,17 @@ public class LogWithAlerts {
         }
     }
 
-    private void alertAndLogPrivate(Component parent, Level level,
-            String message, Throwable ex) {
+    private void alertAndLogPrivate(Component parent, Level level, String message, Throwable ex) {
         parent = getActiveFrame(parent);
         getLogger().log(level, message, ex);
         message = "<html>" + message;
         if (level.intValue() <= Level.INFO.intValue()) {
-            JOptionPane.showMessageDialog(parent, message,
-                "Information has been logged", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(parent, message, "Information has been logged",
+                JOptionPane.INFORMATION_MESSAGE);
         } else if (level.intValue() <= Level.WARNING.intValue()) {
-            JOptionPane.showMessageDialog(parent, message,
-                "A warning has been logged", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(parent, message, "A warning has been logged", JOptionPane.WARNING_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(parent, message,
-                "An error has been logged", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(parent, message, "An error has been logged", JOptionPane.ERROR_MESSAGE);
         }
         if (parent != null) {
             SwingUtilities.invokeLater(new FocusParentLater(parent));
@@ -124,37 +119,37 @@ public class LogWithAlerts {
     private static JFrame activeFrame;
 
     public static Component getActiveFrame(Component parent) {
-		if (parent == null) {
-			for (Frame f: Frame.getFrames()) {
-				if (f.isActive()) {
-					parent = f;
-					break;
-				}
-			}
-			if (parent == null) {
-				if (SwingUtilities.isEventDispatchThread()) {
-					setupActiveFrame();
-				} else {
-					try {
-						SwingUtilities.invokeAndWait(new Runnable() {
-							public void run() {
-								setupActiveFrame();
-							}
-						});
-					} catch (InterruptedException e) {
-						Logger.getAnonymousLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
-					} catch (InvocationTargetException e) {
-						Logger.getAnonymousLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
-					}
-				}
-			}
-		}
-		if (parent != null) {
-			return parent;
-		} else {
-			return activeFrame;
-		}
-	}
+        if (parent == null) {
+            for (Frame f : Frame.getFrames()) {
+                if (f.isActive()) {
+                    parent = f;
+                    break;
+                }
+            }
+            if (parent == null) {
+                if (SwingUtilities.isEventDispatchThread()) {
+                    setupActiveFrame();
+                } else {
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            public void run() {
+                                setupActiveFrame();
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        Logger.getAnonymousLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
+                    } catch (InvocationTargetException e) {
+                        Logger.getAnonymousLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
+                    }
+                }
+            }
+        }
+        if (parent != null) {
+            return parent;
+        } else {
+            return activeFrame;
+        }
+    }
 
     private static void setupActiveFrame() {
         if (activeFrame == null) {
@@ -162,9 +157,8 @@ public class LogWithAlerts {
             activeFrame.setContentPane(new JLabel("Startup..."));
             activeFrame.pack();
             activeFrame.setVisible(true);
-            activeFrame.setLocation((Toolkit.getDefaultToolkit()
-                .getScreenSize().width / 2) - 10, (Toolkit.getDefaultToolkit()
-                .getScreenSize().height / 2) - 10);
+            activeFrame.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width / 2) - 10,
+                (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - 10);
             OpenFrames.addFrame(activeFrame);
         }
     }
@@ -269,18 +263,15 @@ public class LogWithAlerts {
         getLogger().log(arg0);
     }
 
-    public void logp(Level arg0, String arg1, String arg2, String arg3,
-            Object arg4) {
+    public void logp(Level arg0, String arg1, String arg2, String arg3, Object arg4) {
         getLogger().logp(arg0, arg1, arg2, arg3, arg4);
     }
 
-    public void logp(Level arg0, String arg1, String arg2, String arg3,
-            Object[] arg4) {
+    public void logp(Level arg0, String arg1, String arg2, String arg3, Object[] arg4) {
         getLogger().logp(arg0, arg1, arg2, arg3, arg4);
     }
 
-    public void logp(Level arg0, String arg1, String arg2, String arg3,
-            Throwable arg4) {
+    public void logp(Level arg0, String arg1, String arg2, String arg3, Throwable arg4) {
         getLogger().logp(arg0, arg1, arg2, arg3, arg4);
     }
 
@@ -288,23 +279,19 @@ public class LogWithAlerts {
         getLogger().logp(arg0, arg1, arg2, arg3);
     }
 
-    public void logrb(Level arg0, String arg1, String arg2, String arg3,
-            String arg4, Object arg5) {
+    public void logrb(Level arg0, String arg1, String arg2, String arg3, String arg4, Object arg5) {
         getLogger().logrb(arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
-    public void logrb(Level arg0, String arg1, String arg2, String arg3,
-            String arg4, Object[] arg5) {
+    public void logrb(Level arg0, String arg1, String arg2, String arg3, String arg4, Object[] arg5) {
         getLogger().logrb(arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
-    public void logrb(Level arg0, String arg1, String arg2, String arg3,
-            String arg4, Throwable arg5) {
+    public void logrb(Level arg0, String arg1, String arg2, String arg3, String arg4, Throwable arg5) {
         getLogger().logrb(arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
-    public void logrb(Level arg0, String arg1, String arg2, String arg3,
-            String arg4) {
+    public void logrb(Level arg0, String arg1, String arg2, String arg3, String arg4) {
         getLogger().logrb(arg0, arg1, arg2, arg3, arg4);
     }
 

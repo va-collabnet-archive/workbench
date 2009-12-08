@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,9 +42,8 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
     public PhantomFrame(String[] args, LifeCycle lc) throws Exception {
         super(args, lc, true);
         this.setName("Phantom Frame");
-        JLabel l =
-                new JLabel(
-                    "<html>This window shows up to give access to a menu bar<p>when no other windows are showing...");
+        JLabel l = new JLabel(
+            "<html>This window shows up to give access to a menu bar<p>when no other windows are showing...");
         l.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(l);
         this.pack();
@@ -82,8 +81,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
         if ((e.getIndex1() == 0) && (OpenFrames.getNumOfFrames() == 0)) {
             this.setVisible(true);
             this.getQuitList().clear();
-            this.getQuitList()
-                .add(new ComponentFrameBean.StandardQuitter(this));
+            this.getQuitList().add(new ComponentFrameBean.StandardQuitter(this));
         } else {
             if (this.isVisible() == true) {
                 this.setVisible(false);
@@ -99,8 +97,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
         if ((e.getIndex1() == 0) && (OpenFrames.getNumOfFrames() == 0)) {
             this.setVisible(true);
             this.getQuitList().clear();
-            this.getQuitList()
-                .add(new ComponentFrameBean.StandardQuitter(this));
+            this.getQuitList().add(new ComponentFrameBean.StandardQuitter(this));
         } else {
             if (this.isVisible() == true) {
                 this.setVisible(false);
@@ -113,8 +110,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
         if ((e.getIndex1() == 0) && (OpenFrames.getNumOfFrames() == 0)) {
             this.setVisible(true);
             this.getQuitList().clear();
-            this.getQuitList()
-                .add(new ComponentFrameBean.StandardQuitter(this));
+            this.getQuitList().add(new ComponentFrameBean.StandardQuitter(this));
         } else {
             if (this.isVisible() == true) {
                 this.setVisible(false);
