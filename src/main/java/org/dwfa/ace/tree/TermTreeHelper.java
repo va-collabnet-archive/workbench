@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,332 +48,300 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
 public class TermTreeHelper implements PropertyChangeListener {
-	private Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new HashMap<TreeIdPath, ExpandNodeSwingWorker>();
-	private ExecutorService treeExpandThread = Executors.newFixedThreadPool(1);
+    private Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new HashMap<TreeIdPath, ExpandNodeSwingWorker>();
+    private ExecutorService treeExpandThread = Executors.newFixedThreadPool(1);
 
+    private ACE ace;
+    private JTreeWithDragImage tree;
+    private ActivityPanel activity;
+    private TermTreeCellRenderer renderer;
+    private I_ConfigAceFrame aceFrameConfig;
 
-	private ACE ace;
-	private JTreeWithDragImage tree;
-	private ActivityPanel activity;
-	private TermTreeCellRenderer renderer;
-	private I_ConfigAceFrame aceFrameConfig;
+    public ActivityPanel getTreeActivityPanel() {
+        return activity;
+    }
 
-	
-	public ActivityPanel getTreeActivityPanel() {
-		return activity;
-	}
+    public void setTreeActivityPanel(ActivityPanel activity) {
+        this.activity = activity;
+    }
 
-	public void setTreeActivityPanel(ActivityPanel activity) {
-		this.activity = activity;
-	}
+    public JTreeWithDragImage getTree() {
+        return tree;
+    }
 
-	public JTreeWithDragImage getTree() {
-		return tree;
-	}
+    public TermTreeHelper(I_ConfigAceFrame aceFrameConfig, ACE ace) {
+        super();
+        this.ace = ace;
+        this.aceFrameConfig = aceFrameConfig;
+    }
 
-	public TermTreeHelper(I_ConfigAceFrame aceFrameConfig, ACE ace) {
-		super();
-		this.ace = ace;
-		this.aceFrameConfig = aceFrameConfig;
-	}
+    public JComponent getHierarchyPanel() throws TerminologyException, IOException {
+        if (tree != null) {
+            for (TreeExpansionListener tel : tree.getTreeExpansionListeners()) {
+                tree.removeTreeExpansionListener(tel);
+            }
+            for (TreeSelectionListener tsl : tree.getTreeSelectionListeners()) {
+                tree.removeTreeSelectionListener(tsl);
+            }
+            for (TreeWillExpandListener twel : tree.getTreeWillExpandListeners()) {
+                tree.removeTreeWillExpandListener(twel);
+            }
+        }
+        tree = new JTreeWithDragImage(aceFrameConfig, this);
+        tree.putClientProperty("JTree.lineStyle", "None");
+        tree.addMouseListener(new TreeMouseListener(ace));
+        tree.setLargeModel(true);
+        // tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        tree.setTransferHandler(new TerminologyTransferHandler(tree));
+        tree.setDragEnabled(true);
+        renderer = new TermTreeCellRenderer(aceFrameConfig);
+        tree.setCellRenderer(renderer);
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
+        DefaultTreeModel model = setRoots();
+        /*
+         * Since nodes are added dynamically in this application, the only true
+         * leaf nodes are nodes that don't allow children to be added. (By
+         * default, askAllowsChildren is false and all nodes without children
+         * are considered to be leaves.)
+         * 
+         * But there's a complication: when the tree structure changes, JTree
+         * pre-expands the root node unless it's a leaf. To avoid having the
+         * root pre-expanded, we set askAllowsChildrenafter assigning the new
+         * root.
+         */
 
-	public JComponent getHierarchyPanel() throws TerminologyException, IOException {
-		if (tree != null) {
-			for (TreeExpansionListener tel : tree.getTreeExpansionListeners()) {
-				tree.removeTreeExpansionListener(tel);
-			}
-			for (TreeSelectionListener tsl : tree.getTreeSelectionListeners()) {
-				tree.removeTreeSelectionListener(tsl);
-			}
-			for (TreeWillExpandListener twel : tree
-					.getTreeWillExpandListeners()) {
-				tree.removeTreeWillExpandListener(twel);
-			}
-		}
-		tree = new JTreeWithDragImage(aceFrameConfig, this);
-		tree.putClientProperty("JTree.lineStyle", "None");
-		tree.addMouseListener(new TreeMouseListener(ace));
-		tree.setLargeModel(true);
-		// tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		tree.setTransferHandler(new TerminologyTransferHandler(tree));
-		tree.setDragEnabled(true);
-		renderer = new TermTreeCellRenderer(aceFrameConfig);
-		tree.setCellRenderer(renderer);
-		tree.setRootVisible(false);
-		tree.setShowsRootHandles(true);
-		DefaultTreeModel model = setRoots();
-		/*
-		 * Since nodes are added dynamically in this application, the only true
-		 * leaf nodes are nodes that don't allow children to be added. (By
-		 * default, askAllowsChildren is false and all nodes without children
-		 * are considered to be leaves.)
-		 * 
-		 * But there's a complication: when the tree structure changes, JTree
-		 * pre-expands the root node unless it's a leaf. To avoid having the
-		 * root pre-expanded, we set askAllowsChildrenafter assigning the new
-		 * root.
-		 */
+        model.setAsksAllowsChildren(true);
 
-		model.setAsksAllowsChildren(true);
+        tree.addTreeExpansionListener(new TreeExpansionListener() {
+            public void treeExpanded(TreeExpansionEvent evt) {
+                treeTreeExpanded(evt);
+            }
 
-		tree.addTreeExpansionListener(new TreeExpansionListener() {
-			public void treeExpanded(TreeExpansionEvent evt) {
-				treeTreeExpanded(evt);
-			}
+            public void treeCollapsed(TreeExpansionEvent evt) {
+                treeTreeCollapsed(evt, aceFrameConfig);
+            }
+        });
 
-			public void treeCollapsed(TreeExpansionEvent evt) {
-				treeTreeCollapsed(evt, aceFrameConfig);
-			}
-		});
+        tree.addTreeSelectionListener(new TreeSelectionListener() {
 
-		tree.addTreeSelectionListener(new TreeSelectionListener() {
+            public void valueChanged(TreeSelectionEvent evt) {
+                treeValueChanged(evt);
+            }
 
-			public void valueChanged(TreeSelectionEvent evt) {
-				treeValueChanged(evt);
-			}
+        });
+        JScrollPane treeView = new JScrollPane(tree);
+        tree.setScroller(treeView);
+        for (int id : aceFrameConfig.getChildrenExpandedNodes().getSetValues()) {
+            AceLog.getAppLog().info("Child expand: " + id);
+        }
+        for (int id : aceFrameConfig.getParentExpandedNodes().getSetValues()) {
+            AceLog.getAppLog().info("Parent expand: " + id);
+        }
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            TreePath path = tree.getPathForRow(i);
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+            ConceptBeanForTree treeBean = (ConceptBeanForTree) node.getUserObject();
+            if (aceFrameConfig.getChildrenExpandedNodes().contains(treeBean.getConceptId())) {
+                tree.expandPath(new TreePath(node.getPath()));
+            }
+        }
+        return treeView;
+    }
 
-		});
-		JScrollPane treeView = new JScrollPane(tree);
-		tree.setScroller(treeView);
-		for (int id : aceFrameConfig.getChildrenExpandedNodes().getSetValues()) {
-			AceLog.getAppLog().info("Child expand: " + id);
-		}
-		for (int id : aceFrameConfig.getParentExpandedNodes().getSetValues()) {
-			AceLog.getAppLog().info("Parent expand: " + id);
-		}
-		for (int i = 0; i < tree.getRowCount(); i++) {
-			TreePath path = tree.getPathForRow(i);
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path
-					.getLastPathComponent();
-			ConceptBeanForTree treeBean = (ConceptBeanForTree) node
-					.getUserObject();
-			if (aceFrameConfig.getChildrenExpandedNodes().contains(
-					treeBean.getConceptId())) {
-				tree.expandPath(new TreePath(node.getPath()));
-			}
-		}
-		return treeView;
-	}
+    public TermTreeCellRenderer getRenderer() {
+        return renderer;
+    }
 
-	public TermTreeCellRenderer getRenderer() {
-		return renderer;
-	}
+    public void updateHierarchyView(String propChangeName) {
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+        stopWorkersOnPath(null, "stopping for change in " + propChangeName);
+        for (int i = 0; i < root.getChildCount(); i++) {
+            DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root.getChildAt(i);
+            I_GetConceptData cb = (I_GetConceptData) childNode.getUserObject();
+            if (aceFrameConfig.getChildrenExpandedNodes().contains(cb.getConceptId())) {
+                TreePath tp = new TreePath(childNode);
+                TreeExpansionEvent treeEvent = new TreeExpansionEvent(model, tp);
+                handleCollapse(treeEvent, aceFrameConfig);
+                treeTreeExpanded(treeEvent);
+            }
+        }
+    }
 
-	public void updateHierarchyView(String propChangeName) {
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-		stopWorkersOnPath(null, "stopping for change in " + propChangeName);
-		for (int i = 0; i < root.getChildCount(); i++) {
-			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root
-					.getChildAt(i);
-			I_GetConceptData cb = (I_GetConceptData) childNode.getUserObject();
-			if (aceFrameConfig.getChildrenExpandedNodes().contains(
-					cb.getConceptId())) {
-				TreePath tp = new TreePath(childNode);
-				TreeExpansionEvent treeEvent = new TreeExpansionEvent(model, tp);
-				handleCollapse(treeEvent, aceFrameConfig);
-				treeTreeExpanded(treeEvent);
-			}
-		}
-	}
+    public DefaultTreeModel setRoots() {
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(null, true);
 
-	public DefaultTreeModel setRoots() {
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
+            root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId, Integer.MIN_VALUE, 0, false,
+                aceFrameConfig), true));
+        }
+        model.setRoot(root);
+        return model;
+    }
 
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(null, true);
+    protected void treeValueChanged(TreeSelectionEvent evt) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
+        String nodeStr = getNodeString(node);
+        String s = evt.isAddedPath() ? "Selected " + nodeStr : "";
+        aceFrameConfig.setStatusMessage(s);
+        if (node != null) {
+            ConceptBeanForTree treeBean = (ConceptBeanForTree) node.getUserObject();
+            if (treeBean != null) {
+                aceFrameConfig.setHierarchySelection(treeBean.getCoreBean());
+            }
+        } else {
+            aceFrameConfig.setHierarchySelection(null);
+        }
+    }
 
-		for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
-			root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId,
-					Integer.MIN_VALUE, 0, false, aceFrameConfig), true));
-		}
-		model.setRoot(root);
-		return model;
-	}
+    protected void treeTreeCollapsed(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
+        I_GetConceptDataForTree userObject = handleCollapse(evt, aceFrameConfig);
+        aceFrameConfig.getChildrenExpandedNodes().remove(userObject.getConceptId());
 
-	protected void treeValueChanged(TreeSelectionEvent evt) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath()
-				.getLastPathComponent();
-		String nodeStr = getNodeString(node);
-		String s = evt.isAddedPath() ? "Selected " + nodeStr : "";
-		aceFrameConfig.setStatusMessage(s);
-		if (node != null) {
-			ConceptBeanForTree treeBean = (ConceptBeanForTree) node
-					.getUserObject();
-			if (treeBean != null) {
-				aceFrameConfig.setHierarchySelection(treeBean.getCoreBean());
-			}
-		} else {
-			aceFrameConfig.setHierarchySelection(null);
-		}
-	}
+    }
 
-	protected void treeTreeCollapsed(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
-		I_GetConceptDataForTree userObject = handleCollapse(evt, aceFrameConfig);
-		aceFrameConfig.getChildrenExpandedNodes().remove(
-				userObject.getConceptId());
+    protected void treeTreeExpanded(TreeExpansionEvent evt) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
+        String nodeStr = getNodeString(node);
+        TreeIdPath idPath = new TreeIdPath(evt.getPath());
+        synchronized (expansionWorkers) {
+            stopWorkersOnPath(idPath, "stopping before expansion");
+            I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
+            if (userObject != null) {
+                aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptId());
+                aceFrameConfig.setStatusMessage("Expanding " + nodeStr + "...");
+                FrameConfigSnapshot configSnap = new FrameConfigSnapshot(aceFrameConfig);
+                ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker((DefaultTreeModel) tree.getModel(), tree,
+                    node, new CompareConceptBeansForTree(configSnap), this, configSnap);
+                treeExpandThread.execute(worker);
+                expansionWorkers.put(idPath, worker);
+            }
+        }
+    }
 
-	}
+    private I_GetConceptDataForTree handleCollapse(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
+        AceLog.getAppLog().info("Collapsing " + evt.getPath().getLastPathComponent());
+        TreeIdPath idPath = new TreeIdPath(evt.getPath());
+        stopWorkersOnPath(idPath, "stopping for collapse");
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
+        String nodeStr = getNodeString(node);
+        node.removeAllChildren();
+        I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
 
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 
+        /*
+         * To avoid having JTree re-expand the root node, we disable
+         * ask-allows-children when we notify JTree about the new node
+         * structure.
+         */
 
-	protected void treeTreeExpanded(TreeExpansionEvent evt) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath()
-				.getLastPathComponent();
-		String nodeStr = getNodeString(node);
-		TreeIdPath idPath = new TreeIdPath(evt.getPath());
-		synchronized (expansionWorkers) {
-			stopWorkersOnPath(idPath, "stopping before expansion");
-			I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node
-					.getUserObject();
-			if (userObject != null) {
-				aceFrameConfig.getChildrenExpandedNodes().add(
-						userObject.getConceptId());
-				aceFrameConfig.setStatusMessage("Expanding " + nodeStr + "...");
-				FrameConfigSnapshot configSnap = new FrameConfigSnapshot(
-						aceFrameConfig);
-				ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker(
-						(DefaultTreeModel) tree.getModel(), tree, node,
-						new CompareConceptBeansForTree(configSnap), this,
-						configSnap);
-				treeExpandThread.execute(worker);
-				expansionWorkers.put(idPath, worker);
-			}
-		}
-	}
+        model.setAsksAllowsChildren(false);
+        model.nodeStructureChanged(node);
+        model.setAsksAllowsChildren(true);
 
+        aceFrameConfig.setStatusMessage("Collapsed " + nodeStr);
+        return userObject;
+    }
 
-	private I_GetConceptDataForTree handleCollapse(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
-		AceLog.getAppLog().info("Collapsing " + evt.getPath().getLastPathComponent());
-		TreeIdPath idPath = new TreeIdPath(evt.getPath());
-		stopWorkersOnPath(idPath, "stopping for collapse");
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath()
-				.getLastPathComponent();
-		String nodeStr = getNodeString(node);
-		node.removeAllChildren();
-		I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node
-				.getUserObject();
+    private String getNodeString(DefaultMutableTreeNode node) {
+        String nodeStr = node.toString();
+        if ((node.getUserObject() != null)
+            && (I_GetConceptData.class.isAssignableFrom(node.getUserObject().getClass()))) {
+            I_GetConceptData concept = (I_GetConceptData) node.getUserObject();
+            try {
+                I_DescriptionTuple desc = concept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(),
+                    aceFrameConfig);
+                if (desc != null) {
+                    nodeStr = desc.getText();
+                } else {
+                    AceLog.getAppLog().info(" descTuple is null: " + concept.toString());
+                    nodeStr = concept.getInitialText();
+                }
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
 
-		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        }
+        return nodeStr;
+    }
 
-		/*
-		 * To avoid having JTree re-expand the root node, we disable
-		 * ask-allows-children when we notify JTree about the new node
-		 * structure.
-		 */
+    private void removeAnyMatchingExpansionWorker(TreeIdPath key, String message) {
+        synchronized (expansionWorkers) {
+            ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+            if (foundWorker != null) {
+                foundWorker.stopWork(message);
+                expansionWorkers.remove(key);
+            }
+        }
+    }
 
-		model.setAsksAllowsChildren(false);
-		model.nodeStructureChanged(node);
-		model.setAsksAllowsChildren(true);
+    protected void removeExpansionWorker(TreeIdPath key, ExpandNodeSwingWorker worker, String message) {
+        synchronized (expansionWorkers) {
+            ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+            if ((worker != null) && (foundWorker == worker)) {
+                worker.stopWork(message);
+                expansionWorkers.remove(key);
+            }
+        }
+    }
 
-		aceFrameConfig.setStatusMessage("Collapsed " + nodeStr);
-		return userObject;
-	}
+    protected void removeStaleExpansionWorker(TreeIdPath key) {
+        synchronized (expansionWorkers) {
+            ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+            if (foundWorker.getContinueWork() == false) {
+                expansionWorkers.remove(key);
+            }
+        }
+    }
 
-	private String getNodeString(DefaultMutableTreeNode node) {
-		String nodeStr = node.toString();
-		if ((node.getUserObject() != null)
-				&& (I_GetConceptData.class.isAssignableFrom(node
-						.getUserObject().getClass()))) {
-			I_GetConceptData concept = (I_GetConceptData) node.getUserObject();
-			try {
-				I_DescriptionTuple desc = concept.getDescTuple(aceFrameConfig
-						.getShortLabelDescPreferenceList(), aceFrameConfig);
-				if (desc != null) {
-					nodeStr = desc.getText();
-				} else {
-					AceLog.getAppLog().info(
-							" descTuple is null: " + concept.toString());
-					nodeStr = concept.getInitialText();
-				}
-			} catch (IOException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
+    private void stopWorkersOnPath(TreeIdPath idPath, String message) {
+        synchronized (expansionWorkers) {
+            if (idPath == null) {
+                List<TreeIdPath> allKeys = new ArrayList<TreeIdPath>(expansionWorkers.keySet());
+                for (TreeIdPath key : allKeys) {
+                    AceLog.getAppLog().info("  Stopping all: " + key);
+                    removeAnyMatchingExpansionWorker(key, message);
+                }
+            } else {
+                if (expansionWorkers.containsKey(idPath)) {
+                    AceLog.getAppLog().info("  Stopping: " + idPath);
+                    removeAnyMatchingExpansionWorker(idPath, message);
+                }
 
-		}
-		return nodeStr;
-	}
+                List<TreeIdPath> otherKeys = new ArrayList<TreeIdPath>(expansionWorkers.keySet());
+                for (TreeIdPath key : otherKeys) {
+                    if (key.initiallyEqual(idPath)) {
+                        AceLog.getAppLog().info("  Stopping child: " + key);
+                        removeAnyMatchingExpansionWorker(key, message);
+                    }
+                }
+            }
+        }
+    }
 
+    public void addTreeSelectionListener(TreeSelectionListener tsl) {
+        tree.addTreeSelectionListener(tsl);
+    }
 
+    public void removeTreeSelectionListener(TreeSelectionListener tsl) {
+        tree.removeTreeSelectionListener(tsl);
+    }
 
-	private void removeAnyMatchingExpansionWorker(TreeIdPath key, String message) {
-		synchronized (expansionWorkers) {
-			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-			if (foundWorker != null) {
-				foundWorker.stopWork(message);
-				expansionWorkers.remove(key);
-			}
-		}
-	}
+    public Map<TreeIdPath, ExpandNodeSwingWorker> getExpansionWorkers() {
+        return expansionWorkers;
+    }
 
-	protected void removeExpansionWorker(TreeIdPath key,
-			ExpandNodeSwingWorker worker, String message) {
-		synchronized (expansionWorkers) {
-			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-			if ((worker != null) && (foundWorker == worker)) {
-				worker.stopWork(message);
-				expansionWorkers.remove(key);
-			}
-		}
-	}
+    public ExecutorService getTreeExpandThread() {
+        return treeExpandThread;
+    }
 
-	protected void removeStaleExpansionWorker(TreeIdPath key) {
-		synchronized (expansionWorkers) {
-			ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-			if (foundWorker.getContinueWork() == false) {
-				expansionWorkers.remove(key);
-			}
-		}
-	}
-
-
-	private void stopWorkersOnPath(TreeIdPath idPath, String message) {
-		synchronized (expansionWorkers) {
-			if (idPath == null) {
-				List<TreeIdPath> allKeys = new ArrayList<TreeIdPath>(
-						expansionWorkers.keySet());
-				for (TreeIdPath key : allKeys) {
-					AceLog.getAppLog().info("  Stopping all: " + key);
-					removeAnyMatchingExpansionWorker(key, message);
-				}
-			} else {
-				if (expansionWorkers.containsKey(idPath)) {
-					AceLog.getAppLog().info("  Stopping: " + idPath);
-					removeAnyMatchingExpansionWorker(idPath, message);
-				}
-
-				List<TreeIdPath> otherKeys = new ArrayList<TreeIdPath>(
-						expansionWorkers.keySet());
-				for (TreeIdPath key : otherKeys) {
-					if (key.initiallyEqual(idPath)) {
-						AceLog.getAppLog().info("  Stopping child: " + key);
-						removeAnyMatchingExpansionWorker(key, message);
-					}
-				}
-			}
-		}
-	}
-
-	public void addTreeSelectionListener(TreeSelectionListener tsl) {
-		tree.addTreeSelectionListener(tsl);
-	}
-
-	public void removeTreeSelectionListener(TreeSelectionListener tsl) {
-		tree.removeTreeSelectionListener(tsl);
-	}
-
-	public Map<TreeIdPath, ExpandNodeSwingWorker> getExpansionWorkers() {
-		return expansionWorkers;
-	}
-
-	public ExecutorService getTreeExpandThread() {
-		return treeExpandThread;
-	}
-
-	public void propertyChange(PropertyChangeEvent evt) {
-		setRoots();
-		updateHierarchyView(evt.getPropertyName());
-	}
-
+    public void propertyChange(PropertyChangeEvent evt) {
+        setRoots();
+        updateHierarchyView(evt.getPropertyName());
+    }
 
 }

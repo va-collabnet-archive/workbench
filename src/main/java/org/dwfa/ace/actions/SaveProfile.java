@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,9 +37,8 @@ public class SaveProfile implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         try {
             if (AceConfig.config.getProfileFile() == null) {
-                File outFile =
-                        FileDialogUtil.getNewFile("Save to profile...",
-                            new File("profiles/profile.ace"), parentFrame);
+                File outFile = FileDialogUtil.getNewFile("Save to profile...", new File("profiles/profile.ace"),
+                    parentFrame);
                 AceConfig.config.setProfileFile(outFile);
             }
             AceConfig.config.save();

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,36 +23,26 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
-public class SetWorkflowDetailsSheetToErrorsAndWarningsBeanInfo extends
-        SimpleBeanInfo {
+public class SetWorkflowDetailsSheetToErrorsAndWarningsBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor errorsAndWarningsPropName =
-                    new PropertyDescriptor("errorsAndWarningsPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor errorsAndWarningsPropName = new PropertyDescriptor("errorsAndWarningsPropName",
+                getBeanDescriptor().getBeanClass());
             errorsAndWarningsPropName.setBound(true);
-            errorsAndWarningsPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            errorsAndWarningsPropName
-                .setDisplayName("<html><font color='green'>error set prop:");
-            errorsAndWarningsPropName
-                .setShortDescription("The property that contains the errors and warnings.");
+            errorsAndWarningsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            errorsAndWarningsPropName.setDisplayName("<html><font color='green'>error set prop:");
+            errorsAndWarningsPropName.setShortDescription("The property that contains the errors and warnings.");
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("The property that contains the working profile.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the working profile.");
 
-            PropertyDescriptor rv[] =
-                    { errorsAndWarningsPropName, profilePropName };
+            PropertyDescriptor rv[] = { errorsAndWarningsPropName, profilePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -63,11 +53,8 @@ public class SetWorkflowDetailsSheetToErrorsAndWarningsBeanInfo extends
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(
-                    SetWorkflowDetailsSheetToErrorsAndWarnings.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set Workflow Details<br>Sheet to<br>Errors and Warnings");
+        BeanDescriptor bd = new BeanDescriptor(SetWorkflowDetailsSheetToErrorsAndWarnings.class);
+        bd.setDisplayName("<html><font color='green'><center>Set Workflow Details<br>Sheet to<br>Errors and Warnings");
         return bd;
     }
 }

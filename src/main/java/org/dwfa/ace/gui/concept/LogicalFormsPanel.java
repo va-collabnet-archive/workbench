@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -87,9 +87,8 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
         getClassifyPrefs();
 
         // COMPONENT BORDER
-        setBorder(BorderFactory.createCompoundBorder(BorderFactory
-                .createEmptyBorder(1, 1, 1, 3), BorderFactory
-                .createLineBorder(Color.GRAY)));
+        setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3),
+            BorderFactory.createLineBorder(Color.GRAY)));
 
         // SETUP GRIDBAGLAYOUT
         // setLayout(new GridBagLayout());
@@ -107,8 +106,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 
         // ADD COMPUTED NORMAL FORMS (CNF) TABLE VIEW
         cnfTableJPanel = new CNFormsTablePanel(theSnoTable, config);
-        cnfTableJPanel.setToolTipText("Computed Normal Forms for the "
-                + "currently selected concept.");
+        cnfTableJPanel.setToolTipText("Computed Normal Forms for the " + "currently selected concept.");
         tabbedPane.addTab(TAB_NFT, cnfTableJPanel);
         // add(cnfTableJPanel, c);
 
@@ -116,33 +114,27 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 
         // ADD DIFF VIEW
         diffPathJPanel = new DiffPathPanel(config);
-        diffPathJPanel.setBorder(BorderFactory.createTitledBorder(TAB_DIFF
-                + ": "));
-        diffPathJPanel.setToolTipText("All differenced between "
-                + "the current and previous run of the Classifer.");
+        diffPathJPanel.setBorder(BorderFactory.createTitledBorder(TAB_DIFF + ": "));
+        diffPathJPanel.setToolTipText("All differenced between " + "the current and previous run of the Classifer.");
         tabbedPane.addTab(TAB_DIFF, diffPathJPanel);
 
         // ADD EQUIVALENCE VIEW
         equivJPanel = new EquivPanel(config);
-        equivJPanel.setBorder(BorderFactory
-                .createTitledBorder(TAB_EQUIV + ": "));
+        equivJPanel.setBorder(BorderFactory.createTitledBorder(TAB_EQUIV + ": "));
         equivJPanel.setToolTipText("All reported equivalent concepts found"
-                + " in the most recent run of the Classifer.");
+            + " in the most recent run of the Classifer.");
         tabbedPane.addTab(TAB_EQUIV, equivJPanel);
 
         // ADD DESCRIPTION LOGIC TAB
         logicJPanel = new DLPanel(config);
         logicJPanel.setBorder(BorderFactory.createTitledBorder(TAB_DL + ": "));
-        logicJPanel
-                .setToolTipText("Description Logic Declarations which will be "
-                        + "submitted to the Classifer.");
+        logicJPanel.setToolTipText("Description Logic Declarations which will be " + "submitted to the Classifer.");
         tabbedPane.addTab(TAB_DL, logicJPanel);
 
         // ADD VIEW PATH VERSIONS TAB
         if (viewPathTF) {
             viewPathJPanel = new ViewPathPanel(config);
-            viewPathJPanel.setBorder(BorderFactory.createTitledBorder(TAB_VIEW
-                    + ": "));
+            viewPathJPanel.setBorder(BorderFactory.createTitledBorder(TAB_VIEW + ": "));
             tabbedPane.addTab(TAB_VIEW, viewPathJPanel);
         }
 
@@ -156,8 +148,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
      * @param config
      * @throws IOException
      */
-    public void setConcept(ConceptBean conceptIn, I_ConfigAceFrame config)
-            throws IOException {
+    public void setConcept(ConceptBean conceptIn, I_ConfigAceFrame config) throws IOException {
         this.theCBean = conceptIn;
         this.config = config;
 
@@ -188,8 +179,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
             setConcept(theCBean, config);
             revalidate();
         } catch (IOException e1) {
-            AceLog.getAppLog().alertAndLog(this, Level.SEVERE,
-                    "Database Exception: " + e1.getLocalizedMessage(), e1);
+            AceLog.getAppLog().alertAndLog(this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
         }
     }
 
@@ -200,8 +190,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
             // CHECK CLASSIFIER ISA
             if (config.getClassifierIsaType() == null) {
                 String errStr = "Classifier Is-a -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
-                        new Exception(errStr));
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
                 return;
             }
 
@@ -209,8 +198,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
             I_GetConceptData cEditPathObj = config.getClassifierInputPath();
             if (cEditPathObj == null) {
                 String errStr = "Classifier Input (Edit) Path -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
-                        new Exception(errStr));
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
                 return;
             }
             I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
@@ -222,8 +210,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
             I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
             if (cClassPathObj == null) {
                 String errStr = "Classifier Output (Inferred) Path -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
-                        new Exception(errStr));
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
                 return;
             }
             I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());

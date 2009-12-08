@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -111,9 +111,9 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
         if (isNull(concept, config)) {
             return false;
         }
-        
-        List<I_ConceptAttributeTuple> tuples =
-                concept.getConceptAttributeTuples(config.getAllowedStatus(), config.getViewPositionSet());
+
+        List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(config.getAllowedStatus(),
+            config.getViewPositionSet());
         return doesConflictExist(tuples);
     }
 
@@ -123,7 +123,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
         if (isNull(conceptAttribute, config)) {
             return false;
         }
-        
+
         return doesConflictExist(conceptAttribute.getTuples(config.getAllowedStatus(), config.getViewPositionSet()));
     }
 
@@ -141,8 +141,8 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
 
         if (isNull(image, config)) {
             return false;
-        }        
-        
+        }
+
         List<I_ImageTuple> matchingTuples = new ArrayList<I_ImageTuple>();
 
         image.addTuples(config.getAllowedStatus(), null, config.getViewPositionSet(), matchingTuples);
@@ -156,12 +156,12 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
         if (isNull(relationship, config)) {
             return false;
         }
-        
+
         List<I_RelTuple> matchingTuples = new ArrayList<I_RelTuple>();
 
         I_IntSet srcTypes = config.getSourceRelTypes();
-        relationship.addTuples(config.getAllowedStatus(), srcTypes.getSetValues().length == 0 ? null : srcTypes, config
-            .getViewPositionSet(), matchingTuples, true);
+        relationship.addTuples(config.getAllowedStatus(), srcTypes.getSetValues().length == 0 ? null : srcTypes,
+            config.getViewPositionSet(), matchingTuples, true);
 
         return doesConflictExist(matchingTuples);
     }
@@ -172,7 +172,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
         if (isNull(description, config)) {
             return false;
         }
-        
+
         List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
 
         I_IntSet descTypes = config.getDescTypes();
@@ -188,7 +188,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
         if (isNull(extension, config)) {
             return false;
         }
-        
+
         List<I_ThinExtByRefTuple> matchingTuples = new ArrayList<I_ThinExtByRefTuple>();
 
         extension.addTuples(null, null, matchingTuples, true, false);
@@ -197,13 +197,14 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
     }
 
     protected abstract <T extends I_AmPart> boolean doesConflictExist(List<T> versions);
-    
-    private boolean isNull(Object ... obj) {
+
+    private boolean isNull(Object... obj) {
         if (obj == null) {
             return true;
         }
         for (int i = 0; i < obj.length; i++) {
-            if (obj[i] == null) return true;
+            if (obj[i] == null)
+                return true;
         }
         return false;
     }

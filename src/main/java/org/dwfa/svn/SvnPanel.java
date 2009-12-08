@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -223,8 +223,7 @@ public class SvnPanel extends JPanel {
     private static final long serialVersionUID = 1L;
     private SvnPrompter authenticator;
 
-    public SvnPanel(I_ConfigAceFrame aceFrameConfig, String tabName)
-            throws Exception {
+    public SvnPanel(I_ConfigAceFrame aceFrameConfig, String tabName) throws Exception {
         super(new GridBagLayout());
         database = tabName.equalsIgnoreCase("database");
         authenticator = new SvnPrompter();
@@ -258,8 +257,7 @@ public class SvnPanel extends JPanel {
         workingCopy.setEditable(false);
         this.add(workingCopy, c);
         c.gridy++;
-        JComboBox preferredReadOnly =
-                new JComboBox(svd.getReadOnlyUrlMirrors().toArray());
+        JComboBox preferredReadOnly = new JComboBox(svd.getReadOnlyUrlMirrors().toArray());
         preferredReadOnly.setSelectedItem(svd.getPreferredReadRepository());
         preferredReadOnly.addActionListener(new PreferredReadOnlyListener(svd));
         this.add(preferredReadOnly, c);
@@ -317,9 +315,7 @@ public class SvnPanel extends JPanel {
         c.gridy++;
         this.add(new JLabel("log level:"), c);
         c.gridx++;
-        Level[] levels =
-                { Level.CONFIG, Level.INFO, Level.FINE, Level.FINER,
-                 Level.FINEST, Level.ALL };
+        Level[] levels = { Level.CONFIG, Level.INFO, Level.FINE, Level.FINER, Level.FINEST, Level.ALL };
         JComboBox logLevel = new JComboBox(levels);
         logLevel.setSelectedItem(Level.INFO);
         this.add(logLevel, c);

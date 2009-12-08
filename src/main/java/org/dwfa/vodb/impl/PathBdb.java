@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,115 +44,118 @@ import com.sleepycat.je.OperationStatus;
 
 public class PathBdb implements I_StoreInBdb, I_StorePaths {
 
-	private Database pathDb;
-	private PathBinder pathBinder = new PathBinder();
-	private TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
+    private Database pathDb;
+    private PathBinder pathBinder = new PathBinder();
+    private TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 
-	public PathBdb(Environment env, DatabaseConfig dbConfig)
-			throws DatabaseException {
-		super();
-		pathDb = env.openDatabase(null, "pathDb", dbConfig);
-	}
+    public PathBdb(Environment env, DatabaseConfig dbConfig) throws DatabaseException {
+        super();
+        pathDb = env.openDatabase(null, "pathDb", dbConfig);
+    }
 
-	public void close() throws DatabaseException {
-		if (pathDb != null) {
-			pathDb.close();
-		}
-	}
+    public void close() throws DatabaseException {
+        if (pathDb != null) {
+            pathDb.close();
+        }
+    }
 
-	public void sync() throws DatabaseException {
-		if (pathDb != null) {
-			if (!pathDb.getConfig().getReadOnly()) {
-				pathDb.sync();
-			}
-		}
-	}
+    public void sync() throws DatabaseException {
+        if (pathDb != null) {
+            if (!pathDb.getConfig().getReadOnly()) {
+                pathDb.sync();
+            }
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.impl.I_StorePaths#writePath(org.dwfa.ace.api.I_Path)
-	 */
-	public void writePath(I_Path p) throws DatabaseException {
-		DatabaseEntry key = new DatabaseEntry();
-		DatabaseEntry value = new DatabaseEntry();
-		intBinder.objectToEntry(p.getConceptId(), key);
-		pathBinder.objectToEntry(p, value);
-		pathDb.put(BdbEnv.transaction, key, value);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.impl.I_StorePaths#writePath(org.dwfa.ace.api.I_Path)
+     */
+    public void writePath(I_Path p) throws DatabaseException {
+        DatabaseEntry key = new DatabaseEntry();
+        DatabaseEntry value = new DatabaseEntry();
+        intBinder.objectToEntry(p.getConceptId(), key);
+        pathBinder.objectToEntry(p, value);
+        pathDb.put(BdbEnv.transaction, key, value);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.impl.I_StorePaths#getPath(int)
-	 */
-	public I_Path getPath(int nativeId) throws DatabaseException {
-		Stopwatch timer = null;
-		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-			AceLog.getAppLog().fine("Getting path : " + nativeId);
-			timer = new Stopwatch();
-			timer.start();
-		}
-		DatabaseEntry pathKey = new DatabaseEntry();
-		DatabaseEntry pathValue = new DatabaseEntry();
-		intBinder.objectToEntry(nativeId, pathKey);
-		if (pathDb.get(BdbEnv.transaction, pathKey, pathValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-				AceLog.getAppLog().fine("Got path: " + nativeId + " elapsed time: "
-						+ timer.getElapsedTime() / 1000 + " secs");
-			}
-			return (I_Path) pathBinder.entryToObject(pathValue);
-		}
-		throw new DatabaseException("Path: "
-				+ ConceptBean.get(nativeId).toString() + " not found.");
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.impl.I_StorePaths#getPath(int)
+     */
+    public I_Path getPath(int nativeId) throws DatabaseException {
+        Stopwatch timer = null;
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            AceLog.getAppLog().fine("Getting path : " + nativeId);
+            timer = new Stopwatch();
+            timer.start();
+        }
+        DatabaseEntry pathKey = new DatabaseEntry();
+        DatabaseEntry pathValue = new DatabaseEntry();
+        intBinder.objectToEntry(nativeId, pathKey);
+        if (pathDb.get(BdbEnv.transaction, pathKey, pathValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                AceLog.getAppLog().fine(
+                    "Got path: " + nativeId + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
+            }
+            return (I_Path) pathBinder.entryToObject(pathValue);
+        }
+        throw new DatabaseException("Path: " + ConceptBean.get(nativeId).toString() + " not found.");
+    }
 
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.impl.I_StorePaths#hasPath(int)
-	 */
-	public boolean hasPath(int nativeId) throws DatabaseException {
-		Stopwatch timer = null;
-		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-			AceLog.getAppLog().fine("Getting path : " + nativeId);
-			timer = new Stopwatch();
-			timer.start();
-		}
-		DatabaseEntry pathKey = new DatabaseEntry();
-		DatabaseEntry pathValue = new DatabaseEntry();
-		intBinder.objectToEntry(nativeId, pathKey);
-		if (pathDb.get(BdbEnv.transaction, pathKey, pathValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-				AceLog.getAppLog().fine("Got path: " + nativeId + " elapsed time: "
-						+ timer.getElapsedTime() / 1000 + " secs");
-			}
-			return true;
-		}
-		return false;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.impl.I_StorePaths#hasPath(int)
+     */
+    public boolean hasPath(int nativeId) throws DatabaseException {
+        Stopwatch timer = null;
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            AceLog.getAppLog().fine("Getting path : " + nativeId);
+            timer = new Stopwatch();
+            timer.start();
+        }
+        DatabaseEntry pathKey = new DatabaseEntry();
+        DatabaseEntry pathValue = new DatabaseEntry();
+        intBinder.objectToEntry(nativeId, pathKey);
+        if (pathDb.get(BdbEnv.transaction, pathKey, pathValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                AceLog.getAppLog().fine(
+                    "Got path: " + nativeId + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
+            }
+            return true;
+        }
+        return false;
+    }
 
-	public void iteratePaths(I_ProcessPathEntries processor) throws Exception {
-		Cursor pathCursor = pathDb.openCursor(null, null);
-		DatabaseEntry foundKey = processor.getKeyEntry();
-		DatabaseEntry foundData = processor.getDataEntry();
-		while (pathCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-			try {
-				processor.processPath(foundKey, foundData);
-			} catch (Exception e) {
-				pathCursor.close();
-				throw e;
-			}
-		}
-		pathCursor.close();
-	}
+    public void iteratePaths(I_ProcessPathEntries processor) throws Exception {
+        Cursor pathCursor = pathDb.openCursor(null, null);
+        DatabaseEntry foundKey = processor.getKeyEntry();
+        DatabaseEntry foundData = processor.getDataEntry();
+        while (pathCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+            try {
+                processor.processPath(foundKey, foundData);
+            } catch (Exception e) {
+                pathCursor.close();
+                throw e;
+            }
+        }
+        pathCursor.close();
+    }
 
-	public I_Path pathEntryToObject(DatabaseEntry key, DatabaseEntry value) {
-		return (I_Path) pathBinder.entryToObject(value);
-	}
+    public I_Path pathEntryToObject(DatabaseEntry key, DatabaseEntry value) {
+        return (I_Path) pathBinder.entryToObject(value);
+    }
 
-	public void commit(ConceptBean bean, int version, Set<TimePathId> values)
-			throws DatabaseException {
-		// Nothing to do
-		
-	}
+    public void commit(ConceptBean bean, int version, Set<TimePathId> values) throws DatabaseException {
+        // Nothing to do
 
-	public void setupBean(ConceptBean cb) throws IOException {
-		// nothing to do
-	}
+    }
+
+    public void setupBean(ConceptBean cb) throws IOException {
+        // nothing to do
+    }
 
 }

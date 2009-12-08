@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,228 +48,229 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
 
-public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConceptPanel, PropertyChangeListener, ListSelectionListener {
+public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConceptPanel, PropertyChangeListener,
+        ListSelectionListener {
 
-   private static final long serialVersionUID = 1L;
-   private static final int dataVersion = 1;
+    private static final long serialVersionUID = 1L;
+    private static final int dataVersion = 1;
 
-   private String name;
-   private int lastSelectedIndex = -1;
-   private int sequence;
-   private boolean selectedByDefault;
-   
-   private transient JToggleButton toggleButton;
-   private transient Set<ActionListener> showComponentListeners = new HashSet<ActionListener>();
-   private transient Set<I_HoldRefsetData> refSetListeners = new HashSet<I_HoldRefsetData>();
-   private transient I_HostConceptPlugins host;
+    private String name;
+    private int lastSelectedIndex = -1;
+    private int sequence;
+    private boolean selectedByDefault;
 
+    private transient JToggleButton toggleButton;
+    private transient Set<ActionListener> showComponentListeners = new HashSet<ActionListener>();
+    private transient Set<I_HoldRefsetData> refSetListeners = new HashSet<I_HoldRefsetData>();
+    private transient I_HostConceptPlugins host;
 
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(name);
+        out.writeInt(lastSelectedIndex);
+        out.writeInt(sequence);
+        out.writeBoolean(selectedByDefault);
+    }
 
-   private void writeObject(ObjectOutputStream out) throws IOException {
-       out.writeInt(dataVersion);
-       out.writeObject(name);
-       out.writeInt(lastSelectedIndex);
-       out.writeInt(sequence);
-       out.writeBoolean(selectedByDefault);
-   }
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            name = (String) in.readObject();
+            lastSelectedIndex = in.readInt();
+            sequence = in.readInt();
+            selectedByDefault = in.readBoolean();
+            showComponentListeners = new HashSet<ActionListener>();
+            refSetListeners = new HashSet<I_HoldRefsetData>();
+            toggleButton = null;
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-       int objDataVersion = in.readInt();
-       if (objDataVersion == dataVersion) {
-    	   name = (String) in.readObject();
-    	   lastSelectedIndex = in.readInt();
-    	   sequence = in.readInt();
-    	   selectedByDefault = in.readBoolean();
-    	   showComponentListeners = new HashSet<ActionListener>();
-    	   refSetListeners = new HashSet<I_HoldRefsetData>();
-    	   toggleButton = null;
-       } else {
-           throw new IOException("Can't handle dataversion: " + objDataVersion);
-       }
-   }
+    public int getLastSelectedIndex() {
+        return lastSelectedIndex;
+    }
 
-	
-   public int getLastSelectedIndex() {
-		return lastSelectedIndex;
-	}
-   
-   public void valueChanged(ListSelectionEvent evt) {
-       // Ignore extra messages.
-       if (evt.getValueIsAdjusting()) {
-           return;
-       }
-       DefaultListSelectionModel lsm = (DefaultListSelectionModel) evt.getSource();
-	  lastSelectedIndex = lsm.getMinSelectionIndex();
-	  if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-		   AceLog.getAppLog().fine("New selection ("+ getId() + "): " + lastSelectedIndex);
-	  }
-      for (I_HoldRefsetData l: refSetListeners) {
-         try {
-            l.setComponentId(getComponentId());
-         } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-         }
-      }
-      
-   }
-   protected abstract int getComponentId();
-   
-	public void addRefsetListener(I_HoldRefsetData listener) {
-      refSetListeners.add(listener);
-   }
+    public void valueChanged(ListSelectionEvent evt) {
+        // Ignore extra messages.
+        if (evt.getValueIsAdjusting()) {
+            return;
+        }
+        DefaultListSelectionModel lsm = (DefaultListSelectionModel) evt.getSource();
+        lastSelectedIndex = lsm.getMinSelectionIndex();
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            AceLog.getAppLog().fine("New selection (" + getId() + "): " + lastSelectedIndex);
+        }
+        for (I_HoldRefsetData l : refSetListeners) {
+            try {
+                l.setComponentId(getComponentId());
+            } catch (Exception e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
 
-   public void clearRefsetListeners() {
-      refSetListeners.clear();
-   }
-   
-   private class ToggleActionListener implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			try {
-				update();
-			} catch (IOException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			}
-			for (ActionListener l: showComponentListeners) {
-				l.actionPerformed(e);
-			}
-		}
-	}
+    }
 
-	public AbstractPlugin(boolean selectedByDefault, int sequence) {
-		super();
-		this.selectedByDefault = selectedByDefault;
-		this.sequence = sequence;
-		
-	}
+    protected abstract int getComponentId();
 
-	public void propertyChange(PropertyChangeEvent evt) {
-		try {
-			update();
-		} catch (IOException e1) {
-			AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
-		}
-	}
+    public void addRefsetListener(I_HoldRefsetData listener) {
+        refSetListeners.add(listener);
+    }
 
-	public final List<JComponent> getToggleBarComponents() {
-		return Arrays.asList(new JComponent[] { getToggleButton() });
-	}
+    public void clearRefsetListeners() {
+        refSetListeners.clear();
+    }
 
-	public abstract void update() throws IOException;
-	
-	public final void addShowComponentListener(ActionListener l) {
-		showComponentListeners.add(l);
-	}
+    private class ToggleActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            try {
+                update();
+            } catch (IOException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            }
+            for (ActionListener l : showComponentListeners) {
+                l.actionPerformed(e);
+            }
+        }
+    }
 
-	public final void removeShowComponentListener(ActionListener l) {
-		showComponentListeners.remove(l);
-	}
+    public AbstractPlugin(boolean selectedByDefault, int sequence) {
+        super();
+        this.selectedByDefault = selectedByDefault;
+        this.sequence = sequence;
 
-	public final boolean showComponent() {
-		return getToggleButton().isSelected();
-	}
+    }
 
-	private class MoveLeft extends AbstractAction {
+    public void propertyChange(PropertyChangeEvent evt) {
+        try {
+            update();
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
+        }
+    }
 
-		/**
+    public final List<JComponent> getToggleBarComponents() {
+        return Arrays.asList(new JComponent[] { getToggleButton() });
+    }
+
+    public abstract void update() throws IOException;
+
+    public final void addShowComponentListener(ActionListener l) {
+        showComponentListeners.add(l);
+    }
+
+    public final void removeShowComponentListener(ActionListener l) {
+        showComponentListeners.remove(l);
+    }
+
+    public final boolean showComponent() {
+        return getToggleButton().isSelected();
+    }
+
+    private class MoveLeft extends AbstractAction {
+
+        /**
 		 * 
 		 */
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		
-		private MoveLeft() {
-			super("left");
-		}
+        private MoveLeft() {
+            super("left");
+        }
 
+        public void actionPerformed(ActionEvent arg0) {
+            sequence--;
+            AceLog.getAppLog().info("Sequence: " + sequence);
+            try {
+                update();
+            } catch (IOException e1) {
+                AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(),
+                    e1);
+            }
+        }
 
-		public void actionPerformed(ActionEvent arg0) {
-			sequence--;
-			AceLog.getAppLog().info("Sequence: "+ sequence);
-			try {
-				update();
-			} catch (IOException e1) {
-				AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
-			}
-		}
-		
-	}
-	private class MoveRight extends AbstractAction {
+    }
 
-		/**
+    private class MoveRight extends AbstractAction {
+
+        /**
 		 * 
 		 */
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		private MoveRight() {
-			super("right");
-		}
+        private MoveRight() {
+            super("right");
+        }
 
-		public void actionPerformed(ActionEvent arg0) {
-			sequence++;
-			AceLog.getAppLog().info("Sequence: "+ sequence);
-			try {
-				update();
-			} catch (IOException e1) {
-				AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
-			}
-			JOptionPane.showMessageDialog(getToggleButton(), "Move Right");
-		}
-		
-	}
-	public final JToggleButton getToggleButton() {
-		if (toggleButton == null) {
-			toggleButton = new JToggleButton(getImageIcon());
-			toggleButton.setSelected(selectedByDefault);
-			toggleButton.addActionListener(new ToggleActionListener());
-			toggleButton.setToolTipText(getToolTipText());
-	        InputMap imap = toggleButton.getInputMap();
-	        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-	        		 "left");
-	        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-	        		"right");
-			
-			getToggleButton().getActionMap().put("left", new MoveLeft());
-			getToggleButton().getActionMap().put("right", new MoveRight());
-		}
-		return toggleButton;
-	}
-	
-	protected abstract ImageIcon getImageIcon();
+        public void actionPerformed(ActionEvent arg0) {
+            sequence++;
+            AceLog.getAppLog().info("Sequence: " + sequence);
+            try {
+                update();
+            } catch (IOException e1) {
+                AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(),
+                    e1);
+            }
+            JOptionPane.showMessageDialog(getToggleButton(), "Move Right");
+        }
+
+    }
+
+    public final JToggleButton getToggleButton() {
+        if (toggleButton == null) {
+            toggleButton = new JToggleButton(getImageIcon());
+            toggleButton.setSelected(selectedByDefault);
+            toggleButton.addActionListener(new ToggleActionListener());
+            toggleButton.setToolTipText(getToolTipText());
+            InputMap imap = toggleButton.getInputMap();
+            imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+                "left");
+            imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+                "right");
+
+            getToggleButton().getActionMap().put("left", new MoveLeft());
+            getToggleButton().getActionMap().put("right", new MoveRight());
+        }
+        return toggleButton;
+    }
+
+    protected abstract ImageIcon getImageIcon();
+
     protected abstract String getToolTipText();
-    
-	
-	public int getSequence() {
-		return sequence;
-	}
 
-	public void setSequence(int sequence) {
-		this.sequence = sequence;
-	}
+    public int getSequence() {
+        return sequence;
+    }
 
-	public void setId(UUID id) {
-		throw new UnsupportedOperationException();
-	}
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
+    }
 
-	public int compareTo(I_PluginToConceptPanel another) {
-		if (this.sequence == another.getSequence()) {
-			return this.getId().compareTo(another.getId());
-		}
-		return this.sequence - another.getSequence();
-	}
+    public void setId(UUID id) {
+        throw new UnsupportedOperationException();
+    }
 
-	public String getName() {
-		return name;
-	}
+    public int compareTo(I_PluginToConceptPanel another) {
+        if (this.sequence == another.getSequence()) {
+            return this.getId().compareTo(another.getId());
+        }
+        return this.sequence - another.getSequence();
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}	
-	
-	public final I_HostConceptPlugins getHost() {
-		return host;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public final void setHost(I_HostConceptPlugins host) {
-		this.host = host;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public final I_HostConceptPlugins getHost() {
+        return host;
+    }
+
+    public final void setHost(I_HostConceptPlugins host) {
+        this.host = host;
+    }
 
 }

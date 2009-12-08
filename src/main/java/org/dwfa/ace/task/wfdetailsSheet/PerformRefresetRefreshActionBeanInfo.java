@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,16 +27,12 @@ public class PerformRefresetRefreshActionBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("The property that contains the working profile.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the working profile.");
 
             PropertyDescriptor rv[] = { profilePropName };
             return rv;
@@ -49,10 +45,8 @@ public class PerformRefresetRefreshActionBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(PerformRefresetRefreshAction.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Perform Refset<br>Refresh Action");
+        BeanDescriptor bd = new BeanDescriptor(PerformRefresetRefreshAction.class);
+        bd.setDisplayName("<html><font color='green'><center>Perform Refset<br>Refresh Action");
         return bd;
     }
 }

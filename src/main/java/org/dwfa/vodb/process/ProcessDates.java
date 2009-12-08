@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,6 @@ package org.dwfa.vodb.process;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 
 public class ProcessDates {
     private class DateFormatterThreadLocal extends ThreadLocal<SimpleDateFormat> {
@@ -35,20 +34,18 @@ public class ProcessDates {
             return new SimpleDateFormat(formatStr);
         }
 
-        
-        
     }
 
     DateFormatterThreadLocal formatter = new DateFormatterThreadLocal("yyyy-MM-dd HH:mm:ss");
 
     DateFormatterThreadLocal formatter2 = new DateFormatterThreadLocal("yyyyMMdd HH:mm:ss");
-    
+
     DateFormatterThreadLocal formatter3 = new DateFormatterThreadLocal("yyyyMMdd'T'HHmmssZ");
-    
+
     DateFormatterThreadLocal formatter4 = new DateFormatterThreadLocal("yyyyMMdd");
 
     private static ProcessDates dateProcessor = new ProcessDates();
-    
+
     private Date getDateFromString(String dateStr) throws ParseException {
         if (dateStr.contains("-") && dateStr.contains(":")) {
             return formatter.get().parse(dateStr);
@@ -60,7 +57,6 @@ public class ProcessDates {
             return formatter2.get().parse(dateStr);
         }
     }
-    
 
     public static Date getDate(String dateStr) throws ParseException {
         return dateProcessor.getDateFromString(dateStr);

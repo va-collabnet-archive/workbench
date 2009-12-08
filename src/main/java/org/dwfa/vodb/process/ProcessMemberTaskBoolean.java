@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,29 +23,26 @@ import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
 
 public class ProcessMemberTaskBoolean extends ProcessMemberTask {
-    
+
     private static ProcessMemberTaskBoolean[] taskArray;
     private static Exception processException;
     protected static Semaphore semaphore = new Semaphore(TASK_SIZE, true);
-    
+
     private boolean booleanExt;
 
     ProcessMemberTaskBoolean(int arrayIndex) {
         super(arrayIndex);
     }
-    
-    
+
     protected EXT_TYPE getRefsetType() {
         return EXT_TYPE.BOOLEAN;
     }
 
-    protected void reset(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid,
-        int version, int memberId, boolean booleanExt) {
-        resetCore(refsetUuid, statusUuid, componentUuid, pathUuid,
-              version, memberId);
+    protected void reset(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid, int version,
+            int memberId, boolean booleanExt) {
+        resetCore(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId);
         this.booleanExt = booleanExt;
     }
-
 
     protected ThinExtByRefPartBoolean makeNewPart() throws Exception {
         ThinExtByRefPartBoolean part = new ThinExtByRefPartBoolean();
@@ -53,22 +50,21 @@ public class ProcessMemberTaskBoolean extends ProcessMemberTask {
         return part;
     }
 
-    public static void acquire(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid,
-        int version, int memberId, boolean booleanExt) throws Exception {
+    public static void acquire(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid, int version,
+            int memberId, boolean booleanExt) throws Exception {
         check();
         semaphore.acquire();
-        
+
         if (taskArray == null) {
-            taskArray = new ProcessMemberTaskBoolean[TASK_SIZE + 2]; 
+            taskArray = new ProcessMemberTaskBoolean[TASK_SIZE + 2];
             for (int i = 0; i < taskArray.length; i++) {
                 taskArray[i] = new ProcessMemberTaskBoolean(i);
             }
         }
         boolean foundUsableTask = false;
-        for (ProcessMemberTaskBoolean task: taskArray) {
+        for (ProcessMemberTaskBoolean task : taskArray) {
             if (task.isUsable()) {
-                task.reset(refsetUuid, statusUuid, componentUuid, pathUuid,
-                           version, memberId, booleanExt);
+                task.reset(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId, booleanExt);
                 ProcessAceFormatSources.executors.submit(task);
                 foundUsableTask = true;
                 break;
@@ -78,7 +74,6 @@ public class ProcessMemberTaskBoolean extends ProcessMemberTask {
             throw new Exception("Acquired semaphore, but could not find usable task...");
         }
     }
-
 
     public Exception getProcessException() {
         return processException;
@@ -91,7 +86,7 @@ public class ProcessMemberTaskBoolean extends ProcessMemberTask {
     public ProcessMemberTaskBoolean[] getTaskArray() {
         return taskArray;
     }
-    
+
     public static void check() throws Exception {
         if (processException != null) {
             throw processException;

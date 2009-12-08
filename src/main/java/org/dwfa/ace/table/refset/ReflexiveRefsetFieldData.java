@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,132 +20,128 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class ReflexiveRefsetFieldData {
-	
-	public enum REFSET_FIELD_TYPE {
-		CONCEPT_IDENTIFIER,
-		COMPONENT_IDENTIFIER,
-		STRING,
-		VERSION
-	}
-	
-	public enum INVOKE_ON_OBJECT_TYPE {
-		IMMUTABLE, PART, COMPONENT, 
-		CONCEPT, CONCEPT_COMPONENT, 
-		PROMOTION_REFSET_PART;
-	}
 
-	protected REFSET_FIELD_TYPE type;
-	protected String columnName;
-	protected int min;
-	protected int pref;
-	protected int max;
-	protected boolean creationEditable;
-	protected boolean updateEditable;
-	protected Class<?> fieldClass;
-	protected INVOKE_ON_OBJECT_TYPE invokeOnObjectType;
-	protected Method readMethod;
-	protected Method writeMethod;
-	protected Object[] readParamaters;
+    public enum REFSET_FIELD_TYPE {
+        CONCEPT_IDENTIFIER, COMPONENT_IDENTIFIER, STRING, VERSION
+    }
 
-	public ReflexiveRefsetFieldData() {
-	}
+    public enum INVOKE_ON_OBJECT_TYPE {
+        IMMUTABLE, PART, COMPONENT, CONCEPT, CONCEPT_COMPONENT, PROMOTION_REFSET_PART;
+    }
 
-	public INVOKE_ON_OBJECT_TYPE getInvokeOnObjectType() {
-		return invokeOnObjectType;
-	}
+    protected REFSET_FIELD_TYPE type;
+    protected String columnName;
+    protected int min;
+    protected int pref;
+    protected int max;
+    protected boolean creationEditable;
+    protected boolean updateEditable;
+    protected Class<?> fieldClass;
+    protected INVOKE_ON_OBJECT_TYPE invokeOnObjectType;
+    protected Method readMethod;
+    protected Method writeMethod;
+    protected Object[] readParamaters;
 
-	public void setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE invokeOnObjectType) {
-		this.invokeOnObjectType = invokeOnObjectType;
-	}
+    public ReflexiveRefsetFieldData() {
+    }
 
-	public REFSET_FIELD_TYPE getType() {
-		return type;
-	}
+    public INVOKE_ON_OBJECT_TYPE getInvokeOnObjectType() {
+        return invokeOnObjectType;
+    }
 
-	public void setType(REFSET_FIELD_TYPE type) {
-		this.type = type;
-	}
+    public void setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE invokeOnObjectType) {
+        this.invokeOnObjectType = invokeOnObjectType;
+    }
 
-	public String getColumnName() {
-		return columnName;
-	}
+    public REFSET_FIELD_TYPE getType() {
+        return type;
+    }
 
-	public void setColumnName(String columnName) {
-		this.columnName = columnName;
-	}
+    public void setType(REFSET_FIELD_TYPE type) {
+        this.type = type;
+    }
 
-	public int getMin() {
-		return min;
-	}
+    public String getColumnName() {
+        return columnName;
+    }
 
-	public void setMin(int min) {
-		this.min = min;
-	}
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
+    }
 
-	public int getPref() {
-		return pref;
-	}
+    public int getMin() {
+        return min;
+    }
 
-	public void setPref(int pref) {
-		this.pref = pref;
-	}
+    public void setMin(int min) {
+        this.min = min;
+    }
 
-	public int getMax() {
-		return max;
-	}
+    public int getPref() {
+        return pref;
+    }
 
-	public void setMax(int max) {
-		this.max = max;
-	}
+    public void setPref(int pref) {
+        this.pref = pref;
+    }
 
-	public boolean isCreationEditable() {
-		return creationEditable;
-	}
+    public int getMax() {
+        return max;
+    }
 
-	public void setCreationEditable(boolean creationEditable) {
-		this.creationEditable = creationEditable;
-	}
+    public void setMax(int max) {
+        this.max = max;
+    }
 
-	public boolean isUpdateEditable() {
-		return updateEditable;
-	}
+    public boolean isCreationEditable() {
+        return creationEditable;
+    }
 
-	public void setUpdateEditable(boolean updateEditable) {
-		this.updateEditable = updateEditable;
-	}
+    public void setCreationEditable(boolean creationEditable) {
+        this.creationEditable = creationEditable;
+    }
 
-	public Class<?> getFieldClass() {
-		return fieldClass;
-	}
+    public boolean isUpdateEditable() {
+        return updateEditable;
+    }
 
-	public void setFieldClass(Class<?> fieldClass) {
-		this.fieldClass = fieldClass;
-	}
+    public void setUpdateEditable(boolean updateEditable) {
+        this.updateEditable = updateEditable;
+    }
 
-	public Method getReadMethod() {
-		return readMethod;
-	}
+    public Class<?> getFieldClass() {
+        return fieldClass;
+    }
 
-	public void setReadMethod(Method readMethod) {
-		this.readMethod = readMethod;
-	}
+    public void setFieldClass(Class<?> fieldClass) {
+        this.fieldClass = fieldClass;
+    }
 
-	public Method getWriteMethod() {
-		return writeMethod;
-	}
+    public Method getReadMethod() {
+        return readMethod;
+    }
 
-	public void setWriteMethod(Method writeMethod) {
-		this.writeMethod = writeMethod;
-	}
+    public void setReadMethod(Method readMethod) {
+        this.readMethod = readMethod;
+    }
 
-	public Object[] getReadParamaters() {
-		return readParamaters;
-	}
+    public Method getWriteMethod() {
+        return writeMethod;
+    }
 
-	public void setReadParamaters(List<Object> paramaters) {
-		this.readParamaters = paramaters.toArray();
-	}
-	public void setReadParamaters(Object[] paramaters) {
-		this.readParamaters = paramaters;
-	}
+    public void setWriteMethod(Method writeMethod) {
+        this.writeMethod = writeMethod;
+    }
+
+    public Object[] getReadParamaters() {
+        return readParamaters;
+    }
+
+    public void setReadParamaters(List<Object> paramaters) {
+        this.readParamaters = paramaters.toArray();
+    }
+
+    public void setReadParamaters(Object[] paramaters) {
+        this.readParamaters = paramaters;
+    }
 }

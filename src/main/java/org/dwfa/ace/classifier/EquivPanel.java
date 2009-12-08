@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -67,9 +67,8 @@ public class EquivPanel extends JPanel {
             c.gridwidth = 1;
             c.weightx = 0.5;
             c.weighty = 0.5;
-            this.add(new JLabel(
-                "<HTML><FONT COLOR='gray'><I> -- No equivalences reported from"
-                    + " most recent classification. --"), c);
+            this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No equivalences reported from"
+                + " most recent classification. --"), c);
             return;
         }
 
@@ -86,8 +85,7 @@ public class EquivPanel extends JPanel {
             return;
         }
 
-        EquivTableModel theTableModel =
-                new EquivTableModel(theTableStr, SnoQuery.getEquiv());
+        EquivTableModel theTableModel = new EquivTableModel(theTableStr, SnoQuery.getEquiv());
         JTable table = new JTable(theTableModel);
 
         EquivTableRenderer renderer = new EquivTableRenderer(config);
@@ -106,8 +104,7 @@ public class EquivPanel extends JPanel {
         int rowHeight = 18;
         int tWide = 700;
         table.setRowHeight(rowHeight);
-        table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight
-            * table.getRowCount()));
+        table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -120,8 +117,7 @@ public class EquivPanel extends JPanel {
         this.add(new JScrollPane(table), c);
     }
 
-    private String[][] getTableStrings(SnoConGrpList scgl)
-            throws TerminologyException, IOException {
+    private String[][] getTableStrings(SnoConGrpList scgl) throws TerminologyException, IOException {
         int totalCol = 2;
         int totalRows = scgl.count();
         String tableStrings[][] = new String[totalRows][totalCol];

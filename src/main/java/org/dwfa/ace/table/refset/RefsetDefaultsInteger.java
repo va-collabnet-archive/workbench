@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,8 +23,7 @@ import java.io.ObjectOutputStream;
 import org.dwfa.ace.refset.I_RefsetDefaultsInteger;
 import org.dwfa.tapi.TerminologyException;
 
-public class RefsetDefaultsInteger extends RefsetDefaults implements
-        I_RefsetDefaultsInteger {
+public class RefsetDefaultsInteger extends RefsetDefaults implements I_RefsetDefaultsInteger {
 
     public RefsetDefaultsInteger() throws TerminologyException, IOException {
         super();
@@ -49,8 +48,7 @@ public class RefsetDefaultsInteger extends RefsetDefaults implements
         out.writeObject(integerPopupItems);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             defaultForIntegerRefset = in.readInt();
@@ -68,8 +66,7 @@ public class RefsetDefaultsInteger extends RefsetDefaults implements
     public void setDefaultForIntegerRefset(Integer defaultForIntegerRefset) {
         Object oldValue = this.defaultForIntegerRefset;
         this.defaultForIntegerRefset = defaultForIntegerRefset;
-        pcs.firePropertyChange("defaultForIntegerRefset", oldValue,
-            defaultForIntegerRefset);
+        pcs.firePropertyChange("defaultForIntegerRefset", oldValue, defaultForIntegerRefset);
     }
 
     public Integer[] getIntegerPopupItems() {

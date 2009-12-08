@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,76 +33,77 @@ import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class DescriptionsFromCollectionTableModel extends DescriptionTableModel {
-	public DescriptionsFromCollectionTableModel(DESC_FIELD[] columns, I_ConfigAceFrame config) {
-		super(columns, config);
-	}
+    public DescriptionsFromCollectionTableModel(DESC_FIELD[] columns, I_ConfigAceFrame config) {
+        super(columns, config);
+    }
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	private List<I_DescriptionVersioned> descriptionList = new ArrayList<I_DescriptionVersioned>();
-	private List<Float> scoreList = new ArrayList<Float>();
-	
-	@Override
-	public I_DescriptionTuple getDescription(int rowIndex) {
-		if (rowIndex < 0 || rowIndex == descriptionList.size()) {
-			return null;
-		}
-		return descriptionList.get(rowIndex).getLastTuple();
-	}
+    private static final long serialVersionUID = 1L;
+    private List<I_DescriptionVersioned> descriptionList = new ArrayList<I_DescriptionVersioned>();
+    private List<Float> scoreList = new ArrayList<Float>();
 
-	public int getRowCount() {
-		return descriptionList.size();
-	}
+    @Override
+    public I_DescriptionTuple getDescription(int rowIndex) {
+        if (rowIndex < 0 || rowIndex == descriptionList.size()) {
+            return null;
+        }
+        return descriptionList.get(rowIndex).getLastTuple();
+    }
 
-	public void setDescriptions(Collection<I_DescriptionVersioned> descriptions) {
-		descriptionList = new ArrayList<I_DescriptionVersioned>(descriptions);
-		scoreList = null;
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				fireTableChanged(new TableModelEvent(DescriptionsFromCollectionTableModel.this));
-			}});
-	}
-	
-	public void setLuceneMatches(Collection<LuceneMatch> matches) {
-		descriptionList = new ArrayList<I_DescriptionVersioned>(matches.size());
-		scoreList = new ArrayList<Float>(matches.size());
-		synchronized (matches) {
-			for (LuceneMatch m: matches) {
-				descriptionList.add(m.getDesc());
-				scoreList.add(m.getScore());
-			}
-		}
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				fireTableChanged(new TableModelEvent(DescriptionsFromCollectionTableModel.this));
-			}});
-	}
-	
-	public String getScore(int rowIndex) {
-		if (scoreList != null) {
-			return scoreList.get(rowIndex).toString();
-		}
-		return "";
-	}
-	
+    public int getRowCount() {
+        return descriptionList.size();
+    }
 
-	@Override
-	public Map<Integer, ConceptBean> getReferencedConcepts() {
+    public void setDescriptions(Collection<I_DescriptionVersioned> descriptions) {
+        descriptionList = new ArrayList<I_DescriptionVersioned>(descriptions);
+        scoreList = null;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                fireTableChanged(new TableModelEvent(DescriptionsFromCollectionTableModel.this));
+            }
+        });
+    }
+
+    public void setLuceneMatches(Collection<LuceneMatch> matches) {
+        descriptionList = new ArrayList<I_DescriptionVersioned>(matches.size());
+        scoreList = new ArrayList<Float>(matches.size());
+        synchronized (matches) {
+            for (LuceneMatch m : matches) {
+                descriptionList.add(m.getDesc());
+                scoreList.add(m.getScore());
+            }
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                fireTableChanged(new TableModelEvent(DescriptionsFromCollectionTableModel.this));
+            }
+        });
+    }
+
+    public String getScore(int rowIndex) {
+        if (scoreList != null) {
+            return scoreList.get(rowIndex).toString();
+        }
+        return "";
+    }
+
+    @Override
+    public Map<Integer, ConceptBean> getReferencedConcepts() {
         Map<Integer, ConceptBean> referencedConcept = new HashMap<Integer, ConceptBean>();
         List<I_DescriptionVersioned> descriptionListCopy;
         synchronized (descriptionList) {
             descriptionListCopy = new ArrayList<I_DescriptionVersioned>(descriptionList);
         }
-        for (I_DescriptionVersioned desc: descriptionListCopy) {
-            for (I_DescriptionPart part: desc.getVersions()) {
+        for (I_DescriptionVersioned desc : descriptionListCopy) {
+            for (I_DescriptionPart part : desc.getVersions()) {
                 referencedConcept.put(part.getTypeId(), ConceptBean.get(part.getTypeId()));
                 referencedConcept.put(part.getStatusId(), ConceptBean.get(part.getStatusId()));
             }
-            
+
         }
-        
-		return referencedConcept;
-	}
+
+        return referencedConcept;
+    }
 }

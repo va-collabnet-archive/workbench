@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -83,7 +83,7 @@ import org.dwfa.tapi.TerminologyException;
  * 
  * 
  * @author Marc Campbell
- *
+ * 
  */
 
 public class DLPanel extends JPanel {
@@ -152,14 +152,10 @@ public class DLPanel extends JPanel {
             editDL = SnoDLSet.getDLList().get(index);
             tableModelDLEditRhs.select(index);
             tableModelDLEditLhs.select(index);
-            labelDL
-                    .setText("<html><font face='Dialog' size='3' color='black'>DL: "
-                            + "<font face='Dialog' size='3' color='blue'>"
-                            + editDL.toStringDl());
-            labelKRSS
-                    .setText("<html><font face='Dialog' size='3' color='black'>KRSS: "
-                            + "<font face='Dialog' size='3' color='green'>"
-                            + editDL.toStringKrss());
+            labelDL.setText("<html><font face='Dialog' size='3' color='black'>DL: "
+                + "<font face='Dialog' size='3' color='blue'>" + editDL.toStringDl());
+            labelKRSS.setText("<html><font face='Dialog' size='3' color='black'>KRSS: "
+                + "<font face='Dialog' size='3' color='green'>" + editDL.toStringKrss());
         }
     }
 
@@ -178,8 +174,7 @@ public class DLPanel extends JPanel {
         c.gridwidth = 1;
         c.weightx = 0;
         c.weighty = 0;
-        btnReadFromFile = new JButton(new ImageIcon(ACE.class
-                .getResource("/24x24/plain/read_from_disk.png")));
+        btnReadFromFile = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/read_from_disk.png")));
         btnReadFromFile.setToolTipText("Read Description Logic from file.");
         btnReadFromFile.addActionListener(new Listener_BtnFileRead());
         btnReadFromFile.setMaximumSize(btnDim_32x32);
@@ -188,8 +183,7 @@ public class DLPanel extends JPanel {
 
         c.weightx = 0.5;
         c.gridx += 1;
-        btnSaveToFile = new JButton(new ImageIcon(ACE.class
-                .getResource("/24x24/plain/save_to_disk.png")));
+        btnSaveToFile = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/save_to_disk.png")));
         btnSaveToFile.setToolTipText("Write Description Logic to file.");
         btnSaveToFile.addActionListener(new Listener_BtnFileWrite());
         btnSaveToFile.setMaximumSize(btnDim_32x32);
@@ -227,11 +221,9 @@ public class DLPanel extends JPanel {
         c.weightx = 0;
         c.gridx = 0;
         c.gridwidth = 1;
-        btnAddDLEdit = new JButton(new ImageIcon(ACE.class
-                .getResource("/24x24/plain/row_add_after.png")));
+        btnAddDLEdit = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/row_add_after.png")));
         btnAddDLEdit.setToolTipText("add new LHS role from taxonomy selection");
-        btnAddDLEdit
-                .addActionListener(new Listener_BtnAdd_DLEdit(null, config));
+        btnAddDLEdit.addActionListener(new Listener_BtnAdd_DLEdit(null, config));
         btnAddDLEdit.setMaximumSize(btnDim_32x32);
         btnAddDLEdit.setPreferredSize(btnDim_32x32);
         this.add(btnAddDLEdit, c);
@@ -242,15 +234,13 @@ public class DLPanel extends JPanel {
         table = new JTable(tableModelDLEditLhs);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(heightRow);
-        table.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn,
-                heightRow * 4));
+        table.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn, heightRow * 4));
         tc = table.getColumnModel().getColumn(0);
         tc.setPreferredWidth(widthDecr);
         tc.setCellRenderer(new Renderer_SnoCon());
         setUpActButtons(table);
         sp = new JScrollPane(table);
-        sp.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn,
-                heightRow * 5));
+        sp.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn, heightRow * 5));
         this.add(sp, c);
 
         // COMMENT LABELS
@@ -277,11 +267,9 @@ public class DLPanel extends JPanel {
         c.gridx = 0;
         c.weightx = 0;
         c.gridwidth = 1;
-        btnAddDLList = new JButton(new ImageIcon(ACE.class
-                .getResource("/24x24/plain/row_add_after.png")));
+        btnAddDLList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/row_add_after.png")));
         btnAddDLList.setToolTipText("add new DL (RHS) from taxonomy selection");
-        btnAddDLList
-                .addActionListener(new Listener_BtnAdd_DLList(null, config));
+        btnAddDLList.addActionListener(new Listener_BtnAdd_DLList(null, config));
         btnAddDLList.setMaximumSize(btnDim_32x32);
         btnAddDLList.setPreferredSize(btnDim_32x32);
         this.add(btnAddDLList, c);
@@ -294,8 +282,7 @@ public class DLPanel extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getSelectionModel().addListSelectionListener(new Listener_Row());
         table.setRowHeight(heightRow);
-        table.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn,
-                heightRow * 10));
+        table.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn, heightRow * 10));
         tc = table.getColumnModel().getColumn(0);
         tc.setPreferredWidth(widthDecr);
         tc.setCellRenderer(new Renderer_SnoDL());
@@ -304,10 +291,10 @@ public class DLPanel extends JPanel {
         if (true) {
             TableColumn_SelectSyntax col;
             String[] items = {
-                    "<html><font face='Dialog' size='3' color='blue'>DL Format",
-                    "<html><font face='Dialog' size='3' color='green'>KRSS Format",
-                    "<html><font face='Dialog' size='3' color='blue'>DL Format;</font>"
-                            + "<font face='Dialog' size='3' color='green'>KRSS Format" };
+                              "<html><font face='Dialog' size='3' color='blue'>DL Format",
+                              "<html><font face='Dialog' size='3' color='green'>KRSS Format",
+                              "<html><font face='Dialog' size='3' color='blue'>DL Format;</font>"
+                                  + "<font face='Dialog' size='3' color='green'>KRSS Format" };
             JComboBox combo = new JComboBox();
             for (int i = 0; i < items.length; i++) {
                 combo.addItem(items[i]);
@@ -317,8 +304,7 @@ public class DLPanel extends JPanel {
 
         setUpActButtons(table);
         sp = new JScrollPane(table);
-        sp.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn,
-                heightRow * 11));
+        sp.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn, heightRow * 11));
         this.add(sp, c);
 
         // *** ADD "NEVER GROUP" ROLES ***
@@ -336,14 +322,11 @@ public class DLPanel extends JPanel {
         c.weightx = 0;
         c.weighty = 0.5;
         c.gridwidth = 1;
-        btnAddNeverGrp = new JButton(new ImageIcon(ACE.class
-                .getResource("/24x24/plain/row_add_after.png")));
-        btnAddNeverGrp
-                .setToolTipText("add 'Never-Grouped' Role from taxonomy selection");
+        btnAddNeverGrp = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/row_add_after.png")));
+        btnAddNeverGrp.setToolTipText("add 'Never-Grouped' Role from taxonomy selection");
         // btnAddNeverGrp.addActionListener(actionListener);
         // new AddRelationship(host, host.getConfig())
-        btnAddNeverGrp.addActionListener(new Listener_BtnAdd_NeverGrp(null,
-                config));
+        btnAddNeverGrp.addActionListener(new Listener_BtnAdd_NeverGrp(null, config));
         btnAddNeverGrp.setMaximumSize(btnDim_32x32);
         btnAddNeverGrp.setPreferredSize(btnDim_32x32);
         this.add(btnAddNeverGrp, c);
@@ -354,8 +337,7 @@ public class DLPanel extends JPanel {
         table = new JTable(tableModelNeverGrp);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(heightRow);
-        table.setPreferredSize(new Dimension(widthDecr + 1 * widthBtn,
-                heightRow * 10));
+        table.setPreferredSize(new Dimension(widthDecr + 1 * widthBtn, heightRow * 10));
         tc = table.getColumnModel().getColumn(0);
         tc.setPreferredWidth(widthDecr);
         tc.setCellRenderer(new Renderer_SnoCon());
@@ -368,8 +350,7 @@ public class DLPanel extends JPanel {
         tc.setMaxWidth(32);
         tc.setResizable(false);
         sp = new JScrollPane(table);
-        sp.setPreferredSize(new Dimension(widthDecr + 1 * widthBtn,
-                heightRow * 11));
+        sp.setPreferredSize(new Dimension(widthDecr + 1 * widthBtn, heightRow * 11));
         this.add(sp, c);
     }
 
@@ -400,8 +381,7 @@ public class DLPanel extends JPanel {
         tc.setCellEditor(new Editor_BtnAct(new JButton()));
     }
 
-    private class Editor_BtnAct implements TableCellEditor,
-            PropertyChangeListener, ActionListener {
+    private class Editor_BtnAct implements TableCellEditor, PropertyChangeListener, ActionListener {
         protected EventListenerList listeners = new EventListenerList();
         protected ChangeEvent changeEvent;
         protected EventObject editingEvent;
@@ -432,8 +412,7 @@ public class DLPanel extends JPanel {
                     if (changeEvent == null) {
                         changeEvent = new ChangeEvent(this);
                     }
-                    ((CellEditorListener) l[i + 1])
-                            .editingCanceled(changeEvent);
+                    ((CellEditorListener) l[i + 1]).editingCanceled(changeEvent);
                 }
             }
         }
@@ -444,8 +423,7 @@ public class DLPanel extends JPanel {
         }
 
         // *** TableCellEditor ***
-        public Component getTableCellEditorComponent(JTable table,
-                Object value, boolean isSelected, int row, int column) {
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             if (column >= 1)
                 return editor;
             else
@@ -491,8 +469,7 @@ public class DLPanel extends JPanel {
     private class Listener_BtnAdd_DLEdit implements ActionListener {
         private I_ConfigAceFrame config; // :!!!:
 
-        public Listener_BtnAdd_DLEdit(I_ContainTermComponent termContainer,
-                I_ConfigAceFrame config) {
+        public Listener_BtnAdd_DLEdit(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
             super();
             this.config = config;
         }
@@ -501,8 +478,7 @@ public class DLPanel extends JPanel {
             try {
                 if (config.getClassifierInputPath() == null) {
 
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            "Please set the Classifier Edit Path ...");
+                    JOptionPane.showMessageDialog(new JFrame(), "Please set the Classifier Edit Path ...");
                     return;
                 }
                 doEdit(e, config);
@@ -516,8 +492,7 @@ public class DLPanel extends JPanel {
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
                 cNid = config.getHierarchySelection().getConceptId();
-                AceLog.getAppLog().log(Level.INFO,
-                        "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
+                AceLog.getAppLog().log(Level.INFO, "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
 
                 tableModelDLEditLhs.append(cNid);
                 updateEdit(editRowIdx);
@@ -529,8 +504,7 @@ public class DLPanel extends JPanel {
     private class Listener_BtnAdd_DLList implements ActionListener {
         private I_ConfigAceFrame config; // :!!!:
 
-        public Listener_BtnAdd_DLList(I_ContainTermComponent termContainer,
-                I_ConfigAceFrame config) {
+        public Listener_BtnAdd_DLList(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
             super();
             this.config = config;
         }
@@ -539,8 +513,7 @@ public class DLPanel extends JPanel {
             try {
                 if (config.getClassifierInputPath() == null) {
 
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            "Please set the Classifier Edit Path ...");
+                    JOptionPane.showMessageDialog(new JFrame(), "Please set the Classifier Edit Path ...");
                     return;
                 }
                 doEdit(e, config);
@@ -554,8 +527,7 @@ public class DLPanel extends JPanel {
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
                 cNid = config.getHierarchySelection().getConceptId();
-                AceLog.getAppLog().log(Level.INFO,
-                        "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
+                AceLog.getAppLog().log(Level.INFO, "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
 
                 tableModelDLList.append(cNid);
                 editRowIdx = tableDLList.getRowCount() - 1;
@@ -569,8 +541,7 @@ public class DLPanel extends JPanel {
     private class Listener_BtnAdd_NeverGrp implements ActionListener {
         private I_ConfigAceFrame config; // :!!!:
 
-        public Listener_BtnAdd_NeverGrp(I_ContainTermComponent termContainer,
-                I_ConfigAceFrame config) {
+        public Listener_BtnAdd_NeverGrp(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
             super();
             this.config = config;
         }
@@ -579,8 +550,7 @@ public class DLPanel extends JPanel {
             try {
                 if (config.getClassifierInputPath() == null) {
 
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            "Please set the Classifier Edit Path ...");
+                    JOptionPane.showMessageDialog(new JFrame(), "Please set the Classifier Edit Path ...");
                     return;
                 }
                 doEdit(e, config);
@@ -594,10 +564,7 @@ public class DLPanel extends JPanel {
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
                 cNid = config.getHierarchySelection().getConceptId();
-                AceLog.getAppLog().log(
-                        Level.INFO,
-                        "::: TAXONOMY - NEVER GROUPED: "
-                                + SnoTable.toString(cNid));
+                AceLog.getAppLog().log(Level.INFO, "::: TAXONOMY - NEVER GROUPED: " + SnoTable.toString(cNid));
 
                 tableModelNeverGrp.append(cNid);
             }
@@ -611,11 +578,10 @@ public class DLPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             // :TODO: new Frame()
             try {
-                FileDialog dialog = new FileDialog((Frame) DLPanel.this
-                        .getTopLevelAncestor(), "Open Logic", FileDialog.LOAD);
+                FileDialog dialog = new FileDialog((Frame) DLPanel.this.getTopLevelAncestor(), "Open Logic",
+                    FileDialog.LOAD);
                 //
-                dialog.setDirectory(System.getProperty("user.dir")
-                        + System.getProperty("file.separator") + "logic");
+                dialog.setDirectory(System.getProperty("user.dir") + System.getProperty("file.separator") + "logic");
                 dialog.setFilenameFilter(new FilenameFilter() {
                     public boolean accept(File dir, String name) {
                         return name.endsWith(".dlogic");
@@ -625,14 +591,12 @@ public class DLPanel extends JPanel {
                 dialog.setVisible(true);
                 // Check response
                 if (dialog.getFile() != null) {
-                    File theFile = new File(dialog.getDirectory(), dialog
-                            .getFile());
+                    File theFile = new File(dialog.getDirectory(), dialog.getFile());
                     FileInputStream fis = new FileInputStream(theFile);
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     ObjectInputStream ois = new ObjectInputStream(bis);
                     ArrayList<SnoDL> dll = (ArrayList<SnoDL>) (ois.readObject());
-                    ArrayList<SnoConSer> ng = (ArrayList<SnoConSer>) (ois
-                            .readObject());
+                    ArrayList<SnoConSer> ng = (ArrayList<SnoConSer>) (ois.readObject());
                     SnoDLSet.init();
                     SnoDLSet.setDLList(dll);
                     SnoDLSet.setNeverGroup(ng);
@@ -661,12 +625,10 @@ public class DLPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             // :TODO: new Frame()
             try {
-                FileDialog dialog = new FileDialog((Frame) DLPanel.this
-                        .getTopLevelAncestor(), "Save Logic (.dl)",
-                        FileDialog.SAVE);
+                FileDialog dialog = new FileDialog((Frame) DLPanel.this.getTopLevelAncestor(), "Save Logic (.dl)",
+                    FileDialog.SAVE);
                 //
-                dialog.setDirectory(System.getProperty("user.dir")
-                        + System.getProperty("file.separator") + "logic");
+                dialog.setDirectory(System.getProperty("user.dir") + System.getProperty("file.separator") + "logic");
                 // Display dialog and wait for response
                 dialog.setVisible(true);
                 // Check response
@@ -724,74 +686,62 @@ public class DLPanel extends JPanel {
         Renderer_BtnAct_Del() {
             btnDel = new JButton();
             btnDel.setOpaque(true);
-            btnDel.setIcon(new ImageIcon(this.getClass().getResource(
-                    "/16x16/plain/delete2.png")));
+            btnDel.setIcon(new ImageIcon(this.getClass().getResource("/16x16/plain/delete2.png")));
         }
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus, int row,
-                int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
             // TODO Auto-generated method stub
             return btnDel;
         }
     }
 
-    private class Renderer_BtnAct_Dup extends JButton implements
-            TableCellRenderer {
+    private class Renderer_BtnAct_Dup extends JButton implements TableCellRenderer {
         private static final long serialVersionUID = 1L;
 
         Renderer_BtnAct_Dup() {
             this.setOpaque(true);
-            this.setIcon(new ImageIcon(this.getClass().getResource(
-                    "/16x16/plain/navigate_plus.png"))); // add2.png
+            this.setIcon(new ImageIcon(this.getClass().getResource("/16x16/plain/navigate_plus.png"))); // add2.png
         }
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus, int row,
-                int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
             // TODO Auto-generated method stub
             return this;
         }
     }
 
-    private class Renderer_BtnAct_Down extends JButton implements
-            TableCellRenderer {
+    private class Renderer_BtnAct_Down extends JButton implements TableCellRenderer {
         private static final long serialVersionUID = 1L;
 
         Renderer_BtnAct_Down() {
             this.setOpaque(true);
-            this.setIcon(new ImageIcon(this.getClass().getResource(
-                    "/16x16/plain/navigate_down.png"))); // navigate_down2.png
+            this.setIcon(new ImageIcon(this.getClass().getResource("/16x16/plain/navigate_down.png"))); // navigate_down2.png
         }
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus, int row,
-                int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
             // TODO Auto-generated method stub
             return this;
         }
     }
 
-    private class Renderer_BtnAct_Up extends JButton implements
-            TableCellRenderer {
+    private class Renderer_BtnAct_Up extends JButton implements TableCellRenderer {
         private static final long serialVersionUID = 1L;
 
         Renderer_BtnAct_Up() {
             this.setOpaque(true);
-            this.setIcon(new ImageIcon(this.getClass().getResource(
-                    "/16x16/plain/navigate_up.png"))); // navigate_up2.png
+            this.setIcon(new ImageIcon(this.getClass().getResource("/16x16/plain/navigate_up.png"))); // navigate_up2.png
         }
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus, int row,
-                int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
             // TODO Auto-generated method stub
             return this;
         }
     }
 
-    private class Renderer_SnoCon extends AceTableRenderer implements
-            TableCellRenderer {
+    private class Renderer_SnoCon extends AceTableRenderer implements TableCellRenderer {
         private static final long serialVersionUID = 1L;
         boolean renderInactive = false;
 
@@ -800,29 +750,22 @@ public class DLPanel extends JPanel {
             setOpaque(true);
         }
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus, int row,
-                int column) {
-            JLabel renderComponent = (JLabel) super
-                    .getTableCellRendererComponent(table, value, isSelected,
-                            hasFocus, row, column);
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
+            JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                row, column);
 
             if (isSelected == false) {
                 if (renderInactive) {
-                    renderComponent.setBackground(UIManager
-                            .getColor("Table.background"));
-                    renderComponent.setForeground(UIManager
-                            .getColor("Table.foreground"));
+                    renderComponent.setBackground(UIManager.getColor("Table.background"));
+                    renderComponent.setForeground(UIManager.getColor("Table.foreground"));
                 } else {
                     renderComponent.setBackground(colorForRow(row));
-                    renderComponent.setForeground(UIManager
-                            .getColor("Table.foreground"));
+                    renderComponent.setForeground(UIManager.getColor("Table.foreground"));
                 }
             } else {
-                renderComponent.setBackground(UIManager
-                        .getColor("Table.selectionBackground"));
-                renderComponent.setForeground(UIManager
-                        .getColor("Table.selectionForeground"));
+                renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
+                renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
             }
 
             setBorder(column, this, false, false); // .., same, uncommitted
@@ -851,8 +794,7 @@ public class DLPanel extends JPanel {
 
     }
 
-    private class Renderer_SnoDL extends AceTableRenderer implements
-            TableCellRenderer {
+    private class Renderer_SnoDL extends AceTableRenderer implements TableCellRenderer {
         private static final long serialVersionUID = 1L;
         boolean renderInactive = false;
 
@@ -861,30 +803,23 @@ public class DLPanel extends JPanel {
             setOpaque(true);
         }
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus, int row,
-                int column) {
-            JLabel renderComponent = (JLabel) super
-                    .getTableCellRendererComponent(table, value, isSelected,
-                            hasFocus, row, column);
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
+            JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                row, column);
 
             if (isSelected == false) {
                 if (renderInactive) {
-                    renderComponent.setBackground(UIManager
-                            .getColor("Table.background"));
-                    renderComponent.setForeground(UIManager
-                            .getColor("Table.foreground"));
+                    renderComponent.setBackground(UIManager.getColor("Table.background"));
+                    renderComponent.setForeground(UIManager.getColor("Table.foreground"));
                 } else {
                     renderComponent.setBackground(colorForRow(row));
-                    renderComponent.setForeground(UIManager
-                            .getColor("Table.foreground"));
+                    renderComponent.setForeground(UIManager.getColor("Table.foreground"));
                 }
 
             } else {
-                renderComponent.setBackground(UIManager
-                        .getColor("Table.selectionBackground"));
-                renderComponent.setForeground(UIManager
-                        .getColor("Table.selectionForeground"));
+                renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
+                renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
             }
 
             setBorder(column, this, false, false); // .., same, uncommitted
@@ -894,11 +829,9 @@ public class DLPanel extends JPanel {
             // value is the object from data[row][column]
             SnoDL sdl = (SnoDL) value;
             if (dlFormat == FORMAT_DL) {
-                setText("<html><font face='Dialog' size='3' color='blue'>"
-                        + sdl.toStringDl());
+                setText("<html><font face='Dialog' size='3' color='blue'>" + sdl.toStringDl());
             } else if (dlFormat == FORMAT_KRSS) {
-                setText("<html><font face='Dialog' size='3' color='green'>"
-                        + sdl.toStringKrss());
+                setText("<html><font face='Dialog' size='3' color='green'>" + sdl.toStringKrss());
             } else {
                 setText(sdl.toStringHtml());
             }
@@ -912,7 +845,7 @@ public class DLPanel extends JPanel {
         protected static final int COLUMN_COUNT = 1;
 
         protected String[] columnNames = { "<html><font face='Dialog' size='3' color='black'>"
-                + "RHS (Right Hand Side)" };
+            + "RHS (Right Hand Side)" };
         protected Object[][] data; // {concept}
 
         public TableModel_DLEdit_Rhs() {
@@ -1017,8 +950,8 @@ public class DLPanel extends JPanel {
         protected static final int COLUMN_COUNT = 5;
 
         protected String[] columnNames = {
-                "<html><font face='Dialog' size='3' color='black'>"
-                        + "LHS[k] (Left Hand Side)", "", "", "", "" };
+                                          "<html><font face='Dialog' size='3' color='black'>"
+                                              + "LHS[k] (Left Hand Side)", "", "", "", "" };
         protected Object[][] data; // {concept, null-delete button}
 
         public TableModel_DLEdit_Lhs() {
@@ -1053,8 +986,8 @@ public class DLPanel extends JPanel {
 
         // OVERRIDE: make table editable
         public boolean isCellEditable(int row, int column) {
-            return column == DEL_BTN_COLUMN || column == DUPL_BTN_COLUMN
-                    || column == UP_BTN_COLUMN || column == DOWN_BTN_COLUMN;
+            return column == DEL_BTN_COLUMN || column == DUPL_BTN_COLUMN || column == UP_BTN_COLUMN
+                || column == DOWN_BTN_COLUMN;
         }
 
         // OVERRIDE: make table editable
@@ -1118,9 +1051,9 @@ public class DLPanel extends JPanel {
         protected static final int COLUMN_COUNT = 5;
 
         protected String[] columnNames = {
-                "<html><font face='Dialog' size='3' color='blue'>DL Format; </font>"
-                        + "<font face='Dialog' size='3' color='green'>KRSS Format",
-                "", "", "", "" };
+                                          "<html><font face='Dialog' size='3' color='blue'>DL Format; </font>"
+                                              + "<font face='Dialog' size='3' color='green'>KRSS Format", "", "", "",
+                                          "" };
         protected Object[][] data; // {concept, null-delete button}
 
         public TableModel_DLList() {
@@ -1153,8 +1086,8 @@ public class DLPanel extends JPanel {
 
         // OVERRIDE: make table editable
         public boolean isCellEditable(int row, int column) {
-            return column == DEL_BTN_COLUMN || column == DUPL_BTN_COLUMN
-                    || column == UP_BTN_COLUMN || column == DOWN_BTN_COLUMN;
+            return column == DEL_BTN_COLUMN || column == DUPL_BTN_COLUMN || column == UP_BTN_COLUMN
+                || column == DOWN_BTN_COLUMN;
         }
 
         // OVERRIDE: make table editable

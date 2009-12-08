@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,67 +33,66 @@ import org.dwfa.ace.task.conflict.detector.RelTupleConflictComparator;
 
 public class ConceptBeanConflictHelper {
 
-   
-   public static Set<I_ConceptAttributeTuple> getCommonConceptAttributeTuples(ConceptBean cb, I_ConfigAceFrame config)
-         throws IOException {
-      Set<I_ConceptAttributeTuple> commonTuples = null;
-      for (I_Position p : config.getViewPositionSet()) {
-         Set<I_Position> positionSet = new HashSet<I_Position>();
-         positionSet.add(p);
-         List<I_ConceptAttributeTuple> tuplesForPosition = cb.getConceptAttributeTuples(config.getAllowedStatus(),
-               positionSet, false);
-         if (commonTuples == null) {
+    public static Set<I_ConceptAttributeTuple> getCommonConceptAttributeTuples(ConceptBean cb, I_ConfigAceFrame config)
+            throws IOException {
+        Set<I_ConceptAttributeTuple> commonTuples = null;
+        for (I_Position p : config.getViewPositionSet()) {
+            Set<I_Position> positionSet = new HashSet<I_Position>();
+            positionSet.add(p);
+            List<I_ConceptAttributeTuple> tuplesForPosition = cb.getConceptAttributeTuples(config.getAllowedStatus(),
+                positionSet, false);
+            if (commonTuples == null) {
+                commonTuples = new TreeSet<I_ConceptAttributeTuple>(new AttrTupleConflictComparator());
+                commonTuples.addAll(tuplesForPosition);
+            } else {
+                commonTuples.retainAll(tuplesForPosition);
+            }
+        }
+        if (commonTuples == null) {
             commonTuples = new TreeSet<I_ConceptAttributeTuple>(new AttrTupleConflictComparator());
-            commonTuples.addAll(tuplesForPosition);
-         } else {
-            commonTuples.retainAll(tuplesForPosition);
-         }
-      }
-      if (commonTuples == null) {
-         commonTuples = new TreeSet<I_ConceptAttributeTuple>(new AttrTupleConflictComparator());
-      }
-      return commonTuples;
-   }
+        }
+        return commonTuples;
+    }
 
-   public static Set<I_RelTuple> getCommonRelTuples(ConceptBean cb, I_ConfigAceFrame config) throws IOException {
-      Set<I_RelTuple> commonTuples = null;
-      for (I_Position p : config.getViewPositionSet()) {
-         Set<I_Position> positionSet = new HashSet<I_Position>();
-         positionSet.add(p);
-         List<I_RelTuple> tuplesForPosition = cb
-               .getSourceRelTuples(config.getAllowedStatus(), null, positionSet, false);
-         if (commonTuples == null) {
+    public static Set<I_RelTuple> getCommonRelTuples(ConceptBean cb, I_ConfigAceFrame config) throws IOException {
+        Set<I_RelTuple> commonTuples = null;
+        for (I_Position p : config.getViewPositionSet()) {
+            Set<I_Position> positionSet = new HashSet<I_Position>();
+            positionSet.add(p);
+            List<I_RelTuple> tuplesForPosition = cb.getSourceRelTuples(config.getAllowedStatus(), null, positionSet,
+                false);
+            if (commonTuples == null) {
+                commonTuples = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
+                commonTuples.addAll(tuplesForPosition);
+            } else {
+                commonTuples.retainAll(tuplesForPosition);
+            }
+        }
+        if (commonTuples == null) {
             commonTuples = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
-            commonTuples.addAll(tuplesForPosition);
-         } else {
-            commonTuples.retainAll(tuplesForPosition);
-         }
-      }
-      if (commonTuples == null) {
-         commonTuples = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
-      }
-      return commonTuples;
-   }
+        }
+        return commonTuples;
+    }
 
-   public static Set<I_DescriptionTuple> getCommonDescTuples(ConceptBean cb, I_ConfigAceFrame config)
-         throws IOException {
-      Set<I_DescriptionTuple> commonTuples = null;
-      for (I_Position p : config.getViewPositionSet()) {
-         Set<I_Position> positionSet = new HashSet<I_Position>();
-         positionSet.add(p);
-         List<I_DescriptionTuple> tuplesForPosition = cb.getDescriptionTuples(config.getAllowedStatus(), null,
-               positionSet, false);
-         if (commonTuples == null) {
+    public static Set<I_DescriptionTuple> getCommonDescTuples(ConceptBean cb, I_ConfigAceFrame config)
+            throws IOException {
+        Set<I_DescriptionTuple> commonTuples = null;
+        for (I_Position p : config.getViewPositionSet()) {
+            Set<I_Position> positionSet = new HashSet<I_Position>();
+            positionSet.add(p);
+            List<I_DescriptionTuple> tuplesForPosition = cb.getDescriptionTuples(config.getAllowedStatus(), null,
+                positionSet, false);
+            if (commonTuples == null) {
+                commonTuples = new TreeSet<I_DescriptionTuple>(new DescriptionTupleConflictComparator());
+                commonTuples.addAll(tuplesForPosition);
+            } else {
+                commonTuples.retainAll(tuplesForPosition);
+            }
+        }
+        if (commonTuples == null) {
             commonTuples = new TreeSet<I_DescriptionTuple>(new DescriptionTupleConflictComparator());
-            commonTuples.addAll(tuplesForPosition);
-         } else {
-            commonTuples.retainAll(tuplesForPosition);
-         }
-      }
-      if (commonTuples == null) {
-         commonTuples = new TreeSet<I_DescriptionTuple>(new DescriptionTupleConflictComparator());
-      }
-      return commonTuples;
-   }
+        }
+        return commonTuples;
+    }
 
 }

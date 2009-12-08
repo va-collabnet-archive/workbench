@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,9 +23,9 @@ import org.dwfa.ace.api.I_Path;
 
 public interface I_MapIds {
     public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception;
-    
+
     public int getIntId(UUID uid, I_Path idPath, int version) throws Exception;
-    
+
     public void flushIdBuffer() throws Exception;
-    
+
 }

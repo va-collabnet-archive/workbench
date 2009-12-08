@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -162,7 +162,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public I_GetConceptData getClassificationRoleRoot() {
         return baseFrame.getClassificationRoleRoot();
     }
-    
+
     public I_GetConceptData getClassificationRoot() {
         return baseFrame.getClassificationRoot();
     }
@@ -182,7 +182,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot) {
         baseFrame.setClassificationRoleRoot(classificationRoleRoot);
     }
-    
+
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         baseFrame.setClassificationRoot(classificationRoot);
     }
@@ -1156,21 +1156,21 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setShowActivityViewer(show);
     }
 
-	public JPanel getWorkflowDetailsSheet() {
-		return baseFrame.getWorkflowDetailsSheet();
-	}
+    public JPanel getWorkflowDetailsSheet() {
+        return baseFrame.getWorkflowDetailsSheet();
+    }
 
-	public void setShowWorkflowDetailSheet(boolean visible) {
-		baseFrame.setShowWorkflowDetailSheet(visible);
-	}
+    public void setShowWorkflowDetailSheet(boolean visible) {
+        baseFrame.setShowWorkflowDetailSheet(visible);
+    }
 
-	public void setWorkflowDetailSheetDimensions(Dimension dim) {
-		baseFrame.setWorkflowDetailSheetDimensions(dim);
-	}
+    public void setWorkflowDetailSheetDimensions(Dimension dim) {
+        baseFrame.setWorkflowDetailSheetDimensions(dim);
+    }
 
-	public Map<Integer, Color> getPathColorMap() {
-		return baseFrame.getPathColorMap();
-	}
+    public Map<Integer, Color> getPathColorMap() {
+        return baseFrame.getPathColorMap();
+    }
 
     public Boolean getShowPathInfoInTaxonomy() {
         return baseFrame.getShowPathInfoInTaxonomy();
@@ -1184,35 +1184,35 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.fireUpdateHierarchyView();
     }
 
-	public I_ShowActivity getTopActivityListener() {
-		return baseFrame.getTopActivityListener();
-	}
+    public I_ShowActivity getTopActivityListener() {
+        return baseFrame.getTopActivityListener();
+    }
 
-	public boolean searchWithDescTypeFilter() {
-		return baseFrame.searchWithDescTypeFilter();
-	}
+    public boolean searchWithDescTypeFilter() {
+        return baseFrame.searchWithDescTypeFilter();
+    }
 
-	public void setSearchWithDescTypeFilter(boolean filter) {
-		baseFrame.setSearchWithDescTypeFilter(filter);
-	}
+    public void setSearchWithDescTypeFilter(boolean filter) {
+        baseFrame.setSearchWithDescTypeFilter(filter);
+    }
 
-	public void addPromotionPath(I_Path p) {
-		baseFrame.addPromotionPath(p);
-	}
+    public void addPromotionPath(I_Path p) {
+        baseFrame.addPromotionPath(p);
+    }
 
-	public Set<I_Path> getPromotionPathSet() {
-		return baseFrame.getPromotionPathSet();
-	}
+    public Set<I_Path> getPromotionPathSet() {
+        return baseFrame.getPromotionPathSet();
+    }
 
-	public void removePromotionPath(I_Path p) {
-		baseFrame.removePromotionPath(p);
-	}
+    public void removePromotionPath(I_Path p) {
+        baseFrame.removePromotionPath(p);
+    }
 
-	public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
-		baseFrame.replacePromotionPathSet(oldPath, newPath);
-	}
+    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
+        baseFrame.replacePromotionPathSet(oldPath, newPath);
+    }
 
-	public void setSelectedPreferencesTab(String tabName) {
-		baseFrame.setSelectedPreferencesTab(tabName);
-	}
+    public void setSelectedPreferencesTab(String tabName) {
+        baseFrame.setSelectedPreferencesTab(tabName);
+    }
 }

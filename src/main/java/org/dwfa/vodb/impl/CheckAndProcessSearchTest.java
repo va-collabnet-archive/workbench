@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,71 +31,69 @@ import org.dwfa.bpa.process.TaskFailedException;
 
 public class CheckAndProcessSearchTest implements Runnable {
 
-	IntList matches;
+    IntList matches;
 
-	I_GetConceptData conceptToTest;
+    I_GetConceptData conceptToTest;
 
-	List<I_TestSearchResults> checkList;
+    List<I_TestSearchResults> checkList;
 
-	I_ConfigAceFrame config;
+    I_ConfigAceFrame config;
 
-	Semaphore checkSemaphore;
+    Semaphore checkSemaphore;
 
-	Semaphore addSemaphore;
-	
-	CountDownLatch conceptLatch;
+    Semaphore addSemaphore;
 
-	public CheckAndProcessSearchTest(CountDownLatch conceptLatch, Semaphore checkSemaphore, 
-			Semaphore addSemaphore, IntList matches,
-			I_GetConceptData conceptToTest,
-			List<I_TestSearchResults> checkList, I_ConfigAceFrame config) {
-		super();
-		this.matches = matches;
-		this.conceptToTest = conceptToTest;
-		this.checkList = checkList;
-		this.config = config;
-		this.checkSemaphore = checkSemaphore;
-		this.addSemaphore = addSemaphore;
-		this.conceptLatch = conceptLatch;
-	}
+    CountDownLatch conceptLatch;
 
-	public void run() {
-		if (checkList == null || checkList.size() == 0) {
-			try {
-				addSemaphore.acquire();
-				matches.add(conceptToTest.getConceptId());
-				addSemaphore.release();
-			} catch (InterruptedException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-		} else {
-			try {
-				boolean failed = false;
-				for (I_TestSearchResults test : checkList) {
-					if (test.test(conceptToTest, config) == false) {
-						failed = true;
-						break;
-					}
-				}
+    public CheckAndProcessSearchTest(CountDownLatch conceptLatch, Semaphore checkSemaphore, Semaphore addSemaphore,
+            IntList matches, I_GetConceptData conceptToTest, List<I_TestSearchResults> checkList,
+            I_ConfigAceFrame config) {
+        super();
+        this.matches = matches;
+        this.conceptToTest = conceptToTest;
+        this.checkList = checkList;
+        this.config = config;
+        this.checkSemaphore = checkSemaphore;
+        this.addSemaphore = addSemaphore;
+        this.conceptLatch = conceptLatch;
+    }
 
-				if (failed == false) {
-					addSemaphore.acquire();
-					matches.add(conceptToTest.getConceptId());
-					addSemaphore.release();
-				}
-			} catch (TaskFailedException e) {
-				if (ACE.editMode) {
-					AceLog.getAppLog().alertAndLogException(e);
-				} else {
-					AceLog.getAppLog().log(Level.SEVERE,
-							e.getLocalizedMessage(), e);
-				}
-			} catch (InterruptedException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-		}
-		checkSemaphore.release();
-		conceptLatch.countDown();
-	}
+    public void run() {
+        if (checkList == null || checkList.size() == 0) {
+            try {
+                addSemaphore.acquire();
+                matches.add(conceptToTest.getConceptId());
+                addSemaphore.release();
+            } catch (InterruptedException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        } else {
+            try {
+                boolean failed = false;
+                for (I_TestSearchResults test : checkList) {
+                    if (test.test(conceptToTest, config) == false) {
+                        failed = true;
+                        break;
+                    }
+                }
+
+                if (failed == false) {
+                    addSemaphore.acquire();
+                    matches.add(conceptToTest.getConceptId());
+                    addSemaphore.release();
+                }
+            } catch (TaskFailedException e) {
+                if (ACE.editMode) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                } else {
+                    AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
+                }
+            } catch (InterruptedException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+        checkSemaphore.release();
+        conceptLatch.countDown();
+    }
 
 }

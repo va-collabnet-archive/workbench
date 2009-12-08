@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -85,19 +85,17 @@ public class C2KeyForRelCreator implements SecondaryKeyCreator {
         this.relBinding = binding;
     }
 
-    public synchronized boolean createSecondaryKey(SecondaryDatabase secDb,
-            DatabaseEntry keyEntry, DatabaseEntry dataEntry,
-            DatabaseEntry resultEntry) throws DatabaseException {
-        I_RelVersioned rel =
-                (I_RelVersioned) relBinding.entryToObject(dataEntry);
+    public synchronized boolean createSecondaryKey(SecondaryDatabase secDb, DatabaseEntry keyEntry,
+            DatabaseEntry dataEntry, DatabaseEntry resultEntry) throws DatabaseException {
+        I_RelVersioned rel = (I_RelVersioned) relBinding.entryToObject(dataEntry);
         relAndC2Id.setC2Id(rel.getC2Id());
         relAndC2Id.setRelId(rel.getRelId());
         relAndC2IdBinding.objectToEntry(relAndC2Id, resultEntry);
         return true;
     }
 
-    public synchronized boolean createSecondaryKey(int relId, int concId,
-            DatabaseEntry resultEntry) throws DatabaseException {
+    public synchronized boolean createSecondaryKey(int relId, int concId, DatabaseEntry resultEntry)
+            throws DatabaseException {
         relAndC2Id.setC2Id(concId);
         relAndC2Id.setRelId(relId);
         relAndC2IdBinding.objectToEntry(relAndC2Id, resultEntry);

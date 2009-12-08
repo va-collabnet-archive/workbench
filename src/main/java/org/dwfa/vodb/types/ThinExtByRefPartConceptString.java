@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,87 +28,85 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPartConceptString;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
-public class ThinExtByRefPartConceptString extends ThinExtByRefPart implements
-		I_ThinExtByRefPartConceptString {
-	
-	private int c1id;
-	private String str;
+public class ThinExtByRefPartConceptString extends ThinExtByRefPart implements I_ThinExtByRefPartConceptString {
 
-	public ArrayIntList getPartComponentNids() {
-		ArrayIntList partComponentNids = new ArrayIntList(3);
-		partComponentNids.add(getPathId());
-		partComponentNids.add(getStatusId());
-		partComponentNids.add(c1id);
-		return partComponentNids;
-	}
-	public ThinExtByRefPartConceptString(ThinExtByRefPartConceptString another) {
-		super(another);
-		this.c1id = another.c1id;
-		this.str = another.str;
-	}
+    private int c1id;
+    private String str;
 
-	public ThinExtByRefPartConceptString() {
-		super();
-	}
+    public ArrayIntList getPartComponentNids() {
+        ArrayIntList partComponentNids = new ArrayIntList(3);
+        partComponentNids.add(getPathId());
+        partComponentNids.add(getStatusId());
+        partComponentNids.add(c1id);
+        return partComponentNids;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (super.equals(obj)) {
-			if (ThinExtByRefPartConceptString.class.isAssignableFrom(obj
-					.getClass())) {
-				ThinExtByRefPartConceptString another = (ThinExtByRefPartConceptString) obj;
-				return c1id == another.c1id && str.equals(another.str);
-			}
-		}
-		return false;
-	}
+    public ThinExtByRefPartConceptString(ThinExtByRefPartConceptString another) {
+        super(another);
+        this.c1id = another.c1id;
+        this.str = another.str;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_ThinExtByRefPartConcept#getUniversalPart()
-	 */
-	@Override
-	public UniversalAceExtByRefPart getUniversalPart()
-			throws TerminologyException, IOException {
-		I_TermFactory tf = LocalVersionedTerminology.get();
-		UniversalAceExtByRefPartConceptString universalPart = new UniversalAceExtByRefPartConceptString();
-		universalPart.setC1UuidCollection(tf.getUids(getC1id()));
-		universalPart.setStr(getStr());
-		universalPart.setPathUid(tf.getUids(getPathId()));
-		universalPart.setStatusUid(tf.getUids(getStatusId()));
-		universalPart.setTime(ThinVersionHelper.convert(getVersion()));
-		return universalPart;
-	}
+    public ThinExtByRefPartConceptString() {
+        super();
+    }
 
-	public I_ThinExtByRefPart duplicate() {
-		return new ThinExtByRefPartConceptString(this);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (super.equals(obj)) {
+            if (ThinExtByRefPartConceptString.class.isAssignableFrom(obj.getClass())) {
+                ThinExtByRefPartConceptString another = (ThinExtByRefPartConceptString) obj;
+                return c1id == another.c1id && str.equals(another.str);
+            }
+        }
+        return false;
+    }
 
-	public int compareTo(I_ThinExtByRefPart o) {
-		if (ThinExtByRefPartConceptString.class.isAssignableFrom(o.getClass())) {
-			ThinExtByRefPartConceptString otherPart = (ThinExtByRefPartConceptString) o;
-			if (c1id != otherPart.c1id) {
-				return c1id - otherPart.c1id;
-			}
-			return str.compareTo(otherPart.str);
-		}
-		return 1;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_ThinExtByRefPartConcept#getUniversalPart()
+     */
+    @Override
+    public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
+        I_TermFactory tf = LocalVersionedTerminology.get();
+        UniversalAceExtByRefPartConceptString universalPart = new UniversalAceExtByRefPartConceptString();
+        universalPart.setC1UuidCollection(tf.getUids(getC1id()));
+        universalPart.setStr(getStr());
+        universalPart.setPathUid(tf.getUids(getPathId()));
+        universalPart.setStatusUid(tf.getUids(getStatusId()));
+        universalPart.setTime(ThinVersionHelper.convert(getVersion()));
+        return universalPart;
+    }
 
-	public int getC1id() {
-		return c1id;
-	}
+    public I_ThinExtByRefPart duplicate() {
+        return new ThinExtByRefPartConceptString(this);
+    }
 
-	public void setC1id(int c1id) {
-		this.c1id = c1id;
-	}
+    public int compareTo(I_ThinExtByRefPart o) {
+        if (ThinExtByRefPartConceptString.class.isAssignableFrom(o.getClass())) {
+            ThinExtByRefPartConceptString otherPart = (ThinExtByRefPartConceptString) o;
+            if (c1id != otherPart.c1id) {
+                return c1id - otherPart.c1id;
+            }
+            return str.compareTo(otherPart.str);
+        }
+        return 1;
+    }
 
-	public String getStr() {
-		return str;
-	}
+    public int getC1id() {
+        return c1id;
+    }
 
-	public void setStr(String str) {
-		this.str = str;
-	}
+    public void setC1id(int c1id) {
+        this.c1id = c1id;
+    }
+
+    public String getStr() {
+        return str;
+    }
+
+    public void setStr(String str) {
+        this.str = str;
+    }
 }

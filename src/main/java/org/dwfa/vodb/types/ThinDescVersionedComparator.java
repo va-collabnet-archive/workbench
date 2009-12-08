@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,18 +22,18 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 
 public class ThinDescVersionedComparator implements Comparator<I_DescriptionVersioned> {
 
-	public int compare(I_DescriptionVersioned o1, I_DescriptionVersioned o2) {
-		int comparison = o1.getVersions().get(0).getText().compareTo(o2.getVersions().get(0).getText());
-		if (comparison == 0) {
-			if (o1.getDescId() != o2.getDescId()) {
-				if (o1.getDescId() > o2.getDescId()) {
-					comparison = 1;
-				} else {
-					comparison = -1;
-				}
-			}
-		}
-		return comparison;
-	}
+    public int compare(I_DescriptionVersioned o1, I_DescriptionVersioned o2) {
+        int comparison = o1.getVersions().get(0).getText().compareTo(o2.getVersions().get(0).getText());
+        if (comparison == 0) {
+            if (o1.getDescId() != o2.getDescId()) {
+                if (o1.getDescId() > o2.getDescId()) {
+                    comparison = 1;
+                } else {
+                    comparison = -1;
+                }
+            }
+        }
+        return comparison;
+    }
 
 }

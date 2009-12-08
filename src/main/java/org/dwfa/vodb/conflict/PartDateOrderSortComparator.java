@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,18 +24,18 @@ import java.util.Comparator;
 import org.dwfa.ace.api.I_AmPart;
 
 class PartDateOrderSortComparator implements Comparator<I_AmPart> {
-	private boolean reverseOrder = false;
+    private boolean reverseOrder = false;
 
-	public int compare(I_AmPart o1, I_AmPart o2) {
-		if (reverseOrder) {
-			return o2.getVersion() - o1.getVersion();
-		} else {
-			return o1.getVersion() - o2.getVersion();
-		}
-	}
+    public int compare(I_AmPart o1, I_AmPart o2) {
+        if (reverseOrder) {
+            return o2.getVersion() - o1.getVersion();
+        } else {
+            return o1.getVersion() - o2.getVersion();
+        }
+    }
 
-	public PartDateOrderSortComparator(boolean reverseOrder) {
-		super();
-		this.reverseOrder = reverseOrder;
-	}
+    public PartDateOrderSortComparator(boolean reverseOrder) {
+        super();
+        this.reverseOrder = reverseOrder;
+    }
 }

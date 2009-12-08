@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -129,7 +129,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 45; // keep current with objDataVersion logic
+    private static final int dataVersion = 45; // keep current with
+    // objDataVersion logic
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -304,8 +305,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private Map<String, Object> properties = new HashMap<String, Object>();
 
     // 39
-    private Map<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>> conceptPanelPlugins =
-            new HashMap<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>();
+    private Map<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>> conceptPanelPlugins = new HashMap<HOST_ENUM, Map<UUID, I_PluginToConceptPanel>>();
 
     // 40
     private LANGUAGE_SORT_PREF langSortPref = LANGUAGE_SORT_PREF.TYPE_B4_LANG;
@@ -315,18 +315,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 42
     private boolean showPathInfoInTaxonomy = true;
-    
+
     // 43
-    
+
     private boolean searchWithDescTypeFilter = false;
-    
+
     // 44
     private Set<I_Path> promotionPathSet = new HashSet<I_Path>();
 
     // 45
-    private I_GetConceptData classificationRoleRoot;    
+    private I_GetConceptData classificationRoleRoot;
 
-    
     // transient
     private transient MasterWorker worker;
 
@@ -421,8 +420,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         // 21
         try {
             if (defaultImageType == null) {
-                defaultImageType =
-                        AceConfig.getVodb().getConcept(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids());
+                defaultImageType = AceConfig.getVodb().getConcept(
+                    ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids());
             }
             out.writeObject(AceConfig.getVodb().nativeToUuid(defaultImageType.getConceptId()));
         } catch (DatabaseException e) {
@@ -533,16 +532,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 41
         IntSet.writeIntSet(out, prefFilterTypesForRel);
-        
-        //42 
+
+        // 42
         out.writeObject(showPathInfoInTaxonomy);
-        
-        //43
+
+        // 43
         out.writeBoolean(searchWithDescTypeFilter);
-        
-        //44
+
+        // 44
         Path.writePathSet(out, promotionPathSet);
-        
+
         // 45
         try {
             writeConceptAsId(classificationRoleRoot, out);
@@ -551,7 +550,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             newEx.initCause(e);
             throw newEx;
         }
-
 
     }
 
@@ -627,14 +625,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             if (objDataVersion >= 8) {
                 try {
                     defaultStatus = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
-                    defaultDescriptionType =
-                            ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
-                    defaultRelationshipType =
-                            ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
-                    defaultRelationshipCharacteristic =
-                            ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
-                    defaultRelationshipRefinability =
-                            ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    defaultDescriptionType = ConceptBean.get(AceConfig.getVodb().uuidToNative(
+                        (List<UUID>) in.readObject()));
+                    defaultRelationshipType = ConceptBean.get(AceConfig.getVodb().uuidToNative(
+                        (List<UUID>) in.readObject()));
+                    defaultRelationshipCharacteristic = ConceptBean.get(AceConfig.getVodb().uuidToNative(
+                        (List<UUID>) in.readObject()));
+                    defaultRelationshipRefinability = ConceptBean.get(AceConfig.getVodb().uuidToNative(
+                        (List<UUID>) in.readObject()));
                 } catch (Exception e) {
                     IOException newEx = new IOException();
                     newEx.initCause(e);
@@ -642,21 +640,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 }
             } else {
                 try {
-                    defaultStatus =
-                            ConceptBean.get(AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.ACTIVE.getUids())
-                                .getNativeId());
-                    defaultDescriptionType =
-                            ConceptBean.get(AceConfig.getVodb().getId(
-                                ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNativeId());
-                    defaultRelationshipType =
-                            ConceptBean.get(AceConfig.getVodb()
-                                .getId(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNativeId());
-                    defaultRelationshipCharacteristic =
-                            ConceptBean.get(AceConfig.getVodb().getId(
-                                ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()).getNativeId());
-                    defaultRelationshipRefinability =
-                            ConceptBean.get(AceConfig.getVodb().getId(
-                                ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNativeId());
+                    defaultStatus = ConceptBean.get(AceConfig.getVodb().getId(
+                        ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNativeId());
+                    defaultDescriptionType = ConceptBean.get(AceConfig.getVodb().getId(
+                        ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNativeId());
+                    defaultRelationshipType = ConceptBean.get(AceConfig.getVodb().getId(
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNativeId());
+                    defaultRelationshipCharacteristic = ConceptBean.get(AceConfig.getVodb().getId(
+                        ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()).getNativeId());
+                    defaultRelationshipRefinability = ConceptBean.get(AceConfig.getVodb().getId(
+                        ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNativeId());
                 } catch (Exception e) {
                     IOException newEx = new IOException();
                     newEx.initCause(e);
@@ -683,7 +676,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 termTreeDividerLoc = DEFAULT_TREE_TERM_DIV_LOC;
             }
             if (objDataVersion >= 12) {
-            	List<UUID> uuidList = (List<UUID>) in.readObject();
+                List<UUID> uuidList = (List<UUID>) in.readObject();
                 try {
                     if (uuidList != null) {
                         try {
@@ -693,10 +686,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                         }
                     }
                 } catch (Exception e) {
-                	if (uuidList != null) {
-                		AceLog.getAppLog().severe("Exception processing hierarchy selection with uuid list: "
-                				+ uuidList);
-                	}
+                    if (uuidList != null) {
+                        AceLog.getAppLog().severe(
+                            "Exception processing hierarchy selection with uuid list: " + uuidList);
+                    }
                     AceLog.getAppLog().alertAndLogException(e);
                     hierarchySelection = null;
                 }
@@ -764,8 +757,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 editImageTypePopup = IntList.readIntListIgnoreMapErrors(in);
             } else {
                 try {
-                    defaultImageType =
-                            AceConfig.getVodb().getConcept(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids());
+                    defaultImageType = AceConfig.getVodb().getConcept(
+                        ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids());
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }
@@ -860,10 +853,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     List<I_GetConceptData> tabHistoryList = new LinkedList<I_GetConceptData>();
                     for (int nid : il.getListArray()) {
                         try {
-                        tabHistoryList.add(ConceptBean.get(nid));
-						} catch (Exception e) {
-							AceLog.getAppLog().alertAndLogException(e);
-						}
+                            tabHistoryList.add(ConceptBean.get(nid));
+                        } catch (Exception e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
                     }
                     tabHistoryMap.put(mapId, tabHistoryList);
                 }
@@ -972,25 +965,25 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 prefFilterTypesForRel = new IntSet();
             }
-            
+
             if (objDataVersion >= 42) {
                 showPathInfoInTaxonomy = (Boolean) in.readObject();
             } else {
-            	showPathInfoInTaxonomy = true;
+                showPathInfoInTaxonomy = true;
             }
-            
-            if (objDataVersion >=43) {
-            	searchWithDescTypeFilter = in.readBoolean();
+
+            if (objDataVersion >= 43) {
+                searchWithDescTypeFilter = in.readBoolean();
             } else {
-            	searchWithDescTypeFilter = false;
+                searchWithDescTypeFilter = false;
             }
-            
+
             if (objDataVersion >= 44) {
                 promotionPathSet = Path.readPathSet(in);
             } else {
-            	promotionPathSet = new HashSet<I_Path>();
+                promotionPathSet = new HashSet<I_Path>();
             }
-            
+
             if (objDataVersion >= 45) {
                 try {
                     classificationRoleRoot = readConceptFromSerializedUuids(in);
@@ -1016,9 +1009,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         if (obj == null) {
             return null;
         } else {
-        	if (LocalVersionedTerminology.get().hasId((List<UUID>) obj)) {
+            if (LocalVersionedTerminology.get().hasId((List<UUID>) obj)) {
                 return LocalVersionedTerminology.get().getConcept((List<UUID>) obj);
-        	}
+            }
             return null;
         }
     }
@@ -1316,7 +1309,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * types.Path)
      */
     public void removePromotionPath(I_Path p) {
-    	promotionPathSet.remove(p);
+        promotionPathSet.remove(p);
     }
 
     /*
@@ -2349,9 +2342,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setAddressToggleVisible(boolean visible) {
-    	if (aceFrame != null) {
+        if (aceFrame != null) {
             aceFrame.getCdePanel().setAddressToggleVisible(visible);
-    	}
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.ADDRESS);
         } else {
@@ -2360,9 +2353,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setBuilderToggleVisible(boolean visible) {
-    	if (aceFrame != null) {
+        if (aceFrame != null) {
             aceFrame.getCdePanel().setBuilderToggleVisible(visible);
-    	}
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.BUILDER);
         } else {
@@ -2371,9 +2364,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setComponentToggleVisible(boolean visible) {
-    	if (aceFrame != null) {
+        if (aceFrame != null) {
             aceFrame.getCdePanel().setComponentToggleVisible(visible);
-    	}
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.COMPONENT);
         } else {
@@ -2382,9 +2375,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setHierarchyToggleVisible(boolean visible) {
-    	if (aceFrame != null) {
+        if (aceFrame != null) {
             aceFrame.getCdePanel().setHierarchyToggleVisible(visible);
-    	}
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.TAXONOMY);
         } else {
@@ -2393,9 +2386,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setHistoryToggleVisible(boolean visible) {
-    	if (aceFrame != null) {
+        if (aceFrame != null) {
             aceFrame.getCdePanel().setHistoryToggleVisible(visible);
-    	}
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.HISTORY);
         } else {
@@ -2404,9 +2397,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setInboxToggleVisible(boolean visible) {
-    	if (aceFrame != null) {
+        if (aceFrame != null) {
             aceFrame.getCdePanel().setInboxToggleVisible(visible);
-    	}
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.INBOX);
         } else {
@@ -2415,9 +2408,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setPreferencesToggleVisible(boolean visible) {
-    	if (aceFrame != null) {
+        if (aceFrame != null) {
             aceFrame.getCdePanel().setPreferencesToggleVisible(visible);
-    	}
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.PREFERENCES);
         } else {
@@ -2425,11 +2418,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         }
     }
 
-
     public void setSubversionToggleVisible(boolean visible) {
-    	if (aceFrame != null) {
+        if (aceFrame != null) {
             aceFrame.getCdePanel().setSubversionToggleVisible(visible);
-    	}
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.SUBVERSION);
         } else {
@@ -2550,11 +2542,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public Boolean getShowPathInfoInTaxonomy() {
         return showPathInfoInTaxonomy;
     }
+
     public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy) {
         Boolean old = this.showPathInfoInTaxonomy;
         this.showPathInfoInTaxonomy = showPathInfoInTaxonomy;
         changeSupport.firePropertyChange("showPathInfoInTaxonomy", old, showPathInfoInTaxonomy);
-    }    
+    }
+
     public Boolean getShowRefsetInfoInTaxonomy() {
         return showRefsetInfoInTaxonomy;
     }
@@ -2656,9 +2650,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     aceFrame.setVisible(visible);
                 } else if (visible == true) {
                     try {
-                        aceFrame =
-                                new AceFrame(new String[] { masterConfig.getAceRiverConfigFile() }, null,
-                                    AceFrameConfig.this, false);
+                        aceFrame = new AceFrame(new String[] { masterConfig.getAceRiverConfigFile() }, null,
+                            AceFrameConfig.this, false);
                     } catch (Exception e) {
                         AceLog.getAppLog().alertAndLogException(e);
                     }
@@ -2679,7 +2672,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public BundleType getBundleType() {
         if (bundleType == null) {
             File profileDirSvn = new File("profiles" + File.separator + ".svn");
-             if (profileDirSvn.exists()) {
+            if (profileDirSvn.exists()) {
                 bundleType = BundleType.CHANGE_SET_UPDATE;
             } else {
                 bundleType = BundleType.STAND_ALONE;
@@ -2809,7 +2802,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         this.classificationRoleRoot = classificationRoleRoot;
         changeSupport.firePropertyChange("classificationRoleRoot", old, classificationRoleRoot);
     }
-    
+
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         Object old = this.classificationRoot;
         this.classificationRoot = classificationRoot;
@@ -2841,9 +2834,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setColorForPath(int pathNid, Color pathColor) {
         pathColorMap.put(pathNid, pathColor);
     }
-    
+
     public Map<Integer, Color> getPathColorMap() {
-    	return pathColorMap;
+        return pathColorMap;
     }
 
     public I_IntList getLanguagePreferenceList() {
@@ -2932,16 +2925,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             list.add(new ImagePlugin(false, order++));
             list.add(new ConflictPlugin(false, order++));
             list.add(new StatedAndNormalFormsPlugin(false, order++));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT,
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT,
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT,
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT,
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT,
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (UnsupportedEncodingException e) {
@@ -2970,16 +2963,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             list.add(new ImagePlugin(false, order++));
             list.add(new ConflictPlugin(false, order++));
             list.add(new StatedAndNormalFormsPlugin(false, order++));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT,
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT,
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT,
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT,
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT,
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (UnsupportedEncodingException e) {
@@ -3028,43 +3021,42 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.getCdePanel().setShowActivityViewer(show);
     }
 
-	public JPanel getWorkflowDetailsSheet() {
-		return aceFrame.getCdePanel().getWorkflowDetailsSheet();
-	}
+    public JPanel getWorkflowDetailsSheet() {
+        return aceFrame.getCdePanel().getWorkflowDetailsSheet();
+    }
 
-	public void setShowWorkflowDetailSheet(boolean visible) {
-		aceFrame.getCdePanel().setWorfklowDetailSheetVisible(visible);
-	}
+    public void setShowWorkflowDetailSheet(boolean visible) {
+        aceFrame.getCdePanel().setWorfklowDetailSheetVisible(visible);
+    }
 
-	public void setWorkflowDetailSheetDimensions(Dimension dim) {
-		aceFrame.getCdePanel().setWorkflowDetailSheetDimensions(dim);
-	}
+    public void setWorkflowDetailSheetDimensions(Dimension dim) {
+        aceFrame.getCdePanel().setWorkflowDetailSheetDimensions(dim);
+    }
 
-	public I_ShowActivity getTopActivityListener() {
-		if (aceFrame == null) {
-			return null;
-		} else {
-			return aceFrame.getCdePanel().getTopActivityListener();
-		}
-	}
+    public I_ShowActivity getTopActivityListener() {
+        if (aceFrame == null) {
+            return null;
+        } else {
+            return aceFrame.getCdePanel().getTopActivityListener();
+        }
+    }
 
     public void fireUpdateHierarchyView() {
         changeSupport.firePropertyChange("updateHierarchyView", false, true);
     }
 
-	public boolean searchWithDescTypeFilter() {
-		return searchWithDescTypeFilter;
-	}
+    public boolean searchWithDescTypeFilter() {
+        return searchWithDescTypeFilter;
+    }
 
-	public void setSearchWithDescTypeFilter(boolean searchWithDescTypeFilter) {
-		boolean old = this.searchWithDescTypeFilter;
-		this.searchWithDescTypeFilter = searchWithDescTypeFilter;
-		this.changeSupport.firePropertyChange("searchWithDescTypeFilter", old, searchWithDescTypeFilter);
-	}
+    public void setSearchWithDescTypeFilter(boolean searchWithDescTypeFilter) {
+        boolean old = this.searchWithDescTypeFilter;
+        this.searchWithDescTypeFilter = searchWithDescTypeFilter;
+        this.changeSupport.firePropertyChange("searchWithDescTypeFilter", old, searchWithDescTypeFilter);
+    }
 
-	public void setSelectedPreferencesTab(String tabName) {
-		aceFrame.getCdePanel().setSelectedPreferencesTab(tabName);
-	}
-	
-	
+    public void setSelectedPreferencesTab(String tabName) {
+        aceFrame.getCdePanel().setSelectedPreferencesTab(tabName);
+    }
+
 }

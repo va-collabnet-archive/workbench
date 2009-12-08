@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,8 +30,7 @@ public abstract class AddComponent implements ActionListener {
     private I_ContainTermComponent termContainer;
     private I_ConfigAceFrame config;
 
-    public AddComponent(I_ContainTermComponent termContainer,
-            I_ConfigAceFrame config) {
+    public AddComponent(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
         super();
         this.termContainer = termContainer;
         this.config = config;
@@ -40,8 +39,7 @@ public abstract class AddComponent implements ActionListener {
     public final void actionPerformed(ActionEvent e) {
         try {
             if (termContainer.getConfig().getEditingPathSet().size() == 0) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                    "You must select an editing path before editing...");
+                JOptionPane.showMessageDialog(new JFrame(), "You must select an editing path before editing...");
                 return;
             }
             doEdit(termContainer, e, config);
@@ -50,7 +48,7 @@ public abstract class AddComponent implements ActionListener {
         }
     }
 
-    protected abstract void doEdit(I_ContainTermComponent termContainer,
-            ActionEvent e, I_ConfigAceFrame config) throws Exception;
+    protected abstract void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config)
+            throws Exception;
 
 }

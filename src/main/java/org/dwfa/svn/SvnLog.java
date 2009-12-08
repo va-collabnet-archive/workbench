@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -132,18 +132,15 @@ public class SvnLog {
         logger.log(arg0);
     }
 
-    public static void logp(Level arg0, String arg1, String arg2, String arg3,
-            Object arg4) {
+    public static void logp(Level arg0, String arg1, String arg2, String arg3, Object arg4) {
         logger.logp(arg0, arg1, arg2, arg3, arg4);
     }
 
-    public static void logp(Level arg0, String arg1, String arg2, String arg3,
-            Object[] arg4) {
+    public static void logp(Level arg0, String arg1, String arg2, String arg3, Object[] arg4) {
         logger.logp(arg0, arg1, arg2, arg3, arg4);
     }
 
-    public static void logp(Level arg0, String arg1, String arg2, String arg3,
-            Throwable arg4) {
+    public static void logp(Level arg0, String arg1, String arg2, String arg3, Throwable arg4) {
         logger.logp(arg0, arg1, arg2, arg3, arg4);
     }
 
@@ -151,23 +148,19 @@ public class SvnLog {
         logger.logp(arg0, arg1, arg2, arg3);
     }
 
-    public static void logrb(Level arg0, String arg1, String arg2, String arg3,
-            String arg4, Object arg5) {
+    public static void logrb(Level arg0, String arg1, String arg2, String arg3, String arg4, Object arg5) {
         logger.logrb(arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
-    public static void logrb(Level arg0, String arg1, String arg2, String arg3,
-            String arg4, Object[] arg5) {
+    public static void logrb(Level arg0, String arg1, String arg2, String arg3, String arg4, Object[] arg5) {
         logger.logrb(arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
-    public static void logrb(Level arg0, String arg1, String arg2, String arg3,
-            String arg4, Throwable arg5) {
+    public static void logrb(Level arg0, String arg1, String arg2, String arg3, String arg4, Throwable arg5) {
         logger.logrb(arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
-    public static void logrb(Level arg0, String arg1, String arg2, String arg3,
-            String arg4) {
+    public static void logrb(Level arg0, String arg1, String arg2, String arg3, String arg4) {
         logger.logrb(arg0, arg1, arg2, arg3, arg4);
     }
 
@@ -205,9 +198,8 @@ public class SvnLog {
 
     public static void alertAndLog(Exception e) {
         if (VodbEnv.isHeadless() == false) {
-            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                "<html>" + e.getMessage() + "<br>See log for more details",
-                "Subversion Exception", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "<html>" + e.getMessage()
+                + "<br>See log for more details", "Subversion Exception", JOptionPane.ERROR_MESSAGE);
         }
         logger.log(Level.SEVERE, e.getMessage(), e);
 

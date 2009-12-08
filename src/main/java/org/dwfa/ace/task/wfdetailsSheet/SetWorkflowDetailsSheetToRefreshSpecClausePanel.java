@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,9 +56,9 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String refsetPositionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
 
-	private String snomedPositionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
+    private String snomedPositionSetPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
     private String clausesToUpdateMemberUuidPropName = ProcessAttachmentKeys.REFSET_MEMBER_UUID.getAttachmentKey();
-    
+
     private transient Exception ex = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -70,8 +70,7 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
         out.writeObject(clausesToUpdateMemberUuidPropName);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion >= 1) {
             profilePropName = (String) in.readObject();
@@ -95,13 +94,11 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
         this.profilePropName = profilePropName;
     }
 
-
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(final I_EncodeBusinessProcess process,
-            final I_Work worker) throws TaskFailedException {
+    public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
             ex = null;
             if (SwingUtilities.isEventDispatchThread()) {
@@ -110,7 +107,7 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
                 SwingUtilities.invokeAndWait(new Runnable() {
 
                     public void run() {
-                        doRun(process, worker); 
+                        doRun(process, worker);
                     }
 
                 });
@@ -121,15 +118,14 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             throw new TaskFailedException(e);
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
-        } 
+        }
         if (ex != null) {
             throw new TaskFailedException(ex);
         }
         return Condition.CONTINUE;
     }
 
-    private void doRun(final I_EncodeBusinessProcess process,
-            final I_Work worker) {
+    private void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
             ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
@@ -139,37 +135,32 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             int width = 750;
             int height = 300;
             workflowDetailsSheet.setSize(width, height);
-            workflowDetailsSheet.setLayout(new GridLayout(1,1));
+            workflowDetailsSheet.setLayout(new GridLayout(1, 1));
             I_TermFactory tf = LocalVersionedTerminology.get();
-            
-           UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
-           Set<UniversalAcePosition> universalRefsetSpecVersionSet = (Set<UniversalAcePosition>) process.getProperty(refsetPositionSetPropName);
-           Set<I_Position> refsetSpecVersionSet = new HashSet<I_Position>();
-	        for (UniversalAcePosition univPos: universalRefsetSpecVersionSet) {
-		           I_Path path = tf.getPath(univPos.getPathId());
-		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
-		           refsetSpecVersionSet.add(thinPos);
-		        }
 
-	        Set<UniversalAcePosition> universalSourceTerminologyVersionSet = (Set<UniversalAcePosition>) process.getProperty(snomedPositionSetPropName);
-           Set<I_Position> sourceTerminologyVersionSet = new HashSet<I_Position>();
-	        for (UniversalAcePosition univPos: universalSourceTerminologyVersionSet) {
-		           I_Path path = tf.getPath(univPos.getPathId());
-		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
-		           sourceTerminologyVersionSet.add(thinPos);
-		        }
+            UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
+            Set<UniversalAcePosition> universalRefsetSpecVersionSet = (Set<UniversalAcePosition>) process.getProperty(refsetPositionSetPropName);
+            Set<I_Position> refsetSpecVersionSet = new HashSet<I_Position>();
+            for (UniversalAcePosition univPos : universalRefsetSpecVersionSet) {
+                I_Path path = tf.getPath(univPos.getPathId());
+                I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+                refsetSpecVersionSet.add(thinPos);
+            }
 
-           
-           I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-           List<Collection<UUID>> clausesToUpdate = (List<Collection<UUID>>) process.getProperty(clausesToUpdateMemberUuidPropName);
+            Set<UniversalAcePosition> universalSourceTerminologyVersionSet = (Set<UniversalAcePosition>) process.getProperty(snomedPositionSetPropName);
+            Set<I_Position> sourceTerminologyVersionSet = new HashSet<I_Position>();
+            for (UniversalAcePosition univPos : universalSourceTerminologyVersionSet) {
+                I_Path path = tf.getPath(univPos.getPathId());
+                I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+                sourceTerminologyVersionSet.add(thinPos);
+            }
 
-           
-           I_GetConceptData refsetSpec = LocalVersionedTerminology.get().getConcept(refsetSpecUuid);
-           workflowDetailsSheet.add(new RefreshSpecClausePanel(refsetSpec,
-                                                                refsetSpecVersionSet, 
-                                                                sourceTerminologyVersionSet,
-                                                                clausesToUpdate,
-                                                                frameConfig));
+            I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+            List<Collection<UUID>> clausesToUpdate = (List<Collection<UUID>>) process.getProperty(clausesToUpdateMemberUuidPropName);
+
+            I_GetConceptData refsetSpec = LocalVersionedTerminology.get().getConcept(refsetSpecUuid);
+            workflowDetailsSheet.add(new RefreshSpecClausePanel(refsetSpec, refsetSpecVersionSet,
+                sourceTerminologyVersionSet, clausesToUpdate, frameConfig));
         } catch (Exception e) {
             ex = e;
         }
@@ -179,48 +170,47 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
 
     }
+
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }
-    
+
     public String getRefsetUuidPropName() {
-		return refsetUuidPropName;
-	}
+        return refsetUuidPropName;
+    }
 
-	public void setRefsetUuidPropName(String refsetUuidPropName) {
-		this.refsetUuidPropName = refsetUuidPropName;
-	}
+    public void setRefsetUuidPropName(String refsetUuidPropName) {
+        this.refsetUuidPropName = refsetUuidPropName;
+    }
 
-	public String getRefsetPositionSetPropName() {
-		return refsetPositionSetPropName;
-	}
+    public String getRefsetPositionSetPropName() {
+        return refsetPositionSetPropName;
+    }
 
-	public void setRefsetPositionSetPropName(String refsetPositionSetPropName) {
-		this.refsetPositionSetPropName = refsetPositionSetPropName;
-	}
+    public void setRefsetPositionSetPropName(String refsetPositionSetPropName) {
+        this.refsetPositionSetPropName = refsetPositionSetPropName;
+    }
 
-	public String getSnomedPositionSetPropName() {
-		return snomedPositionSetPropName;
-	}
+    public String getSnomedPositionSetPropName() {
+        return snomedPositionSetPropName;
+    }
 
-	public void setSnomedPositionSetPropName(String snomedPositionSetPropName) {
-		this.snomedPositionSetPropName = snomedPositionSetPropName;
-	}
+    public void setSnomedPositionSetPropName(String snomedPositionSetPropName) {
+        this.snomedPositionSetPropName = snomedPositionSetPropName;
+    }
 
-	public String getClausesToUpdateMemberUuidPropName() {
-		return clausesToUpdateMemberUuidPropName;
-	}
+    public String getClausesToUpdateMemberUuidPropName() {
+        return clausesToUpdateMemberUuidPropName;
+    }
 
-	public void setClausesToUpdateMemberUuidPropName(
-			String clauseToUpdateMemberUuidPropName) {
-		this.clausesToUpdateMemberUuidPropName = clauseToUpdateMemberUuidPropName;
-	}
+    public void setClausesToUpdateMemberUuidPropName(String clauseToUpdateMemberUuidPropName) {
+        this.clausesToUpdateMemberUuidPropName = clauseToUpdateMemberUuidPropName;
+    }
 }

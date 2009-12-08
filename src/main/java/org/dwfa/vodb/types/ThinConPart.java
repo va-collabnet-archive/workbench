@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,128 +24,154 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
-
 public class ThinConPart implements I_ConceptAttributePart {
 
-	private int pathId;
-	private int version;
-	private int conceptStatus;
-	private boolean defined;
+    private int pathId;
+    private int version;
+    private int conceptStatus;
+    private boolean defined;
 
-	public ArrayIntList getPartComponentNids() {
-		ArrayIntList partComponentNids = new ArrayIntList(2);
-		partComponentNids.add(pathId);
-		partComponentNids.add(conceptStatus);
-		return partComponentNids;
-	}
+    public ArrayIntList getPartComponentNids() {
+        ArrayIntList partComponentNids = new ArrayIntList(2);
+        partComponentNids.add(pathId);
+        partComponentNids.add(conceptStatus);
+        return partComponentNids;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#getPathId()
-	 */
-	public int getPathId() {
-		return pathId;
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#setPathId(int)
-	 */
-	public void setPathId(int pathId) {
-		this.pathId = pathId;
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#getConceptStatus()
-	 */
-	@Deprecated
-	public int getConceptStatus() {
-		return conceptStatus;
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#setConceptStatus(int)
-	 */
-	@Deprecated
-	public void setConceptStatus(int conceptStatus) {
-		this.conceptStatus = conceptStatus;
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#isDefined()
-	 */
-	public boolean isDefined() {
-		return defined;
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#setDefined(boolean)
-	 */
-	public void setDefined(boolean defined) {
-		this.defined = defined;
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#getVersion()
-	 */
-	public int getVersion() {
-		return version;
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#setVersion(int)
-	 */
-	public void setVersion(int version) {
-		this.version = version;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#hasNewData(org.dwfa.vodb.types.ThinConPart)
-	 */
-	public boolean hasNewData(I_ConceptAttributePart another) {
-		return ((this.defined != another.isDefined()) ||
-				(this.pathId != another.getPathId()) ||
-				(this.conceptStatus != another.getStatusId()));
-	}
-	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
-		pathId = jarToDbNativeMap.get(pathId);
-		conceptStatus = jarToDbNativeMap.get(conceptStatus);
-	}
-	@Override
-	public boolean equals(Object obj) {
-		ThinConPart another = (ThinConPart) obj;
-		return ((pathId == another.pathId) &&
-				(version == another.version) && 
-				(conceptStatus == another.conceptStatus) && 
-				(defined == another.defined));
-	}
-	@Override
-	public int hashCode() {
-		return HashFunction.hashCode(new int[] {pathId, version, conceptStatus } );
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ConceptAttributePart#duplicate()
-	 */
-	public I_ConceptAttributePart duplicate() {
-		ThinConPart newPart = new ThinConPart();
-		newPart.setConceptStatus(conceptStatus);
-		newPart.setDefined(defined);
-		newPart.setPathId(pathId);
-		newPart.setVersion(version);
-		return newPart;
-	}
-	@Override
-	public String toString() {
-		return this.getClass().getSimpleName() + ": defined " + defined + 
-		" status nid: " + conceptStatus + 
-		" pathId " + pathId + 
-		" version " + version + " (" + new Date(ThinVersionHelper.convert(version)) + ")";
-	}
-	
-	public int getStatusId() {
-		return getConceptStatus();
-	}
-	
-	public void setStatusId(int statusId) {
-		setConceptStatus(statusId);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_ConceptAttributePart#getPathId()
+     */
+    public int getPathId() {
+        return pathId;
+    }
 
-	public int getPositionId() {
-		throw new UnsupportedOperationException();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_ConceptAttributePart#setPathId(int)
+     */
+    public void setPathId(int pathId) {
+        this.pathId = pathId;
+    }
 
-	public void setPositionId(int pid) {
-		throw new UnsupportedOperationException();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_ConceptAttributePart#getConceptStatus()
+     */
+    @Deprecated
+    public int getConceptStatus() {
+        return conceptStatus;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_ConceptAttributePart#setConceptStatus(int)
+     */
+    @Deprecated
+    public void setConceptStatus(int conceptStatus) {
+        this.conceptStatus = conceptStatus;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_ConceptAttributePart#isDefined()
+     */
+    public boolean isDefined() {
+        return defined;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_ConceptAttributePart#setDefined(boolean)
+     */
+    public void setDefined(boolean defined) {
+        this.defined = defined;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_ConceptAttributePart#getVersion()
+     */
+    public int getVersion() {
+        return version;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_ConceptAttributePart#setVersion(int)
+     */
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ConceptAttributePart#hasNewData(org.dwfa.vodb.types
+     * .ThinConPart)
+     */
+    public boolean hasNewData(I_ConceptAttributePart another) {
+        return ((this.defined != another.isDefined()) || (this.pathId != another.getPathId()) || (this.conceptStatus != another.getStatusId()));
+    }
+
+    public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
+        pathId = jarToDbNativeMap.get(pathId);
+        conceptStatus = jarToDbNativeMap.get(conceptStatus);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        ThinConPart another = (ThinConPart) obj;
+        return ((pathId == another.pathId) && (version == another.version) && (conceptStatus == another.conceptStatus) && (defined == another.defined));
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { pathId, version, conceptStatus });
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_ConceptAttributePart#duplicate()
+     */
+    public I_ConceptAttributePart duplicate() {
+        ThinConPart newPart = new ThinConPart();
+        newPart.setConceptStatus(conceptStatus);
+        newPart.setDefined(defined);
+        newPart.setPathId(pathId);
+        newPart.setVersion(version);
+        return newPart;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + ": defined " + defined + " status nid: " + conceptStatus + " pathId "
+            + pathId + " version " + version + " (" + new Date(ThinVersionHelper.convert(version)) + ")";
+    }
+
+    public int getStatusId() {
+        return getConceptStatus();
+    }
+
+    public void setStatusId(int statusId) {
+        setConceptStatus(statusId);
+    }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPositionId(int pid) {
+        throw new UnsupportedOperationException();
+    }
 }

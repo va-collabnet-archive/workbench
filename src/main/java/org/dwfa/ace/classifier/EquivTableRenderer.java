@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,27 +41,22 @@ public class EquivTableRenderer extends AceTableRenderer {
         this.frameConfig = frameConfig;
     }
 
-    public Component getTableCellRendererComponent(JTable table, Object value,
-            boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(
-                table, value, isSelected, hasFocus, row, column);
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
+        JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+            column);
 
         if (isSelected == false) {
             if (renderInactive) {
-                renderComponent.setBackground(UIManager
-                        .getColor("Table.background"));
-                renderComponent.setForeground(UIManager
-                        .getColor("Table.foreground"));
+                renderComponent.setBackground(UIManager.getColor("Table.background"));
+                renderComponent.setForeground(UIManager.getColor("Table.foreground"));
             } else {
                 renderComponent.setBackground(colorForRow(row));
-                renderComponent.setForeground(UIManager
-                        .getColor("Table.foreground"));
+                renderComponent.setForeground(UIManager.getColor("Table.foreground"));
             }
         } else {
-            renderComponent.setBackground(UIManager
-                    .getColor("Table.selectionBackground"));
-            renderComponent.setForeground(UIManager
-                    .getColor("Table.selectionForeground"));
+            renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
+            renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
         }
 
         setHorizontalAlignment(SwingConstants.LEFT);

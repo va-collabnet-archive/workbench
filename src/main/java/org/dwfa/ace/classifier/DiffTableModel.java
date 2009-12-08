@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,10 +24,9 @@ import org.dwfa.ace.task.classify.SnoRel;
 
 @SuppressWarnings("serial")
 public class DiffTableModel extends AbstractTableModel {
-    private String[] columnNames = { "<html>"
-            + "<font face='Dialog' size='3' color='green'>Concept 1 - </font>"
-            + "<font face='Dialog' size='3' color='blue'>Role Type - </font>"
-            + "<font face='Dialog' size='3' color='green'>Concept 2" };
+    private String[] columnNames = { "<html>" + "<font face='Dialog' size='3' color='green'>Concept 1 - </font>"
+        + "<font face='Dialog' size='3' color='blue'>Role Type - </font>"
+        + "<font face='Dialog' size='3' color='green'>Concept 2" };
 
     private Object[][] data;
     private ArrayList<SnoRel> srl;

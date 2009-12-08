@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,17 +35,16 @@ public class ThinExtByRefPartCrossmapForRel extends ThinExtByRefPart implements 
     int elementNo;
     int blockNo;
 
+    public ArrayIntList getPartComponentNids() {
+        ArrayIntList partComponentNids = new ArrayIntList(4);
+        partComponentNids.add(getPathId());
+        partComponentNids.add(getStatusId());
+        partComponentNids.add(refineFlagId);
+        partComponentNids.add(additionalCodeId);
+        return partComponentNids;
+    }
 
-	public ArrayIntList getPartComponentNids() {
-		ArrayIntList partComponentNids = new ArrayIntList(4);
-		partComponentNids.add(getPathId());
-		partComponentNids.add(getStatusId());
-		partComponentNids.add(refineFlagId);
-		partComponentNids.add(additionalCodeId);
-		return partComponentNids;
-	}
-
-	public ThinExtByRefPartCrossmapForRel(ThinExtByRefPartCrossmapForRel another) {
+    public ThinExtByRefPartCrossmapForRel(ThinExtByRefPartCrossmapForRel another) {
         super(another);
         this.refineFlagId = another.refineFlagId;
         this.additionalCodeId = another.additionalCodeId;
@@ -57,56 +56,79 @@ public class ThinExtByRefPartCrossmapForRel extends ThinExtByRefPart implements 
         super();
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#getRefineFlagId()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#getRefineFlagId()
      */
     public int getRefineFlagId() {
         return refineFlagId;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#setRefineFlagId(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#setRefineFlagId(int)
      */
     public void setRefineFlagId(int refineFlagId) {
         this.refineFlagId = refineFlagId;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#getAdditionalCodeId()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#getAdditionalCodeId
+     * ()
      */
     public int getAdditionalCodeId() {
         return additionalCodeId;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#setAdditionalCodeId(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#setAdditionalCodeId
+     * (int)
      */
     public void setAdditionalCodeId(int additionalCodeId) {
         this.additionalCodeId = additionalCodeId;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#getElementNo()
      */
     public int getElementNo() {
         return elementNo;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#setElementNo(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#setElementNo(int)
      */
     public void setElementNo(int elementNo) {
         this.elementNo = elementNo;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#getBlockNo()
      */
     public int getBlockNo() {
         return blockNo;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmapForRel#setBlockNo(int)
      */
     public void setBlockNo(int blockNo) {
@@ -120,9 +142,8 @@ public class ThinExtByRefPartCrossmapForRel extends ThinExtByRefPart implements 
         }
         return 1;
     }
-    
-    
-	public I_ThinExtByRefPart duplicate() {
+
+    public I_ThinExtByRefPart duplicate() {
         return new ThinExtByRefPartCrossmapForRel(this);
     }
 
@@ -139,6 +160,5 @@ public class ThinExtByRefPartCrossmapForRel extends ThinExtByRefPart implements 
         universalPart.setTime(ThinVersionHelper.convert(getVersion()));
         return universalPart;
     }
-
 
 }

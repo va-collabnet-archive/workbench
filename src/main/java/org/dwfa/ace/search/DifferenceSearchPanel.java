@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,23 +38,19 @@ import org.dwfa.ace.task.search.RefsetMatch;
 
 public class DifferenceSearchPanel extends JPanel implements I_MakeCriterionPanel {
 
-
-	
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
- 
     List<CriterionPanel> criterionPanels = new ArrayList<CriterionPanel>();
 
     private JPanel criterion = new JPanel();
 
     private List<I_TestSearchResults> extraCriterion;
 
-    public DifferenceSearchPanel(I_ConfigAceFrame config) throws ClassNotFoundException, 
-    		InstantiationException, 
-    		IllegalAccessException {
+    public DifferenceSearchPanel(I_ConfigAceFrame config) throws ClassNotFoundException, InstantiationException,
+            IllegalAccessException {
         super(new GridBagLayout());
         Border b = BorderFactory.createEmptyBorder(5, 5, 0, 0);
         setBorder(b);
@@ -67,16 +63,16 @@ public class DifferenceSearchPanel extends JPanel implements I_MakeCriterionPane
         gbc.gridheight = 1;
         gbc.weightx = 1;
         gbc.weighty = 0;
-       
+
         getCriterionPanels().add(makeCriterionPanel());
-        gbc.anchor = GridBagConstraints.WEST;       
+        gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 6;
         gbc.gridheight = 3;
 
         layoutCriterion();
         add(criterion, gbc);
-        
+
         gbc.weighty = 1;
         gbc.gridy = gbc.gridy + gbc.gridheight;
         gbc.gridy++;
@@ -118,28 +114,28 @@ public class DifferenceSearchPanel extends JPanel implements I_MakeCriterionPane
 
     public CriterionPanel makeCriterionPanel() throws ClassNotFoundException, InstantiationException,
             IllegalAccessException {
-    	List<I_TestSearchResults> criterionOptions = new ArrayList<I_TestSearchResults>();
-    	criterionOptions.add(new DifferenceConceptStatus());
-    	criterionOptions.add(new DifferenceFullySpecifiedName());
-    	criterionOptions.add(new DifferencePreferredName());
-    	criterionOptions.add(new DifferenceRelsDestination());
-    	criterionOptions.add(new DifferenceRelsSource());
-    	criterionOptions.add(new DifferenceRelsSourceOrDestination());
-    	criterionOptions.add(new RefsetMatch());
-    	criterionOptions.add(new IsKindOf());
+        List<I_TestSearchResults> criterionOptions = new ArrayList<I_TestSearchResults>();
+        criterionOptions.add(new DifferenceConceptStatus());
+        criterionOptions.add(new DifferenceFullySpecifiedName());
+        criterionOptions.add(new DifferencePreferredName());
+        criterionOptions.add(new DifferenceRelsDestination());
+        criterionOptions.add(new DifferenceRelsSource());
+        criterionOptions.add(new DifferenceRelsSourceOrDestination());
+        criterionOptions.add(new RefsetMatch());
+        criterionOptions.add(new IsKindOf());
         return new CriterionPanel(this, null, criterionOptions);
     }
 
-	public List<CriterionPanel> getCriterionPanels() {
-		return criterionPanels;
-	}
-	
-	public List<I_TestSearchResults> getCriterion() {
-		List<I_TestSearchResults> results = new ArrayList<I_TestSearchResults>();
-		for (CriterionPanel p: criterionPanels) {
-			results.add(p.getBean());
-		}
-		return results;
-	}
+    public List<CriterionPanel> getCriterionPanels() {
+        return criterionPanels;
+    }
+
+    public List<I_TestSearchResults> getCriterion() {
+        List<I_TestSearchResults> results = new ArrayList<I_TestSearchResults>();
+        for (CriterionPanel p : criterionPanels) {
+            results.add(p.getBean());
+        }
+        return results;
+    }
 
 }

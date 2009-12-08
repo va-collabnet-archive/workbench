@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinExtByRefPartTemplateForRel extends ThinExtByRefPart implements I_ThinExtByRefPartTemplateForRel {
-    
+
     int valueTypeId;
     int cardinality;
     int semanticStatusId;
@@ -39,131 +39,196 @@ public class ThinExtByRefPartTemplateForRel extends ThinExtByRefPart implements 
     int attributeDisplayStatusId;
     int characteristicStatusId;
 
-	public ArrayIntList getPartComponentNids() {
-		ArrayIntList partComponentNids = new ArrayIntList(6);
-		partComponentNids.add(getPathId());
-		partComponentNids.add(getStatusId());
-		partComponentNids.add(valueTypeId);
-		partComponentNids.add(semanticStatusId);
-		partComponentNids.add(attributeDisplayStatusId);
-		partComponentNids.add(characteristicStatusId);
-		return partComponentNids;
-	}
+    public ArrayIntList getPartComponentNids() {
+        ArrayIntList partComponentNids = new ArrayIntList(6);
+        partComponentNids.add(getPathId());
+        partComponentNids.add(getStatusId());
+        partComponentNids.add(valueTypeId);
+        partComponentNids.add(semanticStatusId);
+        partComponentNids.add(attributeDisplayStatusId);
+        partComponentNids.add(characteristicStatusId);
+        return partComponentNids;
+    }
 
-	/* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getValueTypeId()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getValueTypeId()
      */
     public int getValueTypeId() {
         return valueTypeId;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setValueTypeId(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setValueTypeId(int)
      */
     public void setValueTypeId(int valueTypeId) {
         this.valueTypeId = valueTypeId;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getCardinality()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getCardinality()
      */
     public int getCardinality() {
         return cardinality;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setCardinality(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setCardinality(int)
      */
     public void setCardinality(int cardinality) {
         this.cardinality = cardinality;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getSemanticStatusId()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getSemanticStatusId
+     * ()
      */
     public int getSemanticStatusId() {
         return semanticStatusId;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setSemanticStatusId(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setSemanticStatusId
+     * (int)
      */
     public void setSemanticStatusId(int semanticStatusId) {
         this.semanticStatusId = semanticStatusId;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getBrowseAttributeOrder()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * 
+     * 
+     * 
+     * 
+     * 
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getBrowseAttributeOrder
+     * ()
      */
     public int getBrowseAttributeOrder() {
         return browseAttributeOrder;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setBrowseAttributeOrder(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * 
+     * 
+     * 
+     * 
+     * 
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setBrowseAttributeOrder
+     * (int)
      */
     public void setBrowseAttributeOrder(int browseAttributeOrder) {
         this.browseAttributeOrder = browseAttributeOrder;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getBrowseValueOrder()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getBrowseValueOrder
+     * ()
      */
     public int getBrowseValueOrder() {
         return browseValueOrder;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setBrowseValueOrder(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setBrowseValueOrder
+     * (int)
      */
     public void setBrowseValueOrder(int browseValueOrder) {
         this.browseValueOrder = browseValueOrder;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getNotesScreenOrder()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getNotesScreenOrder
+     * ()
      */
     public int getNotesScreenOrder() {
         return notesScreenOrder;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setNotesScreenOrder(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setNotesScreenOrder
+     * (int)
      */
     public void setNotesScreenOrder(int notesScreenOrder) {
         this.notesScreenOrder = notesScreenOrder;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getAttributeDisplayStatusId()
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#
+     * getAttributeDisplayStatusId()
      */
     public int getAttributeDisplayStatusId() {
         return attributeDisplayStatusId;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setAttributeDisplayStatusId(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#
+     * setAttributeDisplayStatusId(int)
      */
     public void setAttributeDisplayStatusId(int attributeDisplayStatusId) {
         this.attributeDisplayStatusId = attributeDisplayStatusId;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#getCharacteristicStatusId()
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#
+     * getCharacteristicStatusId()
      */
     public int getCharacteristicStatusId() {
         return characteristicStatusId;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#setCharacteristicStatusId(int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.dwfa.vodb.types.I_ThinExtByRefPartTemplateForRel#
+     * setCharacteristicStatusId(int)
      */
     public void setCharacteristicStatusId(int characteristicStatusId) {
         this.characteristicStatusId = characteristicStatusId;
     }
 
-
-	public I_ThinExtByRefPart duplicate() {
+    public I_ThinExtByRefPart duplicate() {
         return new ThinExtByRefPartTemplateForRel(this);
     }
 
@@ -178,6 +243,7 @@ public class ThinExtByRefPartTemplateForRel extends ThinExtByRefPart implements 
         this.attributeDisplayStatusId = another.attributeDisplayStatusId;
         this.characteristicStatusId = another.characteristicStatusId;
     }
+
     public ThinExtByRefPartTemplateForRel() {
         super();
     }
@@ -208,5 +274,4 @@ public class ThinExtByRefPartTemplateForRel extends ThinExtByRefPart implements 
         return universalPart;
     }
 
-    
 }

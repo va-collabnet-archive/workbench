@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,10 +38,9 @@ public class UncommittedListRenderer implements ListCellRenderer {
      */
     private static final long serialVersionUID = 1L;
 
-    public Component getListCellRendererComponent(JList list, Object value,
-            int index, boolean isSelected, boolean cellHasFocus) {
-        AlertToDataConstraintFailure failure =
-                (AlertToDataConstraintFailure) value;
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+            boolean cellHasFocus) {
+        AlertToDataConstraintFailure failure = (AlertToDataConstraintFailure) value;
         if (failure.getRendererComponent() == null) {
 
             JLabel label = new JLabel();
@@ -66,8 +65,7 @@ public class UncommittedListRenderer implements ListCellRenderer {
             c.anchor = GridBagConstraints.WEST;
             c.weightx = 1;
             c.gridx++;
-            JComboBox testCombo =
-                    new JComboBox(new String[] { "fix 1", "fix 2" });
+            JComboBox testCombo = new JComboBox(new String[] { "fix 1", "fix 2" });
             componentPanel.add(testCombo, c);
             failure.setRendererComponent(componentPanel);
 
@@ -76,13 +74,11 @@ public class UncommittedListRenderer implements ListCellRenderer {
         component.setBorder(null);
 
         if (isSelected) {
-            component.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 1, 1, 1, Color.BLUE),
-                BorderFactory.createEmptyBorder(1, 0, 0, 0)));
+            component.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1,
+                Color.BLUE), BorderFactory.createEmptyBorder(1, 0, 0, 0)));
         } else {
-            component.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK),
-                BorderFactory.createEmptyBorder(1, 1, 0, 1)));
+            component.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+                Color.BLACK), BorderFactory.createEmptyBorder(1, 1, 0, 1)));
         }
         component.toString();
         return failure.getRendererComponent();

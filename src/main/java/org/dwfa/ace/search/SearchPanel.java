@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,12 +91,12 @@ import org.dwfa.vodb.types.ConceptBean;
 public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     private class FilterSearchActionListener implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			config.setSearchWithDescTypeFilter(searchWithDescTypeFilter.isSelected());
-		}
-	}
+        public void actionPerformed(ActionEvent e) {
+            config.setSearchWithDescTypeFilter(searchWithDescTypeFilter.isSelected());
+        }
+    }
 
-	public class MaximizeSearchListener implements ActionListener {
+    public class MaximizeSearchListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             JToggleButton toggle = (JToggleButton) e.getSource();
@@ -150,9 +150,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 // Create a file dialog box to prompt for a new file to display
                 updateExtraCriterion();
                 QueryBean qb = new QueryBean(searchPhraseField.getText(), extraCriterion);
-                FileDialog f =
-                        new FileDialog((Frame) SearchPanel.this.getTopLevelAncestor(), "Save query (.query)",
-                            FileDialog.SAVE);
+                FileDialog f = new FileDialog((Frame) SearchPanel.this.getTopLevelAncestor(), "Save query (.query)",
+                    FileDialog.SAVE);
                 File searchFolder = new File("search");
                 f.setDirectory(searchFolder.getAbsolutePath());
                 f.setVisible(true); // Display dialog and wait for response
@@ -380,9 +379,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private JButton saveButton;
 
     private JToggleButton showHistory;
-    
+
     private JToggleButton searchWithDescTypeFilter;;
-    
 
     private List<I_TestSearchResults> extraCriterion;
 
@@ -531,9 +529,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         ImageIconList.add(ConceptPanel.UNLINKED_ICON);
         ImageIconList.add(ConceptPanel.TREE_LINK_ICON);
 
-        LinkListModel linkSpinnerModel =
-                new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]), LINK_TYPE.UNLINKED
-                    .ordinal());
+        LinkListModel linkSpinnerModel = new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]),
+            LINK_TYPE.UNLINKED.ordinal());
 
         linkSpinner = new JSpinner(linkSpinnerModel);
         linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
@@ -544,19 +541,18 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         gbc.gridx++;
         showHistory = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
-        showHistory
-            .setToolTipText("show current and historical descriptions, including retired descriptions and descriptions of retired concepts");
+        showHistory.setToolTipText("show current and historical descriptions, including retired descriptions and descriptions of retired concepts");
         add(showHistory, gbc);
         gbc.gridx++;
-        
-        searchWithDescTypeFilter= new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/component_preferences.png")));
-        searchWithDescTypeFilter
-        	.setToolTipText("filter search using preferences");
+
+        searchWithDescTypeFilter = new JToggleButton(new ImageIcon(
+            ACE.class.getResource("/24x24/plain/component_preferences.png")));
+        searchWithDescTypeFilter.setToolTipText("filter search using preferences");
         searchWithDescTypeFilter.setSelected(config.searchWithDescTypeFilter());
         searchWithDescTypeFilter.addActionListener(new FilterSearchActionListener());
         add(searchWithDescTypeFilter, gbc);
         gbc.gridx++;
-        
+
         loadButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/read_from_disk.png")));
         loadButton.setToolTipText("read search specification from disk");
         loadButton.addActionListener(new LoadQuery());
@@ -590,8 +586,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.gridy++;
         gbc.gridheight = 1;
 
-        model =
-                new DescriptionsFromCollectionTableModel(new DESC_FIELD[] { DESC_FIELD.SCORE, DESC_FIELD.STATUS,
+        model = new DescriptionsFromCollectionTableModel(new DESC_FIELD[] { DESC_FIELD.SCORE, DESC_FIELD.STATUS,
                                                                            DESC_FIELD.TEXT, DESC_FIELD.TYPE }, config);
         sortingTable = new TableSorter(model);
         descTable = new JTableWithDragImage(sortingTable);
@@ -627,8 +622,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         JScrollPane scrollPane = new JScrollPane(descTable);
-        JToggleButton maximizeTable =
-                new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/fit_to_size.png")));
+        JToggleButton maximizeTable = new JToggleButton(new ImageIcon(
+            ACE.class.getResource("/16x16/plain/fit_to_size.png")));
         maximizeTable.setToolTipText("show/hide search criterion");
         maximizeTable.setSelected(false);
         maximizeTable.addActionListener(new MaximizeSearchListener());

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -235,7 +235,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public I_GetConceptData getClassificationRoleRoot() {
         return frameConfig.getClassificationRoleRoot();
     }
-    
+
     public I_GetConceptData getClassificationRoot() {
         return frameConfig.getClassificationRoot();
     }
@@ -401,9 +401,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
             try {
                 allowedTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
                 boolean addUncommitted = true;
-                List<I_RelTuple> markedParentRefset =
-                        refset.getSourceRelTuples(frameConfig.getAllowedStatus(), allowedTypes, frameConfig
-                            .getViewPositionSet(), addUncommitted);
+                List<I_RelTuple> markedParentRefset = refset.getSourceRelTuples(frameConfig.getAllowedStatus(),
+                    allowedTypes, frameConfig.getViewPositionSet(), addUncommitted);
                 for (I_RelTuple rel : markedParentRefset) {
                     refsetsToShow.add(rel.getC2Id());
                 }
@@ -429,8 +428,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                 ConceptBean rootBean = ConceptBean.get(rootNid);
                 for (I_ThinExtByRefVersioned ext : rootBean.getExtensions()) {
                     if (refsets.contains(ext.getRefsetId())) {
-                        List<I_ThinExtByRefTuple> tuples =
-                                ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSet(), true);
+                        List<I_ThinExtByRefTuple> tuples = ext.getTuples(frameConfig.getAllowedStatus(),
+                            frameConfig.getViewPositionSet(), true);
                         if (tuples != null && tuples.size() > 0) {
                             refsetRoots.add(rootNid);
                         }
@@ -725,7 +724,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot) {
         frameConfig.setClassificationRoleRoot(classificationRoleRoot);
     }
-    
+
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         frameConfig.setClassificationRoot(classificationRoot);
     }
@@ -1141,62 +1140,63 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setShowActivityViewer(show);
     }
 
-	public JPanel getWorkflowDetailsSheet() {
-		return frameConfig.getWorkflowDetailsSheet();
-	}
+    public JPanel getWorkflowDetailsSheet() {
+        return frameConfig.getWorkflowDetailsSheet();
+    }
 
-	public void setShowWorkflowDetailSheet(boolean visible) {
-		frameConfig.setShowWorkflowDetailSheet(visible);
-	}
+    public void setShowWorkflowDetailSheet(boolean visible) {
+        frameConfig.setShowWorkflowDetailSheet(visible);
+    }
 
-	public void setWorkflowDetailSheetDimensions(Dimension dim) {
-		frameConfig.setWorkflowDetailSheetDimensions(dim);
-	}
+    public void setWorkflowDetailSheetDimensions(Dimension dim) {
+        frameConfig.setWorkflowDetailSheetDimensions(dim);
+    }
 
-	public Map<Integer, Color> getPathColorMap() {
-		return frameConfig.getPathColorMap();
-	}
+    public Map<Integer, Color> getPathColorMap() {
+        return frameConfig.getPathColorMap();
+    }
 
     public Boolean getShowPathInfoInTaxonomy() {
         return frameConfig.getShowPathInfoInTaxonomy();
     }
 
     public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy) {
-        frameConfig.setShowPathInfoInTaxonomy(showPathInfoInTaxonomy);        
+        frameConfig.setShowPathInfoInTaxonomy(showPathInfoInTaxonomy);
     }
 
     public void fireUpdateHierarchyView() {
         frameConfig.fireUpdateHierarchyView();
     }
-	public I_ShowActivity getTopActivityListener() {
-		return frameConfig.getTopActivityListener();
-	}
 
-	public boolean searchWithDescTypeFilter() {
-		return frameConfig.searchWithDescTypeFilter();
-	}
+    public I_ShowActivity getTopActivityListener() {
+        return frameConfig.getTopActivityListener();
+    }
 
-	public void setSearchWithDescTypeFilter(boolean filter) {
-		frameConfig.setSearchWithDescTypeFilter(filter);
-	}
+    public boolean searchWithDescTypeFilter() {
+        return frameConfig.searchWithDescTypeFilter();
+    }
 
-	public void addPromotionPath(I_Path p) {
-		frameConfig.addPromotionPath(p);
-	}
+    public void setSearchWithDescTypeFilter(boolean filter) {
+        frameConfig.setSearchWithDescTypeFilter(filter);
+    }
 
-	public Set<I_Path> getPromotionPathSet() {
-		return frameConfig.getPromotionPathSet();
-	}
+    public void addPromotionPath(I_Path p) {
+        frameConfig.addPromotionPath(p);
+    }
 
-	public void removePromotionPath(I_Path p) {
-		frameConfig.removePromotionPath(p);
-	}
+    public Set<I_Path> getPromotionPathSet() {
+        return frameConfig.getPromotionPathSet();
+    }
 
-	public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
-		frameConfig.replacePromotionPathSet(oldPath, newPath);
-	}
+    public void removePromotionPath(I_Path p) {
+        frameConfig.removePromotionPath(p);
+    }
 
-	public void setSelectedPreferencesTab(String tabName) {
-		frameConfig.setSelectedPreferencesTab(tabName);
-	}
+    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
+        frameConfig.replacePromotionPathSet(oldPath, newPath);
+    }
+
+    public void setSelectedPreferencesTab(String tabName) {
+        frameConfig.setSelectedPreferencesTab(tabName);
+    }
 }

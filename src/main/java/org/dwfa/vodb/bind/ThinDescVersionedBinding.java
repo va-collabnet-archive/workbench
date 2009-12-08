@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,8 +34,7 @@ public class ThinDescVersionedBinding extends TupleBinding {
         int descId = ti.readInt();
         int conceptId = ti.readInt();
         int size = ti.readInt();
-        ThinDescVersioned versioned =
-                new ThinDescVersioned(descId, conceptId, size);
+        ThinDescVersioned versioned = new ThinDescVersioned(descId, conceptId, size);
         String lastLang = null;
         String lastText = null;
         for (int x = 0; x < size; x++) {
@@ -77,8 +76,7 @@ public class ThinDescVersionedBinding extends TupleBinding {
         }
     }
 
-    public static byte[] writeDescText(byte[] lastText, I_DescriptionPart desc,
-            TupleOutput to) {
+    public static byte[] writeDescText(byte[] lastText, I_DescriptionPart desc, TupleOutput to) {
         byte[] text;
         try {
             text = desc.getText().getBytes("UTF-8");
@@ -96,27 +94,27 @@ public class ThinDescVersionedBinding extends TupleBinding {
     }
 
     public void objectToEntry(Object obj, TupleOutput to) {
-		I_DescriptionVersioned versioned = (I_DescriptionVersioned) obj;
-		to.writeInt(versioned.getDescId());
-		to.writeInt(versioned.getConceptId());
-		to.writeInt(versioned.versionCount());
-		String lastLang = null;
-		byte[] lastText = new byte[0];
-		for (I_DescriptionPart desc: versioned.getVersions()) {
-			to.writeInt(desc.getPathId());
-			to.writeInt(desc.getVersion());
-			to.writeInt(desc.getStatusId());
-			to.writeBoolean(desc.getInitialCaseSignificant());
-			String lang = desc.getLang();
-			if (lang == lastLang) {
-				to.writeInt(-1);
-			} else {
-				to.writeInt(lang.length());
-				to.writeBytes(lang);
-				lastLang = lang;
-			}
-			lastText = writeDescText(lastText, desc, to);
-			to.writeInt(desc.getTypeId());
-		}
-	}
+        I_DescriptionVersioned versioned = (I_DescriptionVersioned) obj;
+        to.writeInt(versioned.getDescId());
+        to.writeInt(versioned.getConceptId());
+        to.writeInt(versioned.versionCount());
+        String lastLang = null;
+        byte[] lastText = new byte[0];
+        for (I_DescriptionPart desc : versioned.getVersions()) {
+            to.writeInt(desc.getPathId());
+            to.writeInt(desc.getVersion());
+            to.writeInt(desc.getStatusId());
+            to.writeBoolean(desc.getInitialCaseSignificant());
+            String lang = desc.getLang();
+            if (lang == lastLang) {
+                to.writeInt(-1);
+            } else {
+                to.writeInt(lang.length());
+                to.writeBytes(lang);
+                lastLang = lang;
+            }
+            lastText = writeDescText(lastText, desc, to);
+            to.writeInt(desc.getTypeId());
+        }
+    }
 }

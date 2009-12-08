@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -195,35 +195,34 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public class TestTupleCalculator implements ActionListener {
 
-    	AceConfig aceConfig;
-		public TestTupleCalculator(Configuration config, JFrame aceFrame,
-				AceConfig aceConfig) {
-			this.aceConfig = aceConfig;
-		}
+        AceConfig aceConfig;
 
-		public void actionPerformed(ActionEvent e) {
-			I_TermFactory tf = LocalVersionedTerminology.get();
-			;
-			try {
-				I_GetConceptData refsetConcept = tf.getConcept(UUID.fromString("6fd32c1f-8096-40a1-9053-1cc204bc61e3"));
-				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
-				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
-				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
-				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
-				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
-				refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
-			} catch (TerminologyException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			} catch (IOException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			}
+        public TestTupleCalculator(Configuration config, JFrame aceFrame, AceConfig aceConfig) {
+            this.aceConfig = aceConfig;
+        }
 
-		}
+        public void actionPerformed(ActionEvent e) {
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            ;
+            try {
+                I_GetConceptData refsetConcept = tf.getConcept(UUID.fromString("6fd32c1f-8096-40a1-9053-1cc204bc61e3"));
+                refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+                refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+                refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+                refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+                refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+                refsetConcept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(), aceFrameConfig);
+            } catch (TerminologyException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            } catch (IOException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            }
 
-	}
+        }
 
-	private List<TermComponentDataCheckSelectionListener> dataCheckListeners =
-            new ArrayList<TermComponentDataCheckSelectionListener>();
+    }
+
+    private List<TermComponentDataCheckSelectionListener> dataCheckListeners = new ArrayList<TermComponentDataCheckSelectionListener>();
 
     public void addDataCheckListener(TermComponentDataCheckSelectionListener l) {
         dataCheckListeners.add(l);
@@ -244,8 +243,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
             public void run() {
                 try {
-                    ObjectInputStream ois =
-                            new ObjectInputStream(new BufferedInputStream(new FileInputStream(processFile)));
+                    ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
+                        processFile)));
                     I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
                     ois.close();
                     if (worker.isExecuting()) {
@@ -296,85 +295,84 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
 
         private void layoutAlerts() {
-        	SwingUtilities.invokeLater(new Runnable() {
-				
-				public void run() {
-		            if (editMode) {
-		                if (dataCheckListPanel == null) {
-		                    getDataCheckListScroller();
-		                }
-		                for (Component component : dataCheckListPanel.getComponents()) {
-		                    dataCheckListPanel.remove(component);
-		                }
+            SwingUtilities.invokeLater(new Runnable() {
 
-		                dataCheckListPanel.setLayout(new GridBagLayout());
+                public void run() {
+                    if (editMode) {
+                        if (dataCheckListPanel == null) {
+                            getDataCheckListScroller();
+                        }
+                        for (Component component : dataCheckListPanel.getComponents()) {
+                            dataCheckListPanel.remove(component);
+                        }
 
-		                GridBagConstraints c = new GridBagConstraints();
-		                c.gridx = 0;
-		                c.gridy = 0;
-		                c.gridheight = 1;
-		                c.gridwidth = 1;
-		                c.anchor = GridBagConstraints.NORTHWEST;
-		                c.fill = GridBagConstraints.HORIZONTAL;
-		                c.weightx = 1;
-		                c.weighty = 0;
+                        dataCheckListPanel.setLayout(new GridBagLayout());
 
-		                int dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
-		                int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
-		                if (dataCheckListModel.size() > 0) {
+                        GridBagConstraints c = new GridBagConstraints();
+                        c.gridx = 0;
+                        c.gridy = 0;
+                        c.gridheight = 1;
+                        c.gridwidth = 1;
+                        c.anchor = GridBagConstraints.NORTHWEST;
+                        c.fill = GridBagConstraints.HORIZONTAL;
+                        c.weightx = 1;
+                        c.weighty = 0;
 
-		                    for (AlertToDataConstraintFailure alert : dataCheckListModel) {
-		                        setupAlert(alert);
-		                        dataCheckListPanel.add(alert.getRendererComponent(), c);
-		                        c.gridy++;
-		                    }
+                        int dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+                        int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
+                        if (dataCheckListModel.size() > 0) {
 
-		                    c.weighty = 1;
-		                    c.gridy++;
-		                    dataCheckListPanel.add(new JPanel(), c);
-		                    if (dataCheckIndex == -1) {
-		                        leftTabs.addTab(dataCheckTabLabel, getDataCheckListScroller());
-		                        dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
-		                    }
+                            for (AlertToDataConstraintFailure alert : dataCheckListModel) {
+                                setupAlert(alert);
+                                dataCheckListPanel.add(alert.getRendererComponent(), c);
+                                c.gridy++;
+                            }
 
-		                    leftTabs.setSelectedIndex(dataCheckIndex);
-		                    if (dataCheckPanel == null) {
-		                        try {
-		                            dataCheckPanel =
-		                                    new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK, ACE.this,
-		                                        LINK_TYPE.DATA_CHECK_LINK, conceptTabs, Integer.MAX_VALUE);
-		                            conceptPanels.add(dataCheckPanel);
-		                        } catch (DatabaseException e) {
-		                            AceLog.getAppLog().alertAndLogException(e);
-		                        } catch (IOException e) {
-		                            AceLog.getAppLog().alertAndLogException(e);
-		                        } catch (ClassNotFoundException e) {
-		                            AceLog.getAppLog().alertAndLogException(e);
-		                        } catch (NoSuchAlgorithmException e) {
-		                            AceLog.getAppLog().alertAndLogException(e);
-		                        }
-		                    }
-		                    conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
-		                        "Data Checks Linked");
+                            c.weighty = 1;
+                            c.gridy++;
+                            dataCheckListPanel.add(new JPanel(), c);
+                            if (dataCheckIndex == -1) {
+                                leftTabs.addTab(dataCheckTabLabel, getDataCheckListScroller());
+                                dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+                            }
 
-		                } else {
-		                    leftTabs.setSelectedIndex(taxonomyIndex);
-		                    if (dataCheckIndex != -1) {
-		                        leftTabs.removeTabAt(dataCheckIndex);
-		                    }
-		                    if (dataCheckPanel != null) {
-		                        c.weighty = 1;
-		                        c.gridy++;
-		                        dataCheckListPanel.add(new JPanel(), c);
-		                        if (conceptTabs.indexOfComponent(dataCheckPanel) >= 0) {
-		                            conceptTabs.remove(dataCheckPanel);
-		                            dataCheckPanel.setTermComponent(null);
-		                        }
-		                    }
-		                }
-		            }
-				}
-			});
+                            leftTabs.setSelectedIndex(dataCheckIndex);
+                            if (dataCheckPanel == null) {
+                                try {
+                                    dataCheckPanel = new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK, ACE.this,
+                                        LINK_TYPE.DATA_CHECK_LINK, conceptTabs, Integer.MAX_VALUE);
+                                    conceptPanels.add(dataCheckPanel);
+                                } catch (DatabaseException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                } catch (IOException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                } catch (ClassNotFoundException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                } catch (NoSuchAlgorithmException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                }
+                            }
+                            conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
+                                "Data Checks Linked");
+
+                        } else {
+                            leftTabs.setSelectedIndex(taxonomyIndex);
+                            if (dataCheckIndex != -1) {
+                                leftTabs.removeTabAt(dataCheckIndex);
+                            }
+                            if (dataCheckPanel != null) {
+                                c.weighty = 1;
+                                c.gridy++;
+                                dataCheckListPanel.add(new JPanel(), c);
+                                if (conceptTabs.indexOfComponent(dataCheckPanel) >= 0) {
+                                    conceptTabs.remove(dataCheckPanel);
+                                    dataCheckPanel.setTermComponent(null);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         private void setupAlert(AlertToDataConstraintFailure alert) {
@@ -535,8 +533,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private static Set<I_Transact> uncommitted = Collections.synchronizedSet(new HashSet<I_Transact>());
     private static Set<I_Transact> uncommittedNoChecks = Collections.synchronizedSet(new HashSet<I_Transact>());
 
-    private static Map<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap =
-            new HashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
+    private static Map<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap = new HashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
 
     private static int maxHistoryListSize = 100;
 
@@ -563,9 +560,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private static List<I_TestDataConstraints> creationTests = new ArrayList<I_TestDataConstraints>();
 
     public static void addUncommittedNoChecks(I_Transact to) {
-    	if (to == null) {
-    		return;
-    	}
+        if (to == null) {
+            return;
+        }
         if (commitInProgress) {
             try {
                 to.abort();
@@ -579,9 +576,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public static synchronized void addUncommitted(I_Transact to) {
-    	if (to == null) {
-    		return;
-    	}
+        if (to == null) {
+            return;
+        }
         if (commitInProgress) {
             try {
                 to.abort();
@@ -604,8 +601,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     if (eb.getExtension().getVersions().size() == 0) {
                         eb.abort();
                     }
-                    List<AlertToDataConstraintFailure> warningsAndErrors =
-                            new ArrayList<AlertToDataConstraintFailure>();
+                    List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
                     dataCheckMap.put(uncommittedBean, warningsAndErrors);
                     addUncommitted(uncommittedBean);
                     for (I_ThinExtByRefVersioned ext : LocalVersionedTerminology.get().getAllExtensionsForComponent(
@@ -666,73 +662,73 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public static void updateAlerts(final I_ConfigAceFrame frameConfig) {
-    	SwingUtilities.invokeLater(new Runnable() {
-			
-			public void run() {
-		        doUpdate(frameConfig);
-			}
-		});
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                doUpdate(frameConfig);
+            }
+        });
     }
 
-	private static void doUpdate(I_ConfigAceFrame frameConfig) {
-		try {
-			if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
-			    ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame().getCdePanel();
-			    aceInstance.getDataCheckListScroller();
-			    aceInstance.getUncommittedListModel().clear();
+    private static void doUpdate(I_ConfigAceFrame frameConfig) {
+        try {
+            if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
+                ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame().getCdePanel();
+                aceInstance.getDataCheckListScroller();
+                aceInstance.getUncommittedListModel().clear();
 
-			    for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
-			        aceInstance.getUncommittedListModel().addAll(alerts);
-			    }
-			    if (aceInstance.getUncommittedListModel().size() > 0) {
-			        for (int i = 0; i < aceInstance.leftTabs.getTabCount(); i++) {
-			            if (aceInstance.leftTabs.getTitleAt(i).equals(dataCheckTabLabel)) {
-			                aceInstance.leftTabs.setSelectedIndex(i);
-			                break;
-			            }
-			        }
-			        // show data checks tab...
-			    } else {
-			        for (TermComponentDataCheckSelectionListener l : aceInstance.dataCheckListeners) {
-			            l.setSelection(null);
-			        }
-			        // hide data checks tab...
-			    }
-			}
-		} catch (Exception e) {
-			AceLog.getAppLog().warning(e.toString());
-		}
-	}
+                for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
+                    aceInstance.getUncommittedListModel().addAll(alerts);
+                }
+                if (aceInstance.getUncommittedListModel().size() > 0) {
+                    for (int i = 0; i < aceInstance.leftTabs.getTabCount(); i++) {
+                        if (aceInstance.leftTabs.getTitleAt(i).equals(dataCheckTabLabel)) {
+                            aceInstance.leftTabs.setSelectedIndex(i);
+                            break;
+                        }
+                    }
+                    // show data checks tab...
+                } else {
+                    for (TermComponentDataCheckSelectionListener l : aceInstance.dataCheckListeners) {
+                        l.setSelection(null);
+                    }
+                    // hide data checks tab...
+                }
+            }
+        } catch (Exception e) {
+            AceLog.getAppLog().warning(e.toString());
+        }
+    }
 
     public static void removeUncommitted(final I_Transact to) {
         uncommitted.remove(to);
         if (uncommitted.size() == 0) {
-        	dataCheckMap.clear();
+            dataCheckMap.clear();
         }
         if (aceConfig != null) {
-        	SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-		            removeUncommittedUpdateFrame(to);
-				}
-			});
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    removeUncommittedUpdateFrame(to);
+                }
+            });
         }
     }
 
-	private static void removeUncommittedUpdateFrame(I_Transact to) {
-		for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-		    try {
-				if (ConceptBean.class.isAssignableFrom(to.getClass())) {
-				    frameConfig.removeUncommitted((I_GetConceptData) to);
-				    updateAlerts(frameConfig);
-				}
-				if (uncommitted.size() == 0) {
-				    frameConfig.setCommitEnabled(false);
-				}
-			} catch (Exception e) {
-				AceLog.getAppLog().warning(e.toString());
-			}
-		}
-	}
+    private static void removeUncommittedUpdateFrame(I_Transact to) {
+        for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+            try {
+                if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+                    frameConfig.removeUncommitted((I_GetConceptData) to);
+                    updateAlerts(frameConfig);
+                }
+                if (uncommitted.size() == 0) {
+                    frameConfig.setCommitEnabled(false);
+                }
+            } catch (Exception e) {
+                AceLog.getAppLog().warning(e.toString());
+            }
+        }
+    }
 
     private static Set<I_WriteChangeSet> csWriters = new HashSet<I_WriteChangeSet>();
 
@@ -782,8 +778,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 synchronized (uncommittedNoChecks) {
                     boolean testFailures = false;
                     Set<I_Transact> testFailureSet = new HashSet<I_Transact>();
-                    List<AlertToDataConstraintFailure> warningsAndErrors =
-                            new ArrayList<AlertToDataConstraintFailure>();
+                    List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
                     AceLog.getEditLog().info("Uncommitted count: " + uncommitted.size());
                     AceLog.getEditLog().finer("Uncommitted set: " + uncommitted);
                     for (I_Transact to : uncommitted) {
@@ -804,13 +799,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     }
 
                     if (testFailures) {
-                        int n =
-                                JOptionPane
-                                    .showConfirmDialog(
-                                        null,
-                                        "Would you like to cancel the commit?\n"
-                                            + "If you continue, components with test failures will be rolled back prior to commit.\n  ",
-                                        "Failures Detected", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        int n = JOptionPane.showConfirmDialog(
+                            null,
+                            "Would you like to cancel the commit?\n"
+                                + "If you continue, components with test failures will be rolled back prior to commit.\n  ",
+                            "Failures Detected", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                         if (n == JOptionPane.YES_OPTION) {
                             commitInProgress = false;
                             return;
@@ -1148,8 +1141,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 getRootPane().getLayeredPane().moveToFront(queuePalette);
                 deselectOthers(showQueuesButton);
             }
-            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
-                .getHeight() + 4);
+            queuePalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
+                conceptTabs.getHeight() + 4);
             queuePalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -1183,8 +1176,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 getRootPane().getLayeredPane().moveToFront(processPalette);
                 deselectOthers(showProcessBuilder);
             }
-            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(), conceptTabs
-                .getHeight() + 4);
+            processPalette.setSize(ACE.this.getWidth() - termTreeConceptSplit.getDividerLocation(),
+                conceptTabs.getHeight() + 4);
             processPalette.togglePalette(((JToggleButton) e.getSource()).isSelected(), TOGGLE_DIRECTION.LEFT_RIGHT);
         }
 
@@ -1815,8 +1808,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             if (aceFrameConfig.getTabHistoryMap().get("batchList") == null) {
                 aceFrameConfig.getTabHistoryMap().put("batchList", new ArrayList<I_GetConceptData>());
             }
-            TerminologyListModel batchListModel =
-                    new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("batchList"));
+            TerminologyListModel batchListModel = new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get(
+                "batchList"));
             batchConceptList = new TerminologyList(batchListModel, true, true, aceFrameConfig);
             conceptListEditor = new CollectionEditorContainer(batchConceptList, this, descListProcessBuilderPanel);
         }
@@ -2019,7 +2012,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     boolean svnPositionSet = false;
     private JButton showProgressButton;
     private ActivityPanel topActivityListener;
-	private JTabbedPane preferencesTab;
+    private JTabbedPane preferencesTab;
 
     private void setInitialSvnPosition() {
         if (svnPositionSet == false) {
@@ -2101,9 +2094,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         final JTextPane descriptionPanel = new JTextPane();
         descriptionPanel.setEditable(false);
         descriptionPanel.setContentType("text/html");
-        JScrollPane descriptionScroll =
-                new JScrollPane(descriptionPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane descriptionScroll = new JScrollPane(descriptionPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         JComboBox conflictComboBox = new JComboBox(aceFrameConfig.getAllConflictResolutionStrategies());
         conflictComboBox.setSelectedItem(aceFrameConfig.getConflictResolutionStrategy());
@@ -2187,8 +2179,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         gbc.weighty = 1;
         gbc.gridwidth = 2;
 
-        langPrefPanel.add(new JScrollPane(makeTermList("Langauge (Dialect) preference order:", aceFrameConfig
-            .getLanguagePreferenceList())), gbc);
+        langPrefPanel.add(new JScrollPane(makeTermList("Langauge (Dialect) preference order:",
+            aceFrameConfig.getLanguagePreferenceList())), gbc);
 
         gbc.gridy++;
         TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
@@ -2280,8 +2272,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         gbc.weighty = 1;
         gbc.gridheight = 3;
         gbc.gridy++;
-        checkPanel.add(new JScrollPane(makeTermList("Refsets to show in taxonomy view: ", aceFrameConfig
-            .getRefsetsToShowInTaxonomy())), gbc);
+        checkPanel.add(new JScrollPane(makeTermList("Refsets to show in taxonomy view: ",
+            aceFrameConfig.getRefsetsToShowInTaxonomy())), gbc);
         relPrefPanel.add(checkPanel);
 
         JPanel checkPanel2 = new JPanel(new GridBagLayout());
@@ -2293,14 +2285,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridheight = 1;
-        checkPanel2.add(getCheckboxEditor("sort taxonomy using refsets", "sortTaxonomyUsingRefset", aceFrameConfig
-            .getSortTaxonomyUsingRefset(), true), gbc);
+        checkPanel2.add(getCheckboxEditor("sort taxonomy using refsets", "sortTaxonomyUsingRefset",
+            aceFrameConfig.getSortTaxonomyUsingRefset(), true), gbc);
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridy++;
         gbc.gridheight = 3;
-        checkPanel2.add(new JScrollPane(makeTermList("Refsets to sort taxonomy view: ", aceFrameConfig
-            .getRefsetsToSortTaxonomy())), gbc);
+        checkPanel2.add(new JScrollPane(makeTermList("Refsets to sort taxonomy view: ",
+            aceFrameConfig.getRefsetsToSortTaxonomy())), gbc);
         relPrefPanel.add(checkPanel2);
 
         return relPrefPanel;
@@ -2420,16 +2412,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         case CONCEPT:
             addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
                 .getConceptPreferences(), type);
-            editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getConceptPreferences().getConceptPopupIds(),
+            editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle).getConceptPreferences().getConceptPopupIds(),
                 "Concept types for popup:")));
 
             break;
         case CON_INT:
             addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
                 .getConIntPreferences(), type);
-            editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getConIntPreferences().getConceptPopupIds(),
+            editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle).getConIntPreferences().getConceptPopupIds(),
                 "Concept types for popup:")));
 
             break;
@@ -2441,43 +2433,49 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         case LANGUAGE:
             addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
                 .getLanguagePreferences(), type);
-            editDefaultsTabs.addTab("acceptability types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getAcceptabilityPopupIds(),
-                "Acceptability types for popup:")));
-            editDefaultsTabs.addTab("correctness types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getCorrectnessPopupIds(),
+            editDefaultsTabs.addTab("acceptability types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getLanguagePreferences()
+                    .getAcceptabilityPopupIds(), "Acceptability types for popup:")));
+            editDefaultsTabs.addTab("correctness types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getCorrectnessPopupIds(),
                 "Correctness types for popup:")));
-            editDefaultsTabs.addTab("degree of synonymy types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getLanguagePreferences().getDegreeOfSynonymyPopupIds(),
-                "Degree of synonymy for popup:")));
+            editDefaultsTabs.addTab("degree of synonymy types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getLanguagePreferences()
+                    .getDegreeOfSynonymyPopupIds(), "Degree of synonymy for popup:")));
 
             break;
         case MEASUREMENT:
             addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
                 .getMeasurementPreferences(), type);
-            editDefaultsTabs.addTab("units of measure types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getMeasurementPreferences().getUnitsOfMeasurePopupIds(),
-                "Units of measure for popup:")));
+            editDefaultsTabs.addTab("units of measure types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getMeasurementPreferences()
+                    .getUnitsOfMeasurePopupIds(), "Units of measure for popup:")));
 
             break;
         case SCOPED_LANGUAGE:
             addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
                 .getLanguageScopedPreferences(), type);
 
-            editDefaultsTabs.addTab("acceptability types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getAcceptabilityPopupIds(),
-                "Acceptability types for popup:")));
-            editDefaultsTabs.addTab("correctness types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getCorrectnessPopupIds(),
-                "Correctness types for popup:")));
-            editDefaultsTabs.addTab("degree of synonymy types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getDegreeOfSynonymyPopupIds(),
-                "Degree of synonymy for popup:")));
-            editDefaultsTabs.addTab("scope types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getScopePopupIds(),
+            editDefaultsTabs.addTab("acceptability types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getLanguageScopedPreferences()
+                    .getAcceptabilityPopupIds(), "Acceptability types for popup:")));
+            editDefaultsTabs.addTab("correctness types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getLanguageScopedPreferences()
+                    .getCorrectnessPopupIds(), "Correctness types for popup:")));
+            editDefaultsTabs.addTab("degree of synonymy types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                    .getLanguageScopedPreferences()
+                    .getDegreeOfSynonymyPopupIds(), "Degree of synonymy for popup:")));
+            editDefaultsTabs.addTab("scope types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getScopePopupIds(),
                 "Scope types for popup:")));
-            editDefaultsTabs.addTab("tag types", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-                .getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getTagPopupIds(),
+            editDefaultsTabs.addTab("tag types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle).getLanguageScopedPreferences().getTagPopupIds(),
                 "Tags for popup:")));
             break;
         case STRING:
@@ -2546,35 +2544,30 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             break;
         case SCOPED_LANGUAGE:
             TermComponentLabel defaultScopeForScopedLanguageRefset = new TermComponentLabel(aceFrameConfig);
-            defaultScopeForScopedLanguageRefset.setTermComponent(((RefsetDefaultsLanguageScoped) defaults)
-                .getDefaultScopeForScopedLanguageRefset());
+            defaultScopeForScopedLanguageRefset.setTermComponent(((RefsetDefaultsLanguageScoped) defaults).getDefaultScopeForScopedLanguageRefset());
             gluePreferenceLabel(defaults, "defaultScopeForScopedLanguageRefset", defaultScopeForScopedLanguageRefset);
             wrapAndAdd(refsetsDefault, defaultScopeForScopedLanguageRefset, "Default scope: ");
 
             TermComponentLabel defaultTagForScopedLanguageRefset = new TermComponentLabel(aceFrameConfig);
-            defaultTagForScopedLanguageRefset.setTermComponent(((RefsetDefaultsLanguageScoped) defaults)
-                .getDefaultTagForScopedLanguageRefset());
+            defaultTagForScopedLanguageRefset.setTermComponent(((RefsetDefaultsLanguageScoped) defaults).getDefaultTagForScopedLanguageRefset());
             gluePreferenceLabel(defaults, "defaultTagForScopedLanguageRefset", defaultTagForScopedLanguageRefset);
             wrapAndAdd(refsetsDefault, defaultTagForScopedLanguageRefset, "Default tag: ");
             // @todo priority
 
         case LANGUAGE:
             TermComponentLabel defaultAcceptabilityForLanguageRefset = new TermComponentLabel(aceFrameConfig);
-            defaultAcceptabilityForLanguageRefset.setTermComponent(((RefsetDefaultsLanguage) defaults)
-                .getDefaultAcceptabilityForLanguageRefset());
+            defaultAcceptabilityForLanguageRefset.setTermComponent(((RefsetDefaultsLanguage) defaults).getDefaultAcceptabilityForLanguageRefset());
             gluePreferenceLabel(defaults, "defaultAcceptabilityForLanguageRefset",
                 defaultAcceptabilityForLanguageRefset);
             wrapAndAdd(refsetsDefault, defaultAcceptabilityForLanguageRefset, "Default acceptability: ");
 
             TermComponentLabel defaultCorrectnessForLanguageRefset = new TermComponentLabel(aceFrameConfig);
-            defaultCorrectnessForLanguageRefset.setTermComponent(((RefsetDefaultsLanguage) defaults)
-                .getDefaultCorrectnessForLanguageRefset());
+            defaultCorrectnessForLanguageRefset.setTermComponent(((RefsetDefaultsLanguage) defaults).getDefaultCorrectnessForLanguageRefset());
             gluePreferenceLabel(defaults, "defaultCorrectnessForLanguageRefset", defaultCorrectnessForLanguageRefset);
             wrapAndAdd(refsetsDefault, defaultCorrectnessForLanguageRefset, "Default correctness: ");
 
             TermComponentLabel defaultDegreeOfSynonymyForLanguageRefset = new TermComponentLabel(aceFrameConfig);
-            defaultDegreeOfSynonymyForLanguageRefset.setTermComponent(((RefsetDefaultsLanguage) defaults)
-                .getDefaultDegreeOfSynonymyForLanguageRefset());
+            defaultDegreeOfSynonymyForLanguageRefset.setTermComponent(((RefsetDefaultsLanguage) defaults).getDefaultDegreeOfSynonymyForLanguageRefset());
             gluePreferenceLabel(defaults, "defaultDegreeOfSynonymyForLanguageRefset",
                 defaultDegreeOfSynonymyForLanguageRefset);
             wrapAndAdd(refsetsDefault, defaultDegreeOfSynonymyForLanguageRefset, "Default degree of synonomy: ");
@@ -2585,8 +2578,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             // @todo measurement
 
             TermComponentLabel defaultUnitsOfMeasureForMeasurementRefset = new TermComponentLabel(aceFrameConfig);
-            defaultUnitsOfMeasureForMeasurementRefset.setTermComponent(((RefsetDefaultsMeasurement) defaults)
-                .getDefaultUnitsOfMeasureForMeasurementRefset());
+            defaultUnitsOfMeasureForMeasurementRefset.setTermComponent(((RefsetDefaultsMeasurement) defaults).getDefaultUnitsOfMeasureForMeasurementRefset());
             gluePreferenceLabel(defaults, "defaultTagForScopedLanguageRefset",
                 defaultUnitsOfMeasureForMeasurementRefset);
             wrapAndAdd(refsetsDefault, defaultUnitsOfMeasureForMeasurementRefset, "Default units of measure: ");
@@ -2665,16 +2657,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         wrapAndAdd(classifierPrefPanel, classifierRootLabel, "Classification root: ");
 
-        TermComponentLabel classifierRoleRootLabel = new TermComponentLabel(
-                aceFrameConfig);
+        TermComponentLabel classifierRoleRootLabel = new TermComponentLabel(aceFrameConfig);
         classifierRoleRootLabel.setTermComponent(aceFrameConfig.getClassificationRoleRoot());
-        aceFrameConfig.addPropertyChangeListener("classificationRoleRoot",
-                new PropertyListenerGlue("setTermComponent",
-                        I_AmTermComponent.class, classifierRoleRootLabel));
-        classifierRoleRootLabel.addTermChangeListener(new PropertyListenerGlue(
-                "setClassificationRoleRoot", I_GetConceptData.class, aceFrameConfig));
+        aceFrameConfig.addPropertyChangeListener("classificationRoleRoot", new PropertyListenerGlue("setTermComponent",
+            I_AmTermComponent.class, classifierRoleRootLabel));
+        classifierRoleRootLabel.addTermChangeListener(new PropertyListenerGlue("setClassificationRoleRoot",
+            I_GetConceptData.class, aceFrameConfig));
         wrapAndAdd(classifierPrefPanel, classifierRoleRootLabel, "Role root: ");
-        
+
         TermComponentLabel classificationIsaLabel = new TermComponentLabel(aceFrameConfig);
         classificationIsaLabel.setTermComponent(aceFrameConfig.getClassifierIsaType());
         aceFrameConfig.addPropertyChangeListener("classifierIsaType", new PropertyListenerGlue("setTermComponent",
@@ -2710,8 +2700,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             "Relationship types for popup:")));
         tabs.addTab("rel refinabilty", new JScrollPane(makePopupConfigPanel(
             aceFrameConfig.getEditRelRefinabiltyPopup(), "Relationship refinability for popup:")));
-        tabs.addTab("rel characteristic", new JScrollPane(makePopupConfigPanel(aceFrameConfig
-            .getEditRelCharacteristicPopup(), "Relationship characteristics for popup:")));
+        tabs.addTab("rel characteristic", new JScrollPane(makePopupConfigPanel(
+            aceFrameConfig.getEditRelCharacteristicPopup(), "Relationship characteristics for popup:")));
         tabs.addTab("desc type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditDescTypePopup(),
             "Description types for popup:")));
         tabs.addTab("image type", new JScrollPane(makePopupConfigPanel(aceFrameConfig.getEditImageTypePopup(),
@@ -2971,8 +2961,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(new JLabel("   "), c);
         c.gridx++;
 
-        TransporterLabel flashButton =
-                new TransporterLabel(new ImageIcon(ACE.class.getResource("/32x32/plain/flash.png")), this);
+        TransporterLabel flashButton = new TransporterLabel(new ImageIcon(
+            ACE.class.getResource("/32x32/plain/flash.png")), this);
         topPanel.add(flashButton, c);
         c.gridx++;
 
@@ -3050,8 +3040,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                 "Worker: " + worker.getWorkerDesc() + " (" + worker.getId() + ") executing process: "
                                     + process.getName());
                             worker.execute(process);
-                            SortedSet<ExecutionRecord> sortedRecords =
-                                    new TreeSet<ExecutionRecord>(process.getExecutionRecords());
+                            SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(
+                                process.getExecutionRecords());
                             Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
                             StringBuffer buff = new StringBuffer();
                             while (recordItr.hasNext()) {
@@ -3072,9 +3062,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                     aceFrameConfig.setStatusMessage("<html>Execution of <font color='blue'>"
                                         + bp.getName() + "</font> complete.");
                                 } else {
-                                    aceFrameConfig
-                                        .setStatusMessage("<html><font color='blue'>Process complete: <font color='red'>"
-                                            + exceptionMessage);
+                                    aceFrameConfig.setStatusMessage("<html><font color='blue'>Process complete: <font color='red'>"
+                                        + exceptionMessage);
                                 }
                             }
                         });
@@ -3109,8 +3098,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showSignpostPanelToggle.setToolTipText("show/hide signpost panel");
         c.gridx++;
 
-        TransporterLabel flashButton =
-                new TransporterLabel(new ImageIcon(ACE.class.getResource("/32x32/plain/flash.png")), this);
+        TransporterLabel flashButton = new TransporterLabel(new ImageIcon(
+            ACE.class.getResource("/32x32/plain/flash.png")), this);
         bottomPanel.add(flashButton, c);
         c.gridx++;
 
@@ -3179,11 +3168,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        if ("viewPositions".equals(evt.getPropertyName()) || 
-                "showPathInfoInTaxonomy".equals(evt.getPropertyName()) || 
-                "showRefsetInfoInTaxonomy".equals(evt.getPropertyName()) || 
-                "showViewerImagesInTaxonomy".equals(evt.getPropertyName()) || 
-                "updateHierarchyView".equals(evt.getPropertyName())) {
+        if ("viewPositions".equals(evt.getPropertyName()) || "showPathInfoInTaxonomy".equals(evt.getPropertyName())
+            || "showRefsetInfoInTaxonomy".equals(evt.getPropertyName())
+            || "showViewerImagesInTaxonomy".equals(evt.getPropertyName())
+            || "updateHierarchyView".equals(evt.getPropertyName())) {
             treeHelper.updateHierarchyView(evt.getPropertyName());
         } else if (evt.getPropertyName().equals("commit")) {
             treeHelper.updateHierarchyView(evt.getPropertyName());
@@ -3196,36 +3184,36 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 commitHistoryTableModel.removeElement(commitHistoryTableModel.getSize() - 1);
             }
         } else if (evt.getPropertyName().equals("commitEnabled")) {
-        	if (commitButton != null) {
-        		commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
-        		if (aceFrameConfig.isCommitEnabled()) {
-        			commitButton.setText("<html><b><font color='green'>commit</font></b>");
-        		} else {
-        			commitButton.setText("commit");
-        			if (dataCheckListModel != null) {
-        				dataCheckListModel.clear();                	
-        			}
-        		}
-        	}
-        	if (cancelButton != null) {
-        		cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
-        	}
+            if (commitButton != null) {
+                commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
+                if (aceFrameConfig.isCommitEnabled()) {
+                    commitButton.setText("<html><b><font color='green'>commit</font></b>");
+                } else {
+                    commitButton.setText("commit");
+                    if (dataCheckListModel != null) {
+                        dataCheckListModel.clear();
+                    }
+                }
+            }
+            if (cancelButton != null) {
+                cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
+            }
         } else if (evt.getPropertyName().equals("lastViewed")) {
             viewerHistoryTableModel.addElement(0, (ConceptBean) evt.getNewValue());
             while (viewerHistoryTableModel.getSize() > maxHistoryListSize) {
                 viewerHistoryTableModel.removeElement(viewerHistoryTableModel.getSize() - 1);
             }
         } else if (evt.getPropertyName().equals("uncommitted")) {
-        	if (uncommittedTableModel != null) {
+            if (uncommittedTableModel != null) {
                 uncommittedTableModel.clear();
                 for (I_Transact t : uncommitted) {
-                	if (t != null) {
-                		if (ConceptBean.class.isAssignableFrom(t.getClass())) {
-                			uncommittedTableModel.addElement((ConceptBean) t);
-                		}
-                	}
+                    if (t != null) {
+                        if (ConceptBean.class.isAssignableFrom(t.getClass())) {
+                            uncommittedTableModel.addElement((ConceptBean) t);
+                        }
+                    }
                 }
-        	}
+            }
         } else if (evt.getPropertyName().equals("imported")) {
             importHistoryTableModel.clear();
             for (I_Transact t : imported) {
@@ -3374,9 +3362,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         if (editMode) {
             if (okToClose()) {
-                int option =
-                        JOptionPane.showConfirmDialog(this, "Save profile before quitting?", "Save profile?",
-                            JOptionPane.YES_NO_OPTION);
+                int option = JOptionPane.showConfirmDialog(this, "Save profile before quitting?", "Save profile?",
+                    JOptionPane.YES_NO_OPTION);
                 if (option == JOptionPane.YES_OPTION) {
                     try {
                         AceConfig.config.save();
@@ -3721,17 +3708,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         workflowDetailsSheet.setSize(dim);
     }
 
-	public RefsetSpecEditor getRefsetSpecEditor() {
-		return refsetSpecPanel.getRefsetSpecEditor();
-	}
+    public RefsetSpecEditor getRefsetSpecEditor() {
+        return refsetSpecPanel.getRefsetSpecEditor();
+    }
 
-	public void setSelectedPreferencesTab(String tabName) {
-		for (int i = 0; i < preferencesTab.getTabCount(); i++) {
-			if (preferencesTab.getTitleAt(i).toLowerCase().equals(tabName.toLowerCase())) {
-				preferencesTab.setSelectedIndex(i);
-				break;
-			}
-		}
-		
-	}
+    public void setSelectedPreferencesTab(String tabName) {
+        for (int i = 0; i < preferencesTab.getTabCount(); i++) {
+            if (preferencesTab.getTitleAt(i).toLowerCase().equals(tabName.toLowerCase())) {
+                preferencesTab.setSelectedIndex(i);
+                break;
+            }
+        }
+
+    }
 }
