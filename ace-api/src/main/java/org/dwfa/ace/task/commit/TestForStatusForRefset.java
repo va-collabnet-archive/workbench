@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,91 +39,80 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = {
-		@Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-		@Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-		@Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
 public class TestForStatusForRefset extends AbstractConceptTest {
 
-	private static final long serialVersionUID = 1;
-	private static final int dataVersion = 1;
+    private static final long serialVersionUID = 1;
+    private static final int dataVersion = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
-			//
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+            //
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	@Override
-	public List<AlertToDataConstraintFailure> test(I_GetConceptData concept,
-			boolean forCommit) throws TaskFailedException {
-		try {
-			ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
-			I_TermFactory termFactory = LocalVersionedTerminology.get();
+    @Override
+    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
+            throws TaskFailedException {
+        try {
+            ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
+            I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-			I_ConfigAceFrame activeProfile = termFactory
-					.getActiveAceFrameConfig();
+            I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
 
-			Set<I_Position> allPositions = getPositions(termFactory);
+            Set<I_Position> allPositions = getPositions(termFactory);
 
-			I_IntSet actives = getActiveStatus(termFactory);
+            I_IntSet actives = getActiveStatus(termFactory);
 
-			for (I_ConceptAttributeTuple rel : concept
-					.getConceptAttributeTuples(
-							activeProfile.getAllowedStatus(), allPositions,
-							true, true)) {
-				if (actives.contains(rel.getConceptStatus()))
-					return alertList;
-			}
+            for (I_ConceptAttributeTuple rel : concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(),
+                allPositions, true, true)) {
+                if (actives.contains(rel.getConceptStatus()))
+                    return alertList;
+            }
 
-			I_GetConceptData refset_con = getConceptSafe(termFactory,
-					RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
-			if (refset_con == null)
-				return alertList;
+            I_GetConceptData refset_con = getConceptSafe(termFactory, RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
+            if (refset_con == null)
+                return alertList;
 
-			I_IntSet types = termFactory.newIntSet();
-			I_GetConceptData isa_con;
-			isa_con = getConceptSafe(termFactory, SNOMED.Concept.IS_A.getUids());
-			if (isa_con != null)
-				types.add(isa_con.getConceptId());
-			isa_con = getConceptSafe(termFactory,
-					ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-			if (isa_con != null)
-				types.add(isa_con.getConceptId());
+            I_IntSet types = termFactory.newIntSet();
+            I_GetConceptData isa_con;
+            isa_con = getConceptSafe(termFactory, SNOMED.Concept.IS_A.getUids());
+            if (isa_con != null)
+                types.add(isa_con.getConceptId());
+            isa_con = getConceptSafe(termFactory, ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+            if (isa_con != null)
+                types.add(isa_con.getConceptId());
 
-			for (I_GetConceptData refset : refset_con.getDestRelOrigins(
-					activeProfile.getAllowedStatus(), types, allPositions,
-					true, true)) {
-				// System.out.println(refset.getInitialText());
-				for (I_ThinExtByRefVersioned mem : termFactory
-						.getRefsetExtensionMembers(refset.getConceptId())) {
-					// List<I_ThinExtByRefVersioned> extensions = termFactory
-					// .getAllExtensionsForComponent(refset.getConceptId(),
-					// true);
-					// for (I_ThinExtByRefVersioned ext : extensions) {
-					// System.out.println(ext.getComponentId() + " "
-					// + termFactory.getConcept(ext.getComponentId()));
-					if (mem.getComponentId() == concept.getConceptId()) {
-						alertList
-								.add(new AlertToDataConstraintFailure(
-										AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-										"<html>Refset, but inactive", concept));
-						return alertList;
-					}
-				}
-			}
-			return alertList;
-		} catch (Exception e) {
-			throw new TaskFailedException(e);
-		}
-	}
+            for (I_GetConceptData refset : refset_con.getDestRelOrigins(activeProfile.getAllowedStatus(), types,
+                allPositions, true, true)) {
+                // System.out.println(refset.getInitialText());
+                for (I_ThinExtByRefVersioned mem : termFactory.getRefsetExtensionMembers(refset.getConceptId())) {
+                    // List<I_ThinExtByRefVersioned> extensions = termFactory
+                    // .getAllExtensionsForComponent(refset.getConceptId(),
+                    // true);
+                    // for (I_ThinExtByRefVersioned ext : extensions) {
+                    // System.out.println(ext.getComponentId() + " "
+                    // + termFactory.getConcept(ext.getComponentId()));
+                    if (mem.getComponentId() == concept.getConceptId()) {
+                        alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+                            "<html>Refset, but inactive", concept));
+                        return alertList;
+                    }
+                }
+            }
+            return alertList;
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
 }

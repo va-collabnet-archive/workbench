@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,12 +64,13 @@ public class RefsetHelper extends LineageHelper {
     }
 
     /**
-     * Get the latest, current concept extension part for the FIRST extension matching a specific refset.
-     *
+     * Get the latest, current concept extension part for the FIRST extension
+     * matching a specific refset.
+     * 
      * @param refsetId int
      * @param conceptId int
      * @return I_ThinExtByRefPartConcept with a status of current.
-     *
+     * 
      * @throws Exception if cannot get all extension for a concept id..
      */
     public I_ThinExtByRefPartConcept getFirstCurrentRefsetExtension(int refsetId, int conceptId) throws Exception {
@@ -96,20 +97,24 @@ public class RefsetHelper extends LineageHelper {
     }
 
     /**
-     * Obtain all current extensions (latest part only) for a particular refset that exist on a
+     * Obtain all current extensions (latest part only) for a particular refset
+     * that exist on a
      * specific concept.
-     *
-     * This method is strongly typed. The caller must provide the actual type of the refset.
-     *
+     * 
+     * This method is strongly typed. The caller must provide the actual type of
+     * the refset.
+     * 
      * @param <T> the strong/concrete type of the refset extension
      * @param refsetId Only returns extensions matching this reference set
      * @param conceptId Only returns extensions that exists on this concept
      * @return All matching refset extension (latest version parts only)
      * @throws Exception if unable to complete (never returns null)
-     * @throws ClassCastException if a matching refset extension is not of type T
+     * @throws ClassCastException if a matching refset extension is not of type
+     *             T
      */
     @SuppressWarnings("unchecked")
-    public <T extends I_ThinExtByRefPart> List<T> getAllCurrentRefsetExtensions(int refsetId, int conceptId) throws Exception {
+    public <T extends I_ThinExtByRefPart> List<T> getAllCurrentRefsetExtensions(int refsetId, int conceptId)
+            throws Exception {
 
         ArrayList<T> result = new ArrayList<T>();
 
@@ -135,20 +140,22 @@ public class RefsetHelper extends LineageHelper {
         return result;
     }
 
-    public <T extends I_ThinExtByRefPart> T getLatestCurrentRefsetExtensions(int refsetId, int conceptId) throws Exception {
+    public <T extends I_ThinExtByRefPart> T getLatestCurrentRefsetExtensions(int refsetId, int conceptId)
+            throws Exception {
         T latestPart = null;
-        for (T part : this.<T>getAllCurrentRefsetExtensions(refsetId, conceptId)) {
+        for (T part : this.<T> getAllCurrentRefsetExtensions(refsetId, conceptId)) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
                 latestPart = part;
             }
         }
         return latestPart;
     }
-    
+
     /**
      * @param refsetId Only extensions for this refset will be evaluated
      * @param conceptId The concept to obtain extensions from
-     * @param extProps The fields (being the name of the bean property) and the values to be validated
+     * @param extProps The fields (being the name of the bean property) and the
+     *            values to be validated
      * @return
      * @throws Exception Unable to complete
      */
@@ -173,7 +180,8 @@ public class RefsetHelper extends LineageHelper {
         return false;
     }
 
-    public boolean hasCurrentRefsetExtension(int refsetId, int conceptId, final BeanPropertyMap extProps) throws Exception {
+    public boolean hasCurrentRefsetExtension(int refsetId, int conceptId, final BeanPropertyMap extProps)
+            throws Exception {
         if (!extProps.hasProperty("statusId")) {
             extProps.with(ThinExtByRefPartProperty.STATUS, currentStatusId);
         }
@@ -182,28 +190,29 @@ public class RefsetHelper extends LineageHelper {
 
     /**
      * Add a concept to a refset
-     *
+     * 
      * @param refsetId The subject refset
      * @param conceptId The concept to be added
-     * @param memberTypeId The value of the concept extension to be added to the new member concept.
-     * @param checkNotExists Is true, will only execute if the extension does not already exist.
+     * @param memberTypeId The value of the concept extension to be added to the
+     *            new member concept.
+     * @param checkNotExists Is true, will only execute if the extension does
+     *            not already exist.
      */
-    public <T extends I_ThinExtByRefPart> boolean newRefsetExtension(int refsetId, int conceptId, Class<T> type, final BeanPropertyMap extProps)
-            throws Exception {
+    public <T extends I_ThinExtByRefPart> boolean newRefsetExtension(int refsetId, int conceptId, Class<T> type,
+            final BeanPropertyMap extProps) throws Exception {
 
         // check subject is not already a member
         if (hasCurrentRefsetExtension(refsetId, conceptId, extProps)) {
             return false;
         }
 
-        // create a new extension (with a part for each path the user is editing)
+        // create a new extension (with a part for each path the user is
+        // editing)
 
-        int newMemberId = termFactory.uuidToNativeWithGeneration(
-            UUID.randomUUID(), unspecifiedUuid, getEditPaths(), Integer.MAX_VALUE);
+        int newMemberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedUuid, getEditPaths(),
+            Integer.MAX_VALUE);
 
-
-        I_ThinExtByRefVersioned newExtension =
-                termFactory.newExtension(refsetId, newMemberId, conceptId, type);
+        I_ThinExtByRefVersioned newExtension = termFactory.newExtension(refsetId, newMemberId, conceptId, type);
 
         for (I_Path editPath : getEditPaths()) {
 
@@ -222,9 +231,8 @@ public class RefsetHelper extends LineageHelper {
         return true;
     }
 
-
     /**
-     *
+     * 
      * @param <T>
      * @param refsetId
      * @param conceptId
@@ -236,9 +244,8 @@ public class RefsetHelper extends LineageHelper {
      * @return
      * @throws Exception
      */
-    public <T extends I_ThinExtByRefPart> boolean newRefsetExtension(
-            int refsetId, int conceptId, Class<T> type, final BeanPropertyMap extProps, UUID memberUuid, UUID pathUuid, int effectiveTime)
-            throws Exception {
+    public <T extends I_ThinExtByRefPart> boolean newRefsetExtension(int refsetId, int conceptId, Class<T> type,
+            final BeanPropertyMap extProps, UUID memberUuid, UUID pathUuid, int effectiveTime) throws Exception {
 
         // check subject is not already a member
         if (hasCurrentRefsetExtension(refsetId, conceptId, extProps)) {
@@ -251,13 +258,11 @@ public class RefsetHelper extends LineageHelper {
         if (memberUuid != null && termFactory.hasId(memberUuid)) {
             newMemberId = termFactory.getId(memberUuid).getNativeId();
         } else {
-            newMemberId = termFactory.uuidToNativeWithGeneration(
-                (memberUuid == null) ? UUID.randomUUID() : memberUuid,
+            newMemberId = termFactory.uuidToNativeWithGeneration((memberUuid == null) ? UUID.randomUUID() : memberUuid,
                 unspecifiedUuid, Arrays.asList(path), effectiveTime);
         }
 
-        I_ThinExtByRefVersioned newExtension =
-                termFactory.newExtension(refsetId, newMemberId, conceptId, type);
+        I_ThinExtByRefVersioned newExtension = termFactory.newExtension(refsetId, newMemberId, conceptId, type);
 
         I_ThinExtByRefPart newPart = termFactory.newExtensionPart(type);
 
@@ -276,7 +281,7 @@ public class RefsetHelper extends LineageHelper {
 
     /**
      * Remove a concept from a refset
-     *
+     * 
      * @param refsetId The subject refset
      * @param conceptId The concept to be removed
      * @param memberTypeId The value of the concept extension to be removed (the
@@ -317,7 +322,6 @@ public class RefsetHelper extends LineageHelper {
         return false;
     }
 
-
     /**
      * @return The edit paths from the active config.
      *         Returns null if no config set or the config defines no paths for
@@ -339,7 +343,7 @@ public class RefsetHelper extends LineageHelper {
         return this.editPaths;
     }
 
-    public void setEditPaths(I_Path ... editPaths) {
+    public void setEditPaths(I_Path... editPaths) {
         if (this.editPaths == null) {
             this.editPaths = new HashSet<I_Path>();
         } else {
@@ -385,9 +389,8 @@ public class RefsetHelper extends LineageHelper {
         }
 
         public boolean evaluate(I_GetConceptData concept, int distance) throws Exception {
-            return hasCurrentRefsetExtension(
-                this.refsetId, concept.getConceptId(),
-                new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, this.memberTypeId));
+            return hasCurrentRefsetExtension(this.refsetId, concept.getConceptId(), new BeanPropertyMap().with(
+                ThinExtByRefPartProperty.CONCEPT_ONE, this.memberTypeId));
         }
     }
 

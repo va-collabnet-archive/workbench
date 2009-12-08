@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
 /**
  * Bean info to AddRoot class.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 public class AddRootBeanInfo extends SimpleBeanInfo {
 
@@ -39,13 +40,11 @@ public class AddRootBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor root =
-                    new PropertyDescriptor("root", AddRoot.class);
+            PropertyDescriptor root = new PropertyDescriptor("root", AddRoot.class);
             root.setBound(true);
             root.setPropertyEditorClass(ConceptLabelEditor.class);
             root.setDisplayName("<html><font color='green'>Drag root here:");
-            root.setShortDescription("Choose root to add to hierarchy "
-                + "and drag it here.");
+            root.setShortDescription("Choose root to add to hierarchy " + "and drag it here.");
 
             PropertyDescriptor rv[] = { root };
             return rv;

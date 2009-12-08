@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,8 +34,7 @@ public class Alerter {
     private AlertToDataConstraintFailure alert;
     private Exception ex;
 
-    public Alerter(boolean showAlertOnFailure, Logger log,
-            AlertToDataConstraintFailure alert) {
+    public Alerter(boolean showAlertOnFailure, Logger log, AlertToDataConstraintFailure alert) {
         super();
         this.showAlertOnFailure = showAlertOnFailure;
         this.log = log;
@@ -83,23 +82,22 @@ public class Alerter {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         }
-        log.warning("Commit test " + alert.getAlertType() + ": "
-            + alert.getAlertMessage());
+        log.warning("Commit test " + alert.getAlertType() + ": " + alert.getAlertMessage());
     }
 
     private void presentAlert() throws Exception {
-        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), alert
-            .getAlertMessage(), "Commit test failed: ",
-            JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), alert.getAlertMessage(),
+            "Commit test failed: ", JOptionPane.ERROR_MESSAGE);
 
         if (alert.getFixOptions() != null && alert.getFixOptions().size() > 0) {
-            I_Fixup selectedOption =
-                    (I_Fixup) JOptionPane.showInputDialog(null,
-                        "Would you like to apply one \n"
-                            + "of the following data fixes?", "Fixup avaible",
-                        JOptionPane.QUESTION_MESSAGE, null, // do not use a custom icon
-                        alert.getFixOptions().toArray(), alert.getFixOptions()
-                            .get(0));
+            I_Fixup selectedOption = (I_Fixup) JOptionPane.showInputDialog(null, "Would you like to apply one \n"
+                + "of the following data fixes?", "Fixup avaible", JOptionPane.QUESTION_MESSAGE, null, // do
+                                                                                                       // not
+                                                                                                       // use
+                                                                                                       // a
+                                                                                                       // custom
+                                                                                                       // icon
+                alert.getFixOptions().toArray(), alert.getFixOptions().get(0));
             if (selectedOption != null) {
                 selectedOption.fix();
             }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,31 +37,20 @@ public class SetWFToOwnerOrReviewerPanelTaskBeanInfo extends SimpleBeanInfo {
         try {
 
             PropertyDescriptor reviewerUuidPropName;
-            reviewerUuidPropName =
-                    new PropertyDescriptor("reviewerUuidPropName",
-                        getBeanDescriptor().getBeanClass());
+            reviewerUuidPropName = new PropertyDescriptor("reviewerUuidPropName", getBeanDescriptor().getBeanClass());
             reviewerUuidPropName.setBound(true);
-            reviewerUuidPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            reviewerUuidPropName
-                .setDisplayName("<html><font color='green'>reviewer prop name:");
-            reviewerUuidPropName
-                .setShortDescription("The property to put the reviewer uuid  into.");
+            reviewerUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            reviewerUuidPropName.setDisplayName("<html><font color='green'>reviewer prop name:");
+            reviewerUuidPropName.setShortDescription("The property to put the reviewer uuid  into.");
 
             PropertyDescriptor ownerUuidPropName;
-            ownerUuidPropName =
-                    new PropertyDescriptor("ownerUuidPropName",
-                        getBeanDescriptor().getBeanClass());
+            ownerUuidPropName = new PropertyDescriptor("ownerUuidPropName", getBeanDescriptor().getBeanClass());
             ownerUuidPropName.setBound(true);
-            ownerUuidPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            ownerUuidPropName
-                .setDisplayName("<html><font color='green'>owner uuid prop name:");
-            ownerUuidPropName
-                .setShortDescription("The property to put the owner uuid into.");
+            ownerUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            ownerUuidPropName.setDisplayName("<html><font color='green'>owner uuid prop name:");
+            ownerUuidPropName.setShortDescription("The property to put the owner uuid into.");
 
-            PropertyDescriptor rv[] =
-                    { reviewerUuidPropName, ownerUuidPropName };
+            PropertyDescriptor rv[] = { reviewerUuidPropName, ownerUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -72,10 +61,8 @@ public class SetWFToOwnerOrReviewerPanelTaskBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(SetWFToOwnerOrReviewerPanelTask.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set WF Panel to<br>select owner or<br>reviewer panel");
+        BeanDescriptor bd = new BeanDescriptor(SetWFToOwnerOrReviewerPanelTask.class);
+        bd.setDisplayName("<html><font color='green'><center>Set WF Panel to<br>select owner or<br>reviewer panel");
         return bd;
     }
 

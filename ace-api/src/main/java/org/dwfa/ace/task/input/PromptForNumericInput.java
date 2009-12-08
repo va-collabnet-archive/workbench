@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,12 +52,15 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * This task prompts the user to enter a number. Non-valid characters cannot be entered.
- * The task can be configured to include/exclude negative numbers, zeroes and floating
+ * This task prompts the user to enter a number. Non-valid characters cannot be
+ * entered.
+ * The task can be configured to include/exclude negative numbers, zeroes and
+ * floating
  * point numbers.
  * Based on PromptForUserInput task
+ * 
  * @author Christine Hill
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN) })
 public class PromptForNumericInput extends AbstractTask {
@@ -101,10 +104,10 @@ public class PromptForNumericInput extends AbstractTask {
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(
-                WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+        I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-        // record which buttons were visible so they can be reset appropriately when
+        // record which buttons were visible so they can be reset appropriately
+        // when
         // finished
         done = false;
         boolean builderVisible = config.isBuilderToggleVisible();
@@ -140,11 +143,12 @@ public class PromptForNumericInput extends AbstractTask {
                     workflowPanel.add(new JLabel("  "), c);
                     c.gridx++;
 
-                    // set up formatted text field that will only accept valid numbers
+                    // set up formatted text field that will only accept valid
+                    // numbers
                     DecimalFormat decimalFormat = new DecimalFormat();
                     decimalFormat.setMaximumFractionDigits(0);
-                    NumberFormatterImpl formatter = new NumberFormatterImpl(decimalFormat,
-                            allowNegative, allowZero, allowDouble);
+                    NumberFormatterImpl formatter = new NumberFormatterImpl(decimalFormat, allowNegative, allowZero,
+                        allowDouble);
                     JFormattedTextField nameField = new JFormattedTextField(formatter);
                     nameField.setPreferredSize(new Dimension(200, nameField.getHeight()));
                     workflowPanel.add(nameField, c);
@@ -152,15 +156,15 @@ public class PromptForNumericInput extends AbstractTask {
                     // step image
                     c.gridx++;
                     c.anchor = GridBagConstraints.SOUTHWEST;
-                    JButton stepButton = new JButton(new ImageIcon(InstructAndWait.class
-                            .getResource("/16x16/plain/media_step_forward.png")));
+                    JButton stepButton = new JButton(new ImageIcon(
+                        InstructAndWait.class.getResource("/16x16/plain/media_step_forward.png")));
                     workflowPanel.add(stepButton, c);
 
                     // stop image
                     c.gridx++;
                     stepButton.addActionListener(new StepActionListener());
-                    JButton stopButton = new JButton(new ImageIcon(InstructAndWait.class
-                            .getResource("/16x16/plain/media_stop_red.png")));
+                    JButton stopButton = new JButton(new ImageIcon(
+                        InstructAndWait.class.getResource("/16x16/plain/media_stop_red.png")));
                     workflowPanel.add(stopButton, c);
                     stopButton.addActionListener(new StopActionListener());
                     c.gridx++;
@@ -195,9 +199,12 @@ public class PromptForNumericInput extends AbstractTask {
                 }
             });
 
-            // zeroes are allowed to be entered at the start of the text field for
-            // floating point numbers (e.g. 0.000001 is valid) however we need to double check
-            // that the user hasn't entered something along the lines of 0.0000 and hit step
+            // zeroes are allowed to be entered at the start of the text field
+            // for
+            // floating point numbers (e.g. 0.000001 is valid) however we need
+            // to double check
+            // that the user hasn't entered something along the lines of 0.0000
+            // and hit step
             // when a value of zero isn't allowed
             if (allowDouble && !allowZero && new Double(0).equals(userInputtedNumber)) {
                 userInputtedNumber = null;
@@ -288,12 +295,12 @@ public class PromptForNumericInput extends AbstractTask {
         public void actionPerformed(ActionEvent e) {
 
             JButton stepButton = (JButton) e.getSource();
-            JPanel workflowPanel = (JPanel)stepButton.getParent();
+            JPanel workflowPanel = (JPanel) stepButton.getParent();
 
             Component[] components = workflowPanel.getComponents();
             for (int i = 0; i < components.length; i++) {
                 if (components[i] instanceof JFormattedTextField) {
-                    userInputtedNumber = ((Number)((JFormattedTextField)components[i]).getValue());
+                    userInputtedNumber = ((Number) ((JFormattedTextField) components[i]).getValue());
                 }
             }
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,43 +25,42 @@ import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
 public class RelSubsumptionMatchSearchInfo extends AbstractSeachTestSearchInfo {
 
-	@Override
-	protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
-		try {
-            PropertyDescriptor applySubsumption =
-                new PropertyDescriptor("applySubsumption", getBeanDescriptor().getBeanClass());
+    @Override
+    protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
+        try {
+            PropertyDescriptor applySubsumption = new PropertyDescriptor("applySubsumption",
+                getBeanDescriptor().getBeanClass());
             applySubsumption.setBound(true);
             applySubsumption.setPropertyEditorClass(CheckboxEditor.class);
             applySubsumption.setDisplayName("<html><font color='green'>use subsumption:");
             applySubsumption.setShortDescription("If checked, uses subsumption to test rel type and rel restriction.");
 
-            PropertyDescriptor relTypeTerm = 
-				new PropertyDescriptor("relTypeTerm", getBeanDescriptor().getBeanClass());
-			relTypeTerm.setBound(true);
-			relTypeTerm.setPropertyEditorClass(ConceptLabelEditor.class);
-			relTypeTerm.setDisplayName("<html><font color='green'>type kind:");
-			relTypeTerm.setShortDescription("The concept to test for type is kind of.");
+            PropertyDescriptor relTypeTerm = new PropertyDescriptor("relTypeTerm", getBeanDescriptor().getBeanClass());
+            relTypeTerm.setBound(true);
+            relTypeTerm.setPropertyEditorClass(ConceptLabelEditor.class);
+            relTypeTerm.setDisplayName("<html><font color='green'>type kind:");
+            relTypeTerm.setShortDescription("The concept to test for type is kind of.");
 
-			PropertyDescriptor relRestrictionTerm = 
-				new PropertyDescriptor("relRestrictionTerm", getBeanDescriptor().getBeanClass());
-			relRestrictionTerm.setBound(true);
-			relRestrictionTerm.setPropertyEditorClass(ConceptLabelEditor.class);
-			relRestrictionTerm.setDisplayName("<html><font color='green'>restriction kind:");
-			relRestrictionTerm.setShortDescription("The concept to test for restriction is kind of.");
+            PropertyDescriptor relRestrictionTerm = new PropertyDescriptor("relRestrictionTerm",
+                getBeanDescriptor().getBeanClass());
+            relRestrictionTerm.setBound(true);
+            relRestrictionTerm.setPropertyEditorClass(ConceptLabelEditor.class);
+            relRestrictionTerm.setDisplayName("<html><font color='green'>restriction kind:");
+            relRestrictionTerm.setShortDescription("The concept to test for restriction is kind of.");
 
-			PropertyDescriptor[] rv = { applySubsumption, relTypeTerm, relRestrictionTerm };
-			return rv;
-		} catch (IntrospectionException e) {
-			throw new Error(e.toString());
-		}
-	}
+            PropertyDescriptor[] rv = { applySubsumption, relTypeTerm, relRestrictionTerm };
+            return rv;
+        } catch (IntrospectionException e) {
+            throw new Error(e.toString());
+        }
+    }
 
-	/**
-	 * @see java.beans.BeanInfo#getBeanDescriptor()
-	 */
-	public BeanDescriptor getBeanDescriptor() {
-		BeanDescriptor bd = new BeanDescriptor(RelSubsumptionMatch.class);
-		bd.setDisplayName("rel kind");
-		return bd;
-	}
+    /**
+     * @see java.beans.BeanInfo#getBeanDescriptor()
+     */
+    public BeanDescriptor getBeanDescriptor() {
+        BeanDescriptor bd = new BeanDescriptor(RelSubsumptionMatch.class);
+        bd.setDisplayName("rel kind");
+        return bd;
+    }
 }

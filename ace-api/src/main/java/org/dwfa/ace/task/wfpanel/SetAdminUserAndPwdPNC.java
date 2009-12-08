@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,49 +29,49 @@ import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/wfpanel", type = BeanType.TASK_BEAN) })
 public class SetAdminUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
-	
-	private static final long serialVersionUID = 1;
-	private static final int dataVersion = 1;
-	
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
-			// nothing to read...
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private static final long serialVersionUID = 1;
+    private static final int dataVersion = 1;
 
-	protected void setupInput() {
-		instruction = new JLabel("Enter admin info: ");
-		user = new JTextField(config.getAdminUsername());
-		pwd = new JPasswordField(config.getAdminPassword());
-		user.selectAll();
-		user.requestFocusInWindow();
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	protected void readInput() {
-		config.setAdminUsername(user.getText());
-		config.setAdminPassword(pwd.getText());
-	}
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+            // nothing to read...
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	@Override
-	protected boolean showPrevious() {
-		return true;
-	}
+    protected void setupInput() {
+        instruction = new JLabel("Enter admin info: ");
+        user = new JTextField(config.getAdminUsername());
+        pwd = new JPasswordField(config.getAdminPassword());
+        user.selectAll();
+        user.requestFocusInWindow();
+    }
 
-	@Override
-	protected boolean showFullName() {
-		return false;
-	}
-	@Override
-	protected void finalSetup() {
-		user.requestFocusInWindow();
-	}
+    protected void readInput() {
+        config.setAdminUsername(user.getText());
+        config.setAdminPassword(pwd.getText());
+    }
+
+    @Override
+    protected boolean showPrevious() {
+        return true;
+    }
+
+    @Override
+    protected boolean showFullName() {
+        return false;
+    }
+
+    @Override
+    protected void finalSetup() {
+        user.requestFocusInWindow();
+    }
 
 }

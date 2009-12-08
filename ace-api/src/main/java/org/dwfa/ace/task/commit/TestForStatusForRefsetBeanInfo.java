@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,16 +24,14 @@ import java.beans.SimpleBeanInfo;
 import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
-public class TestForStatusForRefsetBeanInfo extends
-        TestForUneditedDefaultsBeanInfo {
+public class TestForStatusForRefsetBeanInfo extends TestForUneditedDefaultsBeanInfo {
 
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(TestForStatusForRefset.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Test For<br>Status for Refset");
+        bd.setDisplayName("<html><font color='green'><center>Test For<br>Status for Refset");
         return bd;
     }
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,25 +34,18 @@ public class PromoteToPathBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor pathPropName =
-                    new PropertyDescriptor("pathPropName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor pathPropName = new PropertyDescriptor("pathPropName", getBeanDescriptor().getBeanClass());
             pathPropName.setBound(true);
             pathPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            pathPropName
-                .setDisplayName("<html><font color='green'>path concept property:");
+            pathPropName.setDisplayName("<html><font color='green'>path concept property:");
             pathPropName.setShortDescription("The path to be updated");
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile property");
-            profilePropName
-                .setShortDescription("The property containing the profile to be used");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile property");
+            profilePropName.setShortDescription("The property containing the profile to be used");
 
             PropertyDescriptor rv[] = { pathPropName, profilePropName };
             return rv;
@@ -67,8 +60,7 @@ public class PromoteToPathBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(PromoteToPath.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Promote users work<br/>to release path");
+        bd.setDisplayName("<html><font color='green'><center>Promote users work<br/>to release path");
         return bd;
     }
 }

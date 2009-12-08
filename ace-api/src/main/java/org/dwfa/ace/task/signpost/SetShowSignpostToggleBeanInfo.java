@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,15 +27,11 @@ public class SetShowSignpostToggleBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor show =
-                    new PropertyDescriptor("show", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor show = new PropertyDescriptor("show", getBeanDescriptor().getBeanClass());
             show.setBound(true);
             show.setPropertyEditorClass(CheckboxEditor.class);
-            show
-                .setDisplayName("<html><font color='green'>Show signpost toggle");
-            show
-                .setShortDescription("Choose whether to show the signpost toggle.");
+            show.setDisplayName("<html><font color='green'>Show signpost toggle");
+            show.setShortDescription("Choose whether to show the signpost toggle.");
 
             PropertyDescriptor rv[] = { show };
             return rv;
@@ -49,8 +45,7 @@ public class SetShowSignpostToggleBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetShowSignpostToggle.class);
-        bd.setDisplayName("<html><font color='green'><center>Show or Hide <br>"
-            + "Signpost Toggle");
+        bd.setDisplayName("<html><font color='green'><center>Show or Hide <br>" + "Signpost Toggle");
         return bd;
     }
 

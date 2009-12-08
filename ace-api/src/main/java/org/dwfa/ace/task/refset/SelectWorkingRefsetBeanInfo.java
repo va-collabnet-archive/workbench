@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,16 +28,11 @@ public class SelectWorkingRefsetBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         PropertyDescriptor componentPropName;
         try {
-            componentPropName =
-                    new PropertyDescriptor("componentPropName",
-                        SelectWorkingRefset.class);
+            componentPropName = new PropertyDescriptor("componentPropName", SelectWorkingRefset.class);
             componentPropName.setBound(true);
-            componentPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            componentPropName
-                .setDisplayName("<html><font color='green'>Concept property:");
-            componentPropName
-                .setShortDescription("Name of the property containing the refset concept. ");
+            componentPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            componentPropName.setDisplayName("<html><font color='green'>Concept property:");
+            componentPropName.setShortDescription("Name of the property containing the refset concept. ");
 
             PropertyDescriptor rv[] = { componentPropName };
             return rv;
@@ -51,8 +46,7 @@ public class SelectWorkingRefsetBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SelectWorkingRefset.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Select working refset");
+        bd.setDisplayName("<html><font color='green'><center>Select working refset");
         return bd;
     }
 

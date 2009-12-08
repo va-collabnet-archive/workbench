@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,27 +43,19 @@ public class ChooseFileBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor fileKey =
-                    new PropertyDescriptor("fileKey", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor fileKey = new PropertyDescriptor("fileKey", getBeanDescriptor().getBeanClass());
             fileKey.setBound(true);
             fileKey.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            fileKey
-                .setDisplayName("<html><font color='green'>Name of file key:");
+            fileKey.setDisplayName("<html><font color='green'>Name of file key:");
             fileKey.setShortDescription("Name of file key.");
 
-            PropertyDescriptor loadMode =
-                    new PropertyDescriptor("loadMode", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor loadMode = new PropertyDescriptor("loadMode", getBeanDescriptor().getBeanClass());
             loadMode.setBound(true);
             loadMode.setPropertyEditorClass(CheckboxEditor.class);
             loadMode.setDisplayName("<html><font color='green'>Load:");
-            loadMode
-                .setShortDescription("Select if loading a file, deselect if saving a file.");
+            loadMode.setShortDescription("Select if loading a file, deselect if saving a file.");
 
-            PropertyDescriptor message =
-                    new PropertyDescriptor("message", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor message = new PropertyDescriptor("message", getBeanDescriptor().getBeanClass());
             message.setBound(true);
             message.setPropertyEditorClass(JTextFieldEditor.class);
             message.setDisplayName("<html><font color='green'>Prompt to user:");

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,33 +28,25 @@ public class EditSetDefaultBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor defaultConcept =
-                    new PropertyDescriptor("defaultConcept",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor defaultConcept = new PropertyDescriptor("defaultConcept",
+                getBeanDescriptor().getBeanClass());
             defaultConcept.setBound(true);
             defaultConcept.setPropertyEditorClass(ConceptLabelEditor.class);
             defaultConcept.setDisplayName("<html><font color='green'>default:");
-            defaultConcept
-                .setShortDescription("The default value for the selected type");
+            defaultConcept.setShortDescription("The default value for the selected type");
 
-            PropertyDescriptor type =
-                    new PropertyDescriptor("type", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor type = new PropertyDescriptor("type", getBeanDescriptor().getBeanClass());
             type.setBound(true);
             type.setPropertyEditorClass(EditDefaultTypeEditor.class);
             type.setDisplayName("<html><font color='green'>type:");
             type.setShortDescription("The type for which the default applies.");
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("The property that contains the profile to write to disk.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the profile to write to disk.");
 
             PropertyDescriptor rv[] = { defaultConcept, type, profilePropName };
             return rv;

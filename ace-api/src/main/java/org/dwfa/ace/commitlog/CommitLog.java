@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,8 +51,7 @@ public class CommitLog implements I_WriteChangeSet {
 
     private transient I_TermFactory tf;
 
-    private static DateFormat dateFormat =
-            AceDateFormat.getCommitLogDateFormat();
+    private static DateFormat dateFormat = AceDateFormat.getCommitLogDateFormat();
 
     public CommitLog(File changeSetFile, File tempFile) {
         super();
@@ -72,12 +71,10 @@ public class CommitLog implements I_WriteChangeSet {
                         changeSetFile.delete();
                     }
                     if (tempFile.renameTo(changeSetFile) == false) {
-                        FileIO.copyFile(tempFile.getCanonicalPath(),
-                            changeSetFile.getCanonicalPath());
+                        FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile.getCanonicalPath());
                     }
                 } catch (Exception e) {
-                    AceLog.getAppLog().alertAndLogException(
-                        new Exception("FileIO.copyFile failed in CommitLog."));
+                    AceLog.getAppLog().alertAndLogException(new Exception("FileIO.copyFile failed in CommitLog."));
                 }
 
                 tempFile = new File(canonicalFileString);
@@ -91,8 +88,7 @@ public class CommitLog implements I_WriteChangeSet {
             changeSetFile.getParentFile().mkdirs();
             changeSetFile.createNewFile();
         }
-        FileIO.copyFile(changeSetFile.getCanonicalPath(), tempFile
-            .getCanonicalPath());
+        FileIO.copyFile(changeSetFile.getCanonicalPath(), tempFile.getCanonicalPath());
         tempOut = new OutputStreamWriter(new FileOutputStream(tempFile, true));
         tf = LocalVersionedTerminology.get();
     }
@@ -112,32 +108,24 @@ public class CommitLog implements I_WriteChangeSet {
                 tempOut.append(dateFormat.format(new Date(time)));
                 tempOut.append("\tpath\t");
                 tempOut.append(pathChange.toString());
-                tempOut
-                    .append(tf.getUids(pathChange.getConceptId()).toString());
+                tempOut.append(tf.getUids(pathChange.getConceptId()).toString());
                 tempOut.append("\n");
-            } else if (UniversalIdList.class
-                .isAssignableFrom(change.getClass())) {
-                //Nothing to do;
-            } else if (I_GetExtensionData.class.isAssignableFrom(change
-                .getClass())) {
-                I_GetExtensionData extensionChange =
-                        (I_GetExtensionData) change;
+            } else if (UniversalIdList.class.isAssignableFrom(change.getClass())) {
+                // Nothing to do;
+            } else if (I_GetExtensionData.class.isAssignableFrom(change.getClass())) {
+                I_GetExtensionData extensionChange = (I_GetExtensionData) change;
                 tempOut.append(dateFormat.format(new Date(time)));
                 tempOut.append("\textension\t");
-                tempOut.append(extensionChange.getUniversalAceBean()
-                    .getMemberUid().toString());
+                tempOut.append(extensionChange.getUniversalAceBean().getMemberUid().toString());
                 if (tf.hasConcept(extensionChange.getMemberId())) {
                     tempOut.append("\t");
-                    tempOut.append(tf.getConcept(extensionChange.getMemberId())
-                        .getInitialText());
+                    tempOut.append(tf.getConcept(extensionChange.getMemberId()).getInitialText());
                     tempOut.append("\t");
-                    tempOut.append(tf.getConcept(extensionChange.getMemberId())
-                        .getUids().toString());
+                    tempOut.append(tf.getConcept(extensionChange.getMemberId()).getUids().toString());
                 }
                 tempOut.append("\n");
             } else {
-                throw new IOException("Can't handle class: "
-                    + change.getClass().getName());
+                throw new IOException("Can't handle class: " + change.getClass().getName());
             }
         } catch (TerminologyException e) {
             IOException ioe = new IOException(e.getLocalizedMessage());

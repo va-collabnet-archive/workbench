@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,20 +37,18 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/ebr", type = BeanType.TASK_BEAN) })
 public class CountExtensionsInRefset extends AbstractTask {
 
-
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
-    
+
     private TermEntry refsetTermEntry = new TermEntry(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(refsetTermEntry);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-                                                                 ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             refsetTermEntry = (TermEntry) in.readObject();
@@ -64,11 +62,12 @@ public class CountExtensionsInRefset extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-    throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getRefsetExtensionMembers(refsetTermEntry.getLocalConcept().getNid());
-            worker.getLogger().info("Counted " + extensions.size() + " extensions for " + refsetTermEntry.getLocalDesc().getText() + ".");
+            List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getRefsetExtensionMembers(
+                refsetTermEntry.getLocalConcept().getNid());
+            worker.getLogger().info(
+                "Counted " + extensions.size() + " extensions for " + refsetTermEntry.getLocalDesc().getText() + ".");
             return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
@@ -76,13 +75,11 @@ public class CountExtensionsInRefset extends AbstractTask {
 
     }
 
-
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-        throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do.
 
     }
@@ -108,6 +105,5 @@ public class CountExtensionsInRefset extends AbstractTask {
     public void setRefsetTermEntry(TermEntry refsetTermEntry) {
         this.refsetTermEntry = refsetTermEntry;
     }
-
 
 }

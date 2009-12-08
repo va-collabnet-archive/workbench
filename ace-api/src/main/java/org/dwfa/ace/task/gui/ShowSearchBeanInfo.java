@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 /**
  * 
  * @author susan
- *
+ * 
  */
 public class ShowSearchBeanInfo extends SimpleBeanInfo {
 
@@ -39,13 +39,11 @@ public class ShowSearchBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor showSearch =
-                    new PropertyDescriptor("showSearch", ShowSearch.class);
+            PropertyDescriptor showSearch = new PropertyDescriptor("showSearch", ShowSearch.class);
             showSearch.setBound(true);
             showSearch.setPropertyEditorClass(CheckboxEditor.class);
             showSearch.setDisplayName("Show Search:");
-            showSearch
-                .setShortDescription("Select to present search panel to the user.");
+            showSearch.setShortDescription("Select to present search panel to the user.");
 
             PropertyDescriptor rv[] = { showSearch };
             return rv;

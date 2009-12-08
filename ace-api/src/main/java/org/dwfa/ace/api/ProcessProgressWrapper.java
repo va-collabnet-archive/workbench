@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,8 +32,7 @@ public class ProcessProgressWrapper implements I_ProcessConcepts {
 
     private String description;
 
-    public ProcessProgressWrapper(I_ProcessConcepts processor,
-            String description) {
+    public ProcessProgressWrapper(I_ProcessConcepts processor, String description) {
         this.processor = processor;
         this.description = description;
     }
@@ -63,11 +62,8 @@ public class ProcessProgressWrapper implements I_ProcessConcepts {
             this.monitor = null;
         }
         try {
-            int conceptCount =
-                    LocalVersionedTerminology.get().getConceptCount();
-            this.monitor =
-                    new BatchMonitor(this.description, conceptCount,
-                        this.reportingIntervalMs);
+            int conceptCount = LocalVersionedTerminology.get().getConceptCount();
+            this.monitor = new BatchMonitor(this.description, conceptCount, this.reportingIntervalMs);
         } catch (Exception e) {
             throw new TerminologyRuntimeException(e);
         }

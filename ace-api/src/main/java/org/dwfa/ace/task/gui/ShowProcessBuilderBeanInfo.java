@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,13 +27,11 @@ public class ShowProcessBuilderBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor show =
-                    new PropertyDescriptor("show", ShowProcessBuilder.class);
+            PropertyDescriptor show = new PropertyDescriptor("show", ShowProcessBuilder.class);
             show.setBound(true);
             show.setPropertyEditorClass(CheckboxEditor.class);
             show.setDisplayName("Show Process Builder:");
-            show
-                .setShortDescription("Select to show the process builder to the user.");
+            show.setShortDescription("Select to show the process builder to the user.");
 
             PropertyDescriptor rv[] = { show };
             return rv;
@@ -47,8 +45,7 @@ public class ShowProcessBuilderBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ShowProcessBuilder.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Show Process Builder");
+        bd.setDisplayName("<html><font color='green'><center>Show Process Builder");
         return bd;
     }
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,40 +29,27 @@ public class SetProfilePropertyConceptBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor conceptPropName =
-                    new PropertyDescriptor("conceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptPropName = new PropertyDescriptor("conceptPropName",
+                getBeanDescriptor().getBeanClass());
             conceptPropName.setBound(true);
-            conceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptPropName
-                .setDisplayName("<html><font color='green'>concept property");
-            conceptPropName
-                .setShortDescription("The property containing the concept to be stored");
+            conceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptPropName.setDisplayName("<html><font color='green'>concept property");
+            conceptPropName.setShortDescription("The property containing the concept to be stored");
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile property");
-            profilePropName
-                .setShortDescription("The property containing the profile to be modified");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile property");
+            profilePropName.setShortDescription("The property containing the profile to be modified");
 
-            PropertyDescriptor propertyKey =
-                    new PropertyDescriptor("propertyKey", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor propertyKey = new PropertyDescriptor("propertyKey", getBeanDescriptor().getBeanClass());
             propertyKey.setBound(true);
             propertyKey.setPropertyEditorClass(JTextFieldEditorOneLine.class);
-            propertyKey
-                .setDisplayName("<html><font color='green'>profile property key");
-            propertyKey
-                .setShortDescription("A name (key value) for the property to be added to the profile");
+            propertyKey.setDisplayName("<html><font color='green'>profile property key");
+            propertyKey.setShortDescription("A name (key value) for the property to be added to the profile");
 
-            PropertyDescriptor rv[] =
-                    { conceptPropName, profilePropName, propertyKey };
+            PropertyDescriptor rv[] = { conceptPropName, profilePropName, propertyKey };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -74,8 +61,7 @@ public class SetProfilePropertyConceptBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetProfilePropertyConcept.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Save concept as<br/>a profile property");
+        bd.setDisplayName("<html><font color='green'><center>Save concept as<br/>a profile property");
         return bd;
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,171 +51,167 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/address", type = BeanType.TASK_BEAN) })
-public class GetAddressesAndPositionsAndChangeStatusFromConceptStatusChanges  extends AbstractTask {
+public class GetAddressesAndPositionsAndChangeStatusFromConceptStatusChanges extends AbstractTask {
 
-   /**
+    /**
     * 
     */
-   private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-   private static final int dataVersion = 1;
-   
+    private static final int dataVersion = 1;
+
     private String activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
     private String addressListPropName = ProcessAttachmentKeys.ADDRESS_LIST.getAttachmentKey();
     private String positionListPropName = ProcessAttachmentKeys.POSITION_LIST.getAttachmentKey();
     private String statusValuePropName = ProcessAttachmentKeys.STATUS_CONCEPT.getAttachmentKey();
 
-   private void writeObject(ObjectOutputStream out) throws IOException {
-      out.writeInt(dataVersion);
-      out.writeObject(profilePropName);
-      out.writeObject(activeConceptPropName);
-      out.writeObject(addressListPropName);
-      out.writeObject(positionListPropName);
-      out.writeObject(statusValuePropName);
-   }
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(profilePropName);
+        out.writeObject(activeConceptPropName);
+        out.writeObject(addressListPropName);
+        out.writeObject(positionListPropName);
+        out.writeObject(statusValuePropName);
+    }
 
-   private void readObject(ObjectInputStream in) throws IOException,
-         ClassNotFoundException {
-      int objDataVersion = in.readInt();
-      if (objDataVersion == dataVersion) {
-         profilePropName = (String) in.readObject();
-         activeConceptPropName = (String) in.readObject();
-         addressListPropName = (String) in.readObject();
-         positionListPropName = (String) in.readObject();
-         statusValuePropName = (String) in.readObject();
-      } else {
-         throw new IOException("Can't handle dataversion: " + objDataVersion);
-      }
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            profilePropName = (String) in.readObject();
+            activeConceptPropName = (String) in.readObject();
+            addressListPropName = (String) in.readObject();
+            positionListPropName = (String) in.readObject();
+            statusValuePropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-   }
+    }
 
-   public void complete(I_EncodeBusinessProcess process, I_Work worker)
-         throws TaskFailedException {
-      // Nothing to do...
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
-   }
+    }
 
-   public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-         throws TaskFailedException {
-      try {
-         I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-            .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-         
-         I_TermFactory tf = LocalVersionedTerminology.get();
-         
-         I_ConfigAceFrame workingProfile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-         if (workingProfile == null) {
-        	 workingProfile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-         }
-         
-         Object conceptObj = process.readProperty(activeConceptPropName);
-         I_GetConceptData concept = AceTaskUtil.getConceptFromObject(conceptObj);
-         
-         List<I_ConceptAttributeTuple> attrTupels = concept.getConceptAttributeTuples(workingProfile.getAllowedStatus(),
-               workingProfile.getViewPositionSet());
-         
-         I_GetConceptData newStatus = AceTaskUtil.getConceptFromProperty(process, statusValuePropName);
-         
-         
-         I_IntSet pathSet = LocalVersionedTerminology.get().newIntSet();
-         
-         ArrayList<UniversalAcePosition> positionList = new ArrayList<UniversalAcePosition>();
-         for (I_ConceptAttributeTuple t: attrTupels) {
-            positionList.add(new UniversalAcePosition(tf.getUids(t.getPathId()), tf.convertToThickVersion(t.getVersion())));
-            pathSet.add(t.getPathId());
-            I_ConceptAttributePart part = t.duplicatePart();
-            part.setConceptStatus(newStatus.getConceptId());
-            part.setVersion(Integer.MAX_VALUE);
-            t.getConVersioned().addVersion(part);
-            LocalVersionedTerminology.get().addUncommitted(concept);
-         }
-         ArrayList<String> addressList = new ArrayList<String>();
-         
-         I_IntList inboxDescTypeList  = LocalVersionedTerminology.get().newIntList();
-         inboxDescTypeList.add(ArchitectonicAuxiliary.Concept.USER_INBOX.localize().getNid());
-         for (int pathId: pathSet.getSetValues()) {
-            I_GetConceptData pathConcept = LocalVersionedTerminology.get().getConcept(pathId);
-            I_DescriptionTuple inboxDesc = pathConcept.getDescTuple(inboxDescTypeList, config);
-            if (inboxDesc == null) {
-               worker.getLogger().info("Cannot find inbox for: " + pathConcept.getInitialText());
-               worker.getLogger().info(" inboxDescTypeList: " + inboxDescTypeList.getListArray());
-               for (I_DescriptionVersioned desc: pathConcept.getDescriptions()) {
-                    for (I_DescriptionTuple tuple: desc.getTuples()) {
-                       worker.getLogger().info(" desc tuple: " + tuple);
-                    }
-               }
-            } else {
-               addressList.add(inboxDesc.getText());
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+
+            I_TermFactory tf = LocalVersionedTerminology.get();
+
+            I_ConfigAceFrame workingProfile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+            if (workingProfile == null) {
+                workingProfile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             }
-         }
-         process.setProperty(addressListPropName, addressList);
-         process.setProperty(positionListPropName, positionList);
-         worker.getLogger().info("Selected status values have these positions: " + positionList);
-         worker.getLogger().info("Got addresses from status values: " + addressList);
-         
-         return Condition.CONTINUE;
-      } catch (IllegalArgumentException e) {
-         throw new TaskFailedException(e);
-      } catch (IllegalAccessException e) {
-         throw new TaskFailedException(e);
-      } catch (InvocationTargetException e) {
-         throw new TaskFailedException(e);
-      } catch (IntrospectionException e) {
-         throw new TaskFailedException(e);
-      } catch (IOException e) {
-         throw new TaskFailedException(e);
-      } catch (TerminologyException e) {
-         throw new TaskFailedException(e);
-      }
-   }
 
-   public Collection<Condition> getConditions() {
-      return CONTINUE_CONDITION;
-   }
+            Object conceptObj = process.readProperty(activeConceptPropName);
+            I_GetConceptData concept = AceTaskUtil.getConceptFromObject(conceptObj);
 
-   public int[] getDataContainerIds() {
-      return new int[] {};
-   }
+            List<I_ConceptAttributeTuple> attrTupels = concept.getConceptAttributeTuples(
+                workingProfile.getAllowedStatus(), workingProfile.getViewPositionSet());
 
-   public String getActiveConceptPropName() {
-      return activeConceptPropName;
-   }
+            I_GetConceptData newStatus = AceTaskUtil.getConceptFromProperty(process, statusValuePropName);
 
-   public void setActiveConceptPropName(String propName) {
-      this.activeConceptPropName = propName;
-   }
+            I_IntSet pathSet = LocalVersionedTerminology.get().newIntSet();
 
-   public String getProfilePropName() {
-      return profilePropName;
-   }
+            ArrayList<UniversalAcePosition> positionList = new ArrayList<UniversalAcePosition>();
+            for (I_ConceptAttributeTuple t : attrTupels) {
+                positionList.add(new UniversalAcePosition(tf.getUids(t.getPathId()),
+                    tf.convertToThickVersion(t.getVersion())));
+                pathSet.add(t.getPathId());
+                I_ConceptAttributePart part = t.duplicatePart();
+                part.setConceptStatus(newStatus.getConceptId());
+                part.setVersion(Integer.MAX_VALUE);
+                t.getConVersioned().addVersion(part);
+                LocalVersionedTerminology.get().addUncommitted(concept);
+            }
+            ArrayList<String> addressList = new ArrayList<String>();
 
-   public void setProfilePropName(String newStatusPropName) {
-      this.profilePropName = newStatusPropName;
-   }
+            I_IntList inboxDescTypeList = LocalVersionedTerminology.get().newIntList();
+            inboxDescTypeList.add(ArchitectonicAuxiliary.Concept.USER_INBOX.localize().getNid());
+            for (int pathId : pathSet.getSetValues()) {
+                I_GetConceptData pathConcept = LocalVersionedTerminology.get().getConcept(pathId);
+                I_DescriptionTuple inboxDesc = pathConcept.getDescTuple(inboxDescTypeList, config);
+                if (inboxDesc == null) {
+                    worker.getLogger().info("Cannot find inbox for: " + pathConcept.getInitialText());
+                    worker.getLogger().info(" inboxDescTypeList: " + inboxDescTypeList.getListArray());
+                    for (I_DescriptionVersioned desc : pathConcept.getDescriptions()) {
+                        for (I_DescriptionTuple tuple : desc.getTuples()) {
+                            worker.getLogger().info(" desc tuple: " + tuple);
+                        }
+                    }
+                } else {
+                    addressList.add(inboxDesc.getText());
+                }
+            }
+            process.setProperty(addressListPropName, addressList);
+            process.setProperty(positionListPropName, positionList);
+            worker.getLogger().info("Selected status values have these positions: " + positionList);
+            worker.getLogger().info("Got addresses from status values: " + addressList);
 
-   public String getPositionListPropName() {
-      return positionListPropName;
-   }
+            return Condition.CONTINUE;
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-   public void setPositionListPropName(String pathListListPropName) {
-      this.positionListPropName = pathListListPropName;
-   }
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-   public String getAddressListPropName() {
-      return addressListPropName;
-   }
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-   public void setAddressListPropName(String addressListPropName) {
-      this.addressListPropName = addressListPropName;
-   }
+    public String getActiveConceptPropName() {
+        return activeConceptPropName;
+    }
 
-   public String getStatusValuePropName() {
-      return statusValuePropName;
-   }
+    public void setActiveConceptPropName(String propName) {
+        this.activeConceptPropName = propName;
+    }
 
-   public void setStatusValuePropName(String statusValuePropName) {
-      this.statusValuePropName = statusValuePropName;
-   }
+    public String getProfilePropName() {
+        return profilePropName;
+    }
+
+    public void setProfilePropName(String newStatusPropName) {
+        this.profilePropName = newStatusPropName;
+    }
+
+    public String getPositionListPropName() {
+        return positionListPropName;
+    }
+
+    public void setPositionListPropName(String pathListListPropName) {
+        this.positionListPropName = pathListListPropName;
+    }
+
+    public String getAddressListPropName() {
+        return addressListPropName;
+    }
+
+    public void setAddressListPropName(String addressListPropName) {
+        this.addressListPropName = addressListPropName;
+    }
+
+    public String getStatusValuePropName() {
+        return statusValuePropName;
+    }
+
+    public void setStatusValuePropName(String statusValuePropName) {
+        this.statusValuePropName = statusValuePropName;
+    }
 
 }

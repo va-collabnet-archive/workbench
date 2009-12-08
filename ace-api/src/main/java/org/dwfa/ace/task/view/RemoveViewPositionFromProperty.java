@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,13 +42,12 @@ public class RemoveViewPositionFromProperty extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
-     private String viewPathConceptPropName = ProcessAttachmentKeys.VIEW_PATH_CONCEPT.getAttachmentKey();
 
-     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+    private String viewPathConceptPropName = ProcessAttachmentKeys.VIEW_PATH_CONCEPT.getAttachmentKey();
 
+    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
-     private void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(viewPathConceptPropName);
         out.writeObject(profilePropName);
@@ -59,19 +58,17 @@ public class RemoveViewPositionFromProperty extends AbstractTask {
         if (objDataVersion > dataVersion) {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-        
+
         viewPathConceptPropName = (String) in.readObject();
         profilePropName = (String) in.readObject();
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame profile = getProperty(process, I_ConfigAceFrame.class, profilePropName);
             I_GetConceptData viewPathConcept = getProperty(process, I_GetConceptData.class, viewPathConceptPropName);
@@ -81,13 +78,13 @@ public class RemoveViewPositionFromProperty extends AbstractTask {
                     profile.removeViewPosition(viewPosition);
                 }
             }
-            
+
             profile.fireUpdateHierarchyView();
-            
+
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
-        
+
         return Condition.CONTINUE;
     }
 
@@ -98,7 +95,6 @@ public class RemoveViewPositionFromProperty extends AbstractTask {
     public int[] getDataContainerIds() {
         return new int[] {};
     }
-
 
     public String getProfilePropName() {
         return profilePropName;

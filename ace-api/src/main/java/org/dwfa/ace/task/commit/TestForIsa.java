@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,10 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@BeanList(specs = {
-        @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-        @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-        @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
 public class TestForIsa extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
@@ -117,7 +116,7 @@ public class TestForIsa extends AbstractConceptTest {
 
     private void addWarning(final I_GetConceptData concept, final List<AlertToDataConstraintFailure> alertList) {
         alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-                                                       "<html>No IS_A relationship", concept));
+            "<html>No IS_A relationship", concept));
     }
 
     private List<I_RelTuple> getSourceRelationships(final I_GetConceptData concept) throws Exception {
@@ -127,6 +126,6 @@ public class TestForIsa extends AbstractConceptTest {
         boolean conflictResolved = true;
 
         return concept.getSourceRelTuples(getActiveProfile().getAllowedStatus(), isARelationships, allPositions,
-                                          uncommited, conflictResolved);
+            uncommited, conflictResolved);
     }
 }

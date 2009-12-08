@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info for CopyItemsToNewList class.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 public class CopyItemsToNewListBeanInfo extends SimpleBeanInfo {
 
@@ -39,12 +40,10 @@ public class CopyItemsToNewListBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor listName =
-                    new PropertyDescriptor("listName", CopyItemsToNewList.class);
+            PropertyDescriptor listName = new PropertyDescriptor("listName", CopyItemsToNewList.class);
             listName.setBound(true);
             listName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            listName
-                .setDisplayName("<html><font color='green'>Name of temporary list:");
+            listName.setDisplayName("<html><font color='green'>Name of temporary list:");
             listName.setShortDescription("Name of the temporary list.");
 
             PropertyDescriptor rv[] = { listName };
@@ -59,8 +58,7 @@ public class CopyItemsToNewListBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(CopyItemsToNewList.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Copy Items <br> To New List");
+        bd.setDisplayName("<html><font color='green'><center>Copy Items <br> To New List");
         return bd;
     }
 

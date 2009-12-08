@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,19 +16,18 @@
  */
 package org.dwfa.ace.api.ebr;
 
-
 public interface I_ThinExtByRefPartInteger extends I_ThinExtByRefPart {
 
-   /** @deprecated Use {@link #getIntValue()} */
-   @Deprecated
-   public int getValue();
+    /** @deprecated Use {@link #getIntValue()} */
+    @Deprecated
+    public int getValue();
 
-   /** @deprecated Use {@link #setIntValue(int)} */
-   @Deprecated
-   public void setValue(int value);
+    /** @deprecated Use {@link #setIntValue(int)} */
+    @Deprecated
+    public void setValue(int value);
 
-   public int getIntValue();
-   
-   public void setIntValue(int value);
-   
+    public int getIntValue();
+
+    public void setIntValue(int value);
+
 }

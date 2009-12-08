@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -427,11 +427,11 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public Boolean getShowPathInfoInTaxonomy();
 
     public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy);
-    
+
     public Boolean getShowRefsetInfoInTaxonomy();
 
     public void setShowRefsetInfoInTaxonomy(Boolean showRefsetInfoInTaxonomy);
-    
+
     public I_IntList getRefsetsToSortTaxonomy();
 
     public Boolean getSortTaxonomyUsingRefset();
@@ -590,25 +590,28 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext);
 
     public I_DescriptionTuple getSearchResultsSelection();
-    
+
     /**
      * 
-     * @param visible True if you wish to make the workflow details sheet visible. Otherwise false. 
+     * @param visible True if you wish to make the workflow details sheet
+     *            visible. Otherwise false.
      */
     public void setShowWorkflowDetailSheet(boolean visible);
-    
+
     /**
      * 
-     * @param dim dimensions of the workflow dimension sheet. 
+     * @param dim dimensions of the workflow dimension sheet.
      */
     public void setWorkflowDetailSheetDimensions(Dimension dim);
-    
+
     /**
-     * Developers can place components on the details sheet for interaction with the user. 
-     * @return The JPanel that implements the workflow details sheet. 
+     * Developers can place components on the details sheet for interaction with
+     * the user.
+     * 
+     * @return The JPanel that implements the workflow details sheet.
      */
     public JPanel getWorkflowDetailsSheet();
-    
+
     /**
      * 
      * @return a map of the path nids, and the color associated with that path.
@@ -621,5 +624,5 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void fireUpdateHierarchyView();
 
     public void setSuppressChangeEvents(boolean suppressChangeEvents);
-   
+
 }

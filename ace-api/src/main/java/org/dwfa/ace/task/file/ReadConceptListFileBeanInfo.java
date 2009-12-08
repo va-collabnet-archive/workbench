@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,30 +34,21 @@ public class ReadConceptListFileBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor inputFilePropName =
-                    new PropertyDescriptor("inputFilePropName",
-                        ReadConceptListFile.class);
+            PropertyDescriptor inputFilePropName = new PropertyDescriptor("inputFilePropName",
+                ReadConceptListFile.class);
             inputFilePropName.setBound(true);
-            inputFilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            inputFilePropName
-                .setDisplayName("<html><font color='green'>Input file property:");
-            inputFilePropName
-                .setShortDescription("Name of the property containing the filename to import. ");
+            inputFilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            inputFilePropName.setDisplayName("<html><font color='green'>Input file property:");
+            inputFilePropName.setShortDescription("Name of the property containing the filename to import. ");
 
-            PropertyDescriptor conceptListPropName =
-                    new PropertyDescriptor("conceptListPropName",
-                        ReadConceptListFile.class);
+            PropertyDescriptor conceptListPropName = new PropertyDescriptor("conceptListPropName",
+                ReadConceptListFile.class);
             conceptListPropName.setBound(true);
-            conceptListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptListPropName
-                .setDisplayName("<html><font color='green'>Concept list property:");
-            conceptListPropName
-                .setShortDescription("Name of the property set by this task to the concept list in the specified file. ");
+            conceptListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptListPropName.setDisplayName("<html><font color='green'>Concept list property:");
+            conceptListPropName.setShortDescription("Name of the property set by this task to the concept list in the specified file. ");
 
-            PropertyDescriptor rv[] =
-                    { inputFilePropName, conceptListPropName };
+            PropertyDescriptor rv[] = { inputFilePropName, conceptListPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -69,8 +60,7 @@ public class ReadConceptListFileBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ReadConceptListFile.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Read concept list file");
+        bd.setDisplayName("<html><font color='green'><center>Read concept list file");
         return bd;
     }
 

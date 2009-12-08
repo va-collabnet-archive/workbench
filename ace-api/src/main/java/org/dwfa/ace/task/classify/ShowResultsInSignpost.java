@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,25 +68,23 @@ public class ShowResultsInSignpost extends AbstractTask {
         }
     }
 
-    public void complete(I_EncodeBusinessProcess arg0, I_Work arg1)
-    throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess arg0, I_Work arg1) throws TaskFailedException {
         // nothing to do...
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-    throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
             final StringBuilder sb = new StringBuilder();
             sb.append("<tr><th>")
-            .append("CONCEPT 1")
-            .append("</th><th>")
-            .append("RELATIONSHIPS")
-            .append("</th><th>")
-            .append("CONCEPT 2")
-            .append("</th><th>")
-            .append("GROUP")
-            .append("</th></tr>\n");
+                .append("CONCEPT 1")
+                .append("</th><th>")
+                .append("RELATIONSHIPS")
+                .append("</th><th>")
+                .append("CONCEPT 2")
+                .append("</th><th>")
+                .append("GROUP")
+                .append("</th></tr>\n");
 
             I_SnorocketFactory rocket = (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
 
@@ -94,11 +92,12 @@ public class ShowResultsInSignpost extends AbstractTask {
 
             worker.getLogger().info(sb.toString());
 
-            //          update signpost            
+            // update signpost
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             final JPanel signpostPanel = config.getSignpostPanel();
 
-            final JLabel resultsTable = new JLabel("<html><table align=\"center\" border=\"1\">" + sb + "</table></html>");
+            final JLabel resultsTable = new JLabel("<html><table align=\"center\" border=\"1\">" + sb
+                + "</table></html>");
             final JComponent component = new JScrollPane(resultsTable);
 
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -129,11 +128,11 @@ public class ShowResultsInSignpost extends AbstractTask {
             });
 
             worker.getLogger().info("Finished get results. ");
-            //            worker.getLogger().info(
-            //                    "Stated and inferred: " + statedAndInferredCount
-            //                    + " stated and subsumbed: "
-            //                    + statedAndSubsumedCount + " inferred count: "
-            //                    + inferredRelCount);
+            // worker.getLogger().info(
+            // "Stated and inferred: " + statedAndInferredCount
+            // + " stated and subsumbed: "
+            // + statedAndSubsumedCount + " inferred count: "
+            // + inferredRelCount);
 
         } catch (Exception e) {
             throw new TaskFailedException(e);
@@ -161,17 +160,13 @@ public class ShowResultsInSignpost extends AbstractTask {
         public I_GetConceptData relStatus;
         private int returnedRelCount = 0;
 
-        public ProcessResults(final I_Work worker, StringBuilder sb)
-        throws Exception {
+        public ProcessResults(final I_Work worker, StringBuilder sb) throws Exception {
             this.worker = worker;
             this.sb = sb;
 
-            relCharacteristic = 
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            relRefinability = 
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-            relStatus = 
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+            relCharacteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+            relRefinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+            relStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
             worker.getLogger().info("Inferred id is " + relCharacteristic.getConceptId());
             worker.getLogger().info("Inferred UUIDs are " + relCharacteristic.getUids());
@@ -184,17 +179,11 @@ public class ShowResultsInSignpost extends AbstractTask {
                 final I_GetConceptData relSource = termFactory.getConcept(conceptId1);
                 final I_GetConceptData relType = termFactory.getConcept(roleId);
                 final I_GetConceptData relDestination = termFactory.getConcept(conceptId2);
-                //                worker.getLogger().info(relSource + " " + relType + " " + relDestination + " " + group);
+                // worker.getLogger().info(relSource + " " + relType + " " +
+                // relDestination + " " + group);
 
-                sb.append("<tr><td>")
-                .append(relSource)
-                .append("</td><td>")
-                .append(relType)
-                .append("</td><td>")
-                .append(relDestination)
-                .append("</td><td>")
-                .append(group)
-                .append("</td></tr>\n");
+                sb.append("<tr><td>").append(relSource).append("</td><td>").append(relType).append("</td><td>").append(
+                    relDestination).append("</td><td>").append(group).append("</td></tr>\n");
             } catch (TerminologyException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,8 +27,9 @@ public class ShowFileInWebBrowserBeanInfo extends SimpleBeanInfo {
 
     /**
      * Bean info for ShowFileInWebBrowser class.
+     * 
      * @author Susan Castillo
-     *
+     * 
      */
     public ShowFileInWebBrowserBeanInfo() {
         super();
@@ -36,15 +37,12 @@ public class ShowFileInWebBrowserBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor detailHtmlFileNameProp =
-                    new PropertyDescriptor("detailHtmlFileNameProp",
-                        ShowFileInWebBrowser.class);
+            PropertyDescriptor detailHtmlFileNameProp = new PropertyDescriptor("detailHtmlFileNameProp",
+                ShowFileInWebBrowser.class);
             detailHtmlFileNameProp.setBound(true);
-            detailHtmlFileNameProp
-                .setDisplayName("<html><font color='green'>Detail Html File:");
+            detailHtmlFileNameProp.setDisplayName("<html><font color='green'>Detail Html File:");
             detailHtmlFileNameProp.setShortDescription("html file");
-            detailHtmlFileNameProp
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
+            detailHtmlFileNameProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
 
             PropertyDescriptor rv[] = { detailHtmlFileNameProp };
             return rv;
@@ -58,8 +56,7 @@ public class ShowFileInWebBrowserBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ShowFileInWebBrowser.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Show Attachment<br>In Web Browser");
+        bd.setDisplayName("<html><font color='green'><center>Show Attachment<br>In Web Browser");
         return bd;
     }
 

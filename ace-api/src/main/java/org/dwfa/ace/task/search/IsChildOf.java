@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,32 +33,30 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN), 
-        @Spec(directory = "search", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "search", type = BeanType.TASK_BEAN) })
 public class IsChildOf extends AbstractSearchTest {
 
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
-    
 
     /**
-     * Property name for the term component to test. 
+     * Property name for the term component to test.
      */
     private TermEntry parentTerm = new TermEntry(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.parentTerm);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-                this.parentTerm = (TermEntry) in.readObject();
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            this.parentTerm = (TermEntry) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
@@ -66,7 +64,7 @@ public class IsChildOf extends AbstractSearchTest {
     public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
         try {
             I_GetConceptData parent = AceTaskUtil.getConceptFromObject(parentTerm);
-            
+
             I_GetConceptData potChild;
             if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
                 potChild = (I_GetConceptData) component;
@@ -76,9 +74,9 @@ public class IsChildOf extends AbstractSearchTest {
             } else {
                 return applyInversion(false);
             }
-            
-            return applyInversion(parent.isParentOf(potChild, frameConfig.getAllowedStatus(), 
-                                     frameConfig.getDestRelTypes(), frameConfig.getViewPositionSet(), false));
+
+            return applyInversion(parent.isParentOf(potChild, frameConfig.getAllowedStatus(),
+                frameConfig.getDestRelTypes(), frameConfig.getViewPositionSet(), false));
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);
         } catch (IOException e) {
@@ -93,6 +91,5 @@ public class IsChildOf extends AbstractSearchTest {
     public void setParentTerm(TermEntry parentTerm) {
         this.parentTerm = parentTerm;
     }
-
 
 }

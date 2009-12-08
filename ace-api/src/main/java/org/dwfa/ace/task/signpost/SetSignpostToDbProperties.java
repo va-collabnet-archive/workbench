@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,19 +74,18 @@ public class SetSignpostToDbProperties extends AbstractTask {
             Map<String, String> dbProps = LocalVersionedTerminology.get().getProperties();
             StringBuffer buff = new StringBuffer();
             buff.append("<html><table>");
-            for (Entry<String, String> e: dbProps.entrySet()) {
+            for (Entry<String, String> e : dbProps.entrySet()) {
                 buff.append("<tr><td>");
                 buff.append(e.getKey());
                 buff.append("</td><td>");
                 buff.append(e.getValue());
                 buff.append("</td><tr>");
-                
+
             }
             buff.append("</table>");
-            
+
             final String htmlStr = buff.toString();
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-                                                                                .name());
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             final JPanel signpostPanel = config.getSignpostPanel();
             SwingUtilities.invokeAndWait(new Runnable() {
 

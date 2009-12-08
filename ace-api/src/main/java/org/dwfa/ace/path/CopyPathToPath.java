@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -67,12 +67,14 @@ public class CopyPathToPath implements I_ProcessConcepts {
     private boolean readLatestPartOnly = false;
 
     /**
-     * Indicates whether to copy inactive versions of an entity even if the entity doesn't
-     * exist on the target path (true), or to omit inactive versions in the copy if the
+     * Indicates whether to copy inactive versions of an entity even if the
+     * entity doesn't
+     * exist on the target path (true), or to omit inactive versions in the copy
+     * if the
      * entity doesn't exist in the target path (false). Default is false.
      */
     private boolean copyInactiveVersionsNotInTarget = false;
-    
+
     /**
      * Indicates whether to require a a concept to have attributes
      */
@@ -114,14 +116,14 @@ public class CopyPathToPath implements I_ProcessConcepts {
 
     private Logger logger = Logger.getLogger(CopyPathToPath.class.getName());
 
-	private I_GetConceptData active;
+    private I_GetConceptData active;
 
-	private Map<Class, Method> methodCache = new HashMap<Class, Method>();
+    private Map<Class, Method> methodCache = new HashMap<Class, Method>();
 
     public CopyPathToPath() throws IOException, TerminologyException {
         tf = LocalVersionedTerminology.get();
         directInterface = tf.getDirectInterface();
-		active = tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+        active = tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
     }
 
     public void processConcept(I_GetConceptData concept) throws Exception {
@@ -166,12 +168,11 @@ public class CopyPathToPath implements I_ProcessConcepts {
         }
     }
 
-	private void processExtensions(int id) throws IOException,
-			Exception {
-		for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(id)) {
+    private void processExtensions(int id) throws IOException, Exception {
+        for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(id)) {
             processExtensionByReference(extension);
         }
-	}
+    }
 
     private void processConceptAttributes(I_ConceptAttributeVersioned conceptAttributeVersioned) throws Exception {
 
@@ -182,65 +183,66 @@ public class CopyPathToPath implements I_ProcessConcepts {
         boolean datachanged = false;
 
         datachanged = processEntity(conceptAttributeVersioned, conceptAttributeVersioned.getTuples());
-        
+
         if (datachanged) {
             directInterface.writeConceptAttributes(conceptAttributeVersioned);
         }
     }
 
-	private <T extends I_AmTuple> boolean processEntity(I_AmTermComponent termComponent, List<T> allTuples) throws Exception {
-		I_AmTuple latestPart = null;
-		boolean datachanged = false;
+    private <T extends I_AmTuple> boolean processEntity(I_AmTermComponent termComponent, List<T> allTuples)
+            throws Exception {
+        I_AmTuple latestPart = null;
+        boolean datachanged = false;
 
         Collection<T> tuples;
-		if (readLatestPartOnly) {
+        if (readLatestPartOnly) {
             tuples = new ArrayList<T>();
             tuples.add(getLatest(allTuples));
         } else {
             tuples = allTuples;
         }
-        
+
         // are we copying all versions or just the latest state
-		if (copyOnlyLatestState) {
-			//just the latest state - find the latest exportable part
-	        for (T t : tuples) {
-	            if (isValidForCopy(t)) {
+        if (copyOnlyLatestState) {
+            // just the latest state - find the latest exportable part
+            for (T t : tuples) {
+                if (isValidForCopy(t)) {
                     if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
                         latestPart = t;
                     }
-	            }
-	        }
-	        Map<Integer, T> latestInTargetPath = getLatestTuples(allTuples, targetPathId);
-	        //if a part was found to copy and we are either
-	        // - copying parts regardless of the target path state
-	        // - the target path contains a version of the entity already
-	        // - or the latest part is active
-	        //then copy the part
-	        if (latestPart != null && latestPart.getPathId() != targetPathId
-	        		&& (copyInactiveVersionsNotInTarget 
-	        				|| latestInTargetPath.containsKey(latestPart.getFixedPart().getTermComponentId()) 
-	        				|| isActive(latestPart.getStatusId()))) {
-	            duplicateTuple(latestPart);
-	            datachanged = true;
-	        }
-		} else {
-			//straight copy
-			for (T t : tuples) {
-				if (isValidForCopy(t)) {
-					duplicateTuple(t);
-					datachanged = true;
-				}
-			}
-		}
-		return datachanged;
-	}
+                }
+            }
+            Map<Integer, T> latestInTargetPath = getLatestTuples(allTuples, targetPathId);
+            // if a part was found to copy and we are either
+            // - copying parts regardless of the target path state
+            // - the target path contains a version of the entity already
+            // - or the latest part is active
+            // then copy the part
+            if (latestPart != null
+                && latestPart.getPathId() != targetPathId
+                && (copyInactiveVersionsNotInTarget
+                    || latestInTargetPath.containsKey(latestPart.getFixedPart().getTermComponentId()) || isActive(latestPart.getStatusId()))) {
+                duplicateTuple(latestPart);
+                datachanged = true;
+            }
+        } else {
+            // straight copy
+            for (T t : tuples) {
+                if (isValidForCopy(t)) {
+                    duplicateTuple(t);
+                    datachanged = true;
+                }
+            }
+        }
+        return datachanged;
+    }
 
     private boolean isActive(int statusId) throws IOException, TerminologyException {
-    	return active.isParentOf(tf.getConcept(statusId), true);
-	}
+        return active.isParentOf(tf.getConcept(statusId), true);
+    }
 
-	private <T extends I_AmTuple> T getLatest(List<T> tuples) {
-		T latest = null;
+    private <T extends I_AmTuple> T getLatest(List<T> tuples) {
+        T latest = null;
         for (T t : tuples) {
             if (latest == null || latest.getVersion() < t.getVersion()) {
                 latest = t;
@@ -252,8 +254,8 @@ public class CopyPathToPath implements I_ProcessConcepts {
     private void processDescription(List<I_DescriptionVersioned> descriptions) throws Exception {
         for (I_DescriptionVersioned descriptionVersioned : descriptions) {
             processDescription(descriptionVersioned);
-			processId(tf.getId(descriptionVersioned.getDescId()));
-			processExtensions(descriptionVersioned.getDescId());
+            processId(tf.getId(descriptionVersioned.getDescId()));
+            processExtensions(descriptionVersioned.getDescId());
         }
     }
 
@@ -262,7 +264,6 @@ public class CopyPathToPath implements I_ProcessConcepts {
         if (++descriptionCount % 1000 == 0) {
             logger.info("processed description " + descriptionCount);
         }
-
 
         Map<TupleKey, List<I_DescriptionTuple>> versionsMap = new HashMap<TupleKey, List<I_DescriptionTuple>>();
 
@@ -299,14 +300,13 @@ public class CopyPathToPath implements I_ProcessConcepts {
                 versionsMap.put(key, versions);
             }
         }
-        
+
         boolean datachanged = processEntity(descriptionVersioned, descriptionVersioned.getTuples(true));
 
         if (datachanged) {
             directInterface.writeDescription(descriptionVersioned);
         }
     }
-
 
     private void processExtensionByReference(I_ThinExtByRefVersioned extByRef) throws Exception {
 
@@ -332,43 +332,42 @@ public class CopyPathToPath implements I_ProcessConcepts {
         }
         I_AmTermComponent termComponent = latestPart.getFixedPart();
 
-		Class<? extends I_AmPart> partClass;
+        Class<? extends I_AmPart> partClass;
         if (newPart instanceof I_ThinExtByRefPart) {
-        	partClass = I_ThinExtByRefPart.class;
+            partClass = I_ThinExtByRefPart.class;
         } else {
-        	partClass = newPart.getClass();
+            partClass = newPart.getClass();
         }
-		getAddVersionMethod(newPart, termComponent).invoke(termComponent, newPart);
+        getAddVersionMethod(newPart, termComponent).invoke(termComponent, newPart);
     }
-    
-	private Method getAddVersionMethod(I_AmPart newPart,
-			I_AmTermComponent termComponent) throws Exception,
-			NoSuchMethodException {
-		
-		Class<? extends I_AmTermComponent> termComponentClass = termComponent.getClass();
-		Method result = methodCache.get(termComponentClass);
-		
-		if (result == null) {
-			Class<? extends I_AmPart> partClass = null;
-	        if (newPart instanceof I_ThinExtByRefPart) {
-	        	partClass = I_ThinExtByRefPart.class;
-	        } else {
-	        	for (Class interfaceClass : newPart.getClass().getInterfaces()) {
-					if (I_AmPart.class.isAssignableFrom(interfaceClass)) {
-						partClass = interfaceClass;
-						break;
-					}
-				}
-	        	if (partClass == null) {
-	        		throw new Exception(newPart.getClass() + " does not implement a child of I_AmPart");
-	        	}
-	        }
-	        result = termComponentClass.getMethod("addVersion", partClass);
-	        methodCache.put(termComponentClass, result);
-		}
-		return result;
-	}
-    
+
+    private Method getAddVersionMethod(I_AmPart newPart, I_AmTermComponent termComponent) throws Exception,
+            NoSuchMethodException {
+
+        Class<? extends I_AmTermComponent> termComponentClass = termComponent.getClass();
+        Method result = methodCache.get(termComponentClass);
+
+        if (result == null) {
+            Class<? extends I_AmPart> partClass = null;
+            if (newPart instanceof I_ThinExtByRefPart) {
+                partClass = I_ThinExtByRefPart.class;
+            } else {
+                for (Class interfaceClass : newPart.getClass().getInterfaces()) {
+                    if (I_AmPart.class.isAssignableFrom(interfaceClass)) {
+                        partClass = interfaceClass;
+                        break;
+                    }
+                }
+                if (partClass == null) {
+                    throw new Exception(newPart.getClass() + " does not implement a child of I_AmPart");
+                }
+            }
+            result = termComponentClass.getMethod("addVersion", partClass);
+            methodCache.put(termComponentClass, result);
+        }
+        return result;
+    }
+
     private void processId(I_IdVersioned idVersioned) throws Exception {
 
         if (++idCount % 1000 == 0) {
@@ -376,7 +375,7 @@ public class CopyPathToPath implements I_ProcessConcepts {
         }
 
         boolean datachanged = processEntity(idVersioned, idVersioned.getTuples());
-        
+
         if (datachanged) {
             directInterface.writeId(idVersioned);
         }
@@ -386,8 +385,8 @@ public class CopyPathToPath implements I_ProcessConcepts {
         for (I_ImageVersioned imageVersioned : images) {
             processImages(imageVersioned);
 
-			processId(tf.getId(imageVersioned.getTermComponentId()));
-			processExtensions(imageVersioned.getTermComponentId());
+            processId(tf.getId(imageVersioned.getTermComponentId()));
+            processExtensions(imageVersioned.getTermComponentId());
         }
     }
 
@@ -396,7 +395,7 @@ public class CopyPathToPath implements I_ProcessConcepts {
         if (++imageCount % 1000 == 0) {
             logger.info("processed image " + imageCount);
         }
-        
+
         boolean datachanged = processEntity(imageVersioned, imageVersioned.getTuples());
 
         if (datachanged) {
@@ -407,8 +406,8 @@ public class CopyPathToPath implements I_ProcessConcepts {
     private void processRelationship(List<I_RelVersioned> sourceRels) throws Exception {
         for (I_RelVersioned relVersioned : sourceRels) {
             processRelationship(relVersioned);
-			processId(tf.getId(relVersioned.getTermComponentId()));
-			processExtensions(relVersioned.getTermComponentId());
+            processId(tf.getId(relVersioned.getTermComponentId()));
+            processExtensions(relVersioned.getTermComponentId());
         }
     }
 
@@ -458,13 +457,14 @@ public class CopyPathToPath implements I_ProcessConcepts {
             directInterface.writeRel(relVersioned);
         }
     }
-    
-	private <T extends I_AmTuple> Collection<T> getLatestTuples(List<T> tuples) {
+
+    private <T extends I_AmTuple> Collection<T> getLatestTuples(List<T> tuples) {
         return getLatestTuples(tuples, null).values();
     }
 
     /**
-     * Gets the latest tuples for the given pathid - if the pathid is null the latest
+     * Gets the latest tuples for the given pathid - if the pathid is null the
+     * latest
      * tuples will be returned for all paths
      * 
      * @param <T> tuple type
@@ -475,16 +475,16 @@ public class CopyPathToPath implements I_ProcessConcepts {
     private <T extends I_AmTuple> Map<Integer, T> getLatestTuples(Collection<T> tuples, Integer pathid) {
         Map<Integer, T> map = new HashMap<Integer, T>();
         for (T tuple : tuples) {
-        	if (pathid != null && tuple.getPathId() == pathid) {
-	            int termComponentId = tuple.getFixedPart().getTermComponentId();
-				if (map.containsKey(termComponentId)) {
-	                if (map.get(termComponentId).getVersion() < tuple.getVersion()) {
-	                    map.put(termComponentId, tuple);
-	                }
-	            } else {
-	                map.put(termComponentId, tuple);
-	            }
-        	}
+            if (pathid != null && tuple.getPathId() == pathid) {
+                int termComponentId = tuple.getFixedPart().getTermComponentId();
+                if (map.containsKey(termComponentId)) {
+                    if (map.get(termComponentId).getVersion() < tuple.getVersion()) {
+                        map.put(termComponentId, tuple);
+                    }
+                } else {
+                    map.put(termComponentId, tuple);
+                }
+            }
         }
         return map;
     }

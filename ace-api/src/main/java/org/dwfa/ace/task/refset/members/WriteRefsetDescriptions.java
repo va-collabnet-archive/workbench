@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,13 +35,14 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 /**
- * A Task that exports all reference sets to a directory specified in the <code>directoryKey</code> property.
+ * A Task that exports all reference sets to a directory specified in the
+ * <code>directoryKey</code> property.
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public final class WriteRefsetDescriptions extends AbstractTask {
 
-    private static final long serialVersionUID  = 1;
-    private static final int dataVersion        = 1;
+    private static final long serialVersionUID = 1;
+    private static final int dataVersion = 1;
 
     private transient LocalVersionedTerminologyWrapper terminologyWrapper;
     private transient CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder;
@@ -57,23 +58,28 @@ public final class WriteRefsetDescriptions extends AbstractTask {
      * 1. Use setter injection.
      * 2. Use reflection.
      * 3. Use constructor injection.
-     *
+     * 
      * to set dependencies.
-     *
+     * 
      * Why is constructor injection better?
-     *
-     * 1. We have a compile-time check for this constructor (as opposed to reflection which checks only @ runtime)
-     * 2. We don't expose setters that could be used to modify the object post-construction. This could lead to nasty
+     * 
+     * 1. We have a compile-time check for this constructor (as opposed to
+     * reflection which checks only @ runtime)
+     * 2. We don't expose setters that could be used to modify the object
+     * post-construction. This could lead to nasty
      * side-effects.
      * 3. We could legitimately use this constructor if we desired to.
-     *
-     * @param directoryKey The name of the key used to store the default directory.
-     * @param terminologyWrapper The <code>I_TermFactory</code> wrapper to to use.
-     * @param cleanableProcessExtByRefBuilder Builder used to create the <code>CleanableProcessExtByRef</code> instance.
+     * 
+     * @param directoryKey The name of the key used to store the default
+     *            directory.
+     * @param terminologyWrapper The <code>I_TermFactory</code> wrapper to to
+     *            use.
+     * @param cleanableProcessExtByRefBuilder Builder used to create the
+     *            <code>CleanableProcessExtByRef</code> instance.
      */
     @ForTesting
     WriteRefsetDescriptions(final String directoryKey, final LocalVersionedTerminologyWrapper terminologyWrapper,
-                            final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder) {
+            final CleanableProcessExtByRefBuilder cleanableProcessExtByRefBuilder) {
         this.directoryKey = directoryKey;
         this.terminologyWrapper = terminologyWrapper;
         this.cleanableProcessExtByRefBuilder = cleanableProcessExtByRefBuilder;
@@ -82,10 +88,9 @@ public final class WriteRefsetDescriptions extends AbstractTask {
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeUTF(directoryKey);
-     }
+    }
 
-    private void readObject(final ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             directoryKey = in.readUTF();
@@ -100,31 +105,28 @@ public final class WriteRefsetDescriptions extends AbstractTask {
         try {
             TaskLogger taskLogger = new TaskLogger(worker);
             taskLogger.logInfo("Exporting reference sets as description files");
-            taskLogger.logInfo("reading directoryKey ->"  + directoryKey);
+            taskLogger.logInfo("reading directoryKey ->" + directoryKey);
             selectedDirectory = (File) process.readProperty(directoryKey);
             taskLogger.logInfo("Export to path --> " + selectedDirectory);
 
             I_TermFactory termFactory = terminologyWrapper.get();
-            CleanableProcessExtByRef refsetDescriptionWriter = cleanableProcessExtByRefBuilder.
-                                                                withTermFactory(termFactory).
-                                                                withLogger(taskLogger).
-                                                                withSelectedDir(selectedDirectory).
-                                                                build();
+            CleanableProcessExtByRef refsetDescriptionWriter = cleanableProcessExtByRefBuilder.withTermFactory(
+                termFactory).withLogger(taskLogger).withSelectedDir(selectedDirectory).build();
             try {
                 termFactory.iterateExtByRefs(refsetDescriptionWriter);
             } finally {
-                //if any writing fails close the open connections.
+                // if any writing fails close the open connections.
                 refsetDescriptionWriter.clean();
             }
 
-            return  Condition.CONTINUE;
+            return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException("The task failed with a path of -> " + selectedDirectory, e);
         }
     }
 
     public void complete(final I_EncodeBusinessProcess i_encodeBusinessProcess, final I_Work i_work) {
-        //do nothing on completion.
+        // do nothing on completion.
     }
 
     public Collection<Condition> getConditions() {
@@ -133,7 +135,7 @@ public final class WriteRefsetDescriptions extends AbstractTask {
 
     @Override
     public int[] getDataContainerIds() {
-        return new int[] {  };
+        return new int[] {};
     }
 
     @ForJavaBeans

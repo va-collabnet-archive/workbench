@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,44 +35,28 @@ import org.dwfa.tapi.TerminologyException;
 
 public class RelTupleFileUtil {
 
-    public static String exportTuple(I_RelTuple relTuple)
-            throws TerminologyException, IOException {
+    public static String exportTuple(I_RelTuple relTuple) throws TerminologyException, IOException {
 
         try {
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            UUID tupleUuid =
-                    ArchitectonicAuxiliary.Concept.REL_TUPLE.getUids()
-                        .iterator().next();
-            UUID relUuid =
-                    termFactory.getUids(relTuple.getRelId()).iterator().next();
-            UUID c1Uuid =
-                    termFactory.getUids(relTuple.getC1Id()).iterator().next();
-            UUID c2Uuid =
-                    termFactory.getUids(relTuple.getC2Id()).iterator().next();
-            UUID charUuid =
-                    termFactory.getUids(relTuple.getCharacteristicId())
-                        .iterator().next();
+            UUID tupleUuid = ArchitectonicAuxiliary.Concept.REL_TUPLE.getUids().iterator().next();
+            UUID relUuid = termFactory.getUids(relTuple.getRelId()).iterator().next();
+            UUID c1Uuid = termFactory.getUids(relTuple.getC1Id()).iterator().next();
+            UUID c2Uuid = termFactory.getUids(relTuple.getC2Id()).iterator().next();
+            UUID charUuid = termFactory.getUids(relTuple.getCharacteristicId()).iterator().next();
             int group = relTuple.getGroup();
-            UUID refUuid =
-                    termFactory.getUids(relTuple.getRefinabilityId())
-                        .iterator().next();
-            UUID relTypeUuid =
-                    termFactory.getUids(relTuple.getTypeId()).iterator().next();
-            UUID pathUuid =
-                    termFactory.getUids(relTuple.getPathId()).iterator().next();
-            UUID statusUuid =
-                    termFactory.getUids(relTuple.getStatusId()).iterator()
-                        .next();
+            UUID refUuid = termFactory.getUids(relTuple.getRefinabilityId()).iterator().next();
+            UUID relTypeUuid = termFactory.getUids(relTuple.getTypeId()).iterator().next();
+            UUID pathUuid = termFactory.getUids(relTuple.getPathId()).iterator().next();
+            UUID statusUuid = termFactory.getUids(relTuple.getStatusId()).iterator().next();
             int effectiveDate = relTuple.getVersion();
 
-            String idTuple =
-                    IDTupleFileUtil.exportTuple(termFactory.getId(relUuid));
+            String idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(relUuid));
 
-            return idTuple + tupleUuid + "\t" + relUuid + "\t" + c1Uuid + "\t"
-                + c2Uuid + "\t" + charUuid + "\t" + group + "\t" + refUuid
-                + "\t" + relTypeUuid + "\t" + pathUuid + "\t" + statusUuid
-                + "\t" + effectiveDate + "\n";
+            return idTuple + tupleUuid + "\t" + relUuid + "\t" + c1Uuid + "\t" + c2Uuid + "\t" + charUuid + "\t"
+                + group + "\t" + refUuid + "\t" + relTypeUuid + "\t" + pathUuid + "\t" + statusUuid + "\t"
+                + effectiveDate + "\n";
         } catch (Exception e) {
             e.printStackTrace();
             throw new TerminologyException(e.getMessage());
@@ -209,9 +193,8 @@ public class RelTupleFileUtil {
             boolean addUncommitted = true;
 
             // check if the part exists
-            List<I_RelTuple> parts =
-                    concept.getSourceRelTuples(allowedStatus, allowedTypes, null, addUncommitted,
-                        returnConflictResolvedLatestState);
+            List<I_RelTuple> parts = concept.getSourceRelTuples(allowedStatus, allowedTypes, null, addUncommitted,
+                returnConflictResolvedLatestState);
             I_RelTuple latestTuple = null;
             for (I_RelTuple part : parts) {
                 if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
@@ -223,15 +206,13 @@ public class RelTupleFileUtil {
                 Collection<I_Path> paths = termFactory.getPaths();
                 paths.clear();
                 paths.add(termFactory.getPath(new UUID[] { pathUuid }));
-                termFactory.uuidToNativeWithGeneration(relUuid, ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-                    .localize().getNid(), paths, effectiveDate);
+                termFactory.uuidToNativeWithGeneration(relUuid,
+                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), paths, effectiveDate);
 
-                I_RelVersioned v =
-                        termFactory.newRelationship(relUuid, concept, termFactory
-                            .getConcept(new UUID[] { relTypeUuid }), termFactory.getConcept(new UUID[] { c2Uuid }),
-                            termFactory.getConcept(new UUID[] { charUuid }), termFactory
-                                .getConcept(new UUID[] { refUuid }), termFactory.getConcept(new UUID[] { statusUuid }),
-                            group, termFactory.getActiveAceFrameConfig());
+                I_RelVersioned v = termFactory.newRelationship(relUuid, concept,
+                    termFactory.getConcept(new UUID[] { relTypeUuid }), termFactory.getConcept(new UUID[] { c2Uuid }),
+                    termFactory.getConcept(new UUID[] { charUuid }), termFactory.getConcept(new UUID[] { refUuid }),
+                    termFactory.getConcept(new UUID[] { statusUuid }), group, termFactory.getActiveAceFrameConfig());
 
                 I_RelPart newPart = v.getLastTuple().getPart();
                 newPart.setCharacteristicId(termFactory.getId(charUuid).getNativeId());

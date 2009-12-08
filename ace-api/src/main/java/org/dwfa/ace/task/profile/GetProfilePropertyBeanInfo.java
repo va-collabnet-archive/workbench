@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,40 +29,27 @@ public class GetProfilePropertyBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor conceptPropName =
-                    new PropertyDescriptor("conceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptPropName = new PropertyDescriptor("conceptPropName",
+                getBeanDescriptor().getBeanClass());
             conceptPropName.setBound(true);
-            conceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptPropName
-                .setDisplayName("<html><font color='green'>concept property");
-            conceptPropName
-                .setShortDescription("The property to retrieve the concept to");
+            conceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptPropName.setDisplayName("<html><font color='green'>concept property");
+            conceptPropName.setShortDescription("The property to retrieve the concept to");
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile property");
-            profilePropName
-                .setShortDescription("The property containing the profile to be used");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile property");
+            profilePropName.setShortDescription("The property containing the profile to be used");
 
-            PropertyDescriptor propertyKey =
-                    new PropertyDescriptor("propertyKey", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor propertyKey = new PropertyDescriptor("propertyKey", getBeanDescriptor().getBeanClass());
             propertyKey.setBound(true);
             propertyKey.setPropertyEditorClass(JTextFieldEditorOneLine.class);
-            propertyKey
-                .setDisplayName("<html><font color='green'>profile property key");
-            propertyKey
-                .setShortDescription("A name (key value) for the property in the profile");
+            propertyKey.setDisplayName("<html><font color='green'>profile property key");
+            propertyKey.setShortDescription("A name (key value) for the property in the profile");
 
-            PropertyDescriptor rv[] =
-                    { conceptPropName, profilePropName, propertyKey };
+            PropertyDescriptor rv[] = { conceptPropName, profilePropName, propertyKey };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -74,8 +61,7 @@ public class GetProfilePropertyBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(GetProfileProperty.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Retrieve concept from<br/>a profile property");
+        bd.setDisplayName("<html><font color='green'><center>Retrieve concept from<br/>a profile property");
         return bd;
     }
 }

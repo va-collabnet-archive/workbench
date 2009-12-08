@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,106 +34,96 @@ import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class SaveBaseClassification extends AbstractTask {
-	/**
+    /**
      * 
      */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 2;
+    private static final int dataVersion = 2;
 
-	/**
-	 * Bean property
-	 */
-	private String fileName = "baseState.txt";
+    /**
+     * Bean property
+     */
+    private String fileName = "baseState.txt";
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(getFileName());
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(getFileName());
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		final int objDataVersion = in.readInt();
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        final int objDataVersion = in.readInt();
 
-		if (objDataVersion > 1) {
-			setFileName((String) in.readObject());
-		}
-		if (objDataVersion > dataVersion) {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+        if (objDataVersion > 1) {
+            setFileName((String) in.readObject());
+        }
+        if (objDataVersion > dataVersion) {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	public void complete(I_EncodeBusinessProcess arg0, I_Work arg1)
-			throws TaskFailedException {
-		// nothing to do...
-	}
+    public void complete(I_EncodeBusinessProcess arg0, I_Work arg1) throws TaskFailedException {
+        // nothing to do...
+    }
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
-		try {
-			LoadClassifyWrite.logMemory("SBC evaluate start", worker);
-			I_SnorocketFactory rocket = (I_SnorocketFactory) process
-					.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
+        try {
+            LoadClassifyWrite.logMemory("SBC evaluate start", worker);
+            I_SnorocketFactory rocket = (I_SnorocketFactory) process.readAttachement(ProcessKey.SNOROCKET.getAttachmentKey());
 
-			LoadClassifyWrite.logMemory("SBC pre getClassifierResults", worker);
-			getClassifierResults(worker, rocket);
-			LoadClassifyWrite
-					.logMemory("SBC post getClassifierResults", worker);
-			worker.getLogger().info("Finished get results. ");
-			// worker.getLogger().info(
-			// "Stated and inferred: " + statedAndInferredCount
-			// + " stated and subsumbed: "
-			// + statedAndSubsumedCount + " inferred count: "
-			// + inferredRelCount);
+            LoadClassifyWrite.logMemory("SBC pre getClassifierResults", worker);
+            getClassifierResults(worker, rocket);
+            LoadClassifyWrite.logMemory("SBC post getClassifierResults", worker);
+            worker.getLogger().info("Finished get results. ");
+            // worker.getLogger().info(
+            // "Stated and inferred: " + statedAndInferredCount
+            // + " stated and subsumbed: "
+            // + statedAndSubsumedCount + " inferred count: "
+            // + inferredRelCount);
 
-			// EKM - clear this out to reclaim memory
-			process
-					.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(),
-							"");
-			LoadClassifyWrite.logMemory("SBC evaluate end", worker);
-		} catch (Exception e) {
-			throw new TaskFailedException(e);
-		}
+            // EKM - clear this out to reclaim memory
+            process.writeAttachment(ProcessKey.SNOROCKET.getAttachmentKey(), "");
+            LoadClassifyWrite.logMemory("SBC evaluate end", worker);
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
 
-		return Condition.CONTINUE;
-	}
+        return Condition.CONTINUE;
+    }
 
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-	private void getClassifierResults(I_Work worker, I_SnorocketFactory rocket)
-			throws IOException {
-		long startTime = System.currentTimeMillis();
+    private void getClassifierResults(I_Work worker, I_SnorocketFactory rocket) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		final InputStream is = rocket.getStream();
+        final InputStream is = rocket.getStream();
 
-		final FileOutputStream fos = new FileOutputStream(getFileName());
+        final FileOutputStream fos = new FileOutputStream(getFileName());
 
-		final byte[] buffer = new byte[4096];
-		int len;
-		while ((len = is.read(buffer)) >= 0) {
-			fos.write(buffer, 0, len);
-		}
+        final byte[] buffer = new byte[4096];
+        int len;
+        while ((len = is.read(buffer)) >= 0) {
+            fos.write(buffer, 0, len);
+        }
 
-		fos.close();
+        fos.close();
 
-		worker.getLogger().info(
-				"Save classification results time: "
-						+ (System.currentTimeMillis() - startTime));
-	}
+        worker.getLogger().info("Save classification results time: " + (System.currentTimeMillis() - startTime));
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
 }

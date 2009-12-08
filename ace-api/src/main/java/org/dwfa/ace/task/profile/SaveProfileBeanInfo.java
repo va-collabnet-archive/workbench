@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,39 +28,27 @@ public class SaveProfileBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor profileDir =
-                    new PropertyDescriptor("profileDir", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor profileDir = new PropertyDescriptor("profileDir", getBeanDescriptor().getBeanClass());
             profileDir.setBound(true);
             profileDir.setPropertyEditorClass(JTextFieldEditorOneLine.class);
             profileDir.setDisplayName("<html><font color='green'>profile dir:");
-            profileDir
-                .setShortDescription("The directory to write the profile to.");
+            profileDir.setShortDescription("The directory to write the profile to.");
 
-            PropertyDescriptor usernamePropName =
-                    new PropertyDescriptor("usernamePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor usernamePropName = new PropertyDescriptor("usernamePropName",
+                getBeanDescriptor().getBeanClass());
             usernamePropName.setBound(true);
-            usernamePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            usernamePropName
-                .setDisplayName("<html><font color='green'>username prop:");
-            usernamePropName
-                .setShortDescription("The property that contains the username.");
+            usernamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            usernamePropName.setDisplayName("<html><font color='green'>username prop:");
+            usernamePropName.setShortDescription("The property that contains the username.");
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("The property that contains the profile to write to disk.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the profile to write to disk.");
 
-            PropertyDescriptor rv[] =
-                    { profileDir, usernamePropName, profilePropName };
+            PropertyDescriptor rv[] = { profileDir, usernamePropName, profilePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

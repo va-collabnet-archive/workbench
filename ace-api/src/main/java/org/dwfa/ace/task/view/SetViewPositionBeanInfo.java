@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,38 +29,27 @@ public class SetViewPositionBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile property:");
-            profilePropName
-                .setShortDescription("The property containing the profile to change.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile property:");
+            profilePropName.setShortDescription("The property containing the profile to change.");
 
-            PropertyDescriptor positionStr =
-                    new PropertyDescriptor("positionStr", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor positionStr = new PropertyDescriptor("positionStr", getBeanDescriptor().getBeanClass());
             positionStr.setBound(true);
             positionStr.setPropertyEditorClass(JTextFieldEditorOneLine.class);
             positionStr.setDisplayName("<html><font color='green'>position:");
-            positionStr
-                .setShortDescription("The version as a string. Expressed as \"latest\" or yyyy-MM-dd HH:mm:ss.");
+            positionStr.setShortDescription("The version as a string. Expressed as \"latest\" or yyyy-MM-dd HH:mm:ss.");
 
-            PropertyDescriptor viewPathEntry =
-                    new PropertyDescriptor("viewPathEntry", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor viewPathEntry = new PropertyDescriptor("viewPathEntry",
+                getBeanDescriptor().getBeanClass());
             viewPathEntry.setBound(true);
             viewPathEntry.setPropertyEditorClass(ConceptLabelEditor.class);
-            viewPathEntry
-                .setDisplayName("<html><font color='green'>view path:");
-            viewPathEntry
-                .setShortDescription("The property that contains the concept that identifies the view path.");
+            viewPathEntry.setDisplayName("<html><font color='green'>view path:");
+            viewPathEntry.setShortDescription("The property that contains the concept that identifies the view path.");
 
-            PropertyDescriptor rv[] =
-                    { profilePropName, positionStr, viewPathEntry };
+            PropertyDescriptor rv[] = { profilePropName, positionStr, viewPathEntry };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -72,8 +61,7 @@ public class SetViewPositionBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetViewPosition.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>add view position");
+        bd.setDisplayName("<html><font color='green'><center>add view position");
         return bd;
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,33 +32,38 @@ import java.util.List;
 
 public interface RefsetUtil {
 
-	I_ConceptAttributePart getLastestAttributePart(I_GetConceptData refsetConcept) throws IOException;
+    I_ConceptAttributePart getLastestAttributePart(I_GetConceptData refsetConcept) throws IOException;
 
-	I_IntSet createIntSet(I_TermFactory termFactory, Collection<UUID> uuid) throws Exception;
+    I_IntSet createIntSet(I_TermFactory termFactory, Collection<UUID> uuid) throws Exception;
 
-	I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned ext, I_TermFactory termFactory) throws TerminologyException, IOException;
+    I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned ext, I_TermFactory termFactory)
+            throws TerminologyException, IOException;
 
-	String getSnomedId(int nid, I_TermFactory termFactory) throws Exception;
+    String getSnomedId(int nid, I_TermFactory termFactory) throws Exception;
 
-	<T> T assertExactlyOne(Collection<T> collection);
+    <T> T assertExactlyOne(Collection<T> collection);
 
-	I_ThinExtByRefPart getLatestVersionIfCurrent(I_ThinExtByRefVersioned ext, I_TermFactory termFactory) throws Exception;
+    I_ThinExtByRefPart getLatestVersionIfCurrent(I_ThinExtByRefVersioned ext, I_TermFactory termFactory)
+            throws Exception;
 
-	int getLocalizedParentMarkerNid();
+    int getLocalizedParentMarkerNid();
 
-	int getLocalizedConceptExtensionNid() throws Exception;
+    int getLocalizedConceptExtensionNid() throws Exception;
 
-	int getLocalizedCurrentConceptNid() throws Exception;
+    int getLocalizedCurrentConceptNid() throws Exception;
 
-	List<I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept, I_IntSet allowedStatuses, I_IntSet allowedTypes) throws Exception;
+    List<I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept, I_IntSet allowedStatuses,
+            I_IntSet allowedTypes) throws Exception;
 
-	I_IntSet createCurrentStatus(I_TermFactory termFactory) throws Exception;
+    I_IntSet createCurrentStatus(I_TermFactory termFactory) throws Exception;
 
-	I_IntSet createFullySpecifiedName(I_TermFactory termFactory) throws Exception;
+    I_IntSet createFullySpecifiedName(I_TermFactory termFactory) throws Exception;
 
-	I_IntSet createPreferredTerm(I_TermFactory termFactory) throws Exception;
+    I_IntSet createPreferredTerm(I_TermFactory termFactory) throws Exception;
 
-	List<I_DescriptionTuple> getFSNDescriptionsForConceptHavingCurrentStatus(I_TermFactory termFactory, int conceptId) throws Exception;
+    List<I_DescriptionTuple> getFSNDescriptionsForConceptHavingCurrentStatus(I_TermFactory termFactory, int conceptId)
+            throws Exception;
 
-	List<I_DescriptionTuple> getPTDescriptionsForConceptHavingCurrentStatus(I_TermFactory termFactory, int conceptId) throws Exception;
+    List<I_DescriptionTuple> getPTDescriptionsForConceptHavingCurrentStatus(I_TermFactory termFactory, int conceptId)
+            throws Exception;
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,76 +42,74 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/release", type = BeanType.TASK_BEAN) })
 public class PromoteToPath extends AbstractTask {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
-	
-	private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
-	
+    private static final int dataVersion = 1;
+
+    private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
+
     private String pathPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
-    
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(pathPropName);
-		out.writeObject(profilePropName);
-	}
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion > dataVersion) {
-		    throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-		pathPropName = (String) in.readObject();
-		profilePropName = (String) in.readObject();
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(pathPropName);
+        out.writeObject(profilePropName);
+    }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do...
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion > dataVersion) {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+        pathPropName = (String) in.readObject();
+        profilePropName = (String) in.readObject();
+    }
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-	    try {
-	        
-	        I_ConfigAceFrame profile = getProperty(process, I_ConfigAceFrame.class, profilePropName);
-	        I_GetConceptData pathConcept = getProperty(process, I_GetConceptData.class, pathPropName);
-	        	        
-	        I_TermFactory tf = LocalVersionedTerminology.get();
-	        I_Path promoteToPath = tf.getPath(pathConcept.getUids());
-	        
-	        Set<I_Path> originsPaths = new HashSet<I_Path>();
-	        Set<I_Path> paths = new HashSet<I_Path>();
-	        paths.addAll(profile.getEditingPathSet());
-	        
-	        // Remove all paths we are editing that are origins of other path we are already editing.
-	        for (I_Path path : paths) {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
+    }
+
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+
+            I_ConfigAceFrame profile = getProperty(process, I_ConfigAceFrame.class, profilePropName);
+            I_GetConceptData pathConcept = getProperty(process, I_GetConceptData.class, pathPropName);
+
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_Path promoteToPath = tf.getPath(pathConcept.getUids());
+
+            Set<I_Path> originsPaths = new HashSet<I_Path>();
+            Set<I_Path> paths = new HashSet<I_Path>();
+            paths.addAll(profile.getEditingPathSet());
+
+            // Remove all paths we are editing that are origins of other path we
+            // are already editing.
+            for (I_Path path : paths) {
                 for (I_Position origin : path.getOrigins()) {
                     originsPaths.add(origin.getPath());
                 }
             }
-	        paths.removeAll(originsPaths);
-	        
-	        int now = tf.convertToThinVersion(System.currentTimeMillis());
-	        for (I_Path path : paths) {
-	            promoteToPath.addOrigin(tf.newPosition(path, now));    
+            paths.removeAll(originsPaths);
+
+            int now = tf.convertToThinVersion(System.currentTimeMillis());
+            for (I_Path path : paths) {
+                promoteToPath.addOrigin(tf.newPosition(path, now));
             }
-	        
-	        return Condition.CONTINUE;
-	        
-	    } catch (Exception e) {
-	        throw new TaskFailedException(e);
-	    }
-	}
 
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+            return Condition.CONTINUE;
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+    }
+
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
+
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
     public String getProfilePropName() {
         return profilePropName;

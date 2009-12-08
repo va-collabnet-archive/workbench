@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,57 +23,57 @@ import java.util.Collection;
 import java.util.UUID;
 
 public class UniversalAceExtByRefPartScopedLanguage extends UniversalAceExtByRefPartLanguage {
-   /**
+    /**
     * 
     */
-   private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-   private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-   private Collection<UUID> scopeUids;
-   private int priority;
-   private Collection<UUID> tagUids;
+    private Collection<UUID> scopeUids;
+    private int priority;
+    private Collection<UUID> tagUids;
 
-   private void writeObject(ObjectOutputStream out) throws IOException {
-      out.writeInt(dataVersion);
-      out.writeObject(scopeUids);
-      out.writeInt(priority);
-      out.writeObject(tagUids);
-   }
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(scopeUids);
+        out.writeInt(priority);
+        out.writeObject(tagUids);
+    }
 
-   @SuppressWarnings("unchecked")
-   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-      int objDataVersion = in.readInt();
-      if (objDataVersion == dataVersion) {
-         scopeUids = (Collection<UUID>) in.readObject();
-         priority = in.readInt();
-         tagUids = (Collection<UUID>) in.readObject();
-      } else {
-         throw new IOException("Can't handle dataversion: " + objDataVersion);
-      }
-   }
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            scopeUids = (Collection<UUID>) in.readObject();
+            priority = in.readInt();
+            tagUids = (Collection<UUID>) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-   public int getPriority() {
-      return priority;
-   }
+    public int getPriority() {
+        return priority;
+    }
 
-   public void setPriority(int priority) {
-      this.priority = priority;
-   }
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 
-   public Collection<UUID> getScopeUids() {
-      return scopeUids;
-   }
+    public Collection<UUID> getScopeUids() {
+        return scopeUids;
+    }
 
-   public void setScopeUids(Collection<UUID> scopeUids) {
-      this.scopeUids = scopeUids;
-   }
+    public void setScopeUids(Collection<UUID> scopeUids) {
+        this.scopeUids = scopeUids;
+    }
 
-   public Collection<UUID> getTagUids() {
-      return tagUids;
-   }
+    public Collection<UUID> getTagUids() {
+        return tagUids;
+    }
 
-   public void setTagUids(Collection<UUID> tagUids) {
-      this.tagUids = tagUids;
-   }
+    public void setTagUids(Collection<UUID> tagUids) {
+        this.tagUids = tagUids;
+    }
 }

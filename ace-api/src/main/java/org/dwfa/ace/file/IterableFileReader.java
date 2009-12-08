@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,17 +23,20 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * Provides a mechanism to iteratively progress through a file line by line whereby various
+ * Provides a mechanism to iteratively progress through a file line by line
+ * whereby various
  * implementing subclasses will produce a strongly typed output from each line.
  * <p>
- * Effectively each line of the source file will be converted to an object of type T
- * and the objects will be streamed from the file as this instance is iterated.
+ * Effectively each line of the source file will be converted to an object of
+ * type T and the objects will be streamed from the file as this instance is
+ * iterated.
  * <p>
- * <b>NOTE</b>
- * If a line of the file cannot be processed a RuntimeException may be raised by the implementation
- * as {@link Iterator#next()} defines no checked exceptions.
- *
- * @param <T> The defined type output to be produced by a concrete implementation
+ * <b>NOTE</b> If a line of the file cannot be processed a RuntimeException may
+ * be raised by the implementation as {@link Iterator#next()} defines no checked
+ * exceptions.
+ * 
+ * @param <T> The defined type output to be produced by a concrete
+ *            implementation
  */
 public abstract class IterableFileReader<T> implements Iterable<T> {
 
@@ -71,7 +74,9 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
     }
 
     /**
-     * If it exists, the header line will be available after iteration commences.
+     * If it exists, the header line will be available after iteration
+     * commences.
+     * 
      * @return The header line (if available) otherwise null.
      */
     public String getHeader() {
@@ -97,18 +102,17 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
 
     /**
      * To be implemented by subclass.
-     *
+     * 
      * @param line The next line in the file.
      * @return A actual object. Must never return null.
-     *         If the line cannot be processed a runtime exception should be raised.
+     *         If the line cannot be processed a runtime exception should be
+     *         raised.
      * @throws RuntimeException if processing fails
      */
     protected abstract T processLine(String line);
 
-
-
     /**
-     *	The iterator instance for the reader
+     * The iterator instance for the reader
      */
     public class FileReaderIterator<E> implements Iterator<T> {
 
@@ -120,7 +124,7 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
 
         protected FileReaderIterator(File sourceFile) throws IOException {
             setSize(sourceFile);
-            reader = new BufferedReader( new FileReader( sourceFile ) );
+            reader = new BufferedReader(new FileReader(sourceFile));
 
             if (hasHeader) {
                 headerLine = reader.readLine();
@@ -157,9 +161,10 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
         private void setSize(File sourceFile) throws IOException {
             try {
                 size = 0;
-                reader = new BufferedReader( new FileReader( sourceFile ) );
+                reader = new BufferedReader(new FileReader(sourceFile));
 
-                for(;reader.readLine() != null; size++){}
+                for (; reader.readLine() != null; size++) {
+                }
             } finally {
                 reader.close();
             }
@@ -169,8 +174,6 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
             return size;
         }
     }
-
-
 
     public boolean isTransactional() {
         return transactional;

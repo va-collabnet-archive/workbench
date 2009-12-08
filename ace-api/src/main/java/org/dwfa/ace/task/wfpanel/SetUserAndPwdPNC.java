@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,54 +29,53 @@ import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/wfpanel", type = BeanType.TASK_BEAN) })
 public class SetUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
-	
-	private static final long serialVersionUID = 1;
-	private static final int dataVersion = 1;
-	
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
-			// nothing to read...
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private static final long serialVersionUID = 1;
+    private static final int dataVersion = 1;
 
-	protected void setupInput() {
-		instruction = new JLabel("Enter user info: ");
-		fullName = new JTextField(config.getDbConfig().getFullName());
-		fullName.selectAll();
-		user = new JTextField(config.getUsername());
-		user.selectAll();
-		pwd = new JPasswordField(config.getPassword());
-		pwd.selectAll();
-		fullName.selectAll();
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	protected void readInput() {
-		config.getDbConfig().setFullName(fullName.getText());
-		config.setUsername(user.getText());
-		config.setPassword(pwd.getText());
-		config.setFrameName(fullName + " Editor Window");
-	}
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+            // nothing to read...
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	@Override
-	protected boolean showPrevious() {
-		return true;
-	}
+    protected void setupInput() {
+        instruction = new JLabel("Enter user info: ");
+        fullName = new JTextField(config.getDbConfig().getFullName());
+        fullName.selectAll();
+        user = new JTextField(config.getUsername());
+        user.selectAll();
+        pwd = new JPasswordField(config.getPassword());
+        pwd.selectAll();
+        fullName.selectAll();
+    }
 
-	@Override
-	protected boolean showFullName() {
-		return true;
-	}
+    protected void readInput() {
+        config.getDbConfig().setFullName(fullName.getText());
+        config.setUsername(user.getText());
+        config.setPassword(pwd.getText());
+        config.setFrameName(fullName + " Editor Window");
+    }
 
-	@Override
-	protected void finalSetup() {
-		fullName.requestFocusInWindow();
-	}
+    @Override
+    protected boolean showPrevious() {
+        return true;
+    }
+
+    @Override
+    protected boolean showFullName() {
+        return true;
+    }
+
+    @Override
+    protected void finalSetup() {
+        fullName.requestFocusInWindow();
+    }
 }

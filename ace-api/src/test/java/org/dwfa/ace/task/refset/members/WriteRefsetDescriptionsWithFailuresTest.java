@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,8 +41,8 @@ import java.util.logging.Logger;
 
 public final class WriteRefsetDescriptionsWithFailuresTest {
 
-    private static final String DIRECTORY_KEY       = "mykey";
-    private static final String EXCEPTION_MESSAGE   = "Exception message";
+    private static final String DIRECTORY_KEY = "mykey";
+    private static final String EXCEPTION_MESSAGE = "Exception message";
 
     private IMocksControl mockControl;
     private I_TermFactory mockTermFactory;
@@ -69,7 +69,7 @@ public final class WriteRefsetDescriptionsWithFailuresTest {
     @Test
     public void shouldExtendsAbstractTask() {
         assertTrue("WriteRefsetDescriptions should extend AbstractTask",
-                AbstractTask.class.isAssignableFrom(WriteRefsetDescriptions.class));
+            AbstractTask.class.isAssignableFrom(WriteRefsetDescriptions.class));
     }
 
     @Test
@@ -84,10 +84,11 @@ public final class WriteRefsetDescriptionsWithFailuresTest {
         assertThat(spec.type(), equalTo(BeanType.TASK_BEAN));
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @SuppressWarnings( { "ThrowableInstanceNeverThrown" })
     @Test
     public void shouldThrowAnExceptionIfTheTasksFails() throws Exception {
-        EasyMock.expect(mockProcess.readProperty(DIRECTORY_KEY)).andThrow(new IllegalArgumentException(EXCEPTION_MESSAGE));
+        EasyMock.expect(mockProcess.readProperty(DIRECTORY_KEY)).andThrow(
+            new IllegalArgumentException(EXCEPTION_MESSAGE));
         mockControl.replay();
 
         try {
@@ -100,7 +101,7 @@ public final class WriteRefsetDescriptionsWithFailuresTest {
         }
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @SuppressWarnings( { "ThrowableInstanceNeverThrown" })
     @Test
     public void shouldCloseOpenFilesIfATaskFailsAfterWritingFiles() throws Exception {
         EasyMock.expect(mockTerminologyWrapper.get()).andReturn(mockTermFactory);
@@ -126,15 +127,14 @@ public final class WriteRefsetDescriptionsWithFailuresTest {
     }
 
     private void expectThatCleanableProcessisBuilt(final CleanableProcessExtByRef mockCleanableProcess,
-                                                   final File directoryFile) {
+            final File directoryFile) {
         EasyMock.expect(mockBuilder.withTermFactory(mockTermFactory)).andReturn(mockBuilder);
         EasyMock.expect(mockBuilder.withLogger(EasyMock.isA(TaskLogger.class))).andReturn(mockBuilder);
         EasyMock.expect(mockBuilder.withSelectedDir(directoryFile)).andReturn(mockBuilder);
         EasyMock.expect(mockBuilder.build()).andReturn(mockCleanableProcess);
-    }    
+    }
 
     private WriteRefsetDescriptions createTask() {
-        return new WriteRefsetDescriptions(DIRECTORY_KEY, mockTerminologyWrapper,
-                mockBuilder);
-    }    
+        return new WriteRefsetDescriptions(DIRECTORY_KEY, mockTerminologyWrapper, mockBuilder);
+    }
 }

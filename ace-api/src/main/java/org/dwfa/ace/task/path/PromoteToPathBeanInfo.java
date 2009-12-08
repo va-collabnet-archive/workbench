@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,29 +28,21 @@ public class PromoteToPathBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor pathConceptPropName =
-                    new PropertyDescriptor("pathConceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor pathConceptPropName = new PropertyDescriptor("pathConceptPropName",
+                getBeanDescriptor().getBeanClass());
             pathConceptPropName.setBound(true);
-            pathConceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            pathConceptPropName
-                .setDisplayName("<html><font color='green'>path concept property:");
+            pathConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            pathConceptPropName.setDisplayName("<html><font color='green'>path concept property:");
             pathConceptPropName.setShortDescription("The path to be updated");
 
-            PropertyDescriptor destRelTypeConceptPropName =
-                    new PropertyDescriptor("destRelTypeConceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor destRelTypeConceptPropName = new PropertyDescriptor("destRelTypeConceptPropName",
+                getBeanDescriptor().getBeanClass());
             destRelTypeConceptPropName.setBound(true);
-            destRelTypeConceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            destRelTypeConceptPropName
-                .setDisplayName("<html><font color='green'>dest rel type:");
-            destRelTypeConceptPropName
-                .setShortDescription("Origins (paths) of this destination relationship type will be copied to the selected path.");
+            destRelTypeConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            destRelTypeConceptPropName.setDisplayName("<html><font color='green'>dest rel type:");
+            destRelTypeConceptPropName.setShortDescription("Origins (paths) of this destination relationship type will be copied to the selected path.");
 
-            PropertyDescriptor rv[] =
-                    { pathConceptPropName, destRelTypeConceptPropName };
+            PropertyDescriptor rv[] = { pathConceptPropName, destRelTypeConceptPropName };
             return rv;
 
         } catch (IntrospectionException e) {
@@ -63,8 +55,7 @@ public class PromoteToPathBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(PromoteToPath.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>promote updates to path");
+        bd.setDisplayName("<html><font color='green'><center>promote updates to path");
         return bd;
     }
 }

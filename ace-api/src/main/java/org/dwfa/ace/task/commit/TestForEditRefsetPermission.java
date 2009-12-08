@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -106,8 +106,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
             boolean foundMatch = false;
 
             I_GetConceptData refsetSpec = termFactory.getConcept(extension.getRefsetId());
-            I_GetConceptData specifiesRefsetRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+            I_GetConceptData specifiesRefsetRel = termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             I_GetConceptData memberRefset = getLatestRelationshipTarget(refsetSpec, specifiesRefsetRel);
             if (memberRefset == null) { // not a refset spec being edited
                 return alertList;
@@ -142,8 +141,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
 
         List<I_RelTuple> roles = activeUser.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true, true);
 
-        I_GetConceptData createNewRefsetPermission =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.EDIT_REFSET.getUids());
+        I_GetConceptData createNewRefsetPermission = termFactory.getConcept(ArchitectonicAuxiliary.Concept.EDIT_REFSET.getUids());
 
         for (I_RelTuple roleRel : roles) {
             int relationshipId = roleRel.getRelId();
@@ -171,8 +169,8 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
                 I_IntSet isAAllowedTypes = termFactory.newIntSet();
                 isAAllowedTypes.add(isAType.getConceptId());
 
-                List<I_RelTuple> permissions =
-                        c2.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions, true, true);
+                List<I_RelTuple> permissions = c2.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions, true,
+                    true);
 
                 for (I_RelTuple permissionRel : permissions) {
                     if (permissionRel.getC1Id() == createNewRefsetPermission.getConceptId()) {
@@ -189,13 +187,12 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
     private Set<I_GetConceptData> getValidRefsetsFromIndividualUserPermissions() throws Exception {
         Set<I_Position> allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
-        I_GetConceptData createNewRefsetPermissionRel =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.EDIT_REFSET.getUids());
+        I_GetConceptData createNewRefsetPermissionRel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.EDIT_REFSET.getUids());
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(createNewRefsetPermissionRel.getConceptId());
 
-        Set<I_GetConceptData> refsets =
-                activeUser.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true, true);
+        Set<I_GetConceptData> refsets = activeUser.getSourceRelTargets(activeStatuses, allowedTypes, allPositions,
+            true, true);
 
         return refsets;
     }

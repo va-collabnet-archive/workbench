@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,13 +34,10 @@ public class AttachmentListEmptyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor listName =
-                    new PropertyDescriptor("listName",
-                        AttachmentListEmpty.class);
+            PropertyDescriptor listName = new PropertyDescriptor("listName", AttachmentListEmpty.class);
             listName.setBound(true);
             listName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            listName
-                .setDisplayName("<html><font color='green'>Name of temporary list:");
+            listName.setDisplayName("<html><font color='green'>Name of temporary list:");
             listName.setShortDescription("Name of the temporary list.");
 
             PropertyDescriptor rv[] = { listName };
@@ -55,8 +52,7 @@ public class AttachmentListEmptyBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(AttachmentListEmpty.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Attachment List Empty");
+        bd.setDisplayName("<html><font color='green'><center>Attachment List Empty");
         return bd;
     }
 

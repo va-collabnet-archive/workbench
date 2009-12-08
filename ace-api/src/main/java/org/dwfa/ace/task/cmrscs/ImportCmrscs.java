@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,12 +48,11 @@ public class ImportCmrscs extends AbstractTask {
         out.writeObject(rootDirStr);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-                                                                 ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
             rootDirStr = (String) in.readObject();
-         } else {
+        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
@@ -63,33 +62,31 @@ public class ImportCmrscs extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-    throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         importAllChangeSets(worker.getLogger());
 
         return Condition.CONTINUE;
     }
 
-	public void importAllChangeSets(Logger logger) throws TaskFailedException {
-		LocalVersionedTerminology.get().suspendChangeSetWriters();
+    public void importAllChangeSets(Logger logger) throws TaskFailedException {
+        LocalVersionedTerminology.get().suspendChangeSetWriters();
         ChangeSetImporter csi = new ChangeSetImporter() {
-			@Override
-			public I_ReadChangeSet getChangeSetReader(File csf) {
-				return new CmrscsReader(csf);
-			}
+            @Override
+            public I_ReadChangeSet getChangeSetReader(File csf) {
+                return new CmrscsReader(csf);
+            }
         };
         csi.importAllChangeSets(logger, null, rootDirStr, false, ".cmrscs");
 
         LocalVersionedTerminology.get().resumeChangeSetWriters();
-	}
+    }
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-        throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do.
 
     }

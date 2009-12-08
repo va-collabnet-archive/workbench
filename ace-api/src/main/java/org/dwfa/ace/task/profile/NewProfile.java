@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,178 +39,162 @@ import org.dwfa.tapi.TerminologyException;
 
 public abstract class NewProfile extends AbstractTask {
 
-	/**
+    /**
 	    * 
 	    */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 2;
+    private static final int dataVersion = 2;
 
-	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE
-			.getAttachmentKey();
+    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
-	private String usernamePropName = ProcessAttachmentKeys.USERNAME
-			.getAttachmentKey();
+    private String usernamePropName = ProcessAttachmentKeys.USERNAME.getAttachmentKey();
 
-	private String passwordPropName = ProcessAttachmentKeys.PASSWORD
-			.getAttachmentKey();
+    private String passwordPropName = ProcessAttachmentKeys.PASSWORD.getAttachmentKey();
 
-	private String adminUsernamePropName = ProcessAttachmentKeys.ADMIN_USERNAME
-			.getAttachmentKey();
+    private String adminUsernamePropName = ProcessAttachmentKeys.ADMIN_USERNAME.getAttachmentKey();
 
-	private String adminPasswordPropName = ProcessAttachmentKeys.ADMIN_PASSWORD
-			.getAttachmentKey();
+    private String adminPasswordPropName = ProcessAttachmentKeys.ADMIN_PASSWORD.getAttachmentKey();
 
-	private String fullNamePropName = ProcessAttachmentKeys.FULLNAME
-			.getAttachmentKey();
+    private String fullNamePropName = ProcessAttachmentKeys.FULLNAME.getAttachmentKey();
 
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(profilePropName);
+        out.writeObject(usernamePropName);
+        out.writeObject(passwordPropName);
+        out.writeObject(adminUsernamePropName);
+        out.writeObject(adminPasswordPropName);
+        out.writeObject(fullNamePropName);
+    }
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(profilePropName);
-		out.writeObject(usernamePropName);
-		out.writeObject(passwordPropName);
-		out.writeObject(adminUsernamePropName);
-		out.writeObject(adminPasswordPropName);
-		out.writeObject(fullNamePropName);
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion <= dataVersion) {
+            profilePropName = (String) in.readObject();
+            usernamePropName = (String) in.readObject();
+            passwordPropName = (String) in.readObject();
+            adminUsernamePropName = (String) in.readObject();
+            adminPasswordPropName = (String) in.readObject();
+            if (objDataVersion >= 2) {
+                fullNamePropName = (String) in.readObject();
+            } else {
+                fullNamePropName = ProcessAttachmentKeys.FULLNAME.getAttachmentKey();
+            }
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion <= dataVersion) {
-			profilePropName = (String) in.readObject();
-			usernamePropName = (String) in.readObject();
-			passwordPropName = (String) in.readObject();
-			adminUsernamePropName = (String) in.readObject();
-			adminPasswordPropName = (String) in.readObject();
-			if (objDataVersion >= 2) {
-				fullNamePropName = (String) in.readObject();
-			} else {
-				fullNamePropName = ProcessAttachmentKeys.FULLNAME.getAttachmentKey();
-			}
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do
+    }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do
-	}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            String fullname = (String) process.readProperty(fullNamePropName);
+            String username = (String) process.readProperty(usernamePropName);
+            String password = (String) process.readProperty(passwordPropName);
+            String adminUsername = (String) process.readProperty(adminUsernamePropName);
+            String adminPassword = (String) process.readProperty(adminPasswordPropName);
+            I_ConfigAceFrame newProfile = setupNewProfile(fullname, username, password, adminUsername, adminPassword);
+            if (username != null) {
+                if (newProfile.getAddressesList().contains(username) == false) {
+                    newProfile.getAddressesList().add(username);
+                }
+            }
+            process.setProperty(profilePropName, newProfile);
+            return Condition.CONTINUE;
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		try {
-			String fullname = (String) process.readProperty(fullNamePropName);
-			String username = (String) process.readProperty(usernamePropName);
-			String password = (String) process.readProperty(passwordPropName);
-			String adminUsername = (String) process
-					.readProperty(adminUsernamePropName);
-			String adminPassword = (String) process
-					.readProperty(adminPasswordPropName);
-			I_ConfigAceFrame newProfile = setupNewProfile(fullname, username, password,
-					adminUsername, adminPassword);
-			if (username != null) {
-				if (newProfile.getAddressesList().contains(username) == false) {
-					newProfile.getAddressesList().add(username);
-				}
-			}
-			process.setProperty(profilePropName, newProfile);
-			return Condition.CONTINUE;
-		} catch (IllegalArgumentException e) {
-			throw new TaskFailedException(e);
-		} catch (IntrospectionException e) {
-			throw new TaskFailedException(e);
-		} catch (IllegalAccessException e) {
-			throw new TaskFailedException(e);
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(e);
-		} catch (TerminologyException e) {
-			throw new TaskFailedException(e);
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		}
-	}
+    protected abstract I_ConfigAceFrame setupNewProfile(String fullName, String username, String password,
+            String adminUsername, String adminPassword) throws TerminologyException, IOException;
 
-	protected abstract I_ConfigAceFrame setupNewProfile(String fullName, String username,
-			String password, String adminUsername, String adminPassword)
-			throws TerminologyException, IOException;
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+    public Collection<Condition> getConditions() {
+        return AbstractTask.CONTINUE_CONDITION;
+    }
 
-	public Collection<Condition> getConditions() {
-		return AbstractTask.CONTINUE_CONDITION;
-	}
+    public String getProfilePropName() {
+        return profilePropName;
+    }
 
-	public String getProfilePropName() {
-		return profilePropName;
-	}
+    public void setProfilePropName(String address) {
+        this.profilePropName = address;
+    }
 
-	public void setProfilePropName(String address) {
-		this.profilePropName = address;
-	}
+    public static void addIfNotNull(I_IntSet roots, I_ConceptualizeUniversally concept, I_TermFactory tf)
+            throws TerminologyException, IOException {
+        try {
+            roots.add(tf.uuidToNative(concept.getUids()));
+        } catch (NoMappingException e) {
+            // nothing to do...
+        }
+    }
 
-	public static void addIfNotNull(I_IntSet roots,
-			I_ConceptualizeUniversally concept, I_TermFactory tf)
-			throws TerminologyException, IOException {
-		try {
-			roots.add(tf.uuidToNative(concept.getUids()));
-		} catch (NoMappingException e) {
-			// nothing to do...
-		}
-	}
+    public static void addIfNotNull(I_IntList roots, I_ConceptualizeUniversally concept, I_TermFactory tf)
+            throws TerminologyException, IOException {
+        try {
+            roots.add(tf.uuidToNative(concept.getUids()));
+        } catch (NoMappingException e) {
+            // nothing to do...
+        }
+    }
 
-	public static void addIfNotNull(I_IntList roots,
-			I_ConceptualizeUniversally concept, I_TermFactory tf)
-			throws TerminologyException, IOException {
-		try {
-			roots.add(tf.uuidToNative(concept.getUids()));
-		} catch (NoMappingException e) {
-			// nothing to do...
-		}
-	}
+    public String getAdminPasswordPropName() {
+        return adminPasswordPropName;
+    }
 
-	public String getAdminPasswordPropName() {
-		return adminPasswordPropName;
-	}
+    public void setAdminPasswordPropName(String adminPasswordPropName) {
+        this.adminPasswordPropName = adminPasswordPropName;
+    }
 
-	public void setAdminPasswordPropName(String adminPasswordPropName) {
-		this.adminPasswordPropName = adminPasswordPropName;
-	}
+    public String getAdminUsernamePropName() {
+        return adminUsernamePropName;
+    }
 
-	public String getAdminUsernamePropName() {
-		return adminUsernamePropName;
-	}
+    public void setAdminUsernamePropName(String adminUsernamePropName) {
+        this.adminUsernamePropName = adminUsernamePropName;
+    }
 
-	public void setAdminUsernamePropName(String adminUsernamePropName) {
-		this.adminUsernamePropName = adminUsernamePropName;
-	}
+    public String getPasswordPropName() {
+        return passwordPropName;
+    }
 
-	public String getPasswordPropName() {
-		return passwordPropName;
-	}
+    public void setPasswordPropName(String passwordPropName) {
+        this.passwordPropName = passwordPropName;
+    }
 
-	public void setPasswordPropName(String passwordPropName) {
-		this.passwordPropName = passwordPropName;
-	}
+    public String getUsernamePropName() {
+        return usernamePropName;
+    }
 
-	public String getUsernamePropName() {
-		return usernamePropName;
-	}
+    public void setUsernamePropName(String usernamePropName) {
+        this.usernamePropName = usernamePropName;
+    }
 
-	public void setUsernamePropName(String usernamePropName) {
-		this.usernamePropName = usernamePropName;
-	}
+    public String getFullNamePropName() {
+        return fullNamePropName;
+    }
 
-	public String getFullNamePropName() {
-		return fullNamePropName;
-	}
-
-	public void setFullNamePropName(String fullNamePropName) {
-		this.fullNamePropName = fullNamePropName;
-	}
+    public void setFullNamePropName(String fullNamePropName) {
+        this.fullNamePropName = fullNamePropName;
+    }
 
 }

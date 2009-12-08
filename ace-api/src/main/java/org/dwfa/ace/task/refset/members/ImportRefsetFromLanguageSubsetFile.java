@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,7 +53,7 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * Creates reference set extensions from items in a subset language file.
- *
+ * 
  * @author ean
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset", type = BeanType.TASK_BEAN) })
@@ -123,7 +123,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * Bean constructor.
-     *
+     * 
      * @throws Exception if de-serialisation fails.
      */
     public ImportRefsetFromLanguageSubsetFile() throws Exception {
@@ -131,8 +131,9 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * {@inheritDoc}
+     * 
      * @see java.io.Serializable
-     *
+     * 
      * @param out to write object to.
      * @throws IOException on write error.
      */
@@ -144,8 +145,9 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * {@inheritDoc}
+     * 
      * @see java.io.Serializable
-     *
+     * 
      * @param in to read object from
      * @throws IOException on read error
      * @throws ClassNotFoundException on read error
@@ -162,7 +164,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * nothing to do.
      */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
@@ -171,26 +173,30 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * {@inheritDoc}
-     *
-     * Read in the language subset file and add new I_ThinExtByRefPartConcept to the selected reference set (I_GetConceptData).
+     * 
+     * Read in the language subset file and add new I_ThinExtByRefPartConcept to
+     * the selected reference set (I_GetConceptData).
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-    throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         termFactory = LocalVersionedTerminology.get();
-        processMessages  = new StringBuffer();
+        processMessages = new StringBuffer();
         long readLineCount = 0;
 
         try {
             validateTaskData((I_GetConceptData) process.readProperty(refsetConceptPropName),
-                    (String) process.readProperty(languageSpcificationFileName));
+                (String) process.readProperty(languageSpcificationFileName));
             refsetId = ((I_GetConceptData) process.readProperty(refsetConceptPropName)).getConceptId();
             snomedCt = termFactory.getConcept(UUID.fromString("768e720f-8833-415a-b726-5245bbca5941"));
-            acceptableDescriptionTypeNid = termFactory.getConcept(ConceptConstants.ACCEPTABLE.getUuids()).getConceptId();
+            acceptableDescriptionTypeNid = termFactory.getConcept(ConceptConstants.ACCEPTABLE.getUuids())
+                .getConceptId();
             preferredDescriptionTypeNid = termFactory.getConcept(ConceptConstants.PREFERRED.getUuids()).getConceptId();
-            fsnNid = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getConceptId();
-            prefferredTermNid = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getConceptId();
+            fsnNid = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids())
+                .getConceptId();
+            prefferredTermNid = termFactory.getConcept(
+                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getConceptId();
 
-            memberRefsetHelper = new MemberRefsetHelper(refsetId, RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid());
+            memberRefsetHelper = new MemberRefsetHelper(refsetId, RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize()
+                .getNid());
             LanguageSubsetMemberReader reader = new LanguageSubsetMemberReader();
             reader.setSourceFile(new File((String) process.readProperty(languageSpcificationFileName)));
             reader.setHasHeader(true);
@@ -203,7 +209,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
             do {
                 monitor.mark();
                 readLineCount++;
-                try{
+                try {
                     conceptDescription = reader.iterator().next();
                     updateResetExtentions(monitor, refsetId, conceptDescription);
                     processedLineCount++;
@@ -211,7 +217,8 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
                         commit();
                     }
                 } catch (Exception te) {
-                    processMessages.append("<b>Error while processing line</b> " + readLineCount + " " + te.getMessage() + "<br/>");
+                    processMessages.append("<b>Error while processing line</b> " + readLineCount + " "
+                        + te.getMessage() + "<br/>");
                     monitor.setText("<html>" + processMessages + "</html>");
                 }
             } while (reader.iterator().hasNext());
@@ -223,7 +230,8 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
             throw new TaskFailedException("Unable to import refset from file. " + e.getMessage(), e);
         } finally {
             commit();
-            processMessages.append("<br/><br/><b>Processed " + processedLineCount + " of " + readLineCount + " lines sucessfully</b>");
+            processMessages.append("<br/><br/><b>Processed " + processedLineCount + " of " + readLineCount
+                + " lines sucessfully</b>");
             monitor.setText("<html>" + processMessages + "</html>");
             if (monitor != null) {
                 try {
@@ -240,43 +248,47 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * Updates the concept extension for the refset.
-     *
+     * 
      * If the concept extension exists for the refset and description
-     * this will be retired if the extension type is different to the language subset type and a new extension is created.
-     *
+     * this will be retired if the extension type is different to the language
+     * subset type and a new extension is created.
+     * 
      * @param monitor used to inform the user of any errors or warnings.
      * @param refsetId int the reset to update the extension with
-     * @param conceptDescription LanguageSubsetMemberLine the current line in the subset file
-
+     * @param conceptDescription LanguageSubsetMemberLine the current line in
+     *            the subset file
+     * 
      * @throws IOException file read errors
      * @throws TerminologyException looking up concepts etc.
      * @throws Exception MemberRefsetHelper errors
      */
     private void updateResetExtentions(BatchMonitor monitor, int refsetId, LanguageSubsetMemberLine conceptDescription)
-    throws IOException, TerminologyException, Exception {
+            throws IOException, TerminologyException, Exception {
         updateResetExtentions(monitor, refsetId, conceptDescription.getDescriptionVersioned().getDescId(),
-                getSnomedDescriptionTypeForSubsetStatus(conceptDescription.getDescriptionStatusId()));
+            getSnomedDescriptionTypeForSubsetStatus(conceptDescription.getDescriptionStatusId()));
     }
 
     /**
      * Updates the concept extension for the refset.
-     *
+     * 
      * If the concept extension exists for the refset and description
-     * this will be retired if the extension type is different to the language subset type and a new extension is created.
-     *
+     * this will be retired if the extension type is different to the language
+     * subset type and a new extension is created.
+     * 
      * @param monitor used to inform the user of any errors or warnings.
      * @param refsetId int the reset to update the extension with
-     * @param conceptDescription LanguageSubsetMemberLine the current line in the subset file
-
+     * @param conceptDescription LanguageSubsetMemberLine the current line in
+     *            the subset file
+     * 
      * @throws IOException file read errors
      * @throws TerminologyException looking up concepts etc.
      * @throws Exception MemberRefsetHelper errors
      */
     private void updateResetExtentions(BatchMonitor monitor, int refsetId, int descriptionNid, int extensionTypeId)
-    throws IOException, TerminologyException, Exception {
+            throws IOException, TerminologyException, Exception {
         // check if a current extension exists
-        I_ThinExtByRefPartConcept currentRefsetExtension =
-                memberRefsetHelper.getFirstCurrentRefsetExtension(refsetId, descriptionNid);
+        I_ThinExtByRefPartConcept currentRefsetExtension = memberRefsetHelper.getFirstCurrentRefsetExtension(refsetId,
+            descriptionNid);
         if (currentRefsetExtension != null) {
             int currentRefsetExtensionType = currentRefsetExtension.getC1id();
             if (currentRefsetExtensionType != extensionTypeId) {
@@ -293,9 +305,9 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * Converts the 0, 1, 2 subset status to a snomed description type.
-     *
+     * 
      * @param subsetStatusType int
-     *
+     * 
      * @return nid
      */
     public int getSnomedDescriptionTypeForSubsetStatus(int subsetStatusType) {
@@ -311,29 +323,30 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * Notify the user that the concept extension was retired.
-     *
+     * 
      * @param monitor BatchMonitor to add the notification to.
      * @param retiredRefsetExtension the extension that was retired.
      * @throws TerminologyException error getting the description id.
      * @throws IOException if LocalVersionedTerminology.get() fails.
      */
-    private void addRetiredExtensionMessage(BatchMonitor monitor,
-            I_ThinExtByRefPartConcept retiredRefsetExtension) throws IOException, TerminologyException {
+    private void addRetiredExtensionMessage(BatchMonitor monitor, I_ThinExtByRefPartConcept retiredRefsetExtension)
+            throws IOException, TerminologyException {
         processMessages.append("<b>Retired Extension</b><br/>");
-        processMessages.append(LocalVersionedTerminology.get().getConcept(
-                retiredRefsetExtension.getC1id()).getUids().get(0)
-                + "<br/>");
+        processMessages.append(LocalVersionedTerminology.get()
+            .getConcept(retiredRefsetExtension.getC1id())
+            .getUids()
+            .get(0)
+            + "<br/>");
     }
 
     /**
      * Validate the required task information has been set.
-     *
+     * 
      * @param refset I_GetConceptData to create a I_ThinExtByRefPartConcept to.
      * @param filename Language subset file String.
      * @throws TerminologyException if refset or filename afre null
      */
-    private void validateTaskData(I_GetConceptData refset, String filename)
-            throws TerminologyException {
+    private void validateTaskData(I_GetConceptData refset, String filename) throws TerminologyException {
         if (refset == null) {
             throw new TerminologyException("A working refset has not been selected.");
         }
@@ -345,7 +358,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * Commits the current transaction.
-     *
+     * 
      * @throws TaskFailedException if commits fails.
      */
     private void commit() throws TaskFailedException {
@@ -362,7 +375,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.dwfa.bpa.tasks.AbstractTask#getDataContainerIds()
      */
     public int[] getDataContainerIds() {
@@ -371,7 +384,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
     public Collection<Condition> getConditions() {
@@ -380,7 +393,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * The reference set name.
-     *
+     * 
      * @return String refset name
      */
     public String getRefsetConceptPropName() {
@@ -389,7 +402,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * Set the reference set name.
-     *
+     * 
      * @param refsetConceptPropName String
      */
     public void setRefsetConceptPropName(String refsetConceptPropName) {
@@ -398,7 +411,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * The language subset file name.
-     *
+     * 
      * @return String file name.
      */
     public String getLanguageSpcificationFileName() {
@@ -407,7 +420,7 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
     /**
      * Set the subset file name.
-     *
+     * 
      * @param languageSpcificationFileName String
      */
     public void setLanguageSpcificationFileName(String languageSpcificationFileName) {
@@ -415,8 +428,9 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
     }
 
     /**
-     * Go back over all snomed concepts and check we have a language extension for both fsn and preferred term. if make it so.
-     *
+     * Go back over all snomed concepts and check we have a language extension
+     * for both fsn and preferred term. if make it so.
+     * 
      */
     class ConceptIterator implements I_ProcessConcepts {
         @Override
@@ -439,7 +453,8 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
                 }
                 if (latestFsn != null && latestPreferredTerm != null) {
                     updateResetExtentions(monitor, refsetId, latestFsn.getDescId(), acceptableDescriptionTypeNid);
-                    updateResetExtentions(monitor, refsetId, latestPreferredTerm.getDescId(), preferredDescriptionTypeNid);
+                    updateResetExtentions(monitor, refsetId, latestPreferredTerm.getDescId(),
+                        preferredDescriptionTypeNid);
                 }
             }
 
@@ -451,17 +466,17 @@ public class ImportRefsetFromLanguageSubsetFile extends AbstractTask {
 
         /**
          * Is this the latest version of the description type.
-         *
+         * 
          * @param typeNid int
          * @param currentLatest I_DescriptionTuple
          * @param description I_DescriptionTuple
          * @return true if the description is the latest.
          */
-        boolean isLatest(int typeNid, I_DescriptionTuple currentLatest,  I_DescriptionTuple description) {
+        boolean isLatest(int typeNid, I_DescriptionTuple currentLatest, I_DescriptionTuple description) {
             boolean latest = false;
 
-            if(typeNid == description.getTypeId()
-                    && (currentLatest == null || description.getVersion() > currentLatest.getVersion())){
+            if (typeNid == description.getTypeId()
+                && (currentLatest == null || description.getVersion() > currentLatest.getVersion())) {
                 latest = true;
             }
 

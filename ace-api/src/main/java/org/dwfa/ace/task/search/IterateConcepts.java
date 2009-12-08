@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,12 +42,16 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Iterate over all the concept in the database. Putting each iteration into the <code>componentPropName</code> 
- * so that subsequent tasks can test for inclusion. If a concept should be excluded, the <code>componentPropName</code>
- * value should be set to null prior to returning to this task for the next iteration. 
- * The task returns true for each iteration element, and false when the iteration is complete. 
+ * Iterate over all the concept in the database. Putting each iteration into the
+ * <code>componentPropName</code> so that subsequent tasks can test for
+ * inclusion. If a concept should be excluded, the
+ * <code>componentPropName</code> value should be set to null prior to returning
+ * to this task for the next iteration.
+ * The task returns true for each iteration element, and false when the
+ * iteration is complete.
+ * 
  * @author kec
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN) })
 public class IterateConcepts extends AbstractTask {
@@ -57,36 +61,38 @@ public class IterateConcepts extends AbstractTask {
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
-    
+
     /**
-     * Property name for the term component to test. 
+     * Property name for the term component to test.
      */
     private String componentPropName = ProcessAttachmentKeys.SEARCH_TEST_ITEM.getAttachmentKey();
-    
-    /**
-     * Property name for a list of UUID lists, typically used to represent a list
-     * of concepts in a transportable way. 
-     * 
-     * This task will create a new empty list the first time it is executed within a jvm, 
-     * regardless of the contents of this property. It accomplishes this secondary to using
-     * a transient variable for the concept iterator.  
-     */
-     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
 
-     private void writeObject(ObjectOutputStream out) throws IOException {
+    /**
+     * Property name for a list of UUID lists, typically used to represent a
+     * list
+     * of concepts in a transportable way.
+     * 
+     * This task will create a new empty list the first time it is executed
+     * within a jvm,
+     * regardless of the contents of this property. It accomplishes this
+     * secondary to using
+     * a transient variable for the concept iterator.
+     */
+    private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.componentPropName);
         out.writeObject(this.uuidListListPropName);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             this.componentPropName = (String) in.readObject();
             this.uuidListListPropName = (String) in.readObject();
-          } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
@@ -138,7 +144,7 @@ public class IterateConcepts extends AbstractTask {
     }
 
     public int[] getDataContainerIds() {
-        return new int[] { };
+        return new int[] {};
     }
 
     public String getComponentPropName() {

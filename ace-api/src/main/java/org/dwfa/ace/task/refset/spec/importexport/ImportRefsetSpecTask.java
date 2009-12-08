@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -109,8 +109,8 @@ public class ImportRefsetSpecTask extends AbstractTask {
             activityPanel.setProgressInfoLower("<html><font color='black'> In progress.");
 
             TupleFileUtil tupleImporter = new TupleFileUtil();
-            I_GetConceptData memberRefset =
-                    tupleImporter.importFile(new File(importFileName), new File(outputFileName), pathUuid);
+            I_GetConceptData memberRefset = tupleImporter.importFile(new File(importFileName),
+                new File(outputFileName), pathUuid);
 
             LocalVersionedTerminology.get().commit();
 
@@ -120,8 +120,8 @@ public class ImportRefsetSpecTask extends AbstractTask {
             activityPanel.complete();
 
             if (memberRefset != null) {
-                process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), LocalVersionedTerminology
-                    .get().getUids(memberRefset.getConceptId()).iterator().next());
+                process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(),
+                    LocalVersionedTerminology.get().getUids(memberRefset.getConceptId()).iterator().next());
             }
 
             return Condition.CONTINUE;

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,11 +45,11 @@ public class SetProfilePropertyConcept extends AbstractTask {
     private static final int dataVersion = 1;
 
     private String conceptPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
-    
+
     private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
 
     private String propertyKey = "";
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(conceptPropName);
@@ -63,7 +63,7 @@ public class SetProfilePropertyConcept extends AbstractTask {
             conceptPropName = (String) in.readObject();
             profilePropName = (String) in.readObject();
             propertyKey = (String) in.readObject();
-            
+
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -77,12 +77,13 @@ public class SetProfilePropertyConcept extends AbstractTask {
         try {
             I_GetConceptData concept = getProperty(process, I_GetConceptData.class, conceptPropName);
             I_ConfigAceFrame profile = getProperty(process, I_ConfigAceFrame.class, profilePropName);
-            
+
             profile.setProperty(getPropertyKey(), concept.getConceptId());
-            
-            getLogger().info("Set profile property '" + getPropertyKey() + 
-                "' to native id " + concept.getConceptId() + " for concept '" + concept.getInitialText() + "'");
-            
+
+            getLogger().info(
+                "Set profile property '" + getPropertyKey() + "' to native id " + concept.getConceptId()
+                    + " for concept '" + concept.getInitialText() + "'");
+
             return Condition.CONTINUE;
 
         } catch (Exception e) {

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,29 +27,21 @@ public class IterateConceptsBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor uuidListListPropName =
-                    new PropertyDescriptor("uuidListListPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor uuidListListPropName = new PropertyDescriptor("uuidListListPropName",
+                getBeanDescriptor().getBeanClass());
             uuidListListPropName.setBound(true);
-            uuidListListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            uuidListListPropName
-                .setDisplayName("<html><font color='green'>Uuid List:");
+            uuidListListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListListPropName.setDisplayName("<html><font color='green'>Uuid List:");
             uuidListListPropName.setShortDescription("Uuid list.");
 
-            PropertyDescriptor componentPropName =
-                    new PropertyDescriptor("componentPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor componentPropName = new PropertyDescriptor("componentPropName",
+                getBeanDescriptor().getBeanClass());
             componentPropName.setBound(true);
-            componentPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            componentPropName
-                .setDisplayName("<html><font color='green'>component prop:");
-            componentPropName
-                .setShortDescription("The property that contains the component to test.");
+            componentPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            componentPropName.setDisplayName("<html><font color='green'>component prop:");
+            componentPropName.setShortDescription("The property that contains the component to test.");
 
-            PropertyDescriptor rv[] =
-                    { componentPropName, uuidListListPropName };
+            PropertyDescriptor rv[] = { componentPropName, uuidListListPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,173 +47,172 @@ import org.dwfa.util.io.FileIO;
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class SaveNewProfile extends AbstractTask {
 
-	/**
+    /**
      * 
      */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE
-			.getAttachmentKey();
+    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(profilePropName);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(profilePropName);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			profilePropName = (String) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            profilePropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do
+    }
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		try {
-			I_ConfigAceFrame profileToSave = (I_ConfigAceFrame) process.readProperty(profilePropName);
-	        if (profileToSave == null) {
-	        	profileToSave = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-	        }
-			
-			profileToSave.setFrameName(profileToSave.getUsername() + " editor");
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_ConfigAceFrame profileToSave = (I_ConfigAceFrame) process.readProperty(profilePropName);
+            if (profileToSave == null) {
+                profileToSave = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            }
 
-			I_ConfigAceFrame currentProfile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			BundleType bundleType = currentProfile.getBundleType();
+            profileToSave.setFrameName(profileToSave.getUsername() + " editor");
 
-			I_ConfigAceDb currentDbProfile = currentProfile.getDbConfig();
-			File creatorsProfileFile = currentDbProfile.getProfileFile();
-			I_ConfigAceDb newDbProfile = profileToSave.getDbConfig();
+            I_ConfigAceFrame currentProfile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            BundleType bundleType = currentProfile.getBundleType();
 
-			String workingCopyStr = FileIO.getNormalizedRelativePath(creatorsProfileFile.getParentFile());
+            I_ConfigAceDb currentDbProfile = currentProfile.getDbConfig();
+            File creatorsProfileFile = currentDbProfile.getProfileFile();
+            I_ConfigAceDb newDbProfile = profileToSave.getDbConfig();
 
-			String userDirStr = "profiles" + File.separator + profileToSave.getUsername();
-			File userDir = new File(userDirStr);
-			File changeSetRoot = new File(userDir, "changesets");
-			changeSetRoot.mkdirs();
-			File profileFile = new File(userDir, profileToSave.getUsername() + ".ace");
+            String workingCopyStr = FileIO.getNormalizedRelativePath(creatorsProfileFile.getParentFile());
 
-			switch (bundleType) {
-			case STAND_ALONE:
-				break;
-			default:
-				SubversionData creatorSvd = new SubversionData(null, workingCopyStr);
-				currentProfile.svnCompleteRepoInfo(creatorSvd);
-				String sequenceToFind = "src/main/profiles/";
-				int sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
-				if (sequenceLocation == -1) {
-					sequenceToFind = "src/main/resources/profiles/";
-					sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
-				}
-				int sequenceEnd = sequenceLocation + sequenceToFind.length();
-				String profileDirRepoUrl = creatorSvd.getRepositoryUrlStr().substring(0, sequenceEnd);
-				String userDirRepoUrl = profileDirRepoUrl + profileToSave.getUsername();
-				
-				// Create a new profile-csu subversion entry
-				AddSubversionEntry addUserCsuSvn = new AddSubversionEntry();
-				addUserCsuSvn.setKeyName(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_CSU.toString());
-				addUserCsuSvn.setProfilePropName(profilePropName);
-				addUserCsuSvn.setPrompt("verify subversion settings for profile directory: ");
-				addUserCsuSvn.setRepoUrl(profileDirRepoUrl);
-				addUserCsuSvn.setWorkingCopy("profiles"+ File.separator);
-				addUserCsuSvn.evaluate(process, worker);
+            String userDirStr = "profiles" + File.separator + profileToSave.getUsername();
+            File userDir = new File(userDirStr);
+            File changeSetRoot = new File(userDir, "changesets");
+            changeSetRoot.mkdirs();
+            File profileFile = new File(userDir, profileToSave.getUsername() + ".ace");
 
-				// Create a new profile-dbu subversion entry
-				AddSubversionEntry addUserDbuSvn = new AddSubversionEntry();
-				addUserDbuSvn.setKeyName(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_DBU.toString());
-				addUserDbuSvn.setProfilePropName(profilePropName);
-				addUserDbuSvn.setPrompt("verify subversion settings for user profile: ");
-				addUserDbuSvn.setRepoUrl(userDirRepoUrl);
-				addUserDbuSvn.setWorkingCopy(userDirStr);
-				addUserDbuSvn.evaluate(process, worker);
+            switch (bundleType) {
+            case STAND_ALONE:
+                break;
+            default:
+                SubversionData creatorSvd = new SubversionData(null, workingCopyStr);
+                currentProfile.svnCompleteRepoInfo(creatorSvd);
+                String sequenceToFind = "src/main/profiles/";
+                int sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
+                if (sequenceLocation == -1) {
+                    sequenceToFind = "src/main/resources/profiles/";
+                    sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
+                }
+                int sequenceEnd = sequenceLocation + sequenceToFind.length();
+                String profileDirRepoUrl = creatorSvd.getRepositoryUrlStr().substring(0, sequenceEnd);
+                String userDirRepoUrl = profileDirRepoUrl + profileToSave.getUsername();
 
-				// Create a new berkeley-db subversion entry
-				SubversionData databaseSvnData = new SubversionData(null, FileIO.getNormalizedRelativePath(currentDbProfile.getDbFolder()));
-				currentProfile.svnCompleteRepoInfo(databaseSvnData);
-				AddSubversionEntry addDatabaseSvn = new AddSubversionEntry();
-				addDatabaseSvn.setKeyName(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.BERKELEY_DB.toString());
-				addDatabaseSvn.setProfilePropName(profilePropName);
-				addDatabaseSvn.setPrompt("verify subversion settings for berkeley-db: ");
-				addDatabaseSvn.setRepoUrl(databaseSvnData.getRepositoryUrlStr());
-				addDatabaseSvn.setWorkingCopy(databaseSvnData.getWorkingCopyStr());
-				addDatabaseSvn.evaluate(process, worker);
-			}
+                // Create a new profile-csu subversion entry
+                AddSubversionEntry addUserCsuSvn = new AddSubversionEntry();
+                addUserCsuSvn.setKeyName(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_CSU.toString());
+                addUserCsuSvn.setProfilePropName(profilePropName);
+                addUserCsuSvn.setPrompt("verify subversion settings for profile directory: ");
+                addUserCsuSvn.setRepoUrl(profileDirRepoUrl);
+                addUserCsuSvn.setWorkingCopy("profiles" + File.separator);
+                addUserCsuSvn.evaluate(process, worker);
 
-			newDbProfile.getAceFrames().clear();
-			newDbProfile.getAceFrames().add(profileToSave);
-			newDbProfile.setChangeSetRoot(changeSetRoot);
-			newDbProfile.setChangeSetWriterFileName(profileToSave.getUsername() + "." + UUID.randomUUID().toString() + ".jcs");
-			newDbProfile.setDbFolder(currentDbProfile.getDbFolder());
-			newDbProfile.setProfileFile(profileFile);
-			newDbProfile.setUsername(profileToSave.getUsername());
+                // Create a new profile-dbu subversion entry
+                AddSubversionEntry addUserDbuSvn = new AddSubversionEntry();
+                addUserDbuSvn.setKeyName(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_DBU.toString());
+                addUserDbuSvn.setProfilePropName(profilePropName);
+                addUserDbuSvn.setPrompt("verify subversion settings for user profile: ");
+                addUserDbuSvn.setRepoUrl(userDirRepoUrl);
+                addUserDbuSvn.setWorkingCopy(userDirStr);
+                addUserDbuSvn.evaluate(process, worker);
 
-			// write new profile to disk
-			FileOutputStream fos = new FileOutputStream(profileFile);
-			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			ObjectOutputStream oos = new ObjectOutputStream(bos);
-			oos.writeObject(newDbProfile);
-			oos.close();
+                // Create a new berkeley-db subversion entry
+                SubversionData databaseSvnData = new SubversionData(null,
+                    FileIO.getNormalizedRelativePath(currentDbProfile.getDbFolder()));
+                currentProfile.svnCompleteRepoInfo(databaseSvnData);
+                AddSubversionEntry addDatabaseSvn = new AddSubversionEntry();
+                addDatabaseSvn.setKeyName(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.BERKELEY_DB.toString());
+                addDatabaseSvn.setProfilePropName(profilePropName);
+                addDatabaseSvn.setPrompt("verify subversion settings for berkeley-db: ");
+                addDatabaseSvn.setRepoUrl(databaseSvnData.getRepositoryUrlStr());
+                addDatabaseSvn.setWorkingCopy(databaseSvnData.getWorkingCopyStr());
+                addDatabaseSvn.evaluate(process, worker);
+            }
 
-			// Depending on bundle type, synchronize with subversion...
-			switch (bundleType) {
-			case CHANGE_SET_UPDATE:
-				SubversionData profileCsu = profileToSave.getSubversionMap().get(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_CSU.toString());
-				profileToSave.svnCommit(profileCsu);
-				break;
-			case DATABASE_UPDATE:
-				SubversionData profileDbu = profileToSave.getSubversionMap().get(I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_DBU.toString());
-				profileToSave.svnImport(profileDbu);
-				//
-				FileIO.recursiveDelete(new File(userDirStr));
-				profileToSave.svnCheckout(profileDbu);
+            newDbProfile.getAceFrames().clear();
+            newDbProfile.getAceFrames().add(profileToSave);
+            newDbProfile.setChangeSetRoot(changeSetRoot);
+            newDbProfile.setChangeSetWriterFileName(profileToSave.getUsername() + "." + UUID.randomUUID().toString()
+                + ".jcs");
+            newDbProfile.setDbFolder(currentDbProfile.getDbFolder());
+            newDbProfile.setProfileFile(profileFile);
+            newDbProfile.setUsername(profileToSave.getUsername());
 
-				break;
-			case STAND_ALONE:
-				// No subversion synchronization for stand-alone bundle.
-				break;
+            // write new profile to disk
+            FileOutputStream fos = new FileOutputStream(profileFile);
+            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(newDbProfile);
+            oos.close();
 
-			default:
-				throw new TaskFailedException(
-						"Don't know how to handle bundle type: " + bundleType);
-			}
+            // Depending on bundle type, synchronize with subversion...
+            switch (bundleType) {
+            case CHANGE_SET_UPDATE:
+                SubversionData profileCsu = profileToSave.getSubversionMap().get(
+                    I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_CSU.toString());
+                profileToSave.svnCommit(profileCsu);
+                break;
+            case DATABASE_UPDATE:
+                SubversionData profileDbu = profileToSave.getSubversionMap().get(
+                    I_ConfigAceFrame.SPECIAL_SVN_ENTRIES.PROFILE_DBU.toString());
+                profileToSave.svnImport(profileDbu);
+                //
+                FileIO.recursiveDelete(new File(userDirStr));
+                profileToSave.svnCheckout(profileDbu);
 
-			return Condition.CONTINUE;
-		} catch (IllegalArgumentException e) {
-			throw new TaskFailedException(e);
-		} catch (IntrospectionException e) {
-			throw new TaskFailedException(e);
-		} catch (IllegalAccessException e) {
-			throw new TaskFailedException(e);
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(e);
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		}
-	}
+                break;
+            case STAND_ALONE:
+                // No subversion synchronization for stand-alone bundle.
+                break;
 
-	@Override
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+            default:
+                throw new TaskFailedException("Don't know how to handle bundle type: " + bundleType);
+            }
 
-	public Collection<Condition> getConditions() {
-		return AbstractTask.CONTINUE_CONDITION;
-	}
+            return Condition.CONTINUE;
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-	public String getProfilePropName() {
-		return profilePropName;
-	}
+    @Override
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
-	}
+    public Collection<Condition> getConditions() {
+        return AbstractTask.CONTINUE_CONDITION;
+    }
+
+    public String getProfilePropName() {
+        return profilePropName;
+    }
+
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
+    }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,9 +35,9 @@ import java.lang.reflect.Method;
 
 public final class WriteRefsetDescriptionsSerializationTest {
 
-    private static final String DIRECTORY_KEY           = "somedirectory";
-    private static final String DESERIALIZED_DIR_KEY    = "deserialized dir key";
-    
+    private static final String DIRECTORY_KEY = "somedirectory";
+    private static final String DESERIALIZED_DIR_KEY = "deserialized dir key";
+
     private IMocksControl mockControl;
     private LocalVersionedTerminologyWrapper mockTerminologyWrapper;
     private CleanableProcessExtByRefBuilder mockProcessBuilder;
@@ -58,10 +58,10 @@ public final class WriteRefsetDescriptionsSerializationTest {
 
         I_DefineTask task = new WriteRefsetDescriptions(DIRECTORY_KEY, mockTerminologyWrapper, mockProcessBuilder);
         Method method = WriteRefsetDescriptions.class.getDeclaredMethod("writeObject",
-                new Class[]{ObjectOutputStream.class});
+            new Class[] { ObjectOutputStream.class });
         method.setAccessible(true);
         method.invoke(task, mockStream);
-        
+
         mockControl.verify();
     }
 
@@ -81,7 +81,7 @@ public final class WriteRefsetDescriptionsSerializationTest {
         mockControl.verify();
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings( { "unchecked" })
     @Test
     public void shouldThrowAnExceptionIfTheObjectCantBeDeserialized() throws Exception {
         ObjectInputStream mockInputStream = mockControl.createMock(ObjectInputStream.class);
@@ -101,7 +101,7 @@ public final class WriteRefsetDescriptionsSerializationTest {
 
     private Method getReadObject() throws NoSuchMethodException {
         Method method = WriteRefsetDescriptions.class.getDeclaredMethod("readObject",
-                new Class[]{ObjectInputStream.class});
+            new Class[] { ObjectInputStream.class });
         method.setAccessible(true);
         return method;
     }

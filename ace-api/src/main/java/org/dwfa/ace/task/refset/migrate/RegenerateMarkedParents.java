@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,24 +48,22 @@ import org.dwfa.util.bean.Spec;
 @AllowDataCheckSuppression
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/migrate", type = BeanType.TASK_BEAN) })
 public class RegenerateMarkedParents extends AbstractTask {
-	
-	private static final long serialVersionUID = -8787270417774804851L;
 
-	public final String PARENT_MEMBER_HIERARCHY_NAME = "parent members";
+    private static final long serialVersionUID = -8787270417774804851L;
+
+    public final String PARENT_MEMBER_HIERARCHY_NAME = "parent members";
 
     public final String PARENT_MEMBER_REFSET_PURPOSE_NAME = "marked parent membership";
 
-    public final String PARENT_MEMBER_REFSET_RELATIONSHIP_NAME =
-            ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getDescription();
+    public final String PARENT_MEMBER_REFSET_RELATIONSHIP_NAME = ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getDescription();
 
-    private String memberConceptPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey(); 
-    
+    private String memberConceptPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
+
     protected I_GetConceptData memberConcept;
-    
+
     protected I_TermFactory termFactory;
 
     protected HashMap<String, I_GetConceptData> concepts = new HashMap<String, I_GetConceptData>();
-
 
     public RegenerateMarkedParents() throws Exception {
     }
@@ -75,8 +73,8 @@ public class RegenerateMarkedParents extends AbstractTask {
         if (termFactory == null) {
             throw new RuntimeException("The LocalVersionedTerminology is not available. Please check the database.");
         }
-    	
-    	concepts.put("CURRENT", termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()));
+
+        concepts.put("CURRENT", termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()));
         concepts.put("RETIRED", termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()));
         concepts.put("PARENT_MARKER", termFactory.getConcept(ConceptConstants.PARENT_MARKER.localize().getNid()));
     }
@@ -90,8 +88,7 @@ public class RegenerateMarkedParents extends AbstractTask {
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
 
-            List<I_ThinExtByRefTuple> extensions =
-                thinExtByRefVersioned.getTuples(null, null, true, false);
+            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(null, null, true, false);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
@@ -104,47 +101,45 @@ public class RegenerateMarkedParents extends AbstractTask {
             }
         }
 
-        new MarkedParentRefsetHelper(refsetId, memberConcept.getConceptId())
-                .addParentMembers(normalMemberIds.toArray(new Integer[]{}));
+        new MarkedParentRefsetHelper(refsetId, memberConcept.getConceptId()).addParentMembers(normalMemberIds.toArray(new Integer[] {}));
     }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    }
 
-	@SuppressDataChecks
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    @SuppressDataChecks
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             init();
-            
+
             memberConcept = (I_GetConceptData) process.readProperty(memberConceptPropName);
-            
-			if (memberConcept == null) {
-				throw new TerminologyException("No member concept selected.");				
-			}
-            
-            for (Integer memberRefsetId : MemberRefsetHelper.getMemberRefsets()) {      
-            	I_GetConceptData memberRefsetConcept = termFactory.getConcept(memberRefsetId);            	
+
+            if (memberConcept == null) {
+                throw new TerminologyException("No member concept selected.");
+            }
+
+            for (Integer memberRefsetId : MemberRefsetHelper.getMemberRefsets()) {
+                I_GetConceptData memberRefsetConcept = termFactory.getConcept(memberRefsetId);
                 regenerateMarkedParentMembers(memberRefsetConcept);
             }
-            
+
             return Condition.CONTINUE;
-            
+
         } catch (Exception ex) {
             throw new TaskFailedException("Unable to migrate specification refsets", ex);
         }
     }
 
-	public Collection<Condition> getConditions() {
-		return AbstractTask.CONTINUE_CONDITION;
-	}
+    public Collection<Condition> getConditions() {
+        return AbstractTask.CONTINUE_CONDITION;
+    }
 
-	public String getMemberConceptPropName() {
-		return memberConceptPropName;
-	}
+    public String getMemberConceptPropName() {
+        return memberConceptPropName;
+    }
 
-	public void setMemberConceptPropName(String memberConceptPropName) {
-		this.memberConceptPropName = memberConceptPropName;
-	}
-
+    public void setMemberConceptPropName(String memberConceptPropName) {
+        this.memberConceptPropName = memberConceptPropName;
+    }
 
 }

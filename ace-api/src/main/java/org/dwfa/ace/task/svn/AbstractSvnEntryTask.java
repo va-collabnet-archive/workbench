@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ public abstract class AbstractSvnEntryTask extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private String svnEntryString = "svnEntry";
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -46,8 +46,7 @@ public abstract class AbstractSvnEntryTask extends AbstractTask {
         out.writeObject(svnEntryString);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             svnEntryString = (String) in.readObject();
@@ -57,27 +56,25 @@ public abstract class AbstractSvnEntryTask extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             SubversionData svd = config.getSubversionMap().get(svnEntryString);
-            doSvnTask(config, svd, svnEntryString);  
-             return Condition.CONTINUE;
+            doSvnTask(config, svd, svnEntryString);
+            return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         }
     }
 
-    protected abstract void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String svnEntryKey) throws TaskFailedException;
-    
+    protected abstract void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String svnEntryKey)
+            throws TaskFailedException;
+
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }

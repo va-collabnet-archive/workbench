@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,11 +20,10 @@ import java.beans.BeanDescriptor;
 
 import org.dwfa.ace.task.refset.spec.AbstractAddRefsetSpecTaskBeanInfo;
 
-public class RelationshipLogicalQuantifierIsBeanInfo extends
-		AbstractAddRefsetSpecTaskBeanInfo {
+public class RelationshipLogicalQuantifierIsBeanInfo extends AbstractAddRefsetSpecTaskBeanInfo {
 
-	@Override
-	public BeanDescriptor getBeanDescriptor()  {
+    @Override
+    public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(RelationshipLogicalQuantifierIs.class);
         bd.setDisplayName("<html><font color='green'><center>Add<br>Relationship Logical<br>Quantifier Is<br>Clause to RefSet Spec");
         return bd;

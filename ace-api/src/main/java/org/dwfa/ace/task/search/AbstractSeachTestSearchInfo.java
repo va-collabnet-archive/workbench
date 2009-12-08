@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,21 +26,15 @@ public abstract class AbstractSeachTestSearchInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor inverted =
-                    new PropertyDescriptor("inverted", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor inverted = new PropertyDescriptor("inverted", getBeanDescriptor().getBeanClass());
             inverted.setBound(true);
             inverted.setPropertyEditorClass(CheckboxEditor.class);
-            inverted
-                .setDisplayName("<html><font color='green'>exclude matches:");
-            inverted
-                .setShortDescription("If checked, excludes concepts that match this criteria");
+            inverted.setDisplayName("<html><font color='green'>exclude matches:");
+            inverted.setShortDescription("If checked, excludes concepts that match this criteria");
 
-            PropertyDescriptor[] childDescriptors =
-                    getAdditionalPropertyDescriptors();
+            PropertyDescriptor[] childDescriptors = getAdditionalPropertyDescriptors();
 
-            PropertyDescriptor[] rv =
-                    new PropertyDescriptor[childDescriptors.length + 1];
+            PropertyDescriptor[] rv = new PropertyDescriptor[childDescriptors.length + 1];
 
             rv[0] = inverted;
             for (int i = 1; i < rv.length; i++) {

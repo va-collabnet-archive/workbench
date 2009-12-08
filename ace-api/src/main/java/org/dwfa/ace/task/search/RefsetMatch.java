@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@ import org.dwfa.util.bean.Spec;
  * @author Dion McMurtrie
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
-        @Spec(directory = "search", type = BeanType.TASK_BEAN) })
+                   @Spec(directory = "search", type = BeanType.TASK_BEAN) })
 public class RefsetMatch extends AbstractSearchTest {
 
     private static final long serialVersionUID = 1;
@@ -56,7 +56,7 @@ public class RefsetMatch extends AbstractSearchTest {
      * refset concept the component must be a member of.
      */
     private TermEntry refset = new TermEntry(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.refset);
@@ -75,30 +75,32 @@ public class RefsetMatch extends AbstractSearchTest {
     public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
         try {
             I_GetConceptData refsetToMatch = AceTaskUtil.getConceptFromObject(refset);
-            int refsetId = refsetToMatch.getConceptId();            
-            
+            int refsetId = refsetToMatch.getConceptId();
+
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
             boolean result = false;
-            
+
             if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
-            	return isComponentInRefset(frameConfig, termFactory, ((I_GetConceptData) component).getConceptId(), refsetId);            	
-            } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {            	
-            	I_DescriptionVersioned description = (I_DescriptionVersioned) component;
-            	
-            	if (isComponentInRefset(frameConfig, termFactory, description.getDescId(), refsetId)) {
-            		result = true;
-            	} else {
-            	   	result = isComponentInRefset(frameConfig, termFactory, description.getConceptId(), refsetId);
-            	}
+                return isComponentInRefset(frameConfig, termFactory, ((I_GetConceptData) component).getConceptId(),
+                    refsetId);
+            } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
+                I_DescriptionVersioned description = (I_DescriptionVersioned) component;
+
+                if (isComponentInRefset(frameConfig, termFactory, description.getDescId(), refsetId)) {
+                    result = true;
+                } else {
+                    result = isComponentInRefset(frameConfig, termFactory, description.getConceptId(), refsetId);
+                }
             } else if (I_RelVersioned.class.isAssignableFrom(component.getClass())) {
-            	result = isComponentInRefset(frameConfig, termFactory, ((I_RelVersioned) component).getRelId(), refsetId);
+                result = isComponentInRefset(frameConfig, termFactory, ((I_RelVersioned) component).getRelId(),
+                    refsetId);
             }
-            
+
             if (inverted) {
-            	return ! result;
+                return !result;
             } else {
-            	return result;
+                return result;
             }
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);
@@ -107,25 +109,25 @@ public class RefsetMatch extends AbstractSearchTest {
         }
     }
 
-	private boolean isComponentInRefset(I_ConfigAceFrame frameConfig,
-			I_TermFactory termFactory, int componentId, int refsetId)
-			throws IOException {
-		List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(componentId);
-		            
-		for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
-			List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
-			thinExtByRefVersioned.addTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSet(), returnTuples, false);
-			for (I_ThinExtByRefTuple thinExtByRefTuple : returnTuples) {
-				if (thinExtByRefTuple.getRefsetId() == refsetId) {
-					return true;
-				}
-			}
-		}
-		
-		return false;
-	}
+    private boolean isComponentInRefset(I_ConfigAceFrame frameConfig, I_TermFactory termFactory, int componentId,
+            int refsetId) throws IOException {
+        List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(componentId);
 
-	public TermEntry getRefset() {
+        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
+            List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
+            thinExtByRefVersioned.addTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSet(),
+                returnTuples, false);
+            for (I_ThinExtByRefTuple thinExtByRefTuple : returnTuples) {
+                if (thinExtByRefTuple.getRefsetId() == refsetId) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public TermEntry getRefset() {
         return refset;
     }
 
@@ -133,12 +135,12 @@ public class RefsetMatch extends AbstractSearchTest {
         this.refset = refset;
     }
 
-	public boolean isInverted() {
-		return inverted;
-	}
+    public boolean isInverted() {
+        return inverted;
+    }
 
-	public void setInverted(boolean inverted) {
-		this.inverted = inverted;
-	}
+    public void setInverted(boolean inverted) {
+        this.inverted = inverted;
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,63 +28,43 @@ public class CopyPathToPathWithStatusMapsBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("Name of the property to hold the profile from which the view positions are derived. ");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("Name of the property to hold the profile from which the view positions are derived. ");
 
-            PropertyDescriptor toPathPropName =
-                    new PropertyDescriptor("toPathPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor toPathPropName = new PropertyDescriptor("toPathPropName",
+                getBeanDescriptor().getBeanClass());
             toPathPropName.setBound(true);
-            toPathPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
+            toPathPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             toPathPropName.setDisplayName("<html><font color='green'>to path:");
-            toPathPropName
-                .setShortDescription("Name of the property to copy the concept to. ");
+            toPathPropName.setShortDescription("Name of the property to copy the concept to. ");
 
-            PropertyDescriptor conceptPropName =
-                    new PropertyDescriptor("conceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptPropName = new PropertyDescriptor("conceptPropName",
+                getBeanDescriptor().getBeanClass());
             conceptPropName.setBound(true);
-            conceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptPropName
-                .setDisplayName("<html><font color='green'>concept:");
-            conceptPropName
-                .setShortDescription("Name of the property holding the concept to copy. ");
+            conceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptPropName.setDisplayName("<html><font color='green'>concept:");
+            conceptPropName.setShortDescription("Name of the property holding the concept to copy. ");
 
-            PropertyDescriptor conceptStatusMapPropName =
-                    new PropertyDescriptor("conceptStatusMapPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptStatusMapPropName = new PropertyDescriptor("conceptStatusMapPropName",
+                getBeanDescriptor().getBeanClass());
             conceptStatusMapPropName.setBound(true);
-            conceptStatusMapPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptStatusMapPropName
-                .setDisplayName("<html><font color='green'>concept status map:");
-            conceptStatusMapPropName
-                .setShortDescription("Name of the property holding mapping for the new concept status values. ");
+            conceptStatusMapPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptStatusMapPropName.setDisplayName("<html><font color='green'>concept status map:");
+            conceptStatusMapPropName.setShortDescription("Name of the property holding mapping for the new concept status values. ");
 
-            PropertyDescriptor elementStatusMapPropName =
-                    new PropertyDescriptor("elementStatusMapPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor elementStatusMapPropName = new PropertyDescriptor("elementStatusMapPropName",
+                getBeanDescriptor().getBeanClass());
             elementStatusMapPropName.setBound(true);
-            elementStatusMapPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            elementStatusMapPropName
-                .setDisplayName("<html><font color='green'>elem status map:");
-            elementStatusMapPropName
-                .setShortDescription("Name of the property holding the mapping for the new element status values. ");
+            elementStatusMapPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            elementStatusMapPropName.setDisplayName("<html><font color='green'>elem status map:");
+            elementStatusMapPropName.setShortDescription("Name of the property holding the mapping for the new element status values. ");
 
-            PropertyDescriptor rv[] =
-                    { profilePropName, toPathPropName, conceptPropName,
-                     conceptStatusMapPropName, elementStatusMapPropName };
+            PropertyDescriptor rv[] = { profilePropName, toPathPropName, conceptPropName, conceptStatusMapPropName,
+                                       elementStatusMapPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -95,10 +75,8 @@ public class CopyPathToPathWithStatusMapsBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(CopyPathToPathWithStatusMaps.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>copy path to path<br>from views in profile<br>with status maps");
+        BeanDescriptor bd = new BeanDescriptor(CopyPathToPathWithStatusMaps.class);
+        bd.setDisplayName("<html><font color='green'><center>copy path to path<br>from views in profile<br>with status maps");
         return bd;
     }
 }

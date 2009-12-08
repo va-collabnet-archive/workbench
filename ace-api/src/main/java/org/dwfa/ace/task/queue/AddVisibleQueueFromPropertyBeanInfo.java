@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,16 +27,12 @@ public class AddVisibleQueueFromPropertyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor visibleQueuePropName =
-                    new PropertyDescriptor("visibleQueuePropName",
-                        AddVisibleQueueFromProperty.class);
+            PropertyDescriptor visibleQueuePropName = new PropertyDescriptor("visibleQueuePropName",
+                AddVisibleQueueFromProperty.class);
             visibleQueuePropName.setBound(true);
-            visibleQueuePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            visibleQueuePropName
-                .setDisplayName("<html><font color='green'>Visible queue prop:");
-            visibleQueuePropName
-                .setShortDescription("Enter the property name of the queue address to be added.");
+            visibleQueuePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            visibleQueuePropName.setDisplayName("<html><font color='green'>Visible queue prop:");
+            visibleQueuePropName.setShortDescription("Enter the property name of the queue address to be added.");
 
             PropertyDescriptor rv[] = { visibleQueuePropName };
             return rv;
@@ -49,10 +45,8 @@ public class AddVisibleQueueFromPropertyBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(AddVisibleQueueFromProperty.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Add Visible Queue<br>From Property");
+        BeanDescriptor bd = new BeanDescriptor(AddVisibleQueueFromProperty.class);
+        bd.setDisplayName("<html><font color='green'><center>Add Visible Queue<br>From Property");
         return bd;
     }
 

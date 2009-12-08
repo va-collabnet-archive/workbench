@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,27 +32,26 @@ public interface I_SnorocketFactory {
     void getResults(I_Callback callback);
 
     interface I_Callback {
-        void addRelationship(int conceptId1, int roleId, int conceptId2,
-                int group);
+        void addRelationship(int conceptId1, int roleId, int conceptId2, int group);
     }
 
     /*
      * Alternate potential API to allow for batch transfer of data
      * 
-    void addIsas(int[] ids);
-    void addConcepts(int[] conceptIds, boolean fullyDefined);
-    void addRelationships(Rel[] relationships);
-    
-    final class Rel {
-        int conceptId1;
-        int roleId;
-        int conceptId2;
-        int group;
-    }
+     * void addIsas(int[] ids);
+     * void addConcepts(int[] conceptIds, boolean fullyDefined);
+     * void addRelationships(Rel[] relationships);
+     * 
+     * final class Rel {
+     * int conceptId1;
+     * int roleId;
+     * int conceptId2;
+     * int group;
+     * }
      */
 
     /**
-     * Used for persistence.  This part of the API is not finalised - DO NOT USE.
+     * Used for persistence. This part of the API is not finalised - DO NOT USE.
      * 
      * @return
      * @throws IOException
@@ -60,7 +59,8 @@ public interface I_SnorocketFactory {
     InputStream getStream() throws IOException;
 
     /**
-     * Create a new classification engine that can be used to construct and incrementally classify
+     * Create a new classification engine that can be used to construct and
+     * incrementally classify
      * an extension to the base ontology embodied by this classification engine.
      * 
      * @return

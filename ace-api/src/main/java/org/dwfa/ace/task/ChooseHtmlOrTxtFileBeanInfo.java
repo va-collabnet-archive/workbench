@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info to ChooseHtmlOrTxtFile class.
+ * 
  * @author Susan Castillo
- *
+ * 
  */
 public class ChooseHtmlOrTxtFileBeanInfo extends SimpleBeanInfo {
 
@@ -40,28 +41,21 @@ public class ChooseHtmlOrTxtFileBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor instructionFileNamePropName =
-                    new PropertyDescriptor("instructionFileNamePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor instructionFileNamePropName = new PropertyDescriptor("instructionFileNamePropName",
+                getBeanDescriptor().getBeanClass());
             instructionFileNamePropName.setBound(true);
-            instructionFileNamePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            instructionFileNamePropName
-                .setDisplayName("<html><font color='green'>Instruction File:");
+            instructionFileNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            instructionFileNamePropName.setDisplayName("<html><font color='green'>Instruction File:");
             instructionFileNamePropName.setShortDescription("Instruction File");
 
-            PropertyDescriptor directoryPropName =
-                    new PropertyDescriptor("directoryPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor directoryPropName = new PropertyDescriptor("directoryPropName",
+                getBeanDescriptor().getBeanClass());
             directoryPropName.setBound(true);
-            directoryPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            directoryPropName
-                .setDisplayName("<html><font color='green'>Instruction File:");
+            directoryPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            directoryPropName.setDisplayName("<html><font color='green'>Instruction File:");
             directoryPropName.setShortDescription("Instruction File");
 
-            PropertyDescriptor rv[] =
-                    { instructionFileNamePropName, directoryPropName };
+            PropertyDescriptor rv[] = { instructionFileNamePropName, directoryPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -73,8 +67,7 @@ public class ChooseHtmlOrTxtFileBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ChooseHtmlOrTxtFile.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Choose Instruction File");
+        bd.setDisplayName("<html><font color='green'><center>Choose Instruction File");
         return bd;
     }
 

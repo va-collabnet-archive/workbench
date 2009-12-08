@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,16 +30,12 @@ public class TupleKey {
 
     @Override
     public int hashCode() {
-        return ("" + id +
-                "" + pathId +
-                "" + version).hashCode();
+        return ("" + id + "" + pathId + "" + version).hashCode();
     }
 
     @Override
     public boolean equals(Object o) {
         TupleKey compareKey = (TupleKey) o;
-        return id.equals(compareKey.id) &&
-                version.equals(compareKey.version) &&
-                pathId.equals(compareKey.pathId);
+        return id.equals(compareKey.id) && version.equals(compareKey.version) && pathId.equals(compareKey.pathId);
     }
 }

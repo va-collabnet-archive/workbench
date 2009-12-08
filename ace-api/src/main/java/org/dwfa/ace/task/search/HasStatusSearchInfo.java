@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,24 +24,23 @@ import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
 public class HasStatusSearchInfo extends AbstractSeachTestSearchInfo {
 
-	@Override
-	protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
-		try {
+    @Override
+    protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
+        try {
 
-            PropertyDescriptor statusTerm =
-                new PropertyDescriptor("statusTerm", getBeanDescriptor().getBeanClass());
+            PropertyDescriptor statusTerm = new PropertyDescriptor("statusTerm", getBeanDescriptor().getBeanClass());
             statusTerm.setBound(true);
             statusTerm.setPropertyEditorClass(ConceptLabelEditor.class);
             statusTerm.setDisplayName("<html><font color='green'>status kind:");
             statusTerm.setShortDescription("The concept to test for status is kind of.");
 
-            PropertyDescriptor rv[] =
-                { statusTerm };
+            PropertyDescriptor rv[] = { statusTerm };
             return rv;
         } catch (IntrospectionException e) {
-             throw new Error(e.toString());
+            throw new Error(e.toString());
         }
-     }        
+    }
+
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */

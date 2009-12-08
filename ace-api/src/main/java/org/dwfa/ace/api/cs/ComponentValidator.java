@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,84 +23,85 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * Validates a component - it must match exactly with a component in the database.
+ * Validates a component - it must match exactly with a component in the
+ * database.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 public class ComponentValidator extends SimpleValidator {
 
-	private final RelationshipValidator relationshipValidator = new RelationshipValidator();
-	private final DescriptionValidator descriptionValidator = new DescriptionValidator();
-	private final ConceptAttributeValidator conceptAttributeValidator = new ConceptAttributeValidator();
-	private String failureReport;
-	private boolean timeLenient;
-	private boolean strictMode;
+    private final RelationshipValidator relationshipValidator = new RelationshipValidator();
+    private final DescriptionValidator descriptionValidator = new DescriptionValidator();
+    private final ConceptAttributeValidator conceptAttributeValidator = new ConceptAttributeValidator();
+    private String failureReport;
+    private boolean timeLenient;
+    private boolean strictMode;
 
-	@Override
-	protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf)
-			throws IOException, TerminologyException {
+    @Override
+    protected boolean validateAceBean(UniversalAceBean bean, I_TermFactory tf) throws IOException, TerminologyException {
 
-		failureReport = "";
-		
-		conceptAttributeValidator.setTimeLenient(timeLenient);
-		boolean validConceptAttributes = conceptAttributeValidator.validateAceBean(bean, tf);
-		if (!validConceptAttributes) {
-			String message = "Invalid concept attributes: " + conceptAttributeValidator.getFailureReport();
-			failureReport += message;
-			if (strictMode || bean.getUncommittedConceptAttributes() != null) {
-				AceLog.getEditLog().severe(message);
-				return false;
-			}
-			AceLog.getEditLog().warning(message);
-		}
-		
-		descriptionValidator.setTimeLenient(timeLenient);
-		boolean validDescription = descriptionValidator.validateAceBean(bean, tf);
-		if (!validDescription) {
-			String message = "Invalid description: " + descriptionValidator.getFailureReport();
-			failureReport += message;
-			if (strictMode || bean.getUncommittedDescriptions().size() > 0) {
-				AceLog.getEditLog().severe(message);
-				return false;
-			}
-			AceLog.getEditLog().warning(message);
-		}
+        failureReport = "";
 
-		relationshipValidator.setTimeLenient(timeLenient);
-		boolean validRelationship = relationshipValidator.validateAceBean(bean,	tf);
-		if (!validRelationship) {
-			String message = "Invalid relationship: " + relationshipValidator.getFailureReport();
-			failureReport += message;
-			if (strictMode || bean.getUncommittedSourceRels().size() > 0) {
-				AceLog.getEditLog().severe(message);
-				return false;
-			}
-			AceLog.getEditLog().warning(message);
-		}
+        conceptAttributeValidator.setTimeLenient(timeLenient);
+        boolean validConceptAttributes = conceptAttributeValidator.validateAceBean(bean, tf);
+        if (!validConceptAttributes) {
+            String message = "Invalid concept attributes: " + conceptAttributeValidator.getFailureReport();
+            failureReport += message;
+            if (strictMode || bean.getUncommittedConceptAttributes() != null) {
+                AceLog.getEditLog().severe(message);
+                return false;
+            }
+            AceLog.getEditLog().warning(message);
+        }
 
-		return true;
+        descriptionValidator.setTimeLenient(timeLenient);
+        boolean validDescription = descriptionValidator.validateAceBean(bean, tf);
+        if (!validDescription) {
+            String message = "Invalid description: " + descriptionValidator.getFailureReport();
+            failureReport += message;
+            if (strictMode || bean.getUncommittedDescriptions().size() > 0) {
+                AceLog.getEditLog().severe(message);
+                return false;
+            }
+            AceLog.getEditLog().warning(message);
+        }
 
-	}
+        relationshipValidator.setTimeLenient(timeLenient);
+        boolean validRelationship = relationshipValidator.validateAceBean(bean, tf);
+        if (!validRelationship) {
+            String message = "Invalid relationship: " + relationshipValidator.getFailureReport();
+            failureReport += message;
+            if (strictMode || bean.getUncommittedSourceRels().size() > 0) {
+                AceLog.getEditLog().severe(message);
+                return false;
+            }
+            AceLog.getEditLog().warning(message);
+        }
 
-	@Override
-	public String getFailureReport() {
-		return failureReport;
-	}
+        return true;
 
-	public boolean isTimeLenient() {
-		return timeLenient;
-	}
+    }
 
-	public void setTimeLenient(boolean timeLenient) {
-		this.timeLenient = timeLenient;
-	}
+    @Override
+    public String getFailureReport() {
+        return failureReport;
+    }
 
-	public boolean isStrictMode() {
-		return strictMode;
-	}
+    public boolean isTimeLenient() {
+        return timeLenient;
+    }
 
-	public void setStrictMode(boolean strictMode) {
-		this.strictMode = strictMode;
-	}
+    public void setTimeLenient(boolean timeLenient) {
+        this.timeLenient = timeLenient;
+    }
+
+    public boolean isStrictMode() {
+        return strictMode;
+    }
+
+    public void setStrictMode(boolean strictMode) {
+        this.strictMode = strictMode;
+    }
 
 }

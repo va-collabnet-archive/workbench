@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,7 +47,6 @@ public class ClearSignpost extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
@@ -68,8 +67,7 @@ public class ClearSignpost extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-                    .name());
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             final JPanel signpostPanel = config.getSignpostPanel();
             SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -118,7 +116,7 @@ public class ClearSignpost extends AbstractTask {
             throw new TaskFailedException(e);
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
-        } 
+        }
 
         return Condition.CONTINUE;
     }

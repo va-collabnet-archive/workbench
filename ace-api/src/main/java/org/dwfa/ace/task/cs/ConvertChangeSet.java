@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,121 +41,117 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/change sets", type = BeanType.TASK_BEAN) })
 public class ConvertChangeSet extends AbstractTask {
 
-	protected String outputSuffix = ".xml";
+    protected String outputSuffix = ".xml";
 
-	protected String filename = "";
+    protected String filename = "";
 
-	protected String changeSetTransformer = ChangeSetXmlEncoder.class.getName();
+    protected String changeSetTransformer = ChangeSetXmlEncoder.class.getName();
 
-	private static final long serialVersionUID = 1;
+    private static final long serialVersionUID = 1;
 
-	private static final int dataVersion = 0;
+    private static final int dataVersion = 0;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(filename);
-		out.writeObject(outputSuffix);
-		out.writeObject(changeSetTransformer);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(filename);
+        out.writeObject(outputSuffix);
+        out.writeObject(changeSetTransformer);
+    }
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion <= dataVersion) {
-			filename = (String) in.readObject();
-			outputSuffix = (String) in.readObject();
-			changeSetTransformer = (String) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion <= dataVersion) {
+            filename = (String) in.readObject();
+            outputSuffix = (String) in.readObject();
+            changeSetTransformer = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-	}
+    }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
-	 */
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
-		Logger logger = worker.getLogger();
+        Logger logger = worker.getLogger();
 
         if (filename.startsWith(ProcessAttachmentKeys.getAttachmentPrefix())) {
             filename = (String) process.readAttachement(filename.split(ProcessAttachmentKeys.getAttachmentPrefix())[1]);
         }
 
-		File file = new File(filename);
+        File file = new File(filename);
 
-		if (!file.exists() || !file.canRead()) {
-			throw new TaskFailedException("Specified file '" + filename
-					+ "' either does not exist or cannot be read");
-		}
+        if (!file.exists() || !file.canRead()) {
+            throw new TaskFailedException("Specified file '" + filename + "' either does not exist or cannot be read");
+        }
 
-		try {
-			ChangeSetTransformer encoder = getChangeSetTransformer(changeSetTransformer);
-			encoder.setOutputSuffix(outputSuffix);
-			encoder.transform(logger, file);
-		} catch (Exception e) {
-			throw new TaskFailedException("Failed processing file " + file, e);
-		}
+        try {
+            ChangeSetTransformer encoder = getChangeSetTransformer(changeSetTransformer);
+            encoder.setOutputSuffix(outputSuffix);
+            encoder.transform(logger, file);
+        } catch (Exception e) {
+            throw new TaskFailedException("Failed processing file " + file, e);
+        }
 
-		return Condition.CONTINUE;
-	}
+        return Condition.CONTINUE;
+    }
 
-	public static ChangeSetTransformer getChangeSetTransformer(String changeSetTransformer) throws TaskFailedException {
-		try {
-			return (ChangeSetTransformer) Class.forName(changeSetTransformer).newInstance();
-		} catch (Exception e) {
-			throw new TaskFailedException("Failed to get transformer class " + changeSetTransformer, e);
-		}
-	}
+    public static ChangeSetTransformer getChangeSetTransformer(String changeSetTransformer) throws TaskFailedException {
+        try {
+            return (ChangeSetTransformer) Class.forName(changeSetTransformer).newInstance();
+        } catch (Exception e) {
+            throw new TaskFailedException("Failed to get transformer class " + changeSetTransformer, e);
+        }
+    }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
-	 */
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do.
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do.
 
-	}
+    }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
-	 */
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     */
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
-	 */
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
+     */
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-	public String getOutputSuffix() {
-		return outputSuffix;
-	}
+    public String getOutputSuffix() {
+        return outputSuffix;
+    }
 
-	public void setOutputSuffix(String outputSuffix) {
-		this.outputSuffix = outputSuffix;
-	}
+    public void setOutputSuffix(String outputSuffix) {
+        this.outputSuffix = outputSuffix;
+    }
 
-	public String getFilename() {
-		return filename;
-	}
+    public String getFilename() {
+        return filename;
+    }
 
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
 
-	public void setChangeSetTransformer(String changeSetTransformer) {
-		this.changeSetTransformer = changeSetTransformer;
-	}
+    public void setChangeSetTransformer(String changeSetTransformer) {
+        this.changeSetTransformer = changeSetTransformer;
+    }
 
-	public String getChangeSetTransformer() {
-		return changeSetTransformer;
-	}
+    public String getChangeSetTransformer() {
+        return changeSetTransformer;
+    }
 
 }

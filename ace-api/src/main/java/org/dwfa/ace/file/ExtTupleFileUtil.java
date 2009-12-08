@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,86 +33,71 @@ import org.dwfa.tapi.SuppressDataChecks;
 
 public class ExtTupleFileUtil {
 
-    protected static void newIntRefsetExtension(
-            UUID refsetUUid, UUID componentUuid, int value, 
-            UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveDate) 
-            throws Exception {
-        
+    protected static void newIntRefsetExtension(UUID refsetUUid, UUID componentUuid, int value, UUID memberUuid,
+            UUID pathUuid, UUID statusUuid, int effectiveDate) throws Exception {
+
         newRefsetExtension(refsetUUid, componentUuid, memberUuid, pathUuid, statusUuid, effectiveDate,
-            I_ThinExtByRefPartInteger.class, 
-            new BeanPropertyMap().with(ThinExtByRefPartProperty.INTEGER_VALUE, value));
+            I_ThinExtByRefPartInteger.class, new BeanPropertyMap().with(ThinExtByRefPartProperty.INTEGER_VALUE, value));
     }
-    
-    protected static void newConceptRefsetExtension(
-            UUID refsetUUid, UUID componentUuid, UUID c1Uuid, 
-            UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveDate) 
-            throws Exception {
-        
+
+    protected static void newConceptRefsetExtension(UUID refsetUUid, UUID componentUuid, UUID c1Uuid, UUID memberUuid,
+            UUID pathUuid, UUID statusUuid, int effectiveDate) throws Exception {
+
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        
+
         newRefsetExtension(refsetUUid, componentUuid, memberUuid, pathUuid, statusUuid, effectiveDate,
-            I_ThinExtByRefPartConcept.class, 
-            new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, termFactory.getId(c1Uuid).getNativeId()));
-    }    
-    
-    protected static void newConceptConceptRefsetExtension(
-            UUID refsetUUid, UUID componentUuid, UUID c1Uuid, UUID c2Uuid,  
-            UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveDate) 
-            throws Exception {
-        
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
-        
-        newRefsetExtension(refsetUUid, componentUuid, memberUuid, pathUuid, statusUuid, effectiveDate,
-            I_ThinExtByRefPartConceptConcept.class, 
-            new BeanPropertyMap()
-                .with(ThinExtByRefPartProperty.CONCEPT_ONE, termFactory.getId(c1Uuid).getNativeId())
-                .with(ThinExtByRefPartProperty.CONCEPT_TWO, termFactory.getId(c2Uuid).getNativeId()));
+            I_ThinExtByRefPartConcept.class, new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE,
+                termFactory.getId(c1Uuid).getNativeId()));
     }
-    
-    protected static void newConceptConceptConceptRefsetExtension(
-            UUID refsetUUid, UUID componentUuid, UUID c1Uuid, UUID c2Uuid, UUID c3Uuid, 
-            UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveDate) 
-            throws Exception {
-        
+
+    protected static void newConceptConceptRefsetExtension(UUID refsetUUid, UUID componentUuid, UUID c1Uuid,
+            UUID c2Uuid, UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveDate) throws Exception {
+
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        
+
         newRefsetExtension(refsetUUid, componentUuid, memberUuid, pathUuid, statusUuid, effectiveDate,
-            I_ThinExtByRefPartConceptConceptConcept.class, 
-            new BeanPropertyMap()
-                .with(ThinExtByRefPartProperty.CONCEPT_ONE, termFactory.getId(c1Uuid).getNativeId())
-                .with(ThinExtByRefPartProperty.CONCEPT_TWO, termFactory.getId(c2Uuid).getNativeId())
-                .with(ThinExtByRefPartProperty.CONCEPT_THREE, termFactory.getId(c3Uuid).getNativeId()));
+            I_ThinExtByRefPartConceptConcept.class, new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE,
+                termFactory.getId(c1Uuid).getNativeId()).with(ThinExtByRefPartProperty.CONCEPT_TWO,
+                termFactory.getId(c2Uuid).getNativeId()));
     }
- 
-    protected static void newConceptConceptStringRefsetExtension(
-            UUID refsetUUid, UUID componentUuid, UUID c1Uuid, UUID c2Uuid, String strValue, 
-            UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveDate) 
+
+    protected static void newConceptConceptConceptRefsetExtension(UUID refsetUUid, UUID componentUuid, UUID c1Uuid,
+            UUID c2Uuid, UUID c3Uuid, UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveDate)
             throws Exception {
-        
+
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        
+
         newRefsetExtension(refsetUUid, componentUuid, memberUuid, pathUuid, statusUuid, effectiveDate,
-            I_ThinExtByRefPartConceptConceptString.class, 
-            new BeanPropertyMap()
-                .with(ThinExtByRefPartProperty.CONCEPT_ONE, termFactory.getId(c1Uuid).getNativeId())
-                .with(ThinExtByRefPartProperty.CONCEPT_TWO, termFactory.getId(c2Uuid).getNativeId())
-                .with(ThinExtByRefPartProperty.STRING_VALUE, strValue));
-    }    
-    
+            I_ThinExtByRefPartConceptConceptConcept.class, new BeanPropertyMap().with(
+                ThinExtByRefPartProperty.CONCEPT_ONE, termFactory.getId(c1Uuid).getNativeId()).with(
+                ThinExtByRefPartProperty.CONCEPT_TWO, termFactory.getId(c2Uuid).getNativeId()).with(
+                ThinExtByRefPartProperty.CONCEPT_THREE, termFactory.getId(c3Uuid).getNativeId()));
+    }
+
+    protected static void newConceptConceptStringRefsetExtension(UUID refsetUUid, UUID componentUuid, UUID c1Uuid,
+            UUID c2Uuid, String strValue, UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveDate)
+            throws Exception {
+
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+        newRefsetExtension(refsetUUid, componentUuid, memberUuid, pathUuid, statusUuid, effectiveDate,
+            I_ThinExtByRefPartConceptConceptString.class, new BeanPropertyMap().with(
+                ThinExtByRefPartProperty.CONCEPT_ONE, termFactory.getId(c1Uuid).getNativeId()).with(
+                ThinExtByRefPartProperty.CONCEPT_TWO, termFactory.getId(c2Uuid).getNativeId()).with(
+                ThinExtByRefPartProperty.STRING_VALUE, strValue));
+    }
+
     @SuppressDataChecks
-    private static void newRefsetExtension(
-            UUID refsetUUid, UUID componentUuid, UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveDate, 
-            Class<? extends I_ThinExtByRefPart> type, final BeanPropertyMap extProps) 
+    private static void newRefsetExtension(UUID refsetUUid, UUID componentUuid, UUID memberUuid, UUID pathUuid,
+            UUID statusUuid, int effectiveDate, Class<? extends I_ThinExtByRefPart> type, final BeanPropertyMap extProps)
             throws Exception {
-        
-        I_TermFactory termFactory = LocalVersionedTerminology.get();     
-  
-        new RefsetHelper().newRefsetExtension(
-            termFactory.getId(refsetUUid).getNativeId(), 
-            termFactory.getId(componentUuid).getNativeId(), 
-            type, extProps.with(ThinExtByRefPartProperty.STATUS, termFactory.getId(statusUuid).getNativeId()),
-            memberUuid, pathUuid, effectiveDate);
-        
+
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+        new RefsetHelper().newRefsetExtension(termFactory.getId(refsetUUid).getNativeId(), termFactory.getId(
+            componentUuid).getNativeId(), type, extProps.with(ThinExtByRefPartProperty.STATUS, termFactory.getId(
+            statusUuid).getNativeId()), memberUuid, pathUuid, effectiveDate);
+
         termFactory.commit();
     }
 }

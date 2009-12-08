@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,13 +34,11 @@ public class ShowQueueViewerBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor show =
-                    new PropertyDescriptor("show", ShowQueueViewer.class);
+            PropertyDescriptor show = new PropertyDescriptor("show", ShowQueueViewer.class);
             show.setBound(true);
             show.setPropertyEditorClass(CheckboxEditor.class);
             show.setDisplayName("Show Queue Viewer:");
-            show
-                .setShortDescription("Select to show the queue viewer to the user.");
+            show.setShortDescription("Select to show the queue viewer to the user.");
 
             PropertyDescriptor rv[] = { show };
             return rv;
@@ -54,8 +52,7 @@ public class ShowQueueViewerBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ShowQueueViewer.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Show Queue Viewer");
+        bd.setDisplayName("<html><font color='green'><center>Show Queue Viewer");
         return bd;
     }
 

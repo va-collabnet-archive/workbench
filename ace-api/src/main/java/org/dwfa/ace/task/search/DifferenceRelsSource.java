@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,36 +29,31 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = {
-		@Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
-		@Spec(directory = "search", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "search", type = BeanType.TASK_BEAN) })
 public class DifferenceRelsSource extends AbstractDifferenceRels {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	private static final int dataVersion = 1;
+    private static final long serialVersionUID = 1L;
+    private static final int dataVersion = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion <= dataVersion) {
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion <= dataVersion) {
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-
-	protected List<I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig,
-			I_GetConceptData conceptToTest, Set<I_Position> viewSet)
-			throws IOException {
-		return conceptToTest.getSourceRelTuples(frameConfig.getAllowedStatus(), 
-				null, viewSet, false);
-	}
+    protected List<I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig, I_GetConceptData conceptToTest,
+            Set<I_Position> viewSet) throws IOException {
+        return conceptToTest.getSourceRelTuples(frameConfig.getAllowedStatus(), null, viewSet, false);
+    }
 
 }

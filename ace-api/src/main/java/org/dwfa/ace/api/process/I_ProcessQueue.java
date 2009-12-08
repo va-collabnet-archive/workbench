@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,14 +38,17 @@ public interface I_ProcessQueue {
      * of jobs waiting to execute is empty.
      * 
      * @return true if the queue of Runnables waiting to be executed is empty,
-     * false otherwise.
+     *         false otherwise.
      */
     boolean isEmpty();
 
     /**
-     * This method allows the calling thread to block and await completion of all
-     * active and waiting Runnable objects the process queue is managing. Once this
-     * method is called the queue will no longer accept new jobs until all running and
+     * This method allows the calling thread to block and await completion of
+     * all
+     * active and waiting Runnable objects the process queue is managing. Once
+     * this
+     * method is called the queue will no longer accept new jobs until all
+     * running and
      * queued jobs are complete and this method has returned.
      */
     void awaitCompletion();

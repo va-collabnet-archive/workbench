@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,8 +24,9 @@ import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 
 /**
  * Bean info to ShowHistoryView class.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 public class ShowHistoryBeanInfo extends SimpleBeanInfo {
 
@@ -38,12 +39,10 @@ public class ShowHistoryBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor visible =
-                    new PropertyDescriptor("visible", ShowHistory.class);
+            PropertyDescriptor visible = new PropertyDescriptor("visible", ShowHistory.class);
             visible.setBound(true);
             visible.setPropertyEditorClass(CheckboxEditor.class);
-            visible
-                .setDisplayName("<html><font color='green'>Show history view");
+            visible.setDisplayName("<html><font color='green'>Show history view");
             visible.setShortDescription("Choose whether to show history view.");
 
             PropertyDescriptor rv[] = { visible };
@@ -58,9 +57,7 @@ public class ShowHistoryBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ShowHistory.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Show or Hide <br> "
-                + " History View");
+        bd.setDisplayName("<html><font color='green'><center>Show or Hide <br> " + " History View");
         return bd;
     }
 

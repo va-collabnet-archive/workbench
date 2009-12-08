@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,37 +30,26 @@ public class SetPropertyToTermEntryBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor termPropName =
-                    new PropertyDescriptor("termPropName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor termPropName = new PropertyDescriptor("termPropName", getBeanDescriptor().getBeanClass());
             termPropName.setBound(true);
             termPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            termPropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            termPropName
-                .setShortDescription("The property that contains the profile to modify.");
+            termPropName.setDisplayName("<html><font color='green'>profile prop:");
+            termPropName.setShortDescription("The property that contains the profile to modify.");
 
-            PropertyDescriptor termEntry =
-                    new PropertyDescriptor("termEntry", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor termEntry = new PropertyDescriptor("termEntry", getBeanDescriptor().getBeanClass());
             termEntry.setBound(true);
             termEntry.setPropertyEditorClass(ConceptLabelEditor.class);
             termEntry.setDisplayName("<html><font color='green'>term:");
-            termEntry
-                .setShortDescription("The concept to add to the property.");
+            termEntry.setShortDescription("The concept to add to the property.");
 
-            PropertyDescriptor convertToConcept =
-                    new PropertyDescriptor("convertToConcept",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor convertToConcept = new PropertyDescriptor("convertToConcept",
+                getBeanDescriptor().getBeanClass());
             convertToConcept.setBound(true);
             convertToConcept.setPropertyEditorClass(CheckboxEditor.class);
-            convertToConcept
-                .setDisplayName("<html><font color='green'>Convert to concept");
-            convertToConcept
-                .setShortDescription("If checked the property will be set as a concept bean rather than as a term entry");
+            convertToConcept.setDisplayName("<html><font color='green'>Convert to concept");
+            convertToConcept.setShortDescription("If checked the property will be set as a concept bean rather than as a term entry");
 
-            PropertyDescriptor rv[] =
-                    { termPropName, termEntry, convertToConcept };
+            PropertyDescriptor rv[] = { termPropName, termEntry, convertToConcept };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -72,8 +61,7 @@ public class SetPropertyToTermEntryBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetPropertyToTermEntry.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>set property<br>to term entry");
+        bd.setDisplayName("<html><font color='green'><center>set property<br>to term entry");
         return bd;
     }
 }

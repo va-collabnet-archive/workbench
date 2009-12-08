@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,11 +25,11 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info for TakeFirstItemInAttachmentListReturnUUID class.
+ * 
  * @author Susan Castillo
- *
+ * 
  */
-public class TakeFirstItemInAttachmentListReturnUUIDBeanInfo extends
-        SimpleBeanInfo {
+public class TakeFirstItemInAttachmentListReturnUUIDBeanInfo extends SimpleBeanInfo {
 
     /**
      *
@@ -40,24 +40,18 @@ public class TakeFirstItemInAttachmentListReturnUUIDBeanInfo extends
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor uuidListPropName =
-                    new PropertyDescriptor("uuidListPropName",
-                        TakeFirstItemInAttachmentListReturnUUID.class);
+            PropertyDescriptor uuidListPropName = new PropertyDescriptor("uuidListPropName",
+                TakeFirstItemInAttachmentListReturnUUID.class);
             uuidListPropName.setBound(true);
-            uuidListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            uuidListPropName
-                .setDisplayName("<html><font color='green'>Name of list:");
+            uuidListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListPropName.setDisplayName("<html><font color='green'>Name of list:");
             uuidListPropName.setShortDescription("Name of the temporary list.");
 
-            PropertyDescriptor potDupUuidPropName =
-                    new PropertyDescriptor("potDupUuidPropName",
-                        TakeFirstItemInAttachmentListReturnUUID.class);
+            PropertyDescriptor potDupUuidPropName = new PropertyDescriptor("potDupUuidPropName",
+                TakeFirstItemInAttachmentListReturnUUID.class);
             potDupUuidPropName.setBound(true);
-            potDupUuidPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            potDupUuidPropName
-                .setDisplayName("<html><font color='green'>Uuid:");
+            potDupUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            potDupUuidPropName.setDisplayName("<html><font color='green'>Uuid:");
             potDupUuidPropName.setShortDescription("Uuid");
 
             PropertyDescriptor rv[] = { uuidListPropName, potDupUuidPropName };
@@ -71,10 +65,8 @@ public class TakeFirstItemInAttachmentListReturnUUIDBeanInfo extends
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(TakeFirstItemInAttachmentList.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Take 1st Item<br>In Attachment List<br> Return Uuid");
+        BeanDescriptor bd = new BeanDescriptor(TakeFirstItemInAttachmentList.class);
+        bd.setDisplayName("<html><font color='green'><center>Take 1st Item<br>In Attachment List<br> Return Uuid");
         return bd;
     }
 

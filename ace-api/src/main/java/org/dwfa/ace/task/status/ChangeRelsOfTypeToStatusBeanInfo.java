@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,37 +35,26 @@ public class ChangeRelsOfTypeToStatusBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor relType =
-                    new PropertyDescriptor("relType",
-                        ChangeRelsOfTypeToStatus.class);
+            PropertyDescriptor relType = new PropertyDescriptor("relType", ChangeRelsOfTypeToStatus.class);
             relType.setBound(true);
             relType.setPropertyEditorClass(ConceptLabelEditor.class);
             relType.setDisplayName("Rel type:");
-            relType
-                .setShortDescription("The type of rels to change the status of.");
+            relType.setShortDescription("The type of rels to change the status of.");
 
-            PropertyDescriptor newStatus =
-                    new PropertyDescriptor("newStatus",
-                        ChangeRelsOfTypeToStatus.class);
+            PropertyDescriptor newStatus = new PropertyDescriptor("newStatus", ChangeRelsOfTypeToStatus.class);
             newStatus.setBound(true);
             newStatus.setPropertyEditorClass(ConceptLabelEditor.class);
             newStatus.setDisplayName("New status:");
-            newStatus
-                .setShortDescription("The new status value for the concept.");
+            newStatus.setShortDescription("The new status value for the concept.");
 
-            PropertyDescriptor activeConceptPropName =
-                    new PropertyDescriptor("activeConceptPropName",
-                        ChangeRelsOfTypeToStatus.class);
+            PropertyDescriptor activeConceptPropName = new PropertyDescriptor("activeConceptPropName",
+                ChangeRelsOfTypeToStatus.class);
             activeConceptPropName.setBound(true);
-            activeConceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            activeConceptPropName
-                .setDisplayName("<html><font color='green'>Concept property:");
-            activeConceptPropName
-                .setShortDescription("Name of the property containing the concept to change the status of. ");
+            activeConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            activeConceptPropName.setDisplayName("<html><font color='green'>Concept property:");
+            activeConceptPropName.setShortDescription("Name of the property containing the concept to change the status of. ");
 
-            PropertyDescriptor rv[] =
-                    { relType, newStatus, activeConceptPropName };
+            PropertyDescriptor rv[] = { relType, newStatus, activeConceptPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -77,8 +66,7 @@ public class ChangeRelsOfTypeToStatusBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ChangeRelsOfTypeToStatus.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Change Rels of Type<br> to Status");
+        bd.setDisplayName("<html><font color='green'><center>Change Rels of Type<br> to Status");
         return bd;
     }
 }

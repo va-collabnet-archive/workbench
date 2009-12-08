@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,60 +24,62 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 /**
- * This class allows for fields (bean properties) to be defined along with an expected value 
+ * This class allows for fields (bean properties) to be defined along with an
+ * expected value
  * value. The class can then be used to test an object matches these properties.
  * 
- * For example, to validate an object has the following properties 
+ * For example, to validate an object has the following properties
  * <ul>
  * <li>getName() returns "foo"
- * <li>getValue() returns 5 
+ * <li>getValue() returns 5
  * </ul>
- * this class can be created with: 
+ * this class can be created with:
  * <p>
  * <code>new BeanPropertyMap().with("name", "foo").with("value", 5).validate(object)</code>
  * 
  */
 public class BeanPropertyMap {
-    
-    protected HashMap<String, Object> properties = new HashMap<String, Object>(); 
-    
+
+    protected HashMap<String, Object> properties = new HashMap<String, Object>();
+
     protected Class<?> beanClass;
-    
+
     /**
-     * @deprecated Recommend using {@link #with(BeanProperty, Object)} with a well defined bean property.
+     * @deprecated Recommend using {@link #with(BeanProperty, Object)} with a
+     *             well defined bean property.
      */
     @Deprecated
     public BeanPropertyMap with(String propertyName, Object propertyValue) {
         properties.put(propertyName, propertyValue);
         return this;
     }
-    
+
     public <T extends BeanProperty> BeanPropertyMap with(T property, Object propertyValue) {
         properties.put(property.getPropertyName(), propertyValue);
         return this;
     }
-    
+
     public BeanPropertyMap withType(Class<?> beanClass) {
         this.beanClass = beanClass;
         return this;
     }
-    
+
     public boolean hasProperty(String propertyName) {
         return properties.containsKey(propertyName);
     }
-    
+
     public Object getPropertyValue(String propertyName) {
         return properties.get(propertyName);
     }
-    
+
     public boolean validate(Object bean) {
-        
+
         if (beanClass != null) {
             if (!beanClass.isAssignableFrom(bean.getClass())) {
                 return false;
             }
         }
-        
+
         for (String name : properties.keySet()) {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
@@ -94,7 +96,7 @@ public class BeanPropertyMap {
         }
         return true;
     }
-    
+
     public void writeTo(Object bean) throws IntrospectionException, IllegalAccessException, InvocationTargetException {
         for (String name : properties.keySet()) {
             BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
@@ -102,9 +104,8 @@ public class BeanPropertyMap {
                 if (propDesc.getName().equals(name)) {
                     propDesc.getWriteMethod().invoke(bean, properties.get(name));
                 }
-            }            
+            }
         }
     }
-    
-}
 
+}

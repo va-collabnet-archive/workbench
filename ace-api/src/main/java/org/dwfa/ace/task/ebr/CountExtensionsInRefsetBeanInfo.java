@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,14 +27,12 @@ public class CountExtensionsInRefsetBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor refsetTermEntry =
-                    new PropertyDescriptor("refsetTermEntry",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor refsetTermEntry = new PropertyDescriptor("refsetTermEntry",
+                getBeanDescriptor().getBeanClass());
             refsetTermEntry.setBound(true);
             refsetTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
             refsetTermEntry.setDisplayName("RefSet:");
-            refsetTermEntry
-                .setShortDescription("The identity concept for the refset of interest.");
+            refsetTermEntry.setShortDescription("The identity concept for the refset of interest.");
 
             PropertyDescriptor rv[] = { refsetTermEntry };
             return rv;
@@ -48,8 +46,7 @@ public class CountExtensionsInRefsetBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(CountExtensionsInRefset.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Count Extensions<br>in Refset");
+        bd.setDisplayName("<html><font color='green'><center>Count Extensions<br>in Refset");
         return bd;
     }
 }

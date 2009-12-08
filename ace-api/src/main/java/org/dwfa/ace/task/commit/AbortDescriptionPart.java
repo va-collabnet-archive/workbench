@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,8 +28,7 @@ public class AbortDescriptionPart implements I_Fixup {
     I_DescriptionVersioned desc;
     I_DescriptionPart part;
 
-    public AbortDescriptionPart(I_GetConceptData concept,
-            I_DescriptionVersioned desc, I_DescriptionPart part) {
+    public AbortDescriptionPart(I_GetConceptData concept, I_DescriptionVersioned desc, I_DescriptionPart part) {
         super();
         this.concept = concept;
         this.desc = desc;

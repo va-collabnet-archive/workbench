@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,8 +54,7 @@ public class PromptUserForInput extends AbstractTask {
     private static final int dataVersion = 1;
 
     private String instruction = "<html>Instruction";
-    private String newRefsetPropName = ProcessAttachmentKeys.MESSAGE
-            .getAttachmentKey();
+    private String newRefsetPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private String refsetName = "";
     private transient Condition returnCondition;
 
@@ -67,8 +66,7 @@ public class PromptUserForInput extends AbstractTask {
         out.writeObject(newRefsetPropName);
     }// End method writeObject
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             // nothing to read...
@@ -142,11 +140,9 @@ public class PromptUserForInput extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process,
-            final I_Work worker) throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         this.done = false;
-        I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+        I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
         boolean progressPanelVisible = config.isProgressToggleVisible();
@@ -184,19 +180,15 @@ public class PromptUserForInput extends AbstractTask {
                     workflowPanel.add(nameField, c);
                     c.gridx++;
                     c.anchor = GridBagConstraints.EAST;
-                    JButton stepButton = new JButton(
-                            new ImageIcon(
-                                    InstructAndWait.class
-                                            .getResource("/16x16/plain/media_step_forward.png")));
+                    JButton stepButton = new JButton(new ImageIcon(
+                        InstructAndWait.class.getResource("/16x16/plain/media_step_forward.png")));
                     stepButton.setToolTipText("Next step");
                     workflowPanel.add(stepButton, c);
 
                     c.gridx++;
                     stepButton.addActionListener(new StepActionListener());
-                    JButton stopButton = new JButton(
-                            new ImageIcon(
-                                    InstructAndWait.class
-                                            .getResource("/16x16/plain/media_stop_red.png")));
+                    JButton stopButton = new JButton(new ImageIcon(
+                        InstructAndWait.class.getResource("/16x16/plain/media_stop_red.png")));
                     stopButton.setToolTipText("Cancel");
                     workflowPanel.add(stopButton, c);
                     stopButton.addActionListener(new StopActionListener());
@@ -258,8 +250,7 @@ public class PromptUserForInput extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
 
     }// End method complete

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,7 +53,7 @@ class ClassifierUtil {
         this.rocket = rocket;
 
         final I_TermFactory termFactory = LocalVersionedTerminology.get();
-        
+
         rootNid = termFactory.uuidToNative(SNOMED.Concept.ROOT.getUids());
         isaId = termFactory.uuidToNative(SNOMED.Concept.IS_A.getUids());
 
@@ -73,10 +73,11 @@ class ClassifierUtil {
         addConceptToSet(statedForms, termFactory, ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP);
     }
 
-    private void addConceptToSet(I_IntSet set, I_TermFactory tf, Concept relationship) throws TerminologyException, IOException {
+    private void addConceptToSet(I_IntSet set, I_TermFactory tf, Concept relationship) throws TerminologyException,
+            IOException {
         set.add(tf.uuidToNative(relationship.getUids()));
     }
-    
+
     private void addPathIds(final I_IntSet paths, final I_Position p) {
         paths.add(p.getPath().getConceptId());
         for (I_Position origin : p.getPath().getOrigins()) {
@@ -85,9 +86,11 @@ class ClassifierUtil {
     }
 
     /**
-     * If the concept is a SNOMED concept, pass it and all active stated relationships to classifier.
+     * If the concept is a SNOMED concept, pass it and all active stated
+     * relationships to classifier.
      * 
-     * A concept is considered to be a SNOMED concept if it's the root concept or
+     * A concept is considered to be a SNOMED concept if it's the root concept
+     * or
      * it has an active SNOMED ISA relationship.
      * 
      * @param concept
@@ -99,14 +102,14 @@ class ClassifierUtil {
             rocket.addConcept(concept.getConceptId(), false);
         } else {
             final I_ConceptAttributePart latestAttributePart = getLatestAttribute(concept, includeUncommitted);
-            
+
             if (latestAttributePart != null && activeStatus.contains(latestAttributePart.getConceptStatus())) {
                 final List<Relationship> statedRels = collectStatedRelationships(concept, includeUncommitted);
 
                 if (null != statedRels) {
                     rocket.addConcept(concept.getConceptId(), latestAttributePart.isDefined());
 
-                    for (Relationship rel: statedRels) {
+                    for (Relationship rel : statedRels) {
                         rocket.addRelationship(rel.cId1, rel.relId, rel.cId2, rel.group);
                     }
                 }
@@ -114,58 +117,62 @@ class ClassifierUtil {
         }
     }
 
-    private List<Relationship> collectStatedRelationships(final I_GetConceptData concept, final boolean includeUncommitted) throws IOException {
+    private List<Relationship> collectStatedRelationships(final I_GetConceptData concept,
+            final boolean includeUncommitted) throws IOException {
         final List<I_RelVersioned> sourceRels = new ArrayList<I_RelVersioned>();
         final List<Relationship> statedRels = new ArrayList<Relationship>();
 
         boolean isSnomedConcept = false;
-        
+
         if (includeUncommitted) {
             sourceRels.addAll(concept.getUncommittedSourceRels());
         }
         sourceRels.addAll(concept.getSourceRels());
-        
-        for (I_RelVersioned rel: sourceRels) {
+
+        for (I_RelVersioned rel : sourceRels) {
             final I_RelPart latestRel = getLatestRel(concept, rel);
-            
+
             if (null != latestRel && activeStatus.contains(latestRel.getStatusId())) {
-                // check the relationship to see if there is a proper SNOMED is-a.
+                // check the relationship to see if there is a proper SNOMED
+                // is-a.
                 if (latestRel.getRelTypeId() == isaId) {
                     isSnomedConcept = true;
                 }
 
                 if (statedForms.contains(latestRel.getCharacteristicId())) {
-                    final Relationship relationship =
-                        new Relationship(rel.getC1Id(), latestRel.getRelTypeId(), rel.getC2Id(), latestRel.getGroup());
+                    final Relationship relationship = new Relationship(rel.getC1Id(), latestRel.getRelTypeId(),
+                        rel.getC2Id(), latestRel.getGroup());
                     statedRels.add(relationship);
                 }
             }
         }
-        
+
         return isSnomedConcept ? statedRels : null;
     }
 
-    private I_ConceptAttributePart getLatestAttribute(final I_GetConceptData concept, final boolean includeUncommitted) throws IOException {
+    private I_ConceptAttributePart getLatestAttribute(final I_GetConceptData concept, final boolean includeUncommitted)
+            throws IOException {
         final List<I_ConceptAttributePart> parts = new ArrayList<I_ConceptAttributePart>();
-        
+
         I_ConceptAttributePart latestAttributePart = null;
-        
+
         if (includeUncommitted) {
             final I_ConceptAttributeVersioned uncommittedConceptAttributes = concept.getUncommittedConceptAttributes();
             if (null != uncommittedConceptAttributes) {
                 parts.addAll(uncommittedConceptAttributes.getVersions());
             }
         }
-        
+
         parts.addAll(concept.getConceptAttributes().getVersions());
-        
+
         for (I_ConceptAttributePart attributePart : parts) {
             if (allowedPaths.contains(attributePart.getPathId())) {
                 if (latestAttributePart == null || latestAttributePart.getVersion() < attributePart.getVersion()) {
                     latestAttributePart = attributePart;
                 } else if (latestAttributePart.getVersion() == attributePart.getVersion()) {
                     if (getLogger().isLoggable(Level.FINE)) {
-                        getLogger().log(Level.FINE, "has multiple entries with same version: " + attributePart + " for " + concept);
+                        getLogger().log(Level.FINE,
+                            "has multiple entries with same version: " + attributePart + " for " + concept);
                     }
                 }
             }
@@ -181,7 +188,8 @@ class ClassifierUtil {
                     latestPart = part;
                 } else if (latestPart.getVersion() == part.getVersion()) {
                     if (getLogger().isLoggable(Level.FINE)) {
-                        getLogger().log(Level.FINE, "has multiple entries with same version: " + rel + " for " + concept);
+                        getLogger().log(Level.FINE,
+                            "has multiple entries with same version: " + rel + " for " + concept);
                     }
                 }
             }
@@ -192,13 +200,13 @@ class ClassifierUtil {
     private Logger getLogger() {
         return logger;
     }
-    
+
     static private class Relationship {
         final int cId1;
         final int relId;
         final int cId2;
         final int group;
-        
+
         public Relationship(final int cId1, final int relId, final int cId2, final int group) {
             this.cId1 = cId1;
             this.relId = relId;

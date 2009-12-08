@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,25 +29,18 @@ public class AddRootToProfileBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("The property that contains the profile to modify.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the profile to modify.");
 
-            PropertyDescriptor rootEntry =
-                    new PropertyDescriptor("rootEntry", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor rootEntry = new PropertyDescriptor("rootEntry", getBeanDescriptor().getBeanClass());
             rootEntry.setBound(true);
             rootEntry.setPropertyEditorClass(ConceptLabelEditor.class);
             rootEntry.setDisplayName("<html><font color='green'>root:");
-            rootEntry
-                .setShortDescription("The concept to add to the profile as a root.");
+            rootEntry.setShortDescription("The concept to add to the profile as a root.");
 
             PropertyDescriptor rv[] = { profilePropName, rootEntry };
             return rv;
@@ -61,8 +54,7 @@ public class AddRootToProfileBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(AddRootToProfile.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>add root<br>to profile");
+        bd.setDisplayName("<html><font color='green'><center>add root<br>to profile");
         return bd;
     }
 }

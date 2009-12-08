@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,83 +27,87 @@ import java.util.regex.Pattern;
 
 public interface I_DescriptionVersioned extends I_AmTermComponent {
 
-	public boolean addVersion(I_DescriptionPart newPart);
+    public boolean addVersion(I_DescriptionPart newPart);
 
-	public List<I_DescriptionPart> getVersions();
+    public List<I_DescriptionPart> getVersions();
 
-	/**
-	 * @param returnConflictResolvedLatestState
-	 * @return the versions of this description, filtered to a conflict managed state if passed true
-	 * @throws TerminologyException
-	 * @throws IOException
-	 */
-	public List<I_DescriptionPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+    /**
+     * @param returnConflictResolvedLatestState
+     * @return the versions of this description, filtered to a conflict managed
+     *         state if passed true
+     * @throws TerminologyException
+     * @throws IOException
+     */
+    public List<I_DescriptionPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException,
+            IOException;
 
-	public int versionCount();
+    public int versionCount();
 
-	public boolean matches(Pattern p);
+    public boolean matches(Pattern p);
 
-	public int getConceptId();
+    public int getConceptId();
 
-	public int getDescId();
+    public int getDescId();
 
-	public List<I_DescriptionTuple> getTuples();
+    public List<I_DescriptionTuple> getTuples();
 
-	/**
-	 * @param returnConflictResolvedLatestState
-	 * @return the tuples of this description, filtered to a conflict managed state if passed true
-	 * @throws TerminologyException
-	 * @throws IOException
-	 */
-	public List<I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+    /**
+     * @param returnConflictResolvedLatestState
+     * @return the tuples of this description, filtered to a conflict managed
+     *         state if passed true
+     * @throws TerminologyException
+     * @throws IOException
+     */
+    public List<I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException,
+            IOException;
 
-	public I_DescriptionTuple getFirstTuple();
+    public I_DescriptionTuple getFirstTuple();
 
     /**
      * Returns the last description of a tuple.
+     * 
      * @return The last description of a tuple.
      * @throws DescriptionHasNoVersionsException If the tuple has 0 versions.
      */
-	public I_DescriptionTuple getLastTuple() throws DescriptionHasNoVersionsException;
+    public I_DescriptionTuple getLastTuple() throws DescriptionHasNoVersionsException;
 
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positionSet,
+            List<I_DescriptionTuple> matchingTuples, boolean addUncommitted);
 
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positionSet, List<I_DescriptionTuple> matchingTuples,
-         boolean addUncommitted);
+    /**
+     * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
+     * positions -
+     * tuples are returned in the supplied returnTuples List parameter
+     * 
+     * @param allowedStatus
+     *            statuses tuples must match to be returned
+     * @param allowedTypes
+     *            types tuples must match to be returned
+     * @param positionSet
+     *            postions a tuple must be on to be returned
+     * @param matchingTuples
+     *            List to be populated with the result of the search
+     * @param addUncommitted
+     *            if true matching items from the uncommitted list will be
+     *            added, if false the uncommitted list is ignored
+     * @param returnConflictResolvedLatestState
+     *            indicates if all tuples or just the latest state using the
+     *            current profile's conflict resolution strategy is required
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positionSet,
+            List<I_DescriptionTuple> matchingTuples, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            throws TerminologyException, IOException;
 
-	/**
-	 * Retrieves tuples matching the specified allowedStatuses, allowedTypes and positions -
-	 * tuples are returned in the supplied returnTuples List parameter
-	 *
-	 * @param allowedStatus
-	 *            statuses tuples must match to be returned
-	 * @param allowedTypes
-	 *            types tuples must match to be returned
-	 * @param positionSet
-	 *            postions a tuple must be on to be returned
-	 * @param matchingTuples
-	 *            List to be populated with the result of the search
-	 * @param addUncommitted
-	 *            if true matching items from the uncommitted list will be
-	 *            added, if false the uncommitted list is ignored
-	 * @param returnConflictResolvedLatestState
-	 *            indicates if all tuples or just the latest state using the
-	 *            current profile's conflict resolution strategy is required
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positionSet, List<I_DescriptionTuple> matchingTuples,
-         boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+    public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
-	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
+    public boolean merge(I_DescriptionVersioned jarDesc);
 
-	public boolean merge(I_DescriptionVersioned jarDesc);
+    public Set<TimePathId> getTimePathSet();
 
-	public Set<TimePathId> getTimePathSet();
+    public I_DescribeConceptLocally toLocalFixedDesc();
 
-	public I_DescribeConceptLocally toLocalFixedDesc();
-
-	public UniversalAceDescription getUniversal() throws IOException, TerminologyException;
+    public UniversalAceDescription getUniversal() throws IOException, TerminologyException;
 
 }

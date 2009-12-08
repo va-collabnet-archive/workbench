@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,100 +42,97 @@ import org.dwfa.tapi.TerminologyException;
 
 public class SelectPositionSetPanel extends JPanel {
 
-	public class DeleteAction extends AbstractAction {
+    public class DeleteAction extends AbstractAction {
 
-		/**
+        /**
 		 * 
 		 */
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		public void actionPerformed(ActionEvent e) {
-			I_Position p = (I_Position) positionList.getSelectedValue();
-			positionListModel.remove(p);
-			positionSet.remove(p);
-		}
-	}
+        public void actionPerformed(ActionEvent e) {
+            I_Position p = (I_Position) positionList.getSelectedValue();
+            positionListModel.remove(p);
+            positionSet.remove(p);
+        }
+    }
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	
-	private Set<I_Position> positionSet = new HashSet<I_Position>();
+    private static final long serialVersionUID = 1L;
 
-	private JList positionList;
+    private Set<I_Position> positionSet = new HashSet<I_Position>();
 
-	private ArrayListModel<I_Position> positionListModel;
+    private JList positionList;
 
-	private SelectPathAndPositionPanelWithCombo pppwc;
-	
-	private class AddPathActionLister implements ActionListener {
+    private ArrayListModel<I_Position> positionListModel;
 
-		public void actionPerformed(ActionEvent e) {
-			try {
-			if (positionSet.contains(getCurrentPosition()) == false) {
-				positionSet.add(getCurrentPosition());
-				positionListModel.add(getCurrentPosition());
-			}
-			} catch (Exception ex) {
-				AceLog.getAppLog().alertAndLogException(ex);
-			}
-		}
-		
-	}
+    private SelectPathAndPositionPanelWithCombo pppwc;
 
-	public SelectPositionSetPanel(I_ConfigAceFrame config) throws Exception {
-		super(new GridBagLayout());
-		
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.fill = GridBagConstraints.BOTH;
+    private class AddPathActionLister implements ActionListener {
 
-		pppwc = new SelectPathAndPositionPanelWithCombo(true, "", 
-				config, null);
-		pppwc.setPositionCheckBoxVisible(false);
-		pppwc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (positionSet.contains(getCurrentPosition()) == false) {
+                    positionSet.add(getCurrentPosition());
+                    positionListModel.add(getCurrentPosition());
+                }
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
 
-		add(pppwc, gbc);
-		gbc.weighty = 0;
-		gbc.gridy++;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.fill = GridBagConstraints.NONE;
-		JButton addPathButton = new JButton("add position");
-		addPathButton.addActionListener(new AddPathActionLister());
-		add(addPathButton, gbc);
-		
-		gbc.gridy++;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weighty = 1;
-		positionListModel = new ArrayListModel<I_Position>();
-		positionList = new JList(positionListModel);
-		positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
-		positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
-		positionList.getActionMap().put("deleteTask", new DeleteAction());
+    }
 
-		JScrollPane positionScroller = new JScrollPane(positionList);
-		positionScroller.setMinimumSize(new Dimension(100,100));
-		positionScroller.setMaximumSize(new Dimension(500,500));
-		positionScroller.setPreferredSize(new Dimension(150,150));
-		positionScroller.setBorder(BorderFactory.createTitledBorder("Position set: "));
-		add(positionScroller, gbc);
-	}
-	
-	public I_Position getCurrentPosition() throws TerminologyException, IOException {
-		return pppwc.getCurrentPosition();
-	}
+    public SelectPositionSetPanel(I_ConfigAceFrame config) throws Exception {
+        super(new GridBagLayout());
 
-	public Set<I_Position> getPositionSet() {
-		return positionSet;
-	}
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.fill = GridBagConstraints.BOTH;
 
-	
+        pppwc = new SelectPathAndPositionPanelWithCombo(true, "", config, null);
+        pppwc.setPositionCheckBoxVisible(false);
+        pppwc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        add(pppwc, gbc);
+        gbc.weighty = 0;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        JButton addPathButton = new JButton("add position");
+        addPathButton.addActionListener(new AddPathActionLister());
+        add(addPathButton, gbc);
+
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weighty = 1;
+        positionListModel = new ArrayListModel<I_Position>();
+        positionList = new JList(positionListModel);
+        positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
+        positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
+        positionList.getActionMap().put("deleteTask", new DeleteAction());
+
+        JScrollPane positionScroller = new JScrollPane(positionList);
+        positionScroller.setMinimumSize(new Dimension(100, 100));
+        positionScroller.setMaximumSize(new Dimension(500, 500));
+        positionScroller.setPreferredSize(new Dimension(150, 150));
+        positionScroller.setBorder(BorderFactory.createTitledBorder("Position set: "));
+        add(positionScroller, gbc);
+    }
+
+    public I_Position getCurrentPosition() throws TerminologyException, IOException {
+        return pppwc.getCurrentPosition();
+    }
+
+    public Set<I_Position> getPositionSet() {
+        return positionSet;
+    }
 
 }

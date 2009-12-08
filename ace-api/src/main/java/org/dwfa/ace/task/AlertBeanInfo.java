@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,24 +27,18 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 public class AlertBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor alertText =
-                    new PropertyDescriptor("alertText", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor alertText = new PropertyDescriptor("alertText", getBeanDescriptor().getBeanClass());
             alertText.setBound(true);
             alertText.setPropertyEditorClass(JTextFieldEditor.class);
             alertText.setDisplayName("<html><font color='green'>Alert Text:");
             alertText.setShortDescription("Alert text to display to the user.");
 
-            PropertyDescriptor alertTextProperty =
-                    new PropertyDescriptor("alertTextProperty",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor alertTextProperty = new PropertyDescriptor("alertTextProperty",
+                getBeanDescriptor().getBeanClass());
             alertTextProperty.setBound(true);
-            alertTextProperty
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            alertTextProperty
-                .setDisplayName("<html><font color='green'>Alert Text Property:");
-            alertTextProperty
-                .setShortDescription("Text that is appended to the alert text.");
+            alertTextProperty.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            alertTextProperty.setDisplayName("<html><font color='green'>Alert Text Property:");
+            alertTextProperty.setShortDescription("Text that is appended to the alert text.");
 
             PropertyDescriptor rv[] = { alertText, alertTextProperty };
             return rv;

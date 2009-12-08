@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,11 +43,11 @@ public final class RefsetExportValidatorImplTest {
         mockGetConceptData = mockControl.createMock(I_GetConceptData.class);
         exportValidator = new RefsetExportValidatorImpl();
     }
-    
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+
+    @SuppressWarnings( { "ThrowableInstanceNeverThrown" })
     @Test
     public void shouldThrowAnExceptionIfValidateIsCurrentThrowsAnException() throws Exception {
-        EasyMock.expect(mockRefsetUtil.getLocalizedCurrentConceptNid()).andThrow(new IllegalStateException());                
+        EasyMock.expect(mockRefsetUtil.getLocalizedCurrentConceptNid()).andThrow(new IllegalStateException());
         mockControl.replay();
 
         try {
@@ -60,7 +60,7 @@ public final class RefsetExportValidatorImplTest {
         }
     }
 
-    @Test (expected = RefsetExportValidationException.class)
+    @Test(expected = RefsetExportValidationException.class)
     public void shouldThrowAnExceptionIfTheLatestRefsetConceptIsNull() throws Exception {
         EasyMock.expect(mockRefsetUtil.getLastestAttributePart(mockGetConceptData)).andReturn(null);
         EasyMock.expect(mockRefsetUtil.getLocalizedCurrentConceptNid()).andReturn(6);
@@ -69,8 +69,8 @@ public final class RefsetExportValidatorImplTest {
         exportValidator.validateIsCurrent(mockGetConceptData, mockRefsetUtil);
     }
 
-    @Test (expected = RefsetExportValidationException.class)
-    public void  shouldThrowAnExceptionIfTheLatestRefsetConceptIsNotCurrent() throws Exception {
+    @Test(expected = RefsetExportValidationException.class)
+    public void shouldThrowAnExceptionIfTheLatestRefsetConceptIsNotCurrent() throws Exception {
         I_ConceptAttributePart mockConceptAttributePart = mockControl.createMock(I_ConceptAttributePart.class);
         EasyMock.expect(mockRefsetUtil.getLastestAttributePart(mockGetConceptData)).andReturn(mockConceptAttributePart);
         EasyMock.expect(mockConceptAttributePart.getStatusId()).andReturn(2);
@@ -79,7 +79,7 @@ public final class RefsetExportValidatorImplTest {
 
         exportValidator.validateIsCurrent(mockGetConceptData, mockRefsetUtil);
     }
-        
+
     @Test
     public void shouldAcceptTheLatestRefsetConceptIfCurrent() throws Exception {
         I_ConceptAttributePart mockConceptAttributePart = mockControl.createMock(I_ConceptAttributePart.class);
@@ -92,16 +92,16 @@ public final class RefsetExportValidatorImplTest {
 
         mockControl.verify();
     }
-    
-    @Test (expected = RefsetExportValidationException.class)
+
+    @Test(expected = RefsetExportValidationException.class)
     public void shouldThrowAnExceptionIfConceptSuppliedIsNotAConceptExtension() throws Exception {
         EasyMock.expect(mockRefsetUtil.getLocalizedConceptExtensionNid()).andReturn(2000);
         mockControl.replay();
 
-        exportValidator.validateIsConceptExtension(1000, mockRefsetUtil);        
+        exportValidator.validateIsConceptExtension(1000, mockRefsetUtil);
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @SuppressWarnings( { "ThrowableInstanceNeverThrown" })
     @Test
     public void shouldThrowAnExceptionIfValidateIsConceptExtensionThrowsAnException() throws Exception {
         EasyMock.expect(mockRefsetUtil.getLocalizedConceptExtensionNid()).andThrow(new IllegalArgumentException(""));
@@ -112,8 +112,8 @@ public final class RefsetExportValidatorImplTest {
         } catch (RefsetExportValidationException e) {
             assertThat("An exception was thrown while validating concept extension.", equalTo(e.getMessage()));
             assertThat(e.getCause(), notNullValue());
-            Assert.assertTrue("Expected IllegalArgumentException.",
-                    IllegalArgumentException.class == e.getCause().getClass());
+            Assert.assertTrue("Expected IllegalArgumentException.", IllegalArgumentException.class == e.getCause()
+                .getClass());
             mockControl.verify();
         }
     }

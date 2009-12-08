@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,23 +24,22 @@ import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
 public class IsChildOfSearchInfo extends AbstractSeachTestSearchInfo {
 
-	@Override
-	protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
-		try {
-            PropertyDescriptor parentTerm =
-                new PropertyDescriptor("parentTerm", getBeanDescriptor().getBeanClass());
+    @Override
+    protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
+        try {
+            PropertyDescriptor parentTerm = new PropertyDescriptor("parentTerm", getBeanDescriptor().getBeanClass());
             parentTerm.setBound(true);
             parentTerm.setPropertyEditorClass(ConceptLabelEditor.class);
             parentTerm.setDisplayName("<html><font color='green'>parent:");
             parentTerm.setShortDescription("The concept to test for parentage of.");
 
-            PropertyDescriptor rv[] =
-                { parentTerm };
+            PropertyDescriptor rv[] = { parentTerm };
             return rv;
         } catch (IntrospectionException e) {
-             throw new Error(e.toString());
+            throw new Error(e.toString());
         }
-     }        
+    }
+
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */

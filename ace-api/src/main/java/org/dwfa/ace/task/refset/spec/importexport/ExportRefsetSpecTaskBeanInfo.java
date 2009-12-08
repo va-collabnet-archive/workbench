@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,29 +36,18 @@ public class ExportRefsetSpecTaskBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor outputFilePropName;
         PropertyDescriptor reportFilePropName;
         try {
-            outputFilePropName =
-                    new PropertyDescriptor("outputFilePropName",
-                        ExportRefsetSpecTask.class);
+            outputFilePropName = new PropertyDescriptor("outputFilePropName", ExportRefsetSpecTask.class);
             outputFilePropName.setBound(true);
-            outputFilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            outputFilePropName
-                .setDisplayName("<html><font color='green'>Output file property:");
-            outputFilePropName
-                .setShortDescription("Name of the property containing the filename to export to. ");
+            outputFilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            outputFilePropName.setDisplayName("<html><font color='green'>Output file property:");
+            outputFilePropName.setShortDescription("Name of the property containing the filename to export to. ");
 
-            reportFilePropName =
-                    new PropertyDescriptor("reportFilePropName",
-                        ExportRefsetSpecTask.class);
+            reportFilePropName = new PropertyDescriptor("reportFilePropName", ExportRefsetSpecTask.class);
             reportFilePropName.setBound(true);
-            reportFilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            reportFilePropName
-                .setDisplayName("<html><font color='green'>Output file property:");
-            reportFilePropName
-                .setShortDescription("Name of the property containing the report filename. ");
-            PropertyDescriptor rv[] =
-                    { outputFilePropName, reportFilePropName };
+            reportFilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            reportFilePropName.setDisplayName("<html><font color='green'>Output file property:");
+            reportFilePropName.setShortDescription("Name of the property containing the report filename. ");
+            PropertyDescriptor rv[] = { outputFilePropName, reportFilePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -70,8 +59,7 @@ public class ExportRefsetSpecTaskBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ExportRefsetSpecTask.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Export refset spec");
+        bd.setDisplayName("<html><font color='green'><center>Export refset spec");
         return bd;
     }
 

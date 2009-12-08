@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -100,13 +100,12 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             ArrayList<I_DescriptionVersioned> descriptions, boolean forCommit) throws Exception {
         ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        I_GetConceptData fsn_type =
-                getConceptSafe(termFactory, ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        I_GetConceptData fsn_type = getConceptSafe(termFactory,
+            ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         if (fsn_type == null)
             return alertList;
         I_IntSet actives = getActiveStatus(termFactory);
-        HashMap<String, ArrayList<I_DescriptionVersioned>> langs =
-                new HashMap<String, ArrayList<I_DescriptionVersioned>>();
+        HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
         for (I_DescriptionVersioned desc : descriptions) {
             for (I_DescriptionPart part : desc.getVersions(true)) {
                 if (!actives.contains(part.getStatusId()))
@@ -135,9 +134,8 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                         langs.put(lang, dl);
                     }
 
-                    Hits hits =
-                            termFactory.doLuceneSearch("\"" + part.getText().replace("(", "\\(").replace(")", "\\)")
-                                + "\"");
+                    Hits hits = termFactory.doLuceneSearch("\""
+                        + part.getText().replace("(", "\\(").replace(")", "\\)") + "\"");
                     // System.out.println("Found " + hits.length());
                     SEARCH: for (int i = 0; i < hits.length(); i++) {
                         // if (i == 10000)
@@ -153,7 +151,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                             if (part_search.equals(part)) {
                                 continue VERSIONS;
                             }
-                            
+
                             if (actives.contains(part_search.getStatusId())
                                 && part_search.getTypeId() == fsn_type.getConceptId()
                                 && part_search.getText().equals(part.getText())

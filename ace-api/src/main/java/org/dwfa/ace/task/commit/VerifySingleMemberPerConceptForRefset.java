@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,30 +35,30 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-        @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-        @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN)})
+                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
 public class VerifySingleMemberPerConceptForRefset extends AbstractExtensionTest {
 
     private static final long serialVersionUID = 1;
     private static final int dataVersion = 1;
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             //
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
     private static I_IntSet singleConceptRefsets;
+
     @Override
-    public List<AlertToDataConstraintFailure> test(I_ThinExtByRefVersioned extension, 
-    		boolean forCommit)
+    public List<AlertToDataConstraintFailure> test(I_ThinExtByRefVersioned extension, boolean forCommit)
             throws TaskFailedException {
         try {
             I_TermFactory tf = LocalVersionedTerminology.get();
@@ -70,35 +70,35 @@ public class VerifySingleMemberPerConceptForRefset extends AbstractExtensionTest
                 singleConceptRefsets.add(RefsetAuxiliary.Concept.DOCUMENT_SECTION_ORDER.localize().getNid());
                 singleConceptRefsets.add(RefsetAuxiliary.Concept.PATHOLOGY_INCLUSION_SPEC.localize().getNid());
                 // etc..
-                // @TODO  Need to gather this info from a machine readable concept model in the future...
+                // @TODO Need to gather this info from a machine readable
+                // concept model in the future...
             }
             if (singleConceptRefsets.contains(extension.getRefsetId())) {
                 List<I_ThinExtByRefVersioned> matches = new ArrayList<I_ThinExtByRefVersioned>();
-                
-                for (I_ThinExtByRefVersioned ext: tf.getAllExtensionsForComponent(extension.getComponentId(), true)) {
+
+                for (I_ThinExtByRefVersioned ext : tf.getAllExtensionsForComponent(extension.getComponentId(), true)) {
                     if (ext.getRefsetId() == extension.getRefsetId()) {
                         matches.add(ext);
                     }
                 }
-                
-                                
+
                 if (matches.size() > 1) {
                     I_GetConceptData conceptWithDuplicate = tf.getConcept(extension.getComponentId());
                     I_GetConceptData refsetIdentity = tf.getConcept(extension.getRefsetId());
-                	if (forCommit) {
-                		AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(ALERT_TYPE.ERROR,
-                				"<html>Duplicate refset entries of identity: " + refsetIdentity.getInitialText()
+                    if (forCommit) {
+                        AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(ALERT_TYPE.ERROR,
+                            "<html>Duplicate refset entries of identity: " + refsetIdentity.getInitialText()
                                 + "<br>for concept: " + conceptWithDuplicate.getInitialText(), conceptWithDuplicate);
-                		returnValues.add(alert);
-                	} else {
+                        returnValues.add(alert);
+                    } else {
                         // if not for commit, give option of rollback
-                		AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(ALERT_TYPE.WARNING,
-                				"<html>Duplicate refset entries of identity: " + refsetIdentity.getInitialText()
+                        AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(ALERT_TYPE.WARNING,
+                            "<html>Duplicate refset entries of identity: " + refsetIdentity.getInitialText()
                                 + "<br>for concept: " + conceptWithDuplicate.getInitialText(), conceptWithDuplicate);
-                		returnValues.add(alert);
+                        returnValues.add(alert);
                         AbortExtension abortFixup = new AbortExtension(extension, "don't add new refset member");
-                		alert.getFixOptions().add(abortFixup);
-                	}
+                        alert.getFixOptions().add(abortFixup);
+                    }
                 }
             }
             return returnValues;

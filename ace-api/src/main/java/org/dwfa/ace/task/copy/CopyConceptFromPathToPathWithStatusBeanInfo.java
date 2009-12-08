@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,51 +28,35 @@ public class CopyConceptFromPathToPathWithStatusBeanInfo extends SimpleBeanInfo 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor fromPathPropName =
-                    new PropertyDescriptor("fromPathPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor fromPathPropName = new PropertyDescriptor("fromPathPropName",
+                getBeanDescriptor().getBeanClass());
             fromPathPropName.setBound(true);
-            fromPathPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            fromPathPropName
-                .setDisplayName("<html><font color='green'>from path:");
-            fromPathPropName
-                .setShortDescription("Name of the property to copy the concept from. ");
+            fromPathPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            fromPathPropName.setDisplayName("<html><font color='green'>from path:");
+            fromPathPropName.setShortDescription("Name of the property to copy the concept from. ");
 
-            PropertyDescriptor toPathPropName =
-                    new PropertyDescriptor("toPathPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor toPathPropName = new PropertyDescriptor("toPathPropName",
+                getBeanDescriptor().getBeanClass());
             toPathPropName.setBound(true);
-            toPathPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
+            toPathPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             toPathPropName.setDisplayName("<html><font color='green'>to path:");
-            toPathPropName
-                .setShortDescription("Name of the property to copy the concept to. ");
+            toPathPropName.setShortDescription("Name of the property to copy the concept to. ");
 
-            PropertyDescriptor conceptPropName =
-                    new PropertyDescriptor("conceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptPropName = new PropertyDescriptor("conceptPropName",
+                getBeanDescriptor().getBeanClass());
             conceptPropName.setBound(true);
-            conceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptPropName
-                .setDisplayName("<html><font color='green'>concept:");
-            conceptPropName
-                .setShortDescription("Name of the property holding the concept to copy. ");
+            conceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptPropName.setDisplayName("<html><font color='green'>concept:");
+            conceptPropName.setShortDescription("Name of the property holding the concept to copy. ");
 
-            PropertyDescriptor statusPropName =
-                    new PropertyDescriptor("statusPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor statusPropName = new PropertyDescriptor("statusPropName",
+                getBeanDescriptor().getBeanClass());
             statusPropName.setBound(true);
-            statusPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
+            statusPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             statusPropName.setDisplayName("<html><font color='green'>status:");
-            statusPropName
-                .setShortDescription("Name of the property holding the new concept status. ");
+            statusPropName.setShortDescription("Name of the property holding the new concept status. ");
 
-            PropertyDescriptor rv[] =
-                    { fromPathPropName, toPathPropName, conceptPropName,
-                     statusPropName };
+            PropertyDescriptor rv[] = { fromPathPropName, toPathPropName, conceptPropName, statusPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -83,10 +67,8 @@ public class CopyConceptFromPathToPathWithStatusBeanInfo extends SimpleBeanInfo 
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(CopyConceptFromPathToPathWithStatus.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>copy concept<br>to path<br>with status");
+        BeanDescriptor bd = new BeanDescriptor(CopyConceptFromPathToPathWithStatus.class);
+        bd.setDisplayName("<html><font color='green'><center>copy concept<br>to path<br>with status");
         return bd;
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,7 +48,7 @@ import java.util.Properties;
  *         Date: Nov 3, 2009
  *         Time: 9:28:08 AM
  */
-@BeanList(specs = {@Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN) })
 public class ReadAboutBoxProperties extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
@@ -68,8 +68,7 @@ public class ReadAboutBoxProperties extends AbstractTask {
         out.writeObject(aboutBoxTitlePropName);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             aboutBoxPropertiesFilePropName = (String) in.readObject();
@@ -80,17 +79,14 @@ public class ReadAboutBoxProperties extends AbstractTask {
         }
     }
 
-
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
 
-            String aboutBoxPropertiesFileLocation = ""
-                    + process.readProperty(aboutBoxPropertiesFilePropName);
+            String aboutBoxPropertiesFileLocation = "" + process.readProperty(aboutBoxPropertiesFilePropName);
 
             Properties props = new Properties();
-            FileInputStream fis = new FileInputStream( aboutBoxPropertiesFileLocation );
-            props.load( fis );
+            FileInputStream fis = new FileInputStream(aboutBoxPropertiesFileLocation);
+            props.load(fis);
             fis.close();
 
             String aboutBoxHtml = props.getProperty("about.box.html");
@@ -112,17 +108,16 @@ public class ReadAboutBoxProperties extends AbstractTask {
         }
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         return Condition.CONTINUE;
     }
 
     public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+        return CONTINUE_CONDITION;
+    }
 
     public int[] getDataContainerIds() {
-        return new int[]{};
+        return new int[] {};
     }
 
     public JFrame getCurrentFrame() {

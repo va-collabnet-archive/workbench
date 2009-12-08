@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,14 +46,18 @@ import org.dwfa.util.bean.Spec;
 /**
  * Promote updates to a path.
  * <p>
- * This task will copy changes from a number of source paths to a target path (intended to be a path used for releasing content).
- * Source paths are defined as destination relationship origins of a configurable relationship type (eg "promotes to").
+ * This task will copy changes from a number of source paths to a target path
+ * (intended to be a path used for releasing content). Source paths are defined
+ * as destination relationship origins of a configurable relationship type (eg
+ * "promotes to").
  * <p>
- * This task will also copy from the inherited origins of source paths. It will traverse up the origin lineage until it a path
- * is encountered which is a common ancestor of the target path's origin lineage.
+ * This task will also copy from the inherited origins of source paths. It will
+ * traverse up the origin lineage until it a path is encountered which is a
+ * common ancestor of the target path's origin lineage.
  * <p>
- * The immediate origin position of the target path will also be set to the current time. This prevents changes being inherited 
- * without this promotion task being run.
+ * The immediate origin position of the target path will also be set to the
+ * current time. This prevents changes being inherited without this promotion
+ * task being run.
  */
 @AllowDataCheckSuppression
 @BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
@@ -66,7 +70,7 @@ public class PromoteToPath extends AbstractTask {
     private String pathConceptPropName = ProcessAttachmentKeys.TO_PATH_CONCEPT.getAttachmentKey();
 
     private String destRelTypeConceptPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(DATA_VERSION);
         out.writeObject(pathConceptPropName);
@@ -94,74 +98,74 @@ public class PromoteToPath extends AbstractTask {
         try {
             I_GetConceptData targetPathConcept = getProperty(process, I_GetConceptData.class, pathConceptPropName);
             I_GetConceptData destRelType = getProperty(process, I_GetConceptData.class, destRelTypeConceptPropName);
-            
+
             I_TermFactory termFactory = LocalVersionedTerminology.get();
-            
+
             if (!termFactory.hasPath(targetPathConcept.getConceptId())) {
-                throw new TaskFailedException(
-                    "The selected concept '" + targetPathConcept.getInitialText() + "' is not a path.");
+                throw new TaskFailedException("The selected concept '" + targetPathConcept.getInitialText()
+                    + "' is not a path.");
             }
-            
+
             config = termFactory.getActiveAceFrameConfig();
             config.setSuppressChangeEvents(true);
-            
+
             I_IntSet allowedTypes = termFactory.newIntSet();
             allowedTypes.add(destRelType.getConceptId());
-            
-            Set<I_GetConceptData> destRelOrigins = 
-                targetPathConcept.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, null, false, true);
-            
+
+            Set<I_GetConceptData> destRelOrigins = targetPathConcept.getDestRelOrigins(config.getAllowedStatus(),
+                allowedTypes, null, false, true);
+
             if (destRelOrigins.size() == 0) {
-                throw new TaskFailedException(
-                    "No work to complete. The selected path concepts has no '" +
-                    destRelType.getInitialText() + "' destination relationship type origins.");
+                throw new TaskFailedException("No work to complete. The selected path concepts has no '"
+                    + destRelType.getInitialText() + "' destination relationship type origins.");
             }
-            
+
             Set<I_Path> sourcePaths = new HashSet<I_Path>();
             for (I_GetConceptData srcPath : destRelOrigins) {
                 if (!termFactory.hasPath(srcPath.getConceptId())) {
-                    throw new TaskFailedException("The destination relationship origin concept '" + 
-                        srcPath.getInitialText() + "' is not a path.");
+                    throw new TaskFailedException("The destination relationship origin concept '"
+                        + srcPath.getInitialText() + "' is not a path.");
                 }
                 sourcePaths.add(termFactory.getPath(srcPath.getUids()));
             }
             I_Path firstSourcePath = sourcePaths.iterator().next();
-            
+
             // Log task parameters
-            StringBuffer logMsg = new StringBuffer(
-                "PromoteToPath task parameters: target path='" + targetPathConcept.getInitialText() + "', source paths=(");
+            StringBuffer logMsg = new StringBuffer("PromoteToPath task parameters: target path='"
+                + targetPathConcept.getInitialText() + "', source paths=(");
             for (I_Path srcPath : sourcePaths) {
                 logMsg.append("'").append(srcPath.toString()).append("'");
             }
             logMsg.append(")");
-            getLogger().info(logMsg.toString());            
-            
+            getLogger().info(logMsg.toString());
+
             // Fix all target path origins to the present time
-            
+
             I_Path targetPath = termFactory.getPath(targetPathConcept.getUids());
             int presentTime = termFactory.convertToThinVersion(System.currentTimeMillis());
             for (I_Position position : targetPath.getOrigins()) {
                 I_Position newPosition = termFactory.newPosition(position.getPath(), presentTime);
                 termFactory.writePathOrigin(targetPath, newPosition);
             }
-            
+
             // Work out which positions (including origins) to source data from.
-            // We do not copy from paths (including origins) that are common to both a source path
+            // We do not copy from paths (including origins) that are common to
+            // both a source path
             // and the target path.
-            
+
             Set<I_Position> positionsToCopy = new HashSet<I_Position>();
             Set<I_Position> sourceInheritedOriginPaths = firstSourcePath.getNormalisedOrigins(sourcePaths);
             Set<I_Position> targetInheritedOriginPositions = targetPath.getNormalisedOrigins();
-            
+
             for (I_Path srcPath : sourcePaths) {
                 positionsToCopy.add(termFactory.newPosition(srcPath, Integer.MAX_VALUE));
             }
-            
+
             Set<Integer> validSrcPathIds = new HashSet<Integer>();
             for (I_Position originPosition : sourceInheritedOriginPaths) {
                 validSrcPathIds.add(originPosition.getPath().getConceptId());
             }
-            
+
             for (I_Position originPosition : sourceInheritedOriginPaths) {
                 for (I_Position targetPosition : targetInheritedOriginPositions) {
                     if (originPosition.getPath().getConceptId() == targetPosition.getPath().getConceptId()) {
@@ -169,33 +173,33 @@ public class PromoteToPath extends AbstractTask {
                     }
                 }
             }
-            
+
             for (I_Position originPosition : sourceInheritedOriginPaths) {
                 if (validSrcPathIds.contains(originPosition.getPath().getConceptId())) {
                     positionsToCopy.add(originPosition);
                 }
             }
-            
+
             logMsg = new StringBuffer("Calculated the following normalised, inhierited source positions: ");
             for (I_Position copyPosition : positionsToCopy) {
                 logMsg.append("'").append(copyPosition.toString()).append("',");
             }
             logMsg.deleteCharAt(logMsg.length() - 1);
-            getLogger().info(logMsg.toString());            
+            getLogger().info(logMsg.toString());
 
             CopyPathToPath copyProcessor = new CopyPathToPath();
             copyProcessor.setSourcePositions(positionsToCopy);
             copyProcessor.setTargetPathId(targetPath.getConceptId());
             copyProcessor.setCopyOnlyLatestState(true);
             copyProcessor.setReadLatestPartOnly(true);
-            
-            String processDesc = "Promoting updates to path '" + targetPathConcept.getInitialText() + "'"; 
+
+            String processDesc = "Promoting updates to path '" + targetPathConcept.getInitialText() + "'";
             progressWrapper = new ProcessProgressWrapper(copyProcessor, processDesc);
             termFactory.iterateConcepts(progressWrapper);
             progressWrapper.complete();
-            
+
             termFactory.commit();
-            
+
             return Condition.CONTINUE;
 
         } catch (Exception e) {
@@ -209,7 +213,7 @@ public class PromoteToPath extends AbstractTask {
             }
         }
     }
-    
+
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,16 +29,12 @@ public class AddToListViewBeanInfo extends SimpleBeanInfo {
 
         try {
 
-            PropertyDescriptor conceptPropName =
-                    new PropertyDescriptor("conceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptPropName = new PropertyDescriptor("conceptPropName",
+                getBeanDescriptor().getBeanClass());
             conceptPropName.setBound(true);
-            conceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptPropName
-                .setDisplayName("<html><font color='green'>concept prop:");
-            conceptPropName
-                .setShortDescription("The property to hold the concept.");
+            conceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptPropName.setDisplayName("<html><font color='green'>concept prop:");
+            conceptPropName.setShortDescription("The property to hold the concept.");
 
             PropertyDescriptor rv[] = { conceptPropName };
             return rv;
@@ -52,8 +48,7 @@ public class AddToListViewBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(AddToListView.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Add Concept<br>to List View");
+        bd.setDisplayName("<html><font color='green'><center>Add Concept<br>to List View");
         return bd;
     }
 

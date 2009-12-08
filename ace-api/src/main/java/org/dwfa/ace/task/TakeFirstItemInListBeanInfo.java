@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,14 +34,11 @@ public class TakeFirstItemInListBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor propName =
-                    new PropertyDescriptor("propName",
-                        TakeFirstItemInList.class);
+            PropertyDescriptor propName = new PropertyDescriptor("propName", TakeFirstItemInList.class);
             propName.setBound(true);
             propName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             propName.setDisplayName("<html><font color='green'>List property:");
-            propName
-                .setShortDescription("Name of the property to put the concept into. ");
+            propName.setShortDescription("Name of the property to put the concept into. ");
 
             PropertyDescriptor rv[] = { propName };
             return rv;
@@ -55,8 +52,7 @@ public class TakeFirstItemInListBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(TakeFirstItemInList.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Take First Item<br>In List");
+        bd.setDisplayName("<html><font color='green'><center>Take First Item<br>In List");
         return bd;
     }
 

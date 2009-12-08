@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,11 +43,10 @@ public class SetListComponentToggle extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
-    private Boolean selectToggle = false;
-    
-    private TOGGLES toggle = TOGGLES.ATTRIBUTES;
 
+    private Boolean selectToggle = false;
+
+    private TOGGLES toggle = TOGGLES.ATTRIBUTES;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -55,28 +54,23 @@ public class SetListComponentToggle extends AbstractTask {
         out.writeObject(toggle);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-             selectToggle = in.readBoolean();
+            selectToggle = in.readBoolean();
             toggle = (TOGGLES) in.readObject();
         } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-                         throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-                                throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             I_HostConceptPlugins host = configFrame.getListConceptViewer();
             host.setToggleState(toggle, selectToggle);
             return Condition.CONTINUE;
@@ -93,19 +87,19 @@ public class SetListComponentToggle extends AbstractTask {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-	public Boolean getSelectToggle() {
-		return selectToggle;
-	}
+    public Boolean getSelectToggle() {
+        return selectToggle;
+    }
 
-	public void setSelectToggle(Boolean selectToggle) {
-		this.selectToggle = selectToggle;
-	}
+    public void setSelectToggle(Boolean selectToggle) {
+        this.selectToggle = selectToggle;
+    }
 
-	public TOGGLES getToggle() {
-		return toggle;
-	}
+    public TOGGLES getToggle() {
+        return toggle;
+    }
 
-	public void setToggle(TOGGLES toggle) {
-		this.toggle = toggle;
-	}
+    public void setToggle(TOGGLES toggle) {
+        this.toggle = toggle;
+    }
 }

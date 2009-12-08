@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,12 +36,13 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
-* Takes/removes the first item (UUID) in a specified attachment list and returns a UUID.
-* @author Susan Castillo
-*
-*/
+ * Takes/removes the first item (UUID) in a specified attachment list and
+ * returns a UUID.
+ * 
+ * @author Susan Castillo
+ * 
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
-
 public class TakeFirstItemInAttachmentListReturnUUID extends AbstractTask {
 
     /**
@@ -50,11 +51,10 @@ public class TakeFirstItemInAttachmentListReturnUUID extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
-    private String uuidListPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
-    
-    private String potDupUuidPropName = ProcessAttachmentKeys.CONCEPT_UUID.getAttachmentKey();
 
+    private String uuidListPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
+
+    private String potDupUuidPropName = ProcessAttachmentKeys.CONCEPT_UUID.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -62,8 +62,7 @@ public class TakeFirstItemInAttachmentListReturnUUID extends AbstractTask {
         out.writeObject(potDupUuidPropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             uuidListPropName = (String) in.readObject();
@@ -74,30 +73,28 @@ public class TakeFirstItemInAttachmentListReturnUUID extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
     @SuppressWarnings("unchecked")
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            
+
             List<UUID> temporaryListUuid = (List<UUID>) process.readProperty(uuidListPropName);
-            
+
             if (worker.getLogger().isLoggable(Level.FINE)) {
                 worker.getLogger().fine(("Removing first item in attachment list."));
             }
-        
+
             worker.getLogger().info("uuidListPropName: " + uuidListPropName);
             worker.getLogger().info("temporaryListUuid: " + temporaryListUuid);
             UUID uuid = (UUID) temporaryListUuid.remove(0);
-			worker.getLogger().info("uuid: " + uuid);
+            worker.getLogger().info("uuid: " + uuid);
 
             process.setProperty(this.potDupUuidPropName, uuid);
-            
+
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
@@ -118,24 +115,20 @@ public class TakeFirstItemInAttachmentListReturnUUID extends AbstractTask {
         return new int[] {};
     }
 
-	public String getUuidListPropName() {
-		return uuidListPropName;
-	}
+    public String getUuidListPropName() {
+        return uuidListPropName;
+    }
 
-	public void setUuidListPropName(String uuidListPropName) {
-		this.uuidListPropName = uuidListPropName;
-	}
+    public void setUuidListPropName(String uuidListPropName) {
+        this.uuidListPropName = uuidListPropName;
+    }
 
-	public String getPotDupUuidPropName() {
-		return potDupUuidPropName;
-	}
+    public String getPotDupUuidPropName() {
+        return potDupUuidPropName;
+    }
 
-	public void setPotDupUuidPropName(String potDupUuidPropName) {
-		this.potDupUuidPropName = potDupUuidPropName;
-	}
-
-
+    public void setPotDupUuidPropName(String potDupUuidPropName) {
+        this.potDupUuidPropName = potDupUuidPropName;
+    }
 
 }
-
-

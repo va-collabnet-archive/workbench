@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,16 +29,12 @@ public class AddConceptListToListViewBeanInfo extends SimpleBeanInfo {
 
         try {
 
-            PropertyDescriptor conceptListPropName =
-                    new PropertyDescriptor("conceptListPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptListPropName = new PropertyDescriptor("conceptListPropName",
+                getBeanDescriptor().getBeanClass());
             conceptListPropName.setBound(true);
-            conceptListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptListPropName
-                .setDisplayName("<html><font color='green'>concept list prop:");
-            conceptListPropName
-                .setShortDescription("The property holding the concept list to add to the list view.");
+            conceptListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptListPropName.setDisplayName("<html><font color='green'>concept list prop:");
+            conceptListPropName.setShortDescription("The property holding the concept list to add to the list view.");
 
             PropertyDescriptor rv[] = { conceptListPropName };
             return rv;
@@ -52,8 +48,7 @@ public class AddConceptListToListViewBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(AddConceptListToListView.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Add Concept List<br>to List View");
+        bd.setDisplayName("<html><font color='green'><center>Add Concept List<br>to List View");
         return bd;
     }
 

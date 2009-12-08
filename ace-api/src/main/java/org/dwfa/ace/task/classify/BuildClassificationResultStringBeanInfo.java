@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,8 +22,9 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
-/**c
-
+/**
+ * c
+ * 
  * @author Ming Zhang
  * 
  */
@@ -31,13 +32,10 @@ public class BuildClassificationResultStringBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor stringName =
-                    new PropertyDescriptor("stringName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor stringName = new PropertyDescriptor("stringName", getBeanDescriptor().getBeanClass());
             stringName.setBound(true);
             stringName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            stringName
-                .setDisplayName("<html><font color='green'>output string");
+            stringName.setDisplayName("<html><font color='green'>output string");
             stringName.setShortDescription("Input String");
             PropertyDescriptor rv[] = { stringName };
             return rv;
@@ -47,10 +45,8 @@ public class BuildClassificationResultStringBeanInfo extends SimpleBeanInfo {
     }
 
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(BuildClassificationResultString.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Build Classify result");
+        BeanDescriptor bd = new BeanDescriptor(BuildClassificationResultString.class);
+        bd.setDisplayName("<html><font color='green'><center>Build Classify result");
         return bd;
     }
 }

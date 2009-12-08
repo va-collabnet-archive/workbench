@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,36 +21,36 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class UniversalAceExtByRefPartBoolean extends UniversalAceExtByRefPart {
-   /**
+    /**
     * 
     */
-   private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-   private static final int dataVersion = 1;
-   
-   private boolean booleanValue;
+    private static final int dataVersion = 1;
 
-   private void writeObject(ObjectOutputStream out) throws IOException {
-      out.writeInt(dataVersion);
-      out.writeBoolean(booleanValue);
-   }
+    private boolean booleanValue;
 
-   @SuppressWarnings("unchecked")
-   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-      int objDataVersion = in.readInt();
-      if (objDataVersion == dataVersion) {
-         booleanValue = in.readBoolean();
-      } else {
-         throw new IOException("Can't handle dataversion: " + objDataVersion);
-      }
-   }
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeBoolean(booleanValue);
+    }
 
-   public boolean getBooleanValue() {
-      return booleanValue;
-   }
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            booleanValue = in.readBoolean();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-   public void setBooleanValue(boolean value) {
-      this.booleanValue = value;
-   }
+    public boolean getBooleanValue() {
+        return booleanValue;
+    }
+
+    public void setBooleanValue(boolean value) {
+        this.booleanValue = value;
+    }
 
 }

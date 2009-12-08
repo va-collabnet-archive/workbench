@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,81 +28,73 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalIdList;
 
-public class WriteProcessedUniversalChangeSets implements
-		I_ProcessUniversalChangeSets {
+public class WriteProcessedUniversalChangeSets implements I_ProcessUniversalChangeSets {
 
+    private static class NoHeaderObjectOutputStream extends ObjectOutputStream {
 
-	   private static class NoHeaderObjectOutputStream extends ObjectOutputStream {
+        public NoHeaderObjectOutputStream(OutputStream out) throws IOException {
+            super(out);
+        }
 
-	      public NoHeaderObjectOutputStream(OutputStream out) throws IOException {
-	         super(out);
-	      }
+        @Override
+        protected void writeStreamHeader() throws IOException {
+            reset();
+        }
 
-	      @Override
-	      protected void writeStreamHeader() throws IOException {
-	         reset();
-	      }
+    }
 
-	   }
-	
-	private File changeSetFile;
-	private boolean initialized = false;
-	private ObjectOutputStream oos;
-	
-	private void lazyInit() throws IOException {
-		if (initialized == false) {
-			changeSetFile = new File(changeSetFile.getAbsolutePath());
-	        changeSetFile.getParentFile().mkdirs();
-	        changeSetFile.createNewFile();
-	        oos = new ObjectOutputStream(new FileOutputStream(changeSetFile));
-	        oos.writeObject(UniversalChangeSetReader.class);
-	        oos.flush();
-	        oos.close();
-	        FileOutputStream fos = new FileOutputStream(changeSetFile, true);
-			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			oos = new NoHeaderObjectOutputStream(bos);
-			initialized = true;
-		}
-	}
+    private File changeSetFile;
+    private boolean initialized = false;
+    private ObjectOutputStream oos;
 
-	
-	public WriteProcessedUniversalChangeSets(File changeSetFile) {
-		super();
-		this.changeSetFile = changeSetFile;
-	}
+    private void lazyInit() throws IOException {
+        if (initialized == false) {
+            changeSetFile = new File(changeSetFile.getAbsolutePath());
+            changeSetFile.getParentFile().mkdirs();
+            changeSetFile.createNewFile();
+            oos = new ObjectOutputStream(new FileOutputStream(changeSetFile));
+            oos.writeObject(UniversalChangeSetReader.class);
+            oos.flush();
+            oos.close();
+            FileOutputStream fos = new FileOutputStream(changeSetFile, true);
+            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            oos = new NoHeaderObjectOutputStream(bos);
+            initialized = true;
+        }
+    }
 
-	public void processAceEbr(UniversalAceExtByRefBean bean, long commitTime)
-			throws IOException {
-		lazyInit();
-		oos.writeLong(commitTime);
-		oos.writeObject(bean);
-	}
+    public WriteProcessedUniversalChangeSets(File changeSetFile) {
+        super();
+        this.changeSetFile = changeSetFile;
+    }
 
-	public void processAcePath(UniversalAcePath path, long commitTime)
-			throws IOException {
-		lazyInit();
-		oos.writeLong(commitTime);
-		oos.writeObject(path);
-	}
+    public void processAceEbr(UniversalAceExtByRefBean bean, long commitTime) throws IOException {
+        lazyInit();
+        oos.writeLong(commitTime);
+        oos.writeObject(bean);
+    }
 
-	public void processIdList(UniversalIdList list, long commitTime)
-			throws IOException {
-		lazyInit();
-		oos.writeLong(commitTime);
-		oos.writeObject(list);
-	}
+    public void processAcePath(UniversalAcePath path, long commitTime) throws IOException {
+        lazyInit();
+        oos.writeLong(commitTime);
+        oos.writeObject(path);
+    }
 
-	public void processUniversalAceBean(UniversalAceBean bean, long commitTime)
-			throws IOException {
-		lazyInit();
-		oos.writeLong(commitTime);
-		oos.writeObject(bean);
-	}
+    public void processIdList(UniversalIdList list, long commitTime) throws IOException {
+        lazyInit();
+        oos.writeLong(commitTime);
+        oos.writeObject(list);
+    }
 
+    public void processUniversalAceBean(UniversalAceBean bean, long commitTime) throws IOException {
+        lazyInit();
+        oos.writeLong(commitTime);
+        oos.writeObject(bean);
+    }
 
-	public void close() throws IOException {
-		oos.flush();
-		oos.close();
-	}
+    public void close() throws IOException {
+        oos.flush();
+        oos.close();
+    }
 
 }

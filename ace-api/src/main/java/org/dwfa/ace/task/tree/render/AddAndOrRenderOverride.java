@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,7 +61,7 @@ public class AddAndOrRenderOverride extends AbstractTask {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             profilePropName = (String) in.readObject();
-         } else {
+        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
@@ -72,11 +72,11 @@ public class AddAndOrRenderOverride extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            
+
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
             profile.getTaxonomyRendererOverrideList().add(new AndOrRenderOverride());
             return Condition.CONTINUE;
-            
+
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         } catch (IntrospectionException e) {
@@ -105,30 +105,29 @@ public class AddAndOrRenderOverride extends AbstractTask {
     }
 
     private static class AndOrRenderOverride implements I_OverrideTaxonomyRenderer {
-    	private Boolean defaultOpacity;
-    	private Color defaultBackgroundColor;
-    	public JLabel overrideTreeCellRendererComponent(JLabel component,
-    			JTree tree, I_GetConceptData concept, boolean sel,
-    			boolean expanded, boolean leaf, int row, boolean hasFocus,
-    			I_ConfigAceFrame frameConfig) {
-    		if (defaultOpacity == null) {
-    			defaultOpacity = component.isOpaque();
-    		}
-    		if (defaultBackgroundColor == null) {
-    			defaultBackgroundColor = component.getBackground();
-    		}
-    		if (component.getText().toLowerCase().contains("and")) {
-    			component.setBackground(Color.orange);
-    			component.setOpaque(true);
-    		} else if (component.getText().toLowerCase().contains("or")) {
-    			component.setBackground(Color.yellow);
-    			component.setOpaque(true);
-    		} else {
-       			component.setOpaque(defaultOpacity);
-       			component.setBackground(defaultBackgroundColor);
-    		}
-    		return component;
-    	}
+        private Boolean defaultOpacity;
+        private Color defaultBackgroundColor;
+
+        public JLabel overrideTreeCellRendererComponent(JLabel component, JTree tree, I_GetConceptData concept,
+                boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus, I_ConfigAceFrame frameConfig) {
+            if (defaultOpacity == null) {
+                defaultOpacity = component.isOpaque();
+            }
+            if (defaultBackgroundColor == null) {
+                defaultBackgroundColor = component.getBackground();
+            }
+            if (component.getText().toLowerCase().contains("and")) {
+                component.setBackground(Color.orange);
+                component.setOpaque(true);
+            } else if (component.getText().toLowerCase().contains("or")) {
+                component.setBackground(Color.yellow);
+                component.setOpaque(true);
+            } else {
+                component.setOpaque(defaultOpacity);
+                component.setBackground(defaultBackgroundColor);
+            }
+            return component;
+        }
     }
 
 }

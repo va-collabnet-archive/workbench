@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,30 +29,21 @@ public class RemoveViewPositionFromPropertyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile property:");
-            profilePropName
-                .setShortDescription("The property containing the profile to change.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile property:");
+            profilePropName.setShortDescription("The property containing the profile to change.");
 
-            PropertyDescriptor viewPathConceptPropName =
-                    new PropertyDescriptor("viewPathConceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor viewPathConceptPropName = new PropertyDescriptor("viewPathConceptPropName",
+                getBeanDescriptor().getBeanClass());
             viewPathConceptPropName.setBound(true);
-            viewPathConceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            viewPathConceptPropName
-                .setDisplayName("<html><font color='green'>view path:");
-            viewPathConceptPropName
-                .setShortDescription("The property that contains the concept that identifies the view path.");
+            viewPathConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            viewPathConceptPropName.setDisplayName("<html><font color='green'>view path:");
+            viewPathConceptPropName.setShortDescription("The property that contains the concept that identifies the view path.");
 
-            PropertyDescriptor rv[] =
-                    { profilePropName, viewPathConceptPropName };
+            PropertyDescriptor rv[] = { profilePropName, viewPathConceptPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -63,10 +54,8 @@ public class RemoveViewPositionFromPropertyBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(RemoveViewPositionFromProperty.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>remove view position<br>from property");
+        BeanDescriptor bd = new BeanDescriptor(RemoveViewPositionFromProperty.class);
+        bd.setDisplayName("<html><font color='green'><center>remove view position<br>from property");
         return bd;
     }
 }

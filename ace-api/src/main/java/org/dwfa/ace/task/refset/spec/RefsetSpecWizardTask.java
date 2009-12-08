@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -102,15 +102,14 @@ public class RefsetSpecWizardTask extends AbstractTask {
             // create list of editors -> FSN, for use in the drop down list
             final Set<I_GetConceptData> users = userParent.getDestRelOrigins(allowedTypes, true, true);
             final HashMap<String, I_GetConceptData> userNames = new HashMap<String, I_GetConceptData>();
-            I_GetConceptData fsnConcept =
-                    termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+            I_GetConceptData fsnConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
             I_IntSet fsnAllowedTypes = termFactory.newIntSet();
             fsnAllowedTypes.add(fsnConcept.getConceptId());
             for (I_GetConceptData editor : users) {
                 String latestDescription = null;
                 int latestVersion = Integer.MIN_VALUE;
-                List<I_DescriptionTuple> descriptionResults =
-                        editor.getDescriptionTuples(null, fsnAllowedTypes, null, true);
+                List<I_DescriptionTuple> descriptionResults = editor.getDescriptionTuples(null, fsnAllowedTypes, null,
+                    true);
 
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
                     if (descriptionTuple.getVersion() > latestVersion) {
@@ -174,8 +173,9 @@ public class RefsetSpecWizardTask extends AbstractTask {
                         }
 
                         try {
-                            I_GetConceptData owner =
-                                    termFactory.getActiveAceFrameConfig().getDbConfig().getUserConcept();
+                            I_GetConceptData owner = termFactory.getActiveAceFrameConfig()
+                                .getDbConfig()
+                                .getUserConcept();
                             if (owner == null) {
                                 RefsetSpecWizardTask.this.setCondition(Condition.ITEM_CANCELED);
                                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
@@ -201,12 +201,11 @@ public class RefsetSpecWizardTask extends AbstractTask {
                                 process.setDeadline(deadline.getTime());
                                 process.setProperty(ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey(),
                                     refsetParent.getUids().iterator().next());
-                                process
-                                    .setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refsetName);
+                                process.setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refsetName);
                                 process.setProperty(ProcessAttachmentKeys.MESSAGE.getAttachmentKey(), comments);
                                 process.setProperty(ProcessAttachmentKeys.REQUESTOR.getAttachmentKey(), requestor);
-                                process.setProperty(ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey(), reviewers
-                                    .toArray(new UUID[] {}));
+                                process.setProperty(ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey(),
+                                    reviewers.toArray(new UUID[] {}));
                                 process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(),
                                     new UUID[] { owner.getUids().iterator().next() });
                                 process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(),
@@ -281,8 +280,8 @@ public class RefsetSpecWizardTask extends AbstractTask {
     public String getInbox(I_GetConceptData concept) throws TerminologyException, IOException {
         // find the inbox string using the concept's "user inbox" description
 
-        I_GetConceptData descriptionType =
-                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
+        I_GetConceptData descriptionType = LocalVersionedTerminology.get().getConcept(
+            ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
         I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
         allowedTypes.add(descriptionType.getConceptId());
         String latestDescription = null;
@@ -290,7 +289,8 @@ public class RefsetSpecWizardTask extends AbstractTask {
 
         I_IntSet activeStatuses = LocalVersionedTerminology.get().newIntSet();
         activeStatuses.add(LocalVersionedTerminology.get()
-            .getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.getUids())).getConceptId());
+            .getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.getUids()))
+            .getConceptId());
         activeStatuses.add(LocalVersionedTerminology.get().getConcept(
             (ArchitectonicAuxiliary.Concept.CURRENT.getUids())).getConceptId());
         activeStatuses.add(LocalVersionedTerminology.get().getConcept(
@@ -302,8 +302,8 @@ public class RefsetSpecWizardTask extends AbstractTask {
         activeStatuses.add(LocalVersionedTerminology.get().getConcept(
             (ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())).getConceptId());
 
-        List<I_DescriptionTuple> descriptionResults =
-                concept.getDescriptionTuples(activeStatuses, allowedTypes, null, true);
+        List<I_DescriptionTuple> descriptionResults = concept.getDescriptionTuples(activeStatuses, allowedTypes, null,
+            true);
 
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
             if (descriptionTuple.getVersion() > latestVersion) {

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,7 +43,7 @@ public class RemoveEditPathFromProperty extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private String editPathPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -51,8 +51,7 @@ public class RemoveEditPathFromProperty extends AbstractTask {
         out.writeObject(editPathPropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion > dataVersion) {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -60,30 +59,28 @@ public class RemoveEditPathFromProperty extends AbstractTask {
         editPathPropName = (String) in.readObject();
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_GetConceptData pathConcept = getProperty(process, I_GetConceptData.class, editPathPropName);
-            
+
             I_TermFactory tf = LocalVersionedTerminology.get();
             I_ConfigAceFrame profile = tf.getActiveAceFrameConfig();
-            
+
             for (I_Path editPath : new HashSet<I_Path>(profile.getEditingPathSet())) {
                 if (pathConcept.getConceptId() == editPath.getConceptId()) {
                     profile.removeEditingPath(editPath);
                 }
             }
-            
+
             profile.fireUpdateHierarchyView();
-            
+
             return Condition.CONTINUE;
-            
+
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }

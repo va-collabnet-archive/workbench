@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,131 +51,126 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN) })
 public class ChangeRelsOfTypeToStatus extends AbstractTask {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
-	
+    private static final int dataVersion = 1;
+
     private String activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
     private TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
     private TermEntry newStatus = new TermEntry(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(relType);
-		out.writeObject(newStatus);
-		out.writeObject(activeConceptPropName);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(relType);
+        out.writeObject(newStatus);
+        out.writeObject(activeConceptPropName);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			relType = (TermEntry) in.readObject();
-			newStatus = (TermEntry) in.readObject();
-			activeConceptPropName = (String) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            relType = (TermEntry) in.readObject();
+            newStatus = (TermEntry) in.readObject();
+            activeConceptPropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-	}
+    }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do...
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
-	}
+    }
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			
-			I_GetConceptData concept = (I_GetConceptData) process.readProperty(activeConceptPropName);
-			if (config.getEditingPathSet().size() == 0) {
-				throw new TaskFailedException("You must select at least one editing path. ");
-			}
-			
-			
-			Set<I_Position> positionsForEdit = new HashSet<I_Position>();
-			for (I_Path editPath: config.getEditingPathSet()) {
-				positionsForEdit.add(LocalVersionedTerminology.get().newPosition(editPath, Integer.MAX_VALUE));
-			}
-			I_GetConceptData newStatusConcept = LocalVersionedTerminology.get().getConcept(newStatus.ids);
-			I_GetConceptData relTypeConcept = LocalVersionedTerminology.get().getConcept(relType.ids);
-			I_IntSet typeSet = LocalVersionedTerminology.get().newIntSet();
-			typeSet.add(relTypeConcept.getConceptId());
-			
-			for (I_RelTuple relTuple: concept.getSourceRelTuples(config.getAllowedStatus(), 
-						typeSet, positionsForEdit, false)) {
-				for (I_Path editPath: config.getEditingPathSet()) {
-					List<I_RelTuple>  editTuples = concept.getSourceRelTuples(config.getAllowedStatus(), 
-							typeSet, positionsForEdit, false);
-					Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
-					for (I_RelTuple t: editTuples) {
-						if (t.getStatusId() != newStatusConcept.getConceptId()) {
-							I_RelPart newPart = t.duplicatePart();
-							newPart.setPathId(editPath.getConceptId());
-							newPart.setVersion(Integer.MAX_VALUE);
-							newPart.setStatusId(newStatusConcept.getConceptId());
-							partsToAdd.add(newPart);
-						}
-					}
-					for (I_RelPart p: partsToAdd) {
-						relTuple.getFixedPart().addVersion(p);
-					}
-				}
-			}
-			LocalVersionedTerminology.get().addUncommitted(concept);
-			return Condition.CONTINUE;
-		} catch (IllegalArgumentException e) {
-			throw new TaskFailedException(e);
-		} catch (IllegalAccessException e) {
-			throw new TaskFailedException(e);
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(e);
-		} catch (IntrospectionException e) {
-			throw new TaskFailedException(e);
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		} catch (TerminologyException e) {
-			throw new TaskFailedException(e);
-		}
-	}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+            I_GetConceptData concept = (I_GetConceptData) process.readProperty(activeConceptPropName);
+            if (config.getEditingPathSet().size() == 0) {
+                throw new TaskFailedException("You must select at least one editing path. ");
+            }
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+            Set<I_Position> positionsForEdit = new HashSet<I_Position>();
+            for (I_Path editPath : config.getEditingPathSet()) {
+                positionsForEdit.add(LocalVersionedTerminology.get().newPosition(editPath, Integer.MAX_VALUE));
+            }
+            I_GetConceptData newStatusConcept = LocalVersionedTerminology.get().getConcept(newStatus.ids);
+            I_GetConceptData relTypeConcept = LocalVersionedTerminology.get().getConcept(relType.ids);
+            I_IntSet typeSet = LocalVersionedTerminology.get().newIntSet();
+            typeSet.add(relTypeConcept.getConceptId());
 
-	public String getActiveConceptPropName() {
-		return activeConceptPropName;
-	}
+            for (I_RelTuple relTuple : concept.getSourceRelTuples(config.getAllowedStatus(), typeSet, positionsForEdit,
+                false)) {
+                for (I_Path editPath : config.getEditingPathSet()) {
+                    List<I_RelTuple> editTuples = concept.getSourceRelTuples(config.getAllowedStatus(), typeSet,
+                        positionsForEdit, false);
+                    Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
+                    for (I_RelTuple t : editTuples) {
+                        if (t.getStatusId() != newStatusConcept.getConceptId()) {
+                            I_RelPart newPart = t.duplicatePart();
+                            newPart.setPathId(editPath.getConceptId());
+                            newPart.setVersion(Integer.MAX_VALUE);
+                            newPart.setStatusId(newStatusConcept.getConceptId());
+                            partsToAdd.add(newPart);
+                        }
+                    }
+                    for (I_RelPart p : partsToAdd) {
+                        relTuple.getFixedPart().addVersion(p);
+                    }
+                }
+            }
+            LocalVersionedTerminology.get().addUncommitted(concept);
+            return Condition.CONTINUE;
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-	public void setActiveConceptPropName(String propName) {
-		this.activeConceptPropName = propName;
-	}
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-	public TermEntry getNewStatus() {
-		return newStatus;
-	}
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-	public void setNewStatus(TermEntry newStatus) {
-		this.newStatus = newStatus;
-	}
+    public String getActiveConceptPropName() {
+        return activeConceptPropName;
+    }
 
-	public TermEntry getRelType() {
-		return relType;
-	}
+    public void setActiveConceptPropName(String propName) {
+        this.activeConceptPropName = propName;
+    }
 
-	public void setRelType(TermEntry relType) {
-		this.relType = relType;
-	}
+    public TermEntry getNewStatus() {
+        return newStatus;
+    }
+
+    public void setNewStatus(TermEntry newStatus) {
+        this.newStatus = newStatus;
+    }
+
+    public TermEntry getRelType() {
+        return relType;
+    }
+
+    public void setRelType(TermEntry relType) {
+        this.relType = relType;
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,6 +25,6 @@ import java.util.List;
 public interface RefsetTextWriter {
 
     void writeRefset(I_GetConceptData concept, List<I_DescriptionTuple> descriptionTuples,
-                     DescriptionWriter descriptionWriter, I_ThinExtByRefPart part,
-                     NoDescriptionWriter noDescriptionWriter) throws Exception;
+            DescriptionWriter descriptionWriter, I_ThinExtByRefPart part, NoDescriptionWriter noDescriptionWriter)
+            throws Exception;
 }

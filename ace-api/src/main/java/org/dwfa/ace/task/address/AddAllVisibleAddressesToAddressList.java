@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,57 +50,49 @@ public class AddAllVisibleAddressesToAddressList extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-     }
+    }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             //
         } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-                         throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-                                throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             ServiceID serviceID = null;
             Class[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = null;
-            ServiceTemplate template = new ServiceTemplate(serviceID,
-                    serviceTypes,
-                    attrSetTemplates);
-        
+            ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
+
             ServiceItemFilter filter = worker.getServiceProxyFilter();
             ServiceItem[] services = worker.lookup(template, 1, 500, filter, 1000 * 15);
             if (services != null) {
-            	for (ServiceItem service: services) {
-            		if (service.attributeSets != null) {
-            			for (Entry e: service.attributeSets) {
-            				if (ElectronicAddress.class.isAssignableFrom(e.getClass())) {
-            					ElectronicAddress address = (ElectronicAddress) e;
-            					configFrame.getAddressesList().add(address.address);
-            				}
-            			}
-            		}
-            	}
+                for (ServiceItem service : services) {
+                    if (service.attributeSets != null) {
+                        for (Entry e : service.attributeSets) {
+                            if (ElectronicAddress.class.isAssignableFrom(e.getClass())) {
+                                ElectronicAddress address = (ElectronicAddress) e;
+                                configFrame.getAddressesList().add(address.address);
+                            }
+                        }
+                    }
+                }
             }
             return Condition.CONTINUE;
         } catch (Exception ex) {
-        	throw new TaskFailedException(ex);
+            throw new TaskFailedException(ex);
         }
     }
 

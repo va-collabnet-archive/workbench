@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,47 +46,48 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/instruct", type = BeanType.TASK_BEAN),
-		@Spec(directory = "tasks/ide/wfpanel", type = BeanType.TASK_BEAN) })
+                   @Spec(directory = "tasks/ide/wfpanel", type = BeanType.TASK_BEAN) })
 public class InstructAndWait extends AbstractTask {
 
-	private static final long serialVersionUID = 1;
+    private static final long serialVersionUID = 1;
 
-	private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-	private String instruction = "<html>Instruction";
+    private String instruction = "<html>Instruction";
 
-	private boolean done;
+    private boolean done;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(instruction);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(instruction);
+    }
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
-			// nothing to read...
-			instruction = (String) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+            // nothing to read...
+            instruction = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-	}
+    }
+
     private class StepActionListener implements ActionListener {
 
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-        	 done = true;
-             synchronized(InstructAndWait.this) {
-            	 InstructAndWait.this.notifyAll();
+            done = true;
+            synchronized (InstructAndWait.this) {
+                InstructAndWait.this.notifyAll();
             }
 
         }
 
     }
+
     private void waitTillDone(Logger l) {
         while (!this.isDone()) {
             try {
@@ -95,131 +96,127 @@ public class InstructAndWait extends AbstractTask {
                 l.log(Level.SEVERE, e.getMessage(), e);
             }
         }
-    
+
     }
 
     public boolean isDone() {
         return this.done;
     }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
-	 */
-	public Condition evaluate(I_EncodeBusinessProcess process,
-			final I_Work worker) throws TaskFailedException {
-      this.done = false;
-      I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-      .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-            .name());
-      boolean builderVisible = config.isBuilderToggleVisible();
-      config.setBuilderToggleVisible(false);
-      boolean progressPanelVisible = config.isProgressToggleVisible();
-      config.setProgressToggleVisible(false);
-      boolean subversionButtonVisible = config.isBuilderToggleVisible();
-      config.setSubversionToggleVisible(false);
-		try {
-         
-	final JPanel workflowPanel = config.getWorkflowPanel();
-			SwingUtilities.invokeAndWait(new Runnable() {
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+        this.done = false;
+        I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+        boolean builderVisible = config.isBuilderToggleVisible();
+        config.setBuilderToggleVisible(false);
+        boolean progressPanelVisible = config.isProgressToggleVisible();
+        config.setProgressToggleVisible(false);
+        boolean subversionButtonVisible = config.isBuilderToggleVisible();
+        config.setSubversionToggleVisible(false);
+        try {
 
-				private JButton stepButton;
+            final JPanel workflowPanel = config.getWorkflowPanel();
+            SwingUtilities.invokeAndWait(new Runnable() {
 
-				public void run() {
-					Component[] components = workflowPanel.getComponents();
-					for (int i = 0; i < components.length; i++) {
-						workflowPanel.remove(components[i]);
-					}
-					workflowPanel.setLayout(new GridBagLayout());
-					GridBagConstraints c = new GridBagConstraints();
-					c.fill = GridBagConstraints.BOTH;
-					c.gridx = 0;
-					c.gridy = 0;
-					c.gridheight = 1;
-					c.weightx = 1.0;
-					c.weighty = 0;
-					c.anchor = GridBagConstraints.WEST;
-					workflowPanel.add(new JPanel(), c); //Filler
-					c.gridx++;
-					c.weightx = 0.0;
-					workflowPanel.add(new JLabel(instruction), c);
-					c.gridx++;
-					workflowPanel.add(new JLabel("  "), c);
-					c.gridx++;
-					stepButton = new JButton(new ImageIcon(InstructAndWait.class
-							.getResource("/32x32/plain/media_step_forward.png")));
-					workflowPanel.add(stepButton, c);
-					stepButton.addActionListener(new StepActionListener());
-					c.gridx++;
-					workflowPanel.add(new JLabel("     "), c);
-					workflowPanel.validate();
-					Container cont = workflowPanel;
-					while (cont != null) {
-						cont.validate();
-						cont = cont.getParent();
-					}
-					stepButton.requestFocusInWindow();
-				}
-			});
-			synchronized (this) {
-		           this.waitTillDone(worker.getLogger());
-			}
-	            SwingUtilities.invokeAndWait(new Runnable() {
-	    
-	                public void run() {
-						Component[] components = workflowPanel.getComponents();
-						for (int i = 0; i < components.length; i++) {
-							workflowPanel.remove(components[i]);
-						}
-						workflowPanel.validate();
-						Container cont = workflowPanel;
-						while (cont != null) {
-							cont.validate();
-							cont = cont.getParent();
-						}
-	                }
-	    
-	            });
-		} catch (InterruptedException e) {
-			throw new TaskFailedException(e);
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(e);
-		}
-      config.setBuilderToggleVisible(builderVisible);
-      config.setProgressToggleVisible(progressPanelVisible);
-      config.setSubversionToggleVisible(subversionButtonVisible);
-		return Condition.CONTINUE;
-	}
+                private JButton stepButton;
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
-	 */
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do
+                public void run() {
+                    Component[] components = workflowPanel.getComponents();
+                    for (int i = 0; i < components.length; i++) {
+                        workflowPanel.remove(components[i]);
+                    }
+                    workflowPanel.setLayout(new GridBagLayout());
+                    GridBagConstraints c = new GridBagConstraints();
+                    c.fill = GridBagConstraints.BOTH;
+                    c.gridx = 0;
+                    c.gridy = 0;
+                    c.gridheight = 1;
+                    c.weightx = 1.0;
+                    c.weighty = 0;
+                    c.anchor = GridBagConstraints.WEST;
+                    workflowPanel.add(new JPanel(), c); // Filler
+                    c.gridx++;
+                    c.weightx = 0.0;
+                    workflowPanel.add(new JLabel(instruction), c);
+                    c.gridx++;
+                    workflowPanel.add(new JLabel("  "), c);
+                    c.gridx++;
+                    stepButton = new JButton(new ImageIcon(
+                        InstructAndWait.class.getResource("/32x32/plain/media_step_forward.png")));
+                    workflowPanel.add(stepButton, c);
+                    stepButton.addActionListener(new StepActionListener());
+                    c.gridx++;
+                    workflowPanel.add(new JLabel("     "), c);
+                    workflowPanel.validate();
+                    Container cont = workflowPanel;
+                    while (cont != null) {
+                        cont.validate();
+                        cont = cont.getParent();
+                    }
+                    stepButton.requestFocusInWindow();
+                }
+            });
+            synchronized (this) {
+                this.waitTillDone(worker.getLogger());
+            }
+            SwingUtilities.invokeAndWait(new Runnable() {
 
-	}
+                public void run() {
+                    Component[] components = workflowPanel.getComponents();
+                    for (int i = 0; i < components.length; i++) {
+                        workflowPanel.remove(components[i]);
+                    }
+                    workflowPanel.validate();
+                    Container cont = workflowPanel;
+                    while (cont != null) {
+                        cont.validate();
+                        cont = cont.getParent();
+                    }
+                }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
-	 */
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+            });
+        } catch (InterruptedException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        }
+        config.setBuilderToggleVisible(builderVisible);
+        config.setProgressToggleVisible(progressPanelVisible);
+        config.setSubversionToggleVisible(subversionButtonVisible);
+        return Condition.CONTINUE;
+    }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
-	 */
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do
 
-	public String getInstruction() {
-		return instruction;
-	}
+    }
 
-	public void setInstruction(String instruction) {
-		this.instruction = instruction;
-	}
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     */
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
+
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
+     */
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
+
+    public String getInstruction() {
+        return instruction;
+    }
+
+    public void setInstruction(String instruction) {
+        this.instruction = instruction;
+    }
 }
