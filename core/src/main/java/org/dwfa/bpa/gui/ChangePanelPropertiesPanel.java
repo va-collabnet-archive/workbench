@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,10 +39,9 @@ import org.dwfa.bpa.gui.GridBagPanel.GridBagPanelConstraints;
 
 /**
  * @author kec
- *  
+ * 
  */
-public class ChangePanelPropertiesPanel extends JPanel implements
-        ActionListener, ChangeListener {
+public class ChangePanelPropertiesPanel extends JPanel implements ActionListener, ChangeListener {
     /**
      * 
      */
@@ -125,8 +124,7 @@ public class ChangePanelPropertiesPanel extends JPanel implements
     /**
      * @return
      */
-    private void addLabel(JComponent component, String label,
-            GridBagConstraints c) {
+    private void addLabel(JComponent component, String label, GridBagConstraints c) {
         c.weightx = 0.01;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
@@ -146,8 +144,7 @@ public class ChangePanelPropertiesPanel extends JPanel implements
     private JSpinner newWeightSpinner() {
         SpinnerNumberModel model = new SpinnerNumberModel(0.0, 0.0, 1.0, 0.1);
         JSpinner spinner = new JSpinner(model);
-        JSpinner.DefaultEditor editor =
-                (JSpinner.DefaultEditor) spinner.getEditor();
+        JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
         JFormattedTextField textField = editor.getTextField();
         textField.setColumns(3);
         spinner.addChangeListener(this);
@@ -157,8 +154,7 @@ public class ChangePanelPropertiesPanel extends JPanel implements
     private JSpinner newGridSpinner() {
         SpinnerNumberModel model = new SpinnerNumberModel(0, 0, 10, 1);
         JSpinner spinner = new JSpinner(model);
-        JSpinner.DefaultEditor editor =
-                (JSpinner.DefaultEditor) spinner.getEditor();
+        JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
         JFormattedTextField textField = editor.getTextField();
         textField.setColumns(3);
         spinner.addChangeListener(this);
@@ -168,8 +164,7 @@ public class ChangePanelPropertiesPanel extends JPanel implements
     private JSpinner newLayerAndPosSpinner() {
         SpinnerNumberModel model = new SpinnerNumberModel(0, -1, 100, 1);
         JSpinner spinner = new JSpinner(model);
-        JSpinner.DefaultEditor editor =
-                (JSpinner.DefaultEditor) spinner.getEditor();
+        JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
         JFormattedTextField textField = editor.getTextField();
         textField.setColumns(3);
         spinner.addChangeListener(this);
@@ -189,8 +184,7 @@ public class ChangePanelPropertiesPanel extends JPanel implements
             this.heightSpinner.setValue(new Integer(panel.getGridheight()));
             this.widthSpinner.setValue(new Integer(panel.getGridwidth()));
             this.layerSpinner.setValue(new Integer(c.layer));
-            this.positionInLayerSpinner
-                .setValue(new Integer(c.positionInLayer));
+            this.positionInLayerSpinner.setValue(new Integer(c.positionInLayer));
             switch (panel.getFill()) {
             case GridBagConstraints.NONE:
                 this.fillOptions.setSelectedItem("None");
@@ -224,11 +218,9 @@ public class ChangePanelPropertiesPanel extends JPanel implements
             } else if (e.getSource() == this.fillOptions) {
                 if (this.fillOptions.getSelectedItem().equals("None")) {
                     this.panel.setFill(GridBagConstraints.NONE);
-                } else if (this.fillOptions.getSelectedItem().equals(
-                    "Horizontal")) {
+                } else if (this.fillOptions.getSelectedItem().equals("Horizontal")) {
                     this.panel.setFill(GridBagConstraints.HORIZONTAL);
-                } else if (this.fillOptions.getSelectedItem()
-                    .equals("Vertical")) {
+                } else if (this.fillOptions.getSelectedItem().equals("Vertical")) {
                     this.panel.setFill(GridBagConstraints.VERTICAL);
                 } else if (this.fillOptions.getSelectedItem().equals("Both")) {
                     this.panel.setFill(GridBagConstraints.BOTH);
@@ -267,8 +259,7 @@ public class ChangePanelPropertiesPanel extends JPanel implements
                 c.layer = value;
                 this.panel.setConstraints(c);
             } else if (e.getSource() == this.positionInLayerSpinner) {
-                Integer value =
-                        (Integer) this.positionInLayerSpinner.getValue();
+                Integer value = (Integer) this.positionInLayerSpinner.getValue();
                 GridBagPanelConstraints c = this.panel.getConstraints();
                 c.positionInLayer = value;
                 this.panel.setConstraints(c);

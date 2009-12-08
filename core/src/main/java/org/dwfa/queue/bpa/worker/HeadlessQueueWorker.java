@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,10 +48,9 @@ import org.dwfa.bpa.process.WorkspaceActiveException;
 import org.dwfa.bpa.worker.Worker;
 import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 
-
 /**
  * @author kec
- *
+ * 
  */
 public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, Runnable {
 
@@ -61,17 +60,16 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
     private long sleepTime = 1000 * 60 * 1;
     private I_SelectProcesses selector;
 
-
     /**
      * @param config
      * @param id
      * @param desc
      * @throws ConfigurationException
-     * @throws LoginException 
-     * @throws IOException 
+     * @throws LoginException
+     * @throws IOException
      */
-    public HeadlessQueueWorker(Configuration config, UUID id, String desc, I_SelectProcesses selector) 
-    throws ConfigurationException, LoginException, IOException, PrivilegedActionException {
+    public HeadlessQueueWorker(Configuration config, UUID id, String desc, I_SelectProcesses selector)
+            throws ConfigurationException, LoginException, IOException, PrivilegedActionException {
         super(config, id, desc);
         this.selector = selector;
         this.setPluginForInterface(I_GetWorkFromQueue.class, this);
@@ -85,7 +83,8 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_Work#createWorkspace(net.jini.id.UUID, java.lang.String, org.dwfa.bpa.gui.TerminologyConfiguration)
+     * @see org.dwfa.bpa.process.I_Work#createWorkspace(net.jini.id.UUID,
+     *      java.lang.String, org.dwfa.bpa.gui.TerminologyConfiguration)
      */
     public I_Workspace createWorkspace(UUID workspaceId, String name, File menuDir) throws WorkspaceActiveException,
             HeadlessException {
@@ -95,8 +94,7 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
     /**
      * @see org.dwfa.bpa.process.I_Work#getWorkspace(net.jini.id.UUID)
      */
-    public I_Workspace getWorkspace(UUID workspaceId)
-            throws NoSuchWorkspaceException {
+    public I_Workspace getWorkspace(UUID workspaceId) throws NoSuchWorkspaceException {
         throw new UnsupportedOperationException();
     }
 
@@ -122,10 +120,10 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_Work#selectFromList(java.lang.Object[], java.lang.String, java.lang.String)
+     * @see org.dwfa.bpa.process.I_Work#selectFromList(java.lang.Object[],
+     *      java.lang.String, java.lang.String)
      */
-    public Object selectFromList(Object[] list, String title,
-            String instructions) {
+    public Object selectFromList(Object[] list, String title, String instructions) {
         throw new UnsupportedOperationException();
     }
 
@@ -136,7 +134,7 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
         if (this.sleeping) {
             this.workerThread.interrupt();
         }
-        
+
     }
 
     /**
@@ -146,17 +144,17 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
         this.queue = queue;
         this.workerThread = new Thread(this, "Worker " + this.getWorkerDesc());
         this.workerThread.start();
-        
+
     }
-    
-    private void  sleep() {
+
+    private void sleep() {
         this.sleeping = true;
         try {
             Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
-            
+
         }
-        
+
         this.sleeping = false;
     }
 
@@ -164,20 +162,23 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
         Transaction t;
         while (true) {
             try {
-                 while (true) {
+                while (true) {
                     try {
                         t = this.getActiveTransaction();
                         I_EncodeBusinessProcess process = this.queue.take(selector, t);
                         if (logger.isLoggable(Level.INFO)) {
-                            logger.info(this.getWorkerDesc() + " TAKE: " + process.getName() + " (" + process.getProcessID() + ") " + ": " + process.getCurrentTaskId() + " " + 
-                                    process.getTask(process.getCurrentTaskId()).getName() + " deadline: " + dateFormat.format(process.getDeadline()));
+                            logger.info(this.getWorkerDesc() + " TAKE: " + process.getName() + " ("
+                                + process.getProcessID() + ") " + ": " + process.getCurrentTaskId() + " "
+                                + process.getTask(process.getCurrentTaskId()).getName() + " deadline: "
+                                + dateFormat.format(process.getDeadline()));
                         }
-                        
+
                         this.execute(process);
                         this.commitTransactionIfActive();
                     } catch (TaskFailedException ex) {
                         this.discardActiveTransaction();
-                        logger.log(Level.WARNING, "Worker: " + this.getWorkerDesc() + " ("+ this.getId() + ") " + ex.getMessage(), ex);
+                        logger.log(Level.WARNING, "Worker: " + this.getWorkerDesc() + " (" + this.getId() + ") "
+                            + ex.getMessage(), ex);
                     }
                 }
 
@@ -185,42 +186,49 @@ public class HeadlessQueueWorker extends Worker implements I_GetWorkFromQueue, R
                 try {
                     this.abortActiveTransaction();
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Worker: " + this.getWorkerDesc() + " ("+ this.getId() + ") " + e.getMessage(), e);
-                } 
+                    logger.log(Level.SEVERE, "Worker: " + this.getWorkerDesc() + " (" + this.getId() + ") "
+                        + e.getMessage(), e);
+                }
                 if (logger.isLoggable(Level.FINE)) {
-                    logger.fine(this.getWorkerDesc() + " ("+ this.getId() + ") started sleep.");
+                    logger.fine(this.getWorkerDesc() + " (" + this.getId() + ") started sleep.");
                 }
                 this.sleep();
                 if (logger.isLoggable(Level.FINE)) {
-                    logger.fine(this.getWorkerDesc() + " ("+ this.getId() + ") awake.");
+                    logger.fine(this.getWorkerDesc() + " (" + this.getId() + ") awake.");
                 }
             } catch (Throwable ex) {
                 this.discardActiveTransaction();
                 logger.log(Level.SEVERE, this.getWorkerDesc(), ex);
             }
         }
-        
+
     }
+
     /**
-     * @see org.dwfa.bpa.process.I_Work#createHeadlessWorkspace(net.jini.id.UUID, org.dwfa.bpa.gui.TerminologyConfiguration)
+     * @see org.dwfa.bpa.process.I_Work#createHeadlessWorkspace(net.jini.id.UUID,
+     *      org.dwfa.bpa.gui.TerminologyConfiguration)
      */
     public I_Workspace createHeadlessWorkspace(UUID workspace_id) throws WorkspaceActiveException, HeadlessException {
         throw new UnsupportedOperationException();
     }
-    public I_Workspace createWorkspace(UUID arg0, String arg1, I_ManageUserTransactions arg2, File menuDir) throws WorkspaceActiveException, Exception {
+
+    public I_Workspace createWorkspace(UUID arg0, String arg1, I_ManageUserTransactions arg2, File menuDir)
+            throws WorkspaceActiveException, Exception {
         throw new UnsupportedOperationException();
     }
 
-	public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2, FilenameFilter arg3) throws IOException, ClassNotFoundException {
+    public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2, FilenameFilter arg3) throws IOException,
+            ClassNotFoundException {
         throw new UnsupportedOperationException();
-	}
+    }
 
-	public void writeObjToFilesystem(Frame arg0, String arg1, String arg2, String arg3, Object arg4) throws IOException {
+    public void writeObjToFilesystem(Frame arg0, String arg1, String arg2, String arg3, Object arg4) throws IOException {
         throw new UnsupportedOperationException();
-	}
+    }
 
-	public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException, PrivilegedActionException {
-		throw new UnsupportedOperationException();
-	}
+    public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException,
+            PrivilegedActionException {
+        throw new UnsupportedOperationException();
+    }
 
 }

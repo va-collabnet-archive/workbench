@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,8 +43,7 @@ public class QueueEntryData implements Serializable {
      * @param queueid
      * @param processid
      */
-    public QueueEntryData(String origin, ServiceID queueid,
-            ProcessID processid, EntryID entryID) {
+    public QueueEntryData(String origin, ServiceID queueid, ProcessID processid, EntryID entryID) {
         super();
         this.origin = origin;
         queueID = queueid;
@@ -81,8 +80,8 @@ public class QueueEntryData implements Serializable {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return "origin: " + this.origin + "\nqueueID: " + this.queueID
-            + "\nprocessID: " + this.processID + "\nentryID: " + this.entryID;
+        return "origin: " + this.origin + "\nqueueID: " + this.queueID + "\nprocessID: " + this.processID
+            + "\nentryID: " + this.entryID;
     }
 
     /**

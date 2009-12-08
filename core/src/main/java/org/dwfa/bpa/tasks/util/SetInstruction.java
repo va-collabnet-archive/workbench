@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,17 +35,15 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.bpa.tasks.ws.PanelIds;
 
-
 /**
  * @author kec
- *  
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/workspace tasks", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/workspace tasks", type = BeanType.TASK_BEAN) })
 public class SetInstruction extends AbstractTask {
 
     private String instruction;
-    
+
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
@@ -55,8 +53,7 @@ public class SetInstruction extends AbstractTask {
         out.writeObject(instruction);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             instruction = (String) in.readObject();
@@ -70,12 +67,10 @@ public class SetInstruction extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_Workspace workspace = worker.getCurrentWorkspace();
-            InstructionPanel instructionPanel = (InstructionPanel) workspace
-                    .getPanel(PanelIds.INSTRUCTION);
+            InstructionPanel instructionPanel = (InstructionPanel) workspace.getPanel(PanelIds.INSTRUCTION);
             instructionPanel.setInstruction(instruction);
             return Condition.CONTINUE;
         } catch (Exception ex) {
@@ -87,8 +82,7 @@ public class SetInstruction extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
@@ -113,6 +107,7 @@ public class SetInstruction extends AbstractTask {
     public String getInstruction() {
         return instruction;
     }
+
     /**
      * @param instruction The instruction to set.
      */

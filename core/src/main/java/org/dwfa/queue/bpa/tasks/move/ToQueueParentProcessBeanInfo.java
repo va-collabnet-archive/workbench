@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,19 +28,16 @@ import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 
 /**
  * @author kec
- *
+ * 
  */
 public class ToQueueParentProcessBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor queueType =
-                    new PropertyDescriptor("queueType",
-                        ToQueueParentProcess.class);
+            PropertyDescriptor queueType = new PropertyDescriptor("queueType", ToQueueParentProcess.class);
             queueType.setBound(true);
             queueType.setPropertyEditorClass(ConceptLabelEditor.class);
             queueType.setDisplayName("Queue type");
-            queueType
-                .setShortDescription("The type of queue to place this process into.");
+            queueType.setShortDescription("The type of queue to place this process into.");
 
             PropertyDescriptor rv[] = { queueType };
             return rv;
@@ -54,8 +51,7 @@ public class ToQueueParentProcessBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ToQueueParentProcess.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Parent Process<br>To Queue");
+        bd.setDisplayName("<html><font color='green'><center>Parent Process<br>To Queue");
         return bd;
     }
 

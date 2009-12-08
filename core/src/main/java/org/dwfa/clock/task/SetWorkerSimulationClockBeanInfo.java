@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,14 +34,11 @@ public class SetWorkerSimulationClockBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor increment =
-                    new PropertyDescriptor("increment",
-                        SetWorkerSimulationClock.class);
+            PropertyDescriptor increment = new PropertyDescriptor("increment", SetWorkerSimulationClock.class);
             increment.setBound(true);
             increment.setPropertyEditorClass(IncrementEditor.class);
             increment.setDisplayName("ms increment");
-            increment
-                .setShortDescription("The number of ms to increment the clock.");
+            increment.setShortDescription("The number of ms to increment the clock.");
 
             PropertyDescriptor rv[] = { increment };
             return rv;
@@ -55,8 +52,7 @@ public class SetWorkerSimulationClockBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetWorkerSimulationClock.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set Worker<br>Simulation Clock");
+        bd.setDisplayName("<html><font color='green'><center>Set Worker<br>Simulation Clock");
         return bd;
     }
 }

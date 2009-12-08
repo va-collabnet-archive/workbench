@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 
 /**
  * @author kec
- *
+ * 
  */
 public class ActionListenerGlue implements ActionListener {
 
@@ -30,14 +30,15 @@ public class ActionListenerGlue implements ActionListener {
     private Class<?>[] methodArgClasses;
     private Object[] methodArgs;
     private Object target;
+
     /**
      * @param property
      * @param target
      */
     public ActionListenerGlue(String methodName, boolean stateToSet, Object target) {
         this.methodName = methodName;
-        this.methodArgClasses = new Class[] {boolean.class};
-        this.methodArgs = new Object[] {new Boolean(stateToSet)};
+        this.methodArgClasses = new Class[] { boolean.class };
+        this.methodArgs = new Object[] { new Boolean(stateToSet) };
         this.target = target;
     }
 
@@ -53,4 +54,4 @@ public class ActionListenerGlue implements ActionListener {
         }
     }
 
- }
+}

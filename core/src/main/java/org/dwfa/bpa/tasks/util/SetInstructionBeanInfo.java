@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
 /**
  * @author kec
- *
+ * 
  */
 public class SetInstructionBeanInfo extends SimpleBeanInfo {
 
@@ -41,13 +41,11 @@ public class SetInstructionBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor instruction =
-                    new PropertyDescriptor("instruction", SetInstruction.class);
+            PropertyDescriptor instruction = new PropertyDescriptor("instruction", SetInstruction.class);
             instruction.setBound(true);
             instruction.setPropertyEditorClass(JTextFieldEditor.class);
             instruction.setDisplayName("User Instructions");
-            instruction
-                .setShortDescription("A html string that contains instructions to present to the user.");
+            instruction.setShortDescription("A html string that contains instructions to present to the user.");
 
             PropertyDescriptor rv[] = { instruction };
             return rv;

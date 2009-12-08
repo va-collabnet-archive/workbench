@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,6 @@ import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.queue.SelectAll;
 import org.dwfa.util.AceDateFormat;
 
-
 public class QueueTableModel extends AbstractTableModel {
     /**
      * 
@@ -44,31 +43,29 @@ public class QueueTableModel extends AbstractTableModel {
 
     private DateFormat dateFormat = AceDateFormat.getDataInputDateFormat();
 
-    private String[] columnNames = { "Name", "Subject", "Deadline",
-            "Priority", "Originator", "Process ID", "Entry ID" };
+    private String[] columnNames = { "Name", "Subject", "Deadline", "Priority", "Originator", "Process ID", "Entry ID" };
 
     private Object[][] rowData;
-    
+
     private List<I_DescribeQueueEntry> metaList = new ArrayList<I_DescribeQueueEntry>();
 
     private I_QueueProcesses queue;
-    
+
     Collection<I_DescribeBusinessProcess> metaData;
 
     /**
      * @throws RemoteException
      * @throws IOException
-     *  
+     * 
      */
-    public QueueTableModel(I_QueueProcesses queue) throws RemoteException,
-            IOException {
+    public QueueTableModel(I_QueueProcesses queue) throws RemoteException, IOException {
         super();
         this.queue = queue;
         updateQueueData();
     }
 
     public void updateQueueData() throws RemoteException, IOException {
-        
+
         Collection<I_DescribeBusinessProcess> newData = queue.getProcessMetaData(new SelectAll());
         if (metaData == null) {
             metaData = new ArrayList<I_DescribeBusinessProcess>(newData);
@@ -82,8 +79,7 @@ public class QueueTableModel extends AbstractTableModel {
         this.rowData = new Object[metaData.size()][columnNames.length];
         int i = 0;
         for (Iterator<I_DescribeBusinessProcess> metaItr = metaData.iterator(); metaItr.hasNext();) {
-            I_DescribeQueueEntry meta = (I_DescribeQueueEntry) metaItr
-                    .next();
+            I_DescribeQueueEntry meta = (I_DescribeQueueEntry) metaItr.next();
             metaList.add(meta);
             rowData[i][0] = meta.getName();
             rowData[i][1] = meta.getSubject();
@@ -104,14 +100,14 @@ public class QueueTableModel extends AbstractTableModel {
         }
         fireTableDataChanged();
     }
-    
+
     public I_DescribeQueueEntry getRowMetaData(int row) {
-      if (row < metaList.size() && row >= 0) {
-        return metaList.get(row);
-      }
-      return null;
-     }
-    
+        if (row < metaList.size() && row >= 0) {
+            return metaList.get(row);
+        }
+        return null;
+    }
+
     public String getColumnName(int col) {
         return columnNames[col].toString();
     }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,8 +42,9 @@ public class BpaSourceListener implements DragSourceListener {
      * @see java.awt.dnd.DragSourceListener#dragEnter(java.awt.dnd.DragSourceDragEvent)
      */
     public void dragEnter(DragSourceDragEvent ev) {
-        /*System.out.println("Source " + this.prefix + " DragEnter: "
-                + ev.toString());
+        /*
+         * System.out.println("Source " + this.prefix + " DragEnter: "
+         * + ev.toString());
          */
         this.dragging = true;
         this.dragSource.highlightForDrag(true);
@@ -53,8 +54,10 @@ public class BpaSourceListener implements DragSourceListener {
      * @see java.awt.dnd.DragSourceListener#dragOver(java.awt.dnd.DragSourceDragEvent)
      */
     public void dragOver(DragSourceDragEvent ev) {
-        /*System.out.println("Source " + this.prefix + " dragOver: "
-                + ev.toString());*/
+        /*
+         * System.out.println("Source " + this.prefix + " dragOver: "
+         * + ev.toString());
+         */
         this.dragging = true;
 
     }
@@ -63,8 +66,7 @@ public class BpaSourceListener implements DragSourceListener {
      * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.DragSourceDragEvent)
      */
     public void dropActionChanged(DragSourceDragEvent ev) {
-        System.out.println("Source " + this.prefix + " dropActionChanged: "
-            + ev.toString());
+        System.out.println("Source " + this.prefix + " dropActionChanged: " + ev.toString());
 
     }
 
@@ -72,8 +74,9 @@ public class BpaSourceListener implements DragSourceListener {
      * @see java.awt.dnd.DragSourceListener#dragExit(java.awt.dnd.DragSourceEvent)
      */
     public void dragExit(DragSourceEvent ev) {
-        /*System.out.println("Source " + this.prefix + " dragExit: "
-                + ev.toString());
+        /*
+         * System.out.println("Source " + this.prefix + " dragExit: "
+         * + ev.toString());
          */
         this.dragging = false;
         this.dragSource.highlightForDrag(false);
@@ -84,12 +87,13 @@ public class BpaSourceListener implements DragSourceListener {
      * @see java.awt.dnd.DragSourceListener#dragDropEnd(java.awt.dnd.DragSourceDropEvent)
      */
     public void dragDropEnd(DragSourceDropEvent ev) {
-        /*System.out.println("Source " + this.prefix + " dragDropEnd: "
-                + ev.toString());
+        /*
+         * System.out.println("Source " + this.prefix + " dragDropEnd: "
+         * + ev.toString());
          */
         this.dragging = false;
         this.dragSource.highlightForDrag(false);
-        //System.out.println(" drop success = " + ev.getDropSuccess());
+        // System.out.println(" drop success = " + ev.getDropSuccess());
 
     }
 

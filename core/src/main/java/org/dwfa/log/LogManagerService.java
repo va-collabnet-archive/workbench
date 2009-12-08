@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -92,9 +92,8 @@ public class LogManagerService implements I_ManageLogs {
      * 
      */
     public LogManagerService(String[] args, LifeCycle lc) throws Exception {
-        logger.info("\n*******************\n\n" + 
-             "Starting " + this.getClass().getSimpleName() + " with config file: " + Arrays.asList(args)
-                + "\n\n******************\n");
+        logger.info("\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: "
+            + Arrays.asList(args) + "\n\n******************\n");
         this.config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
         this.lifeCycle = lc;
         this.init();
@@ -108,20 +107,20 @@ public class LogManagerService implements I_ManageLogs {
      *             if a problem occurs
      */
     @SuppressWarnings("unchecked")
-   protected void init() throws Exception {
+    protected void init() throws Exception {
         if (JiniManager.isLocalOnly()) {
             List<Entry> entryList = new ArrayList<Entry>();
             Entry[] entries = (Entry[]) this.config.getEntry(this.getClass().getName(), "entries", Entry[].class,
-                                                             new Entry[] {});
+                new Entry[] {});
             entryList.addAll(Arrays.asList(entries));
 
-            ServiceItem serviceItem = new ServiceItem(this.getServiceID(), this, (Entry[]) entryList
-                    .toArray(new Entry[entryList.size()]));
+            ServiceItem serviceItem = new ServiceItem(this.getServiceID(), this,
+                (Entry[]) entryList.toArray(new Entry[entryList.size()]));
             LookupJiniAndLocal.addToLocalServices(serviceItem);
 
         } else {
             LoginContext loginContext = (LoginContext) config.getEntry(this.getClass().getName(), "loginContext",
-                                                                       LoginContext.class, null);
+                LoginContext.class, null);
             if (loginContext == null) {
                 initAsSubject();
             } else {
@@ -153,7 +152,7 @@ public class LogManagerService implements I_ManageLogs {
         DiscoveryManagement discoveryManager;
         try {
             discoveryManager = (DiscoveryManagement) config.getEntry(this.getClass().getName(), "discoveryManager",
-                                                                     DiscoveryManagement.class);
+                DiscoveryManagement.class);
         } catch (NoSuchEntryException e) {
             logger.warning("No entry for discoveryManager in config file. " + e.toString());
             String[] groups = (String[]) config.getEntry(this.getClass().getName(), "groups", String[].class);
@@ -161,15 +160,14 @@ public class LogManagerService implements I_ManageLogs {
         }
 
         Entry[] entries = (Entry[]) this.config.getEntry(this.getClass().getName(), "entries", Entry[].class,
-                                                         new Entry[] {});
+            new Entry[] {});
 
         /* Get the join manager, for joining lookup services */
         joinManager = new JoinManager(smartProxy, entries, getServiceID(), discoveryManager, null /* leaseMgr */,
-                                      config);
+            config);
 
         Entry[] moreEntries = new Entry[] { new ServiceInfo("Log manager service", "Informatics, Inc.",
-                                                            "Informatics, Inc.", VERSION_STRING, "Log manager",
-                                                            "no serial number") };
+            "Informatics, Inc.", VERSION_STRING, "Log manager", "no serial number") };
         joinManager.addAttributes(moreEntries);
 
         ArrayList<Entry> entryList = new ArrayList<Entry>(Arrays.asList(entries));
@@ -187,8 +185,8 @@ public class LogManagerService implements I_ManageLogs {
 
         }
 
-        ServiceItem serviceItem = new ServiceItem(createServiceID(), this, (Entry[]) entryList
-                .toArray(new Entry[entryList.size()]));
+        ServiceItem serviceItem = new ServiceItem(createServiceID(), this,
+            (Entry[]) entryList.toArray(new Entry[entryList.size()]));
         LookupJiniAndLocal.addToLocalServices(serviceItem);
     }
 
@@ -202,9 +200,8 @@ public class LogManagerService implements I_ManageLogs {
      *             if a remote communication problem occurs
      */
     protected Exporter getExporter() throws ConfigurationException, RemoteException {
-        return (Exporter) config
-                .getEntry(this.getClass().getName(), "exporter", Exporter.class,
-                          new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory()));
+        return (Exporter) config.getEntry(this.getClass().getName(), "exporter", Exporter.class, new BasicJeriExporter(
+            TcpServerEndpoint.getInstance(0), new BasicILFactory()));
     }
 
     /** Returns the service ID for this server. */

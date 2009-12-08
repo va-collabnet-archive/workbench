@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,6 @@
  */
 package org.dwfa.bpa.process;
 
-
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -27,10 +26,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Priority to associate with a processes execution. 
- * Implementation of a typesafe enumeration. 
+ * Priority to associate with a processes execution.
+ * Implementation of a typesafe enumeration.
+ * 
  * @author kec
- *  
+ * 
  */
 public class Priority implements Serializable, Comparable {
     private static final long serialVersionUID = 1;
@@ -48,7 +48,7 @@ public class Priority implements Serializable, Comparable {
      */
     public static final Priority NORMAL = new Priority("Normal", 3);
     /**
-     * <code>LOW</code> low priority 
+     * <code>LOW</code> low priority
      */
     public static final Priority LOW = new Priority("Low", 4);
     /**
@@ -62,8 +62,9 @@ public class Priority implements Serializable, Comparable {
     public String toString() {
         return description;
     }
+
     public int compareTo(Object aObject) {
-        return ordinal - ((Priority)aObject).ordinal;
+        return ordinal - ((Priority) aObject).ordinal;
     }
 
     private final int ordinal;
@@ -72,21 +73,21 @@ public class Priority implements Serializable, Comparable {
      *  
      */
     private final String description;
- 
+
     private Priority(String description, int ordinal) {
         this.description = description;
         this.ordinal = ordinal;
     }
 
-     public static final Priority[] values = { HIGHEST, HIGH, NORMAL, LOW, LOWEST };
+    public static final Priority[] values = { HIGHEST, HIGH, NORMAL, LOW, LOWEST };
 
-    public static final List<Priority> VALUES = Collections.unmodifiableList(Arrays
-            .asList(values));
+    public static final List<Priority> VALUES = Collections.unmodifiableList(Arrays.asList(values));
 
-    //Implement Serializable with these two items
+    // Implement Serializable with these two items
     private Object readResolve() throws ObjectStreamException {
-        return values[ordinal-1];
+        return values[ordinal - 1];
     }
+
     /**
      * @return
      */

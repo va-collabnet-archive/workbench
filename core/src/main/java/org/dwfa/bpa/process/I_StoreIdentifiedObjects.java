@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,11 +36,9 @@ public interface I_StoreIdentifiedObjects {
      * @throws RemoteException
      * @throws TransactionException
      */
-    public EntryID write(Object obj, Transaction t)
-            throws RemoteException, IOException, TransactionException;
+    public EntryID write(Object obj, Transaction t) throws RemoteException, IOException, TransactionException;
 
-    public void write(Object obj, EntryID entryID,
-            Transaction t) throws RemoteException, IOException,
+    public void write(Object obj, EntryID entryID, Transaction t) throws RemoteException, IOException,
             TransactionException;
 
     /**
@@ -51,8 +49,7 @@ public interface I_StoreIdentifiedObjects {
      * @throws RemoteException
      * @throws TransactionException
      */
-    public Object take(EntryID entryID, Transaction t)
-            throws RemoteException, IOException, ClassNotFoundException,
+    public Object take(EntryID entryID, Transaction t) throws RemoteException, IOException, ClassNotFoundException,
             TransactionException, NoMatchingEntryException;
 
     /**
@@ -63,8 +60,7 @@ public interface I_StoreIdentifiedObjects {
      * @throws RemoteException
      * @throws TransactionException
      */
-    public Object take(UUID objectID, Transaction t)
-            throws RemoteException, IOException, ClassNotFoundException,
+    public Object take(UUID objectID, Transaction t) throws RemoteException, IOException, ClassNotFoundException,
             TransactionException, NoMatchingEntryException;
 
     /**
@@ -79,15 +75,14 @@ public interface I_StoreIdentifiedObjects {
      * @throws TransactionException
      * @throws NoMatchingEntryException
      */
-    public Object take(I_SelectObjects selector,
-            Transaction t) throws RemoteException, IOException,
-            ClassNotFoundException, TransactionException,
-            NoMatchingEntryException;
+    public Object take(I_SelectObjects selector, Transaction t) throws RemoteException, IOException,
+            ClassNotFoundException, TransactionException, NoMatchingEntryException;
 
     /**
-     * Hides the process with the given entryID for the duration of the transaction. 
+     * Hides the process with the given entryID for the duration of the
+     * transaction.
      * 
-     * @param entryID Identifier for the entry to be hidden. 
+     * @param entryID Identifier for the entry to be hidden.
      * @param t transaction that governs this operation
      * @throws RemoteException
      * @throws IOException
@@ -95,9 +90,8 @@ public interface I_StoreIdentifiedObjects {
      * @throws TransactionException
      * @throws NoMatchingEntryException
      */
-    public void hide(EntryID entryID, Transaction t) throws RemoteException,
-            IOException, ClassNotFoundException, TransactionException,
-            NoMatchingEntryException;
+    public void hide(EntryID entryID, Transaction t) throws RemoteException, IOException, ClassNotFoundException,
+            TransactionException, NoMatchingEntryException;
 
     /**
      * @param processId
@@ -108,8 +102,7 @@ public interface I_StoreIdentifiedObjects {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public Object read(EntryID entryID, Transaction t)
-            throws RemoteException, IOException, ClassNotFoundException;
+    public Object read(EntryID entryID, Transaction t) throws RemoteException, IOException, ClassNotFoundException;
 
     /**
      * @param selector
@@ -119,8 +112,8 @@ public interface I_StoreIdentifiedObjects {
      *         selector's criterion.
      * @throws RemoteException
      */
-    public Collection<I_DescribeObject> getProcessMetaData(
-            I_SelectObjects selector) throws RemoteException, IOException;
+    public Collection<I_DescribeObject> getProcessMetaData(I_SelectObjects selector) throws RemoteException,
+            IOException;
 
     /**
      * Allow a process to be be written (allowing a transactional boundry),
@@ -138,10 +131,8 @@ public interface I_StoreIdentifiedObjects {
      *            writeTran.
      * @throws TransactionException
      */
-    public EntryID writeThenTake(Object process,
-            Transaction writeTran, Transaction takeTran)
-            throws RemoteException, IOException, ClassNotFoundException,
-            TransactionException;
+    public EntryID writeThenTake(Object process, Transaction writeTran, Transaction takeTran) throws RemoteException,
+            IOException, ClassNotFoundException, TransactionException;
 
     /**
      * @return An address that specifies the inbox from which this queue can be

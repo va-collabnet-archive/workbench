@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ import net.jini.id.Uuid;
 
 /**
  * @author kec
- *
+ * 
  */
 public class RemoteHandlerAdaptor extends Handler {
     I_PublishLogRecord remotePublisher;
@@ -37,8 +37,7 @@ public class RemoteHandlerAdaptor extends Handler {
     /**
      * 
      */
-    public RemoteHandlerAdaptor(I_PublishLogRecord remotePublisher,
-            String loggerName, I_ManageLogs logManager) {
+    public RemoteHandlerAdaptor(I_PublishLogRecord remotePublisher, String loggerName, I_ManageLogs logManager) {
         super();
         this.remotePublisher = remotePublisher;
         this.logManager = logManager;
@@ -54,8 +53,7 @@ public class RemoteHandlerAdaptor extends Handler {
         } catch (RemoteException e) {
             e.printStackTrace();
             try {
-                logManager.removeRemoteHandler(loggerName, remotePublisher
-                    .getId());
+                logManager.removeRemoteHandler(loggerName, remotePublisher.getId());
             } catch (RemoteException e1) {
                 e1.printStackTrace();
             }

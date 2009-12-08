@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -90,21 +90,14 @@ public class JiniManager implements I_LookupServices {
             LookupLocator[] lookupLocators = new LookupLocator[0];
             DiscoveryListener discoveryListener = null;
 
-            LookupDiscoveryManager allGroupsLookupDiscoveryManager =
-                    new LookupDiscoveryManager(
-                        DiscoveryGroupManagement.ALL_GROUPS, lookupLocators,
-                        discoveryListener);
-            this.allGroupSdm =
-                    new ServiceDiscoveryManager(
-                        allGroupsLookupDiscoveryManager, leaseRenewalManager);
+            LookupDiscoveryManager allGroupsLookupDiscoveryManager = new LookupDiscoveryManager(
+                DiscoveryGroupManagement.ALL_GROUPS, lookupLocators, discoveryListener);
+            this.allGroupSdm = new ServiceDiscoveryManager(allGroupsLookupDiscoveryManager, leaseRenewalManager);
 
-            ServiceTemplate tmpl =
-                    new ServiceTemplate(null,
-                        new Class[] { TransactionManager.class }, null);
+            ServiceTemplate tmpl = new ServiceTemplate(null, new Class[] { TransactionManager.class }, null);
             ServiceItemFilter filter = null;
             ServiceListModel serviceListener = new ServiceListModel();
-            this.transactionManagerCache =
-                    this.createLookupCache(tmpl, filter, serviceListener);
+            this.transactionManagerCache = this.createLookupCache(tmpl, filter, serviceListener);
         }
         this.jiniAndLocal = new LookupJiniAndLocal(this.sdm);
 
@@ -117,9 +110,8 @@ public class JiniManager implements I_LookupServices {
      * @return
      * @throws java.rmi.RemoteException
      */
-    public LookupCache createLookupCache(ServiceTemplate tmpl,
-            ServiceItemFilter filter, ServiceDiscoveryListener listener)
-            throws RemoteException {
+    public LookupCache createLookupCache(ServiceTemplate tmpl, ServiceItemFilter filter,
+            ServiceDiscoveryListener listener) throws RemoteException {
         return sdm.createLookupCache(tmpl, filter, listener);
     }
 
@@ -164,18 +156,15 @@ public class JiniManager implements I_LookupServices {
      * @throws java.lang.InterruptedException
      * @throws java.rmi.RemoteException
      */
-    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches,
-            int maxMatches, ServiceItemFilter filter, long waitDur)
-            throws InterruptedException, RemoteException {
+    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches, int maxMatches, ServiceItemFilter filter,
+            long waitDur) throws InterruptedException, RemoteException {
         return lookup(tmpl, minMatches, maxMatches, filter, waitDur, false);
     }
 
-    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches,
-            int maxMatches, ServiceItemFilter filter, long waitDur,
-            boolean lookupLocal) throws InterruptedException, RemoteException {
+    public ServiceItem[] lookup(ServiceTemplate tmpl, int minMatches, int maxMatches, ServiceItemFilter filter,
+            long waitDur, boolean lookupLocal) throws InterruptedException, RemoteException {
         if (lookupLocal || localOnly || lookupInCache) {
-            return jiniAndLocal.lookup(tmpl, minMatches, maxMatches, filter,
-                waitDur);
+            return jiniAndLocal.lookup(tmpl, minMatches, maxMatches, filter, waitDur);
         } else {
             return sdm.lookup(tmpl, minMatches, maxMatches, filter, waitDur);
         }
@@ -187,13 +176,11 @@ public class JiniManager implements I_LookupServices {
      * @param filter
      * @return
      */
-    public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches,
-            ServiceItemFilter filter) {
+    public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches, ServiceItemFilter filter) {
         return this.lookup(tmpl, maxMatches, filter, false);
     }
 
-    public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches,
-            ServiceItemFilter filter, boolean lookupLocal) {
+    public ServiceItem[] lookup(ServiceTemplate tmpl, int maxMatches, ServiceItemFilter filter, boolean lookupLocal) {
         if (lookupLocal || localOnly || lookupInCache) {
             return jiniAndLocal.lookup(tmpl, maxMatches, filter);
         }
@@ -209,8 +196,7 @@ public class JiniManager implements I_LookupServices {
         return this.lookup(tmpl, filter, false);
     }
 
-    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter,
-            boolean lookupLocal) {
+    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter, boolean lookupLocal) {
         if (lookupLocal || localOnly || lookupInCache) {
             return jiniAndLocal.lookup(tmpl, filter);
         }
@@ -225,30 +211,26 @@ public class JiniManager implements I_LookupServices {
      * @throws java.lang.InterruptedException
      * @throws java.rmi.RemoteException
      */
-    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter,
-            long waitDur) throws InterruptedException, RemoteException {
+    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter, long waitDur)
+            throws InterruptedException, RemoteException {
         return this.lookup(tmpl, filter, waitDur, false);
     }
 
-    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter,
-            long waitDur, boolean lookupLocal) throws InterruptedException,
-            RemoteException {
+    public ServiceItem lookup(ServiceTemplate tmpl, ServiceItemFilter filter, long waitDur, boolean lookupLocal)
+            throws InterruptedException, RemoteException {
         if (lookupLocal || localOnly || lookupInCache) {
             return jiniAndLocal.lookup(tmpl, filter, waitDur);
         }
         return this.sdm.lookup(tmpl, filter, waitDur);
     }
 
-    public Transaction createTransaction(long maxDuration)
-            throws LeaseDeniedException, RemoteException, InterruptedException {
+    public Transaction createTransaction(long maxDuration) throws LeaseDeniedException, RemoteException,
+            InterruptedException {
         if (maxDuration == Long.MAX_VALUE) {
-            throw new LeaseDeniedException(
-                "Please pick a more appropriate maximum transaction duration...");
+            throw new LeaseDeniedException("Please pick a more appropriate maximum transaction duration...");
         }
         ServiceItem tms;
-        ServiceTemplate tmpl =
-                new ServiceTemplate(null,
-                    new Class[] { TransactionManager.class }, null);
+        ServiceTemplate tmpl = new ServiceTemplate(null, new Class[] { TransactionManager.class }, null);
         ServiceItemFilter filter = null;
         if (localOnly) {
             tms = this.jiniAndLocal.lookup(tmpl, filter);
@@ -260,8 +242,7 @@ public class JiniManager implements I_LookupServices {
         }
         TransactionManager tm = (TransactionManager) tms.service;
         Transaction.Created tc = TransactionFactory.create(tm, renewDuration);
-        this.leaseRenewalManager.renewFor(tc.lease, maxDuration,
-            this.renewDuration, null);
+        this.leaseRenewalManager.renewFor(tc.lease, maxDuration, this.renewDuration, null);
         return tc.transaction;
     }
 
@@ -270,8 +251,7 @@ public class JiniManager implements I_LookupServices {
      * @throws net.jini.core.lease.UnknownLeaseException
      * @throws java.rmi.RemoteException
      */
-    public void cancel(Lease lease) throws UnknownLeaseException,
-            RemoteException {
+    public void cancel(Lease lease) throws UnknownLeaseException, RemoteException {
         leaseRenewalManager.cancel(lease);
     }
 
@@ -305,10 +285,8 @@ public class JiniManager implements I_LookupServices {
      * @param renewDuration
      * @param listener
      */
-    public void renewFor(Lease lease, long desiredDuration, long renewDuration,
-            LeaseListener listener) {
-        leaseRenewalManager.renewFor(lease, desiredDuration, renewDuration,
-            listener);
+    public void renewFor(Lease lease, long desiredDuration, long renewDuration, LeaseListener listener) {
+        leaseRenewalManager.renewFor(lease, desiredDuration, renewDuration, listener);
     }
 
     /**
@@ -316,8 +294,7 @@ public class JiniManager implements I_LookupServices {
      * @param desiredDuration
      * @param listener
      */
-    public void renewFor(Lease lease, long desiredDuration,
-            LeaseListener listener) {
+    public void renewFor(Lease lease, long desiredDuration, LeaseListener listener) {
         leaseRenewalManager.renewFor(lease, desiredDuration, listener);
     }
 
@@ -327,10 +304,8 @@ public class JiniManager implements I_LookupServices {
      * @param renewDuration
      * @param listener
      */
-    public void renewUntil(Lease lease, long desiredExpiration,
-            long renewDuration, LeaseListener listener) {
-        leaseRenewalManager.renewUntil(lease, desiredExpiration, renewDuration,
-            listener);
+    public void renewUntil(Lease lease, long desiredExpiration, long renewDuration, LeaseListener listener) {
+        leaseRenewalManager.renewUntil(lease, desiredExpiration, renewDuration, listener);
     }
 
     /**
@@ -338,8 +313,7 @@ public class JiniManager implements I_LookupServices {
      * @param desiredExpiration
      * @param listener
      */
-    public void renewUntil(Lease lease, long desiredExpiration,
-            LeaseListener listener) {
+    public void renewUntil(Lease lease, long desiredExpiration, LeaseListener listener) {
         leaseRenewalManager.renewUntil(lease, desiredExpiration, listener);
     }
 
@@ -348,8 +322,7 @@ public class JiniManager implements I_LookupServices {
      * @param expiration
      * @throws net.jini.core.lease.UnknownLeaseException
      */
-    public void setExpiration(Lease lease, long expiration)
-            throws UnknownLeaseException {
+    public void setExpiration(Lease lease, long expiration) throws UnknownLeaseException {
         leaseRenewalManager.setExpiration(lease, expiration);
     }
 
@@ -359,8 +332,7 @@ public class JiniManager implements I_LookupServices {
 
     public void addGroups(String[] groups) throws IOException {
         this.getLookupDiscoveryManager().addGroups(groups);
-        logger.info("Added discovery groups: " + Arrays.asList(groups)
-            + " all groups: "
+        logger.info("Added discovery groups: " + Arrays.asList(groups) + " all groups: "
             + Arrays.asList(this.getLookupDiscoveryManager().getGroups()));
     }
 

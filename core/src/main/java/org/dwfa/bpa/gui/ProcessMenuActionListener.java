@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,11 +50,8 @@ public class ProcessMenuActionListener implements ActionListener {
         public void run() {
             I_Work worker = workspaceFrame.getWorker();
             try {
-                ObjectInputStream ois =
-                        new ObjectInputStream(new BufferedInputStream(
-                            new FileInputStream(processFile)));
-                I_EncodeBusinessProcess process =
-                        (I_EncodeBusinessProcess) ois.readObject();
+                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(processFile)));
+                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
                 ois.close();
                 if (worker.isExecuting()) {
                     worker = worker.getTransactionIndependentClone();
@@ -64,10 +61,8 @@ public class ProcessMenuActionListener implements ActionListener {
             } catch (Exception ex) {
 
                 worker.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
-                JOptionPane.showMessageDialog(LogWithAlerts
-                    .getActiveFrame(null),
-                    "<html>Exception processing action: " + action + "<p><p>"
-                        + ex.getMessage() + "<p><p>See log for details.");
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "<html>Exception processing action: "
+                    + action + "<p><p>" + ex.getMessage() + "<p><p>See log for details.");
             }
         }
     };
@@ -75,15 +70,13 @@ public class ProcessMenuActionListener implements ActionListener {
     private File processFile;
     private WorkspaceFrame workspaceFrame;
 
-    public ProcessMenuActionListener(File processFile,
-            WorkspaceFrame workspaceFrame) {
+    public ProcessMenuActionListener(File processFile, WorkspaceFrame workspaceFrame) {
         super();
         this.processFile = processFile;
         this.workspaceFrame = workspaceFrame;
     }
 
     public void actionPerformed(ActionEvent e) {
-        new Thread(new MenuProcessThread(e.getActionCommand()),
-            "Menu Process Execution").start();
+        new Thread(new MenuProcessThread(e.getActionCommand()), "Menu Process Execution").start();
     }
 }

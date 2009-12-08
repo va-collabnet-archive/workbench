@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,19 +74,17 @@ import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
  * @author kec
  * 
  */
-public class WorkspacePanel extends JPanel implements ListSelectionListener,
-        ComponentListener, RemoteEventListener, PropertyChangeListener,
-        InternalFrameListener, I_Workspace {
+public class WorkspacePanel extends JPanel implements ListSelectionListener, ComponentListener, RemoteEventListener,
+        PropertyChangeListener, InternalFrameListener, I_Workspace {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = Logger.getLogger(WorkspacePanel.class
-            .getName());
+    private static Logger logger = Logger.getLogger(WorkspacePanel.class.getName());
 
-    //private JSplitPane splitPane;
+    // private JSplitPane splitPane;
 
     private JList panelList;
 
@@ -95,18 +93,14 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     private JPanel statusPanel;
 
     private HashMap<String, Object> attachments = new HashMap<String, Object>();
-    
+
     private PropertyChangeSupport propChangeSupport = new PropertyChangeSupportWithPropagationId(this);
-
-
 
     private ChangePanelPropertiesPanel changePanelProperties = new ChangePanelPropertiesPanel();
 
-    private JLabel statusMessage = new JLabel(
-            "<HTML><font color='blue'>Welcome to the Architectonic workbench...");
+    private JLabel statusMessage = new JLabel("<HTML><font color='blue'>Welcome to the Architectonic workbench...");
 
-    private JLabel altMessage = new JLabel(
-    	"<HTML><font align='right' color='green'>Alt message");
+    private JLabel altMessage = new JLabel("<HTML><font align='right' color='green'>Alt message");
 
     private JButton commit = new JButton("commit");
 
@@ -121,9 +115,8 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     private WorkspaceFrame frame;
 
     private I_ManageUserTransactions transactionInterface;
-    
-    private Semaphore ownership = new Semaphore(1);
 
+    private Semaphore ownership = new Semaphore(1);
 
     public boolean isShownInInternalFrame() {
         return this.showInInternalFrame;
@@ -134,21 +127,17 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
      * @throws QueryException
      * 
      */
-    public WorkspacePanel(List<GridBagPanel> panels, WorkspaceFrame frame)
-            throws TransactionException {
+    public WorkspacePanel(List<GridBagPanel> panels, WorkspaceFrame frame) throws TransactionException {
         this(panels, frame, null);
     }
 
-    public WorkspacePanel(List<GridBagPanel> panels, WorkspaceFrame frame,
-            I_ManageUserTransactions transactionInterface)
+    public WorkspacePanel(List<GridBagPanel> panels, WorkspaceFrame frame, I_ManageUserTransactions transactionInterface)
             throws TransactionException {
         super(new GridBagLayout());
         this.transactionInterface = transactionInterface;
         if (transactionInterface != null) {
-            this.transactionInterface
-                    .addActiveTransactionListener(new ActiveTransactionListener());
-            this.transactionInterface
-                    .addUncommittedComponentsListener(new UncommittedComponentsListener());
+            this.transactionInterface.addActiveTransactionListener(new ActiveTransactionListener());
+            this.transactionInterface.addUncommittedComponentsListener(new UncommittedComponentsListener());
             this.cancel.setEnabled(transactionInterface.isTransactionActive());
         } else {
             this.cancel.setEnabled(false);
@@ -167,14 +156,14 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
 
         setupPanelList(panels);
 
-        //JPanel configSide = new JPanel(new GridBagLayout());
+        // JPanel configSide = new JPanel(new GridBagLayout());
 
-        //setupConfigSide(configSide);
-        //splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, configSide,
-        //        layoutPanel);
-        //splitPane.setOneTouchExpandable(true);
-        //splitPane.setDividerLocation(200);
-        //splitPane.setDividerLocation(0);
+        // setupConfigSide(configSide);
+        // splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, configSide,
+        // layoutPanel);
+        // splitPane.setOneTouchExpandable(true);
+        // splitPane.setDividerLocation(200);
+        // splitPane.setDividerLocation(0);
 
         for (GridBagPanel gbp : panels) {
             gbp.addGridBagConstraintsListener(this.gridPanelListener);
@@ -194,12 +183,11 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
         c.fill = GridBagConstraints.HORIZONTAL;
         this.add(this.statusPanel, c);
         this.addComponentListener(this);
-        //this.splitPane.addPropertyChangeListener(
-        //        JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
+        // this.splitPane.addPropertyChangeListener(
+        // JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
     }
 
-    private void updateCommitButton(I_ManageUserTransactions config)
-            throws TransactionException {
+    private void updateCommitButton(I_ManageUserTransactions config) throws TransactionException {
         if (transactionInterface != null) {
             if (transactionInterface.isTransactionActive()) {
                 this.commit.setText("<html><font color='#006400'>commit");
@@ -219,15 +207,13 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
      */
     private void setupPanelList(List<GridBagPanel> panels) {
         panelList = new JList(new ArrayListModel<GridBagPanel>(panels));
-        panelList
-                .setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        panelList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         panelList.setLayoutOrientation(JList.VERTICAL);
         panelList.setVisibleRowCount(-1);
         panelList.addListSelectionListener(this);
     }
 
-    private JPanel makeStatusPanel(JLabel statusMessage, JLabel altMessage, JButton commit,
-            JButton cancel) {
+    private JPanel makeStatusPanel(JLabel statusMessage, JLabel altMessage, JButton commit, JButton cancel) {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -264,8 +250,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     @SuppressWarnings("unchecked")
     public void addGridBagPanel(GridBagPanel panel) {
 
-        ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList
-                .getModel();
+        ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList.getModel();
         panel.addGridBagConstraintsListener(this.gridPanelListener);
         listModel.add(panel);
         redoLayout();
@@ -276,6 +261,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     private static class CandP {
         GridBagPanel p;
         GridBagPanelConstraints c;
+
         /**
          * @param c
          * @param p
@@ -286,51 +272,50 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
             this.p = p;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private void restartLayout() {
-        
-        //int dividerLocation = this.splitPane.getDividerLocation();
-        //int lastDividerLocation = this.splitPane.getLastDividerLocation();
-        ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList
-        .getModel();
+
+        // int dividerLocation = this.splitPane.getDividerLocation();
+        // int lastDividerLocation = this.splitPane.getLastDividerLocation();
+        ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList.getModel();
         List<CandP> panelAndConstraint = new ArrayList<CandP>();
         for (GridBagPanel gbp : listModel) {
-            //This operation ensures that the layer and position properties 
-            //reflect any user changes. 
+            // This operation ensures that the layer and position properties
+            // reflect any user changes.
             panelAndConstraint.add(new CandP(gbp.getConstraints(), gbp));
         }
-        for (Component c: this.layoutPanel.getComponents()) {
-          this.layoutPanel.remove(c);
+        for (Component c : this.layoutPanel.getComponents()) {
+            this.layoutPanel.remove(c);
         }
         if (this.showInInternalFrame) {
-          if (JDesktopPane.class.isAssignableFrom(layoutPanel.getClass()) == false) {
-            this.remove(layoutPanel);
-            layoutPanel = new JDesktopPane();
-            GridBagConstraints c = new GridBagConstraints();
-            c.anchor = GridBagConstraints.NORTHWEST;
-            c.fill = GridBagConstraints.BOTH;
-            c.weightx = 1;
-            c.weighty = 1;
-            c.gridx = 0;
-            c.gridy = 0;
-            this.add(layoutPanel, c);
-          }
+            if (JDesktopPane.class.isAssignableFrom(layoutPanel.getClass()) == false) {
+                this.remove(layoutPanel);
+                layoutPanel = new JDesktopPane();
+                GridBagConstraints c = new GridBagConstraints();
+                c.anchor = GridBagConstraints.NORTHWEST;
+                c.fill = GridBagConstraints.BOTH;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.gridx = 0;
+                c.gridy = 0;
+                this.add(layoutPanel, c);
+            }
         } else {
-          if (JLayeredPane.class.isAssignableFrom(layoutPanel.getClass()) == false) {
-            this.remove(layoutPanel);
-            layoutPanel = new JLayeredPane();
-            GridBagConstraints c = new GridBagConstraints();
-            c.anchor = GridBagConstraints.NORTHWEST;
-            c.fill = GridBagConstraints.BOTH;
-            c.weightx = 1;
-            c.weighty = 1;
-            c.gridx = 0;
-            c.gridy = 0;
-            this.add(layoutPanel, c);
-          }
+            if (JLayeredPane.class.isAssignableFrom(layoutPanel.getClass()) == false) {
+                this.remove(layoutPanel);
+                layoutPanel = new JLayeredPane();
+                GridBagConstraints c = new GridBagConstraints();
+                c.anchor = GridBagConstraints.NORTHWEST;
+                c.fill = GridBagConstraints.BOTH;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.gridx = 0;
+                c.gridy = 0;
+                this.add(layoutPanel, c);
+            }
         }
-        //splitPane.setRightComponent(this.layoutPanel);
+        // splitPane.setRightComponent(this.layoutPanel);
         for (GridBagPanel gbp : listModel) {
             gbp.setAddedToLayout(false);
             JInternalFrame intFrame = gbp.getInternalFrame();
@@ -338,18 +323,18 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
                 intFrame.removeInternalFrameListener(this);
                 gbp.setInternalFrame(null);
             }
-            
+
         }
         this.redoLayout();
-        for (CandP entry: panelAndConstraint) {
+        for (CandP entry : panelAndConstraint) {
             entry.p.setConstraints(entry.c);
         }
-        //this.splitPane.setDividerLocation(dividerLocation);
-        //this.splitPane.setLastDividerLocation(lastDividerLocation);
+        // this.splitPane.setDividerLocation(dividerLocation);
+        // this.splitPane.setLastDividerLocation(lastDividerLocation);
         this.setSize(this.getWidth() + 1, this.getHeight() + 1);
         this.setSize(this.getWidth() - 1, this.getHeight() - 1);
     }
-    
+
     public boolean isOptimizedDrawingEnabled() {
         return false;
     }
@@ -360,8 +345,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
      */
     @SuppressWarnings("unchecked")
     private void redoLayout() {
-        ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList
-                .getModel();
+        ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList.getModel();
         int maxX = 0;
         int maxY = 0;
         int minX = Integer.MAX_VALUE;
@@ -369,8 +353,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
         for (GridBagPanel gbp : listModel) {
             if (gbp.isShownInLayout()) {
                 boolean iconified = false;
-                if ((showInInternalFrame) && (gbp.getInternalFrame() != null)
-                        && (gbp.getInternalFrame().isIcon())) {
+                if ((showInInternalFrame) && (gbp.getInternalFrame() != null) && (gbp.getInternalFrame().isIcon())) {
                     iconified = true;
                 }
                 if (iconified == false) {
@@ -388,10 +371,9 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
                         minY = c.gridy;
                     }
                 }
-            } 
+            }
         }
-        if ((this.layoutPanel.getHeight() > 0)
-                && (this.layoutPanel.getWidth() > 0)) {
+        if ((this.layoutPanel.getHeight() > 0) && (this.layoutPanel.getWidth() > 0)) {
             int gridHeight = this.layoutPanel.getHeight() / (maxY - minY);
             int gridWidth = this.layoutPanel.getWidth() / (maxX - minX);
             for (GridBagPanel gbp : listModel) {
@@ -399,11 +381,10 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
                     GridBagPanelConstraints c = gbp.getConstraints();
                     if (showInInternalFrame) {
                         if (gbp.isAddedToLayout() == false) {
-                            JInternalFrame frame = new JInternalFrame(gbp
-                                    .getTitle(), false, // resizable
-                                    true, // closable
-                                    true, // maximizable
-                                    true);// iconifiable);
+                            JInternalFrame frame = new JInternalFrame(gbp.getTitle(), false, // resizable
+                                true, // closable
+                                true, // maximizable
+                                true);// iconifiable);
                             frame.addInternalFrameListener(this);
                             gbp.setInternalFrame(frame);
                             frame.setContentPane(gbp);
@@ -411,16 +392,12 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
                             this.layoutPanel.add(frame, c.layer, c.positionInLayer);
                             gbp.setAddedToLayout(true);
                         }
-                        gbp.getInternalFrame().setBounds(
-                                (c.gridx - minX) * gridWidth,
-                                (c.gridy - minY) * gridHeight,
-                                c.gridwidth * gridWidth,
-                                c.gridheight * gridHeight);
+                        gbp.getInternalFrame().setBounds((c.gridx - minX) * gridWidth, (c.gridy - minY) * gridHeight,
+                            c.gridwidth * gridWidth, c.gridheight * gridHeight);
                         gbp.revalidate();
                     } else {
-                        gbp.setBounds((c.gridx - minX) * gridWidth,
-                                (c.gridy - minY) * gridHeight, c.gridwidth
-                                        * gridWidth, c.gridheight * gridHeight);
+                        gbp.setBounds((c.gridx - minX) * gridWidth, (c.gridy - minY) * gridHeight, c.gridwidth
+                            * gridWidth, c.gridheight * gridHeight);
                         gbp.revalidate();
                         if (gbp.isAddedToLayout() == false) {
                             this.layoutPanel.add(gbp, c.layer, c.positionInLayer);
@@ -450,13 +427,13 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
                     p.setVisible(true);
                     if (p.getInternalFrame() != null) {
                         p.getInternalFrame().setVisible(true);
-                    } 
+                    }
                 } else {
                     p.setVisible(false);
                     if (p.getInternalFrame() != null) {
                         p.getInternalFrame().setVisible(false);
-                    } 
-                    
+                    }
+
                 }
             }
             redoLayout();
@@ -472,8 +449,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
          */
         public void actionPerformed(ActionEvent e) {
             try {
-                WorkspacePanel.this.transactionInterface
-                        .commitActiveTransaction();
+                WorkspacePanel.this.transactionInterface.commitActiveTransaction();
             } catch (Exception e1) {
                 logger.log(Level.WARNING, e1.getMessage(), e1);
             }
@@ -489,15 +465,11 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
          */
         public void actionPerformed(ActionEvent e) {
             try {
-                int n = JOptionPane.showConfirmDialog(WorkspacePanel.this,
-                        "You will lose changes to "
-                                + WorkspacePanel.this.transactionInterface
-                                        .getUncommittedComponents().size()
-                                + " components.\n" + "Do you wish to proceed?",
-                        "Warning", JOptionPane.YES_NO_OPTION);
+                int n = JOptionPane.showConfirmDialog(WorkspacePanel.this, "You will lose changes to "
+                    + WorkspacePanel.this.transactionInterface.getUncommittedComponents().size() + " components.\n"
+                    + "Do you wish to proceed?", "Warning", JOptionPane.YES_NO_OPTION);
                 if (n == JOptionPane.YES_OPTION) {
-                    WorkspacePanel.this.transactionInterface
-                            .abortActiveTransaction();
+                    WorkspacePanel.this.transactionInterface.abortActiveTransaction();
                 }
             } catch (Exception e1) {
                 logger.log(Level.WARNING, e1.getMessage(), e1);
@@ -517,15 +489,13 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
         public void propertyChange(PropertyChangeEvent evt) {
 
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("WorkspacePanel propertyChange: "
-                        + evt.getPropertyName());
+                logger.fine("WorkspacePanel propertyChange: " + evt.getPropertyName());
             }
             if (evt.getPropertyName().equals("activeTransaction")) {
 
                 try {
 
-                    WorkspacePanel.this.cancel.setEnabled(transactionInterface
-                            .isTransactionActive());
+                    WorkspacePanel.this.cancel.setEnabled(transactionInterface.isTransactionActive());
                     updateCommitButton(transactionInterface);
                 } catch (Exception e) {
                     logger.log(Level.WARNING, e.getMessage(), e);
@@ -535,8 +505,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
         }
     }
 
-    private class UncommittedComponentsListener implements
-            PropertyChangeListener {
+    private class UncommittedComponentsListener implements PropertyChangeListener {
         /**
          * Listens for changes in the GridBagConstraints for any of the managed
          * <code>GridBagPanels</code>.
@@ -547,22 +516,17 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
         public void propertyChange(PropertyChangeEvent evt) {
 
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("WorkspacePanel propertyChange: "
-                        + evt.getPropertyName());
+                logger.fine("WorkspacePanel propertyChange: " + evt.getPropertyName());
             }
             if (evt.getPropertyName().equals("uncommittedComponents")) {
                 Collection<Object> uncommitted = (Collection<Object>) evt.getNewValue();
                 if (uncommitted.size() == 1) {
-                    WorkspacePanel.this.statusMessage
-                            .setText("<HTML><font color='red'>1 uncommitted component...");
+                    WorkspacePanel.this.statusMessage.setText("<HTML><font color='red'>1 uncommitted component...");
                 } else if (uncommitted.size() > 1) {
-                    WorkspacePanel.this.statusMessage
-                            .setText("<HTML><font color='red'>"
-                                    + uncommitted.size()
-                                    + " uncommitted components...");
+                    WorkspacePanel.this.statusMessage.setText("<HTML><font color='red'>" + uncommitted.size()
+                        + " uncommitted components...");
                 } else {
-                    WorkspacePanel.this.statusMessage
-                            .setText("<HTML><font color='blue'>no uncommitted components...");
+                    WorkspacePanel.this.statusMessage.setText("<HTML><font color='blue'>no uncommitted components...");
                 }
 
             }
@@ -575,21 +539,21 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting() == false) {
             if (this.panelList.getSelectedIndex() >= 0) {
-                GridBagPanel gbp = (GridBagPanel) this.panelList.getModel()
-                        .getElementAt(this.panelList.getSelectedIndex());
+                GridBagPanel gbp = (GridBagPanel) this.panelList.getModel().getElementAt(
+                    this.panelList.getSelectedIndex());
                 this.changePanelProperties.setPanel(gbp);
                 /*
-                this.layoutPanel.setLayout(null);
-                if (this.showInInternalFrame) {
-                    this.layoutPanel.moveToFront(gbp.getInternalFrame());
-                } else {
-                    this.layoutPanel.moveToFront(gbp);
-                }
-                */
+                 * this.layoutPanel.setLayout(null);
+                 * if (this.showInInternalFrame) {
+                 * this.layoutPanel.moveToFront(gbp.getInternalFrame());
+                 * } else {
+                 * this.layoutPanel.moveToFront(gbp);
+                 * }
+                 */
             }
         } else {
             this.changePanelProperties.setPanel(null);
-         }
+        }
 
     }
 
@@ -625,8 +589,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     /**
      * @see net.jini.core.event.RemoteEventListener#notify(net.jini.core.event.RemoteEvent)
      */
-    public void notify(RemoteEvent theEvent) throws UnknownEventException,
-            RemoteException {
+    public void notify(RemoteEvent theEvent) throws UnknownEventException, RemoteException {
         // TODO Auto-generated method stub
 
     }
@@ -705,8 +668,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
      */
     @SuppressWarnings("unchecked")
     public List<GridBagPanel> getPanelList() {
-        ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList
-                .getModel();
+        ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList.getModel();
         return listModel;
     }
 
@@ -725,6 +687,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     public void setWorkspaceBounds(int x, int y, int width, int height) {
         this.getTopLevelAncestor().setBounds(x, y, width, height);
     }
+
     public void setWorkspaceBounds(Rectangle bounds) {
         this.getTopLevelAncestor().setBounds(bounds);
     }
@@ -732,8 +695,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     /**
      * @see org.dwfa.bpa.process.I_Workspace#getPanel(java.lang.String)
      */
-    public GridBagPanel getPanel(String panelName)
-            throws NoMatchingEntryException {
+    public GridBagPanel getPanel(String panelName) throws NoMatchingEntryException {
         for (GridBagPanel p : this.getPanelList()) {
             if (p.getName().equals(panelName)) {
                 return p;
@@ -809,7 +771,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     }
 
     public void setAttachment(String key, Object attachment) {
-    	Object oldValue = this.attachments.get(key);
+        Object oldValue = this.attachments.get(key);
         this.attachments.put(key, attachment);
         propChangeSupport.firePropertyChange(key, oldValue, attachment);
     }
@@ -820,35 +782,35 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener,
     }
 
     public void setOneTouchExpandable(boolean b) {
-        //this.splitPane.setOneTouchExpandable(b);
-        
+        // this.splitPane.setOneTouchExpandable(b);
+
     }
 
-	public void addAttachmentListener(PropertyChangeListener l) {
-		this.propChangeSupport.addPropertyChangeListener(l);
-		
-	}
+    public void addAttachmentListener(PropertyChangeListener l) {
+        this.propChangeSupport.addPropertyChangeListener(l);
 
-	public void addAttachmentListener(String property, PropertyChangeListener l) {
-		this.propChangeSupport.addPropertyChangeListener(property, l);
-		
-	}
+    }
 
-	public void removeAttachmentListener(PropertyChangeListener l) {
-		this.propChangeSupport.removePropertyChangeListener(l);
-		
-	}
+    public void addAttachmentListener(String property, PropertyChangeListener l) {
+        this.propChangeSupport.addPropertyChangeListener(property, l);
 
-	public void removeAttachmentListener(String property, PropertyChangeListener l) {
-		this.propChangeSupport.removePropertyChangeListener(property, l);
-		
-	}
+    }
 
-  public void acquireOwnership() {
-    ownership.acquireUninterruptibly();
-  }
+    public void removeAttachmentListener(PropertyChangeListener l) {
+        this.propChangeSupport.removePropertyChangeListener(l);
 
-  public void releaseOwnership() {
-    ownership.release();
-  }
+    }
+
+    public void removeAttachmentListener(String property, PropertyChangeListener l) {
+        this.propChangeSupport.removePropertyChangeListener(property, l);
+
+    }
+
+    public void acquireOwnership() {
+        ownership.acquireUninterruptibly();
+    }
+
+    public void releaseOwnership() {
+        ownership.release();
+    }
 }

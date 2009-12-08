@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -75,14 +75,11 @@ import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.bpa.worker.Worker;
 import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 
-
-
 /**
  * @author kec
- *  
+ * 
  */
-public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
-        Runnable {
+public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue, Runnable {
     private I_QueueProcesses queue;
 
     private Thread workerThread;
@@ -90,7 +87,7 @@ public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
     private boolean sleeping;
 
     private long sleepTime = 1000 * 60 * 1;
-    
+
     private Properties props;
     private Authenticator a = null;
     private String username;
@@ -98,132 +95,132 @@ public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
 
     public class MailAuthenticator extends Authenticator {
 
-      private FrameWithOpenFramesListener passwordDialog;  
-      private JLabel mainLabel = new JLabel(
-       "Please enter the password for this inbox POP account: ");
-      private JLabel userLabel = new JLabel("User name: ");
-      private JLabel passwordLabel = new JLabel("Password: ");
-      private JTextField usernameField = new JTextField(20);
-      private JPasswordField passwordField = new JPasswordField(20);
-      private JButton okButton = new JButton("OK");
-      private boolean done = false;
+        private FrameWithOpenFramesListener passwordDialog;
+        private JLabel mainLabel = new JLabel("Please enter the password for this inbox POP account: ");
+        private JLabel userLabel = new JLabel("User name: ");
+        private JLabel passwordLabel = new JLabel("Password: ");
+        private JTextField usernameField = new JTextField(20);
+        private JPasswordField passwordField = new JPasswordField(20);
+        private JButton okButton = new JButton("OK");
+        private boolean done = false;
 
-        
-      public MailAuthenticator(String username) throws Exception {
-    	  /*
-      	List frameList = OpenFrames.getFrames();
-      	JFrame frontFrame = null;
-      	for (Iterator frameItr = frameList.iterator(); frameItr.hasNext();) {
-      		JFrame frame = (JFrame) frameItr.next();
-      		if (frame.isActive()) {
-      			frontFrame = frame;
-      		}
-      	}
-      	*/
-        JPanel contentPanel = new JPanel();
-      	passwordDialog = new FrameWithOpenFramesListener("Mail Authentication", "Authenticate", contentPanel);
-        passwordDialog.setContentPane(contentPanel);
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        contentPanel.setLayout(new GridLayout(4, 1));
-        contentPanel.add(mainLabel);
-        JPanel p2 = new JPanel( );
-        p2.add(userLabel);
-        p2.add(usernameField);
-        usernameField.setText(username);
-        usernameField.setEditable(false);
-        contentPanel.add(p2);
-        JPanel p3 = new JPanel( );
-        p3.add(passwordLabel);
-        p3.add(passwordField);
-        contentPanel.add(p3);
-        JPanel p4 = new JPanel( );
-        p4.add(okButton);
-        contentPanel.add(p4);   
-        passwordDialog.pack( );
-        
-        ActionListener al = new HideDialog( );
-        okButton.addActionListener(al);
-        usernameField.addActionListener(al);
-        passwordField.addActionListener(al);
-        
-      }
-      
-      class HideDialog implements ActionListener {
-      
-        public void actionPerformed(ActionEvent e) {
-          passwordDialog.setVisible(false);
-          OpenFrames.removeFrame(passwordDialog);
-          setDone(true);
-        } 
-        
-      }
-		/**
-		 * @see org.dwfa.bpa.util.TaskWithProgress#isDone()
-		 */
-		public boolean isDone() {
-			return done;
-		}
+        public MailAuthenticator(String username) throws Exception {
+            /*
+             * List frameList = OpenFrames.getFrames();
+             * JFrame frontFrame = null;
+             * for (Iterator frameItr = frameList.iterator();
+             * frameItr.hasNext();) {
+             * JFrame frame = (JFrame) frameItr.next();
+             * if (frame.isActive()) {
+             * frontFrame = frame;
+             * }
+             * }
+             */
+            JPanel contentPanel = new JPanel();
+            passwordDialog = new FrameWithOpenFramesListener("Mail Authentication", "Authenticate", contentPanel);
+            passwordDialog.setContentPane(contentPanel);
+            contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            contentPanel.setLayout(new GridLayout(4, 1));
+            contentPanel.add(mainLabel);
+            JPanel p2 = new JPanel();
+            p2.add(userLabel);
+            p2.add(usernameField);
+            usernameField.setText(username);
+            usernameField.setEditable(false);
+            contentPanel.add(p2);
+            JPanel p3 = new JPanel();
+            p3.add(passwordLabel);
+            p3.add(passwordField);
+            contentPanel.add(p3);
+            JPanel p4 = new JPanel();
+            p4.add(okButton);
+            contentPanel.add(p4);
+            passwordDialog.pack();
 
-		private synchronized void setDone(boolean done) {
-			this.done = done;
-			this.notifyAll();
-		}
+            ActionListener al = new HideDialog();
+            okButton.addActionListener(al);
+            usernameField.addActionListener(al);
+            passwordField.addActionListener(al);
 
-		/**
-		 * @throws InterruptedException
-		 * @see org.dwfa.bpa.util.TaskWithProgress#waitTillDone()
-		 */
-		public synchronized void waitTillDone() throws InterruptedException {
-			while (!this.isDone())
-				wait();
+        }
 
-		}
-      public synchronized PasswordAuthentication getPasswordAuthentication( ) {
-        passwordField.requestFocusInWindow();
-        passwordDialog.setVisible(true);
-        try {
-			this.waitTillDone();
-		} catch (InterruptedException e) {
-			//Nothing to do;
-		}
-        
-        // getPassword( ) returns an array of chars for security reasons.
-        // We need to convert that to a String for 
-        // the PasswordAuthentication( ) constructor.
-        String password = new String(passwordField.getPassword( ));
-        String username = usernameField.getText( );
-        // Erase the password in case this is used again.
-        // The provider should cache the password if necessary.
-        passwordField.setText("");
-        return new PasswordAuthentication(username, password);
-        
-      }
+        class HideDialog implements ActionListener {
+
+            public void actionPerformed(ActionEvent e) {
+                passwordDialog.setVisible(false);
+                OpenFrames.removeFrame(passwordDialog);
+                setDone(true);
+            }
+
+        }
+
+        /**
+         * @see org.dwfa.bpa.util.TaskWithProgress#isDone()
+         */
+        public boolean isDone() {
+            return done;
+        }
+
+        private synchronized void setDone(boolean done) {
+            this.done = done;
+            this.notifyAll();
+        }
+
+        /**
+         * @throws InterruptedException
+         * @see org.dwfa.bpa.util.TaskWithProgress#waitTillDone()
+         */
+        public synchronized void waitTillDone() throws InterruptedException {
+            while (!this.isDone())
+                wait();
+
+        }
+
+        public synchronized PasswordAuthentication getPasswordAuthentication() {
+            passwordField.requestFocusInWindow();
+            passwordDialog.setVisible(true);
+            try {
+                this.waitTillDone();
+            } catch (InterruptedException e) {
+                // Nothing to do;
+            }
+
+            // getPassword( ) returns an array of chars for security reasons.
+            // We need to convert that to a String for
+            // the PasswordAuthentication( ) constructor.
+            String password = new String(passwordField.getPassword());
+            String username = usernameField.getText();
+            // Erase the password in case this is used again.
+            // The provider should cache the password if necessary.
+            passwordField.setText("");
+            return new PasswordAuthentication(username, password);
+
+        }
     }
+
     /**
      * @param config
      * @param id
      * @param desc
      * @throws Exception
      */
-    public InboxQueueWorker(Configuration config, UUID id, String desc, I_SelectProcesses selector)
-            throws Exception {
+    public InboxQueueWorker(Configuration config, UUID id, String desc, I_SelectProcesses selector) throws Exception {
         super(config, id, desc);
-        props = new Properties( );
-        mailHost = (String) this.config.getEntry(this.getClass()
-                .getName(), "mailPop3Host", String.class);
+        props = new Properties();
+        mailHost = (String) this.config.getEntry(this.getClass().getName(), "mailPop3Host", String.class);
         props.put("mail.pop3.host", mailHost);
         props.put("mail.debug", "false");
-        username  = (String) this.config.getEntry(this.getClass()
-                .getName(), "username", String.class);
+        username = (String) this.config.getEntry(this.getClass().getName(), "username", String.class);
         this.a = new MailAuthenticator(username);
-//      add handlers for main MIME types
+        // add handlers for main MIME types
         MailcapCommandMap mc = (MailcapCommandMap) CommandMap.getDefaultCommandMap();
         mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
         mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
         mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
         mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
         mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
-        mc.addMailcap(OutboxQueueWorker.PROCESS_ATTACHMENT_TYPE + ";; x-java-content-handler=com.sun.mail.handlers.text_plain");
+        mc.addMailcap(OutboxQueueWorker.PROCESS_ATTACHMENT_TYPE
+            + ";; x-java-content-handler=com.sun.mail.handlers.text_plain");
         CommandMap.setDefaultCommandMap(mc);
         this.setPluginForInterface(I_GetWorkFromQueue.class, this);
     }
@@ -262,27 +259,26 @@ public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
      * @see java.lang.Runnable#run()
      */
     public void run() {
-    	
-    		
-    		 
+
         Transaction t;
         while (true) {
             try {
-                    logger.info(this.getWorkerDesc() + " starting inbox run");
-                    
-                    Session session = Session.getDefaultInstance(props, a);
-                    Store store = session.getStore("pop3");
-                    store.connect(this.mailHost, this.username, null);
-                    POP3Folder inbox = (POP3Folder) store.getFolder("INBOX");
-                    inbox.open(Folder.READ_WRITE);
-                    while (inbox.getMessageCount() > 0) {
-                        Message msg = inbox.getMessage(1);
-                        //process message
-                        logger.info(this.getWorkerDesc() + " found message: " + msg.getSubject() + " from: " + Arrays.asList(msg.getFrom()));
-                        if (MimeMultipart.class.isAssignableFrom(msg.getContent().getClass())) {
+                logger.info(this.getWorkerDesc() + " starting inbox run");
+
+                Session session = Session.getDefaultInstance(props, a);
+                Store store = session.getStore("pop3");
+                store.connect(this.mailHost, this.username, null);
+                POP3Folder inbox = (POP3Folder) store.getFolder("INBOX");
+                inbox.open(Folder.READ_WRITE);
+                while (inbox.getMessageCount() > 0) {
+                    Message msg = inbox.getMessage(1);
+                    // process message
+                    logger.info(this.getWorkerDesc() + " found message: " + msg.getSubject() + " from: "
+                        + Arrays.asList(msg.getFrom()));
+                    if (MimeMultipart.class.isAssignableFrom(msg.getContent().getClass())) {
                         MimeMultipart parts = (MimeMultipart) msg.getContent();
                         for (int i = 0; i < parts.getCount(); i++) {
-                            MimeBodyPart part =  (MimeBodyPart) parts.getBodyPart(i);
+                            MimeBodyPart part = (MimeBodyPart) parts.getBodyPart(i);
                             if (logger.isLoggable(Level.FINE)) {
                                 logger.fine(this.getWorkerDesc() + " found part: " + part.getContentType());
                             }
@@ -294,48 +290,40 @@ public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
                                 this.commitTransactionIfActive();
                             }
                         }
-                        } else {
-                            logger.info(this.getWorkerDesc() + " found message: " + msg.getSubject() + " from: " + Arrays.asList(msg.getFrom())
-                            		+ "\nIt is of wrong type: " + msg.getContent().getClass().getName() + 
-                            		"\nThe content is: " + msg.getContent());
-                        	
-                        }
-                        msg.setFlag(Flags.Flag.DELETED, true);
-                        inbox.close(true);
-                        inbox.open(Folder.READ_WRITE);
+                    } else {
+                        logger.info(this.getWorkerDesc() + " found message: " + msg.getSubject() + " from: "
+                            + Arrays.asList(msg.getFrom()) + "\nIt is of wrong type: "
+                            + msg.getContent().getClass().getName() + "\nThe content is: " + msg.getContent());
+
                     }
-                    
+                    msg.setFlag(Flags.Flag.DELETED, true);
                     inbox.close(true);
-                    store.close( );
-                    
-                    logger.info(this.getWorkerDesc() + " finished inbox run");
+                    inbox.open(Folder.READ_WRITE);
+                }
+
+                inbox.close(true);
+                store.close();
+
+                logger.info(this.getWorkerDesc() + " finished inbox run");
             } catch (Throwable ex) {
                 this.discardActiveTransaction();
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
-            
+
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine(this.getWorkerDesc() + " ("
-                        + this.getId() + ") started sleep.");
+                logger.fine(this.getWorkerDesc() + " (" + this.getId() + ") started sleep.");
             }
             this.sleep();
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine(this.getWorkerDesc() + " ("
-                        + this.getId() + ") awake.");
+                logger.fine(this.getWorkerDesc() + " (" + this.getId() + ") awake.");
             }
         }
     }
 
-
-
-
-
-
     /**
      * @see org.dwfa.bpa.process.I_Work#execute(org.dwfa.bpa.process.I_EncodeBusinessProcess)
      */
-    public synchronized Condition execute(I_EncodeBusinessProcess process)
-            throws TaskFailedException {
+    public synchronized Condition execute(I_EncodeBusinessProcess process) throws TaskFailedException {
         throw new UnsupportedOperationException();
     }
 
@@ -358,8 +346,7 @@ public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
     /**
      * @see org.dwfa.bpa.process.I_Work#getWorkspace(net.jini.id.UUID)
      */
-    public I_Workspace getWorkspace(UUID workspaceId)
-            throws NoSuchWorkspaceException {
+    public I_Workspace getWorkspace(UUID workspaceId) throws NoSuchWorkspaceException {
         throw new UnsupportedOperationException();
     }
 
@@ -388,8 +375,7 @@ public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
      * @see org.dwfa.bpa.process.I_Work#selectFromList(java.lang.Object[],
      *      java.lang.String, java.lang.String)
      */
-    public Object selectFromList(Object[] list, String title,
-            String instructions) {
+    public Object selectFromList(Object[] list, String title, String instructions) {
         throw new UnsupportedOperationException();
     }
 
@@ -397,22 +383,27 @@ public class InboxQueueWorker extends Worker implements I_GetWorkFromQueue,
      * @see org.dwfa.bpa.process.I_Work#createHeadlessWorkspace(net.jini.id.UUID,
      *      org.dwfa.bpa.gui.TerminologyConfiguration)
      */
-    public I_Workspace createHeadlessWorkspace(UUID workspace_id) throws WorkspaceActiveException,
-            HeadlessException {
+    public I_Workspace createHeadlessWorkspace(UUID workspace_id) throws WorkspaceActiveException, HeadlessException {
         throw new UnsupportedOperationException();
     }
-    public I_Workspace createWorkspace(UUID arg0, String arg1, I_ManageUserTransactions arg2, File menuDir) throws WorkspaceActiveException, Exception {
-        throw new UnsupportedOperationException();
-    }
-	public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2, FilenameFilter arg3) throws IOException, ClassNotFoundException {
-        throw new UnsupportedOperationException();
-	}
 
-	public void writeObjToFilesystem(Frame arg0, String arg1, String arg2, String arg3, Object arg4) throws IOException {
+    public I_Workspace createWorkspace(UUID arg0, String arg1, I_ManageUserTransactions arg2, File menuDir)
+            throws WorkspaceActiveException, Exception {
         throw new UnsupportedOperationException();
-	}
-	public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException, PrivilegedActionException {
-		throw new UnsupportedOperationException();
-	}
+    }
+
+    public Object getObjFromFilesystem(Frame arg0, String arg1, String arg2, FilenameFilter arg3) throws IOException,
+            ClassNotFoundException {
+        throw new UnsupportedOperationException();
+    }
+
+    public void writeObjToFilesystem(Frame arg0, String arg1, String arg2, String arg3, Object arg4) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException,
+            PrivilegedActionException {
+        throw new UnsupportedOperationException();
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import org.dwfa.bpa.process.I_RecordExecution;
 
 /**
  * @author kec
- *
+ * 
  */
 public class ExecutionRecord implements I_RecordExecution {
     /**
@@ -51,8 +51,7 @@ public class ExecutionRecord implements I_RecordExecution {
         out.writeObject(condition);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             this.date = (Date) in.readObject();
@@ -73,8 +72,7 @@ public class ExecutionRecord implements I_RecordExecution {
      * @param workerDescription
      * @param condition
      */
-    public ExecutionRecord(Date date, int taskId, UUID workerId,
-            String workerDescription, Condition condition) {
+    public ExecutionRecord(Date date, int taskId, UUID workerId, String workerDescription, Condition condition) {
         super();
         if (workerId == null) {
             throw new IllegalArgumentException("workerID cannot be null");
@@ -162,8 +160,7 @@ public class ExecutionRecord implements I_RecordExecution {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return date + " taskId: " + taskId + ": " + condition + "; "
-            + workerDescription + " (" + workerId + ")";
+        return date + " taskId: " + taskId + ": " + condition + "; " + workerDescription + " (" + workerId + ")";
     }
 
     /**

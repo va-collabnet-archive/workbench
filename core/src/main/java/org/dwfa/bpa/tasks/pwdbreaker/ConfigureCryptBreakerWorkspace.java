@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,13 +37,11 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.bpa.util.ComponentFrame;
 
-
 /**
  * @author kec
- *  
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/grid/pwdbreaker", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/grid/pwdbreaker", type = BeanType.TASK_BEAN) })
 public class ConfigureCryptBreakerWorkspace extends AbstractTask {
 
     public static UUID WORKSPACE_ID = UUID.fromString("f6013206-04e6-4bad-bb19-3733dba84b0b");
@@ -56,25 +54,23 @@ public class ConfigureCryptBreakerWorkspace extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-
     /**
      * 
      */
     public ConfigureCryptBreakerWorkspace() {
         super();
     }
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(ConfigureCryptBreakerWorkspace.dataVersion);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
         } else {
-         throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
-        
 
     }
 
@@ -89,23 +85,21 @@ public class ConfigureCryptBreakerWorkspace extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             if (worker.isWorkspaceActive(WORKSPACE_ID) == false) {
-                I_Workspace ws = worker.createWorkspace(WORKSPACE_ID,
-                        "Password Breaker Workspace", null);
+                I_Workspace ws = worker.createWorkspace(WORKSPACE_ID, "Password Breaker Workspace", null);
                 FieldInputPanel fip = new FieldInputPanel(INPUT, ws);
                 fip.setGridx(0);
                 fip.setGridheight(4);
                 fip.setTitle(INPUT);
                 fip.setName(INPUT);
-                String[] labels = new String[] { "Salt:", "Word:", "Tries per task:", "High mark:", "Low mark:"};
-                String[] defaults = new String[] { "js", "duke", "10000", "20", "10"};
+                String[] labels = new String[] { "Salt:", "Word:", "Tries per task:", "High mark:", "Low mark:" };
+                String[] defaults = new String[] { "js", "duke", "10000", "20", "10" };
                 fip.setFields(1, labels, defaults);
                 fip.setCompleteLabel("execute");
                 ws.addGridBagPanel(fip);
-                
+
                 ws.setStatusMessage("<HTML><font color='blue'>Welcome to the password breaker workspace...");
 
                 /**/
@@ -117,7 +111,7 @@ public class ConfigureCryptBreakerWorkspace extends AbstractTask {
                 instruction.setGridy(0);
                 instruction.setGridheight(4);
                 instruction.setGridwidth(2);
-                
+
                 StringBuffer buff = new StringBuffer();
                 buff.append("<html><h1><font color='blue'>Parallel Algorithm Execution on a Distributed Grid</font></h1>");
                 buff.append("This process demonstrates that workflow process can utilize a distributed computing grid");
@@ -131,7 +125,7 @@ public class ConfigureCryptBreakerWorkspace extends AbstractTask {
                 buff.append("<p>The master task controls the size and number of generic tasks placed on the grid to minimize the communications overhead ");
                 buff.append(" associated with parallel execution, and to prevent the JavaSpace from being overwhelmed by generic tasks. In this example, ");
                 buff.append(" the master task uses the following user-specified input parameters: ");
-                
+
                 buff.append("<dl><dt><b>Tries per task</b><dd><i>A paramater that controls the size (number of computations) of each generic task.</i>");
                 buff.append("<dt><b>High mark</b><dd><i>The maximum number of generic tasks to write to the JavaSpace.</i>");
                 buff.append("<dt><b>Low mark</b><dd><i>The point at which more tasks should be added to the JavaSpace. ");
@@ -149,12 +143,12 @@ public class ConfigureCryptBreakerWorkspace extends AbstractTask {
                 buff.append("<p>When you have input the desired parameters, press the \"complete\" button on the \"Input parameters\" window to initiate the ");
                 buff.append(" grid computation. Progress (and eventually the results) of the computation will be displayed in this window. ");
                 buff.append("");
-                
+
                 instruction.setInstruction(buff.toString());
-                
+
                 ws.addGridBagPanel(instruction);
-                ws.setWorkspaceBounds(0, 0, ComponentFrame.getDefaultFrameSize().width, ComponentFrame.getDefaultFrameSize().height);
-                
+                ws.setWorkspaceBounds(0, 0, ComponentFrame.getDefaultFrameSize().width,
+                    ComponentFrame.getDefaultFrameSize().height);
 
             }
             I_Workspace ws = worker.getWorkspace(WORKSPACE_ID);
@@ -166,21 +160,19 @@ public class ConfigureCryptBreakerWorkspace extends AbstractTask {
         }
     }
 
-
-
-
-
-
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        //Nothing to do
-        
+        // Nothing to do
+
     }
+
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
      */
     public int[] getDataContainerIds() {
-        return new int[] {  };
-    }}
+        return new int[] {};
+    }
+}

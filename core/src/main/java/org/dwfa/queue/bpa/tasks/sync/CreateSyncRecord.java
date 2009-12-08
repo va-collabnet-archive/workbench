@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,13 +48,13 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/sync", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/sync", type = BeanType.TASK_BEAN) })
 public class CreateSyncRecord extends AbstractTask {
 
     /**
-     * @author kec<p>
-     * Creates an entry 
+     * @author kec
+     *         <p>
+     *         Creates an entry
      */
     private static final long serialVersionUID = 1L;
 
@@ -67,8 +67,7 @@ public class CreateSyncRecord extends AbstractTask {
         out.writeObject(localPropName);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             localPropName = (String) in.readObject();
@@ -89,8 +88,7 @@ public class CreateSyncRecord extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         return Condition.CONTINUE;
     }
 
@@ -98,15 +96,13 @@ public class CreateSyncRecord extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
             ServiceID serviceID = null;
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] { new TermEntry(QueueType.Concept.SYNCHRONIZATION_QUEUE.getUids()) };
-            ServiceTemplate template = new ServiceTemplate(serviceID,
-                    serviceTypes, attrSetTemplates);
+            ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
             ServiceItem service = worker.lookup(template, filter);
             ServiceID syncQueueServiceID = service.serviceID;
@@ -114,15 +110,12 @@ public class CreateSyncRecord extends AbstractTask {
 
             String origin = q.getNodeInboxAddress();
             EntryID entryID = new EntryID(UUID.randomUUID());
-            QueueEntryData qed = new QueueEntryData(origin, syncQueueServiceID,
-                    process.getProcessID(), entryID);
+            QueueEntryData qed = new QueueEntryData(origin, syncQueueServiceID, process.getProcessID(), entryID);
 
-            PropertyDescriptor[] localDescriptors = process
-                    .getAllPropertiesBeanInfo().getPropertyDescriptors();
+            PropertyDescriptor[] localDescriptors = process.getAllPropertiesBeanInfo().getPropertyDescriptors();
             PropertyDescriptorWithTarget localDescriptor = null;
             for (PropertyDescriptor d : localDescriptors) {
-                if (PropertyDescriptorWithTarget.class.isAssignableFrom(d
-                        .getClass())) {
+                if (PropertyDescriptorWithTarget.class.isAssignableFrom(d.getClass())) {
                     PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
                     if (dwt.getLabel().equals(this.localPropName)) {
                         localDescriptor = dwt;
@@ -130,18 +123,14 @@ public class CreateSyncRecord extends AbstractTask {
                     }
                 }
             }
-            PropertyEditor editor = localDescriptor
-                    .createPropertyEditor(localDescriptor.getTarget());
-            editor.addPropertyChangeListener(new EditorGlueForWorker(editor,
-                    localDescriptor.getWriteMethod(), localDescriptor
-                            .getTarget(), worker));
+            PropertyEditor editor = localDescriptor.createPropertyEditor(localDescriptor.getTarget());
+            editor.addPropertyChangeListener(new EditorGlueForWorker(editor, localDescriptor.getWriteMethod(),
+                localDescriptor.getTarget(), worker));
             editor.setValue(qed);
 
             worker.getLogger().info(
-                    worker.getWorkerDesc()
-                            + " Created QueueEntryData for syncronization: "
-                            + process.getName() + " (" + process.getProcessID()
-                            + ")");
+                worker.getWorkerDesc() + " Created QueueEntryData for syncronization: " + process.getName() + " ("
+                    + process.getProcessID() + ")");
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }

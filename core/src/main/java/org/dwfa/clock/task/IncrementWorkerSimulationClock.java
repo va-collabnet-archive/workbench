@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,19 +30,22 @@ import org.dwfa.clock.I_KeepIncrementalTime;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+
 /**
- * Execution of this task increments the worker's clock by the standard increment
- * defined with the workers simulation clock was set by the Set Worker Simulation 
- * Clock task. 
+ * Execution of this task increments the worker's clock by the standard
+ * increment
+ * defined with the workers simulation clock was set by the Set Worker
+ * Simulation
+ * Clock task.
  * 
- * Execution of this task has no effect on the Master Simulation Clock. 
+ * Execution of this task has no effect on the Master Simulation Clock.
+ * 
  * @author kec
- *
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/jehri tasks/clock", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/jehri tasks/clock", type = BeanType.TASK_BEAN) })
 public class IncrementWorkerSimulationClock extends AbstractTask {
-    
+
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
@@ -51,8 +54,7 @@ public class IncrementWorkerSimulationClock extends AbstractTask {
         out.writeInt(dataVersion);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
         } else {
@@ -62,28 +64,28 @@ public class IncrementWorkerSimulationClock extends AbstractTask {
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public final Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
-    	try {
-        	I_KeepIncrementalTime workerClock = (I_KeepIncrementalTime) worker.getTimer();
-			workerClock.increment();
-	        return Condition.CONTINUE;
-		} catch (RemoteException e) {
-			throw new TaskFailedException(e);
-		}
+    public final Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_KeepIncrementalTime workerClock = (I_KeepIncrementalTime) worker.getTimer();
+            workerClock.increment();
+            return Condition.CONTINUE;
+        } catch (RemoteException e) {
+            throw new TaskFailedException(e);
+        }
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public final void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
-        // Nothing to do. 
+    public final void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do.
 
     }
-    
+
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */

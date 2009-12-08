@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,7 @@ import org.dwfa.bpa.process.I_QueueProcesses;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class QueueSelectorPanel extends JPanel {
     /**
@@ -57,8 +57,7 @@ public class QueueSelectorPanel extends JPanel {
          * @param queueName
          * @param id
          */
-        public QueueAdaptor(I_QueueProcesses queue, String queueName,
-                ServiceID id) {
+        public QueueAdaptor(I_QueueProcesses queue, String queueName, ServiceID id) {
             super();
             this.queue = queue;
             this.queueName = queueName;
@@ -70,16 +69,14 @@ public class QueueSelectorPanel extends JPanel {
         }
     }
 
-    private JButton selectButton =
-            new JButton("<html><font color='#006400'>select");
+    private JButton selectButton = new JButton("<html><font color='#006400'>select");
 
     private JLabel statusMessage = new JLabel();
 
     private JTable queueTable;
     QueueTableModel model;
 
-    public QueueSelectorPanel(I_QueueProcesses queue) throws RemoteException,
-            InterruptedException, IOException {
+    public QueueSelectorPanel(I_QueueProcesses queue) throws RemoteException, InterruptedException, IOException {
         super(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -112,7 +109,7 @@ public class QueueSelectorPanel extends JPanel {
         c.gridx = 5;
         panel.add(execute, c);
         c.gridx = 4;
-        //panel.add(cancel, c);
+        // panel.add(cancel, c);
         c.gridx = 3;
         c.weightx = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -123,17 +120,17 @@ public class QueueSelectorPanel extends JPanel {
         c.fill = GridBagConstraints.NONE;
         panel.add(new JLabel("   "), c);
         c.gridx = 1;
-        //ButtonGroup group = new ButtonGroup();
-        //JRadioButton taskButton = new JRadioButton("task");
-        //taskButton.setSelected(true);
-        //taskButton.addActionListener(new ChangeToTaskActionListener());
-        //group.add(taskButton);
+        // ButtonGroup group = new ButtonGroup();
+        // JRadioButton taskButton = new JRadioButton("task");
+        // taskButton.setSelected(true);
+        // taskButton.addActionListener(new ChangeToTaskActionListener());
+        // group.add(taskButton);
         panel.add(new JPanel(), c);
         c.gridx = 0;
-        //JRadioButton dataButton = new JRadioButton("data");
-        //dataButton.setSelected(false);
-        //group.add(dataButton);
-        //dataButton.addActionListener(new ChangeToDataActionListener());
+        // JRadioButton dataButton = new JRadioButton("data");
+        // dataButton.setSelected(false);
+        // group.add(dataButton);
+        // dataButton.addActionListener(new ChangeToDataActionListener());
         panel.add(new JPanel(), c);
 
         return panel;

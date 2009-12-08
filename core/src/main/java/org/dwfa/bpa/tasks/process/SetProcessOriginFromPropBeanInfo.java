@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,15 +32,11 @@ public class SetProcessOriginFromPropBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor newOriginProp =
-                    new PropertyDescriptor("newOriginProp",
-                        SetProcessOriginFromProp.class);
+            PropertyDescriptor newOriginProp = new PropertyDescriptor("newOriginProp", SetProcessOriginFromProp.class);
             newOriginProp.setBound(true);
             newOriginProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            newOriginProp
-                .setDisplayName("<html><font color='green'>new origin prop:");
-            newOriginProp
-                .setShortDescription("Name of the property containing the new origin for the process. ");
+            newOriginProp.setDisplayName("<html><font color='green'>new origin prop:");
+            newOriginProp.setShortDescription("Name of the property containing the new origin for the process. ");
 
             PropertyDescriptor rv[] = { newOriginProp };
             return rv;
@@ -54,8 +50,7 @@ public class SetProcessOriginFromPropBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetProcessOriginFromProp.class);
-        bd
-            .setDisplayName("<html><font color='blue'>Set Origin<br>From Property");
+        bd.setDisplayName("<html><font color='blue'>Set Origin<br>From Property");
         return bd;
     }
 

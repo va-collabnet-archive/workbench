@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -88,8 +88,7 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
                 Clipboard clipboard = getClipboard(c);
                 String name = (String) getValue(Action.NAME);
                 if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Doing transfer action: " + name
-                            + " with transfer handler: " + th);
+                    logger.fine("Doing transfer action: " + name + " with transfer handler: " + th);
                 }
 
                 Transferable trans = null;
@@ -98,16 +97,15 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
                 try {
                     if ((clipboard != null) && (th != null) && (name != null)) {
                         if ("cut".equals(name)) {
-                            th.exportToClipboard(c, clipboard,
-                                    DnDConstants.ACTION_MOVE);
+                            th.exportToClipboard(c, clipboard, DnDConstants.ACTION_MOVE);
                         } else if ("copy".equals(name)) {
-                            th.exportToClipboard(c, clipboard,
-                                    DnDConstants.ACTION_COPY);
+                            th.exportToClipboard(c, clipboard, DnDConstants.ACTION_COPY);
                         } else if ("paste".equals(name)) {
                             trans = clipboard.getContents(null);
                         }
                     } else {
-                        logger.log(Level.WARNING, "clipboard, th, or name is null: " + clipboard + " " + th + " " + name);
+                        logger.log(Level.WARNING, "clipboard, th, or name is null: " + clipboard + " " + th + " "
+                            + name);
                     }
                 } catch (IllegalStateException ise) {
                     logger.log(Level.SEVERE, ise.getMessage(), ise);
@@ -126,15 +124,12 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
          * Returns the clipboard to use for cut/copy/paste.
          */
         private Clipboard getClipboard(JComponent c) {
-        	return Toolkit.getDefaultToolkit().getSystemClipboard();
+            return Toolkit.getDefaultToolkit().getSystemClipboard();
         }
 
     }
-    
 
-    
-    static Logger logger = Logger.getLogger(DnDropTextLabel.class
-            .getName());
+    static Logger logger = Logger.getLogger(DnDropTextLabel.class.getName());
 
     private DragSource dragSource;
 
@@ -148,24 +143,20 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
 
     private int acceptableActions = DnDConstants.ACTION_COPY;
 
-
     private Border originalBorder;
 
     private Border highlightBorder;
 
     private DragGestureRecognizer recognizer;
 
-    
-
-        
     private class FocusListenerForThis implements FocusListener {
 
         public void focusGained(FocusEvent e) {
-           if (logger.isLoggable(Level.FINE)) {
-               logger.fine("focus gained for label: " + DnDropTextLabel.this.getText());
-           }
-           DnDropTextLabel.this.setBackground(UIManager.getColor("Tree.selectionBackground"));
-           DnDropTextLabel.this.setOpaque(true);
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("focus gained for label: " + DnDropTextLabel.this.getText());
+            }
+            DnDropTextLabel.this.setBackground(UIManager.getColor("Tree.selectionBackground"));
+            DnDropTextLabel.this.setOpaque(true);
         }
 
         public void focusLost(FocusEvent e) {
@@ -175,9 +166,9 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
             DnDropTextLabel.this.setBackground(Color.WHITE);
             DnDropTextLabel.this.setOpaque(false);
         }
-        
+
     }
-    
+
     private class DragMouseListener implements MouseListener {
         public void mousePressed(MouseEvent e) {
         }
@@ -200,9 +191,8 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
         private I_DoDragAndDrop dragSource;
 
         private String prefix;
-        
+
         private boolean dragging = false;
-        
 
         /**
          * @param dragSource
@@ -219,8 +209,7 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
          */
         public void dragEnter(DragSourceDragEvent ev) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Source " + this.prefix + " DragEnter: "
-                        + ev.toString());
+                logger.fine("Source " + this.prefix + " DragEnter: " + ev.toString());
             }
             this.dragging = true;
             this.dragSource.highlightForDrag(true);
@@ -231,8 +220,7 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
          */
         public void dragOver(DragSourceDragEvent ev) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Source " + this.prefix + " dragOver: "
-                        + ev.toString());
+                logger.fine("Source " + this.prefix + " dragOver: " + ev.toString());
             }
             this.dragging = true;
 
@@ -243,9 +231,8 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
          */
         public void dropActionChanged(DragSourceDragEvent ev) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Source " + this.prefix + " dropActionChanged: "
-                        + ev.toString());
-            }            
+                logger.fine("Source " + this.prefix + " dropActionChanged: " + ev.toString());
+            }
         }
 
         /**
@@ -253,12 +240,11 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
          */
         public void dragExit(DragSourceEvent ev) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Source " + this.prefix + " dragExit: "
-                        + ev.toString());
+                logger.fine("Source " + this.prefix + " dragExit: " + ev.toString());
             }
             this.dragging = false;
             this.dragSource.highlightForDrag(false);
-            
+
         }
 
         /**
@@ -266,8 +252,7 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
          */
         public void dragDropEnd(DragSourceDropEvent ev) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Source " + this.prefix + " dragDropEnd: "
-                        + ev.toString());
+                logger.fine("Source " + this.prefix + " dragDropEnd: " + ev.toString());
             }
             this.dragging = false;
             this.dragSource.highlightForDrag(false);
@@ -284,7 +269,6 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
             return dragging;
         }
     }
-    
 
     /**
      * 
@@ -294,50 +278,45 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
     public DnDropTextLabel() throws ClassNotFoundException {
         super("<html><color='red'>Drag Property Here");
         String prefix = "tl";
-         this.dragSource = DragSource.getDefaultDragSource();
+        this.dragSource = DragSource.getDefaultDragSource();
         this.sourceListener = new SourceListener(this, prefix);
-        this.gestureListener = new BpaGestureListener(this,
-                this.sourceListener);
+        this.gestureListener = new BpaGestureListener(this, this.sourceListener);
 
-        recognizer = this.dragSource.createDefaultDragGestureRecognizer(this,
-                DnDConstants.ACTION_COPY, this.gestureListener);
+        recognizer = this.dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
+            this.gestureListener);
 
         this.originalBorder = this.getBorder();
         this.highlightForDrop(false);
 
         this.dtListener = new BpaTargetListener(this, prefix);
-        this.dropTarget = new DropTarget(this,
-                this.acceptableActions, this.dtListener, true);
+        this.dropTarget = new DropTarget(this, this.acceptableActions, this.dtListener, true);
 
         addMouseListener(new DragMouseListener());
         this.setEnabled(true);
         this.setFocusable(true);
         this.addFocusListener(new FocusListenerForThis());
         this.setBackground(Color.WHITE);
-        
+
         InputMap imap = this.getInputMap();
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-        		 TransferHandler.getCutAction().getValue(Action.NAME));
+            TransferHandler.getCutAction().getValue(Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-                 TransferHandler.getCopyAction().getValue(Action.NAME));
+            TransferHandler.getCopyAction().getValue(Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-                 TransferHandler.getPasteAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK),
-       		 TransferHandler.getCutAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK),
-                TransferHandler.getCopyAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK),
-                TransferHandler.getPasteAction().getValue(Action.NAME));
+            TransferHandler.getPasteAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK), TransferHandler.getCutAction().getValue(
+            Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK), TransferHandler.getCopyAction().getValue(
+            Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK), TransferHandler.getPasteAction().getValue(
+            Action.NAME));
 
         ActionMap map = this.getActionMap();
-        map.put("cut",
-                new TransferAction("cut"));
-        map.put("copy",
-                new TransferAction("copy"));
-        map.put("paste",
-                new TransferAction("paste"));
+        map.put("cut", new TransferAction("cut"));
+        map.put("copy", new TransferAction("copy"));
+        map.put("paste", new TransferAction("paste"));
         this.setTransferHandler(new TransferHandler("text"));
-        
+
     }
 
     /**
@@ -367,10 +346,9 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
             double oversizeFactor = Math.ceil(p.width / 110);
             p.width = 110;
             p.height = (int) (p.height * oversizeFactor);
-         }
+        }
         return p;
     }
-
 
     /**
      * @see org.dwfa.bpa.dnd.I_SupportDragAndDrop#getAcceptableActions()
@@ -394,14 +372,12 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
      */
     public void highlightForDrag(boolean highlight) {
         if (highlight) {
-            this.highlightBorder = BorderFactory.createCompoundBorder(
-                    this.originalBorder, BorderFactory.createLineBorder(
-                            Color.RED, 2));
+            this.highlightBorder = BorderFactory.createCompoundBorder(this.originalBorder,
+                BorderFactory.createLineBorder(Color.RED, 2));
             super.setBorder(this.highlightBorder);
         } else {
-            this.highlightBorder = BorderFactory.createCompoundBorder(
-                    this.originalBorder, BorderFactory.createEmptyBorder(2, 2,
-                            2, 2));
+            this.highlightBorder = BorderFactory.createCompoundBorder(this.originalBorder,
+                BorderFactory.createEmptyBorder(2, 2, 2, 2));
             super.setBorder(this.highlightBorder);
         }
     }
@@ -411,16 +387,15 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
      */
     public void highlightForDrop(boolean highlight) {
         if (highlight) {
-            this.highlightBorder = BorderFactory.createCompoundBorder(
-                    this.originalBorder, BorderFactory.createLineBorder(
-                            Color.GREEN, 2));
+            this.highlightBorder = BorderFactory.createCompoundBorder(this.originalBorder,
+                BorderFactory.createLineBorder(Color.GREEN, 2));
             super.setBorder(this.highlightBorder);
         } else {
-            this.highlightBorder = BorderFactory.createCompoundBorder(
-                        this.originalBorder, BorderFactory.createEmptyBorder(2,2,2,2));
-            
+            this.highlightBorder = BorderFactory.createCompoundBorder(this.originalBorder,
+                BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
             super.setBorder(this.highlightBorder);
-            
+
         }
 
     }
@@ -429,8 +404,8 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
      * @see org.dwfa.bpa.dnd.I_SupportDragAndDrop#propertyChange(java.beans.PropertyChangeEvent)
      */
     public void setBorder(Border b) {
-            this.originalBorder = b;
-            this.highlightForDrop(false);
+        this.originalBorder = b;
+        this.highlightForDrop(false);
     }
 
     /**
@@ -472,7 +447,7 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
     }
 
     public DataFlavor[] getImportDataFlavors() {
-        return new DataFlavor[] {DataFlavor.stringFlavor};
+        return new DataFlavor[] { DataFlavor.stringFlavor };
     }
 
     public JComponent getJComponent() {
@@ -495,7 +470,7 @@ public class DnDropTextLabel extends JLabel implements I_DoDragAndDrop, ActionLi
         if (logger.isLoggable(Level.FINE)) {
             logger.fine(e.toString());
         }
-        
+
     }
 
 }

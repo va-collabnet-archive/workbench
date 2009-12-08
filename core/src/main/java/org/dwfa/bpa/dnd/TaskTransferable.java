@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,10 +26,9 @@ import java.util.Set;
 
 import org.dwfa.bpa.process.I_DefineTask;
 
-
 public class TaskTransferable implements Transferable {
     @SuppressWarnings("unused")
-	private static boolean initialized = initStaticFields();
+    private static boolean initialized = initStaticFields();
     private I_DefineTask task;
 
     private static DataFlavor stringFlavor;
@@ -56,25 +55,21 @@ public class TaskTransferable implements Transferable {
         return serialTaskFlavor;
     }
 
-    public TaskTransferable(I_DefineTask task)
-            throws ClassNotFoundException {
+    public TaskTransferable(I_DefineTask task) throws ClassNotFoundException {
         this.task = task;
-     }
+    }
 
     public static DataFlavor[] getImportFlavors() {
-        return new DataFlavor[] {
-                TaskTransferable.localTaskFlavor,
-                TaskTransferable.serialTaskFlavor };
+        return new DataFlavor[] { TaskTransferable.localTaskFlavor, TaskTransferable.serialTaskFlavor };
 
     }
 
     public static DataFlavor[] getExportFlavors() {
-        return new DataFlavor[] {
-                TaskTransferable.localTaskFlavor,
-                TaskTransferable.serialTaskFlavor,
-                TaskTransferable.stringFlavor };
+        return new DataFlavor[] { TaskTransferable.localTaskFlavor, TaskTransferable.serialTaskFlavor,
+                                 TaskTransferable.stringFlavor };
 
     }
+
     /**
      * @param flavor
      * @param supportedFlavors
@@ -82,11 +77,9 @@ public class TaskTransferable implements Transferable {
      */
     public static boolean isFlavorSupported(DataFlavor flavor, DataFlavor[] supportedFlavors) {
         for (int i = 0; i < supportedFlavors.length; i++) {
-            if (supportedFlavors[i].getPrimaryType()
-                    .equals(flavor.getPrimaryType())
-                    && supportedFlavors[i].getSubType().equals(flavor.getSubType())
-                    && flavor.getRepresentationClass().isAssignableFrom(
-                            supportedFlavors[i].getRepresentationClass())) {
+            if (supportedFlavors[i].getPrimaryType().equals(flavor.getPrimaryType())
+                && supportedFlavors[i].getSubType().equals(flavor.getSubType())
+                && flavor.getRepresentationClass().isAssignableFrom(supportedFlavors[i].getRepresentationClass())) {
                 return true;
             }
         }
@@ -100,25 +93,19 @@ public class TaskTransferable implements Transferable {
         if (exportFlavors == null) {
             TaskTransferable.exportFlavors = new HashSet<DataFlavor>();
             TaskTransferable.importFlavors = new HashSet<DataFlavor>();
-            serialTaskFlavor = new DataFlavor(
-                    TaskInputStream.class, "Serial I_DefineTask");
+            serialTaskFlavor = new DataFlavor(TaskInputStream.class, "Serial I_DefineTask");
 
             try {
-                String mimeType = DataFlavor.javaJVMLocalObjectMimeType
-                        + ";class=" + I_DefineTask.class.getName();
+                String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + I_DefineTask.class.getName();
                 localTaskFlavor = new DataFlavor(mimeType);
             } catch (ClassNotFoundException cnfe) {
                 cnfe.printStackTrace();
             }
             stringFlavor = DataFlavor.stringFlavor;
-            TaskTransferable.importFlavors
-                    .add(localTaskFlavor);
-            TaskTransferable.importFlavors
-                    .add(serialTaskFlavor);
-            TaskTransferable.exportFlavors
-                    .add(localTaskFlavor);
-            TaskTransferable.exportFlavors
-                    .add(serialTaskFlavor);
+            TaskTransferable.importFlavors.add(localTaskFlavor);
+            TaskTransferable.importFlavors.add(serialTaskFlavor);
+            TaskTransferable.exportFlavors.add(localTaskFlavor);
+            TaskTransferable.exportFlavors.add(serialTaskFlavor);
             TaskTransferable.exportFlavors.add(stringFlavor);
         }
         return true;
@@ -131,26 +118,24 @@ public class TaskTransferable implements Transferable {
      * @see java.awt.datatransfer.Transferable#getTransferDataFlavors()
      */
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] {
-                TaskTransferable.localTaskFlavor,
-                TaskTransferable.serialTaskFlavor,
-                TaskTransferable.stringFlavor };
-        //return new DataFlavor[] {this.localTaskFlavor};
+        return new DataFlavor[] { TaskTransferable.localTaskFlavor, TaskTransferable.serialTaskFlavor,
+                                 TaskTransferable.stringFlavor };
+        // return new DataFlavor[] {this.localTaskFlavor};
     }
 
     /**
      * @see java.awt.datatransfer.Transferable#isDataFlavorSupported(java.awt.datatransfer.DataFlavor)
      */
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        /*System.out.println("isDataFlavorSupported: " + flavor.getMimeType()
-                + " " + flavor.getHumanPresentableName());*/
+        /*
+         * System.out.println("isDataFlavorSupported: " + flavor.getMimeType()
+         * + " " + flavor.getHumanPresentableName());
+         */
         for (Iterator<DataFlavor> i = exportFlavors.iterator(); i.hasNext();) {
             DataFlavor supportedFlavor = i.next();
-            if (supportedFlavor.getPrimaryType()
-                    .equals(flavor.getPrimaryType())
-                    && supportedFlavor.getSubType().equals(flavor.getSubType())
-                    && flavor.getRepresentationClass().isAssignableFrom(
-                            supportedFlavor.getRepresentationClass())) {
+            if (supportedFlavor.getPrimaryType().equals(flavor.getPrimaryType())
+                && supportedFlavor.getSubType().equals(flavor.getSubType())
+                && flavor.getRepresentationClass().isAssignableFrom(supportedFlavor.getRepresentationClass())) {
                 return true;
             }
         }
@@ -160,10 +145,11 @@ public class TaskTransferable implements Transferable {
     /**
      * @see java.awt.datatransfer.Transferable#getTransferData(java.awt.datatransfer.DataFlavor)
      */
-    public Object getTransferData(DataFlavor flavor)
-            throws UnsupportedFlavorException, IOException {
-        /*System.out.println(" # getTransferData "
-                + flavor.getHumanPresentableName());*/
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+        /*
+         * System.out.println(" # getTransferData "
+         * + flavor.getHumanPresentableName());
+         */
         if (this.isDataFlavorSupported(flavor) == false) {
             throw new UnsupportedFlavorException(flavor);
         }

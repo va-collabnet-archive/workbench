@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,9 +23,9 @@ import net.jini.core.transaction.server.TransactionParticipant;
 import net.jini.security.ProxyPreparer;
 
 /**
- *
+ * 
  * @author Sun Microsystems, Inc.
- *
+ * 
  */
 
 class LocalParticipantHandle implements TransactionConstants {
@@ -49,11 +49,9 @@ class LocalParticipantHandle implements TransactionConstants {
     /**
      * Create a new node that is equivalent to that node
      */
-    LocalParticipantHandle(TransactionParticipant preparedPart, long crashcount)
-            throws RemoteException {
+    LocalParticipantHandle(TransactionParticipant preparedPart, long crashcount) throws RemoteException {
         if (preparedPart == null)
-            throw new NullPointerException(
-                "TransactionParticipant argument cannot be null");
+            throw new NullPointerException("TransactionParticipant argument cannot be null");
         this.preparedPart = preparedPart;
         this.crashcount = crashcount;
         this.prepstate = ACTIVE;
@@ -67,9 +65,8 @@ class LocalParticipantHandle implements TransactionConstants {
         return preparedPart;
     }
 
-    // Only called by service initialization code 
-    void restoreTransientState(ProxyPreparer recoveredListenerPreparer)
-            throws RemoteException {
+    // Only called by service initialization code
+    void restoreTransientState(ProxyPreparer recoveredListenerPreparer) throws RemoteException {
         throw new UnsupportedOperationException();
     }
 
@@ -81,8 +78,7 @@ class LocalParticipantHandle implements TransactionConstants {
         case ABORTED:
             break;
         default:
-            throw new IllegalArgumentException("LocalParticipantHandle: "
-                + "setPrepState: cannot set to "
+            throw new IllegalArgumentException("LocalParticipantHandle: " + "setPrepState: cannot set to "
                 + com.sun.jini.constants.TxnConstants.getName(state));
         }
 
@@ -98,7 +94,7 @@ class LocalParticipantHandle implements TransactionConstants {
     }
 
     /**
-     * Return the <code>hashCode</code> of the 
+     * Return the <code>hashCode</code> of the
      * embedded <code>TransactionParticipant</code>.
      */
     public int hashCode() {

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,11 +35,9 @@ import org.dwfa.bpa.gui.TargetAndProcessForEditor;
 import org.dwfa.bpa.gui.TaskIdPanel;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 
-public class ProcessTaskIdEditor implements PropertyEditor, I_OnlyWantOneLine,
-        PropertyChangeListener {
+public class ProcessTaskIdEditor implements PropertyEditor, I_OnlyWantOneLine, PropertyChangeListener {
 
-    private static Logger logger = Logger.getLogger(ProcessTaskIdEditor.class
-            .getName());
+    private static Logger logger = Logger.getLogger(ProcessTaskIdEditor.class.getName());
 
     TaskIdPanel idPanel;
 
@@ -54,6 +52,7 @@ public class ProcessTaskIdEditor implements PropertyEditor, I_OnlyWantOneLine,
         this.idPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         this.idPanel.addPropertyChangeListener("id", this);
     }
+
     /**
      * @return true or false
      * @see java.beans.PropertyEditor#getValue()
@@ -148,8 +147,6 @@ public class ProcessTaskIdEditor implements PropertyEditor, I_OnlyWantOneLine,
         this.firePropertyChange();
     }
 
-
-
     /**
      * Register a listener for the PropertyChange event. The class will fire a
      * PropertyChange value whenever the value is updated.
@@ -157,8 +154,7 @@ public class ProcessTaskIdEditor implements PropertyEditor, I_OnlyWantOneLine,
      * @param listener
      *            An object to be invoked when a PropertyChange event is fired.
      */
-    public synchronized void addPropertyChangeListener(
-            PropertyChangeListener listener) {
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
         if (listeners == null) {
             listeners = new java.util.Vector<PropertyChangeListener>();
         }
@@ -171,8 +167,7 @@ public class ProcessTaskIdEditor implements PropertyEditor, I_OnlyWantOneLine,
      * @param listener
      *            The PropertyChange listener to be removed.
      */
-    public synchronized void removePropertyChangeListener(
-            PropertyChangeListener listener) {
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
         if (listeners == null) {
             return;
         }
@@ -193,7 +188,7 @@ public class ProcessTaskIdEditor implements PropertyEditor, I_OnlyWantOneLine,
         // Tell our listeners that "everything" has changed.
         PropertyChangeEvent evt = new PropertyChangeEvent(this.idPanel, "value", null, null);
 
-        for (PropertyChangeListener l: targets) {
+        for (PropertyChangeListener l : targets) {
             l.propertyChange(evt);
         }
     }
@@ -201,7 +196,7 @@ public class ProcessTaskIdEditor implements PropertyEditor, I_OnlyWantOneLine,
     private java.util.Vector<PropertyChangeListener> listeners;
 
     public void setValue(Object value) {
-        this.setValue((Integer)value);
+        this.setValue((Integer) value);
     }
 
 }

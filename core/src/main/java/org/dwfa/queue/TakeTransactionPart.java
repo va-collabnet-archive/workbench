@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,10 +31,9 @@ import net.jini.core.transaction.server.TransactionManager;
 import org.dwfa.bpa.process.I_DescribeObject;
 import org.dwfa.jini.I_TransactionPart;
 
-
 /**
  * @author kec
- *
+ * 
  */
 public class TakeTransactionPart<T extends I_DescribeObject> implements I_TransactionPart {
 
@@ -44,7 +43,6 @@ public class TakeTransactionPart<T extends I_DescribeObject> implements I_Transa
     private File processFile;
     private ActionListener listener;
     private ObjectServerCore server;
-    
 
     /**
      * @param objDesc
@@ -52,8 +50,7 @@ public class TakeTransactionPart<T extends I_DescribeObject> implements I_Transa
      * @param uncommittedTakes2
      * @param processFile
      */
-    public TakeTransactionPart(T objDesc,
-            SortedSet<T> processesInfoSortedSet, Set<T> uncommittedTakes,
+    public TakeTransactionPart(T objDesc, SortedSet<T> processesInfoSortedSet, Set<T> uncommittedTakes,
             File processFile, ActionListener listener, ObjectServerCore server) {
         super();
         this.processDesc = objDesc;
@@ -64,9 +61,9 @@ public class TakeTransactionPart<T extends I_DescribeObject> implements I_Transa
         this.server = server;
     }
 
-
     /**
-     * @see org.dwfa.jini.I_TransactionPart#commit(net.jini.core.transaction.server.TransactionManager, long, java.util.Date)
+     * @see org.dwfa.jini.I_TransactionPart#commit(net.jini.core.transaction.server.TransactionManager,
+     *      long, java.util.Date)
      */
     public void commit(TransactionManager mgr, long id, Date commitDate) {
         processFile.delete();
@@ -74,7 +71,8 @@ public class TakeTransactionPart<T extends I_DescribeObject> implements I_Transa
     }
 
     /**
-     * @see org.dwfa.jini.I_TransactionPart#abort(net.jini.core.transaction.server.TransactionManager, long)
+     * @see org.dwfa.jini.I_TransactionPart#abort(net.jini.core.transaction.server.TransactionManager,
+     *      long)
      */
     public void abort(TransactionManager mgr, long id) {
         this.processesInfoSortedSet.add(processDesc);

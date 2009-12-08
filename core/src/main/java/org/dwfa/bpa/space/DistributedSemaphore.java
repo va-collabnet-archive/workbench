@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ import net.jini.space.JavaSpace;
 
 /**
  * @author kec
- * See page 77 of JavaSpaces Principles, Patterns, and Practice
+ *         See page 77 of JavaSpaces Principles, Patterns, and Practice
  */
 public class DistributedSemaphore {
     private JavaSpace space;
@@ -47,7 +47,7 @@ public class DistributedSemaphore {
         this.space = space;
         this.resource = resource;
     }
-    
+
     public List<Lease> create(int num) throws TransactionException, IOException {
         List<Lease> leaseList = new ArrayList<Lease>();
         for (int i = 0; i < num; i++) {
@@ -56,12 +56,12 @@ public class DistributedSemaphore {
         }
         return leaseList;
     }
-    
+
     public void down() throws RemoteException, UnusableEntryException, TransactionException, InterruptedException {
         Entry template = new SemaphoreEntry(resource);
         space.take(template, null, Long.MAX_VALUE);
     }
-    
+
     public Lease up() throws RemoteException, UnusableEntryException, TransactionException, InterruptedException {
         Entry semaphoreEntry = new SemaphoreEntry(resource);
         return space.write(semaphoreEntry, null, Long.MAX_VALUE);

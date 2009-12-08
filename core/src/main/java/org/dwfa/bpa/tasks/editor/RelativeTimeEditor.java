@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,10 +50,9 @@ import org.dwfa.bpa.gui.TaskPanel;
  */
 /**
  * @author kec
- *
+ * 
  */
-public class RelativeTimeEditor extends PropertyEditorSupport implements
-        ChangeListener {
+public class RelativeTimeEditor extends PropertyEditorSupport implements ChangeListener {
 
     private class EditorComponent extends JPanel {
 
@@ -103,13 +102,11 @@ public class RelativeTimeEditor extends PropertyEditorSupport implements
 
     private static int MIN_IN_MIN = 1;
 
-    private static String[] unitValues =
-            new String[] { "minute(s)", "hour(s)", "day(s)", "week(s)",
-                          "month(s)", "year(s)" };
+    private static String[] unitValues = new String[] { "minute(s)", "hour(s)", "day(s)", "week(s)", "month(s)",
+                                                       "year(s)" };
 
-    private static int[] unitWeights =
-            new int[] { MIN_IN_MIN, MIN_IN_HOUR, MIN_IN_DAY, MIN_IN_WEEK,
-                       MIN_IN_MONTH, MIN_IN_YEAR };
+    private static int[] unitWeights = new int[] { MIN_IN_MIN, MIN_IN_HOUR, MIN_IN_DAY, MIN_IN_WEEK, MIN_IN_MONTH,
+                                                  MIN_IN_YEAR };
 
     /**
      *  
@@ -144,27 +141,24 @@ public class RelativeTimeEditor extends PropertyEditorSupport implements
                 break;
             }
         }
-        Integer relativeTimeInMins =
-                new Integer(value.intValue() * unitWeights[unitIndex]);
+        Integer relativeTimeInMins = new Integer(value.intValue() * unitWeights[unitIndex]);
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Spinner value: " + value + "\nunit: " + unit
-                + "\nunit index: " + unitIndex + "\nunit weight: "
-                + unitWeights[unitIndex]
-                + "\nset deadline (relative time in min): "
+            logger.fine("Spinner value: " + value + "\nunit: " + unit + "\nunit index: " + unitIndex
+                + "\nunit weight: " + unitWeights[unitIndex] + "\nset deadline (relative time in min): "
                 + relativeTimeInMins);
         }
         return relativeTimeInMins;
     }
 
     /**
-     * Must be an <code>Integer</code> representing relative time in minutes. 
+     * Must be an <code>Integer</code> representing relative time in minutes.
+     * 
      * @see java.beans.PropertyEditor#setValue(java.lang.Object)
      */
     public void setValue(Object value) {
         Integer relativeTimeInMins = (Integer) value;
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("deadline (relative time in min): "
-                + relativeTimeInMins);
+            logger.fine("deadline (relative time in min): " + relativeTimeInMins);
         }
         int unitIndex = -1;
         if (relativeTimeInMins.intValue() == 0) {
@@ -177,12 +171,11 @@ public class RelativeTimeEditor extends PropertyEditorSupport implements
                 }
             }
         }
-        this.numberSpinner =
-                new SpinnerNumberModel(relativeTimeInMins.intValue()
-                    / unitWeights[unitIndex], //initial value
-                    0, //min
-                    99, //max
-                    1); //step
+        this.numberSpinner = new SpinnerNumberModel(relativeTimeInMins.intValue() / unitWeights[unitIndex], // initial
+                                                                                                            // value
+            0, // min
+            99, // max
+            1); // step
         this.numberSpinner.addChangeListener(this);
         this.unitSpinner = new SpinnerListModel(unitValues);
         this.unitSpinner.setValue(unitValues[unitIndex]);
@@ -199,8 +192,10 @@ public class RelativeTimeEditor extends PropertyEditorSupport implements
     }
 
     /**
-     * Calls the paint method on this swing component. 
-     * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics, java.awt.Rectangle)
+     * Calls the paint method on this swing component.
+     * 
+     * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics,
+     *      java.awt.Rectangle)
      */
     public void paintValue(Graphics gfx, Rectangle box) {
         this.editor.setBounds(box);
@@ -229,7 +224,8 @@ public class RelativeTimeEditor extends PropertyEditorSupport implements
     }
 
     /**
-     * Returns null since this editor provides a custom GUI component. 
+     * Returns null since this editor provides a custom GUI component.
+     * 
      * @see java.beans.PropertyEditor#getTags()
      */
     public String[] getTags() {
@@ -237,7 +233,8 @@ public class RelativeTimeEditor extends PropertyEditorSupport implements
     }
 
     /**
-     * Returns swing component to edit the Relative Time property. 
+     * Returns swing component to edit the Relative Time property.
+     * 
      * @see java.beans.PropertyEditor#getCustomEditor()
      */
     public Component getCustomEditor() {
@@ -245,7 +242,8 @@ public class RelativeTimeEditor extends PropertyEditorSupport implements
     }
 
     /**
-     * Returns true since this editor provides a custom GUI component. 
+     * Returns true since this editor provides a custom GUI component.
+     * 
      * @see java.beans.PropertyEditor#supportsCustomEditor()
      */
     public boolean supportsCustomEditor() {

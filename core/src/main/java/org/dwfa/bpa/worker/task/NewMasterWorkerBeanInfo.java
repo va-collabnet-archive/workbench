@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,32 +29,23 @@ public class NewMasterWorkerBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor workerPropName =
-                    new PropertyDescriptor("workerPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor workerPropName = new PropertyDescriptor("workerPropName",
+                getBeanDescriptor().getBeanClass());
             workerPropName.setBound(true);
-            workerPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            workerPropName
-                .setDisplayName("<html><font color='green'>worker prop:");
-            workerPropName
-                .setShortDescription("The property to hold the new worker once it is created.");
+            workerPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            workerPropName.setDisplayName("<html><font color='green'>worker prop:");
+            workerPropName.setShortDescription("The property to hold the new worker once it is created.");
 
-            PropertyDescriptor startupDirectory =
-                    new PropertyDescriptor("startupDirectory",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor startupDirectory = new PropertyDescriptor("startupDirectory",
+                getBeanDescriptor().getBeanClass());
             startupDirectory.setBound(true);
-            startupDirectory
-                .setPropertyEditorClass(JTextFieldEditorOneLine.class);
+            startupDirectory.setPropertyEditorClass(JTextFieldEditorOneLine.class);
 
-            PropertyDescriptor workerName =
-                    new PropertyDescriptor("workerName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor workerName = new PropertyDescriptor("workerName", getBeanDescriptor().getBeanClass());
             workerName.setBound(true);
             workerName.setPropertyEditorClass(JTextFieldEditorOneLine.class);
 
-            PropertyDescriptor rv[] =
-                    { workerPropName, startupDirectory, workerName };
+            PropertyDescriptor rv[] = { workerPropName, startupDirectory, workerName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -66,8 +57,7 @@ public class NewMasterWorkerBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(NewMasterWorker.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>New Master Worker");
+        bd.setDisplayName("<html><font color='green'><center>New Master Worker");
         return bd;
     }
 }

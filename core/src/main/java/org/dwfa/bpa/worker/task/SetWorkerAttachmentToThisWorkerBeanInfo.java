@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,16 +28,12 @@ public class SetWorkerAttachmentToThisWorkerBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor workerPropName =
-                    new PropertyDescriptor("workerPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor workerPropName = new PropertyDescriptor("workerPropName",
+                getBeanDescriptor().getBeanClass());
             workerPropName.setBound(true);
-            workerPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            workerPropName
-                .setDisplayName("<html><font color='green'>worker prop:");
-            workerPropName
-                .setShortDescription("The property to hold the worker.");
+            workerPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            workerPropName.setDisplayName("<html><font color='green'>worker prop:");
+            workerPropName.setShortDescription("The property to hold the worker.");
             PropertyDescriptor rv[] = { workerPropName };
             return rv;
         } catch (IntrospectionException e) {
@@ -50,8 +46,7 @@ public class SetWorkerAttachmentToThisWorkerBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(NewMasterWorker.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set Property:<br>Worker Attachment<br>to This Worker");
+        bd.setDisplayName("<html><font color='green'><center>Set Property:<br>Worker Attachment<br>to This Worker");
         return bd;
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,31 +23,31 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Configuration {
-	List<ServiceConfigOption> options;
-	boolean rmiSecure = false;
-	boolean localOnly = false;
-	
-	
-    public Configuration(List<ServiceConfigOption> options, boolean rmiSecure,
-    		boolean localOnly) {
-		super();
-		this.options = options;
-		this.rmiSecure = rmiSecure;
-		this.localOnly = localOnly;
-	}
-    public Configuration(ServiceConfigOption[] options, boolean rmiSecure, boolean localOnly) {
-    	this(Arrays.asList(options), rmiSecure, localOnly);
+    List<ServiceConfigOption> options;
+    boolean rmiSecure = false;
+    boolean localOnly = false;
+
+    public Configuration(List<ServiceConfigOption> options, boolean rmiSecure, boolean localOnly) {
+        super();
+        this.options = options;
+        this.rmiSecure = rmiSecure;
+        this.localOnly = localOnly;
     }
+
+    public Configuration(ServiceConfigOption[] options, boolean rmiSecure, boolean localOnly) {
+        this(Arrays.asList(options), rmiSecure, localOnly);
+    }
+
     public Configuration(ServiceConfigOption[] options, boolean rmiSecure) {
-    	this(Arrays.asList(options), rmiSecure, false);
+        this(Arrays.asList(options), rmiSecure, false);
     }
 
     public Configuration(List<ServiceConfigOption> options, boolean rmiSecure) {
-    	this(options, rmiSecure, false);
+        this(options, rmiSecure, false);
     }
 
-	public void writeToFile(String fileName) throws IOException {
-    	writeToFile(new File(fileName));
+    public void writeToFile(String fileName) throws IOException {
+        writeToFile(new File(fileName));
     }
 
     /**
@@ -67,35 +67,33 @@ public class Configuration {
         buff.append("import com.sun.jini.config.ConfigUtil;\n");
         buff.append("import net.jini.url.httpmd.HttpmdUtil;\n\n");
         buff.append("import org.dwfa.jini.VHelp;\n\n");
-    
+
         buff.append("com.sun.jini.start {\n");
-    
+
         if (localOnly) {
             buff.append("   private static host = \"localhost\";\n");
         } else {
-            buff.append("   private static host = ConfigUtil.getHostAddress();\n");        	
+            buff.append("   private static host = ConfigUtil.getHostAddress();\n");
         }
-        buff.append("   private static jiniPort = org.dwfa.jini.ConfigUtil.getJiniPort();\n");        	
-        buff.append("   private static jiniPortUrlPart = org.dwfa.jini.ConfigUtil.getJiniPortUrlPart();\n");        	
+        buff.append("   private static jiniPort = org.dwfa.jini.ConfigUtil.getJiniPort();\n");
+        buff.append("   private static jiniPortUrlPart = org.dwfa.jini.ConfigUtil.getJiniPortUrlPart();\n");
 
-        
         buff.append('\n');
         buff.append("   private static jskCodebase = ConfigUtil.concat(new String[] { \"http://\", host, jiniPortUrlPart, VHelp.addDlVersion(\"jsk-dl\")});\n");
         buff.append("   private static jskMdURL = ConfigUtil.concat(new String[] { \"httpmd://\", host, jiniPortUrlPart,  VHelp.addDlVersion(\"jsk-dl\"), \";sha=0\"});\n");
         buff.append("   private static jskCodebaseMd = HttpmdUtil.computeDigestCodebase(\"lib-dl\", jskMdURL);\n\n");
-        for (ServiceConfigOption option: options) {
+        for (ServiceConfigOption option : options) {
             if (option.isEnabled()) {
-             	   String[] setupStrings = option.getSetupStrings(rmiSecure);
-            	   for (int j = 0; j < setupStrings.length; j++) {
-                       buff.append("   ");
-                       buff.append(setupStrings[j]);
-                       buff.append("\n");
-            	   }
+                String[] setupStrings = option.getSetupStrings(rmiSecure);
+                for (int j = 0; j < setupStrings.length; j++) {
+                    buff.append("   ");
+                    buff.append(setupStrings[j]);
+                    buff.append("\n");
+                }
                 buff.append("\n");
             }
         }
-    
-        
+
         buff.append("   static serviceDescriptors = new ServiceDescriptor[] {\n");
         for (int i = 0; i < options.size(); i++) {
             if (options.get(i).isEnabled()) {
@@ -107,22 +105,22 @@ public class Configuration {
                 buff.append("\n");
             }
         }
-    
+
         buff.append("   };\n");
         buff.append("}\n");
-        return buff.toString();   
+        return buff.toString();
     }
 
-	public boolean isRmiSecure() {
-		return rmiSecure;
-	}
+    public boolean isRmiSecure() {
+        return rmiSecure;
+    }
 
-	public void setRmiSecure(boolean rmiSecure) {
-		this.rmiSecure = rmiSecure;
-	}
+    public void setRmiSecure(boolean rmiSecure) {
+        this.rmiSecure = rmiSecure;
+    }
 
-	public List<ServiceConfigOption> getOptions() {
-		return options;
-	}
+    public List<ServiceConfigOption> getOptions() {
+        return options;
+    }
 
 }

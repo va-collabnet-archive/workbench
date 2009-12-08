@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -106,8 +106,7 @@ public class ConceptLabel extends JEditorPane {
         }
 
         private Transferable makeTableTransferable(JTable table) {
-            return FixedTerminologyTransferable
-                    .get(table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()));
+            return FixedTerminologyTransferable.get(table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()));
         }
 
         public void dragGestureRecognized(DragGestureEvent dge) {
@@ -201,17 +200,17 @@ public class ConceptLabel extends JEditorPane {
 
         InputMap imap = this.getInputMap();
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-                 TransferHandler.getCutAction().getValue(Action.NAME));
+            TransferHandler.getCutAction().getValue(Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-                 TransferHandler.getCopyAction().getValue(Action.NAME));
+            TransferHandler.getCopyAction().getValue(Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-                 TransferHandler.getPasteAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK),
-          		 TransferHandler.getCutAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK),
-                   TransferHandler.getCopyAction().getValue(Action.NAME));
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK),
-                   TransferHandler.getPasteAction().getValue(Action.NAME));
+            TransferHandler.getPasteAction().getValue(Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK), TransferHandler.getCutAction().getValue(
+            Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK), TransferHandler.getCopyAction().getValue(
+            Action.NAME));
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK), TransferHandler.getPasteAction().getValue(
+            Action.NAME));
 
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "DEL");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DEL");
@@ -254,7 +253,7 @@ public class ConceptLabel extends JEditorPane {
             setText(nullLabel);
         } else {
             setText("<html>"
-                    + concept.getDescription(ArchitectonicAuxiliary.getLocalFullySpecifiedDescPrefList()).getText());
+                + concept.getDescription(ArchitectonicAuxiliary.getLocalFullySpecifiedDescPrefList()).getText());
         }
         firePropertyChange("concept", old, this.concept);
     }

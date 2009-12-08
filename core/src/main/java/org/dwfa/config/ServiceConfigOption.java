@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,11 +63,9 @@ public class ServiceConfigOption {
      * @param classPath
      * @param args
      */
-    public ServiceConfigOption(String name, String policy, String securePolicy,
-            String propName, String desc, boolean enabledByDefault,
-            String codebase, String jarDir, String classPath, String mainClass,
-            String[] args, String[] secureArgs, boolean optional,
-            boolean alertIfSelected, boolean alertIfDeselected,
+    public ServiceConfigOption(String name, String policy, String securePolicy, String propName, String desc,
+            boolean enabledByDefault, String codebase, String jarDir, String classPath, String mainClass,
+            String[] args, String[] secureArgs, boolean optional, boolean alertIfSelected, boolean alertIfDeselected,
             String alertString) {
         super();
         this.name = name;
@@ -87,8 +85,7 @@ public class ServiceConfigOption {
         this.alertIfDeselected = alertIfDeselected;
         this.alertString = alertString;
         Properties sysProps = System.getProperties();
-        sysProps.setProperty(this.propName, new Boolean(enabledByDefault)
-            .toString());
+        sysProps.setProperty(this.propName, new Boolean(enabledByDefault).toString());
 
     }
 
@@ -104,82 +101,81 @@ public class ServiceConfigOption {
         String localPolicy;
         String[] localArgs;
         if (secure) {
-                localPolicy = this.securePolicy;
-                localArgs = this.secureArgs;
+            localPolicy = this.securePolicy;
+            localArgs = this.secureArgs;
         } else {
-                localPolicy = this.policy;
-                localArgs = this.args;
+            localPolicy = this.policy;
+            localArgs = this.args;
         }
         if (this.codebase != null && this.codebase.length() > 4) {
-                if (secure) {
-                    StringBuffer urlBuff = new StringBuffer();
-                    urlBuff.append("private static "+ this.getPrefix() + "_URL = ");
-                    urlBuff.append("ConfigUtil.concat(new String[] {\"httpmd://\", host, ");
-                    urlBuff.append(this.codebase);
-                    urlBuff.append(";sha=0\"});");
-                    stringList.add(urlBuff.toString());
-                    StringBuffer mdBuff = new StringBuffer();
-                    mdBuff.append("private static "+ this.getPrefix() + "_MD = ");
-                    mdBuff.append("HttpmdUtil.computeDigestCodebase(\"");
-                    mdBuff.append(this.jarDir);
-                    mdBuff.append("\", " + this.getPrefix() + "_URL);");
-                    stringList.add(mdBuff.toString());
-                    StringBuffer codebaseBuff = new StringBuffer();
-                    codebaseBuff.append("private static "+ this.getPrefix() + "_Codebase = ");
-                    codebaseBuff.append("ConfigUtil.concat(new String[] {");
-                    codebaseBuff.append(this.getPrefix() + "_MD , \" \", jskCodebaseMd});");
-                    stringList.add(codebaseBuff.toString());
-                    
-                    
-                } else {
-                    StringBuffer urlBuff = new StringBuffer();
-                    urlBuff.append("private static "+ this.getPrefix() + "_URL = ");
-                    urlBuff.append("ConfigUtil.concat(new String[] {\"http://\", host, ");
-                    urlBuff.append(this.codebase);
-                    urlBuff.append("\"});");
-                    stringList.add(urlBuff.toString());
-                    StringBuffer codebaseBuff = new StringBuffer();
-                    codebaseBuff.append("private static "+ this.getPrefix() + "_Codebase = ");
-                    codebaseBuff.append("ConfigUtil.concat(new String[] {");
-                    codebaseBuff.append(this.getPrefix() + "_URL , \" \", jskCodebase});");
-                    stringList.add(codebaseBuff.toString());    
-                }
+            if (secure) {
+                StringBuffer urlBuff = new StringBuffer();
+                urlBuff.append("private static " + this.getPrefix() + "_URL = ");
+                urlBuff.append("ConfigUtil.concat(new String[] {\"httpmd://\", host, ");
+                urlBuff.append(this.codebase);
+                urlBuff.append(";sha=0\"});");
+                stringList.add(urlBuff.toString());
+                StringBuffer mdBuff = new StringBuffer();
+                mdBuff.append("private static " + this.getPrefix() + "_MD = ");
+                mdBuff.append("HttpmdUtil.computeDigestCodebase(\"");
+                mdBuff.append(this.jarDir);
+                mdBuff.append("\", " + this.getPrefix() + "_URL);");
+                stringList.add(mdBuff.toString());
+                StringBuffer codebaseBuff = new StringBuffer();
+                codebaseBuff.append("private static " + this.getPrefix() + "_Codebase = ");
+                codebaseBuff.append("ConfigUtil.concat(new String[] {");
+                codebaseBuff.append(this.getPrefix() + "_MD , \" \", jskCodebaseMd});");
+                stringList.add(codebaseBuff.toString());
+
+            } else {
+                StringBuffer urlBuff = new StringBuffer();
+                urlBuff.append("private static " + this.getPrefix() + "_URL = ");
+                urlBuff.append("ConfigUtil.concat(new String[] {\"http://\", host, ");
+                urlBuff.append(this.codebase);
+                urlBuff.append("\"});");
+                stringList.add(urlBuff.toString());
+                StringBuffer codebaseBuff = new StringBuffer();
+                codebaseBuff.append("private static " + this.getPrefix() + "_Codebase = ");
+                codebaseBuff.append("ConfigUtil.concat(new String[] {");
+                codebaseBuff.append(this.getPrefix() + "_URL , \" \", jskCodebase});");
+                stringList.add(codebaseBuff.toString());
+            }
         } else {
-                if (secure) {
-                    stringList.add("private static "+ this.getPrefix() + "_Codebase = \"\";");
-                } else {
-                    stringList.add("private static "+ this.getPrefix() + "_Codebase = \"\";");
-                }
+            if (secure) {
+                stringList.add("private static " + this.getPrefix() + "_Codebase = \"\";");
+            } else {
+                stringList.add("private static " + this.getPrefix() + "_Codebase = \"\";");
+            }
         }
-         stringList.add("private static "+ this.getPrefix() + "_Policy = \"" + localPolicy + "\";");
-        stringList.add("private static "+ this.getPrefix() + "_Classpath = " + this.classPath + ";");
-        stringList.add("private static "+ this.getPrefix() + "_Class = \"" + this.mainClass + "\";");
+        stringList.add("private static " + this.getPrefix() + "_Policy = \"" + localPolicy + "\";");
+        stringList.add("private static " + this.getPrefix() + "_Classpath = " + this.classPath + ";");
+        stringList.add("private static " + this.getPrefix() + "_Class = \"" + this.mainClass + "\";");
         //
         StringBuffer argBuff = new StringBuffer();
         argBuff.append("new String[] { ");
         for (int i = 0; i < localArgs.length; i++) {
-        	if (localArgs[i].equals("jiniPort")) {
+            if (localArgs[i].equals("jiniPort")) {
                 argBuff.append(localArgs[i]);
                 if (i == localArgs.length - 1) {
                     argBuff.append(" ");
                 } else {
                     argBuff.append(", ");
                 }
-        	} else {
+            } else {
                 argBuff.append("\"" + localArgs[i]);
                 if (i == localArgs.length - 1) {
                     argBuff.append("\" ");
                 } else {
                     argBuff.append("\", ");
                 }
-        	}
+            }
         }
         argBuff.append("}");
-        stringList.add("private static "+ this.getPrefix() + "_Args = " + argBuff.toString() + ";");
+        stringList.add("private static " + this.getPrefix() + "_Args = " + argBuff.toString() + ";");
         //
         String[] setupStrings = new String[stringList.size()];
         return (String[]) stringList.toArray(setupStrings);
-        
+
     }
 
     public String getNonActivatableServiceDescriptor() {

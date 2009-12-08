@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,6 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 import net.jini.core.event.RemoteEvent;
@@ -46,33 +45,36 @@ import net.jini.jeri.tcp.TcpServerEndpoint;
 
 /**
  * @author kec
- *
+ * 
  */
 public class RemoteEventListenerBean implements RemoteEventListener {
 
     private Configuration config;
 
     private RemoteEventListener proxy;
-    
+
     private Collection<RemoteEventListener> listeners = new HashSet<RemoteEventListener>();
-	/**
-	 * @throws ConfigurationException
-	 * @throws PrivilegedActionException
-	 * @throws RemoteException
-	 * @throws LoginException
-	 * 
-	 */
-	public RemoteEventListenerBean(Configuration config) throws LoginException, RemoteException, PrivilegedActionException, ConfigurationException {
-		this.config = config;
+
+    /**
+     * @throws ConfigurationException
+     * @throws PrivilegedActionException
+     * @throws RemoteException
+     * @throws LoginException
+     * 
+     */
+    public RemoteEventListenerBean(Configuration config) throws LoginException, RemoteException,
+            PrivilegedActionException, ConfigurationException {
+        this.config = config;
         this.init();
-	}
-    public void addRemoteEventListener(RemoteEventListener remEvtLsnr) {
-     this.listeners.add(remEvtLsnr);   
-    }
-    public void removeRemoteEventListener(RemoteEventListener remEvtLsnr) {
-     this.listeners.remove(remEvtLsnr);   
     }
 
+    public void addRemoteEventListener(RemoteEventListener remEvtLsnr) {
+        this.listeners.add(remEvtLsnr);
+    }
+
+    public void removeRemoteEventListener(RemoteEventListener remEvtLsnr) {
+        this.listeners.remove(remEvtLsnr);
+    }
 
     /** Component name for service starter configuration entries */
     static final String START_PACKAGE = "com.sun.jini.start";
@@ -80,36 +82,32 @@ public class RemoteEventListenerBean implements RemoteEventListener {
     private static/* final */Logger logger = null;
     static {
         try {
-            logger = Logger.getLogger(START_PACKAGE + ".service.starter",
-                    START_PACKAGE + ".resources.service");
+            logger = Logger.getLogger(START_PACKAGE + ".service.starter", START_PACKAGE + ".resources.service");
         } catch (Exception e) {
             logger = Logger.getLogger(START_PACKAGE + ".service.starter");
             if (e instanceof MissingResourceException) {
                 logger.info("Could not load logger's ResourceBundle: " + e);
             } else if (e instanceof IllegalArgumentException) {
-                logger.info("Logger exists and uses another resource bundle: "
-                        + e);
+                logger.info("Logger exists and uses another resource bundle: " + e);
             }
             logger.info("Defaulting to existing logger");
         }
     }
 
     @SuppressWarnings("unchecked")
-   private void init() throws LoginException, PrivilegedActionException, RemoteException, ConfigurationException  {
-        LoginContext loginContext = (LoginContext) config
-                .getEntry(this.getClass().getName(), "loginContext",
-                        LoginContext.class, null);
+    private void init() throws LoginException, PrivilegedActionException, RemoteException, ConfigurationException {
+        LoginContext loginContext = (LoginContext) config.getEntry(this.getClass().getName(), "loginContext",
+            LoginContext.class, null);
         if (loginContext == null) {
             initAsSubject();
         } else {
             loginContext.login();
-            Subject.doAsPrivileged(loginContext.getSubject(),
-                    new PrivilegedExceptionAction() {
-                        public Object run() throws Exception {
-                            initAsSubject();
-                            return null;
-                        }
-                    }, null);
+            Subject.doAsPrivileged(loginContext.getSubject(), new PrivilegedExceptionAction() {
+                public Object run() throws Exception {
+                    initAsSubject();
+                    return null;
+                }
+            }, null);
         }
 
     }
@@ -117,10 +115,11 @@ public class RemoteEventListenerBean implements RemoteEventListener {
     /**
      * Initializes the server, assuming that the appropriate subject is in
      * effect.
+     * 
      * @throws ConfigurationException
      * @throws RemoteException
      */
-    protected void initAsSubject() throws RemoteException, ConfigurationException  {
+    protected void initAsSubject() throws RemoteException, ConfigurationException {
         /* Export the server */
         Exporter exporter = getExporter();
         Remote backend = exporter.export(this);
@@ -138,29 +137,26 @@ public class RemoteEventListenerBean implements RemoteEventListener {
      * @throws RemoteException
      *             if a remote communication problem occurs
      */
-    protected Exporter getExporter() throws ConfigurationException,
-            RemoteException {
-        return (Exporter) config
-                .getEntry(this.getClass().getName(), "exporter",
-                        Exporter.class, new BasicJeriExporter(TcpServerEndpoint
-                                .getInstance(0), new BasicILFactory()));
+    protected Exporter getExporter() throws ConfigurationException, RemoteException {
+        return (Exporter) config.getEntry(this.getClass().getName(), "exporter", Exporter.class, new BasicJeriExporter(
+            TcpServerEndpoint.getInstance(0), new BasicILFactory()));
     }
-	/**
-	 * @see net.jini.core.event.RemoteEventListener#notify(net.jini.core.event.RemoteEvent)
-	 */
-	public void notify(RemoteEvent theEvent) throws UnknownEventException,
-			RemoteException {
-		Iterator<RemoteEventListener> listenerItr = this.listeners.iterator();
+
+    /**
+     * @see net.jini.core.event.RemoteEventListener#notify(net.jini.core.event.RemoteEvent)
+     */
+    public void notify(RemoteEvent theEvent) throws UnknownEventException, RemoteException {
+        Iterator<RemoteEventListener> listenerItr = this.listeners.iterator();
         while (listenerItr.hasNext()) {
             RemoteEventListener remEvtLsnr = listenerItr.next();
             remEvtLsnr.notify(theEvent);
         }
-	}
+    }
 
-	/**
-	 * @return Returns the proxy.
-	 */
-	public RemoteEventListener getProxy() {
-		return proxy;
-	}
+    /**
+     * @return Returns the proxy.
+     */
+    public RemoteEventListener getProxy() {
+        return proxy;
+    }
 }

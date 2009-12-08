@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,14 +58,12 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
      * if the server proxy does.
      */
     static QueueProxy create(I_QueueProcesses serverProxy) {
-        return (serverProxy instanceof RemoteMethodControl) ? new ConstrainableProxy(
-                serverProxy)
-                : new QueueProxy(serverProxy);
+        return (serverProxy instanceof RemoteMethodControl) ? new ConstrainableProxy(serverProxy) : new QueueProxy(
+            serverProxy);
     }
 
     public boolean equals(Object o) {
-        return getClass() == o.getClass()
-                && getServerProxy().equals(((QueueProxy) o).getServerProxy());
+        return getClass() == o.getClass() && getServerProxy().equals(((QueueProxy) o).getServerProxy());
     }
 
     public int hashCode() {
@@ -73,8 +71,7 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
     }
 
     /** A constrainable implementation of the smart proxy. */
-    private static final class ConstrainableProxy extends QueueProxy implements
-            RemoteMethodControl {
+    private static final class ConstrainableProxy extends QueueProxy implements RemoteMethodControl {
         /**
          * 
          */
@@ -92,8 +89,7 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
 
         public RemoteMethodControl setConstraints(MethodConstraints mc) {
             return new ConstrainableProxy(
-                    (I_QueueProcesses) ((RemoteMethodControl) getServerProxy())
-                            .setConstraints(mc));
+                (I_QueueProcesses) ((RemoteMethodControl) getServerProxy()).setConstraints(mc));
         }
 
         /*
@@ -121,8 +117,7 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
          * TrustEquivalence.
          */
         Verifier(I_QueueProcesses serverProxy) {
-            if (serverProxy instanceof RemoteMethodControl
-                    && serverProxy instanceof TrustEquivalence) {
+            if (serverProxy instanceof RemoteMethodControl && serverProxy instanceof TrustEquivalence) {
                 this.serverProxy = (RemoteMethodControl) serverProxy;
             } else {
                 throw new UnsupportedOperationException();
@@ -130,19 +125,16 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
         }
 
         /** Implement TrustVerifier */
-        public boolean isTrustedObject(Object obj, TrustVerifier.Context ctx)
-                throws RemoteException {
+        public boolean isTrustedObject(Object obj, TrustVerifier.Context ctx) throws RemoteException {
 
             if (obj == null || ctx == null) {
                 throw new NullPointerException();
             } else if (!(obj instanceof ConstrainableProxy)) {
                 return false;
             }
-            RemoteMethodControl otherServerProxy = (RemoteMethodControl) ((ConstrainableProxy) obj)
-                    .getServerProxy();
+            RemoteMethodControl otherServerProxy = (RemoteMethodControl) ((ConstrainableProxy) obj).getServerProxy();
             MethodConstraints mc = otherServerProxy.getConstraints();
-            TrustEquivalence trusted = (TrustEquivalence) serverProxy
-                    .setConstraints(mc);
+            TrustEquivalence trusted = (TrustEquivalence) serverProxy.setConstraints(mc);
             return trusted.checkTrustEquivalence(otherServerProxy);
         }
     }
@@ -168,8 +160,8 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
      * @throws RemoteException
      * @throws IOException
      */
-    public Collection<I_DescribeBusinessProcess> getProcessMetaData(
-            I_SelectProcesses selector) throws RemoteException, IOException {
+    public Collection<I_DescribeBusinessProcess> getProcessMetaData(I_SelectProcesses selector) throws RemoteException,
+            IOException {
         return backend.getProcessMetaData(selector);
     }
 
@@ -178,10 +170,10 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
      * @param t
      * @return
      * @throws RemoteException
-     * @throws NoMatchingEntryException 
+     * @throws NoMatchingEntryException
      */
-    public I_EncodeBusinessProcess read(EntryID entryID, Transaction t)
-            throws RemoteException, IOException, ClassNotFoundException, NoMatchingEntryException {
+    public I_EncodeBusinessProcess read(EntryID entryID, Transaction t) throws RemoteException, IOException,
+            ClassNotFoundException, NoMatchingEntryException {
         return backend.read(entryID, t);
     }
 
@@ -193,10 +185,9 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
      * @throws IOException
      * @throws ClassNotFoundException
      * @throws TransactionException
-     * @throws NoMatchingEntryException 
+     * @throws NoMatchingEntryException
      */
-    public I_EncodeBusinessProcess take(I_SelectProcesses selector,
-            Transaction t) throws RemoteException, IOException,
+    public I_EncodeBusinessProcess take(I_SelectProcesses selector, Transaction t) throws RemoteException, IOException,
             ClassNotFoundException, TransactionException, NoMatchingEntryException {
         return backend.take(selector, t);
     }
@@ -209,11 +200,10 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
      * @throws IOException
      * @throws ClassNotFoundException
      * @throws TransactionException
-     * @throws NoMatchingEntryException 
+     * @throws NoMatchingEntryException
      */
-    public I_EncodeBusinessProcess take(EntryID entryID, Transaction t)
-            throws RemoteException, IOException, ClassNotFoundException,
-            TransactionException, NoMatchingEntryException {
+    public I_EncodeBusinessProcess take(EntryID entryID, Transaction t) throws RemoteException, IOException,
+            ClassNotFoundException, TransactionException, NoMatchingEntryException {
         return backend.take(entryID, t);
     }
 
@@ -224,14 +214,13 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
      * @throws IOException
      * @throws TransactionException
      */
-    public EntryID write(I_EncodeBusinessProcess process, Transaction t)
-            throws RemoteException, IOException, TransactionException {
+    public EntryID write(I_EncodeBusinessProcess process, Transaction t) throws RemoteException, IOException,
+            TransactionException {
         return backend.write(process, t);
     }
 
-    public void write(I_EncodeBusinessProcess process, EntryID entryID,
-            Transaction t) throws RemoteException, IOException,
-            TransactionException {
+    public void write(I_EncodeBusinessProcess process, EntryID entryID, Transaction t) throws RemoteException,
+            IOException, TransactionException {
         backend.write(process, entryID, t);
     }
 
@@ -244,10 +233,8 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
      * @throws ClassNotFoundException
      * @throws TransactionException
      */
-    public EntryID writeThenTake(I_EncodeBusinessProcess process,
-            Transaction writeTran, Transaction takeTran)
-            throws RemoteException, IOException, ClassNotFoundException,
-            TransactionException {
+    public EntryID writeThenTake(I_EncodeBusinessProcess process, Transaction writeTran, Transaction takeTran)
+            throws RemoteException, IOException, ClassNotFoundException, TransactionException {
         return backend.writeThenTake(process, writeTran, takeTran);
     }
 
@@ -255,15 +242,13 @@ public class QueueProxy implements I_QueueProcesses, Serializable {
         return backend.getNodeInboxAddress();
     }
 
-    public I_EncodeBusinessProcess take(ProcessID processID, Transaction t)
-            throws RemoteException, IOException, ClassNotFoundException,
-            TransactionException, NoMatchingEntryException {
+    public I_EncodeBusinessProcess take(ProcessID processID, Transaction t) throws RemoteException, IOException,
+            ClassNotFoundException, TransactionException, NoMatchingEntryException {
         return backend.take(processID, t);
     }
 
-    public void hide(EntryID entryID, Transaction t) throws RemoteException,
-            IOException, ClassNotFoundException, TransactionException,
-            NoMatchingEntryException {
+    public void hide(EntryID entryID, Transaction t) throws RemoteException, IOException, ClassNotFoundException,
+            TransactionException, NoMatchingEntryException {
         backend.hide(entryID, t);
 
     }

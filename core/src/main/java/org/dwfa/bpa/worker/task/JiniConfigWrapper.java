@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,55 +26,46 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 
 class JiniConfigWrapper implements Configuration {
-  
-  private Configuration jiniConfig;
-  private Map<String, Object> entryMap = new TreeMap<String, Object>();
 
-  JiniConfigWrapper(Configuration jiniConfig) {
-    super();
-    this.jiniConfig = jiniConfig;
-  }
+    private Configuration jiniConfig;
+    private Map<String, Object> entryMap = new TreeMap<String, Object>();
 
-  @SuppressWarnings("unchecked")
-  public Object getEntry(String component, String name, Class type)
-      throws ConfigurationException {
-    if (entryMap.containsKey(makeKey(component, name))) {
-      return entryMap.get(makeKey(component, name));
+    JiniConfigWrapper(Configuration jiniConfig) {
+        super();
+        this.jiniConfig = jiniConfig;
     }
-    return jiniConfig.getEntry(component, name, type);
-  }
 
-  private String makeKey(String component, String name) {
-    return component + ": " + name;
-  }
-
-  @SuppressWarnings("unchecked")
-  public Object getEntry(String component,
-      String name,
-      Class type,
-      Object defaultValue)
-      throws ConfigurationException {
-    if (entryMap.containsKey(makeKey(component, name))) {
-      return entryMap.get(makeKey(component, name));
+    @SuppressWarnings("unchecked")
+    public Object getEntry(String component, String name, Class type) throws ConfigurationException {
+        if (entryMap.containsKey(makeKey(component, name))) {
+            return entryMap.get(makeKey(component, name));
+        }
+        return jiniConfig.getEntry(component, name, type);
     }
-    return jiniConfig.getEntry(component, name, type, defaultValue);
-  }
 
-  @SuppressWarnings("unchecked")
-  public Object getEntry(String component,
-      String name,
-      Class type,
-      Object defaultValue,
-      Object data) throws ConfigurationException {
-    if (entryMap.containsKey(makeKey(component, name))) {
-      return entryMap.get(makeKey(component, name));
+    private String makeKey(String component, String name) {
+        return component + ": " + name;
     }
-    return jiniConfig.getEntry(component, name, type, defaultValue, data);
-  }
-  
-  public void addObject(String component,
-      String name,
-      Object value) {
-    entryMap.put(makeKey(component, name), value);
-  }
+
+    @SuppressWarnings("unchecked")
+    public Object getEntry(String component, String name, Class type, Object defaultValue)
+            throws ConfigurationException {
+        if (entryMap.containsKey(makeKey(component, name))) {
+            return entryMap.get(makeKey(component, name));
+        }
+        return jiniConfig.getEntry(component, name, type, defaultValue);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Object getEntry(String component, String name, Class type, Object defaultValue, Object data)
+            throws ConfigurationException {
+        if (entryMap.containsKey(makeKey(component, name))) {
+            return entryMap.get(makeKey(component, name));
+        }
+        return jiniConfig.getEntry(component, name, type, defaultValue, data);
+    }
+
+    public void addObject(String component, String name, Object value) {
+        entryMap.put(makeKey(component, name), value);
+    }
 }

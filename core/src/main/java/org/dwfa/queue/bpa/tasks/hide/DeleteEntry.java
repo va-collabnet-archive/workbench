@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,15 +38,16 @@ import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.queue.bpa.tasks.failsafe.QueueEntryData;
+
 /**
- *  @author kec<p>
-* Delete an entry in a queue. Useful for 
-* allowing a process on one queue to remove another process from a queue.
-*
-*
-*/
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/entry", type = BeanType.TASK_BEAN)})
+ * @author kec
+ *         <p>
+ *         Delete an entry in a queue. Useful for allowing a process on one
+ *         queue to remove another process from a queue.
+ * 
+ * 
+ */
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/entry", type = BeanType.TASK_BEAN) })
 public class DeleteEntry extends AbstractTask {
 
     /**
@@ -57,14 +58,13 @@ public class DeleteEntry extends AbstractTask {
     private static final int dataVersion = 1;
 
     private String queueEntryPropName = "";
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(queueEntryPropName);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             this.queueEntryPropName = (String) in.readObject();
@@ -79,28 +79,23 @@ public class DeleteEntry extends AbstractTask {
     }
 
     @SuppressWarnings("unchecked")
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-        Class<I_QueueProcesses>[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<I_QueueProcesses>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] {};
             QueueEntryData qed = null;
-            for (PropertyDescriptor d : process
-                    .getAllPropertiesBeanInfo().getPropertyDescriptors()) {
-                    PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
-                    if (dwt.getLabel().equals(this.queueEntryPropName)) {
-                        qed = (QueueEntryData)  dwt.getReadMethod().invoke(dwt.getTarget(), new Object[] {});
-                        break;
-                    }
-                
+            for (PropertyDescriptor d : process.getAllPropertiesBeanInfo().getPropertyDescriptors()) {
+                PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
+                if (dwt.getLabel().equals(this.queueEntryPropName)) {
+                    qed = (QueueEntryData) dwt.getReadMethod().invoke(dwt.getTarget(), new Object[] {});
+                    break;
+                }
+
             }
-            
-            
-            ServiceTemplate template = new ServiceTemplate(qed
-                    .getQueueID(), serviceTypes, attrSetTemplates);
+
+            ServiceTemplate template = new ServiceTemplate(qed.getQueueID(), serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
-            ServiceItem service = worker.lookup(template,
-                    filter);
+            ServiceItem service = worker.lookup(template, filter);
             I_QueueProcesses q = (I_QueueProcesses) service.service;
             try {
                 q.take(qed.getEntryID(), worker.getActiveTransaction());
@@ -113,8 +108,7 @@ public class DeleteEntry extends AbstractTask {
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
 
     }
@@ -147,8 +141,4 @@ public class DeleteEntry extends AbstractTask {
         this.queueEntryPropName = queueEntryPropName;
     }
 
-
-
- 
-    
 }

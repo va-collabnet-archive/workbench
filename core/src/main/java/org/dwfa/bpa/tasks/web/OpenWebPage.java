@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,9 +33,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = 
-{ @Spec(directory = "tasks/web tasks", type = BeanType.TASK_BEAN)})
-
+@BeanList(specs = { @Spec(directory = "tasks/web tasks", type = BeanType.TASK_BEAN) })
 public class OpenWebPage extends AbstractTask {
 
     private String webURLStr = "http://www.aceworkspace.net";
@@ -46,47 +44,45 @@ public class OpenWebPage extends AbstractTask {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(webURLStr);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
-        	if (objDataVersion < 2) {
-        		URL webURL = (URL) in.readObject();
-        		webURLStr = webURL.toExternalForm();
-        	} else {
-        		webURLStr = (String) in.readObject();
-        	}
+            if (objDataVersion < 2) {
+                URL webURL = (URL) in.readObject();
+                webURLStr = webURL.toExternalForm();
+            } else {
+                webURLStr = (String) in.readObject();
+            }
         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
+
     public OpenWebPage() throws MalformedURLException {
         super();
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-        	URL url = new URL(webURLStr);
-        	if (url.getProtocol().toLowerCase().equals("file")) {
-        		File f = new File(url.getFile());
-        		if (f.exists() == false) {
-        			f = new File(System.getProperty("user.dir"), url.getFile());
-        			url = f.toURL();
-        		}
-        	}
-        	PlatformWebBrowser.openURL(url);
+            URL url = new URL(webURLStr);
+            if (url.getProtocol().toLowerCase().equals("file")) {
+                File f = new File(url.getFile());
+                if (f.exists() == false) {
+                    f = new File(System.getProperty("user.dir"), url.getFile());
+                    url = f.toURL();
+                }
+            }
+            PlatformWebBrowser.openURL(url);
             return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
     }
 
@@ -95,7 +91,7 @@ public class OpenWebPage extends AbstractTask {
     }
 
     public int[] getDataContainerIds() {
-        return new int[] {  };
+        return new int[] {};
     }
 
     /**
@@ -107,7 +103,7 @@ public class OpenWebPage extends AbstractTask {
 
     /**
      * @param webURL The webURL to set.
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public void setWebURLString(String webURLString) throws MalformedURLException {
         this.webURLStr = webURLString;

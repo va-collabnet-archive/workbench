@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,7 @@ import com.sun.jini.landlord.Landlord;
 
 /**
  * @author kec
- *
+ * 
  */
 public class LandlordProxy implements Serializable, Landlord {
 
@@ -46,29 +46,25 @@ public class LandlordProxy implements Serializable, Landlord {
      */
     private static final long serialVersionUID = 1L;
     Landlord backend;
+
     /**
      * Create a smart proxy, using an implementation that supports constraints
      * if the server proxy does.
      */
     static Landlord create(Landlord backend) {
-        return (backend instanceof RemoteMethodControl) ? new ConstrainableProxy(
-                backend)
-                : new LandlordProxy(backend);
+        return (backend instanceof RemoteMethodControl) ? new ConstrainableProxy(backend) : new LandlordProxy(backend);
     }
-
 
     public boolean equals(Object o) {
-        return getClass() == o.getClass()
-                && backend.equals(((LandlordProxy) o).backend);
-    }
-    public int hashCode() {
-	    return backend.hashCode();
+        return getClass() == o.getClass() && backend.equals(((LandlordProxy) o).backend);
     }
 
+    public int hashCode() {
+        return backend.hashCode();
+    }
 
     /** A constrainable implementation of the smart proxy. */
-    private static final class ConstrainableProxy extends LandlordProxy
-            implements RemoteMethodControl {
+    private static final class ConstrainableProxy extends LandlordProxy implements RemoteMethodControl {
         /**
          * 
          */
@@ -85,9 +81,7 @@ public class LandlordProxy implements Serializable, Landlord {
         }
 
         public RemoteMethodControl setConstraints(MethodConstraints mc) {
-            return new ConstrainableProxy(
-                    (Landlord) ((RemoteMethodControl) backend)
-                            .setConstraints(mc));
+            return new ConstrainableProxy((Landlord) ((RemoteMethodControl) backend).setConstraints(mc));
         }
 
         /*
@@ -95,7 +89,7 @@ public class LandlordProxy implements Serializable, Landlord {
          * ProxyTrustVerifier class to verify the proxy.
          */
         @SuppressWarnings("unused")
-		private ProxyTrustIterator getProxyTrustIterator() {
+        private ProxyTrustIterator getProxyTrustIterator() {
             return new SingletonProxyTrustIterator(backend);
         }
     }
@@ -114,8 +108,7 @@ public class LandlordProxy implements Serializable, Landlord {
          * TrustEquivalence.
          */
         Verifier(Landlord serverProxy) {
-            if (serverProxy instanceof RemoteMethodControl
-                    && serverProxy instanceof TrustEquivalence) {
+            if (serverProxy instanceof RemoteMethodControl && serverProxy instanceof TrustEquivalence) {
                 this.serverProxy = (RemoteMethodControl) serverProxy;
             } else {
                 throw new UnsupportedOperationException();
@@ -123,8 +116,7 @@ public class LandlordProxy implements Serializable, Landlord {
         }
 
         /** Implement TrustVerifier */
-        public boolean isTrustedObject(Object obj, TrustVerifier.Context ctx)
-                throws RemoteException {
+        public boolean isTrustedObject(Object obj, TrustVerifier.Context ctx) throws RemoteException {
             if (obj == null || ctx == null) {
                 throw new NullPointerException();
             } else if (!(obj instanceof ConstrainableProxy)) {
@@ -132,51 +124,47 @@ public class LandlordProxy implements Serializable, Landlord {
             }
             RemoteMethodControl otherServerProxy = (RemoteMethodControl) ((ConstrainableProxy) obj).backend;
             MethodConstraints mc = otherServerProxy.getConstraints();
-            TrustEquivalence trusted = (TrustEquivalence) serverProxy
-                    .setConstraints(mc);
+            TrustEquivalence trusted = (TrustEquivalence) serverProxy.setConstraints(mc);
             return trusted.checkTrustEquivalence(otherServerProxy);
         }
     }
 
+    /**
+     * @param backend
+     */
+    public LandlordProxy(Landlord backend) {
+        super();
+        this.backend = backend;
+    }
 
-	/**
-	 * @param backend
-	 */
-	public LandlordProxy(Landlord backend) {
-		super();
-		this.backend = backend;
-	}
-	/**
-	 * @see com.sun.jini.landlord.Landlord#renew(net.jini.id.Uuid, long)
-	 */
-	public long renew(Uuid cookie, long duration) throws LeaseDeniedException,
-			UnknownLeaseException, RemoteException {
-		return this.backend.renew(cookie, duration);
-	}
+    /**
+     * @see com.sun.jini.landlord.Landlord#renew(net.jini.id.Uuid, long)
+     */
+    public long renew(Uuid cookie, long duration) throws LeaseDeniedException, UnknownLeaseException, RemoteException {
+        return this.backend.renew(cookie, duration);
+    }
 
-	/**
-	 * @see com.sun.jini.landlord.Landlord#cancel(net.jini.id.Uuid)
-	 */
-	public void cancel(Uuid cookie) throws UnknownLeaseException,
-			RemoteException {
-		this.backend.cancel(cookie);
+    /**
+     * @see com.sun.jini.landlord.Landlord#cancel(net.jini.id.Uuid)
+     */
+    public void cancel(Uuid cookie) throws UnknownLeaseException, RemoteException {
+        this.backend.cancel(cookie);
 
-	}
+    }
 
-	/**
-	 * @see com.sun.jini.landlord.Landlord#renewAll(net.jini.id.Uuid[], long[])
-	 */
-	public RenewResults renewAll(Uuid[] cookies, long[] durations)
-			throws RemoteException {
-		return this.backend.renewAll(cookies, durations);
-	}
+    /**
+     * @see com.sun.jini.landlord.Landlord#renewAll(net.jini.id.Uuid[], long[])
+     */
+    public RenewResults renewAll(Uuid[] cookies, long[] durations) throws RemoteException {
+        return this.backend.renewAll(cookies, durations);
+    }
 
-	/**
-	 * @see com.sun.jini.landlord.Landlord#cancelAll(net.jini.id.Uuid[])
-	 */
-	@SuppressWarnings("unchecked")
-	public Map<Uuid, UnknownLeaseException> cancelAll(Uuid[] cookies) throws RemoteException {
-		return this.backend.cancelAll(cookies);
-	}
+    /**
+     * @see com.sun.jini.landlord.Landlord#cancelAll(net.jini.id.Uuid[])
+     */
+    @SuppressWarnings("unchecked")
+    public Map<Uuid, UnknownLeaseException> cancelAll(Uuid[] cookies) throws RemoteException {
+        return this.backend.cancelAll(cookies);
+    }
 
 }

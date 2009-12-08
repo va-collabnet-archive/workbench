@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,8 +51,7 @@ public class BrowserAdaptor extends Browser implements I_InitComponentMenus {
      */
     private static final long serialVersionUID = 1L;
 
-    protected static Logger logger =
-            Logger.getLogger(BrowserAdaptor.class.getName());
+    protected static Logger logger = Logger.getLogger(BrowserAdaptor.class.getName());
 
     protected JMenu fileMenu;
 
@@ -91,16 +90,11 @@ public class BrowserAdaptor extends Browser implements I_InitComponentMenus {
         super(args, lc);
         this.args = args;
         this.lc = lc;
-        logger.info("\n*******************\n\n" + "Starting "
-            + this.getClass().getSimpleName() + " with config file: "
+        logger.info("\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: "
             + Arrays.asList(args) + "\n\n******************\n");
-        Configuration config =
-                ConfigurationProvider.getInstance(args, getClass()
-                    .getClassLoader());
+        Configuration config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
 
-        String title =
-                (String) config.getEntry(this.getClass().getName(),
-                    "frameName", String.class, "Service Browser");
+        String title = (String) config.getEntry(this.getClass().getName(), "frameName", String.class, "Service Browser");
         if (count == 0) {
             this.setTitle(title);
             count++;

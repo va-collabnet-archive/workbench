@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
 /**
  * @author kec
- *
+ * 
  */
 public class SetDestinationBeanInfo extends SimpleBeanInfo {
 
@@ -41,13 +41,11 @@ public class SetDestinationBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor destination =
-                    new PropertyDescriptor("destination", SetDestination.class);
+            PropertyDescriptor destination = new PropertyDescriptor("destination", SetDestination.class);
             destination.setBound(true);
             destination.setPropertyEditorClass(JTextFieldEditor.class);
             destination.setDisplayName("destination");
-            destination
-                .setShortDescription("An electronic address to which this process is to be delivered.");
+            destination.setShortDescription("An electronic address to which this process is to be delivered.");
 
             PropertyDescriptor rv[] = { destination };
             return rv;

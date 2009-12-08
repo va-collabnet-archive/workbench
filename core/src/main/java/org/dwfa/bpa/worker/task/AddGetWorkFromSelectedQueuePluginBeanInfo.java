@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,16 +25,12 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 public class AddGetWorkFromSelectedQueuePluginBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor workerPropName =
-                    new PropertyDescriptor("workerPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor workerPropName = new PropertyDescriptor("workerPropName",
+                getBeanDescriptor().getBeanClass());
             workerPropName.setBound(true);
-            workerPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            workerPropName
-                .setDisplayName("<html><font color='green'>worker prop:");
-            workerPropName
-                .setShortDescription("The property that holds the worker to add the plugin to.");
+            workerPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            workerPropName.setDisplayName("<html><font color='green'>worker prop:");
+            workerPropName.setShortDescription("The property that holds the worker to add the plugin to.");
 
             PropertyDescriptor rv[] = { workerPropName };
             return rv;
@@ -47,10 +43,8 @@ public class AddGetWorkFromSelectedQueuePluginBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(AddGetWorkFromSelectedQueuePlugin.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Add Plugin:<br>I_GetWorkFromQueue<br>(user selected)");
+        BeanDescriptor bd = new BeanDescriptor(AddGetWorkFromSelectedQueuePlugin.class);
+        bd.setDisplayName("<html><font color='green'><center>Add Plugin:<br>I_GetWorkFromQueue<br>(user selected)");
         return bd;
     }
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,20 +35,18 @@ import javax.swing.JOptionPane;
 
 import org.dwfa.bpa.gui.DnDropTextLabel;
 
-public class PropertyNameLabelEditor implements PropertyEditor,
-        PropertyChangeListener {
+public class PropertyNameLabelEditor implements PropertyEditor, PropertyChangeListener {
 
-    private static Logger logger = Logger.getLogger(PropertyNameLabelEditor.class
-            .getName());
+    private static Logger logger = Logger.getLogger(PropertyNameLabelEditor.class.getName());
 
     private JLabel propertyName;
-    
+
     public Class<?> getAcceptableClass() {
         return Object.class;
     }
 
     public PropertyNameLabelEditor(Object obj) throws ClassNotFoundException {
-        //TargetAndProcessForEditor tpfe = (TargetAndProcessForEditor) obj;
+        // TargetAndProcessForEditor tpfe = (TargetAndProcessForEditor) obj;
         this.propertyName = new DnDropTextLabel();
         this.propertyName.setBorder(BorderFactory.createLoweredBevelBorder());
         this.propertyName.addPropertyChangeListener("text", this);
@@ -147,28 +145,26 @@ public class PropertyNameLabelEditor implements PropertyEditor,
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Property changed for PropertyNameLabelEditor: " + evt);
         }
-    	if (defaultText == null) {
-    		try {
-				defaultText = new DnDropTextLabel().getText();
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-    	}
-    	if (isFrozen() && (getValue() != null) && 
-    			((evt.getOldValue() != null) && evt.getOldValue().equals(defaultText) == false)) {
-            logger.info("Cannot change property for embededded process to: " + 
-            		evt.getNewValue() + " from " + evt.getOldValue());
-            JOptionPane.showMessageDialog(propertyName, "Cannot change property for embededded process to: " + 
-            		evt.getNewValue() + " from " + evt.getOldValue());
+        if (defaultText == null) {
+            try {
+                defaultText = new DnDropTextLabel().getText();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (isFrozen() && (getValue() != null)
+            && ((evt.getOldValue() != null) && evt.getOldValue().equals(defaultText) == false)) {
+            logger.info("Cannot change property for embededded process to: " + evt.getNewValue() + " from "
+                + evt.getOldValue());
+            JOptionPane.showMessageDialog(propertyName, "Cannot change property for embededded process to: "
+                + evt.getNewValue() + " from " + evt.getOldValue());
             propertyName.removePropertyChangeListener("text", this);
             propertyName.setText(evt.getOldValue().toString());
             propertyName.addPropertyChangeListener("text", this);
-    		return;
-    	}
+            return;
+        }
         this.firePropertyChange();
     }
-
-
 
     /**
      * Register a listener for the PropertyChange event. The class will fire a
@@ -177,8 +173,7 @@ public class PropertyNameLabelEditor implements PropertyEditor,
      * @param listener
      *            An object to be invoked when a PropertyChange event is fired.
      */
-    public synchronized void addPropertyChangeListener(
-            PropertyChangeListener listener) {
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
         if (listeners == null) {
             listeners = new java.util.Vector<PropertyChangeListener>();
         }
@@ -191,8 +186,7 @@ public class PropertyNameLabelEditor implements PropertyEditor,
      * @param listener
      *            The PropertyChange listener to be removed.
      */
-    public synchronized void removePropertyChangeListener(
-            PropertyChangeListener listener) {
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
         if (listeners == null) {
             return;
         }
@@ -213,26 +207,26 @@ public class PropertyNameLabelEditor implements PropertyEditor,
         // Tell our listeners that "everything" has changed.
         PropertyChangeEvent evt = new PropertyChangeEvent(this.propertyName, "value", null, null);
 
-        for (PropertyChangeListener l: targets) {
+        for (PropertyChangeListener l : targets) {
             l.propertyChange(evt);
         }
     }
 
     private java.util.Vector<PropertyChangeListener> listeners;
 
-     public void setValue(Object value) {
-        this.setValue((String)value);
+    public void setValue(Object value) {
+        this.setValue((String) value);
         this.firePropertyChange();
     }
-    
+
     private boolean frozen;
 
-	public boolean isFrozen() {
-		return frozen;
-	}
+    public boolean isFrozen() {
+        return frozen;
+    }
 
-	public void setFrozen(boolean frozen) {
-		this.frozen = frozen;
-	}
+    public void setFrozen(boolean frozen) {
+        this.frozen = frozen;
+    }
 
 }

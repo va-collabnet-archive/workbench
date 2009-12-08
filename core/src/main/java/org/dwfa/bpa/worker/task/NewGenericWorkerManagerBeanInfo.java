@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,12 +28,10 @@ public class NewGenericWorkerManagerBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor jiniConfigFile =
-                    new PropertyDescriptor("jiniConfigFile",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor jiniConfigFile = new PropertyDescriptor("jiniConfigFile",
+                getBeanDescriptor().getBeanClass());
             jiniConfigFile.setBound(true);
-            jiniConfigFile
-                .setPropertyEditorClass(JTextFieldEditorOneLine.class);
+            jiniConfigFile.setPropertyEditorClass(JTextFieldEditorOneLine.class);
 
             PropertyDescriptor rv[] = { jiniConfigFile };
             return rv;
@@ -47,8 +45,7 @@ public class NewGenericWorkerManagerBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(NewGenericWorkerManager.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>New Generic<br>Worker Manager");
+        bd.setDisplayName("<html><font color='green'><center>New Generic<br>Worker Manager");
         return bd;
     }
 }

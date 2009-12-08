@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,16 +32,12 @@ public class SetProcessSubjectFromPropBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor newSubjectProp =
-                    new PropertyDescriptor("newSubjectProp",
-                        SetProcessSubjectFromProp.class);
+            PropertyDescriptor newSubjectProp = new PropertyDescriptor("newSubjectProp",
+                SetProcessSubjectFromProp.class);
             newSubjectProp.setBound(true);
-            newSubjectProp
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            newSubjectProp
-                .setDisplayName("<html><font color='green'>new subject prop:");
-            newSubjectProp
-                .setShortDescription("Name of the property containing the new subject for the process. ");
+            newSubjectProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            newSubjectProp.setDisplayName("<html><font color='green'>new subject prop:");
+            newSubjectProp.setShortDescription("Name of the property containing the new subject for the process. ");
 
             PropertyDescriptor rv[] = { newSubjectProp };
             return rv;
@@ -55,8 +51,7 @@ public class SetProcessSubjectFromPropBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetProcessSubjectFromProp.class);
-        bd
-            .setDisplayName("<html><font color='blue'>Set Subject<br>From Property");
+        bd.setDisplayName("<html><font color='blue'>Set Subject<br>From Property");
         return bd;
     }
 

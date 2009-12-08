@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,10 +42,9 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * @author kec
- *
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN) })
 public class ToUserSelectedQueueAllGroups extends AbstractTask {
 
     private static final long serialVersionUID = 1;
@@ -53,7 +52,7 @@ public class ToUserSelectedQueueAllGroups extends AbstractTask {
     private static final int dataVersion = 1;
 
     private TermEntry queueType = TermEntry.getQueueType();
-    
+
     private transient I_QueueProcesses q;
 
     /**
@@ -68,27 +67,27 @@ public class ToUserSelectedQueueAllGroups extends AbstractTask {
         this.queueType = elementId;
         this.firePropertyChange("queueType", oldValue, this.queueType);
     }
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.queueType);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-                this.queueType = (TermEntry) in.readObject();
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            this.queueType = (TermEntry) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             ServiceID serviceID = null;
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
@@ -98,13 +97,12 @@ public class ToUserSelectedQueueAllGroups extends AbstractTask {
             } else {
                 attrSetTemplates = new Entry[] { this.queueType };
             }
-            ServiceTemplate template = new ServiceTemplate(serviceID,
-                    serviceTypes,
-                    attrSetTemplates);
-        
+            ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
+
             ServiceItemFilter filter = null;
             ServiceItem[] services = worker.lookupAllGroups(template, 500, filter);
-            ServiceItem service = (ServiceItem) worker.selectFromList(services, "Select queue", "Select the queue you want this process placed in.");
+            ServiceItem service = (ServiceItem) worker.selectFromList(services, "Select queue",
+                "Select the queue you want this process placed in.");
             if (service == null) {
                 throw new TaskFailedException("User did not select a queue...");
             }
@@ -114,19 +112,19 @@ public class ToUserSelectedQueueAllGroups extends AbstractTask {
             throw e;
         } catch (Exception e) {
             throw new TaskFailedException(e);
-        } 
+        }
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             q.write(process, worker.getActiveTransaction());
         } catch (Exception e) {
             throw new TaskFailedException(e);
-        } 
+        }
 
     }
 
@@ -145,5 +143,3 @@ public class ToUserSelectedQueueAllGroups extends AbstractTask {
     }
 
 }
-
-

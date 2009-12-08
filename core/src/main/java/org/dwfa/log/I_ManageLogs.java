@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import net.jini.id.Uuid;
 
 /**
  * @author kec
- *
+ * 
  */
 public interface I_ManageLogs extends Remote {
 
@@ -36,7 +36,6 @@ public interface I_ManageLogs extends Remote {
      * @return
      */
     List<String> getLoggerNames() throws RemoteException;
-
 
     /**
      * @param loggerName
@@ -50,7 +49,7 @@ public interface I_ManageLogs extends Remote {
      * @return
      */
     boolean isLoggable(String loggerName, Level level) throws RemoteException;
-    
+
     public boolean addRemoteHandler(String loggerName, I_PublishLogRecord remoteHandler) throws RemoteException;
 
     public void removeRemoteHandler(String loggerName, Uuid id) throws RemoteException;

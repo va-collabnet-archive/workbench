@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,23 +37,17 @@ public class ToQueueTwoCriterionBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor queueType =
-                    new PropertyDescriptor("queueType",
-                        ToQueueTwoCriterion.class);
+            PropertyDescriptor queueType = new PropertyDescriptor("queueType", ToQueueTwoCriterion.class);
             queueType.setBound(true);
             queueType.setPropertyEditorClass(ConceptLabelEditor.class);
             queueType.setDisplayName("Queue type 1:");
-            queueType
-                .setShortDescription("The first criterion for the type of queue to place this process into.");
+            queueType.setShortDescription("The first criterion for the type of queue to place this process into.");
 
-            PropertyDescriptor queueType2 =
-                    new PropertyDescriptor("queueType2",
-                        ToQueueTwoCriterion.class);
+            PropertyDescriptor queueType2 = new PropertyDescriptor("queueType2", ToQueueTwoCriterion.class);
             queueType2.setBound(true);
             queueType2.setPropertyEditorClass(ConceptLabelEditor.class);
             queueType2.setDisplayName("Queue type 2:");
-            queueType2
-                .setShortDescription("The second criterion for the type of queue to place this process into.");
+            queueType2.setShortDescription("The second criterion for the type of queue to place this process into.");
 
             PropertyDescriptor rv[] = { queueType, queueType2 };
             return rv;
@@ -67,8 +61,7 @@ public class ToQueueTwoCriterionBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ToQueueTwoCriterion.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>To Queue<br>Two Criterion");
+        bd.setDisplayName("<html><font color='green'><center>To Queue<br>Two Criterion");
         return bd;
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,21 +36,22 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 
 /**
- * This task will unmarshal and continue execution of a process that has been attached to the 
- * process that contains this task. The marshaled process must be attached with 
- * the key specified in the <code>failsafeKey</code> field. 
+ * This task will unmarshal and continue execution of a process that has been
+ * attached to the
+ * process that contains this task. The marshaled process must be attached with
+ * the key specified in the <code>failsafeKey</code> field.
  * <p>
- * This task is not typically used in manually constructed processes, but is part of the 
- * process created by the <code>CreateFailsafe</code> task. 
+ * This task is not typically used in manually constructed processes, but is
+ * part of the process created by the <code>CreateFailsafe</code> task.
  * <p>
- * Process execution is acomplished by temporarily substituting a new process stack 
- * for the worker executing this task,  
+ * Process execution is acomplished by temporarily substituting a new process
+ * stack for the worker executing this task,
+ * 
  * @author kec
  * @see CreateFailsafe
- *
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/failsafe", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/failsafe", type = BeanType.TASK_BEAN) })
 public class LaunchFailsafe extends AbstractTask {
     /**
      *  
@@ -79,8 +80,7 @@ public class LaunchFailsafe extends AbstractTask {
         out.writeObject(this.failsafeKey);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             this.failsafeKey = (String) in.readObject();
@@ -94,11 +94,9 @@ public class LaunchFailsafe extends AbstractTask {
         super();
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            MarshalledObject marshalledFailsafe = (MarshalledObject) process
-                    .readAttachement(this.failsafeKey);
+            MarshalledObject marshalledFailsafe = (MarshalledObject) process.readAttachement(this.failsafeKey);
             I_EncodeBusinessProcess failsafe;
             failsafe = (I_EncodeBusinessProcess) marshalledFailsafe.get();
             if (worker.getLogger().isLoggable(Level.INFO)) {
@@ -115,9 +113,8 @@ public class LaunchFailsafe extends AbstractTask {
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
-        //Nothing to do...
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
     }
 

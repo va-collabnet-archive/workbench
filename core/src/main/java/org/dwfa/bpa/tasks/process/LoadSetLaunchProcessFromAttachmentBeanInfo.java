@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,37 +30,28 @@ public class LoadSetLaunchProcessFromAttachmentBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(LoadSetLaunchProcessFromAttachment.class);
-        bd
-            .setDisplayName("<html><center><font color='blue'>Load, Set, Launch<br>Process From Attachment");
+        BeanDescriptor bd = new BeanDescriptor(LoadSetLaunchProcessFromAttachment.class);
+        bd.setDisplayName("<html><center><font color='blue'>Load, Set, Launch<br>Process From Attachment");
         return bd;
     }
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor processPropName =
-                    new PropertyDescriptor("processPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor processPropName = new PropertyDescriptor("processPropName",
+                getBeanDescriptor().getBeanClass());
             processPropName.setBound(true);
-            processPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
+            processPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             processPropName.setDisplayName("process prop");
-            processPropName
-                .setShortDescription("A property containing a process which is loaded, set, then launched.");
+            processPropName.setShortDescription("A property containing a process which is loaded, set, then launched.");
 
-            PropertyDescriptor dataCheckingSuppressed =
-                    new PropertyDescriptor("dataCheckingSuppressed",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor dataCheckingSuppressed = new PropertyDescriptor("dataCheckingSuppressed",
+                getBeanDescriptor().getBeanClass());
             dataCheckingSuppressed.setBound(true);
             dataCheckingSuppressed.setPropertyEditorClass(CheckboxEditor.class);
-            dataCheckingSuppressed
-                .setDisplayName("<html><font color='green'>Suppress data checks:");
-            dataCheckingSuppressed
-                .setShortDescription("Select if data checking are to be suppressed in supporting tasks");
+            dataCheckingSuppressed.setDisplayName("<html><font color='green'>Suppress data checks:");
+            dataCheckingSuppressed.setShortDescription("Select if data checking are to be suppressed in supporting tasks");
 
-            PropertyDescriptor rv[] =
-                    { processPropName, dataCheckingSuppressed };
+            PropertyDescriptor rv[] = { processPropName, dataCheckingSuppressed };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

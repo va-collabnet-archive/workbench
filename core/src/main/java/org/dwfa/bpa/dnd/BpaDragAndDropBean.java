@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,8 +30,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 
-public class BpaDragAndDropBean implements PropertyChangeListener,
-        I_SupportDragAndDrop {
+public class BpaDragAndDropBean implements PropertyChangeListener, I_SupportDragAndDrop {
     private I_DoDragAndDrop dndComponent;
 
     private DragSource dragSource;
@@ -56,21 +55,17 @@ public class BpaDragAndDropBean implements PropertyChangeListener,
      * @param prefix
      * @throws ClassNotFoundException
      */
-    public BpaDragAndDropBean(String prefix, I_DoDragAndDrop dndComponent,
-            boolean allowDrop, boolean allowDrag) throws ClassNotFoundException {
+    public BpaDragAndDropBean(String prefix, I_DoDragAndDrop dndComponent, boolean allowDrop, boolean allowDrag)
+            throws ClassNotFoundException {
         this.dndComponent = dndComponent;
-        this.dndComponent.getJComponent().addPropertyChangeListener("border",
-            this);
+        this.dndComponent.getJComponent().addPropertyChangeListener("border", this);
         if (allowDrag) {
             this.dragSource = DragSource.getDefaultDragSource();
             this.sourceListener = new BpaSourceListener(dndComponent, prefix);
-            this.gestureListener =
-                    new BpaGestureListener(dndComponent, this.sourceListener);
+            this.gestureListener = new BpaGestureListener(dndComponent, this.sourceListener);
 
-            recognizer =
-                    this.dragSource.createDefaultDragGestureRecognizer(
-                        dndComponent.getJComponent(), DnDConstants.ACTION_COPY,
-                        this.gestureListener);
+            recognizer = this.dragSource.createDefaultDragGestureRecognizer(dndComponent.getJComponent(),
+                DnDConstants.ACTION_COPY, this.gestureListener);
 
         }
 
@@ -79,9 +74,8 @@ public class BpaDragAndDropBean implements PropertyChangeListener,
 
         if (allowDrop) {
             this.dtListener = new BpaTargetListener(dndComponent, prefix);
-            this.dropTarget =
-                    new DropTarget(dndComponent.getJComponent(),
-                        this.acceptableActions, this.dtListener, true);
+            this.dropTarget = new DropTarget(dndComponent.getJComponent(), this.acceptableActions, this.dtListener,
+                true);
         }
     }
 
@@ -107,14 +101,12 @@ public class BpaDragAndDropBean implements PropertyChangeListener,
      */
     public void highlightForDrag(boolean highlight) {
         if (highlight) {
-            this.highlightBorder =
-                    BorderFactory.createCompoundBorder(this.originalBorder,
-                        BorderFactory.createLineBorder(Color.RED, 2));
+            this.highlightBorder = BorderFactory.createCompoundBorder(this.originalBorder,
+                BorderFactory.createLineBorder(Color.RED, 2));
             this.dndComponent.getJComponent().setBorder(this.highlightBorder);
         } else {
-            this.highlightBorder =
-                    BorderFactory.createCompoundBorder(this.originalBorder,
-                        BorderFactory.createEmptyBorder(2, 2, 2, 2));
+            this.highlightBorder = BorderFactory.createCompoundBorder(this.originalBorder,
+                BorderFactory.createEmptyBorder(2, 2, 2, 2));
             this.dndComponent.getJComponent().setBorder(this.highlightBorder);
         }
     }
@@ -124,15 +116,13 @@ public class BpaDragAndDropBean implements PropertyChangeListener,
      */
     public void highlightForDrop(boolean highlight) {
         if (highlight) {
-            this.highlightBorder =
-                    BorderFactory.createCompoundBorder(this.originalBorder,
-                        BorderFactory.createLineBorder(Color.GREEN, 2));
+            this.highlightBorder = BorderFactory.createCompoundBorder(this.originalBorder,
+                BorderFactory.createLineBorder(Color.GREEN, 2));
             this.dndComponent.getJComponent().setBorder(this.highlightBorder);
             this.dndComponent.getJComponent().requestFocus();
         } else {
-            this.highlightBorder =
-                    BorderFactory.createCompoundBorder(this.originalBorder,
-                        BorderFactory.createEmptyBorder(2, 2, 2, 2));
+            this.highlightBorder = BorderFactory.createCompoundBorder(this.originalBorder,
+                BorderFactory.createEmptyBorder(2, 2, 2, 2));
             this.dndComponent.getJComponent().setBorder(this.highlightBorder);
         }
 

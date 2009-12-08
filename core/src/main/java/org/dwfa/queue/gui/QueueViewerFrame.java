@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,8 +58,7 @@ public class QueueViewerFrame extends ComponentFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    protected static Logger logger =
-            Logger.getLogger("org.dwfa.queue.gui.QueueViewer");
+    protected static Logger logger = Logger.getLogger("org.dwfa.queue.gui.QueueViewer");
 
     public class MoveListener implements ActionListener {
 
@@ -105,21 +104,15 @@ public class QueueViewerFrame extends ComponentFrame {
 
         }
 
-        private class GetSelectedQueueAsWorker implements
-                PrivilegedExceptionAction {
+        private class GetSelectedQueueAsWorker implements PrivilegedExceptionAction {
             public Object run() throws Exception {
-                ServiceTemplate template =
-                        new ServiceTemplate(null,
-                            new Class[] { I_QueueProcesses.class }, null);
+                ServiceTemplate template = new ServiceTemplate(null, new Class[] { I_QueueProcesses.class }, null);
 
-                authorityServices =
-                        worker.lookup(template, 1, 20, null, 1000 * 60);
-                if ((authorityServices == null)
-                    || (authorityServices.length == 0)) {
+                authorityServices = worker.lookup(template, 1, 20, null, 1000 * 60);
+                if ((authorityServices == null) || (authorityServices.length == 0)) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            JOptionPane.showMessageDialog(
-                                QueueViewerFrame.this, "No queues found...");
+                            JOptionPane.showMessageDialog(QueueViewerFrame.this, "No queues found...");
                         }
                     });
                     return null;
@@ -127,24 +120,16 @@ public class QueueViewerFrame extends ComponentFrame {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         try {
-                            ServiceItem item =
-                                    (ServiceItem) worker
-                                        .selectFromList(authorityServices,
-                                            "Select Queue",
-                                            "Select the queue you want to examine:");
+                            ServiceItem item = (ServiceItem) worker.selectFromList(authorityServices, "Select Queue",
+                                "Select the queue you want to examine:");
                             if (item != null) {
                                 queueName = "Anonymous I_QueueProcesses";
                                 sid = item.serviceID;
                                 queue = (I_QueueProcesses) item.service;
-                                queue =
-                                        (I_QueueProcesses) worker.prepareProxy(
-                                            queue, I_QueueProcesses.class);
+                                queue = (I_QueueProcesses) worker.prepareProxy(queue, I_QueueProcesses.class);
                                 for (int i = 0; i < item.attributeSets.length; i++) {
-                                    if (Name.class
-                                        .isAssignableFrom(item.attributeSets[i]
-                                            .getClass())) {
-                                        Name nameEntry =
-                                                (Name) item.attributeSets[i];
+                                    if (Name.class.isAssignableFrom(item.attributeSets[i].getClass())) {
+                                        Name nameEntry = (Name) item.attributeSets[i];
                                         queueName = nameEntry.name;
                                     }
                                 }
@@ -210,8 +195,7 @@ public class QueueViewerFrame extends ComponentFrame {
         queueMenu.add(addQueueMI = new JMenuItem("Add Queue"));
         addQueueMI.addActionListener(new AddRemoteQueue());
         queueMenu.addSeparator();
-        queueMenu.add(moveToDiskMI =
-                new JMenuItem("Take Selected Processes and Save To Disk"));
+        queueMenu.add(moveToDiskMI = new JMenuItem("Take Selected Processes and Save To Disk"));
         moveToDiskMI.addActionListener(new MoveListener());
     }
 
@@ -233,13 +217,11 @@ public class QueueViewerFrame extends ComponentFrame {
     }
 
     /**
-     * @throws ConfigurationException 
+     * @throws ConfigurationException
      * @see org.dwfa.bpa.util.ComponentFrame#getNextFrameName()
      */
     public String getNextFrameName() throws ConfigurationException {
-        String title =
-                (String) config.getEntry(this.getClass().getName(),
-                    "frameName", String.class, "Queue Viewer");
+        String title = (String) config.getEntry(this.getClass().getName(), "frameName", String.class, "Queue Viewer");
         if (count > 0) {
             return title + " " + count++;
         }
