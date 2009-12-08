@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,14 +32,13 @@ import org.dwfa.bpa.tasks.AbstractTask;
 
 /**
  * @author kec
- *
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/set-select", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/set-select", type = BeanType.TASK_BEAN) })
 public class SetDestinationParentProcess extends AbstractTask {
 
     private String destination;
-    
+
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
@@ -49,8 +48,7 @@ public class SetDestinationParentProcess extends AbstractTask {
         out.writeObject(destination);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             destination = (String) in.readObject();
@@ -59,11 +57,12 @@ public class SetDestinationParentProcess extends AbstractTask {
         }
 
     }
+
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         Stack<I_EncodeBusinessProcess> processStack = worker.getProcessStack();
         I_EncodeBusinessProcess parentProcess = processStack.get(processStack.size() - 2);
         parentProcess.setDestination(this.destination);
@@ -72,11 +71,11 @@ public class SetDestinationParentProcess extends AbstractTask {
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
-        // Noting to do. 
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Noting to do.
 
     }
 
@@ -100,6 +99,7 @@ public class SetDestinationParentProcess extends AbstractTask {
     public String getDestination() {
         return destination;
     }
+
     /**
      * @param destination The destination to set.
      */

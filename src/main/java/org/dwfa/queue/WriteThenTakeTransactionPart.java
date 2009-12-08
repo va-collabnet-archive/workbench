@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,8 +29,6 @@ import net.jini.core.transaction.server.TransactionManager;
 import org.dwfa.bpa.process.I_DescribeObject;
 import org.dwfa.jini.I_TransactionPart;
 
-
-
 public class WriteThenTakeTransactionPart<T extends I_DescribeObject> implements I_TransactionPart {
 
     private T processDesc;
@@ -38,7 +36,6 @@ public class WriteThenTakeTransactionPart<T extends I_DescribeObject> implements
     private File processFile;
     private Transaction takeTran;
     private ObjectServerCore server;
-    
 
     /**
      * @param processDesc
@@ -46,9 +43,8 @@ public class WriteThenTakeTransactionPart<T extends I_DescribeObject> implements
      * @param uncommittedTakes
      * @param processFile
      */
-    public WriteThenTakeTransactionPart(T processDesc,
-            SortedSet<T> processesInfoSortedSet,
-            File processFile, Transaction takeTran, ObjectServerCore server) {
+    public WriteThenTakeTransactionPart(T processDesc, SortedSet<T> processesInfoSortedSet, File processFile,
+            Transaction takeTran, ObjectServerCore server) {
         super();
         this.processDesc = processDesc;
         this.processesInfoSortedSet = processesInfoSortedSet;
@@ -57,9 +53,9 @@ public class WriteThenTakeTransactionPart<T extends I_DescribeObject> implements
         this.server = server;
     }
 
-
     /**
-     * @see org.dwfa.jini.I_TransactionPart#commit(net.jini.core.transaction.server.TransactionManager, long, java.util.Date)
+     * @see org.dwfa.jini.I_TransactionPart#commit(net.jini.core.transaction.server.TransactionManager,
+     *      long, java.util.Date)
      */
     public void commit(TransactionManager mgr, long id, Date commitDate) {
         this.server.finishWrite(processFile);
@@ -67,7 +63,8 @@ public class WriteThenTakeTransactionPart<T extends I_DescribeObject> implements
     }
 
     /**
-     * @see org.dwfa.jini.I_TransactionPart#abort(net.jini.core.transaction.server.TransactionManager, long)
+     * @see org.dwfa.jini.I_TransactionPart#abort(net.jini.core.transaction.server.TransactionManager,
+     *      long)
      */
     public void abort(TransactionManager mgr, long id) {
         processFile.delete();
@@ -75,7 +72,7 @@ public class WriteThenTakeTransactionPart<T extends I_DescribeObject> implements
             this.takeTran.abort();
         } catch (Exception e) {
             e.printStackTrace();
-        } 
+        }
     }
 
 }

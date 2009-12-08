@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,13 +34,11 @@ public class SetProcessNameBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor newName =
-                    new PropertyDescriptor("newName", SetProcessName.class);
+            PropertyDescriptor newName = new PropertyDescriptor("newName", SetProcessName.class);
             newName.setBound(true);
             newName.setPropertyEditorClass(JTextFieldEditor.class);
             newName.setDisplayName("set process name");
-            newName
-                .setShortDescription("Sets the name of the process to the provided value.");
+            newName.setShortDescription("Sets the name of the process to the provided value.");
 
             PropertyDescriptor rv[] = { newName };
             return rv;

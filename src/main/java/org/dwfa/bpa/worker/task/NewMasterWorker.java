@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,6 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.UUID;
 
-
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -35,108 +34,103 @@ import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/worker", type = BeanType.TASK_BEAN) })
 public class NewMasterWorker extends AbstractTask {
-  private static final long serialVersionUID = 1;
-  private static final int  dataVersion      = 1;
-  
-  private String workerName = "Master Worker";
-  private String startupDirectory = "none";
-  private String workerPropName = ProcessAttachmentKeysForWorkerTasks.WORKER.getAttachmentKey();
-  
-  private void writeObject(ObjectOutputStream out) throws IOException {
-    out.writeInt(dataVersion);
-    out.writeObject(workerName);
-    out.writeObject(startupDirectory);
-    out.writeObject(workerPropName);
-  }
+    private static final long serialVersionUID = 1;
+    private static final int dataVersion = 1;
 
-  private void readObject(java.io.ObjectInputStream in) throws IOException,
-      ClassNotFoundException {
-    int objDataVersion = in.readInt();
-    if (objDataVersion == 1) {
-      workerName = (String) in.readObject();
-      startupDirectory = (String) in.readObject();
-      workerPropName = (String) in.readObject();
-    } else {
-      throw new IOException("Can't handle dataversion: " + objDataVersion);
+    private String workerName = "Master Worker";
+    private String startupDirectory = "none";
+    private String workerPropName = ProcessAttachmentKeysForWorkerTasks.WORKER.getAttachmentKey();
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(workerName);
+        out.writeObject(startupDirectory);
+        out.writeObject(workerPropName);
     }
 
-  }
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+            workerName = (String) in.readObject();
+            startupDirectory = (String) in.readObject();
+            workerPropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-  /**
-   * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-   *      org.dwfa.bpa.process.I_Work)
-   */
-  public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-      throws TaskFailedException {
-    
-    JiniConfigWrapper jcw = new JiniConfigWrapper(worker.getJiniConfig());
-    jcw.addObject(MasterWorker.class.getName(), "workerUuid", UUID.randomUUID());
-    jcw.addObject(MasterWorker.class.getName(), "name", workerName);
-    jcw.addObject(MasterWorker.class.getName(), "startupDirectory", new File(startupDirectory));
-    try {
-      MasterWorker masterWorker = new MasterWorker(jcw);
-      process.setProperty(workerPropName, masterWorker);
-    } catch (Exception e) {
-      throw new TaskFailedException(e);
-    } 
-    
-    
-    return Condition.CONTINUE;
-  }
+    }
 
-  /**
-   * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-   *      org.dwfa.bpa.process.I_Work)
-   */
-  public void complete(I_EncodeBusinessProcess process, I_Work worker)
-      throws TaskFailedException {
-    // nothing to do...
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
-  }
+        JiniConfigWrapper jcw = new JiniConfigWrapper(worker.getJiniConfig());
+        jcw.addObject(MasterWorker.class.getName(), "workerUuid", UUID.randomUUID());
+        jcw.addObject(MasterWorker.class.getName(), "name", workerName);
+        jcw.addObject(MasterWorker.class.getName(), "startupDirectory", new File(startupDirectory));
+        try {
+            MasterWorker masterWorker = new MasterWorker(jcw);
+            process.setProperty(workerPropName, masterWorker);
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
 
-  /**
-   * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
-   */
-  public Collection<Condition> getConditions() {
-    return CONTINUE_CONDITION;
-  }
+        return Condition.CONTINUE;
+    }
 
-  /**
-   * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
-   */
-  public int[] getDataContainerIds() {
-    return new int[] {};
-  }
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // nothing to do...
 
-  public String getWorkerName() {
-    return workerName;
-  }
+    }
 
-  public void setWorkerName(String workerName) {
-    Object old = this.workerName;
-    this.workerName = workerName;
-    this.firePropertyChange("workerName", old, workerName);
-  }
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     */
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-  public String getStartupDirectory() {
-    return startupDirectory;
-  }
+    /**
+     * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
+     */
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-  public void setStartupDirectory(String startupDirectory) {
-    Object old = this.startupDirectory;
-    this.startupDirectory = startupDirectory;
-    this.firePropertyChange("startupDirectory", old, startupDirectory);
-  }
+    public String getWorkerName() {
+        return workerName;
+    }
 
-  public String getWorkerPropName() {
-    return workerPropName;
-  }
+    public void setWorkerName(String workerName) {
+        Object old = this.workerName;
+        this.workerName = workerName;
+        this.firePropertyChange("workerName", old, workerName);
+    }
 
-  public void setWorkerPropName(String workerPropName) {
-    Object old = this.workerPropName;
-    this.workerPropName = workerPropName;
-    this.firePropertyChange("workerPropName", old, workerPropName);
-  }
+    public String getStartupDirectory() {
+        return startupDirectory;
+    }
+
+    public void setStartupDirectory(String startupDirectory) {
+        Object old = this.startupDirectory;
+        this.startupDirectory = startupDirectory;
+        this.firePropertyChange("startupDirectory", old, startupDirectory);
+    }
+
+    public String getWorkerPropName() {
+        return workerPropName;
+    }
+
+    public void setWorkerPropName(String workerPropName) {
+        Object old = this.workerPropName;
+        this.workerPropName = workerPropName;
+        this.firePropertyChange("workerPropName", old, workerPropName);
+    }
 
 }
-

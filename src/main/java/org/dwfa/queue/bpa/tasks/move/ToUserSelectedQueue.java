@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,10 +47,9 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * @author kec
- *
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN) })
 public class ToUserSelectedQueue extends AbstractTask {
 
     private static final long serialVersionUID = 1;
@@ -58,7 +57,7 @@ public class ToUserSelectedQueue extends AbstractTask {
     private static final int dataVersion = 1;
 
     private TermEntry queueType = TermEntry.getQueueType();
-    
+
     private transient I_QueueProcesses q;
 
     /**
@@ -74,92 +73,83 @@ public class ToUserSelectedQueue extends AbstractTask {
         this.firePropertyChange("queueType", oldValue, this.queueType);
         if (this.getLogger().isLoggable(Level.FINE)) {
             this.getLogger().fine("setQueueType to: " + elementId);
-            
+
         }
     }
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.queueType);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-                this.queueType = (TermEntry) in.readObject();
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            this.queueType = (TermEntry) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             ServiceID serviceID = null;
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates;
-            if (this.queueType == null  || 
-            		this.queueType.ids[0].equals(QueueType.Concept.QUEUE_TYPE.getUids().iterator().next())) {
+            if (this.queueType == null
+                || this.queueType.ids[0].equals(QueueType.Concept.QUEUE_TYPE.getUids().iterator().next())) {
                 attrSetTemplates = null;
                 getLogger().info("Setting queue type to null.");
             } else {
                 attrSetTemplates = new Entry[] { this.queueType };
                 getLogger().info("Setting queue type to: " + Arrays.asList(attrSetTemplates));
             }
-           ServiceTemplate template = new ServiceTemplate(serviceID,
-                    serviceTypes,
-                    attrSetTemplates);
-        
+            ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
+
             ServiceItemFilter filter = worker.getServiceProxyFilter();
             ServiceItem[] services = worker.lookup(template, 1, 500, filter, 1000 * 15);
-            ServiceItem service = (ServiceItem) worker.selectFromList(services, 
-            		"Select queue", 
-            		"Select the queue you want this process placed in.");
+            ServiceItem service = (ServiceItem) worker.selectFromList(services, "Select queue",
+                "Select the queue you want this process placed in.");
             if (service == null) {
                 throw new TaskFailedException("User did not select a queue...");
             }
             try {
-				q = (I_QueueProcesses) service.service;
-			} catch (ClassCastException e) {
-				ClassLoader cl1 = I_QueueProcesses.class.getClassLoader();
-				ClassLoader cl2 = service.service.getClass().getClassLoader();
-				worker.getLogger().severe("Class cast exception on object: " + 
-						service.service + 
-						"\n\nI_QueueProcesses.class.getClassLoader():" +
-						 cl1 +
-						"\n\nservice.service.getClass().getClassLoader():" +
-						cl2 +
-						"\n\nClassloaders equal: " + cl1.equals(cl2) +
-						"\n\nParentClassloaders equal: " + cl1.getParent().equals(cl2.getParent()) 
-						
-						);
-				worker.getLogger().severe(
-						"\n\nClass from 1: " + cl1.loadClass(I_QueueProcesses.class.getName()) +
-						"\n\nClass from 2: " + cl2.loadClass(I_QueueProcesses.class.getName()));
-				worker.getLogger().severe(
-						"\n\nClass from parent 1: " + cl1.getParent().loadClass(I_QueueProcesses.class.getName()) +
-						"\n\nClass from parent 2: " + cl2.getParent().loadClass(I_QueueProcesses.class.getName()) 
-						);
-								
-						
-						
-				throw e;
-			}
+                q = (I_QueueProcesses) service.service;
+            } catch (ClassCastException e) {
+                ClassLoader cl1 = I_QueueProcesses.class.getClassLoader();
+                ClassLoader cl2 = service.service.getClass().getClassLoader();
+                worker.getLogger().severe(
+                    "Class cast exception on object: " + service.service
+                        + "\n\nI_QueueProcesses.class.getClassLoader():" + cl1
+                        + "\n\nservice.service.getClass().getClassLoader():" + cl2 + "\n\nClassloaders equal: "
+                        + cl1.equals(cl2) + "\n\nParentClassloaders equal: " + cl1.getParent().equals(cl2.getParent())
+
+                );
+                worker.getLogger().severe(
+                    "\n\nClass from 1: " + cl1.loadClass(I_QueueProcesses.class.getName()) + "\n\nClass from 2: "
+                        + cl2.loadClass(I_QueueProcesses.class.getName()));
+                worker.getLogger().severe(
+                    "\n\nClass from parent 1: " + cl1.getParent().loadClass(I_QueueProcesses.class.getName())
+                        + "\n\nClass from parent 2: " + cl2.getParent().loadClass(I_QueueProcesses.class.getName()));
+
+                throw e;
+            }
             return Condition.STOP;
         } catch (Exception e) {
             throw new TaskFailedException(e);
-        } 
+        }
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             getLogger().info("Starting complete, getting transaction.");
             Transaction t = worker.getActiveTransaction();
@@ -168,7 +158,7 @@ public class ToUserSelectedQueue extends AbstractTask {
             getLogger().info("Written to queue.");
         } catch (Exception e) {
             throw new TaskFailedException(e);
-        } 
+        }
 
     }
 

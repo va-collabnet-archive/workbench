@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,11 +50,10 @@ import com.sun.jini.start.LifeCycle;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class LogViewerFrame extends ComponentFrame {
-    protected static Logger logger =
-            Logger.getLogger(LogViewerFrame.class.getName());
+    protected static Logger logger = Logger.getLogger(LogViewerFrame.class.getName());
 
     /**
      * 
@@ -63,7 +62,7 @@ public class LogViewerFrame extends ComponentFrame {
 
     /**
      * @author kec
-     *
+     * 
      */
     public class PrintSourceAndMethodListener implements ActionListener {
 
@@ -93,7 +92,7 @@ public class LogViewerFrame extends ComponentFrame {
 
     /**
      * @author kec
-     *
+     * 
      */
     public class RefreshAvailableLogsListener implements ActionListener {
 
@@ -113,7 +112,7 @@ public class LogViewerFrame extends ComponentFrame {
 
     /**
      * @author kec
-     *  
+     * 
      */
     public class AddRemoteLogListener implements ActionListener {
 
@@ -129,30 +128,23 @@ public class LogViewerFrame extends ComponentFrame {
          */
         public void actionPerformed(ActionEvent arg0) {
             try {
-                ServiceTemplate template =
-                        new ServiceTemplate(null,
-                            new Class[] { I_ManageLogs.class }, null);
+                ServiceTemplate template = new ServiceTemplate(null, new Class[] { I_ManageLogs.class }, null);
                 ServiceItem[] logServices;
                 logServices = worker.lookup(template, 1, 20, null, 1000 * 60);
-                ServiceItem item =
-                        (ServiceItem) this
-                            .selectFromList(logServices,
-                                "Select Log Manager Service",
-                                "Select the log manager service you want to subscribe to:");
+                ServiceItem item = (ServiceItem) this.selectFromList(logServices, "Select Log Manager Service",
+                    "Select the log manager service you want to subscribe to:");
                 if (item != null) {
                     String loggerName = "Anonymous Remote";
 
                     I_ManageLogs logger = (I_ManageLogs) item.service;
                     for (int i = 0; i < item.attributeSets.length; i++) {
-                        if (Name.class.isAssignableFrom(item.attributeSets[i]
-                            .getClass())) {
+                        if (Name.class.isAssignableFrom(item.attributeSets[i].getClass())) {
                             Name nameEntry = (Name) item.attributeSets[i];
                             loggerName = nameEntry.name;
                         }
                     }
-                    logViewer
-                        .addLoggerTab(logger, loggerName,
-                            "Configure and view log output for a network accessable JVM. ");
+                    logViewer.addLoggerTab(logger, loggerName,
+                        "Configure and view log output for a network accessable JVM. ");
                 }
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -163,8 +155,7 @@ public class LogViewerFrame extends ComponentFrame {
         /**
          * @see org.dwfa.bpa.process.I_Work#selectService(net.jini.core.lookup.ServiceItem[])
          */
-        public Object selectFromList(Object[] list, String title,
-                String labelText) {
+        public Object selectFromList(Object[] list, String title, String labelText) {
             Iterator<JFrame> frameItr = OpenFrames.getFrames().iterator();
             JFrame activeFrame = null;
             while (frameItr.hasNext()) {
@@ -175,12 +166,10 @@ public class LogViewerFrame extends ComponentFrame {
                 }
             }
             if (ServiceItem[].class.isAssignableFrom(list.getClass())) {
-                return SelectServiceDialog.showDialog(activeFrame, activeFrame,
-                        labelText, title, (ServiceItem[]) list,
-                        (ServiceItem) list[0], null);
+                return SelectServiceDialog.showDialog(activeFrame, activeFrame, labelText, title, (ServiceItem[]) list,
+                    (ServiceItem) list[0], null);
             } else {
-                return SelectObjectDialog.showDialog(activeFrame, activeFrame,
-                        labelText, title, list, list[0], null);
+                return SelectObjectDialog.showDialog(activeFrame, activeFrame, labelText, title, list, list[0], null);
             }
         }
     }
@@ -220,14 +209,10 @@ public class LogViewerFrame extends ComponentFrame {
         mainMenuBar.add(logMenu = new JMenu("Log"));
         logMenu.add(addRemoteLoggerMI = new JMenuItem("Add Remote Logger"));
         addRemoteLoggerMI.addActionListener(new AddRemoteLogListener());
-        logMenu.add(refreshAvailableLogs =
-                new JMenuItem("Refresh available logs"));
-        refreshAvailableLogs
-            .addActionListener(new RefreshAvailableLogsListener());
-        logMenu.add(printSourceAndMethod =
-                new JCheckBoxMenuItem("Print source and method"));
-        printSourceAndMethod
-            .addActionListener(new PrintSourceAndMethodListener());
+        logMenu.add(refreshAvailableLogs = new JMenuItem("Refresh available logs"));
+        refreshAvailableLogs.addActionListener(new RefreshAvailableLogsListener());
+        logMenu.add(printSourceAndMethod = new JCheckBoxMenuItem("Print source and method"));
+        printSourceAndMethod.addActionListener(new PrintSourceAndMethodListener());
         logMenu.add(clearLog = new JMenuItem("Clear log"));
         clearLog.addActionListener(new ClearLogListener());
     }
@@ -250,13 +235,11 @@ public class LogViewerFrame extends ComponentFrame {
     }
 
     /**
-     * @throws ConfigurationException 
+     * @throws ConfigurationException
      * @see org.dwfa.bpa.util.ComponentFrame#getNextFrameName()
      */
     public String getNextFrameName() throws ConfigurationException {
-        String title =
-                (String) config.getEntry(this.getClass().getName(),
-                    "frameName", String.class, "Log Viewer");
+        String title = (String) config.getEntry(this.getClass().getName(), "frameName", String.class, "Log Viewer");
         if (count > 0) {
             return title + " " + count++;
         }

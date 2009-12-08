@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,11 +39,10 @@ public class EditorGlueForWorker implements PropertyChangeListener {
     private PropertyEditor editor;
 
     private Object target;
-    
+
     private I_Work worker;
 
-    public EditorGlueForWorker(PropertyEditor editor, Method writeMethod,
-            Object target, I_Work worker) {
+    public EditorGlueForWorker(PropertyEditor editor, Method writeMethod, Object target, I_Work worker) {
         this.editor = editor;
         this.writeMethod = writeMethod;
         this.target = target;

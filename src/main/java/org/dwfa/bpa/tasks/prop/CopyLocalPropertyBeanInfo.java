@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,25 +31,18 @@ public class CopyLocalPropertyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor localPropName =
-                    new PropertyDescriptor("localPropName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor localPropName = new PropertyDescriptor("localPropName",
+                getBeanDescriptor().getBeanClass());
             localPropName.setBound(true);
             localPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            localPropName
-                .setDisplayName("<html><font color='green'>Original property:");
-            localPropName
-                .setShortDescription("Name of the property to copy from. ");
+            localPropName.setDisplayName("<html><font color='green'>Original property:");
+            localPropName.setShortDescription("Name of the property to copy from. ");
 
-            PropertyDescriptor copyPropName =
-                    new PropertyDescriptor("copyPropName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor copyPropName = new PropertyDescriptor("copyPropName", getBeanDescriptor().getBeanClass());
             copyPropName.setBound(true);
             copyPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            copyPropName
-                .setDisplayName("<html><font color='blue'>Copy property:");
-            copyPropName
-                .setShortDescription("Name of the property to copy to. ");
+            copyPropName.setDisplayName("<html><font color='blue'>Copy property:");
+            copyPropName.setShortDescription("Name of the property to copy to. ");
 
             PropertyDescriptor rv[] = { copyPropName, localPropName };
             return rv;

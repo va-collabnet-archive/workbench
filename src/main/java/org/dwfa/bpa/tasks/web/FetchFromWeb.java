@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,8 +37,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 
-@BeanList(specs = 
-{ @Spec(directory = "tasks/web tasks", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/web tasks", type = BeanType.TASK_BEAN) })
 public class FetchFromWeb extends AbstractTask {
 
     private URL webURL = new URL("http://sparrow.vacd.med.umich.edu/vistawebsvcs/siteservice.asmx/getSite?siteID=688");
@@ -49,43 +48,40 @@ public class FetchFromWeb extends AbstractTask {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(webURL);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-        	webURL = (URL) in.readObject();
+            webURL = (URL) in.readObject();
         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
+
     public FetchFromWeb() throws MalformedURLException {
         super();
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-             InputStream inStream = (InputStream) webURL.getContent();
-             BufferedReader in   = 
-                 new BufferedReader (new InputStreamReader (inStream));
-               String line;
-               StringBuffer msgBuff = new StringBuffer();
-               while ((line = in.readLine()) != null) {
-            	   msgBuff.append(line);
-            	   msgBuff.append("\n");
-               }
-        	   JOptionPane.showMessageDialog(new JFrame(), msgBuff.toString());
-               return Condition.CONTINUE;
+            InputStream inStream = (InputStream) webURL.getContent();
+            BufferedReader in = new BufferedReader(new InputStreamReader(inStream));
+            String line;
+            StringBuffer msgBuff = new StringBuffer();
+            while ((line = in.readLine()) != null) {
+                msgBuff.append(line);
+                msgBuff.append("\n");
+            }
+            JOptionPane.showMessageDialog(new JFrame(), msgBuff.toString());
+            return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
     }
 
@@ -94,7 +90,7 @@ public class FetchFromWeb extends AbstractTask {
     }
 
     public int[] getDataContainerIds() {
-        return new int[] {  };
+        return new int[] {};
     }
 
     /**
@@ -106,7 +102,7 @@ public class FetchFromWeb extends AbstractTask {
 
     /**
      * @param webURL The webURL to set.
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public void setWebURLString(String webURLString) throws MalformedURLException {
         this.webURL = new URL(webURLString);

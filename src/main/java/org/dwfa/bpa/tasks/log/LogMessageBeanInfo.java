@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import org.dwfa.bpa.tasks.editor.LevelEditor;
 
 /**
  * @author kec
- *
+ * 
  */
 public class LogMessageBeanInfo extends SimpleBeanInfo {
 
@@ -42,27 +42,23 @@ public class LogMessageBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor level =
-                    new PropertyDescriptor("level", LogMessage.class);
+            PropertyDescriptor level = new PropertyDescriptor("level", LogMessage.class);
             level.setBound(true);
             level.setPropertyEditorClass(LevelEditor.class);
             level.setDisplayName("level");
             level.setShortDescription("Logging level for the message.");
 
-            PropertyDescriptor log =
-                    new PropertyDescriptor("log", LogMessage.class);
+            PropertyDescriptor log = new PropertyDescriptor("log", LogMessage.class);
             log.setBound(true);
             log.setPropertyEditorClass(JTextFieldEditor.class);
             log.setDisplayName("log");
             log.setShortDescription("Log upon which to write the message.");
 
-            PropertyDescriptor message =
-                    new PropertyDescriptor("message", LogMessage.class);
+            PropertyDescriptor message = new PropertyDescriptor("message", LogMessage.class);
             message.setBound(true);
             message.setPropertyEditorClass(JTextFieldEditor.class);
             message.setDisplayName("log message");
-            message
-                .setShortDescription("A message to write to the worker log.");
+            message.setShortDescription("A message to write to the worker log.");
 
             PropertyDescriptor rv[] = { message, log, level };
             return rv;
@@ -76,8 +72,7 @@ public class LogMessageBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(LogMessageOnWorkerLog.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Log on Specified Log");
+        bd.setDisplayName("<html><font color='green'><center>Log on Specified Log");
         return bd;
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,13 +41,14 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.queue.bpa.tasks.failsafe.QueueEntryData;
+
 /**
- * @author kec<p>
- * Moves a process from one queue to another with the processes entry record. The queue type to move to is 
- * specified in the task.
+ * @author kec
+ *         <p>
+ *         Moves a process from one queue to another with the processes entry
+ *         record. The queue type to move to is specified in the task.
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN) })
 public class ToQueueWithEntryRecord extends AbstractTask {
 
     /**
@@ -64,8 +65,7 @@ public class ToQueueWithEntryRecord extends AbstractTask {
         out.writeObject(localPropName);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             localPropName = (String) in.readObject();
@@ -86,8 +86,7 @@ public class ToQueueWithEntryRecord extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         return Condition.STOP;
     }
 
@@ -95,27 +94,23 @@ public class ToQueueWithEntryRecord extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
             QueueEntryData qed = null;
-            for (PropertyDescriptor d : process
-                    .getAllPropertiesBeanInfo().getPropertyDescriptors()) {
-                    PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
-                    if (dwt.getLabel().equals(this.localPropName)) {
-                        qed = (QueueEntryData)  dwt.getReadMethod().invoke(dwt.getTarget(), new Object[] {});
-                        break;
-                    }
-                
+            for (PropertyDescriptor d : process.getAllPropertiesBeanInfo().getPropertyDescriptors()) {
+                PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
+                if (dwt.getLabel().equals(this.localPropName)) {
+                    qed = (QueueEntryData) dwt.getReadMethod().invoke(dwt.getTarget(), new Object[] {});
+                    break;
+                }
+
             }
-             
 
             ServiceID serviceID = qed.getQueueID();
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
-            Entry[] attrSetTemplates = new Entry[] { };
-            ServiceTemplate template = new ServiceTemplate(serviceID,
-                    serviceTypes, attrSetTemplates);
+            Entry[] attrSetTemplates = new Entry[] {};
+            ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
             ServiceItem service = worker.lookup(template, filter);
             I_QueueProcesses q = (I_QueueProcesses) service.service;

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,13 +34,11 @@ public class LaunchProcessBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor process =
-                    new PropertyDescriptor("processTaskId", LaunchProcess.class);
+            PropertyDescriptor process = new PropertyDescriptor("processTaskId", LaunchProcess.class);
             process.setBound(true);
             process.setPropertyEditorClass(ProcessTaskIdEditor.class);
             process.setDisplayName("Process id");
-            process
-                .setShortDescription("A task id for the process to launch. Only tasks that implement the I_EncodeBusinessProcess interface can be dropped. ");
+            process.setShortDescription("A task id for the process to launch. Only tasks that implement the I_EncodeBusinessProcess interface can be dropped. ");
 
             PropertyDescriptor rv[] = { process };
             return rv;
@@ -54,8 +52,7 @@ public class LaunchProcessBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(LaunchProcess.class);
-        bd
-            .setDisplayName("<html><center><font color='blue'>Launch Process<br>From Internal Task");
+        bd.setDisplayName("<html><center><font color='blue'>Launch Process<br>From Internal Task");
         return bd;
     }
 

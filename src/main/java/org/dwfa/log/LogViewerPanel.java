@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,7 +59,7 @@ import com.sun.jini.start.LifeCycle;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class LogViewerPanel extends JPanel implements TableModelListener {
     /**
@@ -70,58 +70,57 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
     JTabbedPane logViewerTabs;
     /** The server proxy, for use by getProxyVerifier */
     protected I_PublishLogRecord serverProxy;
-    private static Logger logger = Logger.getLogger(LogViewerPanel.class
-            .getName());
+    private static Logger logger = Logger.getLogger(LogViewerPanel.class.getName());
     /**
-     * Cache of our <code>LifeCycle</code> object 
+     * Cache of our <code>LifeCycle</code> object
      * TODO implement the lifeCycle
      * destroy methods. See TxnManagerImpl for an example.
      */
     @SuppressWarnings("unused")
-	private LifeCycle lifeCycle = null;
+    private LifeCycle lifeCycle = null;
 
     /** The configuration to use for configuring the server */
     protected final Configuration config;
-    
+
     private List<JTable> logTables = new ArrayList<JTable>();
 
     /**
      * @throws Exception
-     *  
+     * 
      */
     public LogViewerPanel(String[] args, LifeCycle lc) throws Exception {
         super(new GridLayout(1, 1));
-		logger.info("\n*******************\n\n" + 
-            "Starting " + this.getClass().getSimpleName() + " with config file: " + Arrays.asList(args) +
-				"\n\n******************\n");
-        this.config = ConfigurationProvider.getInstance(args, getClass()
-                .getClassLoader());
+        logger.info("\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: "
+            + Arrays.asList(args) + "\n\n******************\n");
+        this.config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
         this.lifeCycle = lc;
         LogManager logManager = LogManager.getLogManager();
-        
+
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         logViewerTabs = new JTabbedPane();
         splitPane.setTopComponent(logViewerTabs);
         JEditorPane logOut = new JEditorPane("text/html", "<html>");
         logHandler = new HtmlHandler(logOut);
-       splitPane.setBottomComponent(new JScrollPane(logOut));
+        splitPane.setBottomComponent(new JScrollPane(logOut));
         this.add(splitPane);
         this.init();
-        LoggerTableModel model = this.addLoggerTab(new LogManagerAdaptor(logManager), "Local logs", "Configure and view log output for the local JVM. ");
+        LoggerTableModel model = this.addLoggerTab(new LogManagerAdaptor(logManager), "Local logs",
+            "Configure and view log output for the local JVM. ");
         this.setHandler(model, "", new Boolean(true));
     }
-    
-    public LoggerTableModel addLoggerTab(I_ManageLogs logManager, String tabDesc, String toolTipText) throws RemoteException {
+
+    public LoggerTableModel addLoggerTab(I_ManageLogs logManager, String tabDesc, String toolTipText)
+            throws RemoteException {
         LoggerTableModel model = new LoggerTableModel(logManager);
         JTable table = new JTable(model);
         setPreferredWidth(table);
         setupTableEditor(table);
         table.getModel().addTableModelListener(this);
         this.logTables.add(table);
-        logViewerTabs.addTab(tabDesc, null, new JScrollPane(table), toolTipText);   
+        logViewerTabs.addTab(tabDesc, null, new JScrollPane(table), toolTipText);
         return model;
     }
-    
+
     /**
      * @param table
      */
@@ -149,7 +148,7 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
         for (int i = 0; i < 4; i++) {
             column = table.getColumnModel().getColumn(i);
             if (i == 0) {
-                column.setPreferredWidth(400); 
+                column.setPreferredWidth(400);
             } else if (i == 2) {
                 column.setPreferredWidth(50);
             } else if (i == 3) {
@@ -175,6 +174,7 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
             newModel.listenToLogger(loggerName);
         }
     }
+
     /**
      * Initializes the server, including exporting it and storing its proxy in
      * the registry.
@@ -183,21 +183,19 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
      *             if a problem occurs
      */
     @SuppressWarnings("unchecked")
-   protected void init() throws Exception {
-        LoginContext loginContext = (LoginContext) config
-                .getEntry(this.getClass().getName(), "loginContext",
-                        LoginContext.class, null);
+    protected void init() throws Exception {
+        LoginContext loginContext = (LoginContext) config.getEntry(this.getClass().getName(), "loginContext",
+            LoginContext.class, null);
         if (loginContext == null) {
             initAsSubject();
         } else {
             loginContext.login();
-            Subject.doAsPrivileged(loginContext.getSubject(),
-                    new PrivilegedExceptionAction() {
-                        public Object run() throws Exception {
-                            initAsSubject();
-                            return null;
-                        }
-                    }, null);
+            Subject.doAsPrivileged(loginContext.getSubject(), new PrivilegedExceptionAction() {
+                public Object run() throws Exception {
+                    initAsSubject();
+                    return null;
+                }
+            }, null);
         }
     }
 
@@ -224,12 +222,9 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
      * @throws RemoteException
      *             if a remote communication problem occurs
      */
-    protected Exporter getExporter() throws ConfigurationException,
-            RemoteException {
-        return (Exporter) config
-                .getEntry(this.getClass().getName(), "exporter",
-                        Exporter.class, new BasicJeriExporter(TcpServerEndpoint
-                                .getInstance(0), new BasicILFactory()));
+    protected Exporter getExporter() throws ConfigurationException, RemoteException {
+        return (Exporter) config.getEntry(this.getClass().getName(), "exporter", Exporter.class, new BasicJeriExporter(
+            TcpServerEndpoint.getInstance(0), new BasicILFactory()));
     }
 
     /**
@@ -256,24 +251,23 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
          */
         private static final long serialVersionUID = 1L;
 
-        private String[] columnNames = { "Logger Name", "Specified Level",
-                "Effective Level", "Listen" };
+        private String[] columnNames = { "Logger Name", "Specified Level", "Effective Level", "Listen" };
 
         private Object[][] rowData;
-        
+
         private I_ManageLogs logManager;
-        
+
         List<String> logNameList;
 
         /**
          * @throws RemoteException
-         *  
+         * 
          */
         public LoggerTableModel(I_ManageLogs logManager) throws RemoteException {
             super();
             this.logManager = logManager;
             logNameList = logManager.getLoggerNames();
-            Collections.<String>sort(logNameList);
+            Collections.<String> sort(logNameList);
 
             this.rowData = new Object[logNameList.size()][4];
             for (int i = 0; i < logNameList.size(); i++) {
@@ -290,8 +284,8 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
          * @param loggerName
          */
         public void listenToLogger(String loggerName) {
-           int index = logNameList.indexOf(loggerName);
-           this.setValueAt(new Boolean(true), index, 3);
+            int index = logNameList.indexOf(loggerName);
+            this.setValueAt(new Boolean(true), index, 3);
         }
 
         /**
@@ -334,13 +328,13 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
 
         public Object getValueAt(int row, int col) {
             try {
-            String loggerName = (String) rowData[row][0];
-            if (col == 1) {
-                return this.logManager.getLevel(loggerName);
-            } else if (col == 2) {
-                return getEffectiveLevel(loggerName);
-            }
-            return rowData[row][col];
+                String loggerName = (String) rowData[row][0];
+                if (col == 1) {
+                    return this.logManager.getLevel(loggerName);
+                } else if (col == 2) {
+                    return getEffectiveLevel(loggerName);
+                }
+                return rowData[row][col];
             } catch (RemoteException ex) {
                 return ex.toString();
             }
@@ -357,12 +351,12 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
                 fireTableCellUpdated(row, col);
                 for (int i = 0; i < this.getRowCount(); i++) {
                     fireTableCellUpdated(i, 2);
-                }                
+                }
             } else {
                 rowData[row][col] = value;
                 fireTableCellUpdated(row, col);
             }
- 
+
         }
 
         public Class<?> getColumnClass(int c) {
@@ -377,7 +371,7 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
             }
             return getValueAt(0, c).getClass();
         }
-        
+
         public List<String> getSelectedLoggers() {
             List<String> selected = new ArrayList<String>();
             for (int i = 0; i < rowData.length; i++) {
@@ -387,7 +381,7 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
                     selected.add(loggerName);
                 }
             }
-            
+
             return selected;
         }
 
@@ -420,15 +414,16 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
      */
     private void changeHandler(I_ManageLogs logs, String loggerName, Boolean listen) throws RemoteException {
         if (listen.booleanValue()) {
-           if (logs.addRemoteHandler(loggerName, this.serverProxy)) {
-               logger.info("Added HTML handler to: " + loggerName + ".");
-           }
+            if (logs.addRemoteHandler(loggerName, this.serverProxy)) {
+                logger.info("Added HTML handler to: " + loggerName + ".");
+            }
         } else {
             logger.info("Removing HTML handler from: " + loggerName + ".");
             logs.removeRemoteHandler(loggerName, logHandler.getId());
         }
 
     }
+
     /**
      * @param valueAt
      * @param data
@@ -441,22 +436,22 @@ public class LogViewerPanel extends JPanel implements TableModelListener {
         }
     }
 
-	/**
-	 * @see org.dwfa.log.HtmlHandler#isPrintSourceAndMethodEnabled()
-	 */
-	public boolean isPrintSourceAndMethodEnabled() {
-		return logHandler.isPrintSourceAndMethodEnabled();
-	}
-	
-	public void clearLog() {
-		logHandler.clearLog();
-	}
+    /**
+     * @see org.dwfa.log.HtmlHandler#isPrintSourceAndMethodEnabled()
+     */
+    public boolean isPrintSourceAndMethodEnabled() {
+        return logHandler.isPrintSourceAndMethodEnabled();
+    }
 
-	/**
-	 * @see org.dwfa.log.HtmlHandler#setPrintSourceAndMethodEnabled(boolean)
-	 */
-	public void setPrintSourceAndMethodEnabled(boolean printSourceAndMethodEnabled) {
-		logHandler.setPrintSourceAndMethodEnabled(printSourceAndMethodEnabled);
-	}
+    public void clearLog() {
+        logHandler.clearLog();
+    }
+
+    /**
+     * @see org.dwfa.log.HtmlHandler#setPrintSourceAndMethodEnabled(boolean)
+     */
+    public void setPrintSourceAndMethodEnabled(boolean printSourceAndMethodEnabled) {
+        logHandler.setPrintSourceAndMethodEnabled(printSourceAndMethodEnabled);
+    }
 
 }

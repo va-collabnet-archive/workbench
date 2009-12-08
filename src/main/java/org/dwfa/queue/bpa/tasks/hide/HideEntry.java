@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,6 @@ import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-
 
 import net.jini.core.entry.Entry;
 import net.jini.core.lookup.ServiceItem;
@@ -41,19 +40,19 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.queue.bpa.tasks.failsafe.QueueEntryData;
 
 /**
- * Hide an entry in a queue for the duration of a transaction. Useful for 
+ * Hide an entry in a queue for the duration of a transaction. Useful for
  * allowing a process on one queue to prevent concurrent access to a process on
- * another queue. If the an entry with the specified id is missing from the 
- * specified queue, the result is logged, but the task continues without 
- * throwing a task failed exception. 
+ * another queue. If the an entry with the specified id is missing from the
+ * specified queue, the result is logged, but the task continues without
+ * throwing a task failed exception.
  * <p>
- * This task reads a QueueEntryData object from the enclosing process, but does not
- * modify this object. 
+ * This task reads a QueueEntryData object from the enclosing process, but does
+ * not modify this object.
+ * 
  * @author kec
- *
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/entry", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/entry", type = BeanType.TASK_BEAN) })
 public class HideEntry extends AbstractTask {
 
     /**
@@ -64,14 +63,13 @@ public class HideEntry extends AbstractTask {
     private static final int dataVersion = 1;
 
     private String queueEntryPropName = "";
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(queueEntryPropName);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             this.queueEntryPropName = (String) in.readObject();
@@ -86,28 +84,23 @@ public class HideEntry extends AbstractTask {
     }
 
     @SuppressWarnings("unchecked")
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-        Class<I_QueueProcesses>[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            Class<I_QueueProcesses>[] serviceTypes = new Class[] { I_QueueProcesses.class };
             Entry[] attrSetTemplates = new Entry[] {};
             QueueEntryData qed = null;
-            for (PropertyDescriptor d : process
-                    .getAllPropertiesBeanInfo().getPropertyDescriptors()) {
-                    PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
-                    if (dwt.getLabel().equals(this.queueEntryPropName)) {
-                        qed = (QueueEntryData)  dwt.getReadMethod().invoke(dwt.getTarget(), new Object[] {});
-                        break;
-                    }
-                
+            for (PropertyDescriptor d : process.getAllPropertiesBeanInfo().getPropertyDescriptors()) {
+                PropertyDescriptorWithTarget dwt = (PropertyDescriptorWithTarget) d;
+                if (dwt.getLabel().equals(this.queueEntryPropName)) {
+                    qed = (QueueEntryData) dwt.getReadMethod().invoke(dwt.getTarget(), new Object[] {});
+                    break;
+                }
+
             }
-            
-            
-            ServiceTemplate template = new ServiceTemplate(qed
-                    .getQueueID(), serviceTypes, attrSetTemplates);
+
+            ServiceTemplate template = new ServiceTemplate(qed.getQueueID(), serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
-            ServiceItem service = worker.lookup(template,
-                    filter);
+            ServiceItem service = worker.lookup(template, filter);
             I_QueueProcesses q = (I_QueueProcesses) service.service;
             try {
                 q.hide(qed.getEntryID(), worker.getActiveTransaction());
@@ -120,8 +113,7 @@ public class HideEntry extends AbstractTask {
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
 
     }
@@ -154,8 +146,4 @@ public class HideEntry extends AbstractTask {
         this.queueEntryPropName = queueEntryPropName;
     }
 
-
-
- 
-    
 }

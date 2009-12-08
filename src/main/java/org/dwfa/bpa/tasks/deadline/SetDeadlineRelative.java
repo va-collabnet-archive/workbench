@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,13 +36,11 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.bpa.worker.Worker;
 
-
 /**
  * @author kec
- *
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/set tasks", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/set tasks", type = BeanType.TASK_BEAN) })
 public class SetDeadlineRelative extends AbstractTask {
 
     private static final long serialVersionUID = 1;
@@ -66,52 +64,54 @@ public class SetDeadlineRelative extends AbstractTask {
     }
 
     public void setRelativeTimeInMins(Integer relativeTime) {
-        Integer oldValue =  new Integer(relativeTimeInMins);
+        Integer oldValue = new Integer(relativeTimeInMins);
         this.relativeTimeInMins = relativeTime.intValue();
         this.firePropertyChange("relativeTimeInMins", oldValue, relativeTime);
     }
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeInt(this.relativeTimeInMins);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-                this.relativeTimeInMins = in.readInt();
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            this.relativeTimeInMins = in.readInt();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
+
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         Date now;
         try {
-          now = new Date(worker.getTime());
+            now = new Date(worker.getTime());
         } catch (RemoteException e) {
-          throw new TaskFailedException(e);
+            throw new TaskFailedException(e);
         }
         long lengthToExtend = relativeTimeInMins;
         lengthToExtend = lengthToExtend * 1000 * 60;
         Date deadline = new Date(now.getTime() + lengthToExtend);
         if (worker.getLogger().isLoggable(Level.FINER)) {
-            worker.getLogger().finer(this.getName() + " Now: " + Worker.dateFormat.format(now) + " relative time in min: " + this.relativeTimeInMins + 
-                " new deadline: " + Worker.dateFormat.format(deadline));
+            worker.getLogger().finer(
+                this.getName() + " Now: " + Worker.dateFormat.format(now) + " relative time in min: "
+                    + this.relativeTimeInMins + " new deadline: " + Worker.dateFormat.format(deadline));
         }
         process.setDeadline(deadline);
         return Condition.CONTINUE;
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // nothing to do...
 
     }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.dwfa.bpa.data;
+
 /*
  * Created on Mar 9, 2005
  */
@@ -35,7 +36,7 @@ import javax.swing.event.ListDataListener;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
     private static final long serialVersionUID = 1;
@@ -44,113 +45,110 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
 
     private List<T> data;
 
-	private transient Collection<ListDataListener> listeners;
+    private transient Collection<ListDataListener> listeners;
 
-     private void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(data);
-     }
+    }
 
     @SuppressWarnings("unchecked")
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-                this.data = (List<T>) in.readObject();
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            this.data = (List<T>) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
 
+    /**
+     * @return
+     */
+    public Iterator<T> iterator() {
+        return data.iterator();
+    }
 
-	/**
-	 * @return
-	 */
-	public Iterator<T> iterator() {
-		return data.iterator();
-	}
-	/**
+    /**
 	 *  
 	 */
-	public ArrayListModel(Collection<T> data) {
-		super();
-		this.data = Collections.synchronizedList(new ArrayList<T>(data));
-	}
+    public ArrayListModel(Collection<T> data) {
+        super();
+        this.data = Collections.synchronizedList(new ArrayList<T>(data));
+    }
 
-	public ArrayListModel() {
-		super();
-		this.data = Collections.synchronizedList(new ArrayList<T>());
-	}
+    public ArrayListModel() {
+        super();
+        this.data = Collections.synchronizedList(new ArrayList<T>());
+    }
 
-	/**
-	 * @see javax.swing.ListModel#getSize()
-	 */
-	public int getSize() {
-		return data.size();
-	}
+    /**
+     * @see javax.swing.ListModel#getSize()
+     */
+    public int getSize() {
+        return data.size();
+    }
 
-	/**
-	 * @see javax.swing.ListModel#getElementAt(int)
-	 */
-	public Object getElementAt(int index) {
-		return this.data.get(index);
-	}
+    /**
+     * @see javax.swing.ListModel#getElementAt(int)
+     */
+    public Object getElementAt(int index) {
+        return this.data.get(index);
+    }
 
-	/**
-	 * @see javax.swing.ListModel#addListDataListener(javax.swing.event.ListDataListener)
-	 */
-	public void addListDataListener(ListDataListener l) {
+    /**
+     * @see javax.swing.ListModel#addListDataListener(javax.swing.event.ListDataListener)
+     */
+    public void addListDataListener(ListDataListener l) {
         if (this.listeners == null) {
-        	    this.listeners = new HashSet<ListDataListener>();
+            this.listeners = new HashSet<ListDataListener>();
         }
-		this.listeners.add(l);
+        this.listeners.add(l);
 
-	}
+    }
 
-	/**
-	 * @see javax.swing.ListModel#removeListDataListener(javax.swing.event.ListDataListener)
-	 */
-	public void removeListDataListener(ListDataListener l) {
-		this.listeners.remove(l);
-	}
+    /**
+     * @see javax.swing.ListModel#removeListDataListener(javax.swing.event.ListDataListener)
+     */
+    public void removeListDataListener(ListDataListener l) {
+        this.listeners.remove(l);
+    }
 
+    /**
+     * @param o
+     * @return
+     * @return
+     */
 
-	/**
-	 * @param o
-	 * @return
-	 * @return
-	 */
-	
-	
-	public boolean add(T o) {
-		boolean rv = data.add(o);
+    public boolean add(T o) {
+        boolean rv = data.add(o);
         ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, data.size() - 2, data.size());
         notifyListenersContentChanged(e);
         return rv;
-	}
-	
-	
-	/**
-	 * @param index
-	 * @param element
-	 */
-	public void add(int index, T element) {
-		data.add(index, element);
+    }
+
+    /**
+     * @param index
+     * @param element
+     */
+    public void add(int index, T element) {
+        data.add(index, element);
         ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index, data.size());
         notifyListenersContentChanged(e);
-	}
-	/**
-	 * @param index
-	 * @param c
-	 * @return
-	 */
-	public boolean addAll(int index, Collection<? extends T> c) {
-		boolean rv = data.addAll(index, c);
+    }
+
+    /**
+     * @param index
+     * @param c
+     * @return
+     */
+    public boolean addAll(int index, Collection<? extends T> c) {
+        boolean rv = data.addAll(index, c);
         ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index, data.size());
         notifyListenersContentChanged(e);
         return rv;
-	}
+    }
 
     /**
      * @param e
@@ -163,80 +161,90 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
             }
         }
     }
-	/**
-	 * @param c
-	 * @return
-	 */
-	public boolean addAll(Collection<? extends T> c) {
+
+    /**
+     * @param c
+     * @return
+     */
+    public boolean addAll(Collection<? extends T> c) {
         int index = data.size();
         boolean rv = data.addAll(index, c);
         ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index, data.size());
         notifyListenersContentChanged(e);
         return rv;
-	}
-	/**
+    }
+
+    /**
 	 * 
 	 */
-	public void clear() {
-		int size = data.size();
-		data.clear();
-	    ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, size);
-	    notifyListenersContentChanged(e);
-	}
-	/**
-	 * @param o
-	 * @return
-	 */
-	public boolean contains(Object o) {
-		return data.contains(o);
-	}
-	/**
-	 * @param c
-	 * @return
-	 */
-	public boolean containsAll(Collection<?> c) {
-		return data.containsAll(c);
-	}
-	/**
-	 * @param index
-	 * @return
-	 */
-	public T get(int index) {
-		return data.get(index);
-	}
-	/**
-	 * @param o
-	 * @return
-	 */
-	public int indexOf(Object o) {
-		return data.indexOf(o);
-	}
-	/**
-	 * @return
-	 */
-	public boolean isEmpty() {
-		return data.isEmpty();
-	}
-	/**
-	 * @param o
-	 * @return
-	 */
-	public int lastIndexOf(Object o) {
-		return data.lastIndexOf(o);
-	}
-	/**
-	 * @return
-	 */
-	public ListIterator<T> listIterator() {
-		return data.listIterator();
-	}
-	/**
-	 * @param index
-	 * @return
-	 */
-	public ListIterator<T> listIterator(int index) {
-		return data.listIterator(index);
-	}
+    public void clear() {
+        int size = data.size();
+        data.clear();
+        ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, size);
+        notifyListenersContentChanged(e);
+    }
+
+    /**
+     * @param o
+     * @return
+     */
+    public boolean contains(Object o) {
+        return data.contains(o);
+    }
+
+    /**
+     * @param c
+     * @return
+     */
+    public boolean containsAll(Collection<?> c) {
+        return data.containsAll(c);
+    }
+
+    /**
+     * @param index
+     * @return
+     */
+    public T get(int index) {
+        return data.get(index);
+    }
+
+    /**
+     * @param o
+     * @return
+     */
+    public int indexOf(Object o) {
+        return data.indexOf(o);
+    }
+
+    /**
+     * @return
+     */
+    public boolean isEmpty() {
+        return data.isEmpty();
+    }
+
+    /**
+     * @param o
+     * @return
+     */
+    public int lastIndexOf(Object o) {
+        return data.lastIndexOf(o);
+    }
+
+    /**
+     * @return
+     */
+    public ListIterator<T> listIterator() {
+        return data.listIterator();
+    }
+
+    /**
+     * @param index
+     * @return
+     */
+    public ListIterator<T> listIterator(int index) {
+        return data.listIterator(index);
+    }
 
     /**
      * @param index
@@ -248,73 +256,81 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
         notifyListenersContentChanged(e);
         return removedObj;
     }
-	/**
-	 * @param o
-	 * @return
-	 */
-	public boolean remove(Object o) {
+
+    /**
+     * @param o
+     * @return
+     */
+    public boolean remove(Object o) {
         int index = this.indexOf(o);
-		return remove(index) != null;
-	}
-	/**
-	 * @param c
-	 * @return
-	 */
-	public boolean removeAll(Collection<?> c) {
-		boolean removed = false;
-		for (Object o: c) {
-			if (remove(o)) {
-				removed = true;
-			}
-		}
-		return removed;
-	}
-	/**
-	 * @param c
-	 * @return
-	 */
-	public boolean retainAll(Collection<?> c) {
+        return remove(index) != null;
+    }
+
+    /**
+     * @param c
+     * @return
+     */
+    public boolean removeAll(Collection<?> c) {
+        boolean removed = false;
+        for (Object o : c) {
+            if (remove(o)) {
+                removed = true;
+            }
+        }
+        return removed;
+    }
+
+    /**
+     * @param c
+     * @return
+     */
+    public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException();
-	}
-	/**
-	 * @param index
-	 * @param element
-	 * @return
-	 */
-	public T set(int index, T element) {
-		T rv = data.set(index, element);
+    }
+
+    /**
+     * @param index
+     * @param element
+     * @return
+     */
+    public T set(int index, T element) {
+        T rv = data.set(index, element);
         ListDataEvent e = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, index, index);
         notifyListenersContentChanged(e);
         return rv;
-	}
-	/**
-	 * @return
-	 */
-	public int size() {
-		return data.size();
-	}
-	/**
-	 * @param fromIndex
-	 * @param toIndex
-	 * @return
-	 */
-	public List<T> subList(int fromIndex, int toIndex) {
-		return Collections.unmodifiableList(data.subList(fromIndex, toIndex));
-	}
-	/**
-	 * @return
-	 */
-	public Object[] toArray() {
-		return data.toArray();
-	}
-	/**
-	 * @param a
-	 * @return
-	 */
-	@SuppressWarnings("hiding")
-	public <T> T[] toArray(T[] a) {
-		return data.toArray(a);
-	}
+    }
+
+    /**
+     * @return
+     */
+    public int size() {
+        return data.size();
+    }
+
+    /**
+     * @param fromIndex
+     * @param toIndex
+     * @return
+     */
+    public List<T> subList(int fromIndex, int toIndex) {
+        return Collections.unmodifiableList(data.subList(fromIndex, toIndex));
+    }
+
+    /**
+     * @return
+     */
+    public Object[] toArray() {
+        return data.toArray();
+    }
+
+    /**
+     * @param a
+     * @return
+     */
+    @SuppressWarnings("hiding")
+    public <T> T[] toArray(T[] a) {
+        return data.toArray(a);
+    }
 
     @Override
     public String toString() {

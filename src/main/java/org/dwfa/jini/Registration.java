@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ import net.jini.id.Uuid;
 
 /**
  * @author kec
- *
+ * 
  */
 public class Registration implements Serializable {
     /**
@@ -45,8 +45,7 @@ public class Registration implements Serializable {
      * @param data
      * @param expiration
      */
-    public Registration(Uuid cookie, RemoteEventListener listener,
-            MarshalledObject data, long expiration) {
+    public Registration(Uuid cookie, RemoteEventListener listener, MarshalledObject data, long expiration) {
         super();
         this.cookie = cookie;
         this.listener = listener;

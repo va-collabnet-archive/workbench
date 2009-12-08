@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,9 +35,9 @@ import com.sun.jini.thread.WakeupManager;
  * interacts with a set of
  * <code>net.jini.core.transaction.server.TransactionParticipant</code>s
  * to inform them to vote.
- *
+ * 
  * @author Sun Microsystems, Inc.
- *
+ * 
  * @see com.sun.jini.mahalo.Job
  * @see com.sun.jini.mahalo.ParticipantTask
  * @see net.jini.core.transaction.Transaction
@@ -49,87 +49,80 @@ public class LocalPrepareJob extends LocalJob implements TransactionConstants {
     LocalParticipantHandle[] handles;
     int maxtries = 5;
     /** Logger for operations related messages */
-    private static final Logger operationsLogger =
-            TxnManagerImpl.operationsLogger;
+    private static final Logger operationsLogger = TxnManagerImpl.operationsLogger;
 
     /** Logger for persistence related messages */
-    private static final Logger persistenceLogger =
-            TxnManagerImpl.persistenceLogger;
+    private static final Logger persistenceLogger = TxnManagerImpl.persistenceLogger;
 
     /**
      * Constructs an <code>PrepareJob</code>
-     *
-     *
+     * 
+     * 
      * @param tr The <code>Transaction</code> whose participants
-     *           will be instructed to vote
-     *
+     *            will be instructed to vote
+     * 
      * @param pool The <code>TaskManager</code> which provides the
-     *             threads used for interacting with participants.
-     *
-     * @param log  The <code>ClientLog</code> used for recording
-     *             recovery data.
-     *
+     *            threads used for interacting with participants.
+     * 
+     * @param log The <code>ClientLog</code> used for recording
+     *            recovery data.
+     * 
      * @param handles The array of participants which will be contacted
-     *                and informed to vote
-     *
+     *            and informed to vote
+     * 
      * @see com.sun.jini.thread.TaskManager
      * @see com.sun.jini.mahalo.log.ClientLog
      * @see net.jini.core.transaction.server.TransactionParticipant
      */
-    public LocalPrepareJob(Transaction tr, TaskManager pool, WakeupManager wm,
-            ClientLog log, LocalParticipantHandle[] handles) {
+    public LocalPrepareJob(Transaction tr, TaskManager pool, WakeupManager wm, ClientLog log,
+            LocalParticipantHandle[] handles) {
         super(pool, wm);
 
         if (log == null)
-            throw new IllegalArgumentException("PrepareJob: PrepareJob: "
-                + "log is null");
+            throw new IllegalArgumentException("PrepareJob: PrepareJob: " + "log is null");
 
         this.log = log;
 
         if (!(tr instanceof ServerTransaction))
-            throw new IllegalArgumentException("PrepareJob: PrepareJob: "
-                + "must be a ServerTransaction");
+            throw new IllegalArgumentException("PrepareJob: PrepareJob: " + "must be a ServerTransaction");
 
         this.tr = (ServerTransaction) tr;
 
         if (handles == null)
-            throw new IllegalArgumentException("PrepareJob: PrepareJob: "
-                + "must have participants");
+            throw new IllegalArgumentException("PrepareJob: PrepareJob: " + "must have participants");
 
         if (handles.length == 0)
-            throw new IllegalArgumentException("PrepareJob: PrepareJob: "
-                + "must have participants");
+            throw new IllegalArgumentException("PrepareJob: PrepareJob: " + "must have participants");
 
         this.handles = handles;
     }
 
     /**
-     * The work to be performed by each <code>TaskManager.Task</code>
-     * is provided by the <code>Job</code> that creates it.
+     * The work to be performed by each <code>TaskManager.Task</code> is
+     * provided by the <code>Job</code> that creates it.
      * The work performed by a task belonging to the AbortJob
      * contacts a participant, instructs it to vote and
      * log appropriately.
-     *
+     * 
      * @param who The task performing the work
-     *
+     * 
      * @param param A parameter, of the task's choosing, useful
-     *              in performing work.
-     *
+     *            in performing work.
+     * 
      * @see com.sun.jini.mahalo.Job
      * @see com.sun.jini.thread.TaskManager.Task
      */
     Object doWork(TaskManager.Task who, Object param) {
         if (operationsLogger.isLoggable(Level.FINER)) {
-            operationsLogger.entering(PrepareJob.class.getName(), "doWork",
-                new Object[] { who, param });
+            operationsLogger.entering(PrepareJob.class.getName(), "doWork", new Object[] { who, param });
         }
         LocalParticipantHandle handle = (LocalParticipantHandle) param;
         TransactionParticipant par = null;
 
-        //check if a vote already exists because it was
-        //recovered from the log. In this situation,
-        //we do not need to log this info since it
-        //exists in the log which was used for recovery...
+        // check if a vote already exists because it was
+        // recovered from the log. In this situation,
+        // we do not need to log this info since it
+        // exists in the log which was used for recovery...
 
         int vote = handle.getPrepState();
 
@@ -139,52 +132,48 @@ public class LocalPrepareJob extends LocalJob implements TransactionConstants {
         case ABORTED:
         case PREPARED:
             if (operationsLogger.isLoggable(Level.FINER)) {
-                operationsLogger.exiting(PrepareJob.class.getName(), "doWork",
-                    new Integer(vote));
+                operationsLogger.exiting(PrepareJob.class.getName(), "doWork", new Integer(vote));
             }
             return new Integer(vote);
         }
 
-        //...otherwise, explicitly instruct the participant to
-        //prepare after unpacking it and checking against the
-        //max retry threshold
+        // ...otherwise, explicitly instruct the participant to
+        // prepare after unpacking it and checking against the
+        // max retry threshold
 
         if (par == null)
             par = handle.getPreParedParticipant();
 
-        //If you have exhausted the max retry threshold
-        //stop, so that no further attempts are made.
+        // If you have exhausted the max retry threshold
+        // stop, so that no further attempts are made.
 
         try {
             if (attempt(who) > maxtries) {
                 if (operationsLogger.isLoggable(Level.FINER)) {
-                    operationsLogger.exiting(PrepareJob.class.getName(),
-                        "doWork", new Integer(ABORTED));
+                    operationsLogger.exiting(PrepareJob.class.getName(), "doWork", new Integer(ABORTED));
                 }
                 return new Integer(ABORTED);
             }
         } catch (JobException je) {
             if (operationsLogger.isLoggable(Level.FINER)) {
-                operationsLogger.exiting(PrepareJob.class.getName(), "doWork",
-                    null);
+                operationsLogger.exiting(PrepareJob.class.getName(), "doWork", null);
             }
             return null;
         }
 
-        //At this point, if participant is null, there
-        //must be an error unpacking, so retry later
+        // At this point, if participant is null, there
+        // must be an error unpacking, so retry later
         if (par == null) {
             if (operationsLogger.isLoggable(Level.FINER)) {
-                operationsLogger.exiting(PrepareJob.class.getName(), "doWork",
-                    null);
+                operationsLogger.exiting(PrepareJob.class.getName(), "doWork", null);
             }
             return null;
         }
 
-        //Here we actually need to ask the participant to
-        //prepare.  Note the RemoteException causes a
-        //retry. Here we only log info for the cases
-        //where a final outcome is available.
+        // Here we actually need to ask the participant to
+        // prepare. Note the RemoteException causes a
+        // retry. Here we only log info for the cases
+        // where a final outcome is available.
 
         Object response = null;
 
@@ -205,25 +194,22 @@ public class LocalPrepareJob extends LocalJob implements TransactionConstants {
             try {
                 log.write(new LocalPrepareRecord(handle, vote));
             } catch (com.sun.jini.mahalo.log.LogException le) {
-                //the full package name used to disambiguate
-                //the LogException
+                // the full package name used to disambiguate
+                // the LogException
                 if (persistenceLogger.isLoggable(Level.WARNING)) {
-                    persistenceLogger.log(Level.WARNING,
-                        "Problem writing PrepareRecord.", le);
+                    persistenceLogger.log(Level.WARNING, "Problem writing PrepareRecord.", le);
                 }
-                //	TODO - ignore?		
+                // TODO - ignore?
             }
             if (operationsLogger.isLoggable(Level.FINER)) {
-                operationsLogger.exiting(PrepareJob.class.getName(), "doWork",
-                    response);
+                operationsLogger.exiting(PrepareJob.class.getName(), "doWork", response);
             }
 
             return response;
         }
 
         if (operationsLogger.isLoggable(Level.FINER)) {
-            operationsLogger
-                .exiting(PrepareJob.class.getName(), "doWork", null);
+            operationsLogger.exiting(PrepareJob.class.getName(), "doWork", null);
         }
         return null;
     }
@@ -236,9 +222,7 @@ public class LocalPrepareJob extends LocalJob implements TransactionConstants {
         TaskManager.Task[] tmp = new TaskManager.Task[handles.length];
 
         for (int i = 0; i < handles.length; i++) {
-            tmp[i] =
-                    new LocalParticipantTask(getPool(), getMgr(), this,
-                        handles[i]);
+            tmp[i] = new LocalParticipantTask(getPool(), getMgr(), this, handles[i]);
         }
 
         return tmp;
@@ -247,21 +231,18 @@ public class LocalPrepareJob extends LocalJob implements TransactionConstants {
     /**
      * Gathers partial results submitted by tasks and produces
      * a single outcome.
-     *
+     * 
      * @see com.sun.jini.mahalo.Job
      */
     Object computeResult() throws JobException {
         if (operationsLogger.isLoggable(Level.FINER)) {
-            operationsLogger.entering(PrepareJob.class.getName(),
-                "computeResult");
+            operationsLogger.entering(PrepareJob.class.getName(), "computeResult");
         }
         try {
             if (!isCompleted(0))
-                throw new ResultNotReadyException("Cannot compute result "
-                    + "since there are jobs pending");
+                throw new ResultNotReadyException("Cannot compute result " + "since there are jobs pending");
         } catch (JobNotStartedException jnse) {
-            throw new ResultNotReadyException("Cannot compute result since"
-                + " jobs were not created");
+            throw new ResultNotReadyException("Cannot compute result since" + " jobs were not created");
         }
 
         int prepstate = NOTCHANGED;
@@ -272,20 +253,20 @@ public class LocalPrepareJob extends LocalJob implements TransactionConstants {
 
             switch (tmp) {
             case NOTCHANGED:
-                //Does not affect the prepstate
+                // Does not affect the prepstate
                 break;
 
             case ABORTED:
-                //Causes all further checks to end
-                //while marking ABORTED. A single abort
-                //aborts the whole transaction.
+                // Causes all further checks to end
+                // while marking ABORTED. A single abort
+                // aborts the whole transaction.
 
                 prepstate = ABORTED;
                 break checkresults;
 
             case PREPARED:
-                //changes the state to PREPARED only
-                //if currently NOTCHANGED
+                // changes the state to PREPARED only
+                // if currently NOTCHANGED
                 if (prepstate == NOTCHANGED)
                     prepstate = PREPARED;
                 break;
@@ -293,8 +274,7 @@ public class LocalPrepareJob extends LocalJob implements TransactionConstants {
         }
         Integer result = new Integer(prepstate);
         if (operationsLogger.isLoggable(Level.FINER)) {
-            operationsLogger.exiting(PrepareJob.class.getName(),
-                "computeResult", result);
+            operationsLogger.exiting(PrepareJob.class.getName(), "computeResult", result);
         }
         return result;
     }

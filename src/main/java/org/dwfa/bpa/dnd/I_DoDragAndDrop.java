@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,32 +25,42 @@ import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 
-
 /**
  * @author kec
- *
+ * 
  */
 public interface I_DoDragAndDrop {
     public void highlightForDrop(boolean highlight);
+
     public void highlightForDrag(boolean highlight);
+
     /**
      * @return Returns the acceptableActions.
      */
     public int getAcceptableActions();
-    
+
     public boolean isFlavorSupportedForImport(DataFlavor flavor);
+
     public boolean isFlavorSupportedForExport(DataFlavor flavor);
+
     public Collection<DataFlavor> getLocalFlavors();
+
     public Collection<DataFlavor> getSerialFlavors();
+
     public DataFlavor[] getImportDataFlavors();
+
     public Image createImage(int width, int height);
+
     public boolean isDragging();
-    
+
     public JComponent getJComponent();
-    
+
     public Transferable getTransferable() throws Exception;
+
     public void setDroppedObject(Object obj, DropTargetDropEvent ev);
+
     public void setDroppedObject(Object obj);
+
     public Logger getLogger();
 
 }

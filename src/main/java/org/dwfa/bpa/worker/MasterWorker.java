@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -71,187 +71,171 @@ import org.dwfa.util.io.FileIO;
  */
 public class MasterWorker extends Worker {
 
-  private static Map<UUID, I_Workspace> workspaces = new HashMap<UUID, I_Workspace>();
+    private static Map<UUID, I_Workspace> workspaces = new HashMap<UUID, I_Workspace>();
 
-  private I_Workspace                   currentWorkspace;
+    private I_Workspace currentWorkspace;
 
-  private boolean                       clonable   = true;
+    private boolean clonable = true;
 
-  /**
-   * @return Returns the currentWorkspace.
-   */
-  public I_Workspace getCurrentWorkspace() {
-    return currentWorkspace;
-  }
-
-  /**
-   * @param currentWorkspace
-   *          The currentWorkspace to set.
-   */
-  public void setCurrentWorkspace(I_Workspace currentWorkspace) {
-    this.currentWorkspace = currentWorkspace;
-  }
-
-  /**
-   * @param config
-   * @param id
-   * @param desc
-   * @throws ConfigurationException
-   * @throws LoginException
-   * @throws IOException
-   */
-  public MasterWorker(Configuration config, UUID id, String desc)
-      throws ConfigurationException, LoginException, IOException,
-      PrivilegedActionException {
-    super(config, id, desc);
-    init(config, id, desc);
-  }
-
-  public MasterWorker(Configuration config) throws ConfigurationException,
-      LoginException, IOException, PrivilegedActionException {
-    super(config, MasterWorker.class);
-    init(config, id, desc);
-  }
-
-  private void init(Configuration config, UUID id, String desc)
-      throws ConfigurationException {
-    if (logger.isLoggable(Level.INFO)) {
-      logger.info("Created new worker: " + desc + " id: " + id);
+    /**
+     * @return Returns the currentWorkspace.
+     */
+    public I_Workspace getCurrentWorkspace() {
+        return currentWorkspace;
     }
-    clonable = (Boolean) config.getEntry(this.getClass().getName(), "clonable",
-        Boolean.class, Boolean.TRUE);
 
-    executeStartupProcesses();
-  }
-
-  /**
-   * @see org.dwfa.bpa.process.I_Work#isWorkspaceActive(UUID)
-   */
-  public boolean isWorkspaceActive(UUID workspaceId) {
-    return workspaces.containsKey(workspaceId);
-  }
-
-  /**
-   * @throws WorkspaceActiveException
-   * @throws QueryException
-   * @throws HeadlessException
-   * @see org.dwfa.bpa.process.I_Work#createWorkspace(UUID, java.lang.String,
-   *      org.dwfa.bpa.gui.TerminologyConfiguration)
-   */
-  public I_Workspace createWorkspace(UUID workspaceId, String title,
-      File menuDir) throws Exception {
-    return this.createWorkspace(workspaceId, title, null, menuDir);
-  }
-
-  public I_Workspace createWorkspace(UUID workspaceId, String title,
-      I_ManageUserTransactions transactionInterface, File menuDir)
-      throws Exception {
-    if (workspaces.containsKey(workspaceId)) {
-      throw new WorkspaceActiveException();
+    /**
+     * @param currentWorkspace
+     *            The currentWorkspace to set.
+     */
+    public void setCurrentWorkspace(I_Workspace currentWorkspace) {
+        this.currentWorkspace = currentWorkspace;
     }
-    WorkspaceFrame frame = new WorkspaceFrame(title, transactionInterface,
-        menuDir, this);
-    frame.getWorkspace().setName(title);
-    frame.getWorkspace().setId(workspaceId);
-    workspaces.put(workspaceId, frame.getWorkspace());
-    this.setCurrentWorkspace(frame.getWorkspace());
-    return frame.getWorkspace();
-  }
 
-  public I_Workspace createHeadlessWorkspace(UUID workspaceId)
-      throws WorkspaceActiveException, HeadlessException, TransactionException {
-    if (workspaces.containsKey(workspaceId)) {
-      throw new WorkspaceActiveException();
+    /**
+     * @param config
+     * @param id
+     * @param desc
+     * @throws ConfigurationException
+     * @throws LoginException
+     * @throws IOException
+     */
+    public MasterWorker(Configuration config, UUID id, String desc) throws ConfigurationException, LoginException,
+            IOException, PrivilegedActionException {
+        super(config, id, desc);
+        init(config, id, desc);
     }
-    WorkspacePanel workspace = new WorkspacePanel(
-        new ArrayList<GridBagPanel>(), null);
-    workspaces.put(workspaceId, workspace);
-    this.setCurrentWorkspace(workspace);
-    return workspace;
-  }
 
-  /**
-   * @throws TaskFailedException
-   * @see org.dwfa.bpa.process.I_Work#selectService(net.jini.core.lookup.ServiceItem[])
-   */
-  public Object selectFromList(Object[] list, String title, String labelText)
-      throws TaskFailedException {
-    if (list == null || list.length == 0) {
-      throw new TaskFailedException("item list is null or zero length: " + list);
+    public MasterWorker(Configuration config) throws ConfigurationException, LoginException, IOException,
+            PrivilegedActionException {
+        super(config, MasterWorker.class);
+        init(config, id, desc);
     }
-    Iterator<JFrame> frameItr = OpenFrames.getFrames().iterator();
-    JFrame activeFrame = null;
-    while (frameItr.hasNext()) {
-      JFrame aFrame = frameItr.next();
-      if (aFrame.isActive()) {
-        activeFrame = aFrame;
-        break;
-      }
+
+    private void init(Configuration config, UUID id, String desc) throws ConfigurationException {
+        if (logger.isLoggable(Level.INFO)) {
+            logger.info("Created new worker: " + desc + " id: " + id);
+        }
+        clonable = (Boolean) config.getEntry(this.getClass().getName(), "clonable", Boolean.class, Boolean.TRUE);
+
+        executeStartupProcesses();
     }
-    if (logger.isLoggable(Level.FINER)) {
-      logger.finer("Prompting user to select from list: " + labelText);
+
+    /**
+     * @see org.dwfa.bpa.process.I_Work#isWorkspaceActive(UUID)
+     */
+    public boolean isWorkspaceActive(UUID workspaceId) {
+        return workspaces.containsKey(workspaceId);
     }
-    if (ServiceItem[].class.isAssignableFrom(list.getClass())) {
-      return SelectServiceDialog.showDialog(activeFrame, activeFrame,
-          labelText, title, (ServiceItem[]) list, null, null);
-    } else {
-      return SelectObjectDialog.showDialog(activeFrame, activeFrame, labelText,
-          title, list, null, null);
+
+    /**
+     * @throws WorkspaceActiveException
+     * @throws QueryException
+     * @throws HeadlessException
+     * @see org.dwfa.bpa.process.I_Work#createWorkspace(UUID, java.lang.String,
+     *      org.dwfa.bpa.gui.TerminologyConfiguration)
+     */
+    public I_Workspace createWorkspace(UUID workspaceId, String title, File menuDir) throws Exception {
+        return this.createWorkspace(workspaceId, title, null, menuDir);
     }
-  }
 
-  /**
-   * @see org.dwfa.bpa.process.I_Work#getWorkspace(UUID)
-   */
-  public I_Workspace getWorkspace(UUID workspaceId)
-      throws NoSuchWorkspaceException {
-    this.setCurrentWorkspace(workspaces.get(workspaceId));
-    return workspaces.get(workspaceId);
-  }
-
-  /**
-   * @see org.dwfa.bpa.process.I_Work#getWorkspaces()
-   */
-  public Collection<I_Workspace> getWorkspaces() {
-    return Collections.unmodifiableCollection(workspaces.values());
-  }
-
-  public Object getObjFromFilesystem(Frame parent, String title,
-      String startDir, FilenameFilter fileFilter) throws IOException,
-      ClassNotFoundException {
-    return FileIO.getObjFromFilesystem(parent, title, startDir, fileFilter).getObj();
-  }
-
-  public void writeObjToFilesystem(Frame parent, String title, String startDir,
-      String defaultFile, Object obj) throws IOException {
-    FileIO.writeObjToFilesystem(parent, title, startDir, defaultFile, obj);
-  }
-
-  public Condition execute(I_EncodeBusinessProcess process)
-      throws TaskFailedException {
-    Condition condition = null;
-    if (isExecuting()) {
-      throw new TaskFailedException(
-          "This Worker is executing another process. "
-              + this.getWorkerDescWithId());
-    } else {
-      condition = super.execute(process);
+    public I_Workspace createWorkspace(UUID workspaceId, String title, I_ManageUserTransactions transactionInterface,
+            File menuDir) throws Exception {
+        if (workspaces.containsKey(workspaceId)) {
+            throw new WorkspaceActiveException();
+        }
+        WorkspaceFrame frame = new WorkspaceFrame(title, transactionInterface, menuDir, this);
+        frame.getWorkspace().setName(title);
+        frame.getWorkspace().setId(workspaceId);
+        workspaces.put(workspaceId, frame.getWorkspace());
+        this.setCurrentWorkspace(frame.getWorkspace());
+        return frame.getWorkspace();
     }
-    return condition;
-  }
 
-  public I_Work getTransactionIndependentClone() throws LoginException,
-      ConfigurationException, IOException, PrivilegedActionException {
-    if (clonable) {
-      MasterWorker newClone = new MasterWorker(config);
-      newClone.setWorkerDesc(newClone.getWorkerDesc()
-          + " transaction independent clone.");
-      newClone.setCurrentWorkspace(this.getCurrentWorkspace());
-      return newClone;
+    public I_Workspace createHeadlessWorkspace(UUID workspaceId) throws WorkspaceActiveException, HeadlessException,
+            TransactionException {
+        if (workspaces.containsKey(workspaceId)) {
+            throw new WorkspaceActiveException();
+        }
+        WorkspacePanel workspace = new WorkspacePanel(new ArrayList<GridBagPanel>(), null);
+        workspaces.put(workspaceId, workspace);
+        this.setCurrentWorkspace(workspace);
+        return workspace;
     }
-    throw new ConfigurationException("clone not supported for this worker: "
-        + this.getWorkerDescWithId());
 
-  }
+    /**
+     * @throws TaskFailedException
+     * @see org.dwfa.bpa.process.I_Work#selectService(net.jini.core.lookup.ServiceItem[])
+     */
+    public Object selectFromList(Object[] list, String title, String labelText) throws TaskFailedException {
+        if (list == null || list.length == 0) {
+            throw new TaskFailedException("item list is null or zero length: " + list);
+        }
+        Iterator<JFrame> frameItr = OpenFrames.getFrames().iterator();
+        JFrame activeFrame = null;
+        while (frameItr.hasNext()) {
+            JFrame aFrame = frameItr.next();
+            if (aFrame.isActive()) {
+                activeFrame = aFrame;
+                break;
+            }
+        }
+        if (logger.isLoggable(Level.FINER)) {
+            logger.finer("Prompting user to select from list: " + labelText);
+        }
+        if (ServiceItem[].class.isAssignableFrom(list.getClass())) {
+            return SelectServiceDialog.showDialog(activeFrame, activeFrame, labelText, title, (ServiceItem[]) list,
+                null, null);
+        } else {
+            return SelectObjectDialog.showDialog(activeFrame, activeFrame, labelText, title, list, null, null);
+        }
+    }
+
+    /**
+     * @see org.dwfa.bpa.process.I_Work#getWorkspace(UUID)
+     */
+    public I_Workspace getWorkspace(UUID workspaceId) throws NoSuchWorkspaceException {
+        this.setCurrentWorkspace(workspaces.get(workspaceId));
+        return workspaces.get(workspaceId);
+    }
+
+    /**
+     * @see org.dwfa.bpa.process.I_Work#getWorkspaces()
+     */
+    public Collection<I_Workspace> getWorkspaces() {
+        return Collections.unmodifiableCollection(workspaces.values());
+    }
+
+    public Object getObjFromFilesystem(Frame parent, String title, String startDir, FilenameFilter fileFilter)
+            throws IOException, ClassNotFoundException {
+        return FileIO.getObjFromFilesystem(parent, title, startDir, fileFilter).getObj();
+    }
+
+    public void writeObjToFilesystem(Frame parent, String title, String startDir, String defaultFile, Object obj)
+            throws IOException {
+        FileIO.writeObjToFilesystem(parent, title, startDir, defaultFile, obj);
+    }
+
+    public Condition execute(I_EncodeBusinessProcess process) throws TaskFailedException {
+        Condition condition = null;
+        if (isExecuting()) {
+            throw new TaskFailedException("This Worker is executing another process. " + this.getWorkerDescWithId());
+        } else {
+            condition = super.execute(process);
+        }
+        return condition;
+    }
+
+    public I_Work getTransactionIndependentClone() throws LoginException, ConfigurationException, IOException,
+            PrivilegedActionException {
+        if (clonable) {
+            MasterWorker newClone = new MasterWorker(config);
+            newClone.setWorkerDesc(newClone.getWorkerDesc() + " transaction independent clone.");
+            newClone.setCurrentWorkspace(this.getCurrentWorkspace());
+            return newClone;
+        }
+        throw new ConfigurationException("clone not supported for this worker: " + this.getWorkerDescWithId());
+
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,29 +29,26 @@ public class MultiQueueStarter {
 
     public MultiQueueStarter(String[] args, LifeCycle lc) throws Exception {
         getLogger().info(
-                         "\n*******************\n\n"
-                                 + "Starting MultiQueueStarter with config file: "
-                                 + Arrays.asList(args) + "\n\n******************\n");
-        Configuration config = ConfigurationProvider.getInstance(args, getClass()
-                         .getClassLoader());
-        File[] directories = (File[]) config.getEntry(this.getClass().getName(),
-                                                     "directory", File[].class, new File[] {new File("queue") });
+            "\n*******************\n\n" + "Starting MultiQueueStarter with config file: " + Arrays.asList(args)
+                + "\n\n******************\n");
+        Configuration config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
+        File[] directories = (File[]) config.getEntry(this.getClass().getName(), "directory", File[].class,
+            new File[] { new File("queue") });
 
-        for (File dir: directories) {
+        for (File dir : directories) {
             processFile(dir, lc);
         }
-        
+
     }
 
     private void processFile(File file, LifeCycle lc) throws Exception {
         if (file.isDirectory() == false) {
-            if (file.getName().equalsIgnoreCase("queue.config") && 
-            		(QueueServer.started(file) == false)) {
-                 getLogger().info("Found queue: " + file.getCanonicalPath());
+            if (file.getName().equalsIgnoreCase("queue.config") && (QueueServer.started(file) == false)) {
+                getLogger().info("Found queue: " + file.getCanonicalPath());
                 new QueueServer(new String[] { file.getCanonicalPath() }, lc);
             }
         } else {
-            for (File f: file.listFiles()) {
+            for (File f : file.listFiles()) {
                 processFile(f, lc);
             }
         }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,20 +28,15 @@ import javax.swing.table.AbstractTableModel;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_RecordExecution;
 
-
-
-
 public class ExecutionRecordTableModel extends AbstractTableModel {
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-    
+
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-
-    private String[] columnNames = { "Task", "Task Name", "Date",
-            "Worker Description", "Worker ID", "Condition" };
+    private String[] columnNames = { "Task", "Task Name", "Date", "Worker Description", "Worker ID", "Condition" };
 
     private I_RecordExecution[] rowData;
 
@@ -50,14 +45,14 @@ public class ExecutionRecordTableModel extends AbstractTableModel {
     /**
      * @throws RemoteException
      * @throws IOException
-     *  
+     * 
      */
-    public ExecutionRecordTableModel(I_EncodeBusinessProcess process)  {
+    public ExecutionRecordTableModel(I_EncodeBusinessProcess process) {
         super();
         this.process = process;
-        rowData = (I_RecordExecution[]) process.getExecutionRecords().toArray(new I_RecordExecution[process.getExecutionRecords().size()]);
+        rowData = (I_RecordExecution[]) process.getExecutionRecords().toArray(
+            new I_RecordExecution[process.getExecutionRecords().size()]);
     }
-    
 
     public String getColumnName(int col) {
         return columnNames[col].toString();
@@ -73,18 +68,18 @@ public class ExecutionRecordTableModel extends AbstractTableModel {
 
     public Object getValueAt(int row, int col) {
         switch (col) {
-            case 0: 
-                return Integer.toString(rowData[row].getTaskId());
-            case 1:
-                return this.process.getTask(rowData[row].getTaskId()).getName();
-            case 2:
-                return dateFormat.format(rowData[row].getDate());
-            case 3:
-                return rowData[row].getWorkerDesc();
-            case 4:
-                return rowData[row].getWorkerId().toString();
-            case 5:
-                return rowData[row].getCondition().toString();
+        case 0:
+            return Integer.toString(rowData[row].getTaskId());
+        case 1:
+            return this.process.getTask(rowData[row].getTaskId()).getName();
+        case 2:
+            return dateFormat.format(rowData[row].getDate());
+        case 3:
+            return rowData[row].getWorkerDesc();
+        case 4:
+            return rowData[row].getWorkerId().toString();
+        case 5:
+            return rowData[row].getCondition().toString();
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -100,6 +95,5 @@ public class ExecutionRecordTableModel extends AbstractTableModel {
     public Class<?> getColumnClass(int c) {
         return String.class;
     }
-
 
 }

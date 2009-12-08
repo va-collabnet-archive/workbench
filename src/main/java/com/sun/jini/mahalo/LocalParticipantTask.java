@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,32 +29,30 @@ import com.sun.jini.thread.WakeupManager;
 /**
  * A <code>ParticipantTask</code> is a general task which
  * interacts with a participant.
- *
+ * 
  * @author Sun Microsystems, Inc.
- *
+ * 
  * @see TransactionParticipant
  * @see TaskManager
  */
 public class LocalParticipantTask extends RetryTask {
     LocalParticipantHandle handle;
     LocalJob myjob;
-    private static final Logger operationsLogger =
-            TxnManagerImpl.operationsLogger;
+    private static final Logger operationsLogger = TxnManagerImpl.operationsLogger;
 
     /**
      * Constructs a <code>ParticipantTask</code>.
-     *
+     * 
      * @param manager <code>TaskManager</code> providing the threads
-     *                of execution.
-     *
+     *            of execution.
+     * 
      * @param myjob <code>Job</code> to which this task belongs.
-     *
+     * 
      * @param handle <code>ParticipantHandle</code> representing the
-     *               <code>TransactionParticipant</code> with which
-     *               this task interacts.
+     *            <code>TransactionParticipant</code> with which
+     *            this task interacts.
      */
-    public LocalParticipantTask(TaskManager manager, WakeupManager wm,
-            LocalJob myjob, LocalParticipantHandle handle) {
+    public LocalParticipantTask(TaskManager manager, WakeupManager wm, LocalJob myjob, LocalParticipantHandle handle) {
         super(manager, wm);
         this.myjob = myjob;
         this.handle = handle;
@@ -62,7 +60,7 @@ public class LocalParticipantTask extends RetryTask {
 
     /**
      * Inherit doc comment from supertype.
-     *
+     * 
      * @see com.sun.jini.thread.RetryTask
      */
 
@@ -72,23 +70,21 @@ public class LocalParticipantTask extends RetryTask {
 
     public boolean tryOnce() {
         if (operationsLogger.isLoggable(Level.FINER)) {
-            operationsLogger.entering(ParticipantTask.class.getName(),
-                "tryOnce");
+            operationsLogger.entering(ParticipantTask.class.getName(), "tryOnce");
         }
 
         boolean result = false;
         try {
             result = myjob.performWork(this, handle);
         } catch (UnknownTaskException ute) {
-            //If task doesn't belong to the
-            //Job, then stop doing work.
+            // If task doesn't belong to the
+            // Job, then stop doing work.
             result = true;
         } catch (JobException je) {
             je.printStackTrace();
         }
         if (operationsLogger.isLoggable(Level.FINER)) {
-            operationsLogger.exiting(ParticipantTask.class.getName(),
-                "tryOnce", Boolean.valueOf(result));
+            operationsLogger.exiting(ParticipantTask.class.getName(), "tryOnce", Boolean.valueOf(result));
         }
 
         return result;

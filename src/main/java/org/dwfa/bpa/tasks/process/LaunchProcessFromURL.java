@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,15 +40,15 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 
 /**
- * Launch a process from a JavaBean at specified location. 
+ * Launch a process from a JavaBean at specified location.
  * 
- * The location may be any valid url including file based URLs and 
- * URLs specifying content within the business process. 
+ * The location may be any valid url including file based URLs and
+ * URLs specifying content within the business process.
+ * 
  * @author kec
- *
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/start tasks", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/start tasks", type = BeanType.TASK_BEAN) })
 public class LaunchProcessFromURL extends AbstractTask {
 
     private URL processURL = new URL("http://www.informatics.com/hello.xml");
@@ -59,24 +59,23 @@ public class LaunchProcessFromURL extends AbstractTask {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(processURL);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             processURL = (URL) in.readObject();
         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
+
     public LaunchProcessFromURL() throws MalformedURLException {
         super();
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_EncodeBusinessProcess processToLaunch;
             if (processURL.toString().toLowerCase().endsWith(".xml")) {
@@ -101,8 +100,7 @@ public class LaunchProcessFromURL extends AbstractTask {
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
     }
 
@@ -111,7 +109,7 @@ public class LaunchProcessFromURL extends AbstractTask {
     }
 
     public int[] getDataContainerIds() {
-        return new int[] {  };
+        return new int[] {};
     }
 
     /**
@@ -123,7 +121,7 @@ public class LaunchProcessFromURL extends AbstractTask {
 
     /**
      * @param processURL The processURL to set.
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public void setProcessURLString(String processURLString) throws MalformedURLException {
         this.processURL = new URL(processURLString);

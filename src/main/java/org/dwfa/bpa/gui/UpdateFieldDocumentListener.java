@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,8 +44,7 @@ public class UpdateFieldDocumentListener implements DocumentListener {
      * @param task
      * @param textField
      */
-    public UpdateFieldDocumentListener(Method setMethod,
-            I_ContainData taskToInvoke, JTextArea textField, Logger logger) {
+    public UpdateFieldDocumentListener(Method setMethod, I_ContainData taskToInvoke, JTextArea textField, Logger logger) {
         super();
         this.setMethod = setMethod;
         this.dataContainer = taskToInvoke;
@@ -58,8 +57,7 @@ public class UpdateFieldDocumentListener implements DocumentListener {
 
             public void run() {
                 try {
-                    setMethod.invoke(dataContainer, new Object[] { textField
-                        .getText() });
+                    setMethod.invoke(dataContainer, new Object[] { textField.getText() });
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, e.getMessage(), e);
                 }
@@ -74,8 +72,7 @@ public class UpdateFieldDocumentListener implements DocumentListener {
 
             public void run() {
                 try {
-                    setMethod.invoke(dataContainer, new Object[] { textField
-                        .getText() });
+                    setMethod.invoke(dataContainer, new Object[] { textField.getText() });
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, e.getMessage(), e);
                 }
@@ -89,8 +86,7 @@ public class UpdateFieldDocumentListener implements DocumentListener {
 
             public void run() {
                 try {
-                    setMethod.invoke(dataContainer, new Object[] { textField
-                        .getText() });
+                    setMethod.invoke(dataContainer, new Object[] { textField.getText() });
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, e.getMessage(), e);
                 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,30 +35,19 @@ public class TestPropertyEqualsTextBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor valueTextPropertyName =
-                    new PropertyDescriptor("valueText",
-                        TestPropertyEqualsText.class);
+            PropertyDescriptor valueTextPropertyName = new PropertyDescriptor("valueText", TestPropertyEqualsText.class);
             valueTextPropertyName.setBound(true);
-            valueTextPropertyName
-                .setPropertyEditorClass(JTextFieldEditorOneLine.class);
-            valueTextPropertyName
-                .setDisplayName("<html><font color='blue'>Test value:");
-            valueTextPropertyName
-                .setShortDescription("Text representation of desired value. ");
+            valueTextPropertyName.setPropertyEditorClass(JTextFieldEditorOneLine.class);
+            valueTextPropertyName.setDisplayName("<html><font color='blue'>Test value:");
+            valueTextPropertyName.setShortDescription("Text representation of desired value. ");
 
-            PropertyDescriptor localPropertyName =
-                    new PropertyDescriptor("localPropName",
-                        TestPropertyEqualsText.class);
+            PropertyDescriptor localPropertyName = new PropertyDescriptor("localPropName", TestPropertyEqualsText.class);
             localPropertyName.setBound(true);
-            localPropertyName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            localPropertyName
-                .setDisplayName("<html><font color='blue'>Local property:");
-            localPropertyName
-                .setShortDescription("Name of the local property to test. ");
+            localPropertyName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            localPropertyName.setDisplayName("<html><font color='blue'>Local property:");
+            localPropertyName.setShortDescription("Name of the local property to test. ");
 
-            PropertyDescriptor rv[] =
-                    { localPropertyName, valueTextPropertyName };
+            PropertyDescriptor rv[] = { localPropertyName, valueTextPropertyName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

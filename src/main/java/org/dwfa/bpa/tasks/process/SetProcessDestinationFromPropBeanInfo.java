@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,16 +32,12 @@ public class SetProcessDestinationFromPropBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor destinationProp =
-                    new PropertyDescriptor("newDestinationProperty",
-                        SetProcessDestinationFromProp.class);
+            PropertyDescriptor destinationProp = new PropertyDescriptor("newDestinationProperty",
+                SetProcessDestinationFromProp.class);
             destinationProp.setBound(true);
-            destinationProp
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            destinationProp
-                .setDisplayName("<html><font color='green'>destination prop:");
-            destinationProp
-                .setShortDescription("Name of the property containing the new destination. ");
+            destinationProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            destinationProp.setDisplayName("<html><font color='green'>destination prop:");
+            destinationProp.setShortDescription("Name of the property containing the new destination. ");
 
             PropertyDescriptor rv[] = { destinationProp };
             return rv;
@@ -54,10 +50,8 @@ public class SetProcessDestinationFromPropBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(SetProcessDestinationFromProp.class);
-        bd
-            .setDisplayName("<html><font color='blue'>Set Destination<br>From Property");
+        BeanDescriptor bd = new BeanDescriptor(SetProcessDestinationFromProp.class);
+        bd.setDisplayName("<html><font color='blue'>Set Destination<br>From Property");
         return bd;
     }
 

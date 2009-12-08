@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,13 +29,14 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+
 /**
- * @author kec<p>
- * Sets the tasks subject to the text specified in the task.
- *
+ * @author kec
+ *         <p>
+ *         Sets the tasks subject to the text specified in the task.
+ * 
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/set tasks", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/set tasks", type = BeanType.TASK_BEAN) })
 public class SetProcessSubject extends AbstractTask {
 
     private String newSubject = "newSubject";
@@ -46,33 +47,32 @@ public class SetProcessSubject extends AbstractTask {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(newSubject);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             newSubject = (String) in.readObject();
         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
+
     public SetProcessSubject() {
         super();
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-			process.setSubject(newSubject);
-		} catch (PropertyVetoException e) {
-			throw new TaskFailedException(e);
-		}
+            process.setSubject(newSubject);
+        } catch (PropertyVetoException e) {
+            throw new TaskFailedException(e);
+        }
         return Condition.CONTINUE;
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
     }
 
@@ -81,7 +81,7 @@ public class SetProcessSubject extends AbstractTask {
     }
 
     public int[] getDataContainerIds() {
-        return new int[] {  };
+        return new int[] {};
     }
 
     /**

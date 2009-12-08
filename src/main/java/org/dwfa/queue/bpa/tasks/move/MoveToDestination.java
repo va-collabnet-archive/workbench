@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,66 +38,65 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * @author Susan Castillo<p>
- * Moves a process to the electronic address. 
+ * @author Susan Castillo
+ *         <p>
+ *         Moves a process to the electronic address.
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/queue tasks/move-to", type = BeanType.TASK_BEAN) })
 public class MoveToDestination extends AbstractTask {
 
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
 
-
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
- 
-     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-  
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         return Condition.STOP;
     }
 
     /**
-     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             ServiceID serviceID = null;
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
-            worker.getLogger().info("Moving process " + process.getProcessID() + " to destination: " + process.getDestination());
+            worker.getLogger().info(
+                "Moving process " + process.getProcessID() + " to destination: " + process.getDestination());
             Entry[] attrSetTemplates = new Entry[] { new ElectronicAddress(process.getDestination()) };
-            ServiceTemplate template = new ServiceTemplate(serviceID,
-               serviceTypes,
-               attrSetTemplates);
+            ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
             ServiceItem service = worker.lookup(template, filter);
             if (service == null) {
-            	throw new TaskFailedException("No queue with the specified address could be found: " + process.getDestination());
+                throw new TaskFailedException("No queue with the specified address could be found: "
+                    + process.getDestination());
             }
             I_QueueProcesses q = (I_QueueProcesses) service.service;
             q.write(process, worker.getActiveTransaction());
-            worker.getLogger().info("Moved process " + process.getProcessID() + " to queue: " + q.getNodeInboxAddress());
+            worker.getLogger()
+                .info("Moved process " + process.getProcessID() + " to queue: " + q.getNodeInboxAddress());
         } catch (Exception e) {
             throw new TaskFailedException(e);
-        } 
+        }
 
     }
 
@@ -114,6 +113,5 @@ public class MoveToDestination extends AbstractTask {
     public int[] getDataContainerIds() {
         return new int[] {};
     }
-
 
 }

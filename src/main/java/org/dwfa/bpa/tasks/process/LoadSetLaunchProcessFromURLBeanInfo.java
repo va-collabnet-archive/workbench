@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,23 +36,19 @@ public class LoadSetLaunchProcessFromURLBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(LoadSetLaunchProcessFromURL.class);
-        bd
-            .setDisplayName("<html><center><font color='blue'>Load, Set, Launch<br>Process From URL");
+        BeanDescriptor bd = new BeanDescriptor(LoadSetLaunchProcessFromURL.class);
+        bd.setDisplayName("<html><center><font color='blue'>Load, Set, Launch<br>Process From URL");
         return bd;
     }
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor processURLString =
-                    new PropertyDescriptor("processURLString",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor processURLString = new PropertyDescriptor("processURLString",
+                getBeanDescriptor().getBeanClass());
             processURLString.setBound(true);
             processURLString.setPropertyEditorClass(JTextFieldEditor.class);
             processURLString.setDisplayName("process URL");
-            processURLString
-                .setShortDescription("A URL from which a process is loaded.");
+            processURLString.setShortDescription("A URL from which a process is loaded.");
 
             PropertyDescriptor rv[] = { processURLString };
             return rv;

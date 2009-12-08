@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,222 +41,217 @@ import javax.swing.event.DocumentListener;
  */
 public class JTextFieldEditor implements PropertyEditor, ItemListener {
 
-	private class UpdateFieldDocumentListener implements DocumentListener {
+    private class UpdateFieldDocumentListener implements DocumentListener {
 
-		/**
-		 * @param setMethod
-		 * @param task
-		 * @param textField
-		 */
-		public UpdateFieldDocumentListener() {
-			super();
-		}
+        /**
+         * @param setMethod
+         * @param task
+         * @param textField
+         */
+        public UpdateFieldDocumentListener() {
+            super();
+        }
 
-		public void insertUpdate(DocumentEvent e) {
-			JTextFieldEditor.this.firePropertyChange();
-		}
+        public void insertUpdate(DocumentEvent e) {
+            JTextFieldEditor.this.firePropertyChange();
+        }
 
-		public void removeUpdate(DocumentEvent e) {
-			JTextFieldEditor.this.firePropertyChange();
-		}
+        public void removeUpdate(DocumentEvent e) {
+            JTextFieldEditor.this.firePropertyChange();
+        }
 
-		public void changedUpdate(DocumentEvent e) {
-			JTextFieldEditor.this.firePropertyChange();
-		}
-	}
+        public void changedUpdate(DocumentEvent e) {
+            JTextFieldEditor.this.firePropertyChange();
+        }
+    }
 
-	private class EditorComponent extends JTextArea {
+    private class EditorComponent extends JTextArea {
 
-		/**
+        /**
      * 
      */
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		/**
-		 * @param text
-		 */
-		public EditorComponent() {
-			this(3, 10);
+        /**
+         * @param text
+         */
+        public EditorComponent() {
+            this(3, 10);
 
-		}
+        }
 
-		public EditorComponent(int rows, int columns) {
-			super(rows, columns);
-			this.setLineWrap(true);
-			this.setBorder(BorderFactory.createLoweredBevelBorder());
-			this.getDocument().addDocumentListener(
-					new UpdateFieldDocumentListener());
-		}
+        public EditorComponent(int rows, int columns) {
+            super(rows, columns);
+            this.setLineWrap(true);
+            this.setBorder(BorderFactory.createLoweredBevelBorder());
+            this.getDocument().addDocumentListener(new UpdateFieldDocumentListener());
+        }
 
-	}
+    }
 
-	/**
+    /**
    * 
    */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private EditorComponent editor = new EditorComponent();
+    private EditorComponent editor = new EditorComponent();
 
-	/**
+    /**
    */
-	public JTextFieldEditor() {
-		super();
-	}
+    public JTextFieldEditor() {
+        super();
+    }
 
-	public JTextFieldEditor(int rows, int columns) {
-		super();
-		editor = new EditorComponent(rows, columns);
-	}
+    public JTextFieldEditor(int rows, int columns) {
+        super();
+        editor = new EditorComponent(rows, columns);
+    }
 
-	/**
-	 * @return String
-	 * @see java.beans.PropertyEditor#getValue()
-	 */
-	public Object getValue() {
-		return editor.getText();
-	}
+    /**
+     * @return String
+     * @see java.beans.PropertyEditor#getValue()
+     */
+    public Object getValue() {
+        return editor.getText();
+    }
 
-	/**
-	 * Must be a <code>String</code>.
-	 * 
-	 * @see java.beans.PropertyEditor#setValue(java.lang.Object)
-	 */
-	public void setValue(Object value) {
-		String message = (String) value;
-		if (editor.getText().equals(message)) {
-			//
-		} else {
-			editor.setText(message);
-			this.firePropertyChange();
-		}
-	}
+    /**
+     * Must be a <code>String</code>.
+     * 
+     * @see java.beans.PropertyEditor#setValue(java.lang.Object)
+     */
+    public void setValue(Object value) {
+        String message = (String) value;
+        if (editor.getText().equals(message)) {
+            //
+        } else {
+            editor.setText(message);
+            this.firePropertyChange();
+        }
+    }
 
-	/**
-	 * @see java.beans.PropertyEditor#isPaintable()
-	 */
-	public boolean isPaintable() {
-		return true;
-	}
+    /**
+     * @see java.beans.PropertyEditor#isPaintable()
+     */
+    public boolean isPaintable() {
+        return true;
+    }
 
-	/**
-	 * Calls the paint method on this swing component.
-	 * 
-	 * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics,
-	 *      java.awt.Rectangle)
-	 */
-	public void paintValue(Graphics gfx, Rectangle box) {
-		this.editor.setBounds(box);
-		this.editor.paintAll(gfx);
-	}
+    /**
+     * Calls the paint method on this swing component.
+     * 
+     * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics,
+     *      java.awt.Rectangle)
+     */
+    public void paintValue(Graphics gfx, Rectangle box) {
+        this.editor.setBounds(box);
+        this.editor.paintAll(gfx);
+    }
 
-	/**
-	 * @see java.beans.PropertyEditor#getJavaInitializationString()
-	 */
-	public String getJavaInitializationString() {
-		return "\"" + this.getValue() + "\"";
-	}
+    /**
+     * @see java.beans.PropertyEditor#getJavaInitializationString()
+     */
+    public String getJavaInitializationString() {
+        return "\"" + this.getValue() + "\"";
+    }
 
-	/**
-	 * @see java.beans.PropertyEditor#getAsText()
-	 */
-	public String getAsText() {
-		return this.getValue().toString();
-	}
+    /**
+     * @see java.beans.PropertyEditor#getAsText()
+     */
+    public String getAsText() {
+        return this.getValue().toString();
+    }
 
-	/**
-	 * @see java.beans.PropertyEditor#setAsText(java.lang.String)
-	 */
-	public void setAsText(String text) throws IllegalArgumentException {
-		this.setValue(text);
-	}
+    /**
+     * @see java.beans.PropertyEditor#setAsText(java.lang.String)
+     */
+    public void setAsText(String text) throws IllegalArgumentException {
+        this.setValue(text);
+    }
 
-	/**
-	 * Returns null since this editor provides a custom GUI component.
-	 * 
-	 * @see java.beans.PropertyEditor#getTags()
-	 */
-	public String[] getTags() {
-		return null;
-	}
+    /**
+     * Returns null since this editor provides a custom GUI component.
+     * 
+     * @see java.beans.PropertyEditor#getTags()
+     */
+    public String[] getTags() {
+        return null;
+    }
 
-	/**
-	 * Returns swing component to edit the check box.
-	 * 
-	 * @see java.beans.PropertyEditor#getCustomEditor()
-	 */
-	public Component getCustomEditor() {
-		JScrollPane textScroller = new JScrollPane(this.editor);
-		textScroller
-				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		return textScroller;
-	}
+    /**
+     * Returns swing component to edit the check box.
+     * 
+     * @see java.beans.PropertyEditor#getCustomEditor()
+     */
+    public Component getCustomEditor() {
+        JScrollPane textScroller = new JScrollPane(this.editor);
+        textScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        return textScroller;
+    }
 
-	/**
-	 * Returns true since this editor provides a custom GUI component.
-	 * 
-	 * @see java.beans.PropertyEditor#supportsCustomEditor()
-	 */
-	public boolean supportsCustomEditor() {
-		return true;
-	}
+    /**
+     * Returns true since this editor provides a custom GUI component.
+     * 
+     * @see java.beans.PropertyEditor#supportsCustomEditor()
+     */
+    public boolean supportsCustomEditor() {
+        return true;
+    }
 
-	public void itemStateChanged(ItemEvent e) {
-		this.firePropertyChange();
-	}
+    public void itemStateChanged(ItemEvent e) {
+        this.firePropertyChange();
+    }
 
-	/**
-	 * Register a listener for the PropertyChange event. The class will fire a
-	 * PropertyChange value whenever the value is updated.
-	 * 
-	 * @param listener
-	 *            An object to be invoked when a PropertyChange event is fired.
-	 */
-	public synchronized void addPropertyChangeListener(
-			PropertyChangeListener listener) {
-		if (listeners == null) {
-			listeners = new java.util.Vector<PropertyChangeListener>();
-		}
-		listeners.addElement(listener);
-	}
+    /**
+     * Register a listener for the PropertyChange event. The class will fire a
+     * PropertyChange value whenever the value is updated.
+     * 
+     * @param listener
+     *            An object to be invoked when a PropertyChange event is fired.
+     */
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (listeners == null) {
+            listeners = new java.util.Vector<PropertyChangeListener>();
+        }
+        listeners.addElement(listener);
+    }
 
-	/**
-	 * Remove a listener for the PropertyChange event.
-	 * 
-	 * @param listener
-	 *            The PropertyChange listener to be removed.
-	 */
-	public synchronized void removePropertyChangeListener(
-			PropertyChangeListener listener) {
-		if (listeners == null) {
-			return;
-		}
-		listeners.removeElement(listener);
-	}
+    /**
+     * Remove a listener for the PropertyChange event.
+     * 
+     * @param listener
+     *            The PropertyChange listener to be removed.
+     */
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+        if (listeners == null) {
+            return;
+        }
+        listeners.removeElement(listener);
+    }
 
-	/**
-	 * Report that we have been modified to any interested listeners.
-	 */
-	public void firePropertyChange() {
-		Vector<PropertyChangeListener> targets;
-		synchronized (this) {
-			if (listeners == null) {
-				return;
-			}
-			targets = new Vector<PropertyChangeListener>(listeners);
-		}
-		// Tell our listeners that "everything" has changed.
-		PropertyChangeEvent evt = new PropertyChangeEvent(this.editor, "value",
-				null, editor.getText());
+    /**
+     * Report that we have been modified to any interested listeners.
+     */
+    public void firePropertyChange() {
+        Vector<PropertyChangeListener> targets;
+        synchronized (this) {
+            if (listeners == null) {
+                return;
+            }
+            targets = new Vector<PropertyChangeListener>(listeners);
+        }
+        // Tell our listeners that "everything" has changed.
+        PropertyChangeEvent evt = new PropertyChangeEvent(this.editor, "value", null, editor.getText());
 
-		for (PropertyChangeListener l : targets) {
-			l.propertyChange(evt);
-		}
-	}
+        for (PropertyChangeListener l : targets) {
+            l.propertyChange(evt);
+        }
+    }
 
-	private java.util.Vector<PropertyChangeListener> listeners;
+    private java.util.Vector<PropertyChangeListener> listeners;
 
-	public void setReadOnly(boolean readOnly) {
-		editor.setEditable(readOnly == false);
-	}
+    public void setReadOnly(boolean readOnly) {
+        editor.setEditable(readOnly == false);
+    }
 
 }

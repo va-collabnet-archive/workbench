@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,58 +32,58 @@ public class BusinessProcessTest extends TestCase {
     String test3 = "this is a ${bpa:test3a} ${bpa:test3b} ${bpa:test3a} ";
 
     public void testGetLocators() {
-		BusinessProcess bp = new BusinessProcess();
-		Set<String> locators = bp.getLocators(test1);
-		assertEquals(1, locators.size());
-		assertEquals("bpa:test1", locators.iterator().next());
+        BusinessProcess bp = new BusinessProcess();
+        Set<String> locators = bp.getLocators(test1);
+        assertEquals(1, locators.size());
+        assertEquals("bpa:test1", locators.iterator().next());
 
-		locators = bp.getLocators(test2);
-		assertEquals(1, locators.size());
-		assertEquals("bpa:test2", locators.iterator().next());
-		assertFalse("bpa:test1".equals(locators.iterator().next()));
+        locators = bp.getLocators(test2);
+        assertEquals(1, locators.size());
+        assertEquals("bpa:test2", locators.iterator().next());
+        assertFalse("bpa:test1".equals(locators.iterator().next()));
 
-		locators = bp.getLocators(test3);
-		assertEquals(2, locators.size());
-		assertTrue(locators.contains("bpa:test3a"));
-		assertTrue(locators.contains("bpa:test3b"));
-		assertFalse("bpa:test1".equals(locators.iterator().next()));
-	}
+        locators = bp.getLocators(test3);
+        assertEquals(2, locators.size());
+        assertTrue(locators.contains("bpa:test3a"));
+        assertTrue(locators.contains("bpa:test3b"));
+        assertFalse("bpa:test1".equals(locators.iterator().next()));
+    }
 
     public void testGetObjectFromURL() {
-		try {
-			BpaProtocols.setupExtraProtocols();
-			BusinessProcess bp = new BusinessProcess();
-			Set<String> locators = bp.getLocators(test1);
-			assertEquals(1, locators.size());
-			assertEquals("bpa:test1", locators.iterator().next());
-			bp.writeAttachment("test1", "test1 value");
-			assertTrue("test1 value".equals(bp.getObjectFromURL(new URL("bpa:test1"))));
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			fail(e.getLocalizedMessage());
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail(e.getLocalizedMessage());
-		}
-	}
+        try {
+            BpaProtocols.setupExtraProtocols();
+            BusinessProcess bp = new BusinessProcess();
+            Set<String> locators = bp.getLocators(test1);
+            assertEquals(1, locators.size());
+            assertEquals("bpa:test1", locators.iterator().next());
+            bp.writeAttachment("test1", "test1 value");
+            assertTrue("test1 value".equals(bp.getObjectFromURL(new URL("bpa:test1"))));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            fail(e.getLocalizedMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getLocalizedMessage());
+        }
+    }
 
     public void testSubstituteProperties() {
-		try {
-			BpaProtocols.setupExtraProtocols();
-			BusinessProcess bp = new BusinessProcess();
-			Set<String> locators = bp.getLocators(test1);
-			assertEquals(1, locators.size());
-			assertEquals("bpa:test1", locators.iterator().next());
-			bp.writeAttachment("test1", "test1 value");
-			assertTrue("test1 value".equals(bp.getObjectFromURL(new URL("bpa:test1"))));
-			assertEquals("this is a test1 value", bp.substituteProperties(test1));
-			assertEquals("this is a [${bpa:test2} is null] [${bpa:test2} is null] ", bp.substituteProperties(test2));
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			fail(e.getLocalizedMessage());
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail(e.getLocalizedMessage());
-		}
-	}
+        try {
+            BpaProtocols.setupExtraProtocols();
+            BusinessProcess bp = new BusinessProcess();
+            Set<String> locators = bp.getLocators(test1);
+            assertEquals(1, locators.size());
+            assertEquals("bpa:test1", locators.iterator().next());
+            bp.writeAttachment("test1", "test1 value");
+            assertTrue("test1 value".equals(bp.getObjectFromURL(new URL("bpa:test1"))));
+            assertEquals("this is a test1 value", bp.substituteProperties(test1));
+            assertEquals("this is a [${bpa:test2} is null] [${bpa:test2} is null] ", bp.substituteProperties(test2));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            fail(e.getLocalizedMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getLocalizedMessage());
+        }
+    }
 }

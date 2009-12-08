@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
 /**
  * @author kec
- *
+ * 
  */
 public class LogMessageOnWorkerLogBeanInfo extends SimpleBeanInfo {
 
@@ -41,14 +41,11 @@ public class LogMessageOnWorkerLogBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor message =
-                    new PropertyDescriptor("message",
-                        LogMessageOnWorkerLog.class);
+            PropertyDescriptor message = new PropertyDescriptor("message", LogMessageOnWorkerLog.class);
             message.setBound(true);
             message.setPropertyEditorClass(JTextFieldEditor.class);
             message.setDisplayName("log message");
-            message
-                .setShortDescription("A message to write to the worker log.");
+            message.setShortDescription("A message to write to the worker log.");
 
             PropertyDescriptor rv[] = { message };
             return rv;
@@ -62,8 +59,7 @@ public class LogMessageOnWorkerLogBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(LogMessageOnWorkerLog.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Log on Worker Log");
+        bd.setDisplayName("<html><font color='green'><center>Log on Worker Log");
         return bd;
     }
 }

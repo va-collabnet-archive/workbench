@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,7 @@ import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 
 /**
  * @author kec
- *  
+ * 
  */
 public class QueueWorkerSpec {
     private Class<? extends I_Work> workerClass;
@@ -43,7 +43,7 @@ public class QueueWorkerSpec {
     private UUID workerId;
 
     private I_SelectProcesses selector;
-    
+
     private String[] specifiedConfigArgs;
 
     /**
@@ -84,9 +84,10 @@ public class QueueWorkerSpec {
             I_SelectProcesses selector) {
         this(workerClass, workerName, workerId, selector, null);
     }
+
     public QueueWorkerSpec(Class<? extends I_Work> workerClass, String workerName, UUID workerId,
             I_SelectProcesses selector, String[] specifiedConfigArgs) {
-        super(); 
+        super();
         this.workerClass = workerClass;
         this.workerName = workerName;
         this.workerId = workerId;
@@ -94,24 +95,21 @@ public class QueueWorkerSpec {
         this.specifiedConfigArgs = specifiedConfigArgs;
     }
 
-    public I_GetWorkFromQueue create(Configuration config)
-            throws SecurityException, NoSuchMethodException,
-            IllegalArgumentException, InstantiationException,
-            IllegalAccessException, InvocationTargetException, ConfigurationException {
-        Constructor<? extends I_Work> c = this.workerClass.getConstructor(new Class[] {
-                Configuration.class, UUID.class, String.class,
-                I_SelectProcesses.class });
-        
+    public I_GetWorkFromQueue create(Configuration config) throws SecurityException, NoSuchMethodException,
+            IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException,
+            ConfigurationException {
+        Constructor<? extends I_Work> c = this.workerClass.getConstructor(new Class[] { Configuration.class,
+                                                                                       UUID.class, String.class,
+                                                                                       I_SelectProcesses.class });
+
         Object[] constructorArgs;
-    		if (this.specifiedConfigArgs == null) {
-    			constructorArgs = new Object[] { config,
-    	                this.workerId, this.workerName, this.selector };
-    		} else {
-    			Configuration specifiedConfig = ConfigurationProvider.getInstance(this.specifiedConfigArgs);
-    			constructorArgs = new Object[] { specifiedConfig,
-    	                this.workerId, this.workerName, this.selector };
-    		}
-         return (I_GetWorkFromQueue) c.newInstance(constructorArgs);
+        if (this.specifiedConfigArgs == null) {
+            constructorArgs = new Object[] { config, this.workerId, this.workerName, this.selector };
+        } else {
+            Configuration specifiedConfig = ConfigurationProvider.getInstance(this.specifiedConfigArgs);
+            constructorArgs = new Object[] { specifiedConfig, this.workerId, this.workerName, this.selector };
+        }
+        return (I_GetWorkFromQueue) c.newInstance(constructorArgs);
 
     }
 }

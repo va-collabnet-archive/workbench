@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,15 +54,14 @@ public abstract class WaitForCancelOrComplete extends AbstractTask {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
 
         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
@@ -74,7 +73,7 @@ public abstract class WaitForCancelOrComplete extends AbstractTask {
          */
         public void actionPerformed(ActionEvent e) {
             exitCondition = Condition.ITEM_CANCELED;
-            synchronized(WaitForCancelOrComplete.this) {
+            synchronized (WaitForCancelOrComplete.this) {
                 WaitForCancelOrComplete.this.notifyAll();
             }
 
@@ -89,20 +88,21 @@ public abstract class WaitForCancelOrComplete extends AbstractTask {
          */
         public void actionPerformed(ActionEvent e) {
             exitCondition = Condition.ITEM_COMPLETE;
-            synchronized(WaitForCancelOrComplete.this) {
+            synchronized (WaitForCancelOrComplete.this) {
                 WaitForCancelOrComplete.this.notifyAll();
             }
 
         }
 
     }
-    
+
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public synchronized Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
-    	worker.getCurrentWorkspace().setStatusMessage("<html><font color='red'>Waiting for user input.");
+    public synchronized Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker)
+            throws TaskFailedException {
+        worker.getCurrentWorkspace().setStatusMessage("<html><font color='red'>Waiting for user input.");
         evaluateStart(process, worker);
         I_Workspace ws = worker.getCurrentWorkspace();
         ws.setWorkspaceVisible(true);
@@ -110,18 +110,18 @@ public abstract class WaitForCancelOrComplete extends AbstractTask {
         this.exitCondition = null;
         this.cancelActionListener = new CancelActionListener();
         this.completeActionListener = new CompleteActionListener();
-        
+
         if (worker.getPluginForInterface(I_CompleteForm.class) != null) {
-          I_CompleteForm completer = (I_CompleteForm) worker.getPluginForInterface(I_CompleteForm.class);
-          completer.setCompleteActionListener(completeActionListener);
+            I_CompleteForm completer = (I_CompleteForm) worker.getPluginForInterface(I_CompleteForm.class);
+            completer.setCompleteActionListener(completeActionListener);
         }
         if (worker.getPluginForInterface(I_CancelForm.class) != null) {
-          I_CancelForm canceler = (I_CancelForm) worker.getPluginForInterface(I_CancelForm.class);
-          canceler.setCancelActionListener(cancelActionListener);
+            I_CancelForm canceler = (I_CancelForm) worker.getPluginForInterface(I_CancelForm.class);
+            canceler.setCancelActionListener(cancelActionListener);
         }
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
-    
+
                 public void run() {
                     try {
                         addListeners(worker);
@@ -129,15 +129,14 @@ public abstract class WaitForCancelOrComplete extends AbstractTask {
                         ex = e;
                     }
                 }
-    
-    
+
             });
             if (ex != null) {
                 throw new TaskFailedException(ex);
             }
             this.waitTillDone(worker.getLogger());
             SwingUtilities.invokeAndWait(new Runnable() {
-    
+
                 public void run() {
                     try {
                         removeListeners(worker);
@@ -145,26 +144,29 @@ public abstract class WaitForCancelOrComplete extends AbstractTask {
                         ex = e;
                     }
                 }
-    
+
             });
             if (ex != null) {
                 throw new TaskFailedException(ex);
             }
-    
+
         } catch (InterruptedException ex2) {
             worker.getLogger().log(Level.SEVERE, ex2.getMessage(), ex2);
         } catch (InvocationTargetException e1) {
             throw new TaskFailedException(e1);
         }
-    	worker.getCurrentWorkspace().setStatusMessage("");
+        worker.getCurrentWorkspace().setStatusMessage("");
         evaluateAfterAction(process, worker, exitCondition);
         return this.exitCondition;
     }
 
     public abstract void evaluateStart(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException;
-    public abstract void evaluateAfterAction(I_EncodeBusinessProcess process, I_Work worker, Condition exitCondition)  throws TaskFailedException;
+
+    public abstract void evaluateAfterAction(I_EncodeBusinessProcess process, I_Work worker, Condition exitCondition)
+            throws TaskFailedException;
 
     protected abstract void addListeners(I_Work worker) throws TaskFailedException;
+
     protected abstract void removeListeners(I_Work worker) throws TaskFailedException;
 
     private void waitTillDone(Logger l) {
@@ -175,13 +177,12 @@ public abstract class WaitForCancelOrComplete extends AbstractTask {
                 l.log(Level.SEVERE, e.getMessage(), e);
             }
         }
-    
+
     }
 
     public boolean isDone() {
         return this.exitCondition != null;
     }
-
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()

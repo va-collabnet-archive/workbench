@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,10 +30,9 @@ import org.dwfa.bpa.process.Priority;
 import org.dwfa.bpa.process.ProcessID;
 import org.dwfa.bpa.process.TaskFailedException;
 
-
 /**
  * @author kec
- *
+ * 
  */
 public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
     /**
@@ -48,6 +47,7 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
     private String subject;
     private String name;
     private EntryID entryID;
+
     /**
      * @param processID
      * @param deadline
@@ -56,9 +56,8 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
      * @param destination
      * @param subject
      */
-    public BusinessProcessInfo(ProcessID processID, Date deadline,
-            Priority priority, String originator, String destination,
-            String subject, String name, EntryID entryID) {
+    public BusinessProcessInfo(ProcessID processID, Date deadline, Priority priority, String originator,
+            String destination, String subject, String name, EntryID entryID) {
         super();
         this.processID = processID;
         this.deadline = deadline;
@@ -69,14 +68,15 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
         this.name = name;
         this.entryID = entryID;
     }
-    
+
     public BusinessProcessInfo(I_DescribeQueueEntry info) {
-        this(info.getProcessID(), info.getDeadline(), info.getPriority(), 
-                info.getOriginator(), info.getDestination(), info.getSubject(), info.getName(), info.getEntryID());
+        this(info.getProcessID(), info.getDeadline(), info.getPriority(), info.getOriginator(), info.getDestination(),
+            info.getSubject(), info.getName(), info.getEntryID());
     }
+
     public BusinessProcessInfo(I_DescribeBusinessProcess info, EntryID entryID) {
-        this(info.getProcessID(), info.getDeadline(), info.getPriority(), 
-                info.getOriginator(), info.getDestination(), info.getSubject(), info.getName(), entryID);
+        this(info.getProcessID(), info.getDeadline(), info.getPriority(), info.getOriginator(), info.getDestination(),
+            info.getSubject(), info.getName(), entryID);
     }
 
     /**
@@ -133,7 +133,7 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
      */
     public void validateAddresses() throws TaskFailedException {
         BusinessProcess.validateAddresses(this);
-        
+
     }
 
     /**
@@ -143,14 +143,15 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
         return this.entryID;
     }
 
-	/**
-	 * @see org.dwfa.bpa.process.I_DescribeBusinessProcess#validateDestination()
-	 */
-	public void validateDestination() throws TaskFailedException {
-		BusinessProcess.validateAddress(this.destination, this.processID);
-		
-	}
-	public String toString() {
+    /**
+     * @see org.dwfa.bpa.process.I_DescribeBusinessProcess#validateDestination()
+     */
+    public void validateDestination() throws TaskFailedException {
+        BusinessProcess.validateAddress(this.destination, this.processID);
+
+    }
+
+    public String toString() {
         StringBuffer b = new StringBuffer();
         b.append(" processID: " + processID);
         b.append(" deadline: " + deadline);
@@ -163,6 +164,7 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
 
         return b.toString();
     }
+
     public UUID getObjectID() {
         return this.getProcessID().getUuid();
     }
@@ -183,6 +185,5 @@ public class BusinessProcessInfo implements I_DescribeQueueEntry, Serializable {
     public int hashCode() {
         return entryID.hashCode();
     }
-    
-    
+
 }

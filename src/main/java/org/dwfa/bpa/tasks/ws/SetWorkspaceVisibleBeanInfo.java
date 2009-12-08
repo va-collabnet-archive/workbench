@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,18 +27,16 @@ import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 
 /**
  * @author kec
- *
+ * 
  */
 public class SetWorkspaceVisibleBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor visible =
-                    new PropertyDescriptor("visible", SetWorkspaceVisible.class);
+            PropertyDescriptor visible = new PropertyDescriptor("visible", SetWorkspaceVisible.class);
             visible.setBound(true);
             visible.setPropertyEditorClass(CheckboxEditor.class);
             visible.setDisplayName("visible");
-            visible
-                .setShortDescription("Shows or hides this component depending on the selected value.");
+            visible.setShortDescription("Shows or hides this component depending on the selected value.");
 
             PropertyDescriptor rv[] = { visible };
             return rv;
@@ -52,8 +50,7 @@ public class SetWorkspaceVisibleBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetWorkspaceVisible.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set Workspace Visible");
+        bd.setDisplayName("<html><font color='green'><center>Set Workspace Visible");
         return bd;
     }
 

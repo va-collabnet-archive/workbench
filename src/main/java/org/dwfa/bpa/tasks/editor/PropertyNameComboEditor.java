@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,34 +43,30 @@ import javax.swing.event.ListDataListener;
 import org.dwfa.bpa.PropertyDescriptorWithTarget;
 import org.dwfa.bpa.gui.TargetAndProcessForEditor;
 
-
-public class PropertyNameComboEditor implements PropertyEditor, ItemListener  {
-
-    
+public class PropertyNameComboEditor implements PropertyEditor, ItemListener {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-    
-    private static Logger logger = Logger.getLogger(PropertyNameComboEditor.class
-            .getName());
+
+    private static Logger logger = Logger.getLogger(PropertyNameComboEditor.class.getName());
 
     private JComboBox editor;
     TargetAndProcessForEditor tpfe;
-    
+
     private class PropertyComboBoxModel implements ComboBoxModel {
         private List<ListDataListener> listeners = new ArrayList<ListDataListener>();
         private Object selectedItem;
         private int lastSize = -1;
-        
+
         public void setSelectedItem(Object anItem) {
             this.selectedItem = anItem;
-            
+
         }
 
         public Object getSelectedItem() {
-           return this.selectedItem;
+            return this.selectedItem;
         }
 
         public int getSize() {
@@ -83,7 +79,7 @@ public class PropertyNameComboEditor implements PropertyEditor, ItemListener  {
         }
 
         public Object getElementAt(int index) {
-             try {
+            try {
                 PropertyDescriptorWithTarget pdwt = (PropertyDescriptorWithTarget) this.getDescriptors()[index];
                 return pdwt.getLabel();
             } catch (IntrospectionException e) {
@@ -94,19 +90,19 @@ public class PropertyNameComboEditor implements PropertyEditor, ItemListener  {
 
         public void addListDataListener(ListDataListener l) {
             this.listeners.add(l);
-            
+
         }
 
         public void removeListDataListener(ListDataListener l) {
             this.listeners.remove(l);
         }
-        
+
         private PropertyDescriptor[] getDescriptors() throws IntrospectionException {
             PropertyDescriptor[] descriptors = tpfe.getProcess().getAllPropertiesBeanInfo().getPropertyDescriptors();
             if (lastSize != -1) {
                 if (lastSize != descriptors.length) {
                     lastSize = descriptors.length;
-                    for (ListDataListener l: listeners) {
+                    for (ListDataListener l : listeners) {
                         l.contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, descriptors.length));
                     }
                 }
@@ -115,29 +111,31 @@ public class PropertyNameComboEditor implements PropertyEditor, ItemListener  {
             }
             return descriptors;
         }
-        
+
     }
+
     /**
      * 
      */
 
     /**
-        * @param arg0
-     * @throws IntrospectionException 
-        */
-       public PropertyNameComboEditor(Object obj) throws IntrospectionException {
-           tpfe = (TargetAndProcessForEditor) obj;
-           this.editor = new JComboBox(new PropertyComboBoxModel());
-           editor.addItemListener(this);
-        }
+     * @param arg0
+     * @throws IntrospectionException
+     */
+    public PropertyNameComboEditor(Object obj) throws IntrospectionException {
+        tpfe = (TargetAndProcessForEditor) obj;
+        this.editor = new JComboBox(new PropertyComboBoxModel());
+        editor.addItemListener(this);
+    }
+
     /**
      * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
      */
     public void itemStateChanged(ItemEvent evt) {
-           this.firePropertyChange();
-        
+        this.firePropertyChange();
+
     }
-       
+
     /**
      * @return true or false
      * @see java.beans.PropertyEditor#getValue()
@@ -145,20 +143,16 @@ public class PropertyNameComboEditor implements PropertyEditor, ItemListener  {
     public Object getValue() {
         return editor.getSelectedItem();
     }
-       
-       
 
     /**
-     * Must be a <code>Level</code> representing logging level for the logger. 
+     * Must be a <code>Level</code> representing logging level for the logger.
+     * 
      * @see java.beans.PropertyEditor#setValue(java.lang.Object)
      */
     public void setValue(Object value) {
         this.editor.setSelectedItem(value);
         this.firePropertyChange();
     }
-
-
-
 
     /**
      * @see java.beans.PropertyEditor#isPaintable()
@@ -168,8 +162,10 @@ public class PropertyNameComboEditor implements PropertyEditor, ItemListener  {
     }
 
     /**
-     * Calls the paint method on this swing component. 
-     * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics, java.awt.Rectangle)
+     * Calls the paint method on this swing component.
+     * 
+     * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics,
+     *      java.awt.Rectangle)
      */
     public void paintValue(Graphics gfx, Rectangle box) {
         this.editor.setBounds(box);
@@ -180,7 +176,7 @@ public class PropertyNameComboEditor implements PropertyEditor, ItemListener  {
      * @see java.beans.PropertyEditor#getJavaInitializationString()
      */
     public String getJavaInitializationString() {
-        return "new String(" +  this.getValue() + ")";
+        return "new String(" + this.getValue() + ")";
     }
 
     /**
@@ -198,7 +194,8 @@ public class PropertyNameComboEditor implements PropertyEditor, ItemListener  {
     }
 
     /**
-     * Returns null since this editor provides a custom GUI component. 
+     * Returns null since this editor provides a custom GUI component.
+     * 
      * @see java.beans.PropertyEditor#getTags()
      */
     public String[] getTags() {
@@ -206,7 +203,8 @@ public class PropertyNameComboEditor implements PropertyEditor, ItemListener  {
     }
 
     /**
-     * Returns swing component to edit the check box. 
+     * Returns swing component to edit the check box.
+     * 
      * @see java.beans.PropertyEditor#getCustomEditor()
      */
     public Component getCustomEditor() {
@@ -214,62 +212,60 @@ public class PropertyNameComboEditor implements PropertyEditor, ItemListener  {
     }
 
     /**
-     * Returns true since this editor provides a custom GUI component. 
+     * Returns true since this editor provides a custom GUI component.
+     * 
      * @see java.beans.PropertyEditor#supportsCustomEditor()
      */
     public boolean supportsCustomEditor() {
         return true;
     }
 
-       /**
-        * Register a listener for the PropertyChange event. The class will fire a
-        * PropertyChange value whenever the value is updated.
-        * 
-        * @param listener
-        *            An object to be invoked when a PropertyChange event is fired.
-        */
-       public synchronized void addPropertyChangeListener(
-               PropertyChangeListener listener) {
-           if (listeners == null) {
-               listeners = new java.util.Vector<PropertyChangeListener>();
-           }
-           listeners.addElement(listener);
-       }
+    /**
+     * Register a listener for the PropertyChange event. The class will fire a
+     * PropertyChange value whenever the value is updated.
+     * 
+     * @param listener
+     *            An object to be invoked when a PropertyChange event is fired.
+     */
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (listeners == null) {
+            listeners = new java.util.Vector<PropertyChangeListener>();
+        }
+        listeners.addElement(listener);
+    }
 
-       /**
-        * Remove a listener for the PropertyChange event.
-        * 
-        * @param listener
-        *            The PropertyChange listener to be removed.
-        */
-       public synchronized void removePropertyChangeListener(
-               PropertyChangeListener listener) {
-           if (listeners == null) {
-               return;
-           }
-           listeners.removeElement(listener);
-       }
+    /**
+     * Remove a listener for the PropertyChange event.
+     * 
+     * @param listener
+     *            The PropertyChange listener to be removed.
+     */
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+        if (listeners == null) {
+            return;
+        }
+        listeners.removeElement(listener);
+    }
 
-       /**
-        * Report that we have been modified to any interested listeners.
-        */
-       public void firePropertyChange() {
-           Vector<PropertyChangeListener> targets;
-           synchronized (this) {
-               if (listeners == null) {
-                   return;
-               }
-               targets = new Vector<PropertyChangeListener>(listeners);
-           }
-           // Tell our listeners that "everything" has changed.
-           PropertyChangeEvent evt = new PropertyChangeEvent(this.editor, "value", null, null);
+    /**
+     * Report that we have been modified to any interested listeners.
+     */
+    public void firePropertyChange() {
+        Vector<PropertyChangeListener> targets;
+        synchronized (this) {
+            if (listeners == null) {
+                return;
+            }
+            targets = new Vector<PropertyChangeListener>(listeners);
+        }
+        // Tell our listeners that "everything" has changed.
+        PropertyChangeEvent evt = new PropertyChangeEvent(this.editor, "value", null, null);
 
-           for (PropertyChangeListener l: targets) {
-               l.propertyChange(evt);
-           }
-       }
+        for (PropertyChangeListener l : targets) {
+            l.propertyChange(evt);
+        }
+    }
 
-       private java.util.Vector<PropertyChangeListener> listeners;
-      
+    private java.util.Vector<PropertyChangeListener> listeners;
 
-   }
+}
