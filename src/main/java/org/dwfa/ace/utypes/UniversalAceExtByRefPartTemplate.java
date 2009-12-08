@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ public class UniversalAceExtByRefPartTemplate extends UniversalAceExtByRefPartTe
 
     Collection<UUID> attributeUid;
     Collection<UUID> targetCodeUid;
-    
+
     /**
      * 
      */
@@ -35,20 +35,20 @@ public class UniversalAceExtByRefPartTemplate extends UniversalAceExtByRefPartTe
     private static final int dataVersion = 1;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-       out.writeInt(dataVersion);
-       out.writeObject(attributeUid);
-       out.writeObject(targetCodeUid);
+        out.writeInt(dataVersion);
+        out.writeObject(attributeUid);
+        out.writeObject(targetCodeUid);
     }
 
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-       int objDataVersion = in.readInt();
-       if (objDataVersion == dataVersion) {
-           attributeUid = (Collection<UUID>) in.readObject();
-           targetCodeUid = (Collection<UUID>) in.readObject();
-       } else {
-          throw new IOException("Can't handle dataversion: " + objDataVersion);
-       }
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            attributeUid = (Collection<UUID>) in.readObject();
+            targetCodeUid = (Collection<UUID>) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
     }
 
     public Collection<UUID> getAttributeUid() {
@@ -66,7 +66,5 @@ public class UniversalAceExtByRefPartTemplate extends UniversalAceExtByRefPartTe
     public void setTargetCodeUid(Collection<UUID> targetCodeUid) {
         this.targetCodeUid = targetCodeUid;
     }
-
-
 
 }

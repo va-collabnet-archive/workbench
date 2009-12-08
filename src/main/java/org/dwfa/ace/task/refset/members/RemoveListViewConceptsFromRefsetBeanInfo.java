@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,30 +28,21 @@ public class RemoveListViewConceptsFromRefsetBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor refsetConceptPropName =
-                    new PropertyDescriptor("refsetConceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor refsetConceptPropName = new PropertyDescriptor("refsetConceptPropName",
+                getBeanDescriptor().getBeanClass());
             refsetConceptPropName.setBound(true);
-            refsetConceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            refsetConceptPropName
-                .setDisplayName("<html><font color='green'>Refset concept property:");
-            refsetConceptPropName
-                .setShortDescription("The property containing the refset concept. ");
+            refsetConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetConceptPropName.setDisplayName("<html><font color='green'>Refset concept property:");
+            refsetConceptPropName.setShortDescription("The property containing the refset concept. ");
 
-            PropertyDescriptor conceptExtValuePropName =
-                    new PropertyDescriptor("conceptExtValuePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptExtValuePropName = new PropertyDescriptor("conceptExtValuePropName",
+                getBeanDescriptor().getBeanClass());
             conceptExtValuePropName.setBound(true);
-            conceptExtValuePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptExtValuePropName
-                .setDisplayName("<html><font color='green'>Extension value concept property:");
-            conceptExtValuePropName
-                .setShortDescription("The property containing the value for the new concept extension. ");
+            conceptExtValuePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptExtValuePropName.setDisplayName("<html><font color='green'>Extension value concept property:");
+            conceptExtValuePropName.setShortDescription("The property containing the value for the new concept extension. ");
 
-            PropertyDescriptor rv[] =
-                    { refsetConceptPropName, conceptExtValuePropName };
+            PropertyDescriptor rv[] = { refsetConceptPropName, conceptExtValuePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -62,10 +53,8 @@ public class RemoveListViewConceptsFromRefsetBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(RemoveListViewConceptsFromRefset.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Remove concepts from<br>list view from refset");
+        BeanDescriptor bd = new BeanDescriptor(RemoveListViewConceptsFromRefset.class);
+        bd.setDisplayName("<html><font color='green'><center>Remove concepts from<br>list view from refset");
         return bd;
     }
 

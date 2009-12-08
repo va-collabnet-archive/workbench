@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,26 +28,18 @@ public class ShowPreferencesForProfileBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("The property that contains the profile.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the profile.");
 
-            PropertyDescriptor visible =
-                    new PropertyDescriptor("visible", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor visible = new PropertyDescriptor("visible", getBeanDescriptor().getBeanClass());
             visible.setBound(true);
             visible.setPropertyEditorClass(CheckboxEditor.class);
-            visible
-                .setDisplayName("<html><font color='green'>Show preferences view");
-            visible
-                .setShortDescription("Choose whether to show preferences view.");
+            visible.setDisplayName("<html><font color='green'>Show preferences view");
+            visible.setShortDescription("Choose whether to show preferences view.");
 
             PropertyDescriptor rv[] = { profilePropName, visible };
             return rv;
@@ -61,8 +53,7 @@ public class ShowPreferencesForProfileBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ShowPreferencesForProfile.class);
-        bd.setDisplayName("<html><font color='green'><center>Show or Hide<br>"
-            + "Preferences View<br>for Profile");
+        bd.setDisplayName("<html><font color='green'><center>Show or Hide<br>" + "Preferences View<br>for Profile");
         return bd;
     }
 

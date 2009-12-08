@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,16 +37,15 @@ public class AddSubversionEntryForUser extends AddSubversionEntry {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private String usernameProperty = ProcessAttachmentKeys.USERNAME.getAttachmentKey();
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(usernameProperty);
-     }
+    }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             usernameProperty = (String) in.readObject();
@@ -55,14 +54,15 @@ public class AddSubversionEntryForUser extends AddSubversionEntry {
         }
 
     }
+
     @Override
     protected void addUserInfo(I_EncodeBusinessProcess process, I_ConfigAceFrame config) throws TaskFailedException {
         String username;
-		try {
-			username = (String) process.readProperty(usernameProperty);
-		} catch (Exception e) {
-			throw new TaskFailedException(e);
-		} 
+        try {
+            username = (String) process.readProperty(usernameProperty);
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
         String repoUrl = this.getRepoUrl();
         if (repoUrl.endsWith("/")) {
             this.setRepoUrl(repoUrl + username);

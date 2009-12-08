@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,383 +60,322 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN) })
 public class SearchReplaceTermsInList extends AbstractTask {
 
-	/**
+    /**
 	 *
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 2;
+    private static final int dataVersion = 2;
 
     private static int objDataVersion = -1;
 
-
-	private String searchStringPropName = ProcessAttachmentKeys.FIND_TEXT.getAttachmentKey();
-	private String replaceStringPropName = ProcessAttachmentKeys.REPLACE_TEXT.getAttachmentKey();
-	private String caseSensitivePropName = ProcessAttachmentKeys.CASE_SENSITIVITY.getAttachmentKey();
-	private String searchAllPropName = ProcessAttachmentKeys.SEARCH_ALL.getAttachmentKey();
-	private String searchFsnPropName = ProcessAttachmentKeys.SEARCH_FSN.getAttachmentKey();
-	private String searchPftPropName = ProcessAttachmentKeys.SEARCH_PT.getAttachmentKey();
-	private String searchSynonymPropName = ProcessAttachmentKeys.SEARCH_SYNONYM.getAttachmentKey();
+    private String searchStringPropName = ProcessAttachmentKeys.FIND_TEXT.getAttachmentKey();
+    private String replaceStringPropName = ProcessAttachmentKeys.REPLACE_TEXT.getAttachmentKey();
+    private String caseSensitivePropName = ProcessAttachmentKeys.CASE_SENSITIVITY.getAttachmentKey();
+    private String searchAllPropName = ProcessAttachmentKeys.SEARCH_ALL.getAttachmentKey();
+    private String searchFsnPropName = ProcessAttachmentKeys.SEARCH_FSN.getAttachmentKey();
+    private String searchPftPropName = ProcessAttachmentKeys.SEARCH_PT.getAttachmentKey();
+    private String searchSynonymPropName = ProcessAttachmentKeys.SEARCH_SYNONYM.getAttachmentKey();
     private String retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
 
     private List<I_GetConceptData> statuses;
 
-
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(searchStringPropName);
-		out.writeObject(replaceStringPropName);
-		out.writeObject(caseSensitivePropName);
-		out.writeObject(searchAllPropName);
-		out.writeObject(searchFsnPropName);
-		out.writeObject(searchPftPropName);
-		out.writeObject(searchSynonymPropName);
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(searchStringPropName);
+        out.writeObject(replaceStringPropName);
+        out.writeObject(caseSensitivePropName);
+        out.writeObject(searchAllPropName);
+        out.writeObject(searchFsnPropName);
+        out.writeObject(searchPftPropName);
+        out.writeObject(searchSynonymPropName);
         out.writeObject(retireAsStatusPropName);
-	}
+    }
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
-			searchStringPropName = (String) in.readObject();
-			replaceStringPropName = (String) in.readObject();
-			caseSensitivePropName = (String) in.readObject();
-			searchAllPropName = (String) in.readObject();
-			searchFsnPropName = (String) in.readObject();
-			searchPftPropName = (String) in.readObject();
-			searchSynonymPropName = (String) in.readObject();
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        objDataVersion = in.readInt();
+        if (objDataVersion == 1) {
+            searchStringPropName = (String) in.readObject();
+            replaceStringPropName = (String) in.readObject();
+            caseSensitivePropName = (String) in.readObject();
+            searchAllPropName = (String) in.readObject();
+            searchFsnPropName = (String) in.readObject();
+            searchPftPropName = (String) in.readObject();
+            searchSynonymPropName = (String) in.readObject();
             retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
         } else if (objDataVersion >= 2) {
             searchStringPropName = (String) in.readObject();
-			replaceStringPropName = (String) in.readObject();
-			caseSensitivePropName = (String) in.readObject();
-			searchAllPropName = (String) in.readObject();
-			searchFsnPropName = (String) in.readObject();
-			searchPftPropName = (String) in.readObject();
-			searchSynonymPropName = (String) in.readObject();
+            replaceStringPropName = (String) in.readObject();
+            caseSensitivePropName = (String) in.readObject();
+            searchAllPropName = (String) in.readObject();
+            searchFsnPropName = (String) in.readObject();
+            searchPftPropName = (String) in.readObject();
+            searchSynonymPropName = (String) in.readObject();
             retireAsStatusPropName = (String) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do...
+    }
 
-	}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		try {
+            I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-			I_TermFactory termFactory = LocalVersionedTerminology.get();
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-							.name());
+            int retiredConceptId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids()
+                .iterator()
+                .next());
+            I_GetConceptData FSN_UUID = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+            I_GetConceptData PFT_UUID = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+            I_GetConceptData SYNONYM_UUID = termFactory.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
 
-			int retiredConceptId = termFactory
-					.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED
-							.getUids().iterator().next());
-			I_GetConceptData FSN_UUID = termFactory
-					.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-							.getUids());
-			I_GetConceptData PFT_UUID = termFactory
-					.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-							.getUids());
-			I_GetConceptData SYNONYM_UUID = termFactory
-					.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
-							.getUids());
+            String searchString = "" + process.readProperty(searchStringPropName);
+            String replaceString = "" + process.readProperty(replaceStringPropName);
+            boolean caseSensitive = Boolean.valueOf("" + process.readProperty(caseSensitivePropName));
+            boolean searchAll = Boolean.valueOf("" + process.readProperty(searchAllPropName));
+            boolean searchFsn = Boolean.valueOf("" + process.readProperty(searchFsnPropName));
+            boolean searchPft = Boolean.valueOf("" + process.readProperty(searchPftPropName));
+            boolean searchSynonym = Boolean.valueOf("" + process.readProperty(searchSynonymPropName));
+            int retireAsStatus = Integer.valueOf("" + process.readProperty(retireAsStatusPropName));
 
-			String searchString = ""
-					+ process.readProperty(searchStringPropName);
-			String replaceString = ""
-					+ process.readProperty(replaceStringPropName);
-			boolean caseSensitive = Boolean.valueOf(""
-					+ process.readProperty(caseSensitivePropName));
-			boolean searchAll = Boolean.valueOf(""
-					+ process.readProperty(searchAllPropName));
-			boolean searchFsn = Boolean.valueOf(""
-					+ process.readProperty(searchFsnPropName));
-			boolean searchPft = Boolean.valueOf(""
-					+ process.readProperty(searchPftPropName));
-			boolean searchSynonym = Boolean.valueOf(""
-					+ process.readProperty(searchSynonymPropName));
-            int retireAsStatus = Integer.valueOf(""
-					+ process.readProperty(retireAsStatusPropName));
+            // create list of IDs of description types to check (e.g. preferred
+            // term)
+            I_IntSet descriptionTypesToCheck = termFactory.newIntSet();
+            if (searchFsn) {
+                descriptionTypesToCheck.add(FSN_UUID.getConceptId());
+            }
+            if (searchPft) {
+                descriptionTypesToCheck.add(PFT_UUID.getConceptId());
+            }
+            if (searchSynonym) {
+                descriptionTypesToCheck.add(SYNONYM_UUID.getConceptId());
+            }
 
-			// create list of IDs of description types to check (e.g. preferred
-			// term)
-			I_IntSet descriptionTypesToCheck = termFactory.newIntSet();
-			if (searchFsn) {
-				descriptionTypesToCheck.add(FSN_UUID.getConceptId());
-			}
-			if (searchPft) {
-				descriptionTypesToCheck.add(PFT_UUID.getConceptId());
-			}
-			if (searchSynonym) {
-				descriptionTypesToCheck.add(SYNONYM_UUID.getConceptId());
-			}
+            JList conceptList = config.getBatchConceptList();
+            I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
+            List<SearchReplaceDescription> searchReplaceDescriptions = new ArrayList<SearchReplaceDescription>();
 
-			JList conceptList = config.getBatchConceptList();
-			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList
-					.getModel();
-			List<SearchReplaceDescription> searchReplaceDescriptions = new ArrayList<SearchReplaceDescription>();
+            // Basically, no replace string was entered... which is a valid
+            // expression of replace matches with an empty string
+            if (replaceString == null) {
+                replaceString = "";
+            }
 
-			// Basically, no replace string was entered... which is a valid
-			// expression of replace matches with an empty string
-			if (replaceString == null) {
-				replaceString = "";
-			}
+            String processedDescriptions = "";
+            String signpostOutput = "";
+            if ((searchString != null && !searchString.equals(""))
+                && (searchAll || searchFsn || searchPft || searchSynonym)) {
+                // For each concept in the list view
+                for (int i = 0; i < model.getSize(); i++) {
 
-			String processedDescriptions = "";
-			String signpostOutput = "";
-			if ((searchString != null && !searchString.equals(""))
-					&& (searchAll || searchFsn || searchPft || searchSynonym)) {
-				// For each concept in the list view
-				for (int i = 0; i < model.getSize(); i++) {
+                    // Get the current concept
+                    I_GetConceptData child = model.getElementAt(i);
 
-					// Get the current concept
-					I_GetConceptData child = model.getElementAt(i);
+                    Set<I_Position> positionsToCheck = config.getViewPositionSet();
 
-					Set<I_Position> positionsToCheck = config
-							.getViewPositionSet();
+                    // get latest descriptions
+                    List<I_DescriptionTuple> descriptionTuples = child.getDescriptionTuples(config.getAllowedStatus(),
+                        (searchAll ? null : descriptionTypesToCheck), positionsToCheck);
 
-					// get latest descriptions
-					List<I_DescriptionTuple> descriptionTuples = child
-							.getDescriptionTuples(config.getAllowedStatus(), (searchAll ? null
-									: descriptionTypesToCheck),
-									positionsToCheck);
+                    // For the current description of this concept
+                    for (I_DescriptionTuple description : descriptionTuples) {
 
-					// For the current description of this concept
-					for (I_DescriptionTuple description : descriptionTuples) {
+                        if (!processedDescriptions.contains(":" + description.getDescId() + ":")) {
+                            // If it contains the search string
+                            if ((caseSensitive && description.getText().contains(searchString))
+                                || (!caseSensitive && description.getText().toUpperCase().contains(
+                                    searchString.toUpperCase()))) {
 
-						if (!processedDescriptions.contains(":"
-								+ description.getDescId() + ":")) {
-							// If it contains the search string
-							if ((caseSensitive && description.getText()
-									.contains(searchString))
-									|| (!caseSensitive && description.getText()
-											.toUpperCase().contains(
-													searchString.toUpperCase()))) {
+                                // If not case sensitive, create regex
+                                // prepending text
+                                String searchPrepend = "";
+                                if (!caseSensitive) {
+                                    searchPrepend = "(?i)";
+                                }
 
-								// If not case sensitive, create regex
-								// prepending text
-								String searchPrepend = "";
-								if (!caseSensitive) {
-									searchPrepend = "(?i)";
-								}
+                                String origDesc = description.getText();
+                                String finalDesc = description.getText().replaceAll(searchPrepend + searchString,
+                                    replaceString);
+                                String origDescHtml = description.getText().replaceAll(searchPrepend + searchString,
+                                    "<font color='red'>" + searchString + "</font>");
+                                String finalDescHtml = description.getText().replaceAll(searchPrepend + searchString,
+                                    "<font color='green'>" + replaceString + "</font>");
 
-								String origDesc = description.getText();
-								String finalDesc = description.getText()
-										.replaceAll(
-												searchPrepend + searchString,
-												replaceString);
-								String origDescHtml = description.getText()
-										.replaceAll(
-												searchPrepend + searchString,
-												"<font color='red'>"
-														+ searchString
-														+ "</font>");
-								String finalDescHtml = description.getText()
-										.replaceAll(
-												searchPrepend + searchString,
-												"<font color='green'>"
-														+ replaceString
-														+ "</font>");
+                                String descType = termFactory.getConcept(description.getTypeId()).getInitialText();
 
-								String descType = termFactory.getConcept(
-										description.getTypeId())
-										.getInitialText();
+                                // Add to our list of descriptions that will
+                                // require change
+                                SearchReplaceDescription srDesc = new SearchReplaceDescription(origDesc, finalDesc,
+                                    origDescHtml, finalDescHtml, descType);
+                                searchReplaceDescriptions.add(srDesc);
 
-								// Add to our list of descriptions that will
-								// require change
-								SearchReplaceDescription srDesc = new SearchReplaceDescription(
-										origDesc, finalDesc, origDescHtml,
-										finalDescHtml, descType);
-								searchReplaceDescriptions.add(srDesc);
+                                Set<I_Path> paths = config.getEditingPathSet();
 
-								Set<I_Path> paths = config.getEditingPathSet();
+                                // Create a new, cloned, description
+                                I_DescriptionVersioned newDesc = termFactory.newDescription(UUID.randomUUID(), child,
+                                    description.getLang(), finalDesc, termFactory.getConcept(description.getTypeId()),
+                                    config);
 
-								// Create a new, cloned, description
-								I_DescriptionVersioned newDesc = termFactory
-										.newDescription(
-												UUID.randomUUID(),
-												child,
-												description.getLang(),
-												finalDesc,
-												termFactory
-														.getConcept(description
-																.getTypeId()),
-												config);
-
-								I_DescriptionPart newLastPart = newDesc.getLastTuple().getPart();
-								for (I_Path path : paths) {
-									// retire the existing description
-									I_DescriptionPart newRetiredPart = description
-											.duplicatePart();
-									newRetiredPart.setPathId(path.getConceptId());
-									newRetiredPart.setVersion(Integer.MAX_VALUE);
+                                I_DescriptionPart newLastPart = newDesc.getLastTuple().getPart();
+                                for (I_Path path : paths) {
+                                    // retire the existing description
+                                    I_DescriptionPart newRetiredPart = description.duplicatePart();
+                                    newRetiredPart.setPathId(path.getConceptId());
+                                    newRetiredPart.setVersion(Integer.MAX_VALUE);
                                     if (retireAsStatus != -1) {
                                         newRetiredPart.setStatusId(retireAsStatus);
                                     } else {
-									    newRetiredPart.setStatusId(retiredConceptId);
+                                        newRetiredPart.setStatusId(retiredConceptId);
                                     }
-									description.getDescVersioned().addVersion(
-											newRetiredPart);
-									// Set the status to that of the original,
-									// and path to the current
-									if (newLastPart == null) {
-										newLastPart = newDesc.getLastTuple().getPart().duplicate();
-									}
-									newLastPart.setStatusId(description.getStatusId());
-									newLastPart.setInitialCaseSignificant(description.getInitialCaseSignificant());
-									newLastPart.setPathId(path.getConceptId());
+                                    description.getDescVersioned().addVersion(newRetiredPart);
+                                    // Set the status to that of the original,
+                                    // and path to the current
+                                    if (newLastPart == null) {
+                                        newLastPart = newDesc.getLastTuple().getPart().duplicate();
+                                    }
+                                    newLastPart.setStatusId(description.getStatusId());
+                                    newLastPart.setInitialCaseSignificant(description.getInitialCaseSignificant());
+                                    newLastPart.setPathId(path.getConceptId());
                                     termFactory.addUncommitted(child);
                                     newLastPart = null;
-								}
-							}
-							processedDescriptions += ":"
-									+ description.getDescId() + ":";
-						}
-					}
-				}
+                                }
+                            }
+                            processedDescriptions += ":" + description.getDescId() + ":";
+                        }
+                    }
+                }
 
-				signpostOutput = "<html>\n"
-						+ "<TABLE width='100%' cellpadding='1' cellspacing='0' border='1' style='font-family:arial;font-size:10px;' bgcolor='white' bordercolor='gray'>\n"
-						+ "<TR>\n"
-						+ "  <TD bgcolor='#00CCCC' align='center'>Update No.</TD>\n"
-						+ "  <TD bgcolor='#00CCCC'>Description Type</TD>\n"
-						+ "  <TD bgcolor='#00CCCC'>Original Value</TD>\n"
-						+ "  <TD bgcolor='#00CCCC'>Updated Value</TD>\n"
-						+ "</TR>\n";
+                signpostOutput = "<html>\n"
+                    + "<TABLE width='100%' cellpadding='1' cellspacing='0' border='1' style='font-family:arial;font-size:10px;' bgcolor='white' bordercolor='gray'>\n"
+                    + "<TR>\n" + "  <TD bgcolor='#00CCCC' align='center'>Update No.</TD>\n"
+                    + "  <TD bgcolor='#00CCCC'>Description Type</TD>\n"
+                    + "  <TD bgcolor='#00CCCC'>Original Value</TD>\n" + "  <TD bgcolor='#00CCCC'>Updated Value</TD>\n"
+                    + "</TR>\n";
 
-				int i = 0;
-				// Output the original and final versions of the string
-				for (SearchReplaceDescription desc : searchReplaceDescriptions) {
+                int i = 0;
+                // Output the original and final versions of the string
+                for (SearchReplaceDescription desc : searchReplaceDescriptions) {
 
-					i++;
-					signpostOutput += "<TR>\n" + "  <TD align='center'>" + i
-							+ "/" + searchReplaceDescriptions.size()
-							+ "</TD>\n" + "  <TD>" + desc.getDescType()
-							+ "</TD>\n" + "  <TD>" + desc.getOrigDescHtml()
-							+ "</TD>\n" + "  <TD>" + desc.getFinalDescHtml()
-							+ "</TD>\n" + "</TR>\n";
-				}
+                    i++;
+                    signpostOutput += "<TR>\n" + "  <TD align='center'>" + i + "/" + searchReplaceDescriptions.size()
+                        + "</TD>\n" + "  <TD>" + desc.getDescType() + "</TD>\n" + "  <TD>" + desc.getOrigDescHtml()
+                        + "</TD>\n" + "  <TD>" + desc.getFinalDescHtml() + "</TD>\n" + "</TR>\n";
+                }
 
-				if (searchReplaceDescriptions.isEmpty()) {
-					signpostOutput = "<html><h1>NO MATCHES FOUND</h1></html>";
-				} else {
-					signpostOutput += "</TABLE>\n" + "</html>";
-				}
-			} else if (searchString == null || searchString.equals("")) {
-				signpostOutput = "<html><h1>NO SEARCH STRING ENTERED</h1></html>";
-			} else {
-				signpostOutput = "<html><h1>NO DESCRIPTION TYPE SELECTED</h1></html>";
-			}
+                if (searchReplaceDescriptions.isEmpty()) {
+                    signpostOutput = "<html><h1>NO MATCHES FOUND</h1></html>";
+                } else {
+                    signpostOutput += "</TABLE>\n" + "</html>";
+                }
+            } else if (searchString == null || searchString.equals("")) {
+                signpostOutput = "<html><h1>NO SEARCH STRING ENTERED</h1></html>";
+            } else {
+                signpostOutput = "<html><h1>NO DESCRIPTION TYPE SELECTED</h1></html>";
+            }
 
-			displayOutput(signpostOutput, config);
+            displayOutput(signpostOutput, config);
 
-			return Condition.CONTINUE;
-		} catch (IllegalArgumentException e) {
-			throw new TaskFailedException(
-					"Failed reading properties from process: ", e);
-		} catch (IntrospectionException e) {
-			throw new TaskFailedException(
-					"Failed reading properties from process: ", e);
-		} catch (IllegalAccessException e) {
-			throw new TaskFailedException(
-					"Failed reading properties from process: ", e);
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(
-					"Failed reading properties from process: ", e);
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		} catch (TerminologyException e) {
-			throw new TaskFailedException(e);
-		}
-	}
+            return Condition.CONTINUE;
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException("Failed reading properties from process: ", e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException("Failed reading properties from process: ", e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException("Failed reading properties from process: ", e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException("Failed reading properties from process: ", e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-	private void displayOutput(String signpostOutput, I_ConfigAceFrame config) {
+    private void displayOutput(String signpostOutput, I_ConfigAceFrame config) {
 
-		JPanel signpostPanel = config.getSignpostPanel();
-		signpostPanel.setLayout(new BorderLayout());
+        JPanel signpostPanel = config.getSignpostPanel();
+        signpostPanel.setLayout(new BorderLayout());
 
-		signpostPanel.removeAll();
-		signpostPanel.validate();
-		// JLabel outputLabel = new JLabel(signpostOutput, JLabel.CENTER);
-		// JScrollPane scrollPane = new JScrollPane(outputLabel);
-		// scrollPane.add(outputLabel);
-		// scrollPane.setPreferredSize(new Dimension(800, 300));
-		// signpostPanel.add(scrollPane);
+        signpostPanel.removeAll();
+        signpostPanel.validate();
+        // JLabel outputLabel = new JLabel(signpostOutput, JLabel.CENTER);
+        // JScrollPane scrollPane = new JScrollPane(outputLabel);
+        // scrollPane.add(outputLabel);
+        // scrollPane.setPreferredSize(new Dimension(800, 300));
+        // signpostPanel.add(scrollPane);
 
-		JEditorPane htmlPane = new JEditorPane("text/html", signpostOutput);
-		htmlPane.setEditable(false);
-		JScrollPane scrollPane = new JScrollPane(htmlPane);
-		signpostPanel.add(scrollPane, BorderLayout.CENTER);
-		scrollPane.setPreferredSize(new Dimension(signpostPanel.getSize()));
+        JEditorPane htmlPane = new JEditorPane("text/html", signpostOutput);
+        htmlPane.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(htmlPane);
+        signpostPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setPreferredSize(new Dimension(signpostPanel.getSize()));
 
-		// signpostPanel.setPreferredSize(new Dimension(1200,300));
-		// signpostPanel.validate();
-	}
+        // signpostPanel.setPreferredSize(new Dimension(1200,300));
+        // signpostPanel.validate();
+    }
 
-	public String getSearchStringPropName() {
-		return searchStringPropName;
-	}
+    public String getSearchStringPropName() {
+        return searchStringPropName;
+    }
 
-	public void setSearchStringPropName(String searchStringPropName) {
-		this.searchStringPropName = searchStringPropName;
-	}
+    public void setSearchStringPropName(String searchStringPropName) {
+        this.searchStringPropName = searchStringPropName;
+    }
 
-	public String getReplaceStringPropName() {
-		return replaceStringPropName;
-	}
+    public String getReplaceStringPropName() {
+        return replaceStringPropName;
+    }
 
-	public void setReplaceStringPropName(String replaceStringPropName) {
-		this.replaceStringPropName = replaceStringPropName;
-	}
+    public void setReplaceStringPropName(String replaceStringPropName) {
+        this.replaceStringPropName = replaceStringPropName;
+    }
 
-	public String getCaseSensitivePropName() {
-		return caseSensitivePropName;
-	}
+    public String getCaseSensitivePropName() {
+        return caseSensitivePropName;
+    }
 
-	public void setCaseSensitivePropName(String caseSensitivePropName) {
-		this.caseSensitivePropName = caseSensitivePropName;
-	}
+    public void setCaseSensitivePropName(String caseSensitivePropName) {
+        this.caseSensitivePropName = caseSensitivePropName;
+    }
 
-	public String getSearchAllPropName() {
-		return searchAllPropName;
-	}
+    public String getSearchAllPropName() {
+        return searchAllPropName;
+    }
 
-	public void setSearchAllPropName(String searchAllPropName) {
-		this.searchAllPropName = searchAllPropName;
-	}
+    public void setSearchAllPropName(String searchAllPropName) {
+        this.searchAllPropName = searchAllPropName;
+    }
 
-	public String getSearchFsnPropName() {
-		return searchFsnPropName;
-	}
+    public String getSearchFsnPropName() {
+        return searchFsnPropName;
+    }
 
-	public void setSearchFsnPropName(String searchFsnPropName) {
-		this.searchFsnPropName = searchFsnPropName;
-	}
+    public void setSearchFsnPropName(String searchFsnPropName) {
+        this.searchFsnPropName = searchFsnPropName;
+    }
 
-	public String getSearchPftPropName() {
-		return searchPftPropName;
-	}
+    public String getSearchPftPropName() {
+        return searchPftPropName;
+    }
 
-	public void setSearchPftPropName(String searchPftPropName) {
-		this.searchPftPropName = searchPftPropName;
-	}
+    public void setSearchPftPropName(String searchPftPropName) {
+        this.searchPftPropName = searchPftPropName;
+    }
 
-	public String getSearchSynonymPropName() {
-		return searchSynonymPropName;
-	}
+    public String getSearchSynonymPropName() {
+        return searchSynonymPropName;
+    }
 
-	public void setSearchSynonymPropName(String searchSynonymPropName) {
-		this.searchSynonymPropName = searchSynonymPropName;
-	}
+    public void setSearchSynonymPropName(String searchSynonymPropName) {
+        this.searchSynonymPropName = searchSynonymPropName;
+    }
 
     public String getRetireAsStatusPropName() {
         return retireAsStatusPropName;
@@ -447,10 +386,10 @@ public class SearchReplaceTermsInList extends AbstractTask {
     }
 
     public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+        return CONTINUE_CONDITION;
+    }
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 }

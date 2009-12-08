@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,25 +24,24 @@ import java.util.UUID;
 import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.tapi.TerminologyException;
 
-
 public interface I_IdVersioned extends I_AmTermComponent {
 
-	public int getNativeId();
+    public int getNativeId();
 
-	public void setNativeId(int nativeId);
+    public void setNativeId(int nativeId);
 
-	public List<I_IdPart> getVersions();
+    public List<I_IdPart> getVersions();
 
-	public List<UUID> getUIDs();
+    public List<UUID> getUIDs();
 
-	public boolean addVersion(I_IdPart srcId);
+    public boolean addVersion(I_IdPart srcId);
 
-	public boolean hasVersion(I_IdPart newPart);
+    public boolean hasVersion(I_IdPart newPart);
 
-	public Set<TimePathId> getTimePathSet();
+    public Set<TimePathId> getTimePathSet();
 
-	public List<I_IdTuple> getTuples();
-	
-	public UniversalAceIdentification getUniversal() throws IOException, TerminologyException;
+    public List<I_IdTuple> getTuples();
+
+    public UniversalAceIdentification getUniversal() throws IOException, TerminologyException;
 
 }

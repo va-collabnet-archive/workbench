@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,33 +36,24 @@ public class ConceptTupleFileUtil {
 
     public static I_GetConceptData lastConcept = null;
 
-    public static String exportTuple(I_GetConceptData concept)
-            throws TerminologyException, IOException {
+    public static String exportTuple(I_GetConceptData concept) throws TerminologyException, IOException {
 
         I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-        String idTuple =
-                IDTupleFileUtil.exportTuple(termFactory.getId(concept.getUids()
-                    .iterator().next()));
+        String idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(concept.getUids().iterator().next()));
 
         RefsetUtilImpl refsetUtil = new RefsetUtilImpl();
-        I_ConceptAttributePart part =
-                refsetUtil.getLastestAttributePart(concept);
+        I_ConceptAttributePart part = refsetUtil.getLastestAttributePart(concept);
 
-        UUID conceptTupleUuid =
-                ArchitectonicAuxiliary.Concept.CON_TUPLE.getUids().iterator()
-                    .next();
-        UUID conceptUuid =
-                termFactory.getUids(concept.getConceptId()).iterator().next();
-        UUID statusUuid =
-                termFactory.getUids(part.getStatusId()).iterator().next();
+        UUID conceptTupleUuid = ArchitectonicAuxiliary.Concept.CON_TUPLE.getUids().iterator().next();
+        UUID conceptUuid = termFactory.getUids(concept.getConceptId()).iterator().next();
+        UUID statusUuid = termFactory.getUids(part.getStatusId()).iterator().next();
         boolean isDefined = part.isDefined();
         UUID pathUuid = termFactory.getUids(part.getPathId()).iterator().next();
         int effectiveDate = part.getVersion();
 
-        return idTuple + conceptTupleUuid + "\t" + conceptUuid + "\t"
-            + isDefined + "\t" + pathUuid + "\t" + statusUuid + "\t"
-            + effectiveDate + "\n";
+        return idTuple + conceptTupleUuid + "\t" + conceptUuid + "\t" + isDefined + "\t" + pathUuid + "\t" + statusUuid
+            + "\t" + effectiveDate + "\n";
     }
 
     public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
@@ -156,9 +147,8 @@ public class ConceptTupleFileUtil {
                 boolean returnConflictResolvedLatestState = true;
 
                 // check if the part exists
-                List<I_ConceptAttributeTuple> parts =
-                        concept.getConceptAttributeTuples(allowedStatus, null, addUncommitted,
-                            returnConflictResolvedLatestState);
+                List<I_ConceptAttributeTuple> parts = concept.getConceptAttributeTuples(allowedStatus, null,
+                    addUncommitted, returnConflictResolvedLatestState);
                 /*
                  * List<I_ConceptAttributeTuple> parts =
                  * concept.getConceptAttributeTuples(allowedStatus, positions,
@@ -186,8 +176,8 @@ public class ConceptTupleFileUtil {
                 }
             } else {
                 // need to create concept + part
-                I_GetConceptData newConcept =
-                        termFactory.newConcept(conceptUuid, isDefined, termFactory.getActiveAceFrameConfig());
+                I_GetConceptData newConcept = termFactory.newConcept(conceptUuid, isDefined,
+                    termFactory.getActiveAceFrameConfig());
                 I_ConceptAttributeVersioned v = newConcept.getConceptAttributes();
 
                 lastConcept = newConcept;
@@ -211,8 +201,8 @@ public class ConceptTupleFileUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage =
-                    "Exception of unknown cause thrown while importing concept tuple : " + e.getLocalizedMessage();
+            String errorMessage = "Exception of unknown cause thrown while importing concept tuple : "
+                + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

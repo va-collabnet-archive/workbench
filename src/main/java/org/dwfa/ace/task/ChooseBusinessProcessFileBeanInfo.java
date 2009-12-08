@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info to ChooseBusinessProcessFile class.
+ * 
  * @author Susan Castillo
- *
+ * 
  */
 public class ChooseBusinessProcessFileBeanInfo extends SimpleBeanInfo {
 
@@ -40,14 +41,11 @@ public class ChooseBusinessProcessFileBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor processFileNamePropName =
-                    new PropertyDescriptor("processFileNamePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor processFileNamePropName = new PropertyDescriptor("processFileNamePropName",
+                getBeanDescriptor().getBeanClass());
             processFileNamePropName.setBound(true);
-            processFileNamePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            processFileNamePropName
-                .setDisplayName("<html><font color='green'>Business Process<br>File:");
+            processFileNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            processFileNamePropName.setDisplayName("<html><font color='green'>Business Process<br>File:");
             processFileNamePropName.setShortDescription("Business Process");
 
             PropertyDescriptor rv[] = { processFileNamePropName };
@@ -62,8 +60,7 @@ public class ChooseBusinessProcessFileBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ChooseBusinessProcessFile.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Choose Business Process");
+        bd.setDisplayName("<html><font color='green'><center>Choose Business Process");
         return bd;
     }
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,8 +27,7 @@ public class LoadClassifyWriteBeanInfo extends SimpleBeanInfo {
         BeanDescriptor bd = new BeanDescriptor(LoadClassifyWrite.class);
         // :EDIT:MEC: color & text change
         // bd.setDisplayName("<html><font color='green'><center>Load &amp; Classify");
-        bd
-            .setDisplayName("<html><font color='#B3B3B3'><center>LoadClassifyWrite");
+        bd.setDisplayName("<html><font color='#B3B3B3'><center>LoadClassifyWrite");
         return bd;
     }
 }

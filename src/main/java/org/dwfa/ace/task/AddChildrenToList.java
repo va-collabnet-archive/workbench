@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,62 +38,58 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN) })
 public class AddChildrenToList extends AbstractTask {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			//
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            //
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-	}
+    }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do...
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
-	}
+    }
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			
-			I_GetConceptData concept = config.getHierarchySelection();
-	
-			JList conceptList = config.getBatchConceptList();
-			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-			
-			for (I_GetConceptData child: concept.getDestRelOrigins(config.getAllowedStatus(), 
-					config.getDestRelTypes(), config.getViewPositionSet(), true)) {
-				model.addElement(child);
-			}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-			return Condition.CONTINUE;
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		}
-	}
+            I_GetConceptData concept = config.getHierarchySelection();
 
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+            JList conceptList = config.getBatchConceptList();
+            I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+            for (I_GetConceptData child : concept.getDestRelOrigins(config.getAllowedStatus(),
+                config.getDestRelTypes(), config.getViewPositionSet(), true)) {
+                model.addElement(child);
+            }
+
+            return Condition.CONTINUE;
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        }
+    }
+
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
+
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
 }

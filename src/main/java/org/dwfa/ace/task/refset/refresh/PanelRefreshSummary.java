@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -71,16 +71,17 @@ import org.dwfa.tapi.TerminologyException;
  * 6) request attachments (file chooser)
  * 
  * @author Perry Reid
- * @version 1.0, November 2009 
+ * @version 1.0, November 2009
  * 
  */
 public class PanelRefreshSummary extends JPanel {
 
-    /* -----------------------
-     * Properties 
+    /*
+     * -----------------------
+     * Properties
      * -----------------------
      */
-    // Serialization Properties 
+    // Serialization Properties
     private static final long serialVersionUID = 1L;
 
     // components
@@ -94,23 +95,20 @@ public class PanelRefreshSummary extends JPanel {
     public PanelRefreshSummary() {
         super(new GridBagLayout());
 
-        /* -------------------------------------------------
-         *  Set Default / initial values for all the fields 
+        /*
+         * -------------------------------------------------
+         * Set Default / initial values for all the fields
          * -------------------------------------------------
          */
-        String defaultMessage =
-                "<html>" + "<STYLE type=\"text/css\"> " + "	body { "
-                    + "		margin-top: 2px; " + "		margin-right: 12px; "
-                    + "		margin-bottom: 2px; " + "		margin-left: 12px; "
-                    + "	} " + "</STYLE> "
-                    + "<body bgcolor='rgb(255, 255, 220)'> "
-                    + "<h2>Refresh Refset Spec Summary</h2>"
-                    + "<p>No summary information available.</p>"
-                    + "</body></html>";
+        String defaultMessage = "<html>" + "<STYLE type=\"text/css\"> " + "	body { " + "		margin-top: 2px; "
+            + "		margin-right: 12px; " + "		margin-bottom: 2px; " + "		margin-left: 12px; " + "	} " + "</STYLE> "
+            + "<body bgcolor='rgb(255, 255, 220)'> " + "<h2>Refresh Refset Spec Summary</h2>"
+            + "<p>No summary information available.</p>" + "</body></html>";
         setMessageText(defaultMessage);
 
-        /* -------------------------------------------------
-         *  Layout the components  
+        /*
+         * -------------------------------------------------
+         * Layout the components
          * -------------------------------------------------
          */
         layoutComponents();
@@ -128,8 +126,7 @@ public class PanelRefreshSummary extends JPanel {
         htmlPane.setText(this.messageText);
         htmlPane.setEditable(false);
         JScrollPane editorScrollPane = new JScrollPane(htmlPane);
-        editorScrollPane
-            .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        editorScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         editorScrollPane.setPreferredSize(new Dimension(450, 580));
         editorScrollPane.setMinimumSize(new Dimension(10, 10));
         editorScrollPane.setBorder(new EtchedBorder(EtchedBorder.RAISED));
@@ -143,8 +140,10 @@ public class PanelRefreshSummary extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         this.add(editorScrollPane, gridBagConstraints);
 
-        // Tell the panel to o lay out its subcomponents again. It should be invoked 
-        // when this container's subcomponents are modified after the container has been displayed.
+        // Tell the panel to o lay out its subcomponents again. It should be
+        // invoked
+        // when this container's subcomponents are modified after the container
+        // has been displayed.
         this.validate();
 
     }

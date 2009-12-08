@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,13 +51,13 @@ public class AddSubversionEntry extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 2;
-    
+
     private String prompt = "enter data for new subversion repository: ";
     private String keyName = "repoKey";
     private String repoUrl = "https://amt-edit-bundle.au-ct.org/svn/amt-edit-bundle/trunk/dev/src/main/profiles/users";
     private String workingCopy = "profiles/users";
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(prompt);
@@ -67,8 +67,7 @@ public class AddSubversionEntry extends AbstractTask {
         out.writeObject(profilePropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
             prompt = (String) in.readObject();
@@ -76,9 +75,9 @@ public class AddSubversionEntry extends AbstractTask {
             repoUrl = (String) in.readObject();
             workingCopy = (String) in.readObject();
             if (objDataVersion >= 2) {
-            	profilePropName = (String) in.readObject();
+                profilePropName = (String) in.readObject();
             } else {
-            	profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+                profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -86,43 +85,40 @@ public class AddSubversionEntry extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) process
-            	.readAttachement(ProcessAttachmentKeys.WORKING_PROFILE.name());
+            I_ConfigAceFrame config = (I_ConfigAceFrame) process.readAttachement(ProcessAttachmentKeys.WORKING_PROFILE.name());
             addUserInfo(process, config);
             SubversionData svd = config.getSubversionMap().get(keyName);
             if (svd == null) {
                 svd = new SubversionData(repoUrl, workingCopy);
             }
-            
+
             Prompter p = new Prompter();
-            p.prompt(prompt, keyName, svd.getRepositoryUrlStr(), svd.getWorkingCopyStr(),
-                     svd.getUsername(), svd.getPassword());
+            p.prompt(prompt, keyName, svd.getRepositoryUrlStr(), svd.getWorkingCopyStr(), svd.getUsername(),
+                svd.getPassword());
             svd.setWorkingCopyStr(p.getWorkingCopyStr());
             svd.setRepositoryUrlStr(p.getRepositoryUrlStr());
             svd.setPassword(p.getPassword());
             svd.setUsername(p.getUsername());
             keyName = p.getRepoKey();
-           
+
             config.getSubversionMap().put(keyName, svd);
-             return Condition.CONTINUE;
+            return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         }
     }
-    
 
     protected void addUserInfo(I_EncodeBusinessProcess process, I_ConfigAceFrame config) throws TaskFailedException {
-        // subclass may override to include user info, for this task, we make no modifications...
-        
+        // subclass may override to include user info, for this task, we make no
+        // modifications...
+
     }
 
     public Collection<Condition> getConditions() {
@@ -148,43 +144,44 @@ public class AddSubversionEntry extends AbstractTask {
     public void setKeyName(String keyName) {
         this.keyName = keyName;
     }
+
     private static class Prompter {
         private String repoKey;
 
-		private String username;
+        private String username;
 
         private String password;
 
         private String repositoryUrlStr;
-        
+
         private String workingCopyStr;
 
         public void prompt(String prompt, String repoKey, String repositoryUrlStr, String workingCopyStr,
-            String username, String password) throws TaskFailedException {
+                String username, String password) throws TaskFailedException {
             JFrame parentFrame = new JFrame();
             JPanel promptPane = new JPanel(new SpringLayout());
             parentFrame.getContentPane().add(promptPane);
-            
+
             promptPane.add(new JLabel("key:", JLabel.RIGHT));
             JTextField keyField = new JTextField(30);
             keyField.setText(repoKey);
             promptPane.add(keyField);
-            
+
             promptPane.add(new JLabel("repository url:", JLabel.RIGHT));
             JTextField repoUrlField = new JTextField(30);
             repoUrlField.setText(repositoryUrlStr);
             promptPane.add(repoUrlField);
-            
+
             promptPane.add(new JLabel("working copy:", JLabel.RIGHT));
             JTextField workingCopyField = new JTextField(30);
             workingCopyField.setText(workingCopyStr);
             promptPane.add(workingCopyField);
-            
+
             promptPane.add(new JLabel("username:", JLabel.RIGHT));
             JTextField userTextField = new JTextField(30);
             userTextField.setText(username);
             promptPane.add(userTextField);
-            
+
             promptPane.add(new JLabel("password:", JLabel.RIGHT));
             JPasswordField pwd = new JPasswordField(30);
             pwd.setText(password);
@@ -237,12 +234,12 @@ public class AddSubversionEntry extends AbstractTask {
         }
 
         public String getRepoKey() {
-			return repoKey;
-		}
+            return repoKey;
+        }
 
-		public void setRepoKey(String repoKey) {
-			this.repoKey = repoKey;
-		}
+        public void setRepoKey(String repoKey) {
+            this.repoKey = repoKey;
+        }
     }
 
     public String getRepoUrl() {
@@ -261,12 +258,12 @@ public class AddSubversionEntry extends AbstractTask {
         this.workingCopy = workingCopy;
     }
 
-	public String getProfilePropName() {
-		return profilePropName;
-	}
+    public String getProfilePropName() {
+        return profilePropName;
+    }
 
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
-	}
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
+    }
 
- }
+}

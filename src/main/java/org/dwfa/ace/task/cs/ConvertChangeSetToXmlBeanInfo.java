@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,23 +27,17 @@ public class ConvertChangeSetToXmlBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor filename =
-                    new PropertyDescriptor("filename", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor filename = new PropertyDescriptor("filename", getBeanDescriptor().getBeanClass());
             filename.setBound(true);
             filename.setPropertyEditorClass(JTextFieldEditor.class);
             filename.setDisplayName("<html><font color='green'>changeset:");
             filename.setShortDescription("The file to convert. ");
 
-            PropertyDescriptor outputSuffix =
-                    new PropertyDescriptor("outputSuffix", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor outputSuffix = new PropertyDescriptor("outputSuffix", getBeanDescriptor().getBeanClass());
             outputSuffix.setBound(true);
             outputSuffix.setPropertyEditorClass(JTextFieldEditor.class);
-            outputSuffix
-                .setDisplayName("<html><font color='green'>output file suffix:");
-            outputSuffix
-                .setShortDescription("The generated output file suffix. ");
+            outputSuffix.setDisplayName("<html><font color='green'>output file suffix:");
+            outputSuffix.setShortDescription("The generated output file suffix. ");
 
             PropertyDescriptor rv[] = { filename, outputSuffix };
             return rv;
@@ -57,8 +51,7 @@ public class ConvertChangeSetToXmlBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ConvertChangeSetToXml.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Convert Change Set<br>to XML");
+        bd.setDisplayName("<html><font color='green'><center>Convert Change Set<br>to XML");
         return bd;
     }
 }

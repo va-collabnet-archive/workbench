@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,6 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/view", type = BeanType.TASK_BEAN) })
-
 public class SetViewToPositionOnEditPathSet extends AbstractTask {
 
     /**
@@ -51,21 +50,20 @@ public class SetViewToPositionOnEditPathSet extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private static SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    
-     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
-     private String positionStr = "latest";
+    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
-     private void writeObject(ObjectOutputStream out) throws IOException {
+    private String positionStr = "latest";
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(profilePropName);
         out.writeObject(positionStr);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             profilePropName = (String) in.readObject();
@@ -76,19 +74,17 @@ public class SetViewToPositionOnEditPathSet extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
             profile.getViewPositionSet().clear();
 
-            for (I_Path path: profile.getEditingPathSet()) {
+            for (I_Path path : profile.getEditingPathSet()) {
                 int version = Integer.MAX_VALUE;
                 if (positionStr.equalsIgnoreCase("latest")) {
                     version = Integer.MAX_VALUE;
@@ -100,7 +96,7 @@ public class SetViewToPositionOnEditPathSet extends AbstractTask {
                 I_Position position = LocalVersionedTerminology.get().newPosition(path, version);
                 profile.addViewPosition(position);
             }
- 
+
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
@@ -126,7 +122,6 @@ public class SetViewToPositionOnEditPathSet extends AbstractTask {
     public int[] getDataContainerIds() {
         return new int[] {};
     }
-
 
     public String getProfilePropName() {
         return profilePropName;

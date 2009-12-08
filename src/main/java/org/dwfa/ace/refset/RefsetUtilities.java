@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -96,10 +96,8 @@ public abstract class RefsetUtilities {
         Set<Integer> parents = new HashSet<Integer>();
 
         I_GetConceptData concept = getConcept(conceptId);
-        List<I_RelTuple> parenttuples =
-                concept.getSourceRelTuples(getStatuses(), (this.altIsA == null
-                                                                              ? getIntSet(ConceptConstants.SNOMED_IS_A)
-                                                                              : getIntSet(this.altIsA)), null, false);
+        List<I_RelTuple> parenttuples = concept.getSourceRelTuples(getStatuses(),
+            (this.altIsA == null ? getIntSet(ConceptConstants.SNOMED_IS_A) : getIntSet(this.altIsA)), null, false);
 
         /*
          * Iterate over children
@@ -160,9 +158,8 @@ public abstract class RefsetUtilities {
         /*
          * Find all children
          */
-        List<I_RelTuple> childrentuples =
-                concept.getDestRelTuples(getStatuses(), (this.altIsA == null ? getIntSet(ConceptConstants.SNOMED_IS_A)
-                                                                            : getIntSet(this.altIsA)), null, false);
+        List<I_RelTuple> childrentuples = concept.getDestRelTuples(getStatuses(),
+            (this.altIsA == null ? getIntSet(ConceptConstants.SNOMED_IS_A) : getIntSet(this.altIsA)), null, false);
 
         /*
          * Iterate over children
@@ -218,9 +215,8 @@ public abstract class RefsetUtilities {
                 if (purposeConcepts.iterator().next().getConceptId() == termFactory.getConcept(
                     RefsetAuxiliary.Concept.INCLUSION_SPECIFICATION.getUids()).getConceptId()) {
                     if (getMemberSetConcept(refsetConcept.getConceptId()) == null) {
-                        System.out
-                            .println("ERROR: inclusion specification concept does not have a defined 'generates' relationship. Skipping generation of refset "
-                                + refsetConcept);
+                        System.out.println("ERROR: inclusion specification concept does not have a defined 'generates' relationship. Skipping generation of refset "
+                            + refsetConcept);
                     } else {
                         allowedRefsets.add(refsetConcept.getConceptId());
                     }
@@ -280,9 +276,8 @@ public abstract class RefsetUtilities {
         I_IntSet currentIntSet = getIntSet(ArchitectonicAuxiliary.Concept.CURRENT);
         I_IntSet generatesRelIntSet = getIntSet(ConceptConstants.GENERATES_REL);
 
-        I_GetConceptData memberSetSpecConcept =
-                assertOneOrNone(getConcept(refsetId)
-                    .getSourceRelTargets(currentIntSet, generatesRelIntSet, null, false));
+        I_GetConceptData memberSetSpecConcept = assertOneOrNone(getConcept(refsetId).getSourceRelTargets(currentIntSet,
+            generatesRelIntSet, null, false));
         return memberSetSpecConcept;
     }
 
@@ -369,10 +364,9 @@ public abstract class RefsetUtilities {
             termFactory.addUncommitted(ext);
 
         } else {
-            int memberId =
-                    termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
-                        ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), termFactory.getPaths(),
-                        Integer.MAX_VALUE);
+            int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
+                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), termFactory.getPaths(),
+                Integer.MAX_VALUE);
 
             I_ThinExtByRefVersioned newExtension = termFactory.newExtension(memberSetId, memberId, conceptId, typeId);
 
@@ -413,10 +407,9 @@ public abstract class RefsetUtilities {
 
         } else {
 
-            int memberId =
-                    termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
-                        ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), termFactory.getPaths(),
-                        Integer.MAX_VALUE);
+            int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
+                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), termFactory.getPaths(),
+                Integer.MAX_VALUE);
 
             I_ThinExtByRefVersioned newExtension = termFactory.newExtension(memberSetId, memberId, conceptId, typeId);
 
@@ -453,9 +446,8 @@ public abstract class RefsetUtilities {
     public int getRelTypeTarget(int conceptId, ConceptSpec relType) throws Exception {
         I_GetConceptData concept = getConcept(conceptId);
 
-        Set<I_GetConceptData> membershipTypes =
-                concept.getSourceRelTargets(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), getIntSet(relType),
-                    null, false);
+        Set<I_GetConceptData> membershipTypes = concept.getSourceRelTargets(
+            getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), getIntSet(relType), null, false);
 
         if (membershipTypes.size() == 0) {
             throw new TerminologyException("A source relationship of type '" + relType.getDescription()

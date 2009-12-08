@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,31 +25,30 @@ import org.dwfa.tapi.TerminologyException;
 
 public interface I_ImageVersioned extends I_AmTermComponent {
 
-	public byte[] getImage();
+    public byte[] getImage();
 
-	public int getImageId();
+    public int getImageId();
 
-	public List<I_ImagePart> getVersions();
+    public List<I_ImagePart> getVersions();
 
-	public boolean addVersion(I_ImagePart part);
+    public boolean addVersion(I_ImagePart part);
 
-	public String getFormat();
+    public String getFormat();
 
-	public int getConceptId();
+    public int getConceptId();
 
-	public I_ImageTuple getLastTuple();
+    public I_ImageTuple getLastTuple();
 
-	public List<I_ImageTuple> getTuples();
+    public List<I_ImageTuple> getTuples();
 
-	public void convertIds(I_MapNativeToNative jarToDbNativeMap);
+    public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
-	public boolean merge(I_ImageVersioned jarImage);
+    public boolean merge(I_ImageVersioned jarImage);
 
-	public Set<TimePathId> getTimePathSet();
+    public Set<TimePathId> getTimePathSet();
 
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positions, List<I_ImageTuple> returnImages);
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+            List<I_ImageTuple> returnImages);
 
-	public UniversalAceImage getUniversal() throws IOException,
-			TerminologyException;
+    public UniversalAceImage getUniversal() throws IOException, TerminologyException;
 }

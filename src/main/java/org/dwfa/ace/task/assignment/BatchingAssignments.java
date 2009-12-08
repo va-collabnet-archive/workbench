@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,9 +38,11 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Takes a uuid list of lists and puts 250 and if less than 250 the size of the list number in to uuid list property
+ * Takes a uuid list of lists and puts 250 and if less than 250 the size of the
+ * list number in to uuid list property
+ * 
  * @author Susan Castillo
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
 public class BatchingAssignments extends AbstractTask {
@@ -51,13 +53,12 @@ public class BatchingAssignments extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
 
     private String uuidList2PropName = ProcessAttachmentKeys.BATCH_UUID_LIST2.getAttachmentKey();
-    
-    private Integer listListSize = 250;
 
+    private Integer listListSize = 250;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -66,52 +67,48 @@ public class BatchingAssignments extends AbstractTask {
         out.writeObject(listListSize);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-        	uuidListListPropName = (String) in.readObject();
-        	uuidList2PropName = (String) in.readObject();
-        	listListSize = (Integer) in.readObject();
+            uuidListListPropName = (String) in.readObject();
+            uuidList2PropName = (String) in.readObject();
+            listListSize = (Integer) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-	@SuppressWarnings("unchecked")
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    @SuppressWarnings("unchecked")
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-        	List<Collection<UUID>> tempListList = 
-        		(List<Collection<UUID>>) process.readProperty(uuidListListPropName);
+            List<Collection<UUID>> tempListList = (List<Collection<UUID>>) process.readProperty(uuidListListPropName);
 
             if (worker.getLogger().isLoggable(Level.FINE)) {
                 worker.getLogger().fine(("Removing first batch in attachment list."));
             }
-            
+
             int sizeOfList = tempListList.size();
             List<Collection<UUID>> uuidListList = null;
-            if (sizeOfList > listListSize){
-            	uuidListList = new ArrayList<Collection<UUID>>(tempListList.subList(0, listListSize));
+            if (sizeOfList > listListSize) {
+                uuidListList = new ArrayList<Collection<UUID>>(tempListList.subList(0, listListSize));
             } else {
-            	uuidListList = new ArrayList<Collection<UUID>>(tempListList.subList(0, sizeOfList));
+                uuidListList = new ArrayList<Collection<UUID>>(tempListList.subList(0, sizeOfList));
             }
-            	
+
             process.setProperty(this.uuidList2PropName, uuidListList);
-            
-            if (tempListList.removeAll(uuidListList)){
-            	//do nothing
+
+            if (tempListList.removeAll(uuidListList)) {
+                // do nothing
             } else {
-            	worker.getLogger().info("error encountered in removing uuid collection from list");
+                worker.getLogger().info("error encountered in removing uuid collection from list");
             }
-            
+
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
@@ -132,27 +129,27 @@ public class BatchingAssignments extends AbstractTask {
         return new int[] {};
     }
 
-	public String getUuidListListPropName() {
-		return uuidListListPropName;
-	}
+    public String getUuidListListPropName() {
+        return uuidListListPropName;
+    }
 
-	public void setUuidListListPropName(String uuidListListPropName) {
-		this.uuidListListPropName = uuidListListPropName;
-	}
+    public void setUuidListListPropName(String uuidListListPropName) {
+        this.uuidListListPropName = uuidListListPropName;
+    }
 
-	public Integer getListListSize() {
-		return listListSize;
-	}
+    public Integer getListListSize() {
+        return listListSize;
+    }
 
-	public void setListListSize(Integer listListSize) {
-		this.listListSize = listListSize;
-	}
+    public void setListListSize(Integer listListSize) {
+        this.listListSize = listListSize;
+    }
 
-	public String getUuidList2PropName() {
-		return uuidList2PropName;
-	}
+    public String getUuidList2PropName() {
+        return uuidList2PropName;
+    }
 
-	public void setUuidList2PropName(String uuidList2PropName) {
-		this.uuidList2PropName = uuidList2PropName;
-	}
+    public void setUuidList2PropName(String uuidList2PropName) {
+        this.uuidList2PropName = uuidList2PropName;
+    }
 }

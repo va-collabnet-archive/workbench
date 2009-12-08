@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,75 +36,71 @@ import org.dwfa.tapi.TerminologyException;
 
 public abstract class AbstractDifferenceRels extends AbstractSearchTest {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	private static final int dataVersion = 1;
+    private static final long serialVersionUID = 1L;
+    private static final int dataVersion = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion <= dataVersion) {
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion <= dataVersion) {
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	@Override
-	public boolean test(I_AmTermComponent component,
-			I_ConfigAceFrame frameConfig) throws TaskFailedException {
-		try {
+    @Override
+    public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
+        try {
 
-			if (frameConfig.getViewPositionSet().size() < 2) {
-				// Cannot be a difference if there are not two or more paths to
-				// compare...
-				return applyInversion(false);
-			}
-			I_GetConceptData conceptToTest;
-			if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
-				conceptToTest = (I_GetConceptData) component;
-			} else if (I_DescriptionVersioned.class.isAssignableFrom(component
-					.getClass())) {
-				I_DescriptionVersioned desc = (I_DescriptionVersioned) component;
-				conceptToTest = LocalVersionedTerminology.get().getConcept(
-						desc.getConceptId());
-			} else {
-				return applyInversion(false);
-			}
+            if (frameConfig.getViewPositionSet().size() < 2) {
+                // Cannot be a difference if there are not two or more paths to
+                // compare...
+                return applyInversion(false);
+            }
+            I_GetConceptData conceptToTest;
+            if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
+                conceptToTest = (I_GetConceptData) component;
+            } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
+                I_DescriptionVersioned desc = (I_DescriptionVersioned) component;
+                conceptToTest = LocalVersionedTerminology.get().getConcept(desc.getConceptId());
+            } else {
+                return applyInversion(false);
+            }
 
-			TreeSet<I_RelTuple> firstSet = null;
-			for (I_Position p: frameConfig.getViewPositionSet()) {
-				Set<I_Position> viewSet = new HashSet<I_Position>();
-				viewSet.add(p);
-				List<I_RelTuple> tuples = getTuplesToCompare(frameConfig, conceptToTest, viewSet);
-				if (firstSet == null) {
-					firstSet = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
-					firstSet.addAll(tuples);
-				} else {
-					int firstSetSize = firstSet.size();
-					if (firstSetSize != tuples.size()) {
-						return applyInversion(true);
-					}
-					firstSet.addAll(tuples);
-					if (firstSet.size() != firstSetSize) {
-						return applyInversion(true);
-					}
-				}
-			}
-			return applyInversion(false);
-		} catch (IOException ex) {
-			throw new TaskFailedException(ex);
-		} catch (TerminologyException e) {
-			throw new TaskFailedException(e);
-		}
-	}
+            TreeSet<I_RelTuple> firstSet = null;
+            for (I_Position p : frameConfig.getViewPositionSet()) {
+                Set<I_Position> viewSet = new HashSet<I_Position>();
+                viewSet.add(p);
+                List<I_RelTuple> tuples = getTuplesToCompare(frameConfig, conceptToTest, viewSet);
+                if (firstSet == null) {
+                    firstSet = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
+                    firstSet.addAll(tuples);
+                } else {
+                    int firstSetSize = firstSet.size();
+                    if (firstSetSize != tuples.size()) {
+                        return applyInversion(true);
+                    }
+                    firstSet.addAll(tuples);
+                    if (firstSet.size() != firstSetSize) {
+                        return applyInversion(true);
+                    }
+                }
+            }
+            return applyInversion(false);
+        } catch (IOException ex) {
+            throw new TaskFailedException(ex);
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-	protected abstract List<I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig,
-			I_GetConceptData conceptToTest, Set<I_Position> viewSet) throws IOException;
+    protected abstract List<I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig,
+            I_GetConceptData conceptToTest, Set<I_Position> viewSet) throws IOException;
 
 }

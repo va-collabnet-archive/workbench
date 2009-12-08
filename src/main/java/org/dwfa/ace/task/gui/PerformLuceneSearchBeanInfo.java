@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,18 +35,13 @@ public class PerformLuceneSearchBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor searchRoot =
-                    new PropertyDescriptor("searchRoot",
-                        PerformLuceneSearch.class);
+            PropertyDescriptor searchRoot = new PropertyDescriptor("searchRoot", PerformLuceneSearch.class);
             searchRoot.setBound(true);
             searchRoot.setPropertyEditorClass(ConceptLabelPropEditor.class);
             searchRoot.setDisplayName("Query root:");
-            searchRoot
-                .setShortDescription("Root used for query. Null search the whole database");
+            searchRoot.setShortDescription("Root used for query. Null search the whole database");
 
-            PropertyDescriptor searchString =
-                    new PropertyDescriptor("searchString",
-                        PerformLuceneSearch.class);
+            PropertyDescriptor searchString = new PropertyDescriptor("searchString", PerformLuceneSearch.class);
             searchString.setBound(true);
             searchString.setPropertyEditorClass(JTextFieldEditor.class);
             searchString.setDisplayName("Query String:");

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,8 +40,9 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * Creates an attachment list based on a previously selected file.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN) })
 public class NewAttachmentListFromChosenFile extends AbstractTask {
@@ -52,7 +53,6 @@ public class NewAttachmentListFromChosenFile extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-
 
     /**
      * The key used by file attachment.
@@ -76,31 +76,26 @@ public class NewAttachmentListFromChosenFile extends AbstractTask {
         out.writeObject(fileKey);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             fileName = (String) in.readObject();
             listName = (String) in.readObject();
             fileKey = (String) in.readObject();
         } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-                         throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-                                throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             fileName = (String) process.readProperty(fileKey);
 
-            ArrayList<Collection<UUID>> temporaryList
-                    = new ArrayList<Collection<UUID>>();
+            ArrayList<Collection<UUID>> temporaryList = new ArrayList<Collection<UUID>>();
 
             if (worker.getLogger().isLoggable(Level.INFO)) {
                 worker.getLogger().info(("Reading in file: " + fileName));

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,116 +45,114 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/copy", type = BeanType.TASK_BEAN) })
 public class CopyConceptFromPathToPathWithStatus extends AbstractTask {
 
-   /**
+    /**
     * 
     */
-   private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-   private static final int dataVersion = 1;
-   
-   private String fromPathPropName = ProcessAttachmentKeys.FROM_PATH_CONCEPT.getAttachmentKey();
-   private String toPathPropName = ProcessAttachmentKeys.TO_PATH_CONCEPT.getAttachmentKey();
-   private String conceptPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
-   private String statusPropName = ProcessAttachmentKeys.NEW_STATUS.getAttachmentKey();
+    private static final int dataVersion = 1;
 
-   private void writeObject(ObjectOutputStream out) throws IOException {
-      out.writeInt(dataVersion);
-      out.writeObject(fromPathPropName);
-      out.writeObject(toPathPropName);
-      out.writeObject(conceptPropName);
-      out.writeObject(statusPropName);
-   }
+    private String fromPathPropName = ProcessAttachmentKeys.FROM_PATH_CONCEPT.getAttachmentKey();
+    private String toPathPropName = ProcessAttachmentKeys.TO_PATH_CONCEPT.getAttachmentKey();
+    private String conceptPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
+    private String statusPropName = ProcessAttachmentKeys.NEW_STATUS.getAttachmentKey();
 
-   private void readObject(ObjectInputStream in) throws IOException,
-         ClassNotFoundException {
-      int objDataVersion = in.readInt();
-      if (objDataVersion == dataVersion) {
-         fromPathPropName = (String) in.readObject();
-         toPathPropName = (String) in.readObject();
-         conceptPropName = (String) in.readObject();
-         statusPropName = (String) in.readObject();
-      } else {
-         throw new IOException("Can't handle dataversion: " + objDataVersion);
-      }
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(fromPathPropName);
+        out.writeObject(toPathPropName);
+        out.writeObject(conceptPropName);
+        out.writeObject(statusPropName);
+    }
 
-   }
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            fromPathPropName = (String) in.readObject();
+            toPathPropName = (String) in.readObject();
+            conceptPropName = (String) in.readObject();
+            statusPropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-   public void complete(I_EncodeBusinessProcess process, I_Work worker)
-         throws TaskFailedException {
-      // Nothing to do...
+    }
 
-   }
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
-   public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-         throws TaskFailedException {
-      try {
-         I_TermFactory tf = LocalVersionedTerminology.get();
-         I_Path fromPath = tf.getPath(AceTaskUtil.getConceptFromObject(process.readProperty(fromPathPropName)).getUids());
-         I_Path toPath = tf.getPath(AceTaskUtil.getConceptFromObject(process.readProperty(toPathPropName)).getUids());
-         I_GetConceptData concept = AceTaskUtil.getConceptFromObject(process.readProperty(conceptPropName));
-         I_GetConceptData newStatus = AceTaskUtil.getConceptFromObject(process.readProperty(statusPropName));
-         Set<I_Position> fromSet = new HashSet<I_Position>();
-         fromSet.add(tf.newPosition(fromPath, Integer.MAX_VALUE));
-         CopyConceptFromPathToPath.copyFromPathToPath(tf, toPath, concept, fromSet, newStatus, null);
-         tf.addUncommitted(concept);
-         tf.commit();
-         
-         return Condition.CONTINUE;
-      } catch (IllegalArgumentException e) {
-         throw new TaskFailedException(e);
-      } catch (IllegalAccessException e) {
-         throw new TaskFailedException(e);
-      } catch (InvocationTargetException e) {
-         throw new TaskFailedException(e);
-      } catch (IntrospectionException e) {
-         throw new TaskFailedException(e);
-      } catch (TerminologyException e) {
-         throw new TaskFailedException(e);
-      } catch (IOException e) {
-         throw new TaskFailedException(e);
-      } catch (Exception e) {
-         throw new TaskFailedException(e);
-      } 
-   }
+    }
 
-   public Collection<Condition> getConditions() {
-      return CONTINUE_CONDITION;
-   }
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_Path fromPath = tf.getPath(AceTaskUtil.getConceptFromObject(process.readProperty(fromPathPropName))
+                .getUids());
+            I_Path toPath = tf.getPath(AceTaskUtil.getConceptFromObject(process.readProperty(toPathPropName)).getUids());
+            I_GetConceptData concept = AceTaskUtil.getConceptFromObject(process.readProperty(conceptPropName));
+            I_GetConceptData newStatus = AceTaskUtil.getConceptFromObject(process.readProperty(statusPropName));
+            Set<I_Position> fromSet = new HashSet<I_Position>();
+            fromSet.add(tf.newPosition(fromPath, Integer.MAX_VALUE));
+            CopyConceptFromPathToPath.copyFromPathToPath(tf, toPath, concept, fromSet, newStatus, null);
+            tf.addUncommitted(concept);
+            tf.commit();
 
-   public int[] getDataContainerIds() {
-      return new int[] {};
-   }
+            return Condition.CONTINUE;
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        } catch (Exception e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-   public String getConceptPropName() {
-      return conceptPropName;
-   }
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
 
-   public void setConceptPropName(String conceptPropName) {
-      this.conceptPropName = conceptPropName;
-   }
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-   public String getFromPathPropName() {
-      return fromPathPropName;
-   }
+    public String getConceptPropName() {
+        return conceptPropName;
+    }
 
-   public void setFromPathPropName(String fromPathPropName) {
-      this.fromPathPropName = fromPathPropName;
-   }
+    public void setConceptPropName(String conceptPropName) {
+        this.conceptPropName = conceptPropName;
+    }
 
-   public String getToPathPropName() {
-      return toPathPropName;
-   }
+    public String getFromPathPropName() {
+        return fromPathPropName;
+    }
 
-   public void setToPathPropName(String toPathPropName) {
-      this.toPathPropName = toPathPropName;
-   }
+    public void setFromPathPropName(String fromPathPropName) {
+        this.fromPathPropName = fromPathPropName;
+    }
 
-   public String getStatusPropName() {
-      return statusPropName;
-   }
+    public String getToPathPropName() {
+        return toPathPropName;
+    }
 
-   public void setStatusPropName(String statusPropName) {
-      this.statusPropName = statusPropName;
-   }
+    public void setToPathPropName(String toPathPropName) {
+        this.toPathPropName = toPathPropName;
+    }
 
- }
+    public String getStatusPropName() {
+        return statusPropName;
+    }
+
+    public void setStatusPropName(String statusPropName) {
+        this.statusPropName = statusPropName;
+    }
+
+}

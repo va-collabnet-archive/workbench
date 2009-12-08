@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,8 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Shows the refset spec panel. An optional refset spec can be specified to show in the panel.
+ * Shows the refset spec panel. An optional refset spec can be specified to show
+ * in the panel.
  * 
  * @author Chrissy Hill
  * 
@@ -57,11 +58,11 @@ public class ShowRefsetSpecTask extends AbstractTask {
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
-        	if (objDataVersion < 2) {
-        		refsetUuidPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
-        	} else {
-        		refsetUuidPropName = (String) in.readObject();
-        	}
+            if (objDataVersion < 2) {
+                refsetUuidPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
+            } else {
+                refsetUuidPropName = (String) in.readObject();
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -75,7 +76,7 @@ public class ShowRefsetSpecTask extends AbstractTask {
 
         try {
 
-        	I_TermFactory termFactory = LocalVersionedTerminology.get();
+            I_TermFactory termFactory = LocalVersionedTerminology.get();
 
             Object obj = process.getProperty(refsetUuidPropName);
             UUID uuid = null;
@@ -112,11 +113,11 @@ public class ShowRefsetSpecTask extends AbstractTask {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-	public String getRefsetUuidPropName() {
-		return refsetUuidPropName;
-	}
+    public String getRefsetUuidPropName() {
+        return refsetUuidPropName;
+    }
 
-	public void setRefsetUuidPropName(String refsetUuidPropName) {
-		this.refsetUuidPropName = refsetUuidPropName;
-	}
+    public void setRefsetUuidPropName(String refsetUuidPropName) {
+        this.refsetUuidPropName = refsetUuidPropName;
+    }
 }

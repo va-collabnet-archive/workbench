@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,8 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class DifferenceRelsSourceBeanInfo extends AbstractSearchTestBeanInfo {
-    private static DifferenceRelsSourceSearchInfo searchInfo =
-            new DifferenceRelsSourceSearchInfo();
+    private static DifferenceRelsSourceSearchInfo searchInfo = new DifferenceRelsSourceSearchInfo();
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         PropertyDescriptor[] parentDescriptors = super.getPropertyDescriptors();
@@ -34,7 +33,9 @@ public class DifferenceRelsSourceBeanInfo extends AbstractSearchTestBeanInfo {
         descriptorList.addAll(Arrays.asList(searchDescriptors));
 
         return descriptorList.toArray(new PropertyDescriptor[descriptorList.size()]);
-     }    public BeanDescriptor getBeanDescriptor() {
+    }
+
+    public BeanDescriptor getBeanDescriptor() {
         return searchInfo.getBeanDescriptor();
     }
 

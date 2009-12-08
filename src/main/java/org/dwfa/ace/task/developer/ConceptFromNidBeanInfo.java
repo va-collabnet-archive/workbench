@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,21 +31,16 @@ public class ConceptFromNidBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor propName =
-                    new PropertyDescriptor("propName", ConceptFromNid.class);
+            PropertyDescriptor propName = new PropertyDescriptor("propName", ConceptFromNid.class);
             propName.setBound(true);
             propName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             propName.setDisplayName("<html><font color='green'>Nid property:");
             propName.setShortDescription("Nid of the concept. ");
 
-            PropertyDescriptor conceptPropName =
-                    new PropertyDescriptor("conceptPropName",
-                        ConceptFromNid.class);
+            PropertyDescriptor conceptPropName = new PropertyDescriptor("conceptPropName", ConceptFromNid.class);
             conceptPropName.setBound(true);
-            conceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptPropName
-                .setDisplayName("<html><font color='green'>Concept property:");
+            conceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptPropName.setDisplayName("<html><font color='green'>Concept property:");
             conceptPropName.setShortDescription("Concept result. ");
 
             PropertyDescriptor rv[] = { propName, conceptPropName };
@@ -60,8 +55,7 @@ public class ConceptFromNidBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ConceptFromNid.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Find a Concept from a NID");
+        bd.setDisplayName("<html><font color='green'><center>Find a Concept from a NID");
         return bd;
     }
-}//End class CreateRefsetMembersetPairBeanInfo
+}// End class CreateRefsetMembersetPairBeanInfo

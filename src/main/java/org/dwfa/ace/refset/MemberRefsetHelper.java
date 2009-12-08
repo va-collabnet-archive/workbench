@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,8 +74,9 @@ public class MemberRefsetHelper extends RefsetHelper {
 
             @Override
             public void processItem(I_GetConceptData item) throws Exception {
-                boolean extAdded = newRefsetExtension(getMemberRefsetId(), item.getConceptId(), I_ThinExtByRefPartConcept.class, 
-                        new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId())); 
+                boolean extAdded = newRefsetExtension(getMemberRefsetId(), item.getConceptId(),
+                    I_ThinExtByRefPartConcept.class, new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE,
+                        getMemberTypeId()));
                 if (extAdded) {
                     newMembers.add(item.getConceptId());
                 }
@@ -83,8 +84,7 @@ public class MemberRefsetHelper extends RefsetHelper {
 
             @Override
             public void onComplete() throws Exception {
-                List<UUID> markedParentsUuid =
-                        Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
+                List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
 
                 if (termFactory.hasId(markedParentsUuid)) {
                     if (useMonitor) {
@@ -147,16 +147,15 @@ public class MemberRefsetHelper extends RefsetHelper {
 
             @Override
             public void processItem(I_GetConceptData item) throws Exception {
-                if (retireRefsetExtension(getMemberRefsetId(), item.getConceptId(), 
-                        new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId()))) {
+                if (retireRefsetExtension(getMemberRefsetId(), item.getConceptId(), new BeanPropertyMap().with(
+                    ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId()))) {
                     removedMembers.add(item.getConceptId());
                 }
             }
 
             @Override
             public void onComplete() throws Exception {
-                List<UUID> markedParentsUuid =
-                        Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
+                List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
 
                 if (termFactory.hasId(markedParentsUuid)) {
                     if (useMonitor) {
@@ -200,8 +199,8 @@ public class MemberRefsetHelper extends RefsetHelper {
      *            The concept to be added
      */
     public boolean addToRefset(int conceptId) throws Exception {
-        boolean extAdded = newRefsetExtension(getMemberRefsetId(), conceptId, I_ThinExtByRefPartConcept.class, 
-                new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId())); 
+        boolean extAdded = newRefsetExtension(getMemberRefsetId(), conceptId, I_ThinExtByRefPartConcept.class,
+            new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId()));
         if (extAdded) {
             addMarkedParents(conceptId);
             return true;
@@ -216,8 +215,8 @@ public class MemberRefsetHelper extends RefsetHelper {
      *            The concept to be removed
      */
     public boolean removeFromRefset(int conceptId) throws Exception {
-        if (retireRefsetExtension(getMemberRefsetId(), conceptId, 
-                new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId()))) {
+        if (retireRefsetExtension(getMemberRefsetId(), conceptId, new BeanPropertyMap().with(
+            ThinExtByRefPartProperty.CONCEPT_ONE, getMemberTypeId()))) {
             removeMarkedParents(conceptId);
             return true;
         } else
@@ -250,9 +249,8 @@ public class MemberRefsetHelper extends RefsetHelper {
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
 
-            List<I_ThinExtByRefTuple> extensions =
-                    thinExtByRefVersioned
-                        .getTuples(config.getAllowedStatus(), config.getViewPositionSet(), true, false);
+            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(config.getAllowedStatus(),
+                config.getViewPositionSet(), true, false);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == memberRefsetId) {

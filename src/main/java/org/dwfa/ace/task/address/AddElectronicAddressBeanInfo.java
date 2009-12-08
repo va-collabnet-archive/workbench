@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
 /**
  * Bean info to AddElectronicAddress class.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 public class AddElectronicAddressBeanInfo extends SimpleBeanInfo {
 
@@ -39,15 +40,11 @@ public class AddElectronicAddressBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor address =
-                    new PropertyDescriptor("address",
-                        AddElectronicAddress.class);
+            PropertyDescriptor address = new PropertyDescriptor("address", AddElectronicAddress.class);
             address.setBound(true);
             address.setPropertyEditorClass(JTextFieldEditor.class);
-            address
-                .setDisplayName("<html><font color='green'>Electronic address:");
-            address
-                .setShortDescription("Enter the electronic address to be added.");
+            address.setDisplayName("<html><font color='green'>Electronic address:");
+            address.setShortDescription("Enter the electronic address to be added.");
 
             PropertyDescriptor rv[] = { address };
             return rv;
@@ -61,8 +58,7 @@ public class AddElectronicAddressBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(AddElectronicAddress.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Add Electronic <br>Address");
+        bd.setDisplayName("<html><font color='green'><center>Add Electronic <br>Address");
         return bd;
     }
 

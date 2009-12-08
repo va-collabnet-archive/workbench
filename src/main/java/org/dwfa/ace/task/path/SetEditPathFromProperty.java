@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,19 +44,18 @@ public class SetEditPathFromProperty extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 2;
-    
+
     private String editPathPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
 
     private boolean keepExistingEditPaths = false;
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(editPathPropName);
         out.writeObject(keepExistingEditPaths);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion > dataVersion) {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -68,22 +67,20 @@ public class SetEditPathFromProperty extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_GetConceptData pathConcept = getProperty(process, I_GetConceptData.class, editPathPropName);
-            
+
             I_TermFactory tf = LocalVersionedTerminology.get();
-            
+
             I_Path editPath = tf.getPath(pathConcept.getUids());
             I_ConfigAceFrame frameConfig = tf.getActiveAceFrameConfig();
-            
+
             Set<I_Path> editSet = frameConfig.getEditingPathSet();
             if (!keepExistingEditPaths) {
                 editSet.clear();
@@ -92,11 +89,11 @@ public class SetEditPathFromProperty extends AbstractTask {
 
             Set<I_Position> viewPositionSet = frameConfig.getViewPositionSet();
             viewPositionSet.add(tf.newPosition(editPath, Integer.MAX_VALUE));
-            
+
             frameConfig.fireUpdateHierarchyView();
-            
+
             return Condition.CONTINUE;
-            
+
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }

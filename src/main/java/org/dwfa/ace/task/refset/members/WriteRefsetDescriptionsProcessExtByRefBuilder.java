@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,16 +29,14 @@ import org.dwfa.ace.task.refset.members.export.RefsetWriterParameterObjectImpl;
 import org.dwfa.ace.task.refset.members.export.WriterFactoryImpl;
 import org.dwfa.ace.task.util.Logger;
 
-public final class WriteRefsetDescriptionsProcessExtByRefBuilder implements
-        CleanableProcessExtByRefBuilder {
+public final class WriteRefsetDescriptionsProcessExtByRefBuilder implements CleanableProcessExtByRefBuilder {
 
     private Logger logger;
     private File selectedDirectory;
     private I_TermFactory termFactory;
     private DescriptionSelector descSelector;
 
-    public CleanableProcessExtByRefBuilder withSelectedDir(
-            final File selectedDirectory) {
+    public CleanableProcessExtByRefBuilder withSelectedDir(final File selectedDirectory) {
         this.selectedDirectory = selectedDirectory;
         return this;
     }
@@ -48,28 +46,23 @@ public final class WriteRefsetDescriptionsProcessExtByRefBuilder implements
         return this;
     }
 
-    public CleanableProcessExtByRefBuilder withTermFactory(
-            final I_TermFactory termFactory) {
+    public CleanableProcessExtByRefBuilder withTermFactory(final I_TermFactory termFactory) {
         this.termFactory = termFactory;
         return this;
     }
 
-    public CleanableProcessExtByRefBuilder withLanguagePreference(
-            DescriptionSelector descSelector) {
+    public CleanableProcessExtByRefBuilder withLanguagePreference(DescriptionSelector descSelector) {
         this.descSelector = descSelector;
         return this;
     }
 
     public CleanableProcessExtByRef build() {
         RefsetUtil refsetUtil = new RefsetUtilImpl();
-        return new WriteRefsetDescriptionsProcessExtByRef(
-            new RefsetExportValidatorImpl(), new RefsetWriterImpl(
-                new RefsetWriterParameterObjectImpl(new ProgressLoggerImpl(
-                    logger), new RefsetTextWriterImpl(refsetUtil, termFactory),
-                    new WriterFactoryImpl(selectedDirectory, logger,
-                        termFactory, refsetUtil)),
-                new CommonAPIParameterObjectImpl(refsetUtil, termFactory,
-                    logger), descSelector), refsetUtil, termFactory, logger);
+        return new WriteRefsetDescriptionsProcessExtByRef(new RefsetExportValidatorImpl(), new RefsetWriterImpl(
+            new RefsetWriterParameterObjectImpl(new ProgressLoggerImpl(logger), new RefsetTextWriterImpl(refsetUtil,
+                termFactory), new WriterFactoryImpl(selectedDirectory, logger, termFactory, refsetUtil)),
+            new CommonAPIParameterObjectImpl(refsetUtil, termFactory, logger), descSelector), refsetUtil, termFactory,
+            logger);
     }
 
 }

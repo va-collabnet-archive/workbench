@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,16 +37,12 @@ public class UpdatePromotionRefsetTaskBeanInfo extends SimpleBeanInfo {
         try {
 
             PropertyDescriptor refsetSpecUuidPropName;
-            refsetSpecUuidPropName =
-                    new PropertyDescriptor("refsetSpecUuidPropName",
-                        getBeanDescriptor().getBeanClass());
+            refsetSpecUuidPropName = new PropertyDescriptor("refsetSpecUuidPropName",
+                getBeanDescriptor().getBeanClass());
             refsetSpecUuidPropName.setBound(true);
-            refsetSpecUuidPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            refsetSpecUuidPropName
-                .setDisplayName("<html><font color='green'>Refset spec UUID prop:");
-            refsetSpecUuidPropName
-                .setShortDescription("The refset spec UUID prop.");
+            refsetSpecUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetSpecUuidPropName.setDisplayName("<html><font color='green'>Refset spec UUID prop:");
+            refsetSpecUuidPropName.setShortDescription("The refset spec UUID prop.");
 
             PropertyDescriptor rv[] = { refsetSpecUuidPropName };
             return rv;
@@ -60,8 +56,7 @@ public class UpdatePromotionRefsetTaskBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(UpdatePromotionRefsetTask.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Update promotion refset");
+        bd.setDisplayName("<html><font color='green'><center>Update promotion refset");
         return bd;
     }
 

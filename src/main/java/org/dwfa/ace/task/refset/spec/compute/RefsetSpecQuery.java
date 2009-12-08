@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,12 +56,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private ArrayList<RefsetSpecComponent> allComponents;
 
     public enum GROUPING_TYPE {
-        OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true),
-        AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true),
-        CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true),
-        NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false),
-        CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true),
-        NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false);
+        OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true), AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true), CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true), NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false), CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true), NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false);
 
         private int nid;
         private boolean truth;
@@ -260,12 +255,14 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
             for (RefsetSpecComponent specComponent : allComponents) {
                 if (!specComponent.execute(component)) {
-                    // can exit the AND early, as at least one statement is returning false
+                    // can exit the AND early, as at least one statement is
+                    // returning false
                     return false;
                 }
             }
 
-            // all queries and statements have returned true, therefore AND will return true
+            // all queries and statements have returned true, therefore AND will
+            // return true
             return true;
         case OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
@@ -274,12 +271,14 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
             for (RefsetSpecComponent specComponent : allComponents) {
                 if (specComponent.execute(component)) {
-                    // exit the OR statement early, as at least one statement has returned true
+                    // exit the OR statement early, as at least one statement
+                    // has returned true
                     return true;
                 }
             }
 
-            // no queries or statements have returned true, therefore the OR will return false
+            // no queries or statements have returned true, therefore the OR
+            // will return false
             return false;
         case CONCEPT_CONTAINS_DESC:
             return executeConceptContainsDesc(component);
@@ -301,9 +300,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         }
 
         I_GetConceptData descriptionConcept = (I_GetConceptData) component;
-        List<I_DescriptionTuple> descriptionTuples =
-                descriptionConcept.getDescriptionTuples(null, null, termFactory.getActiveAceFrameConfig()
-                    .getViewPositionSet(), true);
+        List<I_DescriptionTuple> descriptionTuples = descriptionConcept.getDescriptionTuples(null, null,
+            termFactory.getActiveAceFrameConfig().getViewPositionSet(), true);
 
         for (I_DescriptionTuple tuple : descriptionTuples) {
             I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
@@ -311,7 +309,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
             for (RefsetSpecStatement statement : statements) {
                 if (!statement.execute(descVersioned)) {
-                    // can exit the execution early, as at least one statement is returning false
+                    // can exit the execution early, as at least one statement
+                    // is returning false
                     valid = false;
                     break;
                 } else {
@@ -321,7 +320,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
             for (RefsetSpecQuery subquery : subqueries) {
                 if (!subquery.execute(descVersioned)) {
-                    // can exit the execution early, as at least one query is returning false
+                    // can exit the execution early, as at least one query is
+                    // returning false
                     valid = false;
                     break;
                 } else {
@@ -350,7 +350,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
             for (RefsetSpecStatement statement : statements) {
                 if (!statement.execute(versionedTuple)) {
-                    // can exit the execution early, as at least one statement is returning false
+                    // can exit the execution early, as at least one statement
+                    // is returning false
                     valid = false;
                     break;
                 } else {
@@ -360,7 +361,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
             for (RefsetSpecQuery subquery : subqueries) {
                 if (!subquery.execute(versionedTuple)) {
-                    // can exit the execution early, as at least one query is returning false
+                    // can exit the execution early, as at least one query is
+                    // returning false
                     valid = false;
                     break;
                 } else {

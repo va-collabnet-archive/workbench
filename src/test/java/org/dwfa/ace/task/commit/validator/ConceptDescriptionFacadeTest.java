@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 /**
- *  Copyright (c) 2009 International Health Terminology Standards Development Organisation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.dwfa.ace.task.commit.validator;
 
@@ -79,12 +80,12 @@ public final class ConceptDescriptionFacadeTest {
         mockDescriptionTuple = mocksControl.createMock(I_DescriptionTuple.class);
 
         descriptionTuples = new ArrayList<I_DescriptionTuple>();
-        //Add First Versioned Description
+        // Add First Versioned Description
         descriptionTuples.add(mockDescriptionTuple);
         numExpectedDescriptions++;
 
         uncommittedDescriptions = new ArrayList<I_DescriptionVersioned>();
-        //Add second uncommitted Description
+        // Add second uncommitted Description
         uncommittedDescriptions.add(mockVersionedDescription);
         numExpectedDescriptions++;
 
@@ -97,22 +98,22 @@ public final class ConceptDescriptionFacadeTest {
     @Test
     public void getAllDescriptionsTest() throws Exception {
 
-        this.expectGetFsnConceptOnTermFactory().
-                expectUuidToNativeOnTermFactory().
-                expectGetConceptIdFromMockConcept().
-                expectGetActiveAceFrameConfigFromTermFactory().
-                expectGetPositionsFromTermFactory().expectGetAllowedStatusOnAceConfigFrame().
-                expectGetDescTuplesWithMockStatusOnConcept().expectGetDescVersionedOnMockDescTuple().
-                expectGetUncommittedDescOnConcept();
-
+        this.expectGetFsnConceptOnTermFactory()
+            .expectUuidToNativeOnTermFactory()
+            .expectGetConceptIdFromMockConcept()
+            .expectGetActiveAceFrameConfigFromTermFactory()
+            .expectGetPositionsFromTermFactory()
+            .expectGetAllowedStatusOnAceConfigFrame()
+            .expectGetDescTuplesWithMockStatusOnConcept()
+            .expectGetDescVersionedOnMockDescTuple()
+            .expectGetUncommittedDescOnConcept();
 
         mocksControl.replay();
-        mockConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        mockConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 
-        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next());
+        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next());
 
         assertEquals(mockConcept.getConceptId(), conceptId);
 
@@ -125,22 +126,23 @@ public final class ConceptDescriptionFacadeTest {
     protected class MockConceptTest extends AbstractConceptTest {
 
         @Override
-        public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws
-                TaskFailedException {
+        public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
+                throws TaskFailedException {
             return new ArrayList<AlertToDataConstraintFailure>();
         }
     }
 
     private ConceptDescriptionFacadeTest expectGetFsnConceptOnTermFactory() throws Exception {
-        expect(mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids())).
-                andReturn(mockConcept);
+        expect(mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids())).andReturn(
+            mockConcept);
         return this;
     }
 
     private ConceptDescriptionFacadeTest expectUuidToNativeOnTermFactory() throws Exception {
-        expect(mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().
-                iterator().next())).
-                andReturn(Integer.MIN_VALUE);
+        expect(
+            mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+                .iterator()
+                .next())).andReturn(Integer.MIN_VALUE);
         return this;
     }
 

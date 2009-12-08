@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,7 +65,7 @@ public class AddNoInitialOsFilter extends AbstractTask {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             profilePropName = (String) in.readObject();
-         } else {
+        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
@@ -76,14 +76,14 @@ public class AddNoInitialOsFilter extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            
+
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
             if (profile == null) {
-            	profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+                profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             }
             profile.getTaxonomyRelFilterList().add(new NoInitialOsFilter());
             return Condition.CONTINUE;
-            
+
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         } catch (IntrospectionException e) {
@@ -113,38 +113,40 @@ public class AddNoInitialOsFilter extends AbstractTask {
 
     private static class NoInitialOsFilter implements I_FilterTaxonomyRels {
 
-		public void filter(I_GetConceptData node, List<I_RelTuple> srcRels,
-				List<I_RelTuple> destRels, I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
-			List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
-			AceLog.getAppLog().info("Filtering srcRels: " + srcRels + " destRels: " + destRels + " for: " + node);
-			for (I_RelTuple rt: srcRels) {
-				if (hasInitialO(rt.getC2Id(), frameConfig)) {
-					relsToRemove.add(rt);
-				}
-			}
-			srcRels.removeAll(relsToRemove);
-			relsToRemove.clear();
-			for (I_RelTuple rt: destRels) {
-				if (hasInitialO(rt.getC1Id(), frameConfig)) {
-					relsToRemove.add(rt);
-				}
-			}
-			destRels.removeAll(relsToRemove);
-		}
-		
-		private boolean hasInitialO(int conceptNid, I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
-			I_GetConceptData concept = LocalVersionedTerminology.get().getConcept(conceptNid);
-			boolean initialO = false;
-			AceLog.getAppLog().info("Testing: " + concept);
-			for (I_DescriptionTuple dt: concept.getDescriptionTuples(frameConfig.getAllowedStatus(), null, frameConfig.getViewPositionSet())) {
-				AceLog.getAppLog().info("Testing tuple for supression: " + dt.getText());
-				if (dt.getText().toLowerCase().startsWith("o")) {
-					initialO = true;
-					break;
-				}
-			}
-			return initialO;
-		}
+        public void filter(I_GetConceptData node, List<I_RelTuple> srcRels, List<I_RelTuple> destRels,
+                I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
+            List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
+            AceLog.getAppLog().info("Filtering srcRels: " + srcRels + " destRels: " + destRels + " for: " + node);
+            for (I_RelTuple rt : srcRels) {
+                if (hasInitialO(rt.getC2Id(), frameConfig)) {
+                    relsToRemove.add(rt);
+                }
+            }
+            srcRels.removeAll(relsToRemove);
+            relsToRemove.clear();
+            for (I_RelTuple rt : destRels) {
+                if (hasInitialO(rt.getC1Id(), frameConfig)) {
+                    relsToRemove.add(rt);
+                }
+            }
+            destRels.removeAll(relsToRemove);
+        }
+
+        private boolean hasInitialO(int conceptNid, I_ConfigAceFrame frameConfig) throws TerminologyException,
+                IOException {
+            I_GetConceptData concept = LocalVersionedTerminology.get().getConcept(conceptNid);
+            boolean initialO = false;
+            AceLog.getAppLog().info("Testing: " + concept);
+            for (I_DescriptionTuple dt : concept.getDescriptionTuples(frameConfig.getAllowedStatus(), null,
+                frameConfig.getViewPositionSet())) {
+                AceLog.getAppLog().info("Testing tuple for supression: " + dt.getText());
+                if (dt.getText().toLowerCase().startsWith("o")) {
+                    initialO = true;
+                    break;
+                }
+            }
+            return initialO;
+        }
 
     }
 

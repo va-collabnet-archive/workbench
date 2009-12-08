@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,8 +30,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.jini.TermEntry;
 
-public class ConceptLabelPropEditor extends PropertyEditorSupport implements
-        PropertyChangeListener {
+public class ConceptLabelPropEditor extends PropertyEditorSupport implements PropertyChangeListener {
 
     /**
      * 
@@ -57,7 +56,8 @@ public class ConceptLabelPropEditor extends PropertyEditorSupport implements
     }
 
     /**
-     * Must be a <code>TermEntry</code>. 
+     * Must be a <code>TermEntry</code>.
+     * 
      * @see java.beans.PropertyEditor#setValue(java.lang.Object)
      */
     public void setValue(Object value) {
@@ -68,13 +68,12 @@ public class ConceptLabelPropEditor extends PropertyEditorSupport implements
         } else {
             if (value != null) {
                 if (value.equals(getValue())) {
-                    //nothing to do...
+                    // nothing to do...
                 } else {
                     super.setValue(value);
                     TermEntry entry = (TermEntry) value;
                     try {
-                        this.editor.setTermComponent(LocalVersionedTerminology
-                            .get().getConcept(entry.ids));
+                        this.editor.setTermComponent(LocalVersionedTerminology.get().getConcept(entry.ids));
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -96,8 +95,10 @@ public class ConceptLabelPropEditor extends PropertyEditorSupport implements
     }
 
     /**
-     * Calls the paint method on this swing component. 
-     * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics, java.awt.Rectangle)
+     * Calls the paint method on this swing component.
+     * 
+     * @see java.beans.PropertyEditor#paintValue(java.awt.Graphics,
+     *      java.awt.Rectangle)
      */
     public void paintValue(Graphics gfx, Rectangle box) {
         this.editor.setBounds(box);
@@ -126,7 +127,8 @@ public class ConceptLabelPropEditor extends PropertyEditorSupport implements
     }
 
     /**
-     * Returns null since this editor provides a custom GUI component. 
+     * Returns null since this editor provides a custom GUI component.
+     * 
      * @see java.beans.PropertyEditor#getTags()
      */
     public String[] getTags() {
@@ -134,7 +136,8 @@ public class ConceptLabelPropEditor extends PropertyEditorSupport implements
     }
 
     /**
-     * Returns swing component to edit the check box. 
+     * Returns swing component to edit the check box.
+     * 
      * @see java.beans.PropertyEditor#getCustomEditor()
      */
     public Component getCustomEditor() {
@@ -142,7 +145,8 @@ public class ConceptLabelPropEditor extends PropertyEditorSupport implements
     }
 
     /**
-     * Returns true since this editor provides a custom GUI component. 
+     * Returns true since this editor provides a custom GUI component.
+     * 
      * @see java.beans.PropertyEditor#supportsCustomEditor()
      */
     public boolean supportsCustomEditor() {

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,19 +28,14 @@ public class WriteUuidListListToDiskBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor uuidListListPropName =
-                    new PropertyDescriptor("uuidListListPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor uuidListListPropName = new PropertyDescriptor("uuidListListPropName",
+                getBeanDescriptor().getBeanClass());
             uuidListListPropName.setBound(true);
-            uuidListListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            uuidListListPropName
-                .setDisplayName("<html><font color='green'>Uuid List:");
+            uuidListListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListListPropName.setDisplayName("<html><font color='green'>Uuid List:");
             uuidListListPropName.setShortDescription("Uuid list.");
 
-            PropertyDescriptor fileName =
-                    new PropertyDescriptor("fileName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor fileName = new PropertyDescriptor("fileName", getBeanDescriptor().getBeanClass());
             fileName.setBound(true);
             fileName.setPropertyEditorClass(JTextFieldEditor.class);
             fileName.setDisplayName("<html><font color='green'>Uuid File:");
@@ -58,8 +53,7 @@ public class WriteUuidListListToDiskBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(WriteUuidListListToDisk.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Write UUID List <br> List to File");
+        bd.setDisplayName("<html><font color='green'><center>Write UUID List <br> List to File");
         return bd;
     }
 

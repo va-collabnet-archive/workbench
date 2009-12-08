@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info for ReadUuidListListFromUrl class.
+ * 
  * @author Susan Castillo
- *
+ * 
  */
 public class ReadUuidListListFromUrlBeanInfo extends SimpleBeanInfo {
 
@@ -40,28 +41,23 @@ public class ReadUuidListListFromUrlBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
             PropertyDescriptor uuidListListPropName =
-            //new PropertyDescriptor("luceneDups/dupPotMatchResults/dwfaDups.txt", ReadUuidListListFromUrl.class);
-                    new PropertyDescriptor("uuidListListPropName",
-                        ReadUuidListListFromUrl.class);
+            // new
+            // PropertyDescriptor("luceneDups/dupPotMatchResults/dwfaDups.txt",
+            // ReadUuidListListFromUrl.class);
+            new PropertyDescriptor("uuidListListPropName", ReadUuidListListFromUrl.class);
             uuidListListPropName.setBound(true);
-            uuidListListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            uuidListListPropName
-                .setDisplayName("<html><font color='green'>Uuid List:");
+            uuidListListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListListPropName.setDisplayName("<html><font color='green'>Uuid List:");
             uuidListListPropName.setShortDescription("Uuid list.");
 
-            PropertyDescriptor uuidFileNamePropName =
-                    new PropertyDescriptor("uuidFileNamePropName",
-                        ReadUuidListListFromUrl.class);
+            PropertyDescriptor uuidFileNamePropName = new PropertyDescriptor("uuidFileNamePropName",
+                ReadUuidListListFromUrl.class);
             uuidFileNamePropName.setBound(true);
-            uuidFileNamePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            uuidFileNamePropName
-                .setDisplayName("<html><font color='green'>UUID File Name:");
+            uuidFileNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidFileNamePropName.setDisplayName("<html><font color='green'>UUID File Name:");
             uuidFileNamePropName.setShortDescription("File Name");
 
-            PropertyDescriptor rv[] =
-                    { uuidListListPropName, uuidFileNamePropName };
+            PropertyDescriptor rv[] = { uuidListListPropName, uuidFileNamePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -73,8 +69,7 @@ public class ReadUuidListListFromUrlBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ReadUuidListListFromUrl.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Read UUID List <br> List From File");
+        bd.setDisplayName("<html><font color='green'><center>Read UUID List <br> List From File");
         return bd;
     }
 

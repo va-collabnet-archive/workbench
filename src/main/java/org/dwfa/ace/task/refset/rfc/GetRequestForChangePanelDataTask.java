@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -86,9 +86,9 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
             refsetUuidPropName = (String) in.readObject();
             originalRequestPropName = (String) in.readObject();
             if (objDataVersion >= 2) {
-            	refsetSpecUuidPropName = (String) in.readObject();
+                refsetSpecUuidPropName = (String) in.readObject();
             } else {
-            	refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
+                refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -149,10 +149,10 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                         RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();
                         String inboxAddress = wizard.getInbox(editor);
                         process.setProperty(nextUserTermEntryPropName, inboxAddress);
-                        process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { editor
-                            .getUids().iterator().next() });
-                        process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { owner
-                            .getUids().iterator().next() });
+                        process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(),
+                            new UUID[] { editor.getUids().iterator().next() });
+                        process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(),
+                            new UUID[] { owner.getUids().iterator().next() });
                         if (inboxAddress == null) {
                             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                                 "Request for change wizard cannot be completed. The selected editor has no assigned inbox : "
@@ -189,12 +189,12 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                     process.setDeadline(deadline.getTime());
 
                     process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
-                    process.setProperty(refsetSpecUuidPropName, 
-                    		RefsetHelper.getSpecificationRefsetForRefset(refset, config).iterator().next().getUids().iterator().next());
-                    process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { config
-                        .getDbConfig().getUserConcept().getUids().iterator().next() });
-                    process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { editor
-                        .getUids().iterator().next() });
+                    process.setProperty(refsetSpecUuidPropName, RefsetHelper.getSpecificationRefsetForRefset(refset,
+                        config).iterator().next().getUids().iterator().next());
+                    process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(),
+                        new UUID[] { config.getDbConfig().getUserConcept().getUids().iterator().next() });
+                    process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(),
+                        new UUID[] { editor.getUids().iterator().next() });
                     for (File file : attachments) {
                         process.writeAttachment(file.getName(), new FileContent(file));
                     }
@@ -250,12 +250,12 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
         this.originalRequestPropName = originalRequestPropName;
     }
 
-	public String getRefsetSpecUuidPropName() {
-		return refsetSpecUuidPropName;
-	}
+    public String getRefsetSpecUuidPropName() {
+        return refsetSpecUuidPropName;
+    }
 
-	public void setRefsetSpecUuidPropName(String refsetSpecUuidPropName) {
-		this.refsetSpecUuidPropName = refsetSpecUuidPropName;
-	}
+    public void setRefsetSpecUuidPropName(String refsetSpecUuidPropName) {
+        this.refsetSpecUuidPropName = refsetSpecUuidPropName;
+    }
 
 }

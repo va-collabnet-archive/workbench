@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,8 @@ public class SnoConGrp extends ArrayList<SnoCon> {
 
     public SnoConGrp(Collection<String> concepts) {
         super();
-        // :NYI: defined or not_defined is indeterminate coming from classifier callback.
+        // :NYI: defined or not_defined is indeterminate coming from classifier
+        // callback.
         for (String cStr : concepts)
             this.add(new SnoCon(unwrap(cStr), false));
         Collections.sort(this);
@@ -52,7 +53,7 @@ public class SnoConGrp extends ArrayList<SnoCon> {
     public SnoConGrp() {
         super();
     }
-    
+
     static private int unwrap(final String id) {
         return Integer.parseInt(String.valueOf(id));
     }

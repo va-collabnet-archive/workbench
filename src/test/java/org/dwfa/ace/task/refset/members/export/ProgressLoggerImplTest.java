@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,8 +30,8 @@ import java.util.Map;
 public final class ProgressLoggerImplTest {
 
     private static final String NEW_REFSET_NAME = "A new refset";
-    private static final String REFSET_NAME     = "Refset name";
-    
+    private static final String REFSET_NAME = "Refset name";
+
     private IMocksControl mockControl;
     private Logger mockLogger;
 
@@ -45,19 +45,19 @@ public final class ProgressLoggerImplTest {
     public void shouldInitializeProgressWithZero() {
         mockControl.replay();
 
-        Map<String,Integer> progressMap = new HashMap<String, Integer>();
+        Map<String, Integer> progressMap = new HashMap<String, Integer>();
         ProgressLogger progressLogger = new ProgressLoggerImpl(mockLogger, progressMap);
         progressLogger.logProgress(NEW_REFSET_NAME);
         assertThat(progressMap.get(NEW_REFSET_NAME), equalTo(0));
 
         mockControl.verify();
     }
-    
+
     @Test
     public void shouldIncrementAnExistingRefsetProgress() {
         mockControl.replay();
 
-        Map<String,Integer> progressMap = new HashMap<String, Integer>();
+        Map<String, Integer> progressMap = new HashMap<String, Integer>();
         progressMap.put(REFSET_NAME, 0);
         ProgressLogger progressLogger = new ProgressLoggerImpl(mockLogger, progressMap);
         progressLogger.logProgress(REFSET_NAME);
@@ -65,13 +65,13 @@ public final class ProgressLoggerImplTest {
 
         mockControl.verify();
     }
-    
+
     @Test
     public void shouldLogProgressEveryThousandthProgression() {
         mockLogger.logInfo("Exported 1000 of refset " + REFSET_NAME);
         mockControl.replay();
 
-        Map<String,Integer> progressMap = new HashMap<String, Integer>();
+        Map<String, Integer> progressMap = new HashMap<String, Integer>();
         progressMap.put(REFSET_NAME, 999);
         ProgressLogger progressLogger = new ProgressLoggerImpl(mockLogger, progressMap);
         progressLogger.logProgress(REFSET_NAME);

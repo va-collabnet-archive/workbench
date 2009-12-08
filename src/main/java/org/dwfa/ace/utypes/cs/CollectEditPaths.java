@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,55 +30,49 @@ import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 
 public class CollectEditPaths extends AbstractUncommittedProcessor {
 
-	Set<UUID> pathSet = new HashSet<UUID>();
-	
-	public Set<UUID> getPathSet() {
-		return pathSet;
-	}
+    Set<UUID> pathSet = new HashSet<UUID>();
 
-	@Override
-	protected void processNewUniversalAcePath(UniversalAcePath path) {
-		//Nothing to do...
+    public Set<UUID> getPathSet() {
+        return pathSet;
+    }
 
-	}
+    @Override
+    protected void processNewUniversalAcePath(UniversalAcePath path) {
+        // Nothing to do...
 
-	@Override
-	protected void processUncommittedUniversalAceConceptAttributesPart(
-			UniversalAceConceptAttributesPart part) {
-		pathSet.addAll(part.getPathId());
+    }
 
-	}
+    @Override
+    protected void processUncommittedUniversalAceConceptAttributesPart(UniversalAceConceptAttributesPart part) {
+        pathSet.addAll(part.getPathId());
 
-	@Override
-	protected void processUncommittedUniversalAceDescriptionPart(
-			UniversalAceDescriptionPart part) {
-		pathSet.addAll(part.getPathId());
-	}
+    }
 
-	@Override
-	protected void processUncommittedUniversalAceExtByRefPart(
-			UniversalAceExtByRefPart part) {
-		pathSet.addAll(part.getPathUid());
-	}
+    @Override
+    protected void processUncommittedUniversalAceDescriptionPart(UniversalAceDescriptionPart part) {
+        pathSet.addAll(part.getPathId());
+    }
 
-	@Override
-	protected void processUncommittedUniversalAceIdentificationPart(
-			UniversalAceIdentificationPart part) {
-		pathSet.addAll(part.getPathId());
+    @Override
+    protected void processUncommittedUniversalAceExtByRefPart(UniversalAceExtByRefPart part) {
+        pathSet.addAll(part.getPathUid());
+    }
 
-	}
+    @Override
+    protected void processUncommittedUniversalAceIdentificationPart(UniversalAceIdentificationPart part) {
+        pathSet.addAll(part.getPathId());
 
-	@Override
-	protected void processUncommittedUniversalAceImagePart(
-			UniversalAceImagePart part) {
-		pathSet.addAll(part.getPathId());
+    }
 
-	}
+    @Override
+    protected void processUncommittedUniversalAceImagePart(UniversalAceImagePart part) {
+        pathSet.addAll(part.getPathId());
 
-	@Override
-	protected void processUncommittedUniversalAceRelationshipPart(
-			UniversalAceRelationshipPart part) {
-		pathSet.addAll(part.getPathId());
-	}
+    }
+
+    @Override
+    protected void processUncommittedUniversalAceRelationshipPart(UniversalAceRelationshipPart part) {
+        pathSet.addAll(part.getPathId());
+    }
 
 }

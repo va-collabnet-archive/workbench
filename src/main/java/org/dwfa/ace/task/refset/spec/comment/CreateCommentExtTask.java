@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,8 +40,10 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Creates a comment extension on the refset currently in the refset spec panel, based on the string stored in the
- * comments prop name. The refset spec input parameter specifies the refset spec to use (to derive the appropriate
+ * Creates a comment extension on the refset currently in the refset spec panel,
+ * based on the string stored in the
+ * comments prop name. The refset spec input parameter specifies the refset spec
+ * to use (to derive the appropriate
  * comments refset).
  * 
  * @author Chrissy Hill
@@ -100,9 +102,9 @@ public class CreateCommentExtTask extends AbstractTask {
                     if (commentsRefset != null && memberRefset != null) {
                         SpecRefsetHelper specRefsetHelper = new SpecRefsetHelper();
                         for (I_Path path : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                            specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptId(), memberRefset
-                                .getConceptId(), comments, UUID.randomUUID(), termFactory.getConcept(
-                                path.getConceptId()).getUids().iterator().next(), currentUuid, Integer.MAX_VALUE);
+                            specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptId(),
+                                memberRefset.getConceptId(), comments, UUID.randomUUID(), termFactory.getConcept(
+                                    path.getConceptId()).getUids().iterator().next(), currentUuid, Integer.MAX_VALUE);
                         }
                     }
                 }

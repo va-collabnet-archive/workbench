@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,8 +22,9 @@ import java.beans.SimpleBeanInfo;
 
 /**
  * Bean info to RemoveAllElectronicAddress class.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 public class RemoveAllElectronicAddressBeanInfo extends SimpleBeanInfo {
 
@@ -44,10 +45,8 @@ public class RemoveAllElectronicAddressBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(RemoveAllElectronicAddress.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Remove ALL <br>Addresses");
+        BeanDescriptor bd = new BeanDescriptor(RemoveAllElectronicAddress.class);
+        bd.setDisplayName("<html><font color='green'><center>Remove ALL <br>Addresses");
         return bd;
     }
 

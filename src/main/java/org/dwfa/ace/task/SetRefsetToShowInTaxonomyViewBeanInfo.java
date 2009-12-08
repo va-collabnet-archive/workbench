@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,15 +34,11 @@ public class SetRefsetToShowInTaxonomyViewBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor propName =
-                    new PropertyDescriptor("propName",
-                        SetRefsetToShowInTaxonomyView.class);
+            PropertyDescriptor propName = new PropertyDescriptor("propName", SetRefsetToShowInTaxonomyView.class);
             propName.setBound(true);
             propName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            propName
-                .setDisplayName("<html><font color='green'>Reference set property:");
-            propName
-                .setShortDescription("Name of the property containing the reference set concept. ");
+            propName.setDisplayName("<html><font color='green'>Reference set property:");
+            propName.setShortDescription("Name of the property containing the reference set concept. ");
 
             PropertyDescriptor rv[] = { propName };
             return rv;
@@ -55,10 +51,8 @@ public class SetRefsetToShowInTaxonomyViewBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(SetRefsetToShowInTaxonomyView.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set Reference Set to<br>Show in Taxonomy View");
+        BeanDescriptor bd = new BeanDescriptor(SetRefsetToShowInTaxonomyView.class);
+        bd.setDisplayName("<html><font color='green'><center>Set Reference Set to<br>Show in Taxonomy View");
         return bd;
     }
 

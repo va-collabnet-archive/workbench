@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,12 +36,13 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
-* Takes/removes the first item (UUID) in a specified attachment list of lists and returns a UUID.
-* @author Susan Castillo
-*
-*/
+ * Takes/removes the first item (UUID) in a specified attachment list of lists
+ * and returns a UUID.
+ * 
+ * @author Susan Castillo
+ * 
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
-
 public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
 
     /**
@@ -55,18 +56,16 @@ public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
 
     private String uuidListPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
 
-
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(listListNamePropName);
         out.writeObject(uuidListPropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-        	listListNamePropName = (String) in.readObject();
+            listListNamePropName = (String) in.readObject();
             uuidListPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -74,25 +73,22 @@ public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
     @SuppressWarnings("unchecked")
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            ArrayList<Collection<UUID>> temporaryList =
-                (ArrayList<Collection<UUID>>) process.readProperty(listListNamePropName);
+            ArrayList<Collection<UUID>> temporaryList = (ArrayList<Collection<UUID>>) process.readProperty(listListNamePropName);
 
             if (worker.getLogger().isLoggable(Level.FINE)) {
                 worker.getLogger().fine(("Removing first item in attachment list."));
             }
 
             Collection<UUID> uuid = temporaryList.remove(0);
-			worker.getLogger().info("uuid: " + uuid);
+            worker.getLogger().info("uuid: " + uuid);
 
             process.setProperty(this.uuidListPropName, uuid);
             return Condition.CONTINUE;
@@ -115,21 +111,20 @@ public class TakeFirstItemInAttachmentListListReturnUUID extends AbstractTask {
         return new int[] {};
     }
 
-	public String getUuidListPropName() {
-		return uuidListPropName;
-	}
+    public String getUuidListPropName() {
+        return uuidListPropName;
+    }
 
-	public void setUuidListPropName(String uuidListPropName) {
-		this.uuidListPropName = uuidListPropName;
-	}
+    public void setUuidListPropName(String uuidListPropName) {
+        this.uuidListPropName = uuidListPropName;
+    }
 
-	public String getListListNamePropName() {
-		return listListNamePropName;
-	}
+    public String getListListNamePropName() {
+        return listListNamePropName;
+    }
 
-	public void setListListNamePropName(String listNamePropName) {
-		this.listListNamePropName = listNamePropName;
-	}
+    public void setListListNamePropName(String listNamePropName) {
+        this.listListNamePropName = listNamePropName;
+    }
 
 }
-

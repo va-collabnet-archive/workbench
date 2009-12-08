@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 
 public final class WriteRefsetDescriptionsTest {
 
-    private static final String DIRECTORY_KEY       = "mykey";
+    private static final String DIRECTORY_KEY = "mykey";
 
     private IMocksControl mockControl;
     private I_TermFactory mockTermFactory;
@@ -58,7 +58,7 @@ public final class WriteRefsetDescriptionsTest {
 
         EasyMock.expect(mockTerminologyWrapper.get()).andReturn(mockTermFactory);
         EasyMock.expect(mockWork.getLogger()).andReturn(mockLogger).atLeastOnce();
-        EasyMock.expect(mockLogger.isLoggable(EasyMock.isA(Level.class))).andReturn(false).atLeastOnce();        
+        EasyMock.expect(mockLogger.isLoggable(EasyMock.isA(Level.class))).andReturn(false).atLeastOnce();
     }
 
     @Test
@@ -78,7 +78,7 @@ public final class WriteRefsetDescriptionsTest {
 
         mockControl.verify();
     }
-            
+
     @Test
     public void shouldReturnExpectedConditions() {
         Collection<Condition> conditions = createTask().getConditions();
@@ -89,19 +89,17 @@ public final class WriteRefsetDescriptionsTest {
     }
 
     private WriteRefsetDescriptions createTask() {
-        return new WriteRefsetDescriptions(DIRECTORY_KEY, mockTerminologyWrapper,
-                mockBuilder);
+        return new WriteRefsetDescriptions(DIRECTORY_KEY, mockTerminologyWrapper, mockBuilder);
     }
 
     public void shouldReturnZeroContainerIds() {
-        int[] containerIds = new WriteRefsetDescriptions(DIRECTORY_KEY, mockTerminologyWrapper,
-                mockBuilder).getDataContainerIds();
+        int[] containerIds = new WriteRefsetDescriptions(DIRECTORY_KEY, mockTerminologyWrapper, mockBuilder).getDataContainerIds();
 
         assertThat(containerIds.length, equalTo(0));
     }
 
     private void expectThatCleanableProcessisBuilt(final CleanableProcessExtByRef mockCleanableProcess,
-                                                   final File directoryFile) {
+            final File directoryFile) {
         EasyMock.expect(mockBuilder.withTermFactory(mockTermFactory)).andReturn(mockBuilder);
         EasyMock.expect(mockBuilder.withLogger(EasyMock.isA(TaskLogger.class))).andReturn(mockBuilder);
         EasyMock.expect(mockBuilder.withSelectedDir(directoryFile)).andReturn(mockBuilder);

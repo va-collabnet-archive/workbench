@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,13 +28,11 @@ public class ZeroItemsInSetBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor inputPropName =
-                    new PropertyDescriptor("inputPropName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor inputPropName = new PropertyDescriptor("inputPropName",
+                getBeanDescriptor().getBeanClass());
             inputPropName.setBound(true);
             inputPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            inputPropName
-                .setDisplayName("<html><font color='green'>input set property");
+            inputPropName.setDisplayName("<html><font color='green'>input set property");
             inputPropName.setShortDescription("");
 
             PropertyDescriptor rv[] = { inputPropName };
@@ -49,8 +47,7 @@ public class ZeroItemsInSetBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ZeroItemsInSet.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Check if:<br>1) set is null OR<br>2) zero items in set");
+        bd.setDisplayName("<html><font color='green'><center>Check if:<br>1) set is null OR<br>2) zero items in set");
         return bd;
     }
 }

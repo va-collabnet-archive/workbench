@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import java.io.Serializable;
  * Serialization is not put in SnoCon to minimize the SnoCon memory.
  * 
  * @author Marc E. Campbell
- *
+ * 
  */
 
 public class SnoConSer extends SnoCon implements Serializable {
@@ -45,8 +45,7 @@ public class SnoConSer extends SnoCon implements Serializable {
     }
 
     // customization to handle non-serializable superclass.
-    private void readObject(ObjectInputStream ois) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
         id = ois.readInt();
         isDefined = ois.readBoolean();

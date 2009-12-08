@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,14 +27,11 @@ public class SaveBaseClassificationBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor fileName =
-                    new PropertyDescriptor("fileName",
-                        SaveBaseClassification.class);
+            PropertyDescriptor fileName = new PropertyDescriptor("fileName", SaveBaseClassification.class);
             fileName.setBound(true);
             fileName.setPropertyEditorClass(JTextFieldEditor.class);
             fileName.setDisplayName("<html><font color='green'>File name:");
-            fileName
-                .setShortDescription("Enter the name of the file in which to store the base classification state.");
+            fileName.setShortDescription("Enter the name of the file in which to store the base classification state.");
 
             PropertyDescriptor rv[] = { fileName, };
             return rv;
@@ -48,8 +45,7 @@ public class SaveBaseClassificationBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(GetResults.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Save Base Classification");
+        bd.setDisplayName("<html><font color='green'><center>Save Base Classification");
         return bd;
     }
 

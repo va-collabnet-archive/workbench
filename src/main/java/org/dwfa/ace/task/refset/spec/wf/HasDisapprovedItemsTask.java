@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,8 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Checks if the associated promotion refset has any items with promotion status=not approved.
+ * Checks if the associated promotion refset has any items with promotion
+ * status=not approved.
  * If so, it returns true, else it returns false.
  * 
  * @author Chrissy Hill
@@ -94,18 +95,14 @@ public class HasDisapprovedItemsTask extends AbstractTask {
     private boolean hasDisapprovedItems() throws Exception {
         UUID promotionRefsetUuid = (UUID) process.readProperty(promotionUuidPropName);
         I_GetConceptData promotionRefsetConcept = termFactory.getConcept(new UUID[] { promotionRefsetUuid });
-        I_GetConceptData disapprovedAdditionStatus =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
-        I_GetConceptData disapprovedDeletionStatus =
-                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
+        I_GetConceptData disapprovedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
+        I_GetConceptData disapprovedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
 
         SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
-        List<I_GetConceptData> disapprovedAdditions =
-                refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
-                    .getConceptId()), disapprovedAdditionStatus);
-        List<I_GetConceptData> disapprovedDeletions =
-                refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
-                    .getConceptId()), disapprovedDeletionStatus);
+        List<I_GetConceptData> disapprovedAdditions = refsetHelper.filterListByConceptType(
+            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId()), disapprovedAdditionStatus);
+        List<I_GetConceptData> disapprovedDeletions = refsetHelper.filterListByConceptType(
+            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId()), disapprovedDeletionStatus);
 
         if (disapprovedAdditions.size() > 0) {
             return true;

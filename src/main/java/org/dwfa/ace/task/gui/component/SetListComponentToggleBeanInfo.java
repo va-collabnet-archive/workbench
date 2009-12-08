@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,17 +28,13 @@ public class SetListComponentToggleBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
 
         try {
-            PropertyDescriptor selectToggle =
-                    new PropertyDescriptor("selectToggle", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor selectToggle = new PropertyDescriptor("selectToggle", getBeanDescriptor().getBeanClass());
             selectToggle.setBound(true);
             selectToggle.setPropertyEditorClass(CheckboxEditor.class);
             selectToggle.setDisplayName("<html><font color='green'>Selected:");
             selectToggle.setShortDescription("State to set toggle to. ");
 
-            PropertyDescriptor toggle =
-                    new PropertyDescriptor("toggle", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor toggle = new PropertyDescriptor("toggle", getBeanDescriptor().getBeanClass());
             toggle.setBound(true);
             toggle.setPropertyEditorClass(ComponentToggleEditor.class);
             toggle.setDisplayName("<html><font color='green'>Toggle:");
@@ -56,8 +52,7 @@ public class SetListComponentToggleBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetListComponentToggle.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Set List <br>Component Toggle");
+        bd.setDisplayName("<html><font color='green'><center>Set List <br>Component Toggle");
         return bd;
     }
 

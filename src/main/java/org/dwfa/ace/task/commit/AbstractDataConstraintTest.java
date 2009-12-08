@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,73 +37,73 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
     private static final long serialVersionUID = 1;
 
     private static final int dataVersion = 1;
-    
+
     /**
-     * Property name for the term component to test. 
+     * Property name for the term component to test.
      */
     private String componentPropName = ProcessAttachmentKeys.SEARCH_TEST_ITEM.getAttachmentKey();
-    
+
     /**
-     * Profile to use for determining view paths, status values. 
+     * Profile to use for determining view paths, status values.
      */
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-    
+
     /**
-     * If true, shows an alert on failure, in addition to the message written to the 
-     * worker's log, if false, failure messages are sent only to the worker's log. 
+     * If true, shows an alert on failure, in addition to the message written to
+     * the
+     * worker's log, if false, failure messages are sent only to the worker's
+     * log.
      */
     private Boolean showAlertOnFailure = false;
-    
+
     /**
-     * If true, the task does the data constraint test with the forCommit paramater set to true. 
+     * If true, the task does the data constraint test with the forCommit
+     * paramater set to true.
      */
     private Boolean forCommit = true;
-    
+
     private transient I_ConfigAceFrame frameConfig;
 
-
     public I_ConfigAceFrame getFrameConfig() {
-		return frameConfig;
-	}
+        return frameConfig;
+    }
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.componentPropName);
         out.writeObject(this.profilePropName);
-     }
+    }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             this.componentPropName = (String) in.readObject();
             this.profilePropName = (String) in.readObject();
-         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);   
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
-    
-    
+
     public final void complete(I_EncodeBusinessProcess bp, I_Work worker) throws TaskFailedException {
         // nothing to do..
     }
 
     public final Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        
+
         try {
             I_Transact component = (I_Transact) process.readProperty(componentPropName);
             List<AlertToDataConstraintFailure> alerts = test(component, forCommit);
-    		frameConfig = (I_ConfigAceFrame) process.readProperty(profilePropName);
- 
+            frameConfig = (I_ConfigAceFrame) process.readProperty(profilePropName);
+
             boolean noFailures = true;
-            for (AlertToDataConstraintFailure failure: alerts) {
-            	if (showAlertOnFailure) {
-            		Alerter alert = new Alerter(showAlertOnFailure, worker.getLogger(), failure);
-            		alert.alert();
-            	}
-            	if (failure.getAlertType().equals(AlertToDataConstraintFailure.ALERT_TYPE.ERROR)) {
-            		noFailures = false;
-            	}            	
+            for (AlertToDataConstraintFailure failure : alerts) {
+                if (showAlertOnFailure) {
+                    Alerter alert = new Alerter(showAlertOnFailure, worker.getLogger(), failure);
+                    alert.alert();
+                }
+                if (failure.getAlertType().equals(AlertToDataConstraintFailure.ALERT_TYPE.ERROR)) {
+                    noFailures = false;
+                }
             }
             if (noFailures) {
                 return Condition.TRUE;
@@ -119,9 +119,9 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
             throw new TaskFailedException(e);
         } catch (Exception e) {
             throw new TaskFailedException(e);
-		}
+        }
     }
-    
+
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
@@ -152,8 +152,7 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
         this.componentPropName = componentPropName;
     }
 
-    public abstract List<AlertToDataConstraintFailure> test(I_Transact component, 
-    		boolean forCommit)
+    public abstract List<AlertToDataConstraintFailure> test(I_Transact component, boolean forCommit)
             throws TaskFailedException;
 
     public Boolean getShowAlertOnFailure() {
@@ -164,12 +163,12 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
         this.showAlertOnFailure = showAlertOnFailure;
     }
 
-	public Boolean getForCommit() {
-		return forCommit;
-	}
+    public Boolean getForCommit() {
+        return forCommit;
+    }
 
-	public void setForCommit(Boolean forCommit) {
-		this.forCommit = forCommit;
-	}
+    public void setForCommit(Boolean forCommit) {
+        this.forCommit = forCommit;
+    }
 
 }

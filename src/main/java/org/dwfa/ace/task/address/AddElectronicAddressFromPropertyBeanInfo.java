@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,16 +34,12 @@ public class AddElectronicAddressFromPropertyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor addressPropName =
-                    new PropertyDescriptor("addressPropName",
-                        AddElectronicAddressFromProperty.class);
+            PropertyDescriptor addressPropName = new PropertyDescriptor("addressPropName",
+                AddElectronicAddressFromProperty.class);
             addressPropName.setBound(true);
-            addressPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            addressPropName
-                .setDisplayName("<html><font color='green'>Electronic address prop:");
-            addressPropName
-                .setShortDescription("Enter the property name of the electronic address to be added.");
+            addressPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            addressPropName.setDisplayName("<html><font color='green'>Electronic address prop:");
+            addressPropName.setShortDescription("Enter the property name of the electronic address to be added.");
 
             PropertyDescriptor rv[] = { addressPropName };
             return rv;
@@ -56,10 +52,8 @@ public class AddElectronicAddressFromPropertyBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(AddElectronicAddressFromProperty.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Add Electronic Address<br>From Property");
+        BeanDescriptor bd = new BeanDescriptor(AddElectronicAddressFromProperty.class);
+        bd.setDisplayName("<html><font color='green'><center>Add Electronic Address<br>From Property");
         return bd;
     }
 

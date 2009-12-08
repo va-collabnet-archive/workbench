@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,8 +36,9 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * Adds an electronic address to the viewer.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/address", type = BeanType.TASK_BEAN) })
 public class AddElectronicAddress extends AbstractTask {
@@ -56,37 +57,31 @@ public class AddElectronicAddress extends AbstractTask {
         out.writeObject(address);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             address = (String) in.readObject();
         } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-                         throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-                                throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             if (address == null) {
                 throw new TaskFailedException("Electronic address is null.");
             }
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             Collection<String> list = configFrame.getAddressesList();
             Iterator iterator = list.iterator();
             while (iterator.hasNext()) {
                 if (worker.getLogger().isLoggable(Level.INFO)) {
-                    worker.getLogger().info(("Before adding new address: "
-                            + iterator.next()));
+                    worker.getLogger().info(("Before adding new address: " + iterator.next()));
                 }
             }
             configFrame.getAddressesList().add(address);
@@ -94,8 +89,7 @@ public class AddElectronicAddress extends AbstractTask {
             iterator = list.iterator();
             while (iterator.hasNext()) {
                 if (worker.getLogger().isLoggable(Level.INFO)) {
-                    worker.getLogger().info(("After adding new address:"
-                            + iterator.next()));
+                    worker.getLogger().info(("After adding new address:" + iterator.next()));
                 }
             }
 

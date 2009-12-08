@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,16 +35,11 @@ public class ExportRefsetSpecTaskBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         PropertyDescriptor outputFilePropName;
         try {
-            outputFilePropName =
-                    new PropertyDescriptor("outputFilePropName",
-                        ExportRefsetSpecTask.class);
+            outputFilePropName = new PropertyDescriptor("outputFilePropName", ExportRefsetSpecTask.class);
             outputFilePropName.setBound(true);
-            outputFilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            outputFilePropName
-                .setDisplayName("<html><font color='green'>Output file property:");
-            outputFilePropName
-                .setShortDescription("Name of the property containing the filename to export to. ");
+            outputFilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            outputFilePropName.setDisplayName("<html><font color='green'>Output file property:");
+            outputFilePropName.setShortDescription("Name of the property containing the filename to export to. ");
 
             PropertyDescriptor rv[] = { outputFilePropName };
             return rv;
@@ -58,8 +53,7 @@ public class ExportRefsetSpecTaskBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ExportRefsetSpecTask.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Export refset spec");
+        bd.setDisplayName("<html><font color='green'><center>Export refset spec");
         return bd;
     }
 

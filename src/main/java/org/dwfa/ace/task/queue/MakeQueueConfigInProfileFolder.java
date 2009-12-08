@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,7 +54,7 @@ public class MakeQueueConfigInProfileFolder extends AbstractTask {
     private String template = "config/queue.config";
 
     private String usernamePropName = ProcessAttachmentKeys.USERNAME.getAttachmentKey();
-    
+
     private String queueFolderName = "queue";
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -72,9 +72,9 @@ public class MakeQueueConfigInProfileFolder extends AbstractTask {
             template = (String) in.readObject();
             usernamePropName = (String) in.readObject();
             if (objDataVersion >= 2) {
-            	queueFolderName = (String) in.readObject();
+                queueFolderName = (String) in.readObject();
             } else {
-            	queueFolderName = "queue";
+                queueFolderName = "queue";
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -91,15 +91,15 @@ public class MakeQueueConfigInProfileFolder extends AbstractTask {
             String configTemplate = FileIO.readerToString(new FileReader(template));
             configTemplate = configTemplate.replace("username", username);
             configTemplate = configTemplate.replace("directory", "not_used");
-            
-            File outputFile = new File(profileDir, username + File.separatorChar + queueFolderName + 
-                                       File.separatorChar + "queue.config");
+
+            File outputFile = new File(profileDir, username + File.separatorChar + queueFolderName + File.separatorChar
+                + "queue.config");
             outputFile.getParentFile().mkdirs();
             FileWriter fw = new FileWriter(outputFile);
             fw.append(configTemplate);
             fw.close();
             new QueueServer(new String[] { outputFile.getCanonicalPath() }, null);
-            
+
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
@@ -150,11 +150,11 @@ public class MakeQueueConfigInProfileFolder extends AbstractTask {
         this.template = template;
     }
 
-	public String getQueueFolderName() {
-		return queueFolderName;
-	}
+    public String getQueueFolderName() {
+        return queueFolderName;
+    }
 
-	public void setQueueFolderName(String queueFolderName) {
-		this.queueFolderName = queueFolderName;
-	}
+    public void setQueueFolderName(String queueFolderName) {
+        this.queueFolderName = queueFolderName;
+    }
 }

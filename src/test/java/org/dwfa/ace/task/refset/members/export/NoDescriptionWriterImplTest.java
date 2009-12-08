@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,8 +29,8 @@ import java.util.UUID;
 
 public final class NoDescriptionWriterImplTest {
 
-    private static final String LINE_SEPARATOR  = "\n";
-    private static final String SOME_TEXT       = "Blah blalh";
+    private static final String LINE_SEPARATOR = "\n";
+    private static final String SOME_TEXT = "Blah blalh";
 
     private IMocksControl mockControl;
     private Writer mockWriter;
@@ -42,7 +42,7 @@ public final class NoDescriptionWriterImplTest {
         mockWriter = mockControl.createMock(Writer.class);
         mockLogger = mockControl.createMock(Logger.class);
     }
-    
+
     @Test
     public void shouldWriteConceptsThatDontHaveADescritpion() throws Exception {
         I_GetConceptData mockConcept = mockControl.createMock(I_GetConceptData.class);

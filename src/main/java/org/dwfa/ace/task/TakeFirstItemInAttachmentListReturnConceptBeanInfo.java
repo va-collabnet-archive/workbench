@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,11 +25,11 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info for TakeFirstItemInAttachmentListReturnUUID class.
+ * 
  * @author Susan Castillo
- *
+ * 
  */
-public class TakeFirstItemInAttachmentListReturnConceptBeanInfo extends
-        SimpleBeanInfo {
+public class TakeFirstItemInAttachmentListReturnConceptBeanInfo extends SimpleBeanInfo {
 
     /**
      *
@@ -40,24 +40,18 @@ public class TakeFirstItemInAttachmentListReturnConceptBeanInfo extends
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor uuidListPropName =
-                    new PropertyDescriptor("uuidListPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor uuidListPropName = new PropertyDescriptor("uuidListPropName",
+                getBeanDescriptor().getBeanClass());
             uuidListPropName.setBound(true);
-            uuidListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            uuidListPropName
-                .setDisplayName("<html><font color='green'>Name of list:");
+            uuidListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListPropName.setDisplayName("<html><font color='green'>Name of list:");
             uuidListPropName.setShortDescription("Name of the temporary list.");
 
-            PropertyDescriptor conceptPropName =
-                    new PropertyDescriptor("conceptPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor conceptPropName = new PropertyDescriptor("conceptPropName",
+                getBeanDescriptor().getBeanClass());
             conceptPropName.setBound(true);
-            conceptPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            conceptPropName
-                .setDisplayName("<html><font color='green'>Concept:");
+            conceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            conceptPropName.setDisplayName("<html><font color='green'>Concept:");
             conceptPropName.setShortDescription("Concept");
 
             PropertyDescriptor rv[] = { uuidListPropName, conceptPropName };
@@ -71,11 +65,8 @@ public class TakeFirstItemInAttachmentListReturnConceptBeanInfo extends
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(
-                    TakeFirstItemInAttachmentListReturnConcept.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>DON'T USE<br>Take 1st Item<br>In Attachment List<br> Return Concept");
+        BeanDescriptor bd = new BeanDescriptor(TakeFirstItemInAttachmentListReturnConcept.class);
+        bd.setDisplayName("<html><font color='green'><center>DON'T USE<br>Take 1st Item<br>In Attachment List<br> Return Concept");
         return bd;
     }
 

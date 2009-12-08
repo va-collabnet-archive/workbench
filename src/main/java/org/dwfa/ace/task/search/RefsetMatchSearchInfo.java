@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,23 +24,22 @@ import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 
 public class RefsetMatchSearchInfo extends AbstractSeachTestSearchInfo {
 
-	@Override
-	protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
-		try {
-            PropertyDescriptor refsetTerm =
-                new PropertyDescriptor("refset", getBeanDescriptor().getBeanClass());
+    @Override
+    protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
+        try {
+            PropertyDescriptor refsetTerm = new PropertyDescriptor("refset", getBeanDescriptor().getBeanClass());
             refsetTerm.setBound(true);
             refsetTerm.setPropertyEditorClass(ConceptLabelPropEditor.class);
             refsetTerm.setDisplayName("<html><font color='green'>refset:");
             refsetTerm.setShortDescription("The refset to test the component is in.");
 
-            PropertyDescriptor rv[] =
-                { refsetTerm };
+            PropertyDescriptor rv[] = { refsetTerm };
             return rv;
         } catch (IntrospectionException e) {
-             throw new Error(e.toString());
+            throw new Error(e.toString());
         }
-     }        
+    }
+
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */

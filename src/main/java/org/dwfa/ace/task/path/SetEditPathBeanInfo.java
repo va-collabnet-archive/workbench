@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,15 +27,12 @@ public class SetEditPathBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor editPathEntry =
-                    new PropertyDescriptor("editPathEntry", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor editPathEntry = new PropertyDescriptor("editPathEntry",
+                getBeanDescriptor().getBeanClass());
             editPathEntry.setBound(true);
             editPathEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
-            editPathEntry
-                .setDisplayName("<html><font color='green'>editing path:");
-            editPathEntry
-                .setShortDescription("The property that contains the editing path.");
+            editPathEntry.setDisplayName("<html><font color='green'>editing path:");
+            editPathEntry.setShortDescription("The property that contains the editing path.");
 
             PropertyDescriptor rv[] = { editPathEntry };
             return rv;

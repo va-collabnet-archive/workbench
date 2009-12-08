@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,8 +35,8 @@ import java.lang.reflect.Method;
 
 public final class WriteSingleRefsetDescriptionSerializationTest {
 
-    private static final String WORKING_REFSET_KEY  = "working refset key";
-    private static final String DIRECTORY_KEY       = "somedirectory";
+    private static final String WORKING_REFSET_KEY = "working refset key";
+    private static final String DIRECTORY_KEY = "somedirectory";
 
     private IMocksControl mockControl;
     private CleanableProcessExtByRefBuilder mockCleanableProcessBuilder;
@@ -60,10 +60,11 @@ public final class WriteSingleRefsetDescriptionSerializationTest {
         mockControl.replay();
 
         I_DefineTask task = createTask();
-        //As the Java API insists on calling a private handler method instead of using an API,
-        //we can assume that this method name will not change.
+        // As the Java API insists on calling a private handler method instead
+        // of using an API,
+        // we can assume that this method name will not change.
         Method method = WriteSingleRefsetDescription.class.getDeclaredMethod("writeObject",
-                new Class[]{ObjectOutputStream.class});
+            new Class[] { ObjectOutputStream.class });
         method.setAccessible(true);
         method.invoke(task, mockOutputStream);
 
@@ -80,7 +81,7 @@ public final class WriteSingleRefsetDescriptionSerializationTest {
 
         I_DefineTask task = createDeserializedTask();
         Method method = WriteSingleRefsetDescription.class.getDeclaredMethod("readObject",
-                new Class[]{ObjectInputStream.class});
+            new Class[] { ObjectInputStream.class });
         method.setAccessible(true);
         method.invoke(task, mockInputStream);
 
@@ -93,7 +94,7 @@ public final class WriteSingleRefsetDescriptionSerializationTest {
         mockControl.verify();
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings( { "unchecked" })
     @Test
     public void shouldThrowAnExceptionIfTheObjectCantBeDeserialized() throws Exception {
         ObjectInputStream mockInputStream = mockControl.createMock(ObjectInputStream.class);
@@ -102,7 +103,7 @@ public final class WriteSingleRefsetDescriptionSerializationTest {
 
         I_DefineTask task = createTask();
         Method method = WriteSingleRefsetDescription.class.getDeclaredMethod("readObject",
-                new Class[]{ObjectInputStream.class});
+            new Class[] { ObjectInputStream.class });
         method.setAccessible(true);
 
         try {
@@ -122,11 +123,10 @@ public final class WriteSingleRefsetDescriptionSerializationTest {
 
     private WriteSingleRefsetDescription createTask() {
         return new WriteSingleRefsetDescription(WORKING_REFSET_KEY, mockCleanableProcessBuilder, DIRECTORY_KEY,
-                mockPropertyValidator, mockTerminologyWrapper);
+            mockPropertyValidator, mockTerminologyWrapper);
     }
-    
+
     private WriteSingleRefsetDescription createDeserializedTask() {
-        return new WriteSingleRefsetDescription(WORKING_REFSET_KEY, null, DIRECTORY_KEY,
-                mockPropertyValidator, null);
+        return new WriteSingleRefsetDescription(WORKING_REFSET_KEY, null, DIRECTORY_KEY, mockPropertyValidator, null);
     }
 }

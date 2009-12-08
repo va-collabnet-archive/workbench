@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,19 +36,24 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 
 /**
- * This interface is used as an implementation of the Factory Pattern for creating AlertToDataConstraintFailure objects.
- *
+ * This interface is used as an implementation of the Factory Pattern for
+ * creating AlertToDataConstraintFailure objects.
+ * 
  * @author Matthew Edwards
  */
 public interface AlertToDataConstraintFailureFactory {
 
     /**
-     * Delegates instance creation of AlertToDataConstraintFailure objects to the subclass.
-     * Each Subclass is responsible for creating it's {@code AlertToDataConstraintFailure} objects.
-     * @param message String containing the message for the {@link AlertToDataConstraintFailure}
-     * @param conceptWithAlert I_GetConceptData that the {@link AlertToDataConstraintFailure} is for
+     * Delegates instance creation of AlertToDataConstraintFailure objects to
+     * the subclass.
+     * Each Subclass is responsible for creating it's {@code
+     * AlertToDataConstraintFailure} objects.
+     * 
+     * @param message String containing the message for the
+     *            {@link AlertToDataConstraintFailure}
+     * @param conceptWithAlert I_GetConceptData that the
+     *            {@link AlertToDataConstraintFailure} is for
      * @return an instantiated {@link AlertToDataConstraintFailure} object
      */
-    AlertToDataConstraintFailure createAlertToDataConstraintFailure(
-            String message, I_GetConceptData conceptWithAlert);
+    AlertToDataConstraintFailure createAlertToDataConstraintFailure(String message, I_GetConceptData conceptWithAlert);
 }

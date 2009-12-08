@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -66,7 +66,7 @@ public class SnoTrace {
     public SnoTrace(int max, String s, I_GetConceptData bean) {
         this.max = max;
         try {
-            this.name = s+ " for \""+ bean.getInitialText()+"\"";
+            this.name = s + " for \"" + bean.getInitialText() + "\"";
         } catch (IOException e) {
             this.name = s;
             e.printStackTrace();
@@ -132,8 +132,7 @@ public class SnoTrace {
         try {
             I_GetConceptData a = tf.getConcept(nid);
             a.getUids().iterator().next().toString();
-            String s = nid + "\t" + a.getUids().iterator().next().toString()
-                    + "\t" + a.getInitialText();
+            String s = nid + "\t" + a.getUids().iterator().next().toString() + "\t" + a.getInitialText();
             return s;
         } catch (TerminologyException e) {
             e.printStackTrace();
@@ -242,10 +241,8 @@ public class SnoTrace {
         int b;
         try {
             for (int i = 0; i < (cur < max ? cur : max); i++) {
-                a = tf.getConcept(traceSnoRel[i].typeId).getInitialText()
-                        .length();
-                b = tf.getConcept(traceSnoRel[i].c2Id).getInitialText()
-                        .length();
+                a = tf.getConcept(traceSnoRel[i].typeId).getInitialText().length();
+                b = tf.getConcept(traceSnoRel[i].c2Id).getInitialText().length();
                 if ((a + b + 3) > padTo)
                     padTo = (a + b + 3);
             }

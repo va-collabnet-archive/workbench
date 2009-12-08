@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,56 +30,39 @@ public class PromptForNumericInputBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor instruction =
-                    new PropertyDescriptor("instruction",
-                        PromptForNumericInput.class);
+            PropertyDescriptor instruction = new PropertyDescriptor("instruction", PromptForNumericInput.class);
             instruction.setBound(true);
             instruction.setPropertyEditorClass(JTextFieldEditor.class);
-            instruction
-                .setDisplayName("<html><font color='green'>Instruction:");
-            instruction
-                .setShortDescription("Instructions to present to the user in the workflow panel. ");
+            instruction.setDisplayName("<html><font color='green'>Instruction:");
+            instruction.setShortDescription("Instructions to present to the user in the workflow panel. ");
 
-            PropertyDescriptor outputPropName =
-                    new PropertyDescriptor("outputPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor outputPropName = new PropertyDescriptor("outputPropName",
+                getBeanDescriptor().getBeanClass());
             outputPropName.setBound(true);
-            outputPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            outputPropName
-                .setDisplayName("<html><font color='green'>Output property name:");
+            outputPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            outputPropName.setDisplayName("<html><font color='green'>Output property name:");
             outputPropName.setShortDescription("Output property name.");
 
-            PropertyDescriptor allowNegative =
-                    new PropertyDescriptor("allowNegative", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor allowNegative = new PropertyDescriptor("allowNegative",
+                getBeanDescriptor().getBeanClass());
             allowNegative.setBound(true);
             allowNegative.setPropertyEditorClass(CheckboxEditor.class);
-            allowNegative
-                .setDisplayName("<html><font color='green'>Allow negatives:");
+            allowNegative.setDisplayName("<html><font color='green'>Allow negatives:");
             allowNegative.setShortDescription("");
 
-            PropertyDescriptor allowZero =
-                    new PropertyDescriptor("allowZero", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor allowZero = new PropertyDescriptor("allowZero", getBeanDescriptor().getBeanClass());
             allowZero.setBound(true);
             allowZero.setPropertyEditorClass(CheckboxEditor.class);
             allowZero.setDisplayName("<html><font color='green'>Allow zero:");
             allowZero.setShortDescription("");
 
-            PropertyDescriptor allowDouble =
-                    new PropertyDescriptor("allowDouble", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor allowDouble = new PropertyDescriptor("allowDouble", getBeanDescriptor().getBeanClass());
             allowDouble.setBound(true);
             allowDouble.setPropertyEditorClass(CheckboxEditor.class);
-            allowDouble
-                .setDisplayName("<html><font color='green'>Allow doubles:");
-            allowDouble
-                .setShortDescription("Allow doubles:<br>(alternative is integer only)");
+            allowDouble.setDisplayName("<html><font color='green'>Allow doubles:");
+            allowDouble.setShortDescription("Allow doubles:<br>(alternative is integer only)");
 
-            PropertyDescriptor rv[] =
-                    { instruction, outputPropName, allowNegative, allowZero,
-                     allowDouble };
+            PropertyDescriptor rv[] = { instruction, outputPropName, allowNegative, allowZero, allowDouble };
 
             return rv;
         } catch (IntrospectionException e) {
@@ -92,8 +75,7 @@ public class PromptForNumericInputBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(PromptForNumericInput.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Prompt for numeric<br>input");
+        bd.setDisplayName("<html><font color='green'><center>Prompt for numeric<br>input");
         return bd;
     }
 }

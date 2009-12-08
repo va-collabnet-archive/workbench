@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,9 +34,9 @@ import java.io.File;
 
 public final class WriteSingleRefsetDescriptionWithMissingDataTest {
 
-    private static final String WORKING_REFSET_KEY          = "REFSET_KEY";
-    private static final String DIRECTORY_KEY               = "DIR_KEY";
-    private static final String PROPERTY_NOT_FOUND_MESSAGE  = "could not find property";
+    private static final String WORKING_REFSET_KEY = "REFSET_KEY";
+    private static final String DIRECTORY_KEY = "DIR_KEY";
+    private static final String PROPERTY_NOT_FOUND_MESSAGE = "could not find property";
 
     private IMocksControl mockControl;
     private PropertyValidator mockPropertyValidator;
@@ -50,13 +50,12 @@ public final class WriteSingleRefsetDescriptionWithMissingDataTest {
         mockTerminologyWrapper = mockControl.createMock(LocalVersionedTerminologyWrapper.class);
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @SuppressWarnings( { "ThrowableInstanceNeverThrown" })
     @Test
     public void shouldFailIfTheOutputDirectoryHasNotBeenSelected() throws Exception {
         I_EncodeBusinessProcess mockBusinessProcess = mockControl.createMock(I_EncodeBusinessProcess.class);
         I_Work mockWork = mockControl.createMock(I_Work.class);
-        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder =
-                mockControl.createMock(CleanableProcessExtByRefBuilder.class);
+        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder = mockControl.createMock(CleanableProcessExtByRefBuilder.class);
 
         EasyMock.expect(mockBusinessProcess.readProperty(DIRECTORY_KEY)).andReturn(null);
         mockPropertyValidator.validate(null, "output directory");
@@ -70,20 +69,19 @@ public final class WriteSingleRefsetDescriptionWithMissingDataTest {
         } catch (TaskFailedException e) {
             assertThat(e.getCause(), notNullValue());
             assertTrue("Expected PropertyNotFoundException. Got " + e.getCause(),
-                    e.getCause().getClass() == PropertyNotFoundException.class);
+                e.getCause().getClass() == PropertyNotFoundException.class);
             assertThat(e.getCause().getMessage(), equalTo(PROPERTY_NOT_FOUND_MESSAGE));
             mockControl.verify();
         }
 
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @SuppressWarnings( { "ThrowableInstanceNeverThrown" })
     @Test
     public void shouldFailIfTheWorkingRefsetHasNotBeenSelected() throws Exception {
         I_EncodeBusinessProcess mockBusinessProcess = mockControl.createMock(I_EncodeBusinessProcess.class);
         I_Work mockWork = mockControl.createMock(I_Work.class);
-        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder =
-                mockControl.createMock(CleanableProcessExtByRefBuilder.class);
+        CleanableProcessExtByRefBuilder mockCleanableProcessBuilder = mockControl.createMock(CleanableProcessExtByRefBuilder.class);
         File mockDirectoryFile = mockControl.createMock(File.class);
 
         EasyMock.expect(mockBusinessProcess.readProperty(DIRECTORY_KEY)).andReturn(mockDirectoryFile);
@@ -100,15 +98,15 @@ public final class WriteSingleRefsetDescriptionWithMissingDataTest {
         } catch (TaskFailedException e) {
             assertThat(e.getCause(), notNullValue());
             assertTrue("Expected PropertyNotFoundException. Got " + e.getCause(),
-                    e.getCause().getClass() == PropertyNotFoundException.class);
+                e.getCause().getClass() == PropertyNotFoundException.class);
             assertThat(e.getCause().getMessage(), equalTo(PROPERTY_NOT_FOUND_MESSAGE));
             mockControl.verify();
         }
     }
 
     private WriteSingleRefsetDescription createTask(final CleanableProcessExtByRefBuilder mockCleanableProcessBuilder) {
-        return new WriteSingleRefsetDescription(WORKING_REFSET_KEY, mockCleanableProcessBuilder,
-                DIRECTORY_KEY, mockPropertyValidator, mockTerminologyWrapper);
-    }    
+        return new WriteSingleRefsetDescription(WORKING_REFSET_KEY, mockCleanableProcessBuilder, DIRECTORY_KEY,
+            mockPropertyValidator, mockTerminologyWrapper);
+    }
 
 }

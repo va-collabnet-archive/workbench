@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,64 +26,64 @@ import javax.swing.event.ListDataListener;
 
 public interface I_IntList extends ListDataListener {
 
-	public void contentsChanged(ListDataEvent e);
+    public void contentsChanged(ListDataEvent e);
 
-	public void intervalAdded(ListDataEvent e);
+    public void intervalAdded(ListDataEvent e);
 
-	public void intervalRemoved(ListDataEvent e);
+    public void intervalRemoved(ListDataEvent e);
 
-	public boolean addListDataListener(ListDataListener o);
+    public boolean addListDataListener(ListDataListener o);
 
-	public boolean removeListDataListener(ListDataListener o);
+    public boolean removeListDataListener(ListDataListener o);
 
-	public void add(int index, Integer element);
+    public void add(int index, Integer element);
 
-	public boolean add(Integer o);
+    public boolean add(Integer o);
 
-	public boolean addAll(Collection<? extends Integer> c);
+    public boolean addAll(Collection<? extends Integer> c);
 
-	public boolean addAll(int index, Collection<? extends Integer> c);
+    public boolean addAll(int index, Collection<? extends Integer> c);
 
-	public void clear();
+    public void clear();
 
-	public boolean contains(Object o);
+    public boolean contains(Object o);
 
-	public boolean containsAll(Collection<?> c);
+    public boolean containsAll(Collection<?> c);
 
-	public Integer get(int index);
+    public Integer get(int index);
 
-	public int indexOf(Object o);
+    public int indexOf(Object o);
 
-	public boolean isEmpty();
+    public boolean isEmpty();
 
-	public Iterator<Integer> iterator();
+    public Iterator<Integer> iterator();
 
-	public int lastIndexOf(Object o);
+    public int lastIndexOf(Object o);
 
-	public ListIterator<Integer> listIterator();
+    public ListIterator<Integer> listIterator();
 
-	public ListIterator<Integer> listIterator(int index);
+    public ListIterator<Integer> listIterator(int index);
 
-	public Integer remove(int index);
+    public Integer remove(int index);
 
-	public boolean remove(Object o);
+    public boolean remove(Object o);
 
-	public boolean removeAll(Collection<?> c);
+    public boolean removeAll(Collection<?> c);
 
-	public boolean retainAll(Collection<?> c);
+    public boolean retainAll(Collection<?> c);
 
-	public Integer set(int index, Integer element);
+    public Integer set(int index, Integer element);
 
-	public int size();
+    public int size();
 
-	public List<Integer> subList(int fromIndex, int toIndex);
+    public List<Integer> subList(int fromIndex, int toIndex);
 
-	public Object[] toArray();
+    public Object[] toArray();
 
-	public <T> T[] toArray(T[] a);
+    public <T> T[] toArray(T[] a);
 
-	public List<Integer> getListValues();
-	
-	public int[] getListArray();
+    public List<Integer> getListValues();
+
+    public int[] getListArray();
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,50 +49,44 @@ public class GetConceptListFromListView extends AbstractTask {
     private static final int dataVersion = 1;
 
     private String conceptListPropName = ProcessAttachmentKeys.DEFAULT_CONCEPT_LIST.getAttachmentKey();
-    
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(conceptListPropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-        	conceptListPropName = (String) in.readObject();
+            conceptListPropName = (String) in.readObject();
         } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-                         throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
     @SuppressWarnings("unchecked")
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-                                throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             JList conceptList = configFrame.getBatchConceptList();
-			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-			
-			List<I_GetConceptData> concepts = new ArrayList<I_GetConceptData>();
-			
-			for (int i = 0; i < model.getSize(); i++) {
-				concepts.add(model.getElementAt(i));
-			}
-			
+            I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
+
+            List<I_GetConceptData> concepts = new ArrayList<I_GetConceptData>();
+
+            for (int i = 0; i < model.getSize(); i++) {
+                concepts.add(model.getElementAt(i));
+            }
+
             process.setProperty(conceptListPropName, concepts);
-                        
+
             return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
-		}
+        }
     }
 
     public int[] getDataContainerIds() {
@@ -103,13 +97,12 @@ public class GetConceptListFromListView extends AbstractTask {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-	public String getConceptListPropName() {
-		return conceptListPropName;
-	}
+    public String getConceptListPropName() {
+        return conceptListPropName;
+    }
 
-	public void setConceptListPropName(String conceptListPropName) {
-		this.conceptListPropName = conceptListPropName;
-	}
-
+    public void setConceptListPropName(String conceptListPropName) {
+        this.conceptListPropName = conceptListPropName;
+    }
 
 }

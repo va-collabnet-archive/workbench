@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,24 +28,17 @@ public class CopyTermEntryToPropertyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor termEntry =
-                    new PropertyDescriptor("termEntry", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor termEntry = new PropertyDescriptor("termEntry", getBeanDescriptor().getBeanClass());
             termEntry.setBound(true);
             termEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
             termEntry.setDisplayName("concept:");
-            termEntry
-                .setShortDescription("The concept to copy to the property.");
+            termEntry.setShortDescription("The concept to copy to the property.");
 
-            PropertyDescriptor propertyName =
-                    new PropertyDescriptor("propertyName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor propertyName = new PropertyDescriptor("propertyName", getBeanDescriptor().getBeanClass());
             propertyName.setBound(true);
             propertyName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            propertyName
-                .setDisplayName("<html><font color='green'>concept property:");
-            propertyName
-                .setShortDescription("Name of the property to copy the concept to to. ");
+            propertyName.setDisplayName("<html><font color='green'>concept property:");
+            propertyName.setShortDescription("Name of the property to copy the concept to to. ");
 
             PropertyDescriptor rv[] = { termEntry, propertyName };
             return rv;
@@ -59,8 +52,7 @@ public class CopyTermEntryToPropertyBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(CopyTermEntryToProperty.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>copy term entry<br>to property");
+        bd.setDisplayName("<html><font color='green'><center>copy term entry<br>to property");
         return bd;
     }
 }

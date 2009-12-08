@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,37 +22,29 @@ import org.dwfa.ace.task.refset.members.RefsetUtil;
 
 public final class RefsetExportValidatorImpl implements RefsetExportValidator {
 
-    public void validateIsConceptExtension(final int refsetId,
-            final RefsetUtil refsetUtil) throws RefsetExportValidationException {
+    public void validateIsConceptExtension(final int refsetId, final RefsetUtil refsetUtil)
+            throws RefsetExportValidationException {
 
         try {
-            int conceptExtensionId =
-                    refsetUtil.getLocalizedConceptExtensionNid();
+            int conceptExtensionId = refsetUtil.getLocalizedConceptExtensionNid();
             if (refsetId != conceptExtensionId) {
-                throw new RefsetExportValidationException(
-                    "Refset is not a concept extension.");
+                throw new RefsetExportValidationException("Refset is not a concept extension.");
             }
         } catch (Exception e) {
-            throw new RefsetExportValidationException(
-                "An exception was thrown while validating concept extension.",
-                e);
+            throw new RefsetExportValidationException("An exception was thrown while validating concept extension.", e);
         }
     }
 
-    public void validateIsCurrent(final I_GetConceptData refsetConcept,
-            final RefsetUtil refsetUtil) throws RefsetExportValidationException {
+    public void validateIsCurrent(final I_GetConceptData refsetConcept, final RefsetUtil refsetUtil)
+            throws RefsetExportValidationException {
         try {
             int currentStatusId = refsetUtil.getLocalizedCurrentConceptNid();
-            I_ConceptAttributePart latestAttributePart =
-                    refsetUtil.getLastestAttributePart(refsetConcept);
-            if (latestAttributePart == null
-                || latestAttributePart.getStatusId() != currentStatusId) {
-                throw new RefsetExportValidationException(
-                    "Refset concept is not current.");
+            I_ConceptAttributePart latestAttributePart = refsetUtil.getLastestAttributePart(refsetConcept);
+            if (latestAttributePart == null || latestAttributePart.getStatusId() != currentStatusId) {
+                throw new RefsetExportValidationException("Refset concept is not current.");
             }
         } catch (Exception e) {
-            throw new RefsetExportValidationException(
-                "An exception was thrown while validating current concept.", e);
+            throw new RefsetExportValidationException("An exception was thrown while validating current concept.", e);
         }
     }
 }

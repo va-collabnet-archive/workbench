@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,8 +43,8 @@ import java.util.List;
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public final class WriteSingleRefsetDescription extends AbstractTask {
 
-    private static final long serialVersionUID  = 484045781156873929L;
-    private static final int dataVersion        = 1;
+    private static final long serialVersionUID = 484045781156873929L;
+    private static final int dataVersion = 1;
 
     private transient CleanableProcessExtByRefBuilder cleanableProcessBuilder;
     private transient PropertyValidator propertyValidator;
@@ -54,7 +54,7 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
     private String directoryKey;
 
     public WriteSingleRefsetDescription() {
-        //default contructor for annotated beans.
+        // default contructor for annotated beans.
         selectedRefsetKey = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
         directoryKey = ProcessAttachmentKeys.WORKING_DIR.getAttachmentKey();
         setTransientProperties();
@@ -62,9 +62,8 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
 
     @ForTesting
     WriteSingleRefsetDescription(final String selectedRefsetKey,
-        final CleanableProcessExtByRefBuilder cleanableProcessBuilder, final String directoryKey,
-        final PropertyValidator propertyValidator,
-        final LocalVersionedTerminologyWrapper terminologyWrapper) {
+            final CleanableProcessExtByRefBuilder cleanableProcessBuilder, final String directoryKey,
+            final PropertyValidator propertyValidator, final LocalVersionedTerminologyWrapper terminologyWrapper) {
         this.selectedRefsetKey = selectedRefsetKey;
         this.cleanableProcessBuilder = cleanableProcessBuilder;
         this.directoryKey = directoryKey;
@@ -80,11 +79,8 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
             propertyValidator.validate(refset, "selected refset");
 
             I_TermFactory termFactory = terminologyWrapper.get();
-            CleanableProcessExtByRef processor = cleanableProcessBuilder.
-                                                    withTermFactory(termFactory).
-                                                    withLogger(new TaskLogger(worker)).
-                                                    withSelectedDir(outputDirecotry).
-                                                    build();
+            CleanableProcessExtByRef processor = cleanableProcessBuilder.withTermFactory(termFactory).withLogger(
+                new TaskLogger(worker)).withSelectedDir(outputDirecotry).build();
 
             try {
                 List<I_ThinExtByRefVersioned> extensions = termFactory.getRefsetExtensionMembers(refset.getConceptId());
@@ -102,7 +98,7 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
     }
 
     public void complete(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
-        //do nothing.
+        // do nothing.
     }
 
     public Collection<Condition> getConditions() {
@@ -113,10 +109,9 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
         out.writeInt(dataVersion);
         out.writeUTF(directoryKey);
         out.writeUTF(selectedRefsetKey);
-     }
+    }
 
-    private void readObject(final ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             directoryKey = in.readUTF();
@@ -139,7 +134,7 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
 
     @Override
     public int[] getDataContainerIds() {
-        return new int[] {  };
+        return new int[] {};
     }
 
     @ForJavaBeans

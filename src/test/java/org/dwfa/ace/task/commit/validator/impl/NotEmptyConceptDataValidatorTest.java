@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 /**
- *  Copyright (c) 2009 International Health Terminology Standards Development Organisation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.dwfa.ace.task.commit.validator.impl;
 
@@ -68,7 +69,6 @@ public class NotEmptyConceptDataValidatorTest {
         mockTermFactory = mocksControl.createMock(I_TermFactory.class);
         LocalVersionedTerminology.setStealthfactory(mockTermFactory);
 
-
         mockConcept = mocksControl.createMock(I_GetConceptData.class);
         mockNotRequiredConcept = mocksControl.createMock(I_GetConceptData.class);
         descriptions = new ArrayList<I_DescriptionVersioned>();
@@ -82,21 +82,23 @@ public class NotEmptyConceptDataValidatorTest {
 
     @Test
     public void failValidationWithNullTest() throws Exception {
-        this.expectGetFsnConceptOnTermFactory().expectGetPTConceptOnTermFactory().expectUuidToNativeOnTermFactory().
-                expectGetTypeIdWithCorrectValue(1).
-                expectGetConceptIdWithCorrectValue(3).expectGetTextWithNull(1).expectGetDescriptions();
+        this.expectGetFsnConceptOnTermFactory()
+            .expectGetPTConceptOnTermFactory()
+            .expectUuidToNativeOnTermFactory()
+            .expectGetTypeIdWithCorrectValue(1)
+            .expectGetConceptIdWithCorrectValue(3)
+            .expectGetTextWithNull(1)
+            .expectGetDescriptions();
 
         mocksControl.replay();
 
-        mockConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        mockConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 
-        mockNotRequiredConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+        mockNotRequiredConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
 
-        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next());
+        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next());
 
         Assert.assertEquals(mockConcept.getConceptId(), conceptId);
 
@@ -106,7 +108,7 @@ public class NotEmptyConceptDataValidatorTest {
             TestCase.fail("ValidationException should be thrown");
         } catch (ValidationException ex) {
             Logger.getLogger(NotEmptyConceptDataValidatorTest.class.getName()).log(Level.INFO,
-                    String.format("Exception thrown as expected: %1$s", ex.getMessage()));
+                String.format("Exception thrown as expected: %1$s", ex.getMessage()));
         }
 
         mocksControl.verify();
@@ -114,21 +116,23 @@ public class NotEmptyConceptDataValidatorTest {
 
     @Test
     public void failValidationWithValueTest() throws Exception {
-        this.expectGetFsnConceptOnTermFactory().expectGetPTConceptOnTermFactory().expectUuidToNativeOnTermFactory().
-                expectGetTypeIdWithCorrectValue(1).
-                expectGetConceptIdWithCorrectValue(3).expectGetTextWithoutNull(2).expectGetDescriptions();
+        this.expectGetFsnConceptOnTermFactory()
+            .expectGetPTConceptOnTermFactory()
+            .expectUuidToNativeOnTermFactory()
+            .expectGetTypeIdWithCorrectValue(1)
+            .expectGetConceptIdWithCorrectValue(3)
+            .expectGetTextWithoutNull(2)
+            .expectGetDescriptions();
 
         mocksControl.replay();
 
-        mockConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        mockConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 
-        mockNotRequiredConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+        mockNotRequiredConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
 
-        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next());
+        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next());
 
         Assert.assertEquals(mockConcept.getConceptId(), conceptId);
 
@@ -138,7 +142,7 @@ public class NotEmptyConceptDataValidatorTest {
             TestCase.fail("ValidationException should be thrown");
         } catch (ValidationException ex) {
             Logger.getLogger(NotEmptyConceptDataValidatorTest.class.getName()).log(Level.INFO,
-                    String.format("Exception thrown as expected: %1$s", ex.getMessage()));
+                String.format("Exception thrown as expected: %1$s", ex.getMessage()));
         }
 
         mocksControl.verify();
@@ -146,21 +150,22 @@ public class NotEmptyConceptDataValidatorTest {
 
     @Test
     public void skipValidationIncorrectConceptType() throws Exception {
-        this.expectGetFsnConceptOnTermFactory().expectGetPTConceptOnTermFactory().expectUuidToNativeOnTermFactory().
-                expectGetTypeIdWithWrongValue(1).
-                expectGetConceptIdWithWrongValue(2).expectGetDescriptions();
+        this.expectGetFsnConceptOnTermFactory()
+            .expectGetPTConceptOnTermFactory()
+            .expectUuidToNativeOnTermFactory()
+            .expectGetTypeIdWithWrongValue(1)
+            .expectGetConceptIdWithWrongValue(2)
+            .expectGetDescriptions();
 
         mocksControl.replay();
 
-        mockConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        mockConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 
-        mockNotRequiredConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+        mockNotRequiredConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
 
-        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next());
+        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next());
 
         Assert.assertEquals(mockConcept.getConceptId(), conceptId);
 
@@ -170,7 +175,7 @@ public class NotEmptyConceptDataValidatorTest {
         } catch (ValidationException ex) {
             TestCase.fail("ValidationException should Not be thrown");
             Logger.getLogger(NotEmptyConceptDataValidatorTest.class.getName()).log(Level.INFO,
-                    String.format("Exception thrown unexpectedly: %1$s", ex.getMessage()));
+                String.format("Exception thrown unexpectedly: %1$s", ex.getMessage()));
         }
 
         mocksControl.verify();
@@ -178,19 +183,20 @@ public class NotEmptyConceptDataValidatorTest {
 
     @Test
     public void passValidationWithValueTest() throws Exception {
-        this.expectGetFsnConceptOnTermFactory().expectUuidToNativeOnTermFactory().
-                expectGetTypeIdWithCorrectValue(1).
-                expectGetConceptIdWithCorrectValue(2).
-                expectGetTextWithValue(2).expectGetDescriptions();
+        this.expectGetFsnConceptOnTermFactory()
+            .expectUuidToNativeOnTermFactory()
+            .expectGetTypeIdWithCorrectValue(1)
+            .expectGetConceptIdWithCorrectValue(2)
+            .expectGetTextWithValue(2)
+            .expectGetDescriptions();
 
         mocksControl.replay();
 
-        mockConcept = mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        mockConcept = mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 
-        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next());
+        int conceptId = mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+            .iterator()
+            .next());
 
         Assert.assertEquals(mockConcept.getConceptId(), conceptId);
 
@@ -200,30 +206,30 @@ public class NotEmptyConceptDataValidatorTest {
         } catch (ValidationException ex) {
             TestCase.fail("ValidationException should Not be thrown");
             Logger.getLogger(NotEmptyConceptDataValidatorTest.class.getName()).log(Level.INFO,
-                    String.format("Exception thrown unexpectedly: %1$s", ex.getMessage()));
+                String.format("Exception thrown unexpectedly: %1$s", ex.getMessage()));
         }
 
         mocksControl.verify();
     }
 
     private NotEmptyConceptDataValidatorTest expectGetFsnConceptOnTermFactory() throws Exception {
-        EasyMock.expect(mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids())).
-                andReturn(mockConcept);
+        EasyMock.expect(
+            mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()))
+            .andReturn(mockConcept);
         return this;
     }
 
     private NotEmptyConceptDataValidatorTest expectGetPTConceptOnTermFactory() throws Exception {
-        EasyMock.expect(mockTermFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids())).andReturn(mockConcept);
+        EasyMock.expect(mockTermFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()))
+            .andReturn(mockConcept);
         return this;
     }
 
     private NotEmptyConceptDataValidatorTest expectUuidToNativeOnTermFactory() throws Exception {
-        EasyMock.expect(mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.
-                getUids().
-                iterator().next())).
-                andReturn(Integer.MIN_VALUE);
+        EasyMock.expect(
+            mockTermFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()
+                .iterator()
+                .next())).andReturn(Integer.MIN_VALUE);
         return this;
     }
 
@@ -267,4 +273,3 @@ public class NotEmptyConceptDataValidatorTest {
         return this;
     }
 }
-

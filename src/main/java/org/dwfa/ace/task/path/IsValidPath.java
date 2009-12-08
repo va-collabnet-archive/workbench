@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -84,8 +84,7 @@ public class IsValidPath extends AbstractTask {
             }
             if (uuid != null) {
                 I_GetConceptData path = termFactory.getConcept(new UUID[] { uuid });
-                I_GetConceptData pathTopHierarchy =
-                        termFactory.getConcept(ArchitectonicAuxiliary.Concept.PATH.getUids());
+                I_GetConceptData pathTopHierarchy = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PATH.getUids());
 
                 I_IntSet allowedStatus = termFactory.getActiveAceFrameConfig().getAllowedStatus();
                 I_IntSet allowedTypes = termFactory.newIntSet();

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,10 +44,10 @@ import org.dwfa.util.bean.Spec;
 @AllowDataCheckSuppression
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/migrate", type = BeanType.TASK_BEAN) })
 public class RetireAllMarkedParents extends AbstractTask {
-	
-	private static final long serialVersionUID = 7859118015824964201L;
-	
-	protected I_TermFactory termFactory;
+
+    private static final long serialVersionUID = 7859118015824964201L;
+
+    protected I_TermFactory termFactory;
 
     protected HashMap<String, I_GetConceptData> concepts = new HashMap<String, I_GetConceptData>();
 
@@ -59,12 +59,11 @@ public class RetireAllMarkedParents extends AbstractTask {
         if (termFactory == null) {
             throw new RuntimeException("The LocalVersionedTerminology is not available. Please check the database.");
         }
-    	
+
         concepts.put("CURRENT", termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()));
         concepts.put("RETIRED", termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()));
         concepts.put("PARENT_MARKER", termFactory.getConcept(ConceptConstants.PARENT_MARKER.localize().getNid()));
     }
-
 
     private void retireExistingMarkedParentMembers(I_GetConceptData memberRefsetConcept) throws Exception {
 
@@ -74,15 +73,14 @@ public class RetireAllMarkedParents extends AbstractTask {
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
 
-            List<I_ThinExtByRefTuple> extensions =
-                thinExtByRefVersioned.getTuples(null, null, true, false);
+            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(null, null, true, false);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
 
                     I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
                     if (part.getC1id() == concepts.get("PARENT_MARKER").getConceptId()
-                            && part.getStatusId() == concepts.get("CURRENT").getConceptId() ) {
+                        && part.getStatusId() == concepts.get("CURRENT").getConceptId()) {
 
                         I_ThinExtByRefPart clone = part.duplicate();
                         clone.setStatusId(concepts.get("RETIRED").getConceptId());
@@ -92,7 +90,7 @@ public class RetireAllMarkedParents extends AbstractTask {
                         String subject = termFactory.getConcept(thinExtByRefTuple.getComponentId()).getInitialText();
                         getLogger().info("Retiring current parent member extension on concept :" + subject);
                         getLogger().info("\t" + part.toString());
-                        
+
                         termFactory.addUncommittedNoChecks(thinExtByRefVersioned);
                     }
                 }
@@ -100,28 +98,28 @@ public class RetireAllMarkedParents extends AbstractTask {
         }
     }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    }
 
-	@SuppressDataChecks
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    @SuppressDataChecks
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             init();
-            
-            for (Integer memberRefsetId : MemberRefsetHelper.getMemberRefsets()) {      
-            	I_GetConceptData memberRefsetConcept = termFactory.getConcept(memberRefsetId);
+
+            for (Integer memberRefsetId : MemberRefsetHelper.getMemberRefsets()) {
+                I_GetConceptData memberRefsetConcept = termFactory.getConcept(memberRefsetId);
                 retireExistingMarkedParentMembers(memberRefsetConcept);
             }
-            
+
             return Condition.CONTINUE;
-            
+
         } catch (Exception ex) {
             throw new TaskFailedException("Unable to migrate specification refsets", ex);
         }
-	}
+    }
 
-	public Collection<Condition> getConditions() {
-		return AbstractTask.CONTINUE_CONDITION;
-	}
+    public Collection<Condition> getConditions() {
+        return AbstractTask.CONTINUE_CONDITION;
+    }
 
 }

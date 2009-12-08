@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -109,8 +109,7 @@ public class DescStatement extends RefsetSpecStatement {
             possibleConcepts.or(parentPossibleConcepts);
             break;
         case DESC_IS_MEMBER_OF:
-            List<I_ThinExtByRefVersioned> refsetExtensions =
-                    termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
+            List<I_ThinExtByRefVersioned> refsetExtensions = termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ThinExtByRefVersioned ext : refsetExtensions) {
                 refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
@@ -159,7 +158,8 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     /**
-     * Checks if the description being tested has a description type matching the query constraint.
+     * Checks if the description being tested has a description type matching
+     * the query constraint.
      * This also checks for the description type's children (depth >= 1);
      */
     private boolean descriptionTypeIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws IOException,
@@ -214,8 +214,8 @@ public class DescStatement extends RefsetSpecStatement {
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
         // get list of all children of input concept
-        Set<I_GetConceptData> childDescTypes =
-                ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<I_GetConceptData> childDescTypes = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null,
+            allowedTypes, null, true, true);
 
         // call descriptionTypeIs on each
         for (I_GetConceptData childDescType : childDescTypes) {
@@ -241,8 +241,8 @@ public class DescStatement extends RefsetSpecStatement {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-        Set<I_GetConceptData> childStatuses =
-                ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null,
+            allowedTypes, null, true, true);
 
         for (I_GetConceptData childStatus : childStatuses) {
             if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {
@@ -289,7 +289,8 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionIs(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
         I_DescriptionTuple queryConstraintDesc = (I_DescriptionTuple) queryConstraint;
-        return descriptionBeingChecked.equals(queryConstraintDesc); // TODO check
+        return descriptionBeingChecked.equals(queryConstraintDesc); // TODO
+        // check
     }
 
     private boolean descriptionRegexMatch(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {

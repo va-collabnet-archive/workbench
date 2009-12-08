@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,78 +39,78 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/prop", type = BeanType.TASK_BEAN) })
 public class SetPropertyToConceptFromProperty extends AbstractTask {
 
-   /**
+    /**
     * 
     */
-   private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-   private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-   private String conceptPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
-   private String conceptSpecPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
+    private String conceptPropName = ProcessAttachmentKeys.I_GET_CONCEPT_DATA.getAttachmentKey();
+    private String conceptSpecPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
 
-   private void writeObject(ObjectOutputStream out) throws IOException {
-       out.writeInt(dataVersion);
-       out.writeObject(conceptPropName);
-       out.writeObject(conceptSpecPropName);
-   }
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(conceptPropName);
+        out.writeObject(conceptSpecPropName);
+    }
 
-   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-       int objDataVersion = in.readInt();
-       if (objDataVersion == dataVersion) {
-           conceptPropName = (String) in.readObject();
-           conceptSpecPropName = (String) in.readObject();
-       } else {
-           throw new IOException("Can't handle dataversion: " + objDataVersion);
-       }
-   }
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            conceptPropName = (String) in.readObject();
+            conceptSpecPropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-   public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-       // Nothing to do
-   }
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do
+    }
 
-   public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-       try {
-          I_GetConceptData concept = AceTaskUtil.getConceptFromProperty(process, conceptSpecPropName);
-           process.setProperty(conceptPropName, concept);
-           return Condition.CONTINUE;
-           
-       } catch (IllegalArgumentException e) {
-           throw new TaskFailedException(e);
-       } catch (IntrospectionException e) {
-           throw new TaskFailedException(e);
-       } catch (IllegalAccessException e) {
-           throw new TaskFailedException(e);
-       } catch (InvocationTargetException e) {
-           throw new TaskFailedException(e);
-       } catch (TerminologyException e) {
-          throw new TaskFailedException(e);
-      } catch (IOException e) {
-         throw new TaskFailedException(e);
-      } 
-   }
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_GetConceptData concept = AceTaskUtil.getConceptFromProperty(process, conceptSpecPropName);
+            process.setProperty(conceptPropName, concept);
+            return Condition.CONTINUE;
 
-   public int[] getDataContainerIds() {
-       return new int[] {};
-   }
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-   public Collection<Condition> getConditions() {
-       return AbstractTask.CONTINUE_CONDITION;
-   }
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-   public String getConceptPropName() {
-       return conceptPropName;
-   }
+    public Collection<Condition> getConditions() {
+        return AbstractTask.CONTINUE_CONDITION;
+    }
 
-   public void setConceptPropName(String profilePropName) {
-       this.conceptPropName = profilePropName;
-   }
+    public String getConceptPropName() {
+        return conceptPropName;
+    }
 
-   public String getConceptSpecPropName() {
-      return conceptSpecPropName;
-   }
+    public void setConceptPropName(String profilePropName) {
+        this.conceptPropName = profilePropName;
+    }
 
-   public void setConceptSpecPropName(String conceptSpecPropName) {
-      this.conceptSpecPropName = conceptSpecPropName;
-   }
+    public String getConceptSpecPropName() {
+        return conceptSpecPropName;
+    }
+
+    public void setConceptSpecPropName(String conceptSpecPropName) {
+        this.conceptSpecPropName = conceptSpecPropName;
+    }
 }

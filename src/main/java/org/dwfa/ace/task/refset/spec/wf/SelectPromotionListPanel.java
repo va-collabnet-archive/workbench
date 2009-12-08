@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -78,36 +78,17 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
 
     private I_GetConceptData selectedConceptType;
 
-    public SelectPromotionListPanel(I_GetConceptData promotionRefsetConcept)
-            throws Exception {
+    public SelectPromotionListPanel(I_GetConceptData promotionRefsetConcept) throws Exception {
         super();
         refsetHelper = new SpecRefsetHelper();
         this.promotionRefsetConcept = promotionRefsetConcept;
         termFactory = LocalVersionedTerminology.get();
-        unreviewedAdditionStatus =
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION
-                        .getUids());
-        unreviewedDeletionStatus =
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION
-                        .getUids());
-        reviewedApprovedAdditionStatus =
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION
-                        .getUids());
-        reviewedApprovedDeletionStatus =
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION
-                        .getUids());
-        reviewedRejectedAdditionStatus =
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION
-                        .getUids());
-        reviewedRejectedDeletionStatus =
-                termFactory
-                    .getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
-                        .getUids());
+        unreviewedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids());
+        unreviewedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
+        reviewedApprovedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION.getUids());
+        reviewedApprovedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION.getUids());
+        reviewedRejectedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
+        reviewedRejectedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
         init();
     }
 

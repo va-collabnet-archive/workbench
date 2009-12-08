@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,36 +35,26 @@ import org.dwfa.tapi.TerminologyException;
 
 public class DescTupleFileUtil {
 
-    public static String exportTuple(I_DescriptionTuple descTuple)
-            throws TerminologyException, IOException {
+    public static String exportTuple(I_DescriptionTuple descTuple) throws TerminologyException, IOException {
 
         I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-        UUID tupleUuid =
-                ArchitectonicAuxiliary.Concept.DESC_TUPLE.getUids().iterator()
-                    .next();
-        UUID conceptUuid =
-                termFactory.getUids(descTuple.getConceptId()).iterator().next();
-        UUID descUuid =
-                termFactory.getUids(descTuple.getDescId()).iterator().next();
+        UUID tupleUuid = ArchitectonicAuxiliary.Concept.DESC_TUPLE.getUids().iterator().next();
+        UUID conceptUuid = termFactory.getUids(descTuple.getConceptId()).iterator().next();
+        UUID descUuid = termFactory.getUids(descTuple.getDescId()).iterator().next();
         String text = descTuple.getText();
         String lang = descTuple.getLang();
-        UUID typeUuid =
-                termFactory.getUids(descTuple.getTypeId()).iterator().next();
-        UUID pathUuid =
-                termFactory.getUids(descTuple.getPathId()).iterator().next();
-        UUID statusUuid =
-                termFactory.getUids(descTuple.getStatusId()).iterator().next();
+        UUID typeUuid = termFactory.getUids(descTuple.getTypeId()).iterator().next();
+        UUID pathUuid = termFactory.getUids(descTuple.getPathId()).iterator().next();
+        UUID statusUuid = termFactory.getUids(descTuple.getStatusId()).iterator().next();
         boolean initialCapSignificant = descTuple.getInitialCaseSignificant();
         int effectiveDate = descTuple.getVersion();
 
-        String idTuple =
-                IDTupleFileUtil.exportTuple(termFactory.getId(descUuid));
+        String idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(descUuid));
 
-        return idTuple + tupleUuid + "\t" + conceptUuid + "\t" + descUuid
-            + "\t" + text + "\t" + lang + "\t" + initialCapSignificant + "\t"
-            + typeUuid + "\t" + pathUuid + "\t" + statusUuid + "\t"
-            + effectiveDate + "\n";
+        return idTuple + tupleUuid + "\t" + conceptUuid + "\t" + descUuid + "\t" + text + "\t" + lang + "\t"
+            + initialCapSignificant + "\t" + typeUuid + "\t" + pathUuid + "\t" + statusUuid + "\t" + effectiveDate
+            + "\n";
     }
 
     public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
@@ -181,8 +171,8 @@ public class DescTupleFileUtil {
             boolean returnConflictResolvedLatestState = true;
 
             // check if the part exists
-            List<I_DescriptionTuple> parts =
-                    concept.getDescriptionTuples(allowedStatus, allowedTypes, null, returnConflictResolvedLatestState);
+            List<I_DescriptionTuple> parts = concept.getDescriptionTuples(allowedStatus, allowedTypes, null,
+                returnConflictResolvedLatestState);
             I_DescriptionTuple latestTuple = null;
             for (I_DescriptionTuple part : parts) {
                 if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
@@ -194,12 +184,11 @@ public class DescTupleFileUtil {
                 Collection<I_Path> paths = termFactory.getPaths();
                 paths.clear();
                 paths.add(termFactory.getPath(new UUID[] { pathUuid }));
-                termFactory.uuidToNativeWithGeneration(descUuid, ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
-                    .localize().getNid(), paths, effectiveDate);
+                termFactory.uuidToNativeWithGeneration(descUuid,
+                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), paths, effectiveDate);
 
-                I_DescriptionVersioned v =
-                        termFactory.newDescription(descUuid, concept, lang, text, termFactory
-                            .getConcept(new UUID[] { typeUuid }), termFactory.getActiveAceFrameConfig());
+                I_DescriptionVersioned v = termFactory.newDescription(descUuid, concept, lang, text,
+                    termFactory.getConcept(new UUID[] { typeUuid }), termFactory.getActiveAceFrameConfig());
 
                 I_DescriptionPart newLastPart = v.getLastTuple().getPart();
                 newLastPart.setLang(lang);
@@ -227,8 +216,8 @@ public class DescTupleFileUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage =
-                    "Exception of unknown cause thrown while importing desc tuple : " + e.getLocalizedMessage();
+            String errorMessage = "Exception of unknown cause thrown while importing desc tuple : "
+                + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

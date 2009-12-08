@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,8 @@
 package org.dwfa.ace.api.cs;
 
 /**
- * Validates a component. Warns if the component parts are different but not part of the change,
+ * Validates a component. Warns if the component parts are different but not
+ * part of the change,
  * fails if parts are different that are part of the change.
  * 
  * @author Dion McMurtrie

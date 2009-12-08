@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,22 +43,37 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * How do I begin tuning performance?<br><br>
-
-Gathering environment statistics is a useful first step to doing JE performance tuning. Execute the following code snippet periodically to display statistics for the past period and and to reset statistics counters for the next display.
-<br><code><br>
+ * How do I begin tuning performance?<br>
+ * <br>
+ * 
+ * Gathering environment statistics is a useful first step to doing JE
+ * performance tuning. Execute the following code snippet periodically to
+ * display statistics for the past period and and to reset statistics counters
+ * for the next display. <br>
+ * <code><br>
 StatsConfig config = new StatsConfig();<br>
 config.setClear(true);<br>
 <br>
 System.err.println(env.getStats(config));
 </code><br>
-The Javadoc for com.sleepycat.je.EnvironmentStats describes each field. Cache behavior can have a major effect on performance, and nCacheMiss is an indicator of how hot the cache is. You may want to adjust the cache size, data access pattern, or cache eviction policy and monitor nCacheMiss.
-<br><br>
-Applications which use transactions may want to check nFSyncs to see how many of these costly system calls have been issued. Experimenting with other flavors of commit durability, like TxnWriteNoSync and TxnNoSync can improve performance.
-<br><br>
-nCleanerRuns and cleanerBacklog are indicators of log cleaning activity. Adjusting the property je.cleaner.minUtilization can increase or decrease log cleaning. The user may also elect to do batch log cleaning, as described in the Javadoc for Environment.cleanLog(), to control when log cleaning occurs.
-<br><br>
-High values for nRepeatFaultReads and nRepeatIteratorReads may indicate non-optimal read buffer sizes. See the FAQ entry on configuring read buffers.
+ * The Javadoc for com.sleepycat.je.EnvironmentStats describes each field. Cache
+ * behavior can have a major effect on performance, and nCacheMiss is an
+ * indicator of how hot the cache is. You may want to adjust the cache size,
+ * data access pattern, or cache eviction policy and monitor nCacheMiss. <br>
+ * <br>
+ * Applications which use transactions may want to check nFSyncs to see how many
+ * of these costly system calls have been issued. Experimenting with other
+ * flavors of commit durability, like TxnWriteNoSync and TxnNoSync can improve
+ * performance. <br>
+ * <br>
+ * nCleanerRuns and cleanerBacklog are indicators of log cleaning activity.
+ * Adjusting the property je.cleaner.minUtilization can increase or decrease log
+ * cleaning. The user may also elect to do batch log cleaning, as described in
+ * the Javadoc for Environment.cleanLog(), to control when log cleaning occurs. <br>
+ * <br>
+ * High values for nRepeatFaultReads and nRepeatIteratorReads may indicate
+ * non-optimal read buffer sizes. See the FAQ entry on configuring read buffers.
+ * 
  * @author kec
  * @see http://www.oracle.com/technology/products/berkeley-db/faq/je_faq.html
  */
@@ -88,10 +103,9 @@ public class SetSignpostToDbStats extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            
+
             final String htmlStr = LocalVersionedTerminology.get().getStats();
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-                                                                                .name());
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             final JPanel signpostPanel = config.getSignpostPanel();
             SwingUtilities.invokeAndWait(new Runnable() {
 

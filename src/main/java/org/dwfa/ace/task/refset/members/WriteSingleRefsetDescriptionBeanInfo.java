@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,20 +29,20 @@ public final class WriteSingleRefsetDescriptionBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
             PropertyDescriptor putputDirPropertyName = new PropertyDescriptor("directoryKey",
-                    getBeanDescriptor().getBeanClass());
+                getBeanDescriptor().getBeanClass());
             putputDirPropertyName.setBound(true);
             putputDirPropertyName.setDisplayName("<html><font color='green'>Output directory key:");
             putputDirPropertyName.setShortDescription("Output directory key");
             putputDirPropertyName.setPropertyEditorClass(PropertyNameLabelEditor.class);
 
             PropertyDescriptor refsetPropertyName = new PropertyDescriptor("selectedRefsetKey",
-                    getBeanDescriptor().getBeanClass());
+                getBeanDescriptor().getBeanClass());
             refsetPropertyName.setBound(true);
             refsetPropertyName.setDisplayName("<html><font color='green'>Selected Refset key:");
             refsetPropertyName.setShortDescription("Selected Refset key");
             refsetPropertyName.setPropertyEditorClass(PropertyNameLabelEditor.class);
 
-            return new PropertyDescriptor[]{putputDirPropertyName, refsetPropertyName};
+            return new PropertyDescriptor[] { putputDirPropertyName, refsetPropertyName };
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
         }

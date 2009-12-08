@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,10 +38,11 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
-* Input Uuid and return  concept name.
-* @author Susan Castillo
-*
-*/
+ * Input Uuid and return concept name.
+ * 
+ * @author Susan Castillo
+ * 
+ */
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
 public class GetConceptNameFromConceptUuid extends AbstractTask {
@@ -52,9 +53,9 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 2;
-    
+
     private String uuidPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT_UUID.getAttachmentKey();
-    
+
     private String conceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
 
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
@@ -66,16 +67,15 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
         out.writeObject(profilePropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
             uuidPropName = (String) in.readObject();
             conceptPropName = (String) in.readObject();
             if (objDataVersion < 2) {
-            	profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+                profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
             } else {
-            	profilePropName = (String) in.readObject();
+                profilePropName = (String) in.readObject();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -83,31 +83,28 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
     @SuppressWarnings("unchecked")
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            
-        	I_GetConceptData concept = AceTaskUtil.getConceptFromProperty(process, uuidPropName);
-            I_ConfigAceFrame config = (I_ConfigAceFrame) process
-            	.readProperty(profilePropName);
-            
+
+            I_GetConceptData concept = AceTaskUtil.getConceptFromProperty(process, uuidPropName);
+            I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(profilePropName);
+
             if (worker.getLogger().isLoggable(Level.FINE)) {
                 worker.getLogger().fine(("Removing first item in attachment list."));
             }
-        
-            I_DescriptionTuple desc = concept.getDescTuple(config.getLongLabelDescPreferenceList(), 
-					config.getLanguagePreferenceList(),
-					config.getAllowedStatus(), config.getViewPositionSet(), config.getLanguageSortPref());
+
+            I_DescriptionTuple desc = concept.getDescTuple(config.getLongLabelDescPreferenceList(),
+                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSet(),
+                config.getLanguageSortPref());
 
             process.setProperty(this.conceptPropName, desc.getText());
-            
+
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
@@ -118,10 +115,10 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
         } catch (IllegalAccessException e) {
             throw new TaskFailedException(e);
         } catch (TerminologyException e) {
-        	throw new TaskFailedException(e);
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		}
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        }
     }
 
     public Collection<Condition> getConditions() {
@@ -132,30 +129,28 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
         return new int[] {};
     }
 
-	public String getConceptPropName() {
-		return conceptPropName;
-	}
+    public String getConceptPropName() {
+        return conceptPropName;
+    }
 
-	public void setConceptPropName(String conceptPropName) {
-		this.conceptPropName = conceptPropName;
-	}
+    public void setConceptPropName(String conceptPropName) {
+        this.conceptPropName = conceptPropName;
+    }
 
-	public String getUuidPropName() {
-		return uuidPropName;
-	}
+    public String getUuidPropName() {
+        return uuidPropName;
+    }
 
-	public void setUuidPropName(String uuidPropName) {
-		this.uuidPropName = uuidPropName;
-	}
+    public void setUuidPropName(String uuidPropName) {
+        this.uuidPropName = uuidPropName;
+    }
 
-	public String getProfilePropName() {
-		return profilePropName;
-	}
+    public String getProfilePropName() {
+        return profilePropName;
+    }
 
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
-	}
-
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
+    }
 
 }
-

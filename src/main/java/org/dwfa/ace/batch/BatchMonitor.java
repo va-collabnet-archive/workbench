@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,8 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 
 /**
- * Used to give statistical reporting (progress, time remaining, etc) during a batch processing operation.
+ * Used to give statistical reporting (progress, time remaining, etc) during a
+ * batch processing operation.
  */
 public class BatchMonitor {
 
@@ -63,7 +64,6 @@ public class BatchMonitor {
     private boolean showMessagePanel = false;
     private JButton finishedButton;
 
-
     /**
      * @param description A textual description of the batch
      * @param totalEvents The total number of expected events
@@ -81,7 +81,8 @@ public class BatchMonitor {
      * @param description A textual description of the batch
      * @param totalEvents The total number of expected events
      * @param reportCycleMs The time between giving an updated report
-     * @param showMessagePanelToSet Adds a text panel to the bottom on the dialog for messages etc.
+     * @param showMessagePanelToSet Adds a text panel to the bottom on the
+     *            dialog for messages etc.
      */
     public BatchMonitor(String description, long totalEvents, long reportCycleMs, boolean showMessagePanelToSet) {
         this(description, totalEvents, reportCycleMs);
@@ -103,7 +104,7 @@ public class BatchMonitor {
 
     public void setText(String text) {
         if (activity != null) {
-            if(showMessagePanel){
+            if (showMessagePanel) {
                 htmlPane.setText(text);
             } else {
                 activity.setProgressInfoLower(text);
@@ -132,18 +133,19 @@ public class BatchMonitor {
 
             if (eventsSinceLastReport > 0) {
 
-                double eventsPerMs = eventsSinceLastReport / (double)timeSinceLastReport;
+                double eventsPerMs = eventsSinceLastReport / (double) timeSinceLastReport;
                 long timeToCompleteMs = Math.round((totalEvents - eventCount) / eventsPerMs);
 
-                activity.setProgressInfoLower(percentComplete + "% completed (" + eventCount + " of " + totalEvents + "). " +
-                        asTimeFormat(timeToCompleteMs, false) + "remaining");
-                activity.setValue((int)eventCount);
+                activity.setProgressInfoLower(percentComplete + "% completed (" + eventCount + " of " + totalEvents
+                    + "). " + asTimeFormat(timeToCompleteMs, false) + "remaining");
+                activity.setValue((int) eventCount);
 
-                logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents + "). " +
-                        getEventRate(eventsPerMs) + ". Estimated time to complete: " + asTimeFormat(timeToCompleteMs, true));
+                logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents
+                    + "). " + getEventRate(eventsPerMs) + ". Estimated time to complete: "
+                    + asTimeFormat(timeToCompleteMs, true));
             } else {
-                logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents + "). " +
-                        "No activity since last report!");
+                logger.info(description + ": " + percentComplete + "% complete (" + eventCount + " of " + totalEvents
+                    + "). " + "No activity since last report!");
             }
 
             lastReportEventCount = eventCount;
@@ -159,7 +161,7 @@ public class BatchMonitor {
         activity = termFactory.newActivityPanel(false, termFactory.getActiveAceFrameConfig());
         activity.setProgressInfoUpper(description);
         activity.setProgressInfoLower("Commencing...");
-        activity.setMaximum((int)totalEvents);
+        activity.setMaximum((int) totalEvents);
         activity.setValue(0);
         activity.setIndeterminate(false);
 
@@ -206,16 +208,13 @@ public class BatchMonitor {
      * Add a JEditorPane to the bottom on the dialog.
      */
     private void addFinishedButton() {
-        finishedButton = new JButton(new ImageIcon(BatchMonitor.class
-                .getResource("/24x24/plain/flag_green.png")));
+        finishedButton = new JButton(new ImageIcon(BatchMonitor.class.getResource("/24x24/plain/flag_green.png")));
         finishedButton.setVisible(false);
-        finishedButton.addActionListener(
-                new ActionListener(){
-                    public void actionPerformed(ActionEvent e) {
-                        finished();
-                    };
-                }
-        );
+        finishedButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                finished();
+            };
+        });
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 4;
@@ -230,7 +229,7 @@ public class BatchMonitor {
 
     /**
      * Show or hide the finish button.
-     *
+     * 
      * @param visible boolean
      */
     public void setFinishedButtonVisible(boolean visible) {
@@ -256,7 +255,8 @@ public class BatchMonitor {
 
     /**
      * Cancel the monitor. Batch has been aborted.
-     * Any further calls to {@link #mark()} or {@link #complete()} will raise a {@link BatchCancelledException}
+     * Any further calls to {@link #mark()} or {@link #complete()} will raise a
+     * {@link BatchCancelledException}
      */
     public void cancel() {
         isCancelled = true;
@@ -318,13 +318,11 @@ public class BatchMonitor {
             this.reportCycle = reportCycleMs;
             this.activity = activity;
 
-            this.activity.addActionListener(
-                    new ActionListener(){
-                        public void actionPerformed(ActionEvent e) {
-                            cancel();
-                        };
-                    }
-            );
+            this.activity.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    cancel();
+                };
+            });
         }
 
         @Override
@@ -358,7 +356,7 @@ public class BatchMonitor {
             dialog.setLocation(x, y);
 
             // beef it up a little
-            dialog.setSize((int)(1.25 * dialog.getWidth()), (int)(1.5 * dialog.getHeight()));
+            dialog.setSize((int) (1.25 * dialog.getWidth()), (int) (1.5 * dialog.getHeight()));
 
             dialog.setVisible(true);
         }

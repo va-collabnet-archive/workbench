@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,45 +40,33 @@ public class ReadMatchReviewItemFromUrlBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor uuidListListPropName =
-                    new PropertyDescriptor("uuidListListPropName",
-                        ReadMatchReviewItemFromUrl.class);
+            PropertyDescriptor uuidListListPropName = new PropertyDescriptor("uuidListListPropName",
+                ReadMatchReviewItemFromUrl.class);
             uuidListListPropName.setBound(true);
-            uuidListListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            uuidListListPropName
-                .setDisplayName("<html><font color='green'>Uuid List:");
+            uuidListListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListListPropName.setDisplayName("<html><font color='green'>Uuid List:");
             uuidListListPropName.setShortDescription("Uuid list.");
 
-            PropertyDescriptor inputFileNamePropName =
-                    new PropertyDescriptor("inputFileNamePropName",
-                        ReadMatchReviewItemFromUrl.class);
+            PropertyDescriptor inputFileNamePropName = new PropertyDescriptor("inputFileNamePropName",
+                ReadMatchReviewItemFromUrl.class);
             inputFileNamePropName.setBound(true);
-            inputFileNamePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            inputFileNamePropName
-                .setDisplayName("<html><font color='green'>Input File Name:");
+            inputFileNamePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            inputFileNamePropName.setDisplayName("<html><font color='green'>Input File Name:");
             inputFileNamePropName.setShortDescription("File Name");
 
-            PropertyDescriptor htmlPropName =
-                    new PropertyDescriptor("htmlPropName",
-                        ReadMatchReviewItemFromUrl.class);
+            PropertyDescriptor htmlPropName = new PropertyDescriptor("htmlPropName", ReadMatchReviewItemFromUrl.class);
             htmlPropName.setBound(true);
             htmlPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             htmlPropName.setDisplayName("<html><font color='green'>HTML:");
             htmlPropName.setShortDescription("HTML");
 
-            PropertyDescriptor termPropName =
-                    new PropertyDescriptor("termPropName",
-                        ReadMatchReviewItemFromUrl.class);
+            PropertyDescriptor termPropName = new PropertyDescriptor("termPropName", ReadMatchReviewItemFromUrl.class);
             termPropName.setBound(true);
             termPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             termPropName.setDisplayName("<html><font color='green'>Term:");
             termPropName.setShortDescription("Term");
 
-            PropertyDescriptor rv[] =
-                    { uuidListListPropName, inputFileNamePropName,
-                     htmlPropName, termPropName };
+            PropertyDescriptor rv[] = { uuidListListPropName, inputFileNamePropName, htmlPropName, termPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -89,10 +77,8 @@ public class ReadMatchReviewItemFromUrlBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(ReadMatchReviewItemFromUrl.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Read Match Review <br> Item From File");
+        BeanDescriptor bd = new BeanDescriptor(ReadMatchReviewItemFromUrl.class);
+        bd.setDisplayName("<html><font color='green'><center>Read Match Review <br> Item From File");
         return bd;
     }
 

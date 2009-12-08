@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,31 +37,21 @@ public class GetSelectedOwnerOrReviewerTaskBeanInfo extends SimpleBeanInfo {
         try {
 
             PropertyDescriptor nextUserTermEntryPropName;
-            nextUserTermEntryPropName =
-                    new PropertyDescriptor("nextUserTermEntryPropName",
-                        getBeanDescriptor().getBeanClass());
+            nextUserTermEntryPropName = new PropertyDescriptor("nextUserTermEntryPropName",
+                getBeanDescriptor().getBeanClass());
             nextUserTermEntryPropName.setBound(true);
-            nextUserTermEntryPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            nextUserTermEntryPropName
-                .setDisplayName("<html><font color='green'>next person:");
-            nextUserTermEntryPropName
-                .setShortDescription("The next person the BP will go to.");
+            nextUserTermEntryPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            nextUserTermEntryPropName.setDisplayName("<html><font color='green'>next person:");
+            nextUserTermEntryPropName.setShortDescription("The next person the BP will go to.");
 
             PropertyDescriptor commentsPropName;
-            commentsPropName =
-                    new PropertyDescriptor("commentsPropName",
-                        getBeanDescriptor().getBeanClass());
+            commentsPropName = new PropertyDescriptor("commentsPropName", getBeanDescriptor().getBeanClass());
             commentsPropName.setBound(true);
-            commentsPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            commentsPropName
-                .setDisplayName("<html><font color='green'>comments prop name:");
-            commentsPropName
-                .setShortDescription("The property to put the comments into.");
+            commentsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            commentsPropName.setDisplayName("<html><font color='green'>comments prop name:");
+            commentsPropName.setShortDescription("The property to put the comments into.");
 
-            PropertyDescriptor rv[] =
-                    { nextUserTermEntryPropName, commentsPropName };
+            PropertyDescriptor rv[] = { nextUserTermEntryPropName, commentsPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -72,10 +62,8 @@ public class GetSelectedOwnerOrReviewerTaskBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(GetSelectedOwnerOrReviewerTask.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Get selected owner or<br>reviewer");
+        BeanDescriptor bd = new BeanDescriptor(GetSelectedOwnerOrReviewerTask.class);
+        bd.setDisplayName("<html><font color='green'><center>Get selected owner or<br>reviewer");
         return bd;
     }
 

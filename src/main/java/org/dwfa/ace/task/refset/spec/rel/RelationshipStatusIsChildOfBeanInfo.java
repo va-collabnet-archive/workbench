@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,7 @@ public class RelationshipStatusIsChildOfBeanInfo extends AbstractAddRefsetSpecTa
     @Override
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(RelationshipStatusIsChildOf.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Add<br>Relationship Status Is<br>Child Of<br>Clause to RefSet Spec");
+        bd.setDisplayName("<html><font color='green'><center>Add<br>Relationship Status Is<br>Child Of<br>Clause to RefSet Spec");
         return bd;
     }
 }

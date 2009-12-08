@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 package org.dwfa.ace.path;
-
-
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -65,8 +63,7 @@ import org.dwfa.tapi.TerminologyException;
  * @author kec
  * 
  */
-public class PositionPanel extends GridBagPanel implements ChangeListener,
-        ItemListener {
+public class PositionPanel extends GridBagPanel implements ChangeListener, ItemListener {
     /**
      * 
      */
@@ -95,56 +92,53 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
 
     private boolean selectPositionOnly = false;
 
-	private Font monoSpaceFont;
+    private Font monoSpaceFont;
 
-	private PropertySetListenerGlue editGlue;
-	private PropertySetListenerGlue promoteGlue;
+    private PropertySetListenerGlue editGlue;
+    private PropertySetListenerGlue promoteGlue;
 
-	private PropertySetListenerGlue selectGlue;
+    private PropertySetListenerGlue selectGlue;
 
-	private I_ConfigAceFrame aceConfig;
+    private I_ConfigAceFrame aceConfig;
 
-	private JCheckBox colorPath;
+    private JCheckBox colorPath;
 
     private class Setup implements Runnable {
-    	I_Position startingPosition;
-    	
-        public Setup(I_Position startingPosition) {
-			this.startingPosition = startingPosition;
-		}
+        I_Position startingPosition;
 
-		public void run() {
+        public Setup(I_Position startingPosition) {
+            this.startingPosition = startingPosition;
+        }
+
+        public void run() {
             try {
-            	dates = new ArrayList<Date>();
-            	dates.add(new Date(LocalVersionedTerminology.get().convertToThickVersion(Integer.MIN_VALUE)));
-            	for (TimePathId tp: LocalVersionedTerminology.get().getTimePathList()) {
-            		if (tp.getPathId() == path.getConceptId()) {
-            			dates.add(new Date(LocalVersionedTerminology.get().convertToThickVersion(tp.getTime())));
-            		}
-            		
-            	}
+                dates = new ArrayList<Date>();
+                dates.add(new Date(LocalVersionedTerminology.get().convertToThickVersion(Integer.MIN_VALUE)));
+                for (TimePathId tp : LocalVersionedTerminology.get().getTimePathList()) {
+                    if (tp.getPathId() == path.getConceptId()) {
+                        dates.add(new Date(LocalVersionedTerminology.get().convertToThickVersion(tp.getTime())));
+                    }
+
+                }
                 if (PositionPanel.this.dates.size() > 1) {
                     Collections.sort(PositionPanel.this.dates);
                 }
-                PositionPanel.this.dates.add(null); // For the top "latest" position...
+                PositionPanel.this.dates.add(null); // For the top "latest"
+                // position...
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().fine("Processing path: "
-                            + LocalVersionedTerminology.get().getConcept(path.getConceptId()).getInitialText() +
-                            " with " + dates.size()
-                            + " coordinates");
+                    AceLog.getAppLog().fine(
+                        "Processing path: "
+                            + LocalVersionedTerminology.get().getConcept(path.getConceptId()).getInitialText()
+                            + " with " + dates.size() + " coordinates");
                 }
                 PositionPanel.this.positionStrings = new ArrayList<String>();
-                for (Iterator<Date> sortedDateItr = PositionPanel.this.dates
-                        .iterator(); sortedDateItr.hasNext();) {
+                for (Iterator<Date> sortedDateItr = PositionPanel.this.dates.iterator(); sortedDateItr.hasNext();) {
                     Date date = sortedDateItr.next();
                     if (date != null) {
                         if (date.after(new Date(Long.MIN_VALUE))) {
-                            PositionPanel.this.positionStrings
-                                    .add(PositionPanel.this.dateFormatter
-                                            .format(date));
+                            PositionPanel.this.positionStrings.add(PositionPanel.this.dateFormatter.format(date));
                         } else {
-                            PositionPanel.this.positionStrings
-                                    .add("Beginning of time");
+                            PositionPanel.this.positionStrings.add("Beginning of time");
                         }
 
                     } else {
@@ -160,8 +154,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                             c.anchor = GridBagConstraints.NORTHWEST;
 
                             JLabel pathLabel = new JLabel(path.toHtmlString());
-                            pathLabel.setBorder(BorderFactory
-                                    .createMatteBorder(0, 0, 2, 0, Color.GRAY));
+                            pathLabel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.GRAY));
                             c.gridheight = 1;
                             c.gridwidth = 2;
                             c.gridx = 0;
@@ -184,63 +177,59 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                             c.weighty = 1;
                             addFiller(c);
                             // this.setBorder(BorderFactory.createTitledBorder("PositionPanel"));
-                            
+
                             revalidate();
-                            repaint(0,0,getWidth(), getHeight());
+                            repaint(0, 0, getWidth(), getHeight());
                         } catch (Exception ex) {
-                			AceLog.getAppLog().alertAndLogException(ex);
+                            AceLog.getAppLog().alertAndLogException(ex);
                         }
                     }
                 });
 
             } catch (Exception ex) {
-    			AceLog.getAppLog().alertAndLogException(ex);
+                AceLog.getAppLog().alertAndLogException(ex);
             }
         }
     }
 
-    public PositionPanel(I_Path path,
-            boolean selectPositionOnly, String purpose,
-            String name, I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws IOException {
-    	this(path, selectPositionOnly, purpose, name, aceConfig, selectGlue, null);
+    public PositionPanel(I_Path path, boolean selectPositionOnly, String purpose, String name,
+            I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws IOException {
+        this(path, selectPositionOnly, purpose, name, aceConfig, selectGlue, null);
     }
+
     /**
      * @param config
      * @throws QueryException
      * @throws RemoteException
      * 
      */
-    public PositionPanel(I_Path path,
-            boolean selectPositionOnly, String purpose,
-            String name, I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue, I_Position position) throws IOException {
+    public PositionPanel(I_Path path, boolean selectPositionOnly, String purpose, String name,
+            I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue, I_Position position) throws IOException {
         super(new GridBagLayout(), name, null);
         Font defaultFont = new JLabel().getFont();
-       	monoSpaceFont = new Font("Monospaced", defaultFont.getStyle(), defaultFont.getSize());
+        monoSpaceFont = new Font("Monospaced", defaultFont.getStyle(), defaultFont.getSize());
 
         this.selectPositionOnly = selectPositionOnly;
         this.aceConfig = aceConfig;
         this.dateFormatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
         this.path = path;
-        this.selectPositionCheckBox = new JCheckBox("Use position "
-                + purpose);
+        this.selectPositionCheckBox = new JCheckBox("Use position " + purpose);
         this.selectPositionCheckBox.setSelected(false);
         this.editOnPathCheckBox = new JCheckBox("Edit on this path");
         this.editOnPathCheckBox.setSelected(aceConfig.getEditingPathSet().contains(path));
         this.promoteToPathCheckBox = new JCheckBox("Promote to this path");
         this.promoteToPathCheckBox.setSelected(aceConfig.getPromotionPathSet().contains(path));
-        
+
         this.selectGlue = selectGlue;
-        this.editGlue = new PropertySetListenerGlue("removeEditingPath",
-        	    "addEditingPath", "replaceEditingPath", "getEditingPathSet",
-                I_Path.class, aceConfig);
-        this.promoteGlue = new PropertySetListenerGlue("removePromotionPath",
-        	    "addPromotionPath", "replacePromotionPathSet", "getPromotionPathSet",
-                I_Path.class, aceConfig);
+        this.editGlue = new PropertySetListenerGlue("removeEditingPath", "addEditingPath", "replaceEditingPath",
+            "getEditingPathSet", I_Path.class, aceConfig);
+        this.promoteGlue = new PropertySetListenerGlue("removePromotionPath", "addPromotionPath",
+            "replacePromotionPathSet", "getPromotionPathSet", I_Path.class, aceConfig);
         colorPath = new JCheckBox("color path");
         if (aceConfig.getColorForPath(path.getConceptId()) != null) {
-        	colorPath.setSelected(true);
-        	colorPath.setBackground(aceConfig.getColorForPath(path.getConceptId()));
-        	colorPath.setOpaque(true);
+            colorPath.setSelected(true);
+            colorPath.setBackground(aceConfig.getColorForPath(path.getConceptId()));
+            colorPath.setOpaque(true);
         }
 
         new Thread(new Setup(position), "PositionPanel Setup").start();
@@ -248,11 +237,11 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
         setSize(size);
         setPreferredSize(size);
         setMinimumSize(size);
-       
+
     }
-    
+
     public void setPositionCheckBoxVisible(Boolean visible) {
-    	this.selectPositionCheckBox.setVisible(visible);
+        this.selectPositionCheckBox.setVisible(visible);
     }
 
     /**
@@ -260,12 +249,12 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
      */
     private void addFiller(GridBagConstraints c) {
         JLabel fillerLabel = new JLabel();
-        //fillerLabel.setBorder(BorderFactory.createLineBorder(Color.red));
+        // fillerLabel.setBorder(BorderFactory.createLineBorder(Color.red));
         this.add(fillerLabel, c);
     }
 
     /**
-     * @param startingPosition 
+     * @param startingPosition
      * @param c
      * @throws QueryException
      * @throws InvocationTargetException
@@ -275,12 +264,11 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
      * @throws SecurityException
      */
     @SuppressWarnings("unchecked")
-	private JComponent setupSliderPanel(I_Position startingPosition) throws
-            SecurityException, IllegalArgumentException, NoSuchMethodException,
-            IllegalAccessException, InvocationTargetException {
-    	int coarseLabelInset = 8;
+    private JComponent setupSliderPanel(I_Position startingPosition) throws SecurityException,
+            IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        int coarseLabelInset = 8;
         JPanel sliderPanel = new JPanel(new GridBagLayout());
-        //sliderPanel.setBorder(BorderFactory.createLineBorder(Color.green));
+        // sliderPanel.setBorder(BorderFactory.createLineBorder(Color.green));
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -321,9 +309,8 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
         sliderPanel.add(fill, c);
         // Create the slider
         if (dates.size() > 0) {
-            this.coarseControl = new JSlider(JSlider.VERTICAL, 0,
-                    dates.size() - 1, dates.size() - 1);
-            //coarseControl.setBorder(BorderFactory.createLineBorder(Color.green));
+            this.coarseControl = new JSlider(JSlider.VERTICAL, 0, dates.size() - 1, dates.size() - 1);
+            // coarseControl.setBorder(BorderFactory.createLineBorder(Color.green));
             coarseControl.addChangeListener(this);
             coarseControl.setMajorTickSpacing(10);
             coarseControl.setPaintTicks(false);
@@ -357,11 +344,9 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
             lastChange.setBorder(BorderFactory.createEmptyBorder(coarseLabelInset, 0, 0, 0));
             lastChange.setFont(monoSpaceFont);
             sliderPanel.add(lastChange, c);
-            if (this.coarseControl.getMaximum()
-                    - this.coarseControl.getMinimum() < 10) {
-                this.fineControl = new JSlider(JSlider.VERTICAL, 0,
-                        this.coarseControl.getMaximum(), this.coarseControl
-                                .getValue());
+            if (this.coarseControl.getMaximum() - this.coarseControl.getMinimum() < 10) {
+                this.fineControl = new JSlider(JSlider.VERTICAL, 0, this.coarseControl.getMaximum(),
+                    this.coarseControl.getValue());
                 this.fineControlSize = this.coarseControl.getMaximum();
             } else {
                 this.fineControl = new JSlider(JSlider.VERTICAL, 0, 9, 1);
@@ -373,11 +358,11 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
             this.fineControl.setValue(this.fineControl.getMaximum());
             this.updateFineControl();
             if (this.selectGlue != null) {
-            	Set<I_Position> positions;
-            	synchronized (this.selectGlue.getSet()) {
-            		positions = new HashSet<I_Position>((Collection<? extends I_Position>) this.selectGlue.getSet());
-				}
-                for (I_Position position: positions) {
+                Set<I_Position> positions;
+                synchronized (this.selectGlue.getSet()) {
+                    positions = new HashSet<I_Position>((Collection<? extends I_Position>) this.selectGlue.getSet());
+                }
+                for (I_Position position : positions) {
                     if (position.getPath() != null && this.path != null) {
                         if (position.getPath().equals(this.path)) {
                             setupPathsEqual(position);
@@ -388,7 +373,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
 
                 }
             } else if (startingPosition != null) {
-            	setupPathsEqual(startingPosition);
+                setupPathsEqual(startingPosition);
             }
             this.fineControl.addChangeListener(this);
             c.gridheight = 1;
@@ -410,7 +395,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
             firstChange.setBorder(BorderFactory.createEmptyBorder(0, 0, coarseLabelInset, 0));
             sliderPanel.add(firstChange, c);
         }
-        
+
         c.gridy++;
         return sliderPanel;
     }
@@ -452,16 +437,13 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
      */
     private void updateFineControlLabelTable() {
         Hashtable<Integer, JLabel> fineLabelTable = new Hashtable<Integer, JLabel>();
-        for (int i = this.fineControl.getMinimum(); i <= this.fineControl
-                .getMaximum(); i++) {
+        for (int i = this.fineControl.getMinimum(); i <= this.fineControl.getMaximum(); i++) {
             if ((i != 0) && (i != this.coarseControl.getMaximum())) {
                 if (i == this.fineControl.getMinimum()) {
-                    fineLabelTable.put(new Integer(i), new JLabel(
-                            "<html><font color='blue'>prev"));
+                    fineLabelTable.put(new Integer(i), new JLabel("<html><font color='blue'>prev"));
 
                 } else if (i == this.fineControl.getMaximum()) {
-                    fineLabelTable.put(new Integer(i), new JLabel(
-                            "<html><font color='blue'>next"));
+                    fineLabelTable.put(new Integer(i), new JLabel("<html><font color='blue'>next"));
 
                 } else {
                     labelDateItem(fineLabelTable, i);
@@ -484,32 +466,27 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
         if (i == this.fineControl.getValue()) {
             prefix.append("<html><font color='red'>");
         }
-        JLabel positionLabel = new JLabel(prefix.toString()
-                + this.positionStrings.get(i));
+        JLabel positionLabel = new JLabel(prefix.toString() + this.positionStrings.get(i));
         positionLabel.setFont(monoSpaceFont);
         fineLabelTable.put(new Integer(i), positionLabel);
 
     }
 
     private int getFineControlMax() {
-        if (this.coarseControl.getValue() > this.coarseControl.getMaximum()
-                - fineControlSize / 2) {
+        if (this.coarseControl.getValue() > this.coarseControl.getMaximum() - fineControlSize / 2) {
             return this.coarseControl.getMaximum();
         }
-        if (this.coarseControl.getValue() < this.coarseControl.getMinimum()
-                + fineControlSize / 2) {
+        if (this.coarseControl.getValue() < this.coarseControl.getMinimum() + fineControlSize / 2) {
             return this.coarseControl.getMinimum() + fineControlSize;
         }
         return this.coarseControl.getValue() + fineControlSize / 2;
     }
 
     private int getFineControlMin() {
-        if (this.coarseControl.getValue() > this.coarseControl.getMaximum()
-                - fineControlSize / 2) {
+        if (this.coarseControl.getValue() > this.coarseControl.getMaximum() - fineControlSize / 2) {
             return this.coarseControl.getMaximum() - fineControlSize;
         }
-        if (this.coarseControl.getValue() < this.coarseControl.getMinimum()
-                + fineControlSize / 2) {
+        if (this.coarseControl.getValue() < this.coarseControl.getMinimum() + fineControlSize / 2) {
             return this.coarseControl.getMinimum();
         }
         return this.coarseControl.getValue() - fineControlSize / 2;
@@ -527,41 +504,34 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
             this.coarseControl.removeChangeListener(this);
             this.coarseControl.setValue(this.fineControl.getValue());
             this.coarseControl.addChangeListener(this);
-            if ((this.fineControl.getValue() == this.fineControl.getMinimum())
-                    && (this.fineControl.getValue() != 0)) {
-                this.fineControl.setMinimum(Math.max(this.fineControl
-                        .getMinimum() - 1, 0));
-                this.fineControl.setMaximum(Math.min(this.fineControl
-                        .getMaximum() - 1, this.dates.size() - 1));
+            if ((this.fineControl.getValue() == this.fineControl.getMinimum()) && (this.fineControl.getValue() != 0)) {
+                this.fineControl.setMinimum(Math.max(this.fineControl.getMinimum() - 1, 0));
+                this.fineControl.setMaximum(Math.min(this.fineControl.getMaximum() - 1, this.dates.size() - 1));
             }
             if ((this.fineControl.getValue() == this.fineControl.getMaximum())
-                    && (this.fineControl.getValue() != this.coarseControl
-                            .getMaximum())) {
-                this.fineControl.setMinimum(Math.max(this.fineControl
-                        .getMinimum() + 1, 0));
-                this.fineControl.setMaximum(Math.min(this.fineControl
-                        .getMaximum() + 1, this.dates.size() - 1));
+                && (this.fineControl.getValue() != this.coarseControl.getMaximum())) {
+                this.fineControl.setMinimum(Math.max(this.fineControl.getMinimum() + 1, 0));
+                this.fineControl.setMaximum(Math.min(this.fineControl.getMaximum() + 1, this.dates.size() - 1));
             }
             this.updateFineControlLabelTable();
             this.fineControl.addChangeListener(this);
         }
         if (this.position != null) {
             I_Position oldPosition = this.position;
-        	Date d = this.dates.get(this.fineControl.getValue());
-        	if (d == null) {
-        		d = new Date(Long.MAX_VALUE);
-        	}
-            try {
-            this.position = LocalVersionedTerminology.get().newPosition(this.path, 
-            		LocalVersionedTerminology.get().convertToThinVersion(d.getTime()));
-            if (oldPosition.equals(this.position) == false) {
-                	if (this.selectGlue != null) {
-                        this.selectGlue.replaceObj(oldPosition,
-                                this.position);
-                	}
+            Date d = this.dates.get(this.fineControl.getValue());
+            if (d == null) {
+                d = new Date(Long.MAX_VALUE);
             }
+            try {
+                this.position = LocalVersionedTerminology.get().newPosition(this.path,
+                    LocalVersionedTerminology.get().convertToThinVersion(d.getTime()));
+                if (oldPosition.equals(this.position) == false) {
+                    if (this.selectGlue != null) {
+                        this.selectGlue.replaceObj(oldPosition, this.position);
+                    }
+                }
             } catch (Exception e1) {
-    			AceLog.getAppLog().alertAndLogException(e1);
+                AceLog.getAppLog().alertAndLogException(e1);
             }
         }
 
@@ -590,41 +560,40 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
                         this.selectGlue.removeObj(position);
                         this.position = null;
                     } else if (e.getStateChange() == ItemEvent.SELECTED) {
-                    	Date d = this.dates.get(this.fineControl.getValue());
-                    	long time = Long.MAX_VALUE;
-                    	if (d != null) {
-                    		time = d.getTime();
-                    	}
-                        this.position = LocalVersionedTerminology.get().newPosition(this.path, 
-                        		(LocalVersionedTerminology.get().convertToThinVersion(time)));
+                        Date d = this.dates.get(this.fineControl.getValue());
+                        long time = Long.MAX_VALUE;
+                        if (d != null) {
+                            time = d.getTime();
+                        }
+                        this.position = LocalVersionedTerminology.get().newPosition(this.path,
+                            (LocalVersionedTerminology.get().convertToThinVersion(time)));
                         this.selectGlue.addObj(position);
                     }
                 }
             } else if (e.getSource() == colorPath) {
-            	if (e.getStateChange() == ItemEvent.SELECTED) {
-                	Color selectedColor = JColorChooser.showDialog(this, 
-                			"Select color to identify components on path", 
-                			colorPath.getBackground());
-                	if (selectedColor == null) {
-                		colorPath.setSelected(false);
-                	} else {
-                		colorPath.setOpaque(true);
-                		colorPath.setBackground(selectedColor);
-                	}
-            		aceConfig.setColorForPath(path.getConceptId(), selectedColor);
-            		aceConfig.invalidate();
-            		aceConfig.validate();
-            		aceConfig.repaint();
-            	} else {
-            		colorPath.setOpaque(false);
-            		aceConfig.setColorForPath(path.getConceptId(), null);
-            		aceConfig.invalidate();
-            		aceConfig.validate();
-            		aceConfig.repaint();
-            	}
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    Color selectedColor = JColorChooser.showDialog(this, "Select color to identify components on path",
+                        colorPath.getBackground());
+                    if (selectedColor == null) {
+                        colorPath.setSelected(false);
+                    } else {
+                        colorPath.setOpaque(true);
+                        colorPath.setBackground(selectedColor);
+                    }
+                    aceConfig.setColorForPath(path.getConceptId(), selectedColor);
+                    aceConfig.invalidate();
+                    aceConfig.validate();
+                    aceConfig.repaint();
+                } else {
+                    colorPath.setOpaque(false);
+                    aceConfig.setColorForPath(path.getConceptId(), null);
+                    aceConfig.invalidate();
+                    aceConfig.validate();
+                    aceConfig.repaint();
+                }
             }
         } catch (Exception ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
+            AceLog.getAppLog().alertAndLogException(ex);
         }
     }
 
@@ -637,15 +606,15 @@ public class PositionPanel extends GridBagPanel implements ChangeListener,
 
     /**
      * @return
-     * @throws IOException 
-     * @throws TerminologyException 
+     * @throws IOException
+     * @throws TerminologyException
      */
     public I_Position getPosition() throws TerminologyException, IOException {
-       	Date d = this.dates.get(this.fineControl.getValue());
-       	if (d == null) {
-       		d = new Date(Long.MAX_VALUE);
-       	}
-       	return LocalVersionedTerminology.get().newPosition(this.path, 
-       			LocalVersionedTerminology.get().convertToThinVersion(d.getTime()));
-     }
+        Date d = this.dates.get(this.fineControl.getValue());
+        if (d == null) {
+            d = new Date(Long.MAX_VALUE);
+        }
+        return LocalVersionedTerminology.get().newPosition(this.path,
+            LocalVersionedTerminology.get().convertToThinVersion(d.getTime()));
+    }
 }

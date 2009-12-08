@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
  * Bean info for GetDetailHtmlDirUuidSetHtmlFileName class.
+ * 
  * @author Susan Castillo
- *
+ * 
  */
 public class GetDetailHtmlDirUuidSetHtmlFileNameBeanInfo extends SimpleBeanInfo {
 
@@ -39,39 +40,28 @@ public class GetDetailHtmlDirUuidSetHtmlFileNameBeanInfo extends SimpleBeanInfo 
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor detailHtmlFileNameProp =
-                    new PropertyDescriptor("detailHtmlFileNameProp",
-                        GetDetailHtmlDirUuidSetHtmlFileName.class);
+            PropertyDescriptor detailHtmlFileNameProp = new PropertyDescriptor("detailHtmlFileNameProp",
+                GetDetailHtmlDirUuidSetHtmlFileName.class);
             detailHtmlFileNameProp.setBound(true);
-            detailHtmlFileNameProp
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            detailHtmlFileNameProp
-                .setDisplayName("<html><font color='green'>File Name <br> Dup Details");
-            detailHtmlFileNameProp
-                .setShortDescription("Dup Html <br> Detail File Name");
+            detailHtmlFileNameProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            detailHtmlFileNameProp.setDisplayName("<html><font color='green'>File Name <br> Dup Details");
+            detailHtmlFileNameProp.setShortDescription("Dup Html <br> Detail File Name");
 
-            PropertyDescriptor uuidListPropName =
-                    new PropertyDescriptor("uuidListPropName",
-                        GetDetailHtmlDirUuidSetHtmlFileName.class);
+            PropertyDescriptor uuidListPropName = new PropertyDescriptor("uuidListPropName",
+                GetDetailHtmlDirUuidSetHtmlFileName.class);
             uuidListPropName.setBound(true);
-            uuidListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            uuidListPropName
-                .setDisplayName("<html><font color='green'>Uuid List of Concept");
+            uuidListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListPropName.setDisplayName("<html><font color='green'>Uuid List of Concept");
             uuidListPropName.setShortDescription("Uuid of Concept");
 
-            PropertyDescriptor htmlDirPropName =
-                    new PropertyDescriptor("htmlDirPropName",
-                        GetDetailHtmlDirUuidSetHtmlFileName.class);
+            PropertyDescriptor htmlDirPropName = new PropertyDescriptor("htmlDirPropName",
+                GetDetailHtmlDirUuidSetHtmlFileName.class);
             htmlDirPropName.setBound(true);
-            htmlDirPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            htmlDirPropName
-                .setDisplayName("<html><font color='green'>Dir Html File");
+            htmlDirPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            htmlDirPropName.setDisplayName("<html><font color='green'>Dir Html File");
             htmlDirPropName.setShortDescription("Detail Html File Name");
 
-            PropertyDescriptor rv[] =
-                    { detailHtmlFileNameProp, uuidListPropName, htmlDirPropName };
+            PropertyDescriptor rv[] = { detailHtmlFileNameProp, uuidListPropName, htmlDirPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -82,10 +72,8 @@ public class GetDetailHtmlDirUuidSetHtmlFileNameBeanInfo extends SimpleBeanInfo 
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(GetDetailHtmlDirUuidSetHtmlFileName.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Get Detail <br>Html Dir and Uuid <br> Set Html Detail File Name");
+        BeanDescriptor bd = new BeanDescriptor(GetDetailHtmlDirUuidSetHtmlFileName.class);
+        bd.setDisplayName("<html><font color='green'><center>Get Detail <br>Html Dir and Uuid <br> Set Html Detail File Name");
         return bd;
     }
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,23 +28,17 @@ public class ClassifyBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor factoryClass =
-                    new PropertyDescriptor("factoryClass", Classify.class);
+            PropertyDescriptor factoryClass = new PropertyDescriptor("factoryClass", Classify.class);
             factoryClass.setBound(true);
             factoryClass.setPropertyEditorClass(JTextFieldEditor.class);
-            factoryClass
-                .setDisplayName("<html><font color='green'>Factory class:");
-            factoryClass
-                .setShortDescription("Enter the factory class to be called.");
+            factoryClass.setDisplayName("<html><font color='green'>Factory class:");
+            factoryClass.setShortDescription("Enter the factory class to be called.");
 
-            PropertyDescriptor classifyRoot =
-                    new PropertyDescriptor("classifyRoot", Classify.class);
+            PropertyDescriptor classifyRoot = new PropertyDescriptor("classifyRoot", Classify.class);
             classifyRoot.setBound(true);
             classifyRoot.setPropertyEditorClass(ConceptLabelPropEditor.class);
-            classifyRoot
-                .setDisplayName("<html><font color='green'>Classification Root Concept:");
-            classifyRoot
-                .setShortDescription("Define the root Concept for classification.");
+            classifyRoot.setDisplayName("<html><font color='green'>Classification Root Concept:");
+            classifyRoot.setShortDescription("Define the root Concept for classification.");
 
             PropertyDescriptor rv[] = { factoryClass, classifyRoot, };
             return rv;

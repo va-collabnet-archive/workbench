@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,41 +20,40 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-
 public interface I_IdTuple extends I_AmTuple {
 
-	public abstract int getNativeId();
+    public abstract int getNativeId();
 
-	public abstract Set<TimePathId> getTimePathSet();
+    public abstract Set<TimePathId> getTimePathSet();
 
-	public abstract List<UUID> getUIDs();
+    public abstract List<UUID> getUIDs();
 
-	public abstract List<I_IdPart> getVersions();
+    public abstract List<I_IdPart> getVersions();
 
-	public abstract boolean hasVersion(I_IdPart newPart);
+    public abstract boolean hasVersion(I_IdPart newPart);
 
-	public abstract void setNativeId(int nativeId);
+    public abstract void setNativeId(int nativeId);
 
-	/**
-	 * @deprecated Use {@link #getStatusId()}
-	 */
-	@Deprecated
-	public abstract int getIdStatus();
+    /**
+     * @deprecated Use {@link #getStatusId()}
+     */
+    @Deprecated
+    public abstract int getIdStatus();
 
-	public abstract int getSource();
+    public abstract int getSource();
 
-	public abstract Object getSourceId();
+    public abstract Object getSourceId();
 
-	public abstract I_IdVersioned getIdVersioned();
+    public abstract I_IdVersioned getIdVersioned();
 
-	/**
-	 * @deprecated Use {@link #duplicate()}
-	 */
-	@Deprecated
-	public abstract I_IdPart duplicatePart();
+    /**
+     * @deprecated Use {@link #duplicate()}
+     */
+    @Deprecated
+    public abstract I_IdPart duplicatePart();
 
-	public I_IdPart duplicate();
-	
-   public abstract I_IdPart getPart();
+    public I_IdPart duplicate();
+
+    public abstract I_IdPart getPart();
 
 }

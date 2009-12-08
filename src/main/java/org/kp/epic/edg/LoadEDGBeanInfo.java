@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,16 +28,11 @@ public class LoadEDGBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         PropertyDescriptor inputFilePropName;
         try {
-            inputFilePropName =
-                    new PropertyDescriptor("inputFilePropName",
-                        getBeanDescriptor().getBeanClass());
+            inputFilePropName = new PropertyDescriptor("inputFilePropName", getBeanDescriptor().getBeanClass());
             inputFilePropName.setBound(true);
-            inputFilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            inputFilePropName
-                .setDisplayName("<html><font color='green'>File property:");
-            inputFilePropName
-                .setShortDescription("Name of the file to import from. ");
+            inputFilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            inputFilePropName.setDisplayName("<html><font color='green'>File property:");
+            inputFilePropName.setShortDescription("Name of the file to import from. ");
 
             PropertyDescriptor rv[] = { inputFilePropName };
             return rv;

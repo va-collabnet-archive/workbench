@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,8 +68,9 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public LANGUAGE_SORT_PREF getLanguageSortPref();
 
     public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref);
-    
+
     public boolean searchWithDescTypeFilter();
+
     public void setSearchWithDescTypeFilter(boolean filter);
 
     public boolean isActive();
@@ -130,13 +131,19 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void setDestRelTypes(I_IntSet browseUpRels);
 
     public void addEditingPath(I_Path p);
+
     public void removeEditingPath(I_Path p);
+
     public void replaceEditingPath(I_Path oldPath, I_Path newPath);
+
     public Set<I_Path> getEditingPathSet();
 
     public void addPromotionPath(I_Path p);
+
     public void removePromotionPath(I_Path p);
+
     public void replacePromotionPathSet(I_Path oldPath, I_Path newPath);
+
     public Set<I_Path> getPromotionPathSet();
 
     public void addViewPosition(I_Position p);
@@ -328,6 +335,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion);
 
     public void setShowPreferences(boolean shown);
+
     public void setSelectedPreferencesTab(String tabName);
 
     public void setShowHistory(boolean shown);
@@ -427,7 +435,9 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void setShowInferredInTaxonomy(Boolean showInferredInTaxonomy);
 
     public Boolean getShowPathInfoInTaxonomy();
+
     public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy);
+
     public Boolean getShowRefsetInfoInTaxonomy();
 
     public void setShowRefsetInfoInTaxonomy(Boolean showRefsetInfoInTaxonomy);
@@ -514,8 +524,9 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_GetConceptData getClassificationRoot();
 
     public void setClassificationRoot(I_GetConceptData classificationRoot);
-    
+
     public I_GetConceptData getClassificationRoleRoot();
+
     public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot);
 
     public I_GetConceptData getClassifierIsaType();
@@ -591,25 +602,28 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void fireRefsetSpecChanged(I_ThinExtByRefVersioned ext);
 
     public I_DescriptionTuple getSearchResultsSelection();
-    
+
     /**
      * 
-     * @param visible True if you wish to make the workflow details sheet visible. Otherwise false. 
+     * @param visible True if you wish to make the workflow details sheet
+     *            visible. Otherwise false.
      */
     public void setShowWorkflowDetailSheet(boolean visible);
-    
+
     /**
      * 
-     * @param dim dimensions of the workflow dimension sheet. 
+     * @param dim dimensions of the workflow dimension sheet.
      */
     public void setWorkflowDetailSheetDimensions(Dimension dim);
-    
+
     /**
-     * Developers can place components on the details sheet for interaction with the user. 
-     * @return The JPanel that implements the workflow details sheet. 
+     * Developers can place components on the details sheet for interaction with
+     * the user.
+     * 
+     * @return The JPanel that implements the workflow details sheet.
      */
     public JPanel getWorkflowDetailsSheet();
-    
+
     /**
      * 
      * @return a map of the path nids, and the color associated with that path.

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,13 +39,12 @@ public abstract class AbstractAllSvnEntriesTask extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             //
@@ -55,33 +54,31 @@ public abstract class AbstractAllSvnEntriesTask extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-                .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             if (worker.getLogger().isLoggable(Level.INFO)) {
-            	worker.getLogger().info("java.library.path: " + System.getProperty("java.library.path"));
+                worker.getLogger().info("java.library.path: " + System.getProperty("java.library.path"));
             }
-            for (String key: config.getSubversionMap().keySet()) {
-            	SubversionData svd =  config.getSubversionMap().get(key);
-            	worker.getLogger().info(" processing: " + key);
+            for (String key : config.getSubversionMap().keySet()) {
+                SubversionData svd = config.getSubversionMap().get(key);
+                worker.getLogger().info(" processing: " + key);
                 doSvnTask(config, svd, key);
             }
-             return Condition.CONTINUE;
+            return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         }
     }
 
-    protected abstract void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String key) throws TaskFailedException;
-    
+    protected abstract void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String key)
+            throws TaskFailedException;
+
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
@@ -90,4 +87,4 @@ public abstract class AbstractAllSvnEntriesTask extends AbstractTask {
         return new int[] {};
     }
 
- }
+}

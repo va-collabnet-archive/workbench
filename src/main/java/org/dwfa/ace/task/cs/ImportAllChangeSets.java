@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * @author kec
- *
+ * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/ide/change sets", type = BeanType.TASK_BEAN) })
 public class ImportAllChangeSets extends AbstractTask {
@@ -44,7 +44,7 @@ public class ImportAllChangeSets extends AbstractTask {
     private String rootDirStr = "profiles/";
 
     private Boolean validateChangeSets = true;
-    
+
     private String validators = ComponentValidator.class.getName();
 
     private static final long serialVersionUID = 1;
@@ -58,21 +58,20 @@ public class ImportAllChangeSets extends AbstractTask {
         out.writeObject(validators);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-                                                                 ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
             rootDirStr = (String) in.readObject();
             if (objDataVersion > 1) {
-            	validateChangeSets = in.readBoolean();
+                validateChangeSets = in.readBoolean();
             } else {
-            	validateChangeSets = true;
+                validateChangeSets = true;
             }
-            
+
             if (objDataVersion > 2) {
-            	validators = (String) in.readObject();
+                validators = (String) in.readObject();
             } else {
-            	validators = ComponentValidator.class.getName();
+                validators = ComponentValidator.class.getName();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -84,8 +83,7 @@ public class ImportAllChangeSets extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-    throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         LocalVersionedTerminology.get().suspendChangeSetWriters();
         importAllChangeSets(worker.getLogger());
@@ -93,17 +91,17 @@ public class ImportAllChangeSets extends AbstractTask {
 
         return Condition.CONTINUE;
     }
-    
+
     public void importAllChangeSets(Logger log) throws TaskFailedException {
         ChangeSetImporter csi = new ChangeSetImporter() {
-			@Override
-			public I_ReadChangeSet getChangeSetReader(File csf) {
-				try {
-					return LocalVersionedTerminology.get().newBinaryChangeSetReader(csf);
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			}
+            @Override
+            public I_ReadChangeSet getChangeSetReader(File csf) {
+                try {
+                    return LocalVersionedTerminology.get().newBinaryChangeSetReader(csf);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         };
         csi.importAllChangeSets(log, validators, rootDirStr, validateChangeSets, ".jcs");
     }
@@ -112,8 +110,7 @@ public class ImportAllChangeSets extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-        throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do.
 
     }
@@ -147,19 +144,19 @@ public class ImportAllChangeSets extends AbstractTask {
         this.rootDirStr = rootDirStr;
     }
 
-	public Boolean getValidateChangeSets() {
-		return validateChangeSets;
-	}
+    public Boolean getValidateChangeSets() {
+        return validateChangeSets;
+    }
 
-	public void setValidateChangeSets(Boolean validateChangeSets) {
-		this.validateChangeSets = validateChangeSets;
-	}
+    public void setValidateChangeSets(Boolean validateChangeSets) {
+        this.validateChangeSets = validateChangeSets;
+    }
 
-	public String getValidators() {
-		return validators;
-	}
+    public String getValidators() {
+        return validators;
+    }
 
-	public void setValidators(String validators) {
-		this.validators = validators;
-	}
+    public void setValidators(String validators) {
+        this.validators = validators;
+    }
 }

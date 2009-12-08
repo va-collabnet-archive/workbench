@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,23 +26,19 @@ import org.dwfa.queue.bpa.tasks.move.QueueTypeEditor;
 
 /**
  * @author Ming Zhang
- *
+ * 
  * @created 18/01/2008
  */
 public class SetEditPathFromDescriptionBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor pathDescription =
-                    new PropertyDescriptor("PathDescription",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor pathDescription = new PropertyDescriptor("PathDescription",
+                getBeanDescriptor().getBeanClass());
             pathDescription.setBound(true);
-            pathDescription
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            pathDescription
-                .setDisplayName("<html><font color='green'>path Description:");
-            pathDescription
-                .setShortDescription("The property that contains the editing path.");
+            pathDescription.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            pathDescription.setDisplayName("<html><font color='green'>path Description:");
+            pathDescription.setShortDescription("The property that contains the editing path.");
 
             PropertyDescriptor rv[] = { pathDescription };
             return rv;
@@ -55,10 +51,8 @@ public class SetEditPathFromDescriptionBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(SetEditPathFromDescription.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>set edit path<br>From Description");
+        BeanDescriptor bd = new BeanDescriptor(SetEditPathFromDescription.class);
+        bd.setDisplayName("<html><font color='green'><center>set edit path<br>From Description");
         return bd;
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,9 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 
 /**
  * Bean info to NewAttachmentListFromChosenFile class.
+ * 
  * @author Christine Hill
- *
+ * 
  */
 public class NewAttachmentListFromChosenFileBeanInfo extends SimpleBeanInfo {
 
@@ -40,18 +41,13 @@ public class NewAttachmentListFromChosenFileBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor listName =
-                    new PropertyDescriptor("listName",
-                        NewAttachmentListFromChosenFile.class);
+            PropertyDescriptor listName = new PropertyDescriptor("listName", NewAttachmentListFromChosenFile.class);
             listName.setBound(true);
             listName.setPropertyEditorClass(JTextFieldEditor.class);
-            listName
-                .setDisplayName("<html><font color='green'>Name of temporary list:");
+            listName.setDisplayName("<html><font color='green'>Name of temporary list:");
             listName.setShortDescription("Name of the temporary list.");
 
-            PropertyDescriptor fileKey =
-                    new PropertyDescriptor("fileKey",
-                        NewAttachmentListFromChosenFile.class);
+            PropertyDescriptor fileKey = new PropertyDescriptor("fileKey", NewAttachmentListFromChosenFile.class);
             fileKey.setBound(true);
             fileKey.setPropertyEditorClass(JTextFieldEditor.class);
             fileKey.setDisplayName("<html><font color='green'>File key:");
@@ -68,10 +64,8 @@ public class NewAttachmentListFromChosenFileBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(NewAttachmentListFromChosenFile.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>New Attachment<br>List From<br>Previously<br>Chosen File");
+        BeanDescriptor bd = new BeanDescriptor(NewAttachmentListFromChosenFile.class);
+        bd.setDisplayName("<html><font color='green'><center>New Attachment<br>List From<br>Previously<br>Chosen File");
         return bd;
     }
 

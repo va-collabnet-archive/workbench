@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,36 +20,36 @@ import org.apache.lucene.util.OpenBitSet;
 
 public class IdentifierSetReadOnly extends IdentifierSet {
 
-	private IdentifierSetReadOnly() {
-		super();
-	}
+    private IdentifierSetReadOnly() {
+        super();
+    }
 
-	private IdentifierSetReadOnly(int numBits) {
-		super(numBits);
-	}
+    private IdentifierSetReadOnly(int numBits) {
+        super(numBits);
+    }
 
-	public IdentifierSetReadOnly(IdentifierSet set) {
-		this.bitSet =  (OpenBitSet) set.bitSet.clone();
-	}
+    public IdentifierSetReadOnly(IdentifierSet set) {
+        this.bitSet = (OpenBitSet) set.bitSet.clone();
+    }
 
-	@Override
-	public void and(I_RepresentIdSet other) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void and(I_RepresentIdSet other) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public void or(I_RepresentIdSet other) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void or(I_RepresentIdSet other) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public void setMember(int nid) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void setMember(int nid) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public void setNotMember(int nid) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public void setNotMember(int nid) {
+        throw new UnsupportedOperationException();
+    }
 
 }

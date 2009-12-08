@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,28 +22,29 @@ import java.util.Set;
 import org.dwfa.tapi.TerminologyException;
 
 public interface I_AmTermComponent {
-	
-	/**
-	 * @deprecated use getNid();
-	 * @return The terminology component's identifier
-	 */
-	public int getTermComponentId();
-	
-	/**
-	 * @return The terminology component's identifier
-	 */
-	public int getNid();
-	
-	/**
-	 * 
-	 * @param viewPosition The position items should be promoted from. 
-	 * @param pomotionPaths The path to promote items to. 
-	 * @param allowedStatus Only promote items that have one of these status values. 
-	 * @return true if there are any promotions that require commitment. 
-	 * @throws IOException 
-	 * @throws TerminologyException 
-	 */
-	public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) 
-		throws IOException, TerminologyException;
+
+    /**
+     * @deprecated use getNid();
+     * @return The terminology component's identifier
+     */
+    public int getTermComponentId();
+
+    /**
+     * @return The terminology component's identifier
+     */
+    public int getNid();
+
+    /**
+     * 
+     * @param viewPosition The position items should be promoted from.
+     * @param pomotionPaths The path to promote items to.
+     * @param allowedStatus Only promote items that have one of these status
+     *            values.
+     * @return true if there are any promotions that require commitment.
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus)
+            throws IOException, TerminologyException;
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,14 +27,11 @@ public class AddUuidListListToListViewBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor uuidListListPropName =
-                    new PropertyDescriptor("uuidListListPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor uuidListListPropName = new PropertyDescriptor("uuidListListPropName",
+                getBeanDescriptor().getBeanClass());
             uuidListListPropName.setBound(true);
-            uuidListListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            uuidListListPropName
-                .setDisplayName("<html><font color='green'>Uuid List:");
+            uuidListListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListListPropName.setDisplayName("<html><font color='green'>Uuid List:");
             uuidListListPropName.setShortDescription("Uuid list.");
 
             PropertyDescriptor rv[] = { uuidListListPropName };
@@ -49,8 +46,7 @@ public class AddUuidListListToListViewBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(AddUuidListListToListView.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Add UUID List list <br>to list view");
+        bd.setDisplayName("<html><font color='green'><center>Add UUID List list <br>to list view");
         return bd;
     }
 

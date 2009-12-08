@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,8 +52,7 @@ public class SnoAB {
         try {
             I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
             isaNid = config.getClassifierIsaType().getConceptId();
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT
-                    .getUids());
+            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -99,7 +98,7 @@ public class SnoAB {
     private List<SnoRel> findIsaProximal(I_GetConceptData cBean) {
         List<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
         try {
-			List<? extends I_RelVersioned> relList = cBean.getSourceRels();
+            List<? extends I_RelVersioned> relList = cBean.getSourceRels();
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;
@@ -119,8 +118,7 @@ public class SnoAB {
                         }
                     }
                     if (rp1 != null) {
-                        if (rp1.getStatusId() == isCURRENT
-                                && rp1.getTypeId() == isaNid) {
+                        if (rp1.getStatusId() == isCURRENT && rp1.getTypeId() == isaNid) {
                             returnSnoRels.add(new SnoRel(rel, rp1, -1));
                         }
                         break; // IF FOUND ON THIS PATH, STOP SEARCHING

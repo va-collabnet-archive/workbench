@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,12 +34,13 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-
 /**
-* Takes/removes the first item (UUID) in a specified attachment list and returns a concept.
-* @author Susan Castillo
-*
-*/
+ * Takes/removes the first item (UUID) in a specified attachment list and
+ * returns a concept.
+ * 
+ * @author Susan Castillo
+ * 
+ */
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
 public class TakeFirstItemInAttachmentListReturnConcept extends AbstractTask {
@@ -50,11 +51,10 @@ public class TakeFirstItemInAttachmentListReturnConcept extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
-    
-    private String uuidListPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
-    
-    private String conceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
 
+    private String uuidListPropName = ProcessAttachmentKeys.UUID_LIST.getAttachmentKey();
+
+    private String conceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -62,8 +62,7 @@ public class TakeFirstItemInAttachmentListReturnConcept extends AbstractTask {
         out.writeObject(conceptPropName);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             uuidListPropName = (String) in.readObject();
@@ -74,20 +73,18 @@ public class TakeFirstItemInAttachmentListReturnConcept extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
 
     }
 
     @SuppressWarnings("unchecked")
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            
+
             I_GetConceptData concept = AceTaskUtil.getConceptFromProperty(process, uuidListPropName);
             process.setProperty(this.conceptPropName, concept);
-            
+
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
@@ -98,10 +95,10 @@ public class TakeFirstItemInAttachmentListReturnConcept extends AbstractTask {
         } catch (IllegalAccessException e) {
             throw new TaskFailedException(e);
         } catch (TerminologyException e) {
-        	throw new TaskFailedException(e);
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		}
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        }
     }
 
     public Collection<Condition> getConditions() {
@@ -112,21 +109,20 @@ public class TakeFirstItemInAttachmentListReturnConcept extends AbstractTask {
         return new int[] {};
     }
 
-	public String getUuidListPropName() {
-		return uuidListPropName;
-	}
+    public String getUuidListPropName() {
+        return uuidListPropName;
+    }
 
-	public void setUuidListPropName(String uuidListPropName) {
-		this.uuidListPropName = uuidListPropName;
-	}
+    public void setUuidListPropName(String uuidListPropName) {
+        this.uuidListPropName = uuidListPropName;
+    }
 
-	public String getConceptPropName() {
-		return conceptPropName;
-	}
+    public String getConceptPropName() {
+        return conceptPropName;
+    }
 
-	public void setConceptPropName(String conceptPropName) {
-		this.conceptPropName = conceptPropName;
-	}
+    public void setConceptPropName(String conceptPropName) {
+        this.conceptPropName = conceptPropName;
+    }
 
 }
-

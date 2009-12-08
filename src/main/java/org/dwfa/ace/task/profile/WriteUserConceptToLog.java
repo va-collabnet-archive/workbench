@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,6 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
-
 public class WriteUserConceptToLog extends AbstractTask {
 
     /**
@@ -43,7 +42,6 @@ public class WriteUserConceptToLog extends AbstractTask {
 
     private static final int dataVersion = 1;
 
-
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
@@ -51,7 +49,7 @@ public class WriteUserConceptToLog extends AbstractTask {
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
- 
+
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -63,11 +61,10 @@ public class WriteUserConceptToLog extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame profile = (I_ConfigAceFrame) worker
-				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             worker.getLogger().info("userConcept: " + profile.getDbConfig().getUserConcept());
             return Condition.CONTINUE;
-            
+
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
         }

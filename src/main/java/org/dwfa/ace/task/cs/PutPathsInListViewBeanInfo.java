@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,16 +28,12 @@ public class PutPathsInListViewBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor inputFilePropName =
-                    new PropertyDescriptor("inputFilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor inputFilePropName = new PropertyDescriptor("inputFilePropName",
+                getBeanDescriptor().getBeanClass());
             inputFilePropName.setBound(true);
-            inputFilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            inputFilePropName
-                .setDisplayName("<html><font color='green'>input file prop:");
-            inputFilePropName
-                .setShortDescription("The property that contains the file name of the input file.");
+            inputFilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            inputFilePropName.setDisplayName("<html><font color='green'>input file prop:");
+            inputFilePropName.setShortDescription("The property that contains the file name of the input file.");
 
             PropertyDescriptor rv[] = { inputFilePropName };
             return rv;
@@ -51,8 +47,7 @@ public class PutPathsInListViewBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(PutPathsInListView.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Put Edit Paths<br>from Change Set<br>in List View");
+        bd.setDisplayName("<html><font color='green'><center>Put Edit Paths<br>from Change Set<br>in List View");
         return bd;
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,11 +40,11 @@ public final class ChooseDirectory extends AbstractTask {
 
     private static final long serialVersionUID = 960853732663625974L;
     private static final int dataVersion = 1;
-    
+
     private String directoryKey;
 
     public ChooseDirectory() {
-        directoryKey =  ProcessAttachmentKeys.WORKING_DIR.getAttachmentKey();
+        directoryKey = ProcessAttachmentKeys.WORKING_DIR.getAttachmentKey();
     }
 
     private void writeObject(final ObjectOutputStream out) throws IOException {
@@ -52,11 +52,10 @@ public final class ChooseDirectory extends AbstractTask {
         out.writeUTF(directoryKey);
     }
 
-    private void readObject(final ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
-            directoryKey = in.readUTF();        
+            directoryKey = in.readUTF();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -73,14 +72,14 @@ public final class ChooseDirectory extends AbstractTask {
 
         final File selectedDirectory = chooser.getSelectedFile();
         final Logger logger = new TaskLogger(worker);
-    
+
         logger.logInfo(("Selected directory: " + selectedDirectory.getName()));
 
         try {
             process.setProperty(directoryKey, selectedDirectory);
             logger.logInfo(directoryKey + " --> " + process.readProperty(directoryKey));
         } catch (Exception e) {
-            logger.logWarn("Could not set directory " + selectedDirectory.getName() + ", to key "+ directoryKey);
+            logger.logWarn("Could not set directory " + selectedDirectory.getName() + ", to key " + directoryKey);
             throw new TaskFailedException(e);
         }
 
@@ -88,7 +87,7 @@ public final class ChooseDirectory extends AbstractTask {
     }
 
     public void complete(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
-        //do nothing.
+        // do nothing.
     }
 
     public Collection<Condition> getConditions() {

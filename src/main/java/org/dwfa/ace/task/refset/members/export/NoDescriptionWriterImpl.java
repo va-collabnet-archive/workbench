@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,8 +27,7 @@ public final class NoDescriptionWriterImpl implements NoDescriptionWriter {
     private final Logger logger;
     private final String lineSeparator;
 
-    public NoDescriptionWriterImpl(final Writer writer,
-            final String lineSeparator, final Logger logger) {
+    public NoDescriptionWriterImpl(final Writer writer, final String lineSeparator, final Logger logger) {
         this.lineSeparator = lineSeparator;
         this.logger = logger;
         this.writer = writer;
@@ -36,10 +35,8 @@ public final class NoDescriptionWriterImpl implements NoDescriptionWriter {
 
     public void write(final I_GetConceptData concept) throws Exception {
         String conceptUuids = concept.getUids().iterator().next().toString();
-        logger.logWarn("Concept " + conceptUuids
-            + " has no active preferred term");
-        writer.append("Concept ").append(conceptUuids).append(
-            " has no active preferred term");
+        logger.logWarn("Concept " + conceptUuids + " has no active preferred term");
+        writer.append("Concept ").append(conceptUuids).append(" has no active preferred term");
         writer.append(lineSeparator);
     }
 

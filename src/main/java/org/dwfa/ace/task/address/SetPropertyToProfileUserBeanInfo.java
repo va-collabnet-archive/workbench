@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,25 +28,18 @@ public class SetPropertyToProfileUserBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile prop:");
-            profilePropName
-                .setShortDescription("The property that contains the profile to get the user from.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile prop:");
+            profilePropName.setShortDescription("The property that contains the profile to get the user from.");
 
-            PropertyDescriptor userPropName =
-                    new PropertyDescriptor("userPropName", getBeanDescriptor()
-                        .getBeanClass());
+            PropertyDescriptor userPropName = new PropertyDescriptor("userPropName", getBeanDescriptor().getBeanClass());
             userPropName.setBound(true);
             userPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             userPropName.setDisplayName("<html><font color='green'>user prop:");
-            userPropName
-                .setShortDescription("The property to put the username into.");
+            userPropName.setShortDescription("The property to put the username into.");
 
             PropertyDescriptor rv[] = { profilePropName, userPropName };
             return rv;
@@ -60,8 +53,7 @@ public class SetPropertyToProfileUserBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SetPropertyToProfileUser.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>set property<br>to profile user");
+        bd.setDisplayName("<html><font color='green'><center>set property<br>to profile user");
         return bd;
     }
 }

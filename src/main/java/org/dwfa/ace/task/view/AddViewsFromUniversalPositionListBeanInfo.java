@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,27 +27,19 @@ public class AddViewsFromUniversalPositionListBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-            PropertyDescriptor profilePropName =
-                    new PropertyDescriptor("profilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor profilePropName = new PropertyDescriptor("profilePropName",
+                getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
-            profilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            profilePropName
-                .setDisplayName("<html><font color='green'>profile property:");
-            profilePropName
-                .setShortDescription("The property containing the profile to change.");
+            profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            profilePropName.setDisplayName("<html><font color='green'>profile property:");
+            profilePropName.setShortDescription("The property containing the profile to change.");
 
-            PropertyDescriptor positionListPropName =
-                    new PropertyDescriptor("positionListPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor positionListPropName = new PropertyDescriptor("positionListPropName",
+                getBeanDescriptor().getBeanClass());
             positionListPropName.setBound(true);
-            positionListPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            positionListPropName
-                .setDisplayName("<html><font color='green'>position list prop:");
-            positionListPropName
-                .setShortDescription("The property that contains universal position list");
+            positionListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            positionListPropName.setDisplayName("<html><font color='green'>position list prop:");
+            positionListPropName.setShortDescription("The property that contains universal position list");
 
             PropertyDescriptor rv[] = { profilePropName, positionListPropName };
             return rv;
@@ -60,10 +52,8 @@ public class AddViewsFromUniversalPositionListBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(AddViewsFromUniversalPositionList.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>add view positions<br>from position list");
+        BeanDescriptor bd = new BeanDescriptor(AddViewsFromUniversalPositionList.class);
+        bd.setDisplayName("<html><font color='green'><center>add view positions<br>from position list");
         return bd;
     }
 }

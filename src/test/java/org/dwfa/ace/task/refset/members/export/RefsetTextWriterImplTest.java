@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,9 +31,9 @@ import java.util.List;
 
 public final class RefsetTextWriterImplTest {
 
-    private static final int CONCEPT_ID             = 2100;
-    private static final int LOCALIZED_PARENT_NID   = 500;
-    private static final int PART_CONCEPT_ID        = 3000;
+    private static final int CONCEPT_ID = 2100;
+    private static final int LOCALIZED_PARENT_NID = 500;
+    private static final int PART_CONCEPT_ID = 3000;
 
     private IMocksControl mockControl;
     private RefsetUtil mockRefsetUtil;
@@ -73,7 +73,7 @@ public final class RefsetTextWriterImplTest {
 
         RefsetTextWriter writer = new RefsetTextWriterImpl(mockRefsetUtil, mockTermFactory);
         writer.writeRefset(mockRefsetConcept, descriptionTupleList, mockDescriptionWriter, mockPart,
-                mockNoDescriptionWriter);
+            mockNoDescriptionWriter);
 
         mockControl.verify();
     }
@@ -84,9 +84,9 @@ public final class RefsetTextWriterImplTest {
         mockNoDescriptionWriter.write(mockRefsetConcept);
         mockControl.replay();
 
-        RefsetTextWriter writer = new RefsetTextWriterImpl(mockRefsetUtil, mockTermFactory);        
+        RefsetTextWriter writer = new RefsetTextWriterImpl(mockRefsetUtil, mockTermFactory);
         writer.writeRefset(mockRefsetConcept, descriptionTupleList, mockDescriptionWriter, mockPart,
-                mockNoDescriptionWriter);
+            mockNoDescriptionWriter);
 
         mockControl.verify();
     }

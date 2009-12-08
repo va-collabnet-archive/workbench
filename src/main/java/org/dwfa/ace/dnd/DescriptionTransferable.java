@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,13 +34,11 @@ import org.dwfa.tapi.impl.UniversalFixedDescription;
 
 public class DescriptionTransferable implements Transferable {
 
-    public static String thinDescTupleType =
-            DataFlavor.javaJVMLocalObjectMimeType + ";class="
-                + I_DescriptionTuple.class.getName();
+    public static String thinDescTupleType = DataFlavor.javaJVMLocalObjectMimeType + ";class="
+        + I_DescriptionTuple.class.getName();
 
-    public static final String thinDescVersionedType =
-            DataFlavor.javaJVMLocalObjectMimeType + ";class="
-                + I_DescriptionVersioned.class.getName();
+    public static final String thinDescVersionedType = DataFlavor.javaJVMLocalObjectMimeType + ";class="
+        + I_DescriptionVersioned.class.getName();
 
     public DataFlavor thinDescVersionedFlavor;
     public DataFlavor thinDescTupleFlavor;
@@ -51,20 +49,15 @@ public class DescriptionTransferable implements Transferable {
         super();
         this.tuple = tuple;
         try {
-            thinDescVersionedFlavor =
-                    new DataFlavor(
-                        DescriptionTransferable.thinDescVersionedType);
-            thinDescTupleFlavor =
-                    new DataFlavor(DescriptionTransferable.thinDescTupleType);
-            conceptBeanFlavor =
-                    new DataFlavor(ConceptTransferable.conceptBeanType);
+            thinDescVersionedFlavor = new DataFlavor(DescriptionTransferable.thinDescVersionedType);
+            thinDescTupleFlavor = new DataFlavor(DescriptionTransferable.thinDescTupleType);
+            conceptBeanFlavor = new DataFlavor(ConceptTransferable.conceptBeanType);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Object getTransferData(DataFlavor flavor)
-            throws UnsupportedFlavorException, IOException {
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if (tuple == null) {
             return null;
         }
@@ -80,45 +73,33 @@ public class DescriptionTransferable implements Transferable {
             return tuple.getDescVersioned();
         } else if (flavor.equals(thinDescTupleFlavor)) {
             return tuple;
-        } else if (flavor
-            .equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
+        } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
             try {
-                return UniversalFixedConcept.get(tf.getConcept(
-                    tuple.getConceptId()).getUids());
+                return UniversalFixedConcept.get(tf.getConcept(tuple.getConceptId()).getUids());
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
-        } else if (flavor
-            .equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
+        } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
             try {
-                return UniversalFixedConcept.get(tf.getConcept(
-                    tuple.getConceptId()).getUids());
+                return UniversalFixedConcept.get(tf.getConcept(tuple.getConceptId()).getUids());
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
-        } else if (flavor
-            .equals(FixedTerminologyTransferable.universalFixedDescFlavor)) {
+        } else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescFlavor)) {
             try {
-                return new UniversalFixedDescription(tuple.getDescVersioned()
-                    .getUniversal().getDescId(), tf.getConcept(
-                    tuple.getStatusId()).getUids(), tf.getConcept(
-                    tuple.getConceptId()).getUids(), tuple
-                    .getInitialCaseSignificant(), tf.getConcept(
-                    tuple.getTypeId()).getUids(), tuple.getText(), tuple
-                    .getLang());
+                return new UniversalFixedDescription(tuple.getDescVersioned().getUniversal().getDescId(),
+                    tf.getConcept(tuple.getStatusId()).getUids(), tf.getConcept(tuple.getConceptId()).getUids(),
+                    tuple.getInitialCaseSignificant(), tf.getConcept(tuple.getTypeId()).getUids(), tuple.getText(),
+                    tuple.getLang());
             } catch (TerminologyException e) {
                 throw new IOException(e);
             }
-        } else if (flavor
-            .equals(FixedTerminologyTransferable.universalFixedDescInterfaceFlavor)) {
+        } else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescInterfaceFlavor)) {
             try {
-                return new UniversalFixedDescription(tuple.getDescVersioned()
-                    .getUniversal().getDescId(), tf.getConcept(
-                    tuple.getStatusId()).getUids(), tf.getConcept(
-                    tuple.getConceptId()).getUids(), tuple
-                    .getInitialCaseSignificant(), tf.getConcept(
-                    tuple.getTypeId()).getUids(), tuple.getText(), tuple
-                    .getLang());
+                return new UniversalFixedDescription(tuple.getDescVersioned().getUniversal().getDescId(),
+                    tf.getConcept(tuple.getStatusId()).getUids(), tf.getConcept(tuple.getConceptId()).getUids(),
+                    tuple.getInitialCaseSignificant(), tf.getConcept(tuple.getTypeId()).getUids(), tuple.getText(),
+                    tuple.getLang());
             } catch (TerminologyException e) {
                 throw new IOException(e);
             }
@@ -129,10 +110,7 @@ public class DescriptionTransferable implements Transferable {
     }
 
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] {
-                                 thinDescVersionedFlavor,
-                                 thinDescTupleFlavor,
-                                 conceptBeanFlavor,
+        return new DataFlavor[] { thinDescVersionedFlavor, thinDescTupleFlavor, conceptBeanFlavor,
                                  FixedTerminologyTransferable.universalFixedConceptFlavor,
                                  FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor,
                                  FixedTerminologyTransferable.universalFixedDescFlavor,
@@ -141,17 +119,17 @@ public class DescriptionTransferable implements Transferable {
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-		for (DataFlavor f : getTransferDataFlavors()) {
-			if (f.equals(flavor)) {
-				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-					AceLog.getAppLog().fine("DT flavor supported: " + flavor);
-				}
-				return true;
-			}
-		}
-		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-			AceLog.getAppLog().fine("DT flavor not supported" + flavor);
-		}
-		return false;
-	}
+        for (DataFlavor f : getTransferDataFlavors()) {
+            if (f.equals(flavor)) {
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine("DT flavor supported: " + flavor);
+                }
+                return true;
+            }
+        }
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            AceLog.getAppLog().fine("DT flavor not supported" + flavor);
+        }
+        return false;
+    }
 }

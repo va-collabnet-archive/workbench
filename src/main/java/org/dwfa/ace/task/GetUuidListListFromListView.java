@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,82 +43,77 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN) })
 public class GetUuidListListFromListView extends AbstractTask {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
-	
+    private static final int dataVersion = 1;
+
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
 
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(uuidListListPropName);
+    }
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(uuidListListPropName);
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            uuidListListPropName = (String) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			uuidListListPropName = (String) in.readObject();
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
+    }
 
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do...
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do...
+    }
 
-	}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-				
-			JList conceptList = config.getBatchConceptList();
-			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-			
-			List<List<UUID>> idListList = new ArrayList<List<UUID>>(model.getSize());
-			
-			for (int i = 0; i < model.getSize(); i++) {
-				I_GetConceptData conceptInList = model.getElementAt(i);
-				idListList.add(conceptInList.getUids());
-			}
-			
-			process.setProperty(uuidListListPropName, idListList);
+            JList conceptList = config.getBatchConceptList();
+            I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 
-			return Condition.CONTINUE;
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		} catch (IntrospectionException e) {
-			throw new TaskFailedException(e);
-		} catch (IllegalAccessException e) {
-			throw new TaskFailedException(e);
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(e);
-		}
-	}
+            List<List<UUID>> idListList = new ArrayList<List<UUID>>(model.getSize());
 
-	public Collection<Condition> getConditions() {
-		return CONTINUE_CONDITION;
-	}
+            for (int i = 0; i < model.getSize(); i++) {
+                I_GetConceptData conceptInList = model.getElementAt(i);
+                idListList.add(conceptInList.getUids());
+            }
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+            process.setProperty(uuidListListPropName, idListList);
 
-	public String getUuidListListPropName() {
-		return uuidListListPropName;
-	}
+            return Condition.CONTINUE;
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        }
+    }
 
-	public void setUuidListListPropName(String uuidListListPropName) {
-		this.uuidListListPropName = uuidListListPropName;
-	}
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
+
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
+
+    public String getUuidListListPropName() {
+        return uuidListListPropName;
+    }
+
+    public void setUuidListListPropName(String uuidListListPropName) {
+        this.uuidListListPropName = uuidListListPropName;
+    }
 
 }

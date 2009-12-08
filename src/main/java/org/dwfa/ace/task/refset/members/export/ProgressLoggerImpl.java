@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ public final class ProgressLoggerImpl implements ProgressLogger {
         progressMap = new HashMap<String, Integer>();
     }
 
-    //for testing.
+    // for testing.
     ProgressLoggerImpl(final Logger logger, final Map<String, Integer> progressMap) {
         this.logger = logger;
         this.progressMap = progressMap;
@@ -47,7 +47,7 @@ public final class ProgressLoggerImpl implements ProgressLogger {
 
         Integer progress = progressMap.get(refsetName);
 
-        if (progress !=0 && progress % 1000 == 0) {
+        if (progress != 0 && progress % 1000 == 0) {
             logger.logInfo("Exported " + progress + " of refset " + refsetName);
         }
     }

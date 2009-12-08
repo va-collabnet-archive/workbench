@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,12 +39,13 @@ import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 
 /**
- * This class is used to create instances of {@link AlertToDataConstraintFailure} objects with alert type
+ * This class is used to create instances of
+ * {@link AlertToDataConstraintFailure} objects with alert type
  * {@link ALERT_TYPE.WARNING}
+ * 
  * @author Matthew Edwards
  */
-class WarningConstraintFailureFactory implements
-        AlertToDataConstraintFailureFactory {
+class WarningConstraintFailureFactory implements AlertToDataConstraintFailureFactory {
 
     private ALERT_TYPE alertType;
 
@@ -53,18 +54,17 @@ class WarningConstraintFailureFactory implements
     }
 
     /**
-     * Creates an instance of {@link AlertToDataConstraintFailure} with the alert type of
-     * {@link ALERT_TYPE.WARNING}
+     * Creates an instance of {@link AlertToDataConstraintFailure} with the
+     * alert type of {@link ALERT_TYPE.WARNING}
+     * 
      * @see AlertToDataConstraintFailureFactory
-     * #createAlertToDataConstraintFailure(java.lang.String, org.dwfa.ace.api.I_GetConceptData)
+     *      #createAlertToDataConstraintFailure(java.lang.String,
+     *      org.dwfa.ace.api.I_GetConceptData)
      */
-    public AlertToDataConstraintFailure createAlertToDataConstraintFailure(
-            String message, I_GetConceptData conceptWithAlert) {
-        AlertToDataConstraintFailure alert =
-                new AlertToDataConstraintFailure(alertType, message,
-                    conceptWithAlert);
-        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO,
-            message);
+    public AlertToDataConstraintFailure createAlertToDataConstraintFailure(String message,
+            I_GetConceptData conceptWithAlert) {
+        AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(alertType, message, conceptWithAlert);
+        Logger.getLogger(this.getClass().getCanonicalName()).log(Level.INFO, message);
         return alert;
     }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,8 +43,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.ace.path.*;
 
 /**
- * The PanelSnomedVersion class displays a list of paths and lets the user 
- * select the version of SNOMED to use for the refresh process 
+ * The PanelSnomedVersion class displays a list of paths and lets the user
+ * select the version of SNOMED to use for the refresh process
  * 
  * @author wpr
  * @version 1, November 2009
@@ -52,99 +52,94 @@ import org.dwfa.ace.path.*;
  */
 public class PanelSnomedVersion extends JPanel {
 
-	private static final long serialVersionUID = 1L;
-	private Set<I_Position> positionSet = new HashSet<I_Position>();
-	private JList positionList;
-	private ArrayListModel<I_Position> positionListModel;
-	private SelectPathAndPositionPanelWithCombo pppwc;
-	
+    private static final long serialVersionUID = 1L;
+    private Set<I_Position> positionSet = new HashSet<I_Position>();
+    private JList positionList;
+    private ArrayListModel<I_Position> positionListModel;
+    private SelectPathAndPositionPanelWithCombo pppwc;
 
-	public class DeleteAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
+    public class DeleteAction extends AbstractAction {
+        private static final long serialVersionUID = 1L;
 
-		public void actionPerformed(ActionEvent e) {
-			I_Position p = (I_Position) positionList.getSelectedValue();
-			positionListModel.remove(p);
-			positionSet.remove(p);
-		}
-	}
+        public void actionPerformed(ActionEvent e) {
+            I_Position p = (I_Position) positionList.getSelectedValue();
+            positionListModel.remove(p);
+            positionSet.remove(p);
+        }
+    }
 
-	private class AddPathActionLister implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			try {
-			if (positionSet.contains(getCurrentPosition()) == false) {
-				positionSet.add(getCurrentPosition());
-				positionListModel.add(getCurrentPosition());
-			}
-			} catch (Exception ex) {
-				AceLog.getAppLog().alertAndLogException(ex);
-			}
-		}
-	}
+    private class AddPathActionLister implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (positionSet.contains(getCurrentPosition()) == false) {
+                    positionSet.add(getCurrentPosition());
+                    positionListModel.add(getCurrentPosition());
+                }
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+    }
 
+    public PanelSnomedVersion(I_ConfigAceFrame config) throws Exception {
+        super(new GridBagLayout());
 
-	public PanelSnomedVersion(I_ConfigAceFrame config) throws Exception {
-		super(new GridBagLayout());
-		
-		GridBagConstraints gbc = new GridBagConstraints();
-		
-		// Add the path and positions 
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		pppwc = new SelectPathAndPositionPanelWithCombo(true, "", config, null);
-		pppwc.setPositionCheckBoxVisible(false);
-		pppwc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		add(pppwc, gbc);
-		
-		
-		// Add the "add position" button  
-		gbc.weighty = 0;
-		gbc.gridy++;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.fill = GridBagConstraints.NONE;
-		JButton addPathButton = new JButton("add position");
-		addPathButton.addActionListener(new AddPathActionLister());
-		add(addPathButton, gbc);
-		
-		// Add the "position set" list control  
-		gbc.gridy++;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weighty = 1;
-		positionListModel = new ArrayListModel<I_Position>();
-		positionList = new JList(positionListModel);
-		positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
-		positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
-		positionList.getActionMap().put("deleteTask", new DeleteAction());
+        GridBagConstraints gbc = new GridBagConstraints();
 
-		JScrollPane positionScroller = new JScrollPane(positionList);
-		positionScroller.setMinimumSize(new Dimension(100,100));
-		positionScroller.setMaximumSize(new Dimension(500,500));
-		positionScroller.setPreferredSize(new Dimension(150,150));
-		positionScroller.setBorder(BorderFactory.createTitledBorder("Position set: "));
-		add(positionScroller, gbc);
-	}
-	
-	public I_Position getCurrentPosition() throws TerminologyException, IOException {
-		return pppwc.getCurrentPosition();
-	}
+        // Add the path and positions
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        pppwc = new SelectPathAndPositionPanelWithCombo(true, "", config, null);
+        pppwc.setPositionCheckBoxVisible(false);
+        pppwc.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        add(pppwc, gbc);
 
-	public Set<I_Position> getPositionSet() {
-		return positionSet;
-	}
+        // Add the "add position" button
+        gbc.weighty = 0;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        JButton addPathButton = new JButton("add position");
+        addPathButton.addActionListener(new AddPathActionLister());
+        add(addPathButton, gbc);
 
-	public void setPositionSet(Set<I_Position> newPositions) {
-		positionListModel.clear();
-		positionSet.clear(); 
-		positionListModel.addAll(newPositions);
-		positionSet.addAll(newPositions);
-	}
+        // Add the "position set" list control
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weighty = 1;
+        positionListModel = new ArrayListModel<I_Position>();
+        positionList = new JList(positionListModel);
+        positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
+        positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
+        positionList.getActionMap().put("deleteTask", new DeleteAction());
 
-	
+        JScrollPane positionScroller = new JScrollPane(positionList);
+        positionScroller.setMinimumSize(new Dimension(100, 100));
+        positionScroller.setMaximumSize(new Dimension(500, 500));
+        positionScroller.setPreferredSize(new Dimension(150, 150));
+        positionScroller.setBorder(BorderFactory.createTitledBorder("Position set: "));
+        add(positionScroller, gbc);
+    }
+
+    public I_Position getCurrentPosition() throws TerminologyException, IOException {
+        return pppwc.getCurrentPosition();
+    }
+
+    public Set<I_Position> getPositionSet() {
+        return positionSet;
+    }
+
+    public void setPositionSet(Set<I_Position> newPositions) {
+        positionListModel.clear();
+        positionSet.clear();
+        positionListModel.addAll(newPositions);
+        positionSet.addAll(newPositions);
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,93 +45,79 @@ import org.dwfa.util.io.FileIO;
 @BeanList(specs = { @Spec(directory = "tasks/ide/svn", type = BeanType.TASK_BEAN) })
 public class AddSubversionEntryAndQueueEntry extends AddSubversionEntry {
 
-	/**
+    /**
      * 
      */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-	private transient TaskFailedException ex = null;
+    private transient TaskFailedException ex = null;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion != dataVersion) {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-		ex = null;
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion != dataVersion) {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+        ex = null;
+    }
 
-	@Override
-	protected void addUserInfo(I_EncodeBusinessProcess process,
-			final I_ConfigAceFrame config) throws TaskFailedException {
-		try {
-			SwingUtilities.invokeAndWait(new Runnable() {
+    @Override
+    protected void addUserInfo(I_EncodeBusinessProcess process, final I_ConfigAceFrame config)
+            throws TaskFailedException {
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
 
-				public void run() {
-					FileDialog dialog = new FileDialog(new Frame(),
-							"Select a queue");
-					dialog.setDirectory(System.getProperty("user.dir"));
-					dialog.setFilenameFilter(new FilenameFilter() {
-						public boolean accept(File dir, String name) {
-							return name.endsWith("queue.config");
-						}
-					});
-					dialog.setVisible(true);
-					if (dialog.getFile() == null) {
-						ex = new TaskFailedException("User canceled operation");
-					} else {
-						try {
-							File queueFile = new File(dialog.getDirectory(),
-									dialog.getFile());
-							String workingCopy = FileIO.getRelativePath(queueFile.getParentFile()
-											.getAbsoluteFile());
-							SubversionData svd = new SubversionData(null,
-									workingCopy);
-							config.svnCompleteRepoInfo(svd);
-							AddSubversionEntryAndQueueEntry.this
-									.setWorkingCopy(workingCopy);
-							AddSubversionEntryAndQueueEntry.this.setRepoUrl(svd
-									.getRepositoryUrlStr());
-							AddSubversionEntryAndQueueEntry.this
-									.setKeyName(workingCopy);
-							config.getDbConfig().getQueues().add(
-									FileIO.getRelativePath(queueFile));
-							Configuration queueConfig = ConfigurationProvider
-									.getInstance(new String[] { queueFile
-											.getAbsolutePath() });
-							Entry[] entries = (Entry[]) queueConfig.getEntry(
-									"org.dwfa.queue.QueueServer", "entries",
-									Entry[].class, new Entry[] {});
-							for (Entry entry : entries) {
-								if (ElectronicAddress.class
-										.isAssignableFrom(entry.getClass())) {
-									ElectronicAddress ea = (ElectronicAddress) entry;
-									config.getQueueAddressesToShow().add(
-											ea.address);
-									break;
-								}
-							}
-						} catch (ConfigurationException e) {
-							ex = new TaskFailedException(e);
-						} catch (TaskFailedException e) {
-							ex = e;
-						}
-					}
-				}
-			});
-		} catch (InterruptedException e) {
-			throw new TaskFailedException(e);
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(e);
-		}
-		if (ex != null) {
-			throw ex;
-		}
-	}
+                public void run() {
+                    FileDialog dialog = new FileDialog(new Frame(), "Select a queue");
+                    dialog.setDirectory(System.getProperty("user.dir"));
+                    dialog.setFilenameFilter(new FilenameFilter() {
+                        public boolean accept(File dir, String name) {
+                            return name.endsWith("queue.config");
+                        }
+                    });
+                    dialog.setVisible(true);
+                    if (dialog.getFile() == null) {
+                        ex = new TaskFailedException("User canceled operation");
+                    } else {
+                        try {
+                            File queueFile = new File(dialog.getDirectory(), dialog.getFile());
+                            String workingCopy = FileIO.getRelativePath(queueFile.getParentFile().getAbsoluteFile());
+                            SubversionData svd = new SubversionData(null, workingCopy);
+                            config.svnCompleteRepoInfo(svd);
+                            AddSubversionEntryAndQueueEntry.this.setWorkingCopy(workingCopy);
+                            AddSubversionEntryAndQueueEntry.this.setRepoUrl(svd.getRepositoryUrlStr());
+                            AddSubversionEntryAndQueueEntry.this.setKeyName(workingCopy);
+                            config.getDbConfig().getQueues().add(FileIO.getRelativePath(queueFile));
+                            Configuration queueConfig = ConfigurationProvider.getInstance(new String[] { queueFile.getAbsolutePath() });
+                            Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries",
+                                Entry[].class, new Entry[] {});
+                            for (Entry entry : entries) {
+                                if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
+                                    ElectronicAddress ea = (ElectronicAddress) entry;
+                                    config.getQueueAddressesToShow().add(ea.address);
+                                    break;
+                                }
+                            }
+                        } catch (ConfigurationException e) {
+                            ex = new TaskFailedException(e);
+                        } catch (TaskFailedException e) {
+                            ex = e;
+                        }
+                    }
+                }
+            });
+        } catch (InterruptedException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        }
+        if (ex != null) {
+            throw ex;
+        }
+    }
 }

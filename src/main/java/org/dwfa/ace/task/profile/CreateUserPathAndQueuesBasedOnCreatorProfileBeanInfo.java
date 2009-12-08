@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,48 +23,33 @@ import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
-public class CreateUserPathAndQueuesBasedOnCreatorProfileBeanInfo extends
-        SimpleBeanInfo {
+public class CreateUserPathAndQueuesBasedOnCreatorProfileBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor creatorProfilePropName =
-                    new PropertyDescriptor("creatorProfilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor creatorProfilePropName = new PropertyDescriptor("creatorProfilePropName",
+                getBeanDescriptor().getBeanClass());
             creatorProfilePropName.setBound(true);
-            creatorProfilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            creatorProfilePropName
-                .setDisplayName("<html><font color='green'>creator profile prop:");
-            creatorProfilePropName
-                .setShortDescription("The property that contains the creator's profile.");
+            creatorProfilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            creatorProfilePropName.setDisplayName("<html><font color='green'>creator profile prop:");
+            creatorProfilePropName.setShortDescription("The property that contains the creator's profile.");
 
-            PropertyDescriptor newProfilePropName =
-                    new PropertyDescriptor("newProfilePropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor newProfilePropName = new PropertyDescriptor("newProfilePropName",
+                getBeanDescriptor().getBeanClass());
             newProfilePropName.setBound(true);
-            newProfilePropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            newProfilePropName
-                .setDisplayName("<html><font color='green'>new profile prop:");
-            newProfilePropName
-                .setShortDescription("The property that contains the new profile.");
+            newProfilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            newProfilePropName.setDisplayName("<html><font color='green'>new profile prop:");
+            newProfilePropName.setShortDescription("The property that contains the new profile.");
 
-            PropertyDescriptor errorsAndWarningsPropName =
-                    new PropertyDescriptor("errorsAndWarningsPropName",
-                        getBeanDescriptor().getBeanClass());
+            PropertyDescriptor errorsAndWarningsPropName = new PropertyDescriptor("errorsAndWarningsPropName",
+                getBeanDescriptor().getBeanClass());
             errorsAndWarningsPropName.setBound(true);
-            errorsAndWarningsPropName
-                .setPropertyEditorClass(PropertyNameLabelEditor.class);
-            errorsAndWarningsPropName
-                .setDisplayName("<html><font color='green'>error & warn prop:");
-            errorsAndWarningsPropName
-                .setShortDescription("The property that contains errors and warnings found prior to commit.");
+            errorsAndWarningsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            errorsAndWarningsPropName.setDisplayName("<html><font color='green'>error & warn prop:");
+            errorsAndWarningsPropName.setShortDescription("The property that contains errors and warnings found prior to commit.");
 
-            PropertyDescriptor rv[] =
-                    { creatorProfilePropName, newProfilePropName,
-                     errorsAndWarningsPropName };
+            PropertyDescriptor rv[] = { creatorProfilePropName, newProfilePropName, errorsAndWarningsPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -75,11 +60,8 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfileBeanInfo extends
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd =
-                new BeanDescriptor(
-                    CreateUserPathAndQueuesBasedOnCreatorProfile.class);
-        bd
-            .setDisplayName("<html><font color='green'><center>Create User Path,<br>User Concept, <br>and User Queues<br>Based on Creator");
+        BeanDescriptor bd = new BeanDescriptor(CreateUserPathAndQueuesBasedOnCreatorProfile.class);
+        bd.setDisplayName("<html><font color='green'><center>Create User Path,<br>User Concept, <br>and User Queues<br>Based on Creator");
         return bd;
     }
 }

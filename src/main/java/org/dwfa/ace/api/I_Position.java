@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,27 +19,26 @@ package org.dwfa.ace.api;
 import java.util.Collection;
 import java.util.List;
 
-
 public interface I_Position {
 
-	public I_Path getPath();
+    public I_Path getPath();
 
-	public int getVersion();
-	
-	public long getTime();
+    public int getVersion();
 
-	public boolean isSubsequentOrEqualTo(int version, int pathId);
+    public long getTime();
 
-	public boolean isAntecedentOrEqualTo(int version, int pathId);
+    public boolean isSubsequentOrEqualTo(int version, int pathId);
 
-	public boolean isAntecedentOrEqualTo(I_Position another);
+    public boolean isAntecedentOrEqualTo(int version, int pathId);
 
-	public boolean checkAntecedentOrEqualToOrigins(List<I_Position> origins);
+    public boolean isAntecedentOrEqualTo(I_Position another);
 
-	public boolean isSubsequentOrEqualTo(I_Position another);
+    public boolean checkAntecedentOrEqualToOrigins(List<I_Position> origins);
 
-	public boolean equals(int version, int pathId);
+    public boolean isSubsequentOrEqualTo(I_Position another);
 
-	public Collection<I_Position> getAllOrigins();
+    public boolean equals(int version, int pathId);
+
+    public Collection<I_Position> getAllOrigins();
 
 }

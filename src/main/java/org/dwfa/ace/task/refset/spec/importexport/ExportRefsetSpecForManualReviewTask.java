@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,7 +56,8 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Exports the refset currently in the refset spec panel to the specified file, in a tab delimited format of
+ * Exports the refset currently in the refset spec panel to the specified file,
+ * in a tab delimited format of
  * (concept name, sct id, associated comment).
  * Comment is left blank as this is filled in externally.
  * 
@@ -74,8 +75,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
     private static final int dataVersion = 1;
 
     private String outputFilePropName = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
-    private TermEntry descriptionTypeTermEntry =
-            new TermEntry(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+    private TermEntry descriptionTypeTermEntry = new TermEntry(
+        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
     private String refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
     private Integer maxLineCount = 10000;
     private boolean addUncommitted = true;
@@ -112,11 +113,9 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         returnCondition = Condition.ITEM_COMPLETE;
         delimiter = "\t";
         try {
-            activityPanel =
-                    LocalVersionedTerminology.get().newActivityPanel(true,
-                        LocalVersionedTerminology.get().getActiveAceFrameConfig());
-            I_ConfigAceFrame configFrame =
-                    (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            activityPanel = LocalVersionedTerminology.get().newActivityPanel(true,
+                LocalVersionedTerminology.get().getActiveAceFrameConfig());
+            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             String outputFileName = (String) process.getProperty(outputFilePropName);
 
@@ -170,8 +169,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                 "No member spec found. Please put the refset to be exported in the refset spec panel.");
         }
 
-        List<I_ThinExtByRefVersioned> extensions =
-                LocalVersionedTerminology.get().getRefsetExtensionMembers(memberRefset.getConceptId());
+        List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getRefsetExtensionMembers(
+            memberRefset.getConceptId());
 
         writeHeader(exportFileWriter);
 
@@ -181,9 +180,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
 
         for (I_ThinExtByRefVersioned ext : extensions) {
 
-            List<I_ThinExtByRefTuple> tuples =
-                    ext.getTuples(helper.getCurrentStatusIntSet(), null, addUncommitted,
-                        returnConflictResolvedLatestState);
+            List<I_ThinExtByRefTuple> tuples = ext.getTuples(helper.getCurrentStatusIntSet(), null, addUncommitted,
+                returnConflictResolvedLatestState);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : tuples) {
                 if (thinExtByRefTuple.getPart() instanceof I_ThinExtByRefPartConcept) {
@@ -202,8 +200,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                                 writeHeader(exportFileWriter);
                             }
                             // write to file
-                            String description =
-                                    getDescription(descriptionTypeTermEntry, thinExtByRefTuple.getComponentId());
+                            String description = getDescription(descriptionTypeTermEntry,
+                                thinExtByRefTuple.getComponentId());
                             if (description == null) {
                                 description = "UNKNOWN";
                             }
@@ -239,9 +237,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
     private String getSctId(int componentId) throws TerminologyException, IOException {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         I_IdVersioned idVersioned = termFactory.getId(componentId);
-        int snomedIntegerId =
-                termFactory.getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())
-                    .getNativeId();
+        int snomedIntegerId = termFactory.getId(
+            ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNativeId();
 
         List<I_IdPart> parts = idVersioned.getVersions();
         I_IdPart latestPart = null;
@@ -272,10 +269,11 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         String latestDescription = null;
         int latestVersion = Integer.MIN_VALUE;
 
-        List<I_DescriptionTuple> descriptionResults =
-                concept.getDescriptionTuples(helper.getCurrentStatusIntSet(), allowedTypes, null, true);
+        List<I_DescriptionTuple> descriptionResults = concept.getDescriptionTuples(helper.getCurrentStatusIntSet(),
+            allowedTypes, null, true);
 
-        // find the latest tuple, so that the latest edited version of the description is always used
+        // find the latest tuple, so that the latest edited version of the
+        // description is always used
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
             if (descriptionTuple.getVersion() > latestVersion) {
                 latestVersion = descriptionTuple.getVersion();

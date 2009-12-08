@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,176 +56,176 @@ import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalAcePosition;
 
 /**
- * This task collects the Refset Spec Version data entered on the 
- * PanelRefsetVersion panel currently displayed in the Workflow Details Sheet 
+ * This task collects the Refset Spec Version data entered on the
+ * PanelRefsetVersion panel currently displayed in the Workflow Details Sheet
  * and verifies that the required data has been filled in.
  * 
  * @author Perry Reid
- * @version 1.0, November 2009 
+ * @version 1.0, November 2009
  * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/wf", type = BeanType.TASK_BEAN) })
 public class GetRefsetVersionPanelDataTask extends AbstractTask {
 
-	
-	/* -----------------------
-     * Properties 
+    /*
+     * -----------------------
+     * Properties
      * -----------------------
      */
-	// Serialization Properties 
-	private static final long serialVersionUID = 1;
-	private static final int dataVersion = 1;
+    // Serialization Properties
+    private static final long serialVersionUID = 1;
+    private static final int dataVersion = 1;
 
-	// Task Attribute Properties 
-	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-	private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
-	
+    // Task Attribute Properties
+    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+    private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
+
     private I_TermFactory termFactory;
 
-    /* -----------------------
+    /*
+     * -----------------------
      * Serialization Methods
      * -----------------------
      */
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-		out.writeObject(profilePropName);
-		out.writeObject(positionSetPropName);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(profilePropName);
+        out.writeObject(positionSetPropName);
+    }
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion <= dataVersion) {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion <= dataVersion) {
             if (objDataVersion >= 1) {
                 // Read version 1 data fields
-				profilePropName = (String) in.readObject();
-				positionSetPropName = (String) in.readObject();
-            } 
-			// Initialize transient properties...
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
-
-	
-	/**
-	 * Handles actions required by the task after normal task completion (such as moving a 
-	 * process to another user's input queue).   
-	 * @return  	void
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#complete(
-	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
-	 */
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do
-	}
-
-	/**
-	 * Performs the primary action of the task, which in this case is to gather and 
-	 * validate data that has been entered by the user on the Workflow Details Sheet.
-	 * @return  	The exit condition of the task
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
-	 */
-	public Condition evaluate(final I_EncodeBusinessProcess process,
-			final I_Work worker) throws TaskFailedException {
-		
-		// Set up local variables  
-        termFactory = LocalVersionedTerminology.get();
-
-		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
-			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
-			for (Component c: workflowDetailsSheet.getComponents()) {
-				if (PanelRefsetVersion.class.isAssignableFrom(c.getClass())) {
-					PanelRefsetVersion panel = (PanelRefsetVersion) c;
-					
-                    // --------------------------------
-                    // Retrieve values from the panel 
-                    // --------------------------------
-					Set<I_Position> positionSet = null;
-					positionSet = panel.getPositionSet();	
-					
-                    // -----------------------------------------
-                    // Verify required fields are present and 
-                    // use the values retrieved from this panel 
-                    // -----------------------------------------
-					if (positionSet == null || positionSet.isEmpty() ) {
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), 
-                        		"You must select a version for this Refset Spec. ",
-                                "", JOptionPane.ERROR_MESSAGE);
-                        return Condition.ITEM_CANCELED;
-					} else {
-
-						//change all I_Positions to UniversalAcePositions 
-						Set<UniversalAcePosition> universalPositions = new HashSet<UniversalAcePosition>();
-						
-						for (I_Position position : positionSet) {
-						    try {
-						         I_GetConceptData pathConcept = termFactory.getConcept(position.getPath().getConceptId());
-						        
-						         universalPositions.add(new UniversalAcePosition(termFactory.getUids(pathConcept.getConceptId()), 
-						                        termFactory.convertToThickVersion(position.getVersion())));
-						  
-						    } catch (TerminologyException e) {
-						        // TODO Auto-generated catch block
-						        e.printStackTrace();
-						    } catch (IOException e) {
-						        // TODO Auto-generated catch block
-						        e.printStackTrace();
-						    } 
-						}
-						
-						process.setProperty(positionSetPropName, universalPositions);
-						return Condition.ITEM_COMPLETE;
-					}
-				}
-			}
-		} catch (InvocationTargetException e) {
-			throw new TaskFailedException(e);
-		} catch (IllegalArgumentException e) {
-			throw new TaskFailedException(e);
-		} catch (IntrospectionException e) {
-			throw new TaskFailedException(e);
-		} catch (IllegalAccessException e) {
-			throw new TaskFailedException(e);
-		} 
-		throw new TaskFailedException("Cannot find PanelRefsetVersion.");
-	}
-
+                profilePropName = (String) in.readObject();
+                positionSetPropName = (String) in.readObject();
+            }
+            // Initialize transient properties...
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
     /**
-     * This method implements the interface method specified by: getConditions() in I_DefineTask
-     * @return The possible evaluation conditions for this task.
-	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     * Handles actions required by the task after normal task completion (such
+     * as moving a
+     * process to another user's input queue).
+     * 
+     * @return void
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
-	public Collection<Condition> getConditions() {
-		return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do
+    }
 
-	public String getPositionSetPropName() {
-		return positionSetPropName;
-	}
+    /**
+     * Performs the primary action of the task, which in this case is to gather
+     * and
+     * validate data that has been entered by the user on the Workflow Details
+     * Sheet.
+     * 
+     * @return The exit condition of the task
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
+    public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
 
-	public void setPositionSetPropName(String positionSetPropName) {
-		this.positionSetPropName = positionSetPropName;
-	}
+        // Set up local variables
+        termFactory = LocalVersionedTerminology.get();
 
-	public String getProfilePropName() {
-		return profilePropName;
-	}
+        try {
+            I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+            JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
+            for (Component c : workflowDetailsSheet.getComponents()) {
+                if (PanelRefsetVersion.class.isAssignableFrom(c.getClass())) {
+                    PanelRefsetVersion panel = (PanelRefsetVersion) c;
 
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
-	}
+                    // --------------------------------
+                    // Retrieve values from the panel
+                    // --------------------------------
+                    Set<I_Position> positionSet = null;
+                    positionSet = panel.getPositionSet();
 
+                    // -----------------------------------------
+                    // Verify required fields are present and
+                    // use the values retrieved from this panel
+                    // -----------------------------------------
+                    if (positionSet == null || positionSet.isEmpty()) {
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "You must select a version for this Refset Spec. ", "", JOptionPane.ERROR_MESSAGE);
+                        return Condition.ITEM_CANCELED;
+                    } else {
 
+                        // change all I_Positions to UniversalAcePositions
+                        Set<UniversalAcePosition> universalPositions = new HashSet<UniversalAcePosition>();
+
+                        for (I_Position position : positionSet) {
+                            try {
+                                I_GetConceptData pathConcept = termFactory.getConcept(position.getPath().getConceptId());
+
+                                universalPositions.add(new UniversalAcePosition(
+                                    termFactory.getUids(pathConcept.getConceptId()),
+                                    termFactory.convertToThickVersion(position.getVersion())));
+
+                            } catch (TerminologyException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+
+                        process.setProperty(positionSetPropName, universalPositions);
+                        return Condition.ITEM_COMPLETE;
+                    }
+                }
+            }
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        }
+        throw new TaskFailedException("Cannot find PanelRefsetVersion.");
+    }
+
+    /**
+     * This method implements the interface method specified by: getConditions()
+     * in I_DefineTask
+     * 
+     * @return The possible evaluation conditions for this task.
+     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     */
+    public Collection<Condition> getConditions() {
+        return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
+    }
+
+    public String getPositionSetPropName() {
+        return positionSetPropName;
+    }
+
+    public void setPositionSetPropName(String positionSetPropName) {
+        this.positionSetPropName = positionSetPropName;
+    }
+
+    public String getProfilePropName() {
+        return profilePropName;
+    }
+
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
+    }
 
 }

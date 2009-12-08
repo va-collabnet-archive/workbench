@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,12 +33,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class RefsetWriterImplTest {
-    
-    private static final String REFSET_NAME         = "A refset name";
-    private static final String ERROR_MESSAGE       = "There was an error";
-    private static final int REFSET_ID              = 1000;
-    private static final int COMPONENT_ID           = 5000;
-    
+
+    private static final String REFSET_NAME = "A refset name";
+    private static final String ERROR_MESSAGE = "There was an error";
+    private static final int REFSET_ID = 1000;
+    private static final int COMPONENT_ID = 5000;
+
     private RefsetWriterParameterObject mockRefsetParamObj;
     private CommonAPIParameterObject mockCommonAPIParamObj;
     private IMocksControl mockControl;
@@ -103,7 +103,7 @@ public final class RefsetWriterImplTest {
         mockControl.verify();
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @SuppressWarnings( { "ThrowableInstanceNeverThrown" })
     @Test
     public void shouldLogAndErrorIfAnExceptionIsThrown() throws Exception {
         I_ThinExtByRefVersioned mockRefset = mockControl.createMock(I_ThinExtByRefVersioned.class);
@@ -116,7 +116,7 @@ public final class RefsetWriterImplTest {
 
         mockControl.verify();
     }
-    
+
     @Test
     public void shouldCloseFiles() throws Exception {
         mockWriterFactory.closeFiles();
@@ -134,14 +134,14 @@ public final class RefsetWriterImplTest {
 
         List<I_DescriptionTuple> refsetDescriptionsList = Arrays.asList(mockRefsetName);
         EasyMock.expect(mockRefset.getRefsetId()).andReturn(REFSET_ID);
-        EasyMock.expect(mockRefsetUtil.getFSNDescriptionsForConceptHavingCurrentStatus(mockTermFactory, REFSET_ID)).
-                andReturn(refsetDescriptionsList);
+        EasyMock.expect(mockRefsetUtil.getFSNDescriptionsForConceptHavingCurrentStatus(mockTermFactory, REFSET_ID))
+            .andReturn(refsetDescriptionsList);
 
         EasyMock.expect(mockRefset.getComponentId()).andReturn(COMPONENT_ID);
         EasyMock.expect(mockTermFactory.getConcept(COMPONENT_ID)).andReturn(mockConcept);
         EasyMock.expect(mockRefsetUtil.assertExactlyOne(refsetDescriptionsList)).andReturn(mockRefsetName);
-        EasyMock.expect(mockRefsetUtil.getPTDescriptionsForConceptHavingCurrentStatus(mockTermFactory, COMPONENT_ID)).
-                andReturn(conceptDescriptionList);
+        EasyMock.expect(mockRefsetUtil.getPTDescriptionsForConceptHavingCurrentStatus(mockTermFactory, COMPONENT_ID))
+            .andReturn(conceptDescriptionList);
 
         EasyMock.expect(mockRefsetName.getText()).andReturn(REFSET_NAME);
         mockProgressLogger.logProgress(REFSET_NAME);
