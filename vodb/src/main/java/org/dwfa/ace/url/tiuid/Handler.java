@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,24 +21,22 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
-
 public class Handler extends URLStreamHandler {
 
-	@Override
-	protected URLConnection openConnection(URL u) throws IOException {
-		return new BdbImageConnection(u);
-	}
+    @Override
+    protected URLConnection openConnection(URL u) throws IOException {
+        return new BdbImageConnection(u);
+    }
 
-	@Override
-	protected void parseURL(URL u, String spec, int start, int limit) {
-		
-		this.setURL(u, ExtendedUrlStreamHandlerFactory.PROTOCOL,
-				"", -1, "", "", "", spec.substring(start), "");
-	}
+    @Override
+    protected void parseURL(URL u, String spec, int start, int limit) {
 
-	@Override
-	protected String toExternalForm(URL u) {
-		return ExtendedUrlStreamHandlerFactory.PROTOCOL + ":" + u.getQuery();
-	}
+        this.setURL(u, ExtendedUrlStreamHandlerFactory.PROTOCOL, "", -1, "", "", "", spec.substring(start), "");
+    }
+
+    @Override
+    protected String toExternalForm(URL u) {
+        return ExtendedUrlStreamHandlerFactory.PROTOCOL + ":" + u.getQuery();
+    }
 
 }

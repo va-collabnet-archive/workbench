@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -88,15 +88,14 @@ public class MockTuple implements I_AmTuple {
     public boolean equals(Object o) {
         if (o instanceof MockTuple) {
             MockTuple testTuple = ((MockTuple) o);
-            return value.equals(testTuple.value) && id == testTuple.id
-                && pathId == testTuple.pathId && version == testTuple.version;
+            return value.equals(testTuple.value) && id == testTuple.id && pathId == testTuple.pathId
+                && version == testTuple.version;
         }
         throw new UnsupportedOperationException();
     }
 
     public String toString() {
-        return "TestTuple{id=" + id + ",pathid=" + pathId + ",version="
-            + version + ",value='" + value + "'}";
+        return "TestTuple{id=" + id + ",pathid=" + pathId + ",version=" + version + ",value='" + value + "'}";
     }
 
 }

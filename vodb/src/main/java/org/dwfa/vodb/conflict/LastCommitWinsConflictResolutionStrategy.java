@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ import org.dwfa.ace.api.I_AmTuple;
  * strategy will resolve conflict by choosing the part or tuple of an entity
  * with the latest
  * commit time regardless of path.
- *
+ * 
  * "In conflict" is rare for this strategy. As the latest part of any given
  * entity
  * is chosen, and the differences between latest state on different paths is of
@@ -46,11 +46,11 @@ import org.dwfa.ace.api.I_AmTuple;
  * way to achieve a conflict is for two parts to have the same effective time.
  * This is rare, but
  * if it occurs will be considered a conflict.
- *
+ * 
  * When in conflict the "resolve" methods will arbitrarily return one of the
  * parts with the most
  * recent commit time.
- *
+ * 
  * @author Dion
  */
 public class LastCommitWinsConflictResolutionStrategy extends ConflictManagementStrategy implements Serializable {
@@ -116,7 +116,7 @@ public class LastCommitWinsConflictResolutionStrategy extends ConflictManagement
      * true will be returned. If the part/s with the most recent version (commit
      * time) have the same data aside from their path (or there is only one part
      * with the greatest version) then false will be returned.
-     *
+     * 
      * @param <T>
      *            type of data in the list - extension of I_AmPart
      * @param versions
@@ -144,10 +144,10 @@ public class LastCommitWinsConflictResolutionStrategy extends ConflictManagement
 
                 if (amPartDuplicate.equals(firstPartDuplicate)) {
                     continue; // identical, no conflict with this one, check for
-                              // more
+                    // more
                 } else {
                     return true; // version the same but different data -
-                                 // conflict
+                    // conflict
                 }
             } else {
                 return false; // different version, no conflict

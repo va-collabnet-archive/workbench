@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,18 +24,18 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class TimePathIdBinder extends TupleBinding {
 
-	@Override
-	public Object entryToObject(TupleInput ti) {
-		int time = ti.readInt();
-		int pathId = ti.readInt();
-		return new TimePathId(time, pathId);
-	}
+    @Override
+    public Object entryToObject(TupleInput ti) {
+        int time = ti.readInt();
+        int pathId = ti.readInt();
+        return new TimePathId(time, pathId);
+    }
 
-	@Override
-	public void objectToEntry(Object obj, TupleOutput to) {
-		TimePathId tb = (TimePathId) obj;
-		to.writeInt(tb.getTime());
-		to.writeInt(tb.getPathId());
-	}
+    @Override
+    public void objectToEntry(Object obj, TupleOutput to) {
+        TimePathId tb = (TimePathId) obj;
+        to.writeInt(tb.getTime());
+        to.writeInt(tb.getPathId());
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,19 +28,20 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 public class ConDescRelBdbTest extends TestCase {
 
     public void testRoundTrip() {
-		List<I_DescriptionVersioned> descriptions = null;
-		try {
-			ConDescRelBdb.DescriptionCompressionMap map1 = new ConDescRelBdb.DescriptionCompressionMap(descriptions);
-			byte[] compressedMapBytes = map1.getBytes();
-			ConDescRelBdb.DescriptionCompressionMap map2 = new ConDescRelBdb.DescriptionCompressionMap(compressedMapBytes);
-			map2.call();
+        List<I_DescriptionVersioned> descriptions = null;
+        try {
+            ConDescRelBdb.DescriptionCompressionMap map1 = new ConDescRelBdb.DescriptionCompressionMap(descriptions);
+            byte[] compressedMapBytes = map1.getBytes();
+            ConDescRelBdb.DescriptionCompressionMap map2 = new ConDescRelBdb.DescriptionCompressionMap(
+                compressedMapBytes);
+            map2.call();
 
-		} catch (UnsupportedEncodingException e) {
-			fail(e.toString());
-		} catch (DataFormatException e) {
-			fail(e.toString());
-		} catch (IOException e) {
-			fail(e.toString());
-		}
-	}
+        } catch (UnsupportedEncodingException e) {
+            fail(e.toString());
+        } catch (DataFormatException e) {
+            fail(e.toString());
+        } catch (IOException e) {
+            fail(e.toString());
+        }
+    }
 }

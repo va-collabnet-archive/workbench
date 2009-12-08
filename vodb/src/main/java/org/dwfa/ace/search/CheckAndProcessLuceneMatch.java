@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,78 +35,71 @@ import com.sleepycat.je.DatabaseException;
 
 public class CheckAndProcessLuceneMatch implements Runnable {
 
-	Collection<LuceneMatch> matches;
+    Collection<LuceneMatch> matches;
 
-	List<I_TestSearchResults> checkList;
+    List<I_TestSearchResults> checkList;
 
-	I_ConfigAceFrame config;
+    I_ConfigAceFrame config;
 
-	Document doc;
+    Document doc;
 
-	private float score;
+    private float score;
 
-	private CountDownLatch hitLatch;
+    private CountDownLatch hitLatch;
 
-	private I_StoreDescriptions descStore;
+    private I_StoreDescriptions descStore;
 
-	public CheckAndProcessLuceneMatch(CountDownLatch hitLatch,
-			LuceneProgressUpdator updater, Document doc, float score,
-			Collection<LuceneMatch> matches,
-			List<I_TestSearchResults> checkList, I_ConfigAceFrame config,
-			I_StoreDescriptions descStore) {
-		super();
-		this.doc = doc;
-		this.score = score;
-		this.matches = matches;
-		this.checkList = checkList;
-		this.config = config;
-		this.hitLatch = hitLatch;
-		this.descStore = descStore;
-	}
+    public CheckAndProcessLuceneMatch(CountDownLatch hitLatch, LuceneProgressUpdator updater, Document doc,
+            float score, Collection<LuceneMatch> matches, List<I_TestSearchResults> checkList, I_ConfigAceFrame config,
+            I_StoreDescriptions descStore) {
+        super();
+        this.doc = doc;
+        this.score = score;
+        this.matches = matches;
+        this.checkList = checkList;
+        this.config = config;
+        this.hitLatch = hitLatch;
+        this.descStore = descStore;
+    }
 
-	public void run() {
-		if (hitLatch.getCount() > 0) {
-			int nid = Integer.parseInt(doc.get("dnid"));
-			int cnid = Integer.parseInt(doc.get("cnid"));
-			try {
-				ThinDescVersioned descV = (ThinDescVersioned) descStore
-						.getDescription(nid, cnid);
-				LuceneMatch match = new LuceneMatch(descV, score);
-				if (checkList == null || checkList.size() == 0) {
-					matches.add(match);
-					if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-						AceLog.getAppLog().fine(
-								"processing match: " + descV
-										+ " new match size: "
-										+ matches.size());
-					}
-				} else {
-					try {
-						boolean failed = false;
-						for (I_TestSearchResults test : checkList) {
-							if (test.test(descV, config) == false) {
-								failed = true;
-								break;
-							}
-						}
+    public void run() {
+        if (hitLatch.getCount() > 0) {
+            int nid = Integer.parseInt(doc.get("dnid"));
+            int cnid = Integer.parseInt(doc.get("cnid"));
+            try {
+                ThinDescVersioned descV = (ThinDescVersioned) descStore.getDescription(nid, cnid);
+                LuceneMatch match = new LuceneMatch(descV, score);
+                if (checkList == null || checkList.size() == 0) {
+                    matches.add(match);
+                    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                        AceLog.getAppLog().fine("processing match: " + descV + " new match size: " + matches.size());
+                    }
+                } else {
+                    try {
+                        boolean failed = false;
+                        for (I_TestSearchResults test : checkList) {
+                            if (test.test(descV, config) == false) {
+                                failed = true;
+                                break;
+                            }
+                        }
 
-						if (failed == false) {
-							matches.add(match);
-						}
-					} catch (TaskFailedException e) {
-						AceLog.getAppLog().alertAndLogException(e);
-					}
-				}
-			} catch (IOException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			} catch (DatabaseException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			}
-			this.hitLatch.countDown();
-			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-				AceLog.getAppLog().fine(
-						"Hit latch: " + this.hitLatch.getCount());
-			}
-		}
-	}
+                        if (failed == false) {
+                            matches.add(match);
+                        }
+                    } catch (TaskFailedException e) {
+                        AceLog.getAppLog().alertAndLogException(e);
+                    }
+                }
+            } catch (IOException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            } catch (DatabaseException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            }
+            this.hitLatch.countDown();
+            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                AceLog.getAppLog().fine("Hit latch: " + this.hitLatch.getCount());
+            }
+        }
+    }
 }

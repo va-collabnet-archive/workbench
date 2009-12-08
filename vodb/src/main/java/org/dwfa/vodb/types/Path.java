@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,78 +54,77 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 import com.sleepycat.je.DatabaseException;
 
 public class Path implements I_Transact, I_Path {
-	/**
+    /**
 	 *
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	int conceptId;
+    int conceptId;
 
-	List<I_Position> origins;
+    List<I_Position> origins;
 
-	public Path(int conceptId, List<I_Position> origins) {
-		super();
-		this.conceptId = conceptId;
-		if (origins != null) {
-			this.origins = Collections.unmodifiableList(origins);
-		} else {
-			this.origins = Collections
-					.unmodifiableList(new ArrayList<I_Position>(0));
-		}
-	}
+    public Path(int conceptId, List<I_Position> origins) {
+        super();
+        this.conceptId = conceptId;
+        if (origins != null) {
+            this.origins = Collections.unmodifiableList(origins);
+        } else {
+            this.origins = Collections.unmodifiableList(new ArrayList<I_Position>(0));
+        }
+    }
 
-	public boolean equals(I_Path another) {
-		return (conceptId == another.getConceptId());
-	}
+    public boolean equals(I_Path another) {
+        return (conceptId == another.getConceptId());
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (I_Path.class.isAssignableFrom(obj.getClass())) {
-			return equals((I_Path) obj);
-		}
-		return false;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (I_Path.class.isAssignableFrom(obj.getClass())) {
+            return equals((I_Path) obj);
+        }
+        return false;
+    }
 
-	@Override
-	public int hashCode() {
-		return conceptId;
-	}
+    @Override
+    public int hashCode() {
+        return conceptId;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.dwfa.vodb.types.I_Path#getConceptId()
-	 */
-	public int getConceptId() {
-		return conceptId;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_Path#getConceptId()
+     */
+    public int getConceptId() {
+        return conceptId;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.dwfa.vodb.types.I_Path#getOrigins()
-	 */
-	public List<I_Position> getOrigins() {
-		return origins;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_Path#getOrigins()
+     */
+    public List<I_Position> getOrigins() {
+        return origins;
+    }
 
-	public Set<I_Position> getInheritedOrigins() {
-	    HashSet<I_Position> inheritedOrigins = new HashSet<I_Position>();
-	    for (I_Position origin : this.origins) {
-	        inheritedOrigins.addAll(origin.getPath().getInheritedOrigins());
-	        inheritedOrigins.add(origin);
-	    }
-	    return inheritedOrigins;
-	}
+    public Set<I_Position> getInheritedOrigins() {
+        HashSet<I_Position> inheritedOrigins = new HashSet<I_Position>();
+        for (I_Position origin : this.origins) {
+            inheritedOrigins.addAll(origin.getPath().getInheritedOrigins());
+            inheritedOrigins.add(origin);
+        }
+        return inheritedOrigins;
+    }
 
-	public Set<I_Position> getNormalisedOrigins() {
-	    return getNormalisedOrigins(null);
-	}
+    public Set<I_Position> getNormalisedOrigins() {
+        return getNormalisedOrigins(null);
+    }
 
-	public Set<I_Position> getNormalisedOrigins(Collection<I_Path> paths) {
+    public Set<I_Position> getNormalisedOrigins(Collection<I_Path> paths) {
         final Set<I_Position> inheritedOrigins = getInheritedOrigins();
         if (paths != null) {
             for (I_Path path : paths) {
@@ -143,221 +142,218 @@ public class Path implements I_Transact, I_Path {
             }
         }
         return normalisedOrigins;
-	}
+    }
 
-	public static List<I_Path> makeBasePaths(VodbEnv vodb)
-			throws DatabaseException, ParseException, TerminologyException,
-			IOException {
+    public static List<I_Path> makeBasePaths(VodbEnv vodb) throws DatabaseException, ParseException,
+            TerminologyException, IOException {
 
-		List<I_Path> basePaths = new ArrayList<I_Path>();
+        List<I_Path> basePaths = new ArrayList<I_Path>();
 
-		Path aceRelease = new Path(
-				vodb
-						.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
-								.getUids()), null);
-		basePaths.add(aceRelease);
+        Path aceRelease = new Path(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()),
+            null);
+        basePaths.add(aceRelease);
 
-		Position latestAceRelease = new Position(Integer.MAX_VALUE, aceRelease);
-		List<I_Position> origins = new ArrayList<I_Position>(1);
-		origins.add(latestAceRelease);
+        Position latestAceRelease = new Position(Integer.MAX_VALUE, aceRelease);
+        List<I_Position> origins = new ArrayList<I_Position>(1);
+        origins.add(latestAceRelease);
 
-
-//        addIfFound(vodb, basePaths, origins, ArchitectonicAuxiliary.Concept.TGA_DATA);
-//        addIfFound(vodb, basePaths, origins, ArchitectonicAuxiliary.Concept.AMT_SOURCE_DATA);
+        // addIfFound(vodb, basePaths, origins,
+        // ArchitectonicAuxiliary.Concept.TGA_DATA);
+        // addIfFound(vodb, basePaths, origins,
+        // ArchitectonicAuxiliary.Concept.AMT_SOURCE_DATA);
         addIfFound(vodb, basePaths, origins, ArchitectonicAuxiliary.Concept.SNOMED_CORE);
 
-		return basePaths;
+        return basePaths;
 
-	}
+    }
 
-    private static void addIfFound(VodbEnv vodb, List<I_Path> basePaths, List<I_Position> origins, Concept pathConcept) throws TerminologyException, IOException {
+    private static void addIfFound(VodbEnv vodb, List<I_Path> basePaths, List<I_Position> origins, Concept pathConcept)
+            throws TerminologyException, IOException {
         try {
             Path path = new Path(vodb.uuidToNative(pathConcept.getUids()), origins);
             basePaths.add(path);
         } catch (NoMappingException ex) {
-            AceLog.getAppLog().info("Exception processing: "  + pathConcept.name() + ": " + ex.toString());
+            AceLog.getAppLog().info("Exception processing: " + pathConcept.name() + ": " + ex.toString());
         }
     }
 
+    // public static void main(String[] args) {
+    // try {
+    // String fileStr;
+    // if (args.length == 0) {
+    // fileStr = "berkeley-db";
+    // } else {
+    // fileStr = args[0];
+    // }
+    // VodbEnv vodb = new VodbEnv();
+    // vodb.setup(new File(fileStr), false, 600000000L);
+    //
+    // writeBasePaths(vodb);
+    // vodb.sync();
+    // vodb.close();
+    // } catch (Exception ex) {
+    // AceLog.getAppLog().alertAndLogException(ex);
+    // }
+    // System.exit(0);
+    // }
 
-//	public static void main(String[] args) {
-//		try {
-//			String fileStr;
-//			if (args.length == 0) {
-//				fileStr = "berkeley-db";
-//			} else {
-//				fileStr = args[0];
-//			}
-//			VodbEnv vodb = new VodbEnv();
-//			vodb.setup(new File(fileStr), false, 600000000L);
-//
-//			writeBasePaths(vodb);
-//			vodb.sync();
-//			vodb.close();
-//		} catch (Exception ex) {
-//			AceLog.getAppLog().alertAndLogException(ex);
-//		}
-//		System.exit(0);
-//	}
-
-	public static void writeBasePaths(VodbEnv vodb) throws DatabaseException,
-			ParseException, TerminologyException, IOException {
-		List<I_Path> basePaths = makeBasePaths(vodb);
-		for (I_Path p : basePaths) {
-			vodb.writePath(p);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.dwfa.vodb.types.I_Path#getMatchingPath(int)
-	 */
-	public I_Path getMatchingPath(int pathId) {
-		if (conceptId == pathId) {
-			return this;
-		}
-		for (I_Position origin : origins) {
-			if (origin.getPath().getMatchingPath(pathId) != null) {
-				return origin.getPath();
-			}
-		}
-		return null;
-	}
-
-	public static String toHtmlString(I_Path path) throws IOException {
-		StringBuffer buff = new StringBuffer();
-		buff.append("<html><font color='blue' size='+1'><u>");
-		ConceptBean cb = ConceptBean.get(path.getConceptId());
-		buff.append(cb.getInitialText());
-		buff.append("</u></font>");
-		if (path != null) {
-			for (I_Position origin : path.getOrigins()) {
-				buff.append("<br>&nbsp;&nbsp;&nbsp;Origin: ");
-				buff.append(origin);
-			}
-		}
-		return buff.toString();
-	}
+    public static void writeBasePaths(VodbEnv vodb) throws DatabaseException, ParseException, TerminologyException,
+            IOException {
+        List<I_Path> basePaths = makeBasePaths(vodb);
+        for (I_Path p : basePaths) {
+            vodb.writePath(p);
+        }
+    }
 
     /*
-	 * (non-Javadoc)
-	 *
-	 * @see org.dwfa.vodb.types.I_Path#abort()
-	 */
-	public void abort() {
-		// Nothing to do...
-	}
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_Path#getMatchingPath(int)
+     */
+    public I_Path getMatchingPath(int pathId) {
+        if (conceptId == pathId) {
+            return this;
+        }
+        for (I_Position origin : origins) {
+            if (origin.getPath().getMatchingPath(pathId) != null) {
+                return origin.getPath();
+            }
+        }
+        return null;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.dwfa.vodb.types.I_Path#commit(int, java.util.Set)
-	 */
-	public void commit(int version, Set<TimePathId> values) throws IOException {
-		AceConfig.getVodb().writePath(this);
+    public static String toHtmlString(I_Path path) throws IOException {
+        StringBuffer buff = new StringBuffer();
+        buff.append("<html><font color='blue' size='+1'><u>");
+        ConceptBean cb = ConceptBean.get(path.getConceptId());
+        buff.append(cb.getInitialText());
+        buff.append("</u></font>");
+        if (path != null) {
+            for (I_Position origin : path.getOrigins()) {
+                buff.append("<br>&nbsp;&nbsp;&nbsp;Origin: ");
+                buff.append(origin);
+            }
+        }
+        return buff.toString();
+    }
 
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_Path#abort()
+     */
+    public void abort() {
+        // Nothing to do...
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.dwfa.vodb.types.I_Path#convertIds(org.dwfa.ace.api.I_MapNativeToNative)
-	 */
-	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
-		conceptId = jarToDbNativeMap.get(conceptId);
-		for (I_Position origin : origins) {
-			origin.getPath().convertIds(jarToDbNativeMap);
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_Path#commit(int, java.util.Set)
+     */
+    public void commit(int version, Set<TimePathId> values) throws IOException {
+        AceConfig.getVodb().writePath(this);
 
-	public UniversalAcePath getUniversal() throws IOException,
-			TerminologyException {
-		try {
-			List<UniversalAcePosition> universalOrigins = new ArrayList<UniversalAcePosition>(
-					origins.size());
-			for (I_Position position : origins) {
-				universalOrigins.add(new UniversalAcePosition(AceConfig.getVodb()
-						.nativeToUuid(position.getPath().getConceptId()),
-						ThinVersionHelper.convert(position.getVersion())));
-			}
-			return new UniversalAcePath(AceConfig.getVodb().nativeToUuid(conceptId),
-					universalOrigins);
-		} catch (DatabaseException e) {
-			throw new ToIoException(e);
-		}
-	}
+    }
 
-   public static void writePath(ObjectOutputStream out, I_Path p) throws IOException {
-      try {
-         out.writeObject(AceConfig.getVodb().nativeToUuid(p.getConceptId()));
-      } catch (DatabaseException e) {
-         IOException newEx = new IOException();
-         newEx.initCause(e);
-         throw newEx;
-      }
-      out.writeInt(p.getOrigins().size());
-      for (I_Position origin: p.getOrigins()) {
-         Position.writePosition(out, origin);
-      }
-   }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_Path#convertIds(org.dwfa.ace.api.I_MapNativeToNative
+     * )
+     */
+    public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
+        conceptId = jarToDbNativeMap.get(conceptId);
+        for (I_Position origin : origins) {
+            origin.getPath().convertIds(jarToDbNativeMap);
+        }
+    }
 
-   @SuppressWarnings("unchecked")
-   public static I_Path readPath(ObjectInputStream in) throws IOException, ClassNotFoundException  {
-      int pathId;
-      try {
-         pathId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
-      } catch (TerminologyException e) {
-         IOException newEx = new IOException();
-         newEx.initCause(e);
-         throw newEx;
-      }
-      int size = in.readInt();
-      List<I_Position> origins = new ArrayList<I_Position>(size);
-      for (int i = 0; i < size; i++) {
-         origins.add(Position.readPosition(in));
+    public UniversalAcePath getUniversal() throws IOException, TerminologyException {
+        try {
+            List<UniversalAcePosition> universalOrigins = new ArrayList<UniversalAcePosition>(origins.size());
+            for (I_Position position : origins) {
+                universalOrigins.add(new UniversalAcePosition(AceConfig.getVodb().nativeToUuid(
+                    position.getPath().getConceptId()), ThinVersionHelper.convert(position.getVersion())));
+            }
+            return new UniversalAcePath(AceConfig.getVodb().nativeToUuid(conceptId), universalOrigins);
+        } catch (DatabaseException e) {
+            throw new ToIoException(e);
+        }
+    }
+
+    public static void writePath(ObjectOutputStream out, I_Path p) throws IOException {
+        try {
+            out.writeObject(AceConfig.getVodb().nativeToUuid(p.getConceptId()));
+        } catch (DatabaseException e) {
+            IOException newEx = new IOException();
+            newEx.initCause(e);
+            throw newEx;
+        }
+        out.writeInt(p.getOrigins().size());
+        for (I_Position origin : p.getOrigins()) {
+            Position.writePosition(out, origin);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static I_Path readPath(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int pathId;
+        try {
+            pathId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+        } catch (TerminologyException e) {
+            IOException newEx = new IOException();
+            newEx.initCause(e);
+            throw newEx;
+        }
+        int size = in.readInt();
+        List<I_Position> origins = new ArrayList<I_Position>(size);
+        for (int i = 0; i < size; i++) {
+            origins.add(Position.readPosition(in));
         }
         return new Path(pathId, origins);
-   }
+    }
 
-   public static Set<I_Path> readPathSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
-      int size = in.readInt();
-      Set<I_Path> positions = new HashSet<I_Path>(size);
-      for (int i = 0; i < size; i++) {
-         try {
-            positions.add(readPath(in));
-         } catch (IOException ex) {
-            if (NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
-               AceLog.getAppLog().alertAndLogException(ex);
-            } else {
-               throw ex;
+    public static Set<I_Path> readPathSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int size = in.readInt();
+        Set<I_Path> positions = new HashSet<I_Path>(size);
+        for (int i = 0; i < size; i++) {
+            try {
+                positions.add(readPath(in));
+            } catch (IOException ex) {
+                if (NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } else {
+                    throw ex;
+                }
             }
-         }
-      }
-      return positions;
-   }
+        }
+        return positions;
+    }
 
-   public static void writePathSet(ObjectOutputStream out, Set<I_Path> viewPositions) throws IOException {
-      out.writeInt(viewPositions.size());
-      for (I_Path p: viewPositions) {
-         writePath(out, p);
-      }
-   }
-   public String toString() {
-      StringBuffer buff = new StringBuffer();
-      ConceptBean cb = ConceptBean.get(getConceptId());
-      try {
-         buff.append(cb.getInitialText());
-      } catch (IOException e) {
-         buff.append(e.getMessage());
-         AceLog.getAppLog().alertAndLogException(e);
-      }
-      return buff.toString();
-   }
+    public static void writePathSet(ObjectOutputStream out, Set<I_Path> viewPositions) throws IOException {
+        out.writeInt(viewPositions.size());
+        for (I_Path p : viewPositions) {
+            writePath(out, p);
+        }
+    }
 
-   public String toHtmlString() throws IOException {
-	return Path.toHtmlString(this);
-   }
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+        ConceptBean cb = ConceptBean.get(getConceptId());
+        try {
+            buff.append(cb.getInitialText());
+        } catch (IOException e) {
+            buff.append(e.getMessage());
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return buff.toString();
+    }
+
+    public String toHtmlString() throws IOException {
+        return Path.toHtmlString(this);
+    }
 
     public void addOrigin(I_Position position) throws TerminologyException {
         AceConfig.getVodb().writePathOrigin(this, position);
@@ -367,24 +363,25 @@ public class Path implements I_Transact, I_Path {
         try {
             int namespaceRefsetId = RefsetAuxiliary.Concept.REFSET_PATH_NAMESPACE_ID.localize().getNid();
             RefsetHelper refsetHelper = new RefsetHelper();
-            
-            I_ThinExtByRefPartString extension = 
-                refsetHelper.<I_ThinExtByRefPartString>getLatestCurrentRefsetExtensions(namespaceRefsetId, conceptId);
-                
+
+            I_ThinExtByRefPartString extension = refsetHelper.<I_ThinExtByRefPartString> getLatestCurrentRefsetExtensions(
+                namespaceRefsetId, conceptId);
+
             if (extension != null) {
                 return extension.getStringValue();
             } else {
-                // Find the closest parent with the latest namespace extension to be inherited      
+                // Find the closest parent with the latest namespace extension
+                // to be inherited
                 DistanceTrackingCondition distanceTracker = refsetHelper.new DistanceTrackingCondition();
-                
+
                 int closestDistance = -1;
                 I_ThinExtByRefPartString candidate = null;
-                for (I_GetConceptData ancestor : 
-                        refsetHelper.getAllAncestors(AceConfig.getVodb().getConcept(conceptId), 
-                            refsetHelper.new NotAlreadyVisited(), distanceTracker)) {
+                for (I_GetConceptData ancestor : refsetHelper.getAllAncestors(
+                    AceConfig.getVodb().getConcept(conceptId), refsetHelper.new NotAlreadyVisited(), distanceTracker)) {
                     int distance = distanceTracker.getMinimumDistance(ancestor.getConceptId());
                     if (closestDistance == -1 || distance <= closestDistance) {
-                        extension = refsetHelper.<I_ThinExtByRefPartString>getLatestCurrentRefsetExtensions(namespaceRefsetId, ancestor.getConceptId());
+                        extension = refsetHelper.<I_ThinExtByRefPartString> getLatestCurrentRefsetExtensions(
+                            namespaceRefsetId, ancestor.getConceptId());
                         if (extension != null) {
                             if (candidate == null || candidate.getVersion() < extension.getVersion()) {
                                 candidate = extension;
@@ -392,14 +389,14 @@ public class Path implements I_Transact, I_Path {
                             }
                         }
                     }
-                }                
+                }
                 if (candidate == null) {
-                    throw new TerminologyException("No namespace identifier defined or inheritable for concept " + 
-                        AceConfig.getVodb().getConcept(conceptId).getInitialText());
+                    throw new TerminologyException("No namespace identifier defined or inheritable for concept "
+                        + AceConfig.getVodb().getConcept(conceptId).getInitialText());
                 }
                 return candidate.getStringValue();
             }
-            
+
         } catch (Exception e) {
             throw new TerminologyException(e);
         }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,14 +59,14 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ThinExtBinder extends TupleBinding {
-	private static int BOOLEAN_ID = 1;
-	private static int CONCEPT_ID = 2;
-	private static int INTEGER_ID = 3;
-	private static int MEASUREMENT_ID = 4;
-	private static int LANGUAGE_ID = 5;
-	private static int SCOPED_LANGUAGE_ID = 6;
-	private static int STRING_ID = 7;
-	private static int CON_INT_ID = 8;
+    private static int BOOLEAN_ID = 1;
+    private static int CONCEPT_ID = 2;
+    private static int INTEGER_ID = 3;
+    private static int MEASUREMENT_ID = 4;
+    private static int LANGUAGE_ID = 5;
+    private static int SCOPED_LANGUAGE_ID = 6;
+    private static int STRING_ID = 7;
+    private static int CON_INT_ID = 8;
     private static int TEMPLATE_FOR_REL_ID = 9;
     private static int TEMPLATE_ID = 10;
     private static int CROSS_MAP_FOR_REL_ID = 11;
@@ -75,25 +75,9 @@ public class ThinExtBinder extends TupleBinding {
     private static int CONCEPT_CONCEPT_CONCEPT_ID = 14;
     private static int CONCEPT_CONCEPT_STRING_ID = 15;
     private static int CONCEPT_STRING_ID = 16;
-	
+
     public static enum EXT_TYPE {
-        BOOLEAN(BOOLEAN_ID, "boolean", I_ThinExtByRefPartBoolean.class), 
-        CONCEPT(CONCEPT_ID, "concept", I_ThinExtByRefPartConcept.class), 
-        CON_INT(CON_INT_ID, "con int", I_ThinExtByRefPartConceptInt.class),
-        STRING(STRING_ID, "string", I_ThinExtByRefPartString.class), 
-        INTEGER(INTEGER_ID, "integer", I_ThinExtByRefPartInteger.class), 
-        MEASUREMENT(MEASUREMENT_ID, "measurement", I_ThinExtByRefPartMeasurement.class), 
-        LANGUAGE(LANGUAGE_ID,"language", I_ThinExtByRefPartLanguage.class), 
-        SCOPED_LANGUAGE(SCOPED_LANGUAGE_ID, "scoped language", I_ThinExtByRefPartLanguageScoped.class), 
-        TEMPLATE_FOR_REL(TEMPLATE_FOR_REL_ID, "template for rel", ThinExtByRefPartTemplateForRel.class),
-        TEMPLATE(TEMPLATE_ID, "template", ThinExtByRefPartTemplate.class),
-        CROSS_MAP_FOR_REL(CROSS_MAP_FOR_REL_ID, "cross map for rel", ThinExtByRefPartCrossmapForRel.class),
-        CROSS_MAP(CROSS_MAP_ID, "cross map", ThinExtByRefPartCrossmap.class),
-        CONCEPT_CONCEPT(CONCEPT_CONCEPT_ID, "concept-concept", I_ThinExtByRefPartConceptConcept.class),
-        CONCEPT_CONCEPT_CONCEPT(CONCEPT_CONCEPT_CONCEPT_ID, "concept-concept-concept", I_ThinExtByRefPartConceptConceptConcept.class),
-        CONCEPT_CONCEPT_STRING(CONCEPT_CONCEPT_STRING_ID, "concept-concept-string", I_ThinExtByRefPartConceptConceptString.class),
-        CONCEPT_STRING(CONCEPT_STRING_ID, "concept-string", I_ThinExtByRefPartConceptString.class),
-                ;
+        BOOLEAN(BOOLEAN_ID, "boolean", I_ThinExtByRefPartBoolean.class), CONCEPT(CONCEPT_ID, "concept", I_ThinExtByRefPartConcept.class), CON_INT(CON_INT_ID, "con int", I_ThinExtByRefPartConceptInt.class), STRING(STRING_ID, "string", I_ThinExtByRefPartString.class), INTEGER(INTEGER_ID, "integer", I_ThinExtByRefPartInteger.class), MEASUREMENT(MEASUREMENT_ID, "measurement", I_ThinExtByRefPartMeasurement.class), LANGUAGE(LANGUAGE_ID, "language", I_ThinExtByRefPartLanguage.class), SCOPED_LANGUAGE(SCOPED_LANGUAGE_ID, "scoped language", I_ThinExtByRefPartLanguageScoped.class), TEMPLATE_FOR_REL(TEMPLATE_FOR_REL_ID, "template for rel", ThinExtByRefPartTemplateForRel.class), TEMPLATE(TEMPLATE_ID, "template", ThinExtByRefPartTemplate.class), CROSS_MAP_FOR_REL(CROSS_MAP_FOR_REL_ID, "cross map for rel", ThinExtByRefPartCrossmapForRel.class), CROSS_MAP(CROSS_MAP_ID, "cross map", ThinExtByRefPartCrossmap.class), CONCEPT_CONCEPT(CONCEPT_CONCEPT_ID, "concept-concept", I_ThinExtByRefPartConceptConcept.class), CONCEPT_CONCEPT_CONCEPT(CONCEPT_CONCEPT_CONCEPT_ID, "concept-concept-concept", I_ThinExtByRefPartConceptConceptConcept.class), CONCEPT_CONCEPT_STRING(CONCEPT_CONCEPT_STRING_ID, "concept-concept-string", I_ThinExtByRefPartConceptConceptString.class), CONCEPT_STRING(CONCEPT_STRING_ID, "concept-string", I_ThinExtByRefPartConceptString.class), ;
 
         private int enumId;
 
@@ -101,8 +85,7 @@ public class ThinExtBinder extends TupleBinding {
 
         private Class<? extends I_ThinExtByRefPart> partClass;
 
-        private EXT_TYPE(int id, String interfaceName, 
-        		Class<? extends I_ThinExtByRefPart> partClass) {
+        private EXT_TYPE(int id, String interfaceName, Class<? extends I_ThinExtByRefPart> partClass) {
             this.enumId = id;
             this.interfaceName = interfaceName;
             this.partClass = partClass;
@@ -129,7 +112,7 @@ public class ThinExtBinder extends TupleBinding {
             case 7:
                 return STRING;
             case 8:
-            	return CON_INT;
+                return CON_INT;
             case 9:
                 return TEMPLATE_FOR_REL;
             case 10:
@@ -156,13 +139,13 @@ public class ThinExtBinder extends TupleBinding {
             return interfaceName;
         }
 
-		public Class<? extends I_ThinExtByRefPart> getPartClass() {
-			return partClass;
-		}
-		
-		public int getNid() {
-		    return getExtensionTypeNid(this);
-		}
+        public Class<? extends I_ThinExtByRefPart> getPartClass() {
+            return partClass;
+        }
+
+        public int getNid() {
+            return getExtensionTypeNid(this);
+        }
     }
 
     private boolean fixedOnly;
@@ -186,7 +169,7 @@ public class ThinExtBinder extends TupleBinding {
 
         int partCount = ti.readInt();
         I_ThinExtByRefVersioned versioned = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId,
-                                                                      partCount);
+            partCount);
         if (fixedOnly) {
             return versioned;
         }
@@ -347,7 +330,7 @@ public class ThinExtBinder extends TupleBinding {
             break;
         case CONCEPT_CONCEPT:
             for (int x = 0; x < partCount; x++) {
-            	ThinExtByRefPartConceptConcept part = new ThinExtByRefPartConceptConcept();
+                ThinExtByRefPartConceptConcept part = new ThinExtByRefPartConceptConcept();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
                 part.setStatusId(ti.readInt());
@@ -359,7 +342,7 @@ public class ThinExtBinder extends TupleBinding {
 
         case CONCEPT_CONCEPT_CONCEPT:
             for (int x = 0; x < partCount; x++) {
-            	ThinExtByRefPartConceptConceptConcept part = new ThinExtByRefPartConceptConceptConcept();
+                ThinExtByRefPartConceptConceptConcept part = new ThinExtByRefPartConceptConceptConcept();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
                 part.setStatusId(ti.readInt());
@@ -371,7 +354,7 @@ public class ThinExtBinder extends TupleBinding {
             break;
         case CONCEPT_CONCEPT_STRING:
             for (int x = 0; x < partCount; x++) {
-            	ThinExtByRefPartConceptConceptString part = new ThinExtByRefPartConceptConceptString();
+                ThinExtByRefPartConceptConceptString part = new ThinExtByRefPartConceptConceptString();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
                 part.setStatusId(ti.readInt());
@@ -383,7 +366,7 @@ public class ThinExtBinder extends TupleBinding {
             break;
         case CONCEPT_STRING:
             for (int x = 0; x < partCount; x++) {
-            	ThinExtByRefPartConceptString part = new ThinExtByRefPartConceptString();
+                ThinExtByRefPartConceptString part = new ThinExtByRefPartConceptString();
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
                 part.setStatusId(ti.readInt());
@@ -398,7 +381,7 @@ public class ThinExtBinder extends TupleBinding {
         }
         return versioned;
     }
-    
+
     private static Integer booleanNid;
     private static Integer stringNid;
     private static Integer conceptNid;
@@ -441,62 +424,74 @@ public class ThinExtBinder extends TupleBinding {
                 return integerNid;
             case CON_INT:
                 if (conIntNid == null) {
-                    conIntNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids());
+                    conIntNid = AceConfig.getVodb().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids());
                 }
                 return conIntNid;
             case LANGUAGE:
                 if (languageNid == null) {
-                    languageNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids());
+                    languageNid = AceConfig.getVodb()
+                        .uuidToNative(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids());
                 }
                 return languageNid;
             case SCOPED_LANGUAGE:
                 if (scopedLanguageNid == null) {
-                    scopedLanguageNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids());
+                    scopedLanguageNid = AceConfig.getVodb().uuidToNative(
+                        RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids());
                 }
                 return scopedLanguageNid;
             case MEASUREMENT:
                 if (measurementNid == null) {
-                    measurementNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids());
+                    measurementNid = AceConfig.getVodb().uuidToNative(
+                        RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids());
                 }
                 return measurementNid;
             case CROSS_MAP:
                 if (crossMapNid == null) {
-                    crossMapNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids());
+                    crossMapNid = AceConfig.getVodb().uuidToNative(
+                        RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids());
                 }
                 return crossMapNid;
             case CROSS_MAP_FOR_REL:
                 if (crossMapForRelNid == null) {
-                    crossMapForRelNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids());
+                    crossMapForRelNid = AceConfig.getVodb().uuidToNative(
+                        RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids());
                 }
                 return crossMapForRelNid;
             case TEMPLATE:
                 if (templateNid == null) {
-                    templateNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.TEMPLATE_EXTENSION.getUids());
+                    templateNid = AceConfig.getVodb()
+                        .uuidToNative(RefsetAuxiliary.Concept.TEMPLATE_EXTENSION.getUids());
                 }
                 return templateNid;
             case TEMPLATE_FOR_REL:
                 if (templateForRelNid == null) {
-                    templateForRelNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids());
+                    templateForRelNid = AceConfig.getVodb().uuidToNative(
+                        RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids());
                 }
                 return templateForRelNid;
             case CONCEPT_CONCEPT:
                 if (conceptConceptNid == null) {
-                	conceptConceptNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids());
+                    conceptConceptNid = AceConfig.getVodb().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids());
                 }
                 return conceptConceptNid;
             case CONCEPT_CONCEPT_CONCEPT:
                 if (conceptConceptConceptNid == null) {
-                	conceptConceptConceptNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids());
+                    conceptConceptConceptNid = AceConfig.getVodb().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids());
                 }
                 return conceptConceptConceptNid;
             case CONCEPT_CONCEPT_STRING:
                 if (conceptConceptStringNid == null) {
-                	conceptConceptStringNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids());
+                    conceptConceptStringNid = AceConfig.getVodb().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids());
                 }
                 return conceptConceptStringNid;
             case CONCEPT_STRING:
                 if (conceptStringNid == null) {
-                	conceptStringNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids());
+                    conceptStringNid = AceConfig.getVodb().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids());
                 }
                 return conceptStringNid;
             default:
@@ -542,12 +537,14 @@ public class ThinExtBinder extends TupleBinding {
                 return languageNid;
             case SCOPED_LANGUAGE:
                 if (scopedLanguageNid == null) {
-                    scopedLanguageNid = map.getIntId(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids(), idPath, version);
+                    scopedLanguageNid = map.getIntId(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids(),
+                        idPath, version);
                 }
                 return scopedLanguageNid;
             case MEASUREMENT:
                 if (measurementNid == null) {
-                    measurementNid = map.getIntId(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids(), idPath, version);
+                    measurementNid = map.getIntId(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids(), idPath,
+                        version);
                 }
                 return measurementNid;
             case CROSS_MAP:
@@ -557,7 +554,8 @@ public class ThinExtBinder extends TupleBinding {
                 return crossMapNid;
             case CROSS_MAP_FOR_REL:
                 if (crossMapForRelNid == null) {
-                    crossMapForRelNid = map.getIntId(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids(), idPath, version);
+                    crossMapForRelNid = map.getIntId(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids(), idPath,
+                        version);
                 }
                 return crossMapForRelNid;
             case TEMPLATE:
@@ -567,27 +565,32 @@ public class ThinExtBinder extends TupleBinding {
                 return templateNid;
             case TEMPLATE_FOR_REL:
                 if (templateForRelNid == null) {
-                    templateForRelNid = map.getIntId(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids(), idPath, version);
+                    templateForRelNid = map.getIntId(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids(), idPath,
+                        version);
                 }
                 return templateForRelNid;
             case CONCEPT_CONCEPT:
                 if (conceptConceptNid == null) {
-                	conceptConceptNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids(), idPath, version);
+                    conceptConceptNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids(),
+                        idPath, version);
                 }
                 return conceptConceptNid;
             case CONCEPT_CONCEPT_CONCEPT:
                 if (conceptConceptConceptNid == null) {
-                	conceptConceptConceptNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids(), idPath, version);
+                    conceptConceptConceptNid = map.getIntId(
+                        RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids(), idPath, version);
                 }
                 return conceptConceptConceptNid;
             case CONCEPT_CONCEPT_STRING:
                 if (conceptConceptStringNid == null) {
-                	conceptConceptStringNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids(), idPath, version);
+                    conceptConceptStringNid = map.getIntId(
+                        RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids(), idPath, version);
                 }
                 return conceptConceptStringNid;
             case CONCEPT_STRING:
                 if (conceptStringNid == null) {
-                	conceptStringNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids(), idPath, version);
+                    conceptStringNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids(), idPath,
+                        version);
                 }
                 return conceptStringNid;
             default:
@@ -652,8 +655,7 @@ public class ThinExtBinder extends TupleBinding {
             }
             break;
         case MEASUREMENT:
-            List<ThinExtByRefPartMeasurement> measurementParts = (List<ThinExtByRefPartMeasurement>) versioned
-                    .getVersions();
+            List<ThinExtByRefPartMeasurement> measurementParts = (List<ThinExtByRefPartMeasurement>) versioned.getVersions();
             for (I_ThinExtByRefPartMeasurement part : measurementParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
@@ -684,8 +686,7 @@ public class ThinExtBinder extends TupleBinding {
             }
             break;
         case SCOPED_LANGUAGE:
-            List<ThinExtByRefPartLanguageScoped> scopedLangParts = (List<ThinExtByRefPartLanguageScoped>) versioned
-                    .getVersions();
+            List<ThinExtByRefPartLanguageScoped> scopedLangParts = (List<ThinExtByRefPartLanguageScoped>) versioned.getVersions();
             for (I_ThinExtByRefPartLanguageScoped part : scopedLangParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
@@ -698,9 +699,8 @@ public class ThinExtBinder extends TupleBinding {
                 to.writeInt(part.getPriority());
             }
         case CROSS_MAP:
-            List<ThinExtByRefPartCrossmap> crossMapParts = (List<ThinExtByRefPartCrossmap>) versioned
-            .getVersions();
-            for (ThinExtByRefPartCrossmap part: crossMapParts) {
+            List<ThinExtByRefPartCrossmap> crossMapParts = (List<ThinExtByRefPartCrossmap>) versioned.getVersions();
+            for (ThinExtByRefPartCrossmap part : crossMapParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatusId());
@@ -714,9 +714,8 @@ public class ThinExtBinder extends TupleBinding {
             }
             break;
         case CROSS_MAP_FOR_REL:
-            List<ThinExtByRefPartCrossmapForRel> crossMapForRelParts = (List<ThinExtByRefPartCrossmapForRel>) versioned
-            .getVersions();
-            for (ThinExtByRefPartCrossmapForRel part: crossMapForRelParts) {
+            List<ThinExtByRefPartCrossmapForRel> crossMapForRelParts = (List<ThinExtByRefPartCrossmapForRel>) versioned.getVersions();
+            for (ThinExtByRefPartCrossmapForRel part : crossMapForRelParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatusId());
@@ -728,9 +727,8 @@ public class ThinExtBinder extends TupleBinding {
             }
             break;
         case TEMPLATE:
-            List<ThinExtByRefPartTemplate> templateParts = (List<ThinExtByRefPartTemplate>) versioned
-            .getVersions();
-            for (ThinExtByRefPartTemplate part: templateParts) {
+            List<ThinExtByRefPartTemplate> templateParts = (List<ThinExtByRefPartTemplate>) versioned.getVersions();
+            for (ThinExtByRefPartTemplate part : templateParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatusId());
@@ -748,9 +746,8 @@ public class ThinExtBinder extends TupleBinding {
             }
             break;
         case TEMPLATE_FOR_REL:
-            List<ThinExtByRefPartTemplateForRel> templateForRelParts = (List<ThinExtByRefPartTemplateForRel>) versioned
-            .getVersions();
-            for (ThinExtByRefPartTemplateForRel part: templateForRelParts) {
+            List<ThinExtByRefPartTemplateForRel> templateForRelParts = (List<ThinExtByRefPartTemplateForRel>) versioned.getVersions();
+            for (ThinExtByRefPartTemplateForRel part : templateForRelParts) {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatusId());
@@ -765,48 +762,48 @@ public class ThinExtBinder extends TupleBinding {
                 versioned.addVersion(part);
             }
             break;
-            case CONCEPT_CONCEPT:
-                List<ThinExtByRefPartConceptConcept> ccParts = (List<ThinExtByRefPartConceptConcept>) versioned.getVersions();
-                for (ThinExtByRefPartConceptConcept part : ccParts) {
-                    to.writeInt(part.getPathId());
-                    to.writeInt(part.getVersion());
-                    to.writeInt(part.getStatusId());
-                    to.writeInt(part.getC1id());
-                    to.writeInt(part.getC2id());
-                }
-            	break;
-            case CONCEPT_CONCEPT_CONCEPT:
-                List<ThinExtByRefPartConceptConceptConcept> cccParts = (List<ThinExtByRefPartConceptConceptConcept>) versioned.getVersions();
-                for (ThinExtByRefPartConceptConceptConcept part : cccParts) {
-                    to.writeInt(part.getPathId());
-                    to.writeInt(part.getVersion());
-                    to.writeInt(part.getStatusId());
-                    to.writeInt(part.getC1id());
-                    to.writeInt(part.getC2id());
-                    to.writeInt(part.getC3id());
-                }
-            	break;
-            case CONCEPT_CONCEPT_STRING:
-                List<ThinExtByRefPartConceptConceptString> ccsParts = (List<ThinExtByRefPartConceptConceptString>) versioned.getVersions();
-                for (ThinExtByRefPartConceptConceptString part : ccsParts) {
-                    to.writeInt(part.getPathId());
-                    to.writeInt(part.getVersion());
-                    to.writeInt(part.getStatusId());
-                    to.writeInt(part.getC1id());
-                    to.writeInt(part.getC2id());
-                    to.writeString(part.getStr());
-                }
-            	break;
-            case CONCEPT_STRING:
-                List<ThinExtByRefPartConceptString> csParts = (List<ThinExtByRefPartConceptString>) versioned.getVersions();
-                for (ThinExtByRefPartConceptString part : csParts) {
-                    to.writeInt(part.getPathId());
-                    to.writeInt(part.getVersion());
-                    to.writeInt(part.getStatusId());
-                    to.writeInt(part.getC1id());
-                    to.writeString(part.getStr());
-                }
-            	break;
+        case CONCEPT_CONCEPT:
+            List<ThinExtByRefPartConceptConcept> ccParts = (List<ThinExtByRefPartConceptConcept>) versioned.getVersions();
+            for (ThinExtByRefPartConceptConcept part : ccParts) {
+                to.writeInt(part.getPathId());
+                to.writeInt(part.getVersion());
+                to.writeInt(part.getStatusId());
+                to.writeInt(part.getC1id());
+                to.writeInt(part.getC2id());
+            }
+            break;
+        case CONCEPT_CONCEPT_CONCEPT:
+            List<ThinExtByRefPartConceptConceptConcept> cccParts = (List<ThinExtByRefPartConceptConceptConcept>) versioned.getVersions();
+            for (ThinExtByRefPartConceptConceptConcept part : cccParts) {
+                to.writeInt(part.getPathId());
+                to.writeInt(part.getVersion());
+                to.writeInt(part.getStatusId());
+                to.writeInt(part.getC1id());
+                to.writeInt(part.getC2id());
+                to.writeInt(part.getC3id());
+            }
+            break;
+        case CONCEPT_CONCEPT_STRING:
+            List<ThinExtByRefPartConceptConceptString> ccsParts = (List<ThinExtByRefPartConceptConceptString>) versioned.getVersions();
+            for (ThinExtByRefPartConceptConceptString part : ccsParts) {
+                to.writeInt(part.getPathId());
+                to.writeInt(part.getVersion());
+                to.writeInt(part.getStatusId());
+                to.writeInt(part.getC1id());
+                to.writeInt(part.getC2id());
+                to.writeString(part.getStr());
+            }
+            break;
+        case CONCEPT_STRING:
+            List<ThinExtByRefPartConceptString> csParts = (List<ThinExtByRefPartConceptString>) versioned.getVersions();
+            for (ThinExtByRefPartConceptString part : csParts) {
+                to.writeInt(part.getPathId());
+                to.writeInt(part.getVersion());
+                to.writeInt(part.getStatusId());
+                to.writeInt(part.getC1id());
+                to.writeString(part.getStr());
+            }
+            break;
         default:
             throw new RuntimeException("Can't handle type: " + extType);
         }
@@ -820,7 +817,7 @@ public class ThinExtBinder extends TupleBinding {
         }
         throw new UnsupportedOperationException("Can't convert to type: " + partType);
     }
-    
+
     public static EXT_TYPE getExtensionType(I_ThinExtByRefVersioned versioned) {
         if (versioned.getVersions() == null || versioned.getVersions().size() == 0) {
             try {
@@ -840,21 +837,21 @@ public class ThinExtBinder extends TupleBinding {
                     return EXT_TYPE.SCOPED_LANGUAGE;
                 } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.MEASUREMENT)) {
                     return EXT_TYPE.MEASUREMENT;
-                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CROSS_MAP)) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CROSS_MAP)) {
                     return EXT_TYPE.CROSS_MAP;
-                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CROSS_MAP_FOR_REL)) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CROSS_MAP_FOR_REL)) {
                     return EXT_TYPE.CROSS_MAP_FOR_REL;
-                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.TEMPLATE)) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.TEMPLATE)) {
                     return EXT_TYPE.TEMPLATE;
-                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.TEMPLATE_FOR_REL)) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.TEMPLATE_FOR_REL)) {
                     return EXT_TYPE.TEMPLATE_FOR_REL;
-                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_CONCEPT)) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_CONCEPT)) {
                     return EXT_TYPE.CONCEPT_CONCEPT;
-                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_CONCEPT_CONCEPT)) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_CONCEPT_CONCEPT)) {
                     return EXT_TYPE.CONCEPT_CONCEPT_CONCEPT;
-                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_CONCEPT_STRING)) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_CONCEPT_STRING)) {
                     return EXT_TYPE.CONCEPT_CONCEPT_STRING;
-                }else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_STRING)) {
+                } else if (versioned.getTypeId() == getExtensionTypeNid(EXT_TYPE.CONCEPT_STRING)) {
                     return EXT_TYPE.CONCEPT_STRING;
                 }
             } catch (Exception e) {
@@ -878,21 +875,21 @@ public class ThinExtBinder extends TupleBinding {
                 return EXT_TYPE.SCOPED_LANGUAGE;
             } else if (ThinExtByRefPartMeasurement.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.MEASUREMENT;
-            }else if (ThinExtByRefPartTemplate.class.equals(firstPart.getClass())) {
+            } else if (ThinExtByRefPartTemplate.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.TEMPLATE;
-            }else if (ThinExtByRefPartTemplateForRel.class.equals(firstPart.getClass())) {
+            } else if (ThinExtByRefPartTemplateForRel.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.TEMPLATE_FOR_REL;
-            }else if (ThinExtByRefPartCrossmap.class.equals(firstPart.getClass())) {
+            } else if (ThinExtByRefPartCrossmap.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.CROSS_MAP;
-            }else if (ThinExtByRefPartCrossmapForRel.class.equals(firstPart.getClass())) {
+            } else if (ThinExtByRefPartCrossmapForRel.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.CROSS_MAP_FOR_REL;
-            }else if (ThinExtByRefPartConceptConcept.class.equals(firstPart.getClass())) {
+            } else if (ThinExtByRefPartConceptConcept.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.CONCEPT_CONCEPT;
-            }else if (ThinExtByRefPartConceptConceptConcept.class.equals(firstPart.getClass())) {
+            } else if (ThinExtByRefPartConceptConceptConcept.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.CONCEPT_CONCEPT_CONCEPT;
-            }else if (ThinExtByRefPartConceptConceptString.class.equals(firstPart.getClass())) {
+            } else if (ThinExtByRefPartConceptConceptString.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.CONCEPT_CONCEPT_STRING;
-            }else if (ThinExtByRefPartConceptString.class.equals(firstPart.getClass())) {
+            } else if (ThinExtByRefPartConceptString.class.equals(firstPart.getClass())) {
                 return EXT_TYPE.CONCEPT_STRING;
             }
         }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,8 +46,7 @@ public class TerminologyIntList extends JList {
         public void actionPerformed(ActionEvent e) {
             int selectedIndex = getSelectedIndex();
             if (selectedIndex >= 0) {
-                TerminologyIntListModel tm =
-                        (TerminologyIntListModel) getModel();
+                TerminologyIntListModel tm = (TerminologyIntListModel) getModel();
                 tm.removeElement(selectedIndex);
             }
         }
@@ -59,8 +58,7 @@ public class TerminologyIntList extends JList {
      */
     private static final long serialVersionUID = 1L;
 
-    public TerminologyIntList(TerminologyIntListModel dataModel,
-            I_ConfigAceFrame config) {
+    public TerminologyIntList(TerminologyIntListModel dataModel, I_ConfigAceFrame config) {
         super(dataModel);
         init(config);
     }
@@ -70,24 +68,17 @@ public class TerminologyIntList extends JList {
         setTransferHandler(new TerminologyTransferHandler(this));
         setDragEnabled(true);
         DeleteAction delete = new DeleteAction();
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-            KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
             delete.getValue(Action.NAME));
-        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), delete.getValue(Action.NAME));
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
             delete.getValue(Action.NAME));
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-            KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
-            delete.getValue(Action.NAME));
-        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
-            delete.getValue(Action.NAME));
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), delete.getValue(Action.NAME));
 
         ActionMap map = this.getActionMap();
-        map.put(TransferHandler.getCutAction().getValue(Action.NAME),
-            TransferHandler.getCutAction());
-        map.put(TransferHandler.getCopyAction().getValue(Action.NAME),
-            TransferHandler.getCopyAction());
-        map.put(TransferHandler.getPasteAction().getValue(Action.NAME),
-            TransferHandler.getPasteAction());
+        map.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
+        map.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
+        map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
         map.put(delete.getValue(Action.NAME), delete);
 
     }

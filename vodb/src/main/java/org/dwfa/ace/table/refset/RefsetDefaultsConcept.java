@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,8 +28,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
-public class RefsetDefaultsConcept extends RefsetDefaults implements
-        I_RefsetDefaultsConcept {
+public class RefsetDefaultsConcept extends RefsetDefaults implements I_RefsetDefaultsConcept {
 
     private I_IntList conceptPopupIds = new IntList();
 
@@ -48,8 +47,7 @@ public class RefsetDefaultsConcept extends RefsetDefaults implements
         IntList.writeIntList(out, conceptPopupIds);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             defaultForConceptRefset = readConcept(in);
@@ -62,10 +60,7 @@ public class RefsetDefaultsConcept extends RefsetDefaults implements
 
     public RefsetDefaultsConcept() throws TerminologyException, IOException {
         super();
-        defaultForConceptRefset =
-                ConceptBean
-                    .get(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT
-                        .getUids());
+        defaultForConceptRefset = ConceptBean.get(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
         conceptPopupIds.add(defaultForConceptRefset.getConceptId());
     }
 
@@ -73,12 +68,10 @@ public class RefsetDefaultsConcept extends RefsetDefaults implements
         return defaultForConceptRefset;
     }
 
-    public void setDefaultForConceptRefset(
-            I_GetConceptData defaultForConceptRefset) {
+    public void setDefaultForConceptRefset(I_GetConceptData defaultForConceptRefset) {
         Object oldValue = this.defaultForConceptRefset;
         this.defaultForConceptRefset = defaultForConceptRefset;
-        pcs.firePropertyChange("defaultForConceptRefset", oldValue,
-            defaultForConceptRefset);
+        pcs.firePropertyChange("defaultForConceptRefset", oldValue, defaultForConceptRefset);
     }
 
     public I_IntList getConceptPopupIds() {

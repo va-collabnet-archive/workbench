@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,26 +22,27 @@ import com.sleepycat.je.DatabaseEntry;
 
 public abstract class TermCounter implements Callable<Object> {
 
-	int count = 0;
-	protected boolean canceled = false;
+    int count = 0;
+    protected boolean canceled = false;
 
-	
-	public int getCount() {
-		return count;
-	}
-	public DatabaseEntry getDataEntry() {
-		DatabaseEntry data = new DatabaseEntry(); 
-		data.setPartial(0, 0, true);
-		return data;
-	}
+    public int getCount() {
+        return count;
+    }
 
-	public DatabaseEntry getKeyEntry() {
-		DatabaseEntry key = new DatabaseEntry(); 
-		key.setPartial(0, 0, true);
-		return key;
-	}
-	public void cancel() {
-		canceled = true;
-	}
-	
+    public DatabaseEntry getDataEntry() {
+        DatabaseEntry data = new DatabaseEntry();
+        data.setPartial(0, 0, true);
+        return data;
+    }
+
+    public DatabaseEntry getKeyEntry() {
+        DatabaseEntry key = new DatabaseEntry();
+        key.setPartial(0, 0, true);
+        return key;
+    }
+
+    public void cancel() {
+        canceled = true;
+    }
+
 }

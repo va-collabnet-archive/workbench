@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,176 +49,173 @@ import org.dwfa.vodb.bind.ThinDescVersionedBinding;
 
 public class ImportChangeSetReader implements ActionListener, I_Count {
 
+    JarInputStream input;
 
+    ThinDescVersionedBinding descBinding = new ThinDescVersionedBinding();
 
-	JarInputStream input;
+    boolean continueWork = true;
 
-	ThinDescVersionedBinding descBinding = new ThinDescVersionedBinding();
+    String upperProgressMessage = "Reading Java Change Set";
 
-	boolean continueWork = true;
+    String lowerProgressMessage = "counting";
 
-	String upperProgressMessage = "Reading Java Change Set";
+    int max = -1;
 
-	String lowerProgressMessage = "counting";
+    int concepts = -1;
 
-	int max = -1;
+    int descriptions = -1;
 
-	int concepts = -1;
+    int relationships = -1;
 
-	int descriptions = -1;
+    int ids = -1;
 
-	int relationships = -1;
+    int images = -1;
 
-	int ids = -1;
+    int total = -1;
 
-	int images = -1;
+    int processed = 0;
 
-	int total = -1;
+    private CountDownLatch latch;
 
-	int processed = 0;
+    private AceConfig config;
 
-	private CountDownLatch latch;
+    private JPanel secondaryProgressPanel;
 
-	private AceConfig config;
+    private class ProgressUpdator implements I_UpdateProgress {
+        Timer updateTimer;
 
-	private JPanel secondaryProgressPanel;
+        boolean firstUpdate = true;
 
-	private class ProgressUpdator implements I_UpdateProgress {
-		Timer updateTimer;
+        ActivityPanel activity = new ActivityPanel(true, true, secondaryProgressPanel);
 
-		boolean firstUpdate = true;
+        public ProgressUpdator() {
+            super();
+            updateTimer = new Timer(1000, this);
+            updateTimer.start();
+        }
 
-		ActivityPanel activity = new ActivityPanel(true, true, secondaryProgressPanel);
+        public void actionPerformed(ActionEvent e) {
+            if (firstUpdate) {
+                firstUpdate = false;
+                try {
+                    ActivityViewer.addActivity(activity);
+                } catch (Exception e1) {
+                    AceLog.getAppLog().alertAndLogException(e1);
+                }
+            }
+            activity.setIndeterminate(total == -1);
+            activity.setValue(processed);
+            activity.setMaximum(total);
+            activity.setProgressInfoUpper(upperProgressMessage);
+            if (latch != null) {
+                activity.setProgressInfoLower(lowerProgressMessage + processed + " latch: " + latch.getCount());
+            } else {
+                activity.setProgressInfoLower(lowerProgressMessage + processed);
+            }
+            if (!continueWork) {
+                activity.complete();
+                updateTimer.stop();
+            }
+        }
 
-		public ProgressUpdator() {
-			super();
-			updateTimer = new Timer(1000, this);
-			updateTimer.start();
-		}
+        public void normalCompletion() {
+            activity.complete();
+            updateTimer.stop();
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			if (firstUpdate) {
-				firstUpdate = false;
-				try {
-					ActivityViewer.addActivity(activity);
-				} catch (Exception e1) {
-					AceLog.getAppLog().alertAndLogException(e1);
-				}
-			}
-			activity.setIndeterminate(total == -1);
-			activity.setValue(processed);
-			activity.setMaximum(total);
-			activity.setProgressInfoUpper(upperProgressMessage);
-			if (latch != null) {
-				activity.setProgressInfoLower(lowerProgressMessage + processed +
-						" latch: " + latch.getCount());				
-			} else {
-				activity.setProgressInfoLower(lowerProgressMessage + processed);
-			}
-			if (!continueWork) {
-				activity.complete();
-				updateTimer.stop();
-			}
-		}
+    }
 
-		public void normalCompletion() {
-			activity.complete();
-			updateTimer.stop();
-		}
+    public ImportChangeSetReader(final Configuration riverConfig, JPanel secondaryProgressPanel, Frame parentFrame) {
+        this(riverConfig, parentFrame);
+        this.secondaryProgressPanel = secondaryProgressPanel;
+    }
 
-	}
+    public ImportChangeSetReader(final Configuration riverConfig, Frame parentFrame) {
+        try {
+            final File csFile = FileDialogUtil.getExistingFile("Select Java Change Set to Import...",
+                new FilenameFilter() {
 
-	public ImportChangeSetReader(final Configuration riverConfig, JPanel secondaryProgressPanel, Frame parentFrame) {
-		this(riverConfig, parentFrame);
-		this.secondaryProgressPanel = secondaryProgressPanel;
-	}
+                    public boolean accept(File dir, String name) {
+                        return name.toLowerCase().endsWith(".jcs");
+                    }
+                }, null, parentFrame);
+            ProgressUpdator updater = new ProgressUpdator();
+            updater.activity.addActionListener(this);
+            ACE.threadPool.execute(new Runnable() {
+                public void run() {
+                    try {
+                        importChangeSet(csFile, riverConfig);
+                        ACE.commit();
+                    } catch (TaskFailedException ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                    }
+                }
 
-	public ImportChangeSetReader(final Configuration riverConfig, Frame parentFrame) {
-		try {
-			final File csFile = FileDialogUtil
-					.getExistingFile("Select Java Change Set to Import...", new FilenameFilter() {
+            });
+        } catch (TaskFailedException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+    }
 
-						public boolean accept(File dir, String name) {
-							return name.toLowerCase().endsWith(".jcs");
-						}}, null, parentFrame);
-			ProgressUpdator updater = new ProgressUpdator();
-			updater.activity.addActionListener(this);
-			ACE.threadPool.execute(new Runnable() {
-				public void run() {
-					try {
-						importChangeSet(csFile, riverConfig);
-						ACE.commit();
-					} catch (TaskFailedException ex) {
-						AceLog.getAppLog().alertAndLogException(ex);
-					}
-				}
-
-			});
-		} catch (TaskFailedException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     protected void importChangeSet(File csFile, final Configuration riverConfig) throws TaskFailedException {
-		try {
+        try {
 
-			lowerProgressMessage = "Processing change set";
-			AceLog.getEditLog().info("Importing change set: " + csFile.getAbsolutePath());
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(csFile));
-			Class<I_ReadChangeSet> readerClass = (Class<I_ReadChangeSet>) ois.readObject();
-			ois.close();
-			I_ReadChangeSet reader = (I_ReadChangeSet) readerClass.newInstance();
-			processed = 0;
-			reader.setCounter(this);
-			reader.setChangeSetFile(csFile);
-			reader.read();
-			
-			lowerProgressMessage = "Starting sync ";
-			AceConfig.getVodb().sync();
-			upperProgressMessage = "Import complete";
-			lowerProgressMessage = "Finished sync. Components imported: ";
+            lowerProgressMessage = "Processing change set";
+            AceLog.getEditLog().info("Importing change set: " + csFile.getAbsolutePath());
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(csFile));
+            Class<I_ReadChangeSet> readerClass = (Class<I_ReadChangeSet>) ois.readObject();
+            ois.close();
+            I_ReadChangeSet reader = (I_ReadChangeSet) readerClass.newInstance();
+            processed = 0;
+            reader.setCounter(this);
+            reader.setChangeSetFile(csFile);
+            reader.read();
 
-			continueWork = false;
-			if (config != null) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						for (I_ConfigAceFrame ace: config.aceFrames) {
-							if (ace.isActive()) {
-								ACE cdePanel;
-								try {
-									cdePanel = new ACE(riverConfig);
-									cdePanel.setup(ace);
-									JFrame cdeFrame = new JFrame(ace.getFrameName());
-									cdeFrame.setContentPane(cdePanel);
-									cdeFrame.setJMenuBar(cdePanel.createMenuBar(cdeFrame));
+            lowerProgressMessage = "Starting sync ";
+            AceConfig.getVodb().sync();
+            upperProgressMessage = "Import complete";
+            lowerProgressMessage = "Finished sync. Components imported: ";
 
-									cdeFrame.setBounds(ace.getBounds());
-									cdeFrame.setVisible(true);
-								} catch (Exception e) {
-									AceLog.getEditLog().alertAndLog(Level.SEVERE, e.getLocalizedMessage(), e);
-								}
-							}
-						}
-					}
-					
-				});
-			}
-		} catch (Exception e) {
-			continueWork = false;
-			throw new TaskFailedException(e);
-		}
-		
-	}
+            continueWork = false;
+            if (config != null) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        for (I_ConfigAceFrame ace : config.aceFrames) {
+                            if (ace.isActive()) {
+                                ACE cdePanel;
+                                try {
+                                    cdePanel = new ACE(riverConfig);
+                                    cdePanel.setup(ace);
+                                    JFrame cdeFrame = new JFrame(ace.getFrameName());
+                                    cdeFrame.setContentPane(cdePanel);
+                                    cdeFrame.setJMenuBar(cdePanel.createMenuBar(cdeFrame));
 
+                                    cdeFrame.setBounds(ace.getBounds());
+                                    cdeFrame.setVisible(true);
+                                } catch (Exception e) {
+                                    AceLog.getEditLog().alertAndLog(Level.SEVERE, e.getLocalizedMessage(), e);
+                                }
+                            }
+                        }
+                    }
 
-	public void actionPerformed(ActionEvent e) {
-		continueWork = false;
-		lowerProgressMessage = "User stopped action";
-	}
+                });
+            }
+        } catch (Exception e) {
+            continueWork = false;
+            throw new TaskFailedException(e);
+        }
 
-	public void increment() {
-		processed++;
-	}
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        continueWork = false;
+        lowerProgressMessage = "User stopped action";
+    }
+
+    public void increment() {
+        processed++;
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,410 +68,383 @@ import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
-public class DescriptionPlugin extends AbstractPlugin implements
-		TableModelListener, I_HostConceptPlugins {
+public class DescriptionPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
 
-	private static final long serialVersionUID = 1L;
-	private static final int dataVersion = 1;
+    private static final long serialVersionUID = 1L;
+    private static final int dataVersion = 1;
 
-	private transient JPanel descPanel;
-	private transient DescriptionsForConceptTableModel descTableModel;
-	private transient JTableWithDragImage descTable;
-	private transient boolean idToggleState = false;
-	protected transient Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
-	private transient IdPlugin idPlugin;
-	private transient I_GetConceptData lastSelectedConcept;
-	private transient PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private transient JPanel descPanel;
+    private transient DescriptionsForConceptTableModel descTableModel;
+    private transient JTableWithDragImage descTable;
+    private transient boolean idToggleState = false;
+    protected transient Set<EXT_TYPE> visibleExtensions = new HashSet<EXT_TYPE>();
+    private transient IdPlugin idPlugin;
+    private transient I_GetConceptData lastSelectedConcept;
+    private transient PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			visibleExtensions = new HashSet<EXT_TYPE>();
-			pcs = new PropertyChangeSupport(this);
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            visibleExtensions = new HashSet<EXT_TYPE>();
+            pcs = new PropertyChangeSupport(this);
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	public DescriptionPlugin(boolean shownByDefault, int sequence) {
+    public DescriptionPlugin(boolean shownByDefault, int sequence) {
         super(shownByDefault, sequence);
-	}
+    }
 
-	public UUID getId() {
-		return I_HostConceptPlugins.TOGGLES.DESCRIPTIONS.getPluginId();
-	}
+    public UUID getId() {
+        return I_HostConceptPlugins.TOGGLES.DESCRIPTIONS.getPluginId();
+    }
 
-	@Override
-	protected ImageIcon getImageIcon() {
-		return new ImageIcon(ACE.class
-				.getResource("/24x24/plain/paragraph.png"));
-	}
+    @Override
+    protected ImageIcon getImageIcon() {
+        return new ImageIcon(ACE.class.getResource("/24x24/plain/paragraph.png"));
+    }
 
-	@Override
-	public void update() throws IOException {
-		if (getHost() != null) {
-			int lastSelectedRowCount = descTable.getRowCount();
-			int lastSelectedRow = descTable.getSelectedRow();
-			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-				AceLog.getAppLog().fine("desc rowcount: " + lastSelectedRowCount + " selected row: " + lastSelectedRow);
-			}
-			if (idPlugin != null) {
-				idPlugin.update();
-			}
+    @Override
+    public void update() throws IOException {
+        if (getHost() != null) {
+            int lastSelectedRowCount = descTable.getRowCount();
+            int lastSelectedRow = descTable.getSelectedRow();
+            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                AceLog.getAppLog().fine("desc rowcount: " + lastSelectedRowCount + " selected row: " + lastSelectedRow);
+            }
+            if (idPlugin != null) {
+                idPlugin.update();
+            }
 
-			if (RefsetUtil.refSetsChanged(getHost(), TOGGLES.DESCRIPTIONS, this,
-					visibleExtensions) || getHost().getToggleState(TOGGLES.ID) != idToggleState) {
-				idToggleState = getHost().getToggleState(TOGGLES.ID);
-				createPluginComponent(getHost());
-			}
+            if (RefsetUtil.refSetsChanged(getHost(), TOGGLES.DESCRIPTIONS, this, visibleExtensions)
+                || getHost().getToggleState(TOGGLES.ID) != idToggleState) {
+                idToggleState = getHost().getToggleState(TOGGLES.ID);
+                createPluginComponent(getHost());
+            }
 
-			PropertyChangeEvent evt = new PropertyChangeEvent(getHost(),
-					"termComponent", null, getHost().getTermComponent());
-			DESC_FIELD[] columnEnums = getDescColumns(getHost());
-			descTableModel.setColumns(columnEnums);
-			for (int i = 0; i < descTableModel.getColumnCount(); i++) {
-				TableColumn column = descTable.getColumnModel().getColumn(i);
-				DESC_FIELD columnDesc = columnEnums[i];
-				column.setIdentifier(columnDesc);
-				column.setPreferredWidth(columnDesc.getPref());
-				column.setMaxWidth(columnDesc.getMax());
-				column.setMinWidth(columnDesc.getMin());
-			}
-			setupEditorsAndRenderers(getHost());
-			descTableModel.propertyChange(evt);
-			
-			if (lastSelectedConcept == getHost().getTermComponent()) {
-				SwingUtilities.invokeLater(new ReselectRow(lastSelectedRowCount, lastSelectedRow));
-			}
-			lastSelectedConcept = (I_GetConceptData) getHost().getTermComponent();
-		}
-	}
-	
-	private class ReselectRow implements Runnable {
+            PropertyChangeEvent evt = new PropertyChangeEvent(getHost(), "termComponent", null,
+                getHost().getTermComponent());
+            DESC_FIELD[] columnEnums = getDescColumns(getHost());
+            descTableModel.setColumns(columnEnums);
+            for (int i = 0; i < descTableModel.getColumnCount(); i++) {
+                TableColumn column = descTable.getColumnModel().getColumn(i);
+                DESC_FIELD columnDesc = columnEnums[i];
+                column.setIdentifier(columnDesc);
+                column.setPreferredWidth(columnDesc.getPref());
+                column.setMaxWidth(columnDesc.getMax());
+                column.setMinWidth(columnDesc.getMin());
+            }
+            setupEditorsAndRenderers(getHost());
+            descTableModel.propertyChange(evt);
 
-		int lastSelectedRowCount;
-		int lastSelectedRow;
+            if (lastSelectedConcept == getHost().getTermComponent()) {
+                SwingUtilities.invokeLater(new ReselectRow(lastSelectedRowCount, lastSelectedRow));
+            }
+            lastSelectedConcept = (I_GetConceptData) getHost().getTermComponent();
+        }
+    }
 
+    private class ReselectRow implements Runnable {
 
-		public ReselectRow(int lastSelectedRowCount, int lastSelectedRow) {
-			super();
-			this.lastSelectedRowCount = lastSelectedRowCount;
-			this.lastSelectedRow = lastSelectedRow;
-		}
+        int lastSelectedRowCount;
+        int lastSelectedRow;
 
+        public ReselectRow(int lastSelectedRowCount, int lastSelectedRow) {
+            super();
+            this.lastSelectedRowCount = lastSelectedRowCount;
+            this.lastSelectedRow = lastSelectedRow;
+        }
 
-		public void run() {
-			if (lastSelectedRowCount == descTable.getRowCount()) {
-				descTable.getSelectionModel().setSelectionInterval(lastSelectedRow, lastSelectedRow);
-				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-					AceLog.getAppLog().fine("reselecting: " + lastSelectedRow);
-				}
-			} else {
-				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-					AceLog.getAppLog().info("rowcount changed to: " + descTable.getRowCount());
-				}
-			}
-		}
-		
-	}
+        public void run() {
+            if (lastSelectedRowCount == descTable.getRowCount()) {
+                descTable.getSelectionModel().setSelectionInterval(lastSelectedRow, lastSelectedRow);
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine("reselecting: " + lastSelectedRow);
+                }
+            } else {
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().info("rowcount changed to: " + descTable.getRowCount());
+                }
+            }
+        }
 
-	public JComponent getComponent(I_HostConceptPlugins host) {
-		setHost(host);
-		if (descPanel == null
-				|| RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this,
-						visibleExtensions)) {
-			createPluginComponent(host);
-		}
-		return descPanel;
-	}
+    }
 
-	private void createPluginComponent(I_HostConceptPlugins host) {
-		setHost(host);
-		descPanel = getDescPanel(host);
-		host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
-		host.addPropertyChangeListener("commit", this);
-		PropertyChangeEvent evt = new PropertyChangeEvent(host,
-				"termComponent", null, host.getTermComponent());
-		descTableModel.propertyChange(evt);
-	}
+    public JComponent getComponent(I_HostConceptPlugins host) {
+        setHost(host);
+        if (descPanel == null || RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this, visibleExtensions)) {
+            createPluginComponent(host);
+        }
+        return descPanel;
+    }
 
-	private DESC_FIELD[] getDescColumns(I_HostConceptPlugins host) {
-		List<DESC_FIELD> fields = new ArrayList<DESC_FIELD>();
-		fields.add(DESC_FIELD.TEXT);
-		fields.add(DESC_FIELD.TYPE);
-		fields.add(DESC_FIELD.CASE_FIXED);
-		fields.add(DESC_FIELD.LANG);
-		fields.add(DESC_FIELD.STATUS);
-		if (host.getShowHistory()) {
-			fields.add(DESC_FIELD.VERSION);
-			fields.add(DESC_FIELD.PATH);
-		}
-		return fields.toArray(new DESC_FIELD[fields.size()]);
-	}
+    private void createPluginComponent(I_HostConceptPlugins host) {
+        setHost(host);
+        descPanel = getDescPanel(host);
+        host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+        host.addPropertyChangeListener("commit", this);
+        PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+        descTableModel.propertyChange(evt);
+    }
 
-	private JPanel getDescPanel(I_HostConceptPlugins host) {
-		descTableModel = new DescriptionsForConceptTableModel(
-				getDescColumns(host), host);
-		descTableModel.addTableModelListener(this);
-		JPanel descPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		c.gridwidth = 2;
-		JLabel descLabel = new JLabel("Descriptions:");
-		descLabel.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 0));
-		descPanel.add(descLabel, c);
+    private DESC_FIELD[] getDescColumns(I_HostConceptPlugins host) {
+        List<DESC_FIELD> fields = new ArrayList<DESC_FIELD>();
+        fields.add(DESC_FIELD.TEXT);
+        fields.add(DESC_FIELD.TYPE);
+        fields.add(DESC_FIELD.CASE_FIXED);
+        fields.add(DESC_FIELD.LANG);
+        fields.add(DESC_FIELD.STATUS);
+        if (host.getShowHistory()) {
+            fields.add(DESC_FIELD.VERSION);
+            fields.add(DESC_FIELD.PATH);
+        }
+        return fields.toArray(new DESC_FIELD[fields.size()]);
+    }
 
-		SmallProgressPanel descProgress = new SmallProgressPanel();
-		descProgress.setVisible(false);
-		c.gridwidth = 1;
-		c.anchor = GridBagConstraints.SOUTHEAST;
-		c.gridx++;
-		descPanel.add(descProgress, c);
-		descTableModel.setProgress(descProgress);
+    private JPanel getDescPanel(I_HostConceptPlugins host) {
+        descTableModel = new DescriptionsForConceptTableModel(getDescColumns(host), host);
+        descTableModel.addTableModelListener(this);
+        JPanel descPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.NONE;
+        c.gridwidth = 2;
+        JLabel descLabel = new JLabel("Descriptions:");
+        descLabel.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 0));
+        descPanel.add(descLabel, c);
 
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy++;
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = 0.0;
-		c.weighty = 0.0;
-		c.gridheight = 2;
+        SmallProgressPanel descProgress = new SmallProgressPanel();
+        descProgress.setVisible(false);
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.SOUTHEAST;
+        c.gridx++;
+        descPanel.add(descProgress, c);
+        descTableModel.setProgress(descProgress);
 
-		if (ACE.editMode) {
-			JButton rowAddAfter = new JButton(new ImageIcon(ACE.class
-					.getResource("/24x24/plain/row_add_after.png")));
-			descPanel.add(rowAddAfter, c);
-			rowAddAfter.addActionListener(new AddDescription(host, host
-					.getConfig()));
-			rowAddAfter.setToolTipText("add new description");
-		} else {
-			JPanel filler = new JPanel();
-			filler.setMaximumSize(new Dimension(40, 32));
-			filler.setMinimumSize(new Dimension(40, 32));
-			filler.setPreferredSize(new Dimension(40, 32));
-			descPanel.add(filler, c);
-		}
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy++;
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0.0;
+        c.weighty = 0.0;
+        c.gridheight = 2;
 
-		c.gridheight = 1;
-		c.gridx++;
-		TableSorter sortingTable = new TableSorter(descTableModel);
-		descTable = new JTableWithDragImage(sortingTable);
-		descTable.getSelectionModel().addListSelectionListener(this);
-		descTable.setDragEnabled(true);
-		descTable.setTransferHandler(new TerminologyTransferHandler(descTable));
+        if (ACE.editMode) {
+            JButton rowAddAfter = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/row_add_after.png")));
+            descPanel.add(rowAddAfter, c);
+            rowAddAfter.addActionListener(new AddDescription(host, host.getConfig()));
+            rowAddAfter.setToolTipText("add new description");
+        } else {
+            JPanel filler = new JPanel();
+            filler.setMaximumSize(new Dimension(40, 32));
+            filler.setMinimumSize(new Dimension(40, 32));
+            filler.setPreferredSize(new Dimension(40, 32));
+            descPanel.add(filler, c);
+        }
 
-		if (ACE.editMode) {
-			descTable.addMouseListener(descTableModel.makePopupListener(
-					descTable, host.getConfig()));
-		}
+        c.gridheight = 1;
+        c.gridx++;
+        TableSorter sortingTable = new TableSorter(descTableModel);
+        descTable = new JTableWithDragImage(sortingTable);
+        descTable.getSelectionModel().addListSelectionListener(this);
+        descTable.setDragEnabled(true);
+        descTable.setTransferHandler(new TerminologyTransferHandler(descTable));
 
-		descTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		sortingTable.setTableHeader(descTable.getTableHeader());
+        if (ACE.editMode) {
+            descTable.addMouseListener(descTableModel.makePopupListener(descTable, host.getConfig()));
+        }
 
-		DESC_FIELD[] columnEnums = descTableModel.getColumnEnums();
+        descTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        sortingTable.setTableHeader(descTable.getTableHeader());
 
-		for (int i = 0; i < descTable.getColumnCount(); i++) {
-			TableColumn column = descTable.getColumnModel().getColumn(i);
-			DESC_FIELD columnDesc = columnEnums[i];
-			column.setIdentifier(columnDesc);
-			column.setPreferredWidth(columnDesc.getPref());
-			column.setMaxWidth(columnDesc.getMax());
-			column.setMinWidth(columnDesc.getMin());
-		}
+        DESC_FIELD[] columnEnums = descTableModel.getColumnEnums();
 
-		// Set up tool tips for column headers.
-		sortingTable
-				.getTableHeader()
-				.setToolTipText(
-						"Click to specify sorting; Control-Click to specify secondary sorting");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
-		descPanel.add(descTable.getTableHeader(), c);
-		c.gridy++;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
-		c.gridheight = 6;
+        for (int i = 0; i < descTable.getColumnCount(); i++) {
+            TableColumn column = descTable.getColumnModel().getColumn(i);
+            DESC_FIELD columnDesc = columnEnums[i];
+            column.setIdentifier(columnDesc);
+            column.setPreferredWidth(columnDesc.getPref());
+            column.setMaxWidth(columnDesc.getMax());
+            column.setMinWidth(columnDesc.getMin());
+        }
 
-		setupEditorsAndRenderers(host);
-		descPanel.add(descTable, c);
+        // Set up tool tips for column headers.
+        sortingTable.getTableHeader().setToolTipText(
+            "Click to specify sorting; Control-Click to specify secondary sorting");
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
+        descPanel.add(descTable.getTableHeader(), c);
+        c.gridy++;
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.gridheight = 6;
 
-		c.weightx = 0.0;
-		c.weighty = 0.0;
-		c.gridy = c.gridy + c.gridheight;
-		c.gridheight = 1;
-		c.gridx = 0;
-		c.gridwidth = 2;
+        setupEditorsAndRenderers(host);
+        descPanel.add(descTable, c);
 
-		if (host.getToggleState(TOGGLES.ID) == true) {
-			idPlugin = new IdPlugin(true, 1);
-			idPlugin.setShowBorder(false);
-			descPanel.add(idPlugin.getComponent(this), c);
-			c.gridy++;
-		}
+        c.weightx = 0.0;
+        c.weighty = 0.0;
+        c.gridy = c.gridy + c.gridheight;
+        c.gridheight = 1;
+        c.gridx = 0;
+        c.gridwidth = 2;
 
-		visibleExtensions.clear();
-		RefsetUtil.addRefsetTables(host, this, TOGGLES.DESCRIPTIONS, c,
-				visibleExtensions, descPanel);
+        if (host.getToggleState(TOGGLES.ID) == true) {
+            idPlugin = new IdPlugin(true, 1);
+            idPlugin.setShowBorder(false);
+            descPanel.add(idPlugin.getComponent(this), c);
+            c.gridy++;
+        }
 
-		descPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createEmptyBorder(1, 1, 1, 3), BorderFactory
-				.createLineBorder(Color.GRAY)));
+        visibleExtensions.clear();
+        RefsetUtil.addRefsetTables(host, this, TOGGLES.DESCRIPTIONS, c, visibleExtensions, descPanel);
 
-		return descPanel;
-	}
+        descPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3),
+            BorderFactory.createLineBorder(Color.GRAY)));
 
-	private void setupEditorsAndRenderers(I_HostConceptPlugins host) {
-		DescriptionTableRenderer renderer = new DescriptionTableRenderer(host.getConfig());
-		descTable.setDefaultRenderer(Boolean.class, renderer);
-		JComboBox comboBox = new JComboBox() {
-			/**
+        return descPanel;
+    }
+
+    private void setupEditorsAndRenderers(I_HostConceptPlugins host) {
+        DescriptionTableRenderer renderer = new DescriptionTableRenderer(host.getConfig());
+        descTable.setDefaultRenderer(Boolean.class, renderer);
+        JComboBox comboBox = new JComboBox() {
+            /**
 			 * 
 			 */
-			private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
-			@Override
-			public void setSelectedItem(Object anObject) {
-				Boolean value = null;
-				if (Boolean.class.isAssignableFrom(anObject.getClass())) {
-					value = (Boolean) anObject;
-				} else if (StringWithDescTuple.class.isAssignableFrom(anObject
-						.getClass())) {
-					StringWithDescTuple swt = (StringWithDescTuple) anObject;
-					value = Boolean.parseBoolean(swt.getCellText());
-				}
-				super.setSelectedItem(value);
-			}
-		};
-		comboBox.addItem(new Boolean(true));
-		comboBox.addItem(new Boolean(false));
-		if (ACE.editMode) {
-			descTable.setDefaultEditor(Boolean.class, new DefaultCellEditor(
-					comboBox));
+            @Override
+            public void setSelectedItem(Object anObject) {
+                Boolean value = null;
+                if (Boolean.class.isAssignableFrom(anObject.getClass())) {
+                    value = (Boolean) anObject;
+                } else if (StringWithDescTuple.class.isAssignableFrom(anObject.getClass())) {
+                    StringWithDescTuple swt = (StringWithDescTuple) anObject;
+                    value = Boolean.parseBoolean(swt.getCellText());
+                }
+                super.setSelectedItem(value);
+            }
+        };
+        comboBox.addItem(new Boolean(true));
+        comboBox.addItem(new Boolean(false));
+        if (ACE.editMode) {
+            descTable.setDefaultEditor(Boolean.class, new DefaultCellEditor(comboBox));
 
-			descTable.setDefaultEditor(StringWithDescTuple.class,
-					new DescriptionTableModel.DescTextFieldEditor());
-			descTable.getColumn(DESC_FIELD.TYPE).setCellEditor(
-					new DescriptionTableModel.DescTypeFieldEditor(host
-							.getConfig()));
-			descTable.getColumn(DESC_FIELD.STATUS).setCellEditor(
-					new DescriptionTableModel.DescStatusFieldEditor(host
-							.getConfig()));
-		}
+            descTable.setDefaultEditor(StringWithDescTuple.class, new DescriptionTableModel.DescTextFieldEditor());
+            descTable.getColumn(DESC_FIELD.TYPE).setCellEditor(
+                new DescriptionTableModel.DescTypeFieldEditor(host.getConfig()));
+            descTable.getColumn(DESC_FIELD.STATUS).setCellEditor(
+                new DescriptionTableModel.DescStatusFieldEditor(host.getConfig()));
+        }
 
-		descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
-		descTable.setDefaultRenderer(Number.class, renderer);
-		descTable.setDefaultRenderer(String.class, renderer);
-	}
+        descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
+        descTable.setDefaultRenderer(Number.class, renderer);
+        descTable.setDefaultRenderer(String.class, renderer);
+    }
 
-	@Override
-	protected String getToolTipText() {
-		return "show/hide descriptions for this concept";
-	}
+    @Override
+    protected String getToolTipText() {
+        return "show/hide descriptions for this concept";
+    }
 
-	@Override
-	protected int getComponentId() {
-		if (descTable.getSelectedRow() < 0) {
-			return Integer.MIN_VALUE;
-		}
-		StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(
-				descTable.getSelectedRow(), 0);
-		return swdt.getTuple().getDescId();
-	}
+    @Override
+    protected int getComponentId() {
+        if (descTable.getSelectedRow() < 0) {
+            return Integer.MIN_VALUE;
+        }
+        StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(descTable.getSelectedRow(), 0);
+        return swdt.getTuple().getDescId();
+    }
 
-	protected I_AmTermComponent getSelectedPluginComponent() {
-		if (descTable.getSelectedRow() >= 0) {
-			StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(
-					descTable.getSelectedRow(), 0);
-			if (swdt != null && swdt.getTuple() != null) {
-				return swdt.getTuple().getDescVersioned();
-			}
-		}
-		return null;
-	}
+    protected I_AmTermComponent getSelectedPluginComponent() {
+        if (descTable.getSelectedRow() >= 0) {
+            StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(descTable.getSelectedRow(), 0);
+            if (swdt != null && swdt.getTuple() != null) {
+                return swdt.getTuple().getDescVersioned();
+            }
+        }
+        return null;
+    }
 
+    public void tableChanged(TableModelEvent tme) {
+        if (descTable.getSelectedRow() == -1) {
+            if (descTable.getRowCount() > 0) {
+                int rowToSelect = 0; // descTable.getRowCount() -1;
+                descTable.setRowSelectionInterval(rowToSelect, rowToSelect);
+            }
+        }
 
-	public void tableChanged(TableModelEvent tme) {
-		if (descTable.getSelectedRow() == -1) {
-			if (descTable.getRowCount() > 0) {
-				int rowToSelect = 0; // descTable.getRowCount() -1;
-				descTable.setRowSelectionInterval(rowToSelect, rowToSelect);
-			}
-		}
+    }
 
-	}
+    public I_GetConceptData getHierarchySelection() {
+        return getHost().getHierarchySelection();
+    }
 
-	public I_GetConceptData getHierarchySelection() {
-		return getHost().getHierarchySelection();
-	}
+    public boolean getShowHistory() {
+        return getHost().getShowHistory();
+    }
 
-	public boolean getShowHistory() {
-		return getHost().getShowHistory();
-	}
+    public boolean getShowRefsets() {
+        return getHost().getShowRefsets();
+    }
 
-	public boolean getShowRefsets() {
-		return getHost().getShowRefsets();
-	}
+    public boolean getToggleState(TOGGLES toggle) {
+        return getHost().getToggleState(toggle);
+    }
 
-	public boolean getToggleState(TOGGLES toggle) {
-		return getHost().getToggleState(toggle);
-	}
+    public boolean getUsePrefs() {
+        return getHost().getUsePrefs();
+    }
 
-	public boolean getUsePrefs() {
-		return getHost().getUsePrefs();
-	}
+    public void setAllTogglesToState(boolean state) {
+        getHost().setAllTogglesToState(state);
+    }
 
-	public void setAllTogglesToState(boolean state) {
-		getHost().setAllTogglesToState(state);
-	}
+    public void setLinkType(LINK_TYPE link) {
+        getHost().setLinkType(link);
+    }
 
-	public void setLinkType(LINK_TYPE link) {
-		getHost().setLinkType(link);
-	}
+    public void setToggleState(TOGGLES toggle, boolean state) {
+        getHost().setToggleState(toggle, state);
+    }
 
-	public void setToggleState(TOGGLES toggle, boolean state) {
-		getHost().setToggleState(toggle, state);
-	}
+    public void unlink() {
+        getHost().unlink();
+    }
 
-	public void unlink() {
-		getHost().unlink();
-	}
+    public I_ConfigAceFrame getConfig() {
+        return getHost().getConfig();
+    }
 
+    public I_AmTermComponent getTermComponent() {
+        return getSelectedPluginComponent();
+    }
 
-	public I_ConfigAceFrame getConfig() {
-		return getHost().getConfig();
-	}
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(propertyName, listener);
+    }
 
-	public I_AmTermComponent getTermComponent() {
-		return getSelectedPluginComponent();
-	}
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(propertyName, listener);
+    }
 
-	public void removePropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
-		pcs.removePropertyChangeListener(propertyName, listener);
-	}
+    public void setTermComponent(I_AmTermComponent arg0) {
+        throw new UnsupportedOperationException();
+    }
 
-	public void addPropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
-		pcs.addPropertyChangeListener(propertyName, listener);
-	}
-
-	public void setTermComponent(I_AmTermComponent arg0) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void valueChanged(ListSelectionEvent evt) {
-		super.valueChanged(evt);
-		pcs.firePropertyChange(I_ContainTermComponent.TERM_COMPONENT, null, getSelectedPluginComponent());
-	}
+    @Override
+    public void valueChanged(ListSelectionEvent evt) {
+        super.valueChanged(evt);
+        pcs.firePropertyChange(I_ContainTermComponent.TERM_COMPONENT, null, getSelectedPluginComponent());
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,43 +23,42 @@ import org.dwfa.ace.api.I_RelTuple;
 
 public class LabelForGroupTuple extends LabelForTuple {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	private List<I_RelTuple> relGroup;
+    private static final long serialVersionUID = 1L;
+    private List<I_RelTuple> relGroup;
 
-	public LabelForGroupTuple(List<I_RelTuple> rel, boolean longForm,
-			boolean showStatus) {
-		super(longForm, showStatus);
-		this.relGroup = rel;
-	}
+    public LabelForGroupTuple(List<I_RelTuple> rel, boolean longForm, boolean showStatus) {
+        super(longForm, showStatus);
+        this.relGroup = rel;
+    }
 
-	public I_ImplementActiveLabel copy() throws IOException {
-		return TermLabelMaker.newLabel(relGroup, isLongForm(), getShowStatus());
-	}
+    public I_ImplementActiveLabel copy() throws IOException {
+        return TermLabelMaker.newLabel(relGroup, isLongForm(), getShowStatus());
+    }
 
-	public List<I_RelTuple> getRelGroup() {
-		return relGroup;
-	}
+    public List<I_RelTuple> getRelGroup() {
+        return relGroup;
+    }
 
-	@Override
-	protected boolean tupleEquals(Object obj) {
-		if (LabelForGroupTuple.class.isAssignableFrom(obj.getClass())) {
-			LabelForGroupTuple another = (LabelForGroupTuple) obj;
-			return relGroup.equals(another.relGroup);
-		}
-		return false;
-	}
+    @Override
+    protected boolean tupleEquals(Object obj) {
+        if (LabelForGroupTuple.class.isAssignableFrom(obj.getClass())) {
+            LabelForGroupTuple another = (LabelForGroupTuple) obj;
+            return relGroup.equals(another.relGroup);
+        }
+        return false;
+    }
 
-	@Override
-	protected int tupleHash() {
-		return this.relGroup.hashCode();
-	}
+    @Override
+    protected int tupleHash() {
+        return this.relGroup.hashCode();
+    }
 
-	@Override
-	protected String getTupleString() {
-		return relGroup.toString();
-	}
+    @Override
+    protected String getTupleString() {
+        return relGroup.toString();
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,106 +38,107 @@ import org.dwfa.ace.table.refset.RefsetUtil;
 
 public class SrcRelPlugin extends RelPlugin {
 
-	private static final long serialVersionUID = 1L;
-	private static final int dataVersion = 1;
+    private static final long serialVersionUID = 1L;
+    private static final int dataVersion = 1;
 
-	private transient JPanel pluginPanel;
-	private transient SrcRelTableModel srcRelTableModel;
+    private transient JPanel pluginPanel;
+    private transient SrcRelTableModel srcRelTableModel;
     private static TOGGLES toggleType = TOGGLES.SOURCE_RELS;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	public SrcRelPlugin(boolean selectedByDefault, int sequence) {
+    public SrcRelPlugin(boolean selectedByDefault, int sequence) {
         super(selectedByDefault, sequence);
-	}
-	
-	   public UUID getId() {
-		   return TOGGLES.SOURCE_RELS.getPluginId();
-	   }
+    }
 
+    public UUID getId() {
+        return TOGGLES.SOURCE_RELS.getPluginId();
+    }
 
-	public JPanel getComponent(I_HostConceptPlugins host) {
-	  setHost(host);
-      if (pluginPanel == null || RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)) {
-         createPluginComponent(host);
-      }
-		return pluginPanel;
-	}
+    public JPanel getComponent(I_HostConceptPlugins host) {
+        setHost(host);
+        if (pluginPanel == null || RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)) {
+            createPluginComponent(host);
+        }
+        return pluginPanel;
+    }
 
-   private void createPluginComponent(I_HostConceptPlugins host) {
-		  setHost(host);
-      if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-         AceLog.getAppLog().fine("creating src rel plugin component...");
-      }
-      srcRelTableModel = new SrcRelTableModel(host,
-      		getSrcRelColumns(host.getShowHistory()), host.getConfig());
-      pluginPanel = getRelPanel(host, srcRelTableModel, "Source relationships:", true, toggleType);
-      host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
-      host.addPropertyChangeListener("commit", this);
-      PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
-      srcRelTableModel.propertyChange(evt);
-   }
+    private void createPluginComponent(I_HostConceptPlugins host) {
+        setHost(host);
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            AceLog.getAppLog().fine("creating src rel plugin component...");
+        }
+        srcRelTableModel = new SrcRelTableModel(host, getSrcRelColumns(host.getShowHistory()), host.getConfig());
+        pluginPanel = getRelPanel(host, srcRelTableModel, "Source relationships:", true, toggleType);
+        host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
+        host.addPropertyChangeListener("commit", this);
+        PropertyChangeEvent evt = new PropertyChangeEvent(host, "termComponent", null, host.getTermComponent());
+        srcRelTableModel.propertyChange(evt);
+    }
 
-	private REL_FIELD[] getSrcRelColumns(boolean showHistory) {
-		List<REL_FIELD> fields = new ArrayList<REL_FIELD>();
-		fields.add(REL_FIELD.REL_TYPE);
-		fields.add(REL_FIELD.DEST_ID);
-		fields.add(REL_FIELD.CHARACTERISTIC);
-		fields.add(REL_FIELD.REFINABILITY);
-		fields.add(REL_FIELD.GROUP);
-		fields.add(REL_FIELD.STATUS);
-		if (showHistory) {
-			fields.add(REL_FIELD.VERSION);
-			fields.add(REL_FIELD.PATH);
-		}
-		return fields.toArray(new REL_FIELD[fields.size()]);
-	}
+    private REL_FIELD[] getSrcRelColumns(boolean showHistory) {
+        List<REL_FIELD> fields = new ArrayList<REL_FIELD>();
+        fields.add(REL_FIELD.REL_TYPE);
+        fields.add(REL_FIELD.DEST_ID);
+        fields.add(REL_FIELD.CHARACTERISTIC);
+        fields.add(REL_FIELD.REFINABILITY);
+        fields.add(REL_FIELD.GROUP);
+        fields.add(REL_FIELD.STATUS);
+        if (showHistory) {
+            fields.add(REL_FIELD.VERSION);
+            fields.add(REL_FIELD.PATH);
+        }
+        return fields.toArray(new REL_FIELD[fields.size()]);
+    }
 
-	@Override
-	protected ImageIcon getImageIcon() {
-		return new ImageIcon(ACE.class.getResource("/24x24/plain/node.png"));
-	}
-	@Override
-	public void update() throws IOException {
-		if (getHost() != null) {
-			
-		if (idPlugin != null) {
-			idPlugin.update();
-		}
+    @Override
+    protected ImageIcon getImageIcon() {
+        return new ImageIcon(ACE.class.getResource("/24x24/plain/node.png"));
+    }
 
-         if (RefsetUtil.refSetsChanged(getHost(), toggleType, this, visibleExtensions)|| getHost().getToggleState(TOGGLES.ID) != idToggleState) {
-				idToggleState = getHost().getToggleState(TOGGLES.ID);
-				createPluginComponent(getHost());
-         }
+    @Override
+    public void update() throws IOException {
+        if (getHost() != null) {
 
-         PropertyChangeEvent evt = new PropertyChangeEvent(getHost(), "termComponent", null, getHost().getTermComponent());
-			REL_FIELD[] columnEnums = getSrcRelColumns(getHost().getShowHistory());
-			srcRelTableModel.setColumns(getSrcRelColumns(getHost().getShowHistory()));
-			for (int i = 0; i < srcRelTableModel.getColumnCount(); i++) {
-				TableColumn column = getRelTable().getColumnModel().getColumn(i);
-				REL_FIELD columnDesc = columnEnums[i];
-				column.setIdentifier(columnDesc);
-				column.setPreferredWidth(columnDesc.getPref());
-				column.setMaxWidth(columnDesc.getMax());
-				column.setMinWidth(columnDesc.getMin());
-			}
-			setupEditors(getHost());
-			srcRelTableModel.propertyChange(evt);			
-		}
-	}
-   @Override
-   protected String getToolTipText() {
-      return "show/hide source relationships for this concept";
-   }
+            if (idPlugin != null) {
+                idPlugin.update();
+            }
+
+            if (RefsetUtil.refSetsChanged(getHost(), toggleType, this, visibleExtensions)
+                || getHost().getToggleState(TOGGLES.ID) != idToggleState) {
+                idToggleState = getHost().getToggleState(TOGGLES.ID);
+                createPluginComponent(getHost());
+            }
+
+            PropertyChangeEvent evt = new PropertyChangeEvent(getHost(), "termComponent", null,
+                getHost().getTermComponent());
+            REL_FIELD[] columnEnums = getSrcRelColumns(getHost().getShowHistory());
+            srcRelTableModel.setColumns(getSrcRelColumns(getHost().getShowHistory()));
+            for (int i = 0; i < srcRelTableModel.getColumnCount(); i++) {
+                TableColumn column = getRelTable().getColumnModel().getColumn(i);
+                REL_FIELD columnDesc = columnEnums[i];
+                column.setIdentifier(columnDesc);
+                column.setPreferredWidth(columnDesc.getPref());
+                column.setMaxWidth(columnDesc.getMax());
+                column.setMinWidth(columnDesc.getMin());
+            }
+            setupEditors(getHost());
+            srcRelTableModel.propertyChange(evt);
+        }
+    }
+
+    @Override
+    protected String getToolTipText() {
+        return "show/hide source relationships for this concept";
+    }
 }

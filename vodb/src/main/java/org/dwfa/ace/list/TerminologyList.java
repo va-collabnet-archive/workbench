@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,12 +49,9 @@ public class TerminologyList extends JList {
                 int selectedIndex = getSelectedIndex();
                 if (selectedIndex >= 0) {
                     TerminologyListModel tm = (TerminologyListModel) getModel();
-                    int option =
-                            JOptionPane.showConfirmDialog(TerminologyList.this,
-                                "<html>Are you sure you want to erase item <font color='red'>"
-                                    + tm.getElementAt(selectedIndex)
-                                    + "</font> from the list?",
-                                "Erase the list?", JOptionPane.YES_NO_OPTION);
+                    int option = JOptionPane.showConfirmDialog(TerminologyList.this,
+                        "<html>Are you sure you want to erase item <font color='red'>" + tm.getElementAt(selectedIndex)
+                            + "</font> from the list?", "Erase the list?", JOptionPane.YES_NO_OPTION);
                     if (option == JOptionPane.YES_OPTION) {
                         delete();
                     }
@@ -86,8 +83,7 @@ public class TerminologyList extends JList {
         init(true, config);
     }
 
-    public TerminologyList(TerminologyListModel dataModel,
-            I_ConfigAceFrame config) {
+    public TerminologyList(TerminologyListModel dataModel, I_ConfigAceFrame config) {
         super(dataModel);
         init(true, config);
     }
@@ -97,8 +93,8 @@ public class TerminologyList extends JList {
         init(allowDelete, config);
     }
 
-    public TerminologyList(TerminologyListModel dataModel, boolean allowDelete,
-            boolean confirmDelete, I_ConfigAceFrame config) {
+    public TerminologyList(TerminologyListModel dataModel, boolean allowDelete, boolean confirmDelete,
+            I_ConfigAceFrame config) {
         super(dataModel);
         this.confirmDelete = confirmDelete;
         init(allowDelete, config);
@@ -110,25 +106,17 @@ public class TerminologyList extends JList {
         setDragEnabled(true);
         if (allowDelete) {
             DeleteAction delete = new DeleteAction();
-            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
+            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
                 delete.getValue(Action.NAME));
-            getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
+            getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), delete.getValue(Action.NAME));
+            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
                 delete.getValue(Action.NAME));
-            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
-                delete.getValue(Action.NAME));
-            getInputMap().put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
-                delete.getValue(Action.NAME));
+            getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), delete.getValue(Action.NAME));
 
             ActionMap map = this.getActionMap();
-            map.put(TransferHandler.getCutAction().getValue(Action.NAME),
-                TransferHandler.getCutAction());
-            map.put(TransferHandler.getCopyAction().getValue(Action.NAME),
-                TransferHandler.getCopyAction());
-            map.put(TransferHandler.getPasteAction().getValue(Action.NAME),
-                TransferHandler.getPasteAction());
+            map.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
+            map.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
+            map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
             map.put(delete.getValue(Action.NAME), delete);
         }
     }

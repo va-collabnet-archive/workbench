@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,33 +30,27 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
-public class TermComponentListSelectionListener implements
-        ListSelectionListener {
+public class TermComponentListSelectionListener implements ListSelectionListener {
 
     I_ContainTermComponent linkedComponent;
 
     private boolean warnForUncommitted = false;
 
-    public TermComponentListSelectionListener(
-            I_ContainTermComponent linkedComponent) {
+    public TermComponentListSelectionListener(I_ContainTermComponent linkedComponent) {
         super();
         this.linkedComponent = linkedComponent;
     }
 
     public void valueChanged(ListSelectionEvent e) {
         try {
-            ConceptBean currentBean =
-                    (ConceptBean) linkedComponent.getTermComponent();
+            ConceptBean currentBean = (ConceptBean) linkedComponent.getTermComponent();
             if (currentBean != null) {
                 if (currentBean.isUncommitted()) {
                     if (warnForUncommitted) {
-                        int option =
-                                JOptionPane.showConfirmDialog(
-                                    (Component) linkedComponent,
-                                    "This view contains an uncommited concept. If you continue, the "
-                                        + "focused concept will change...",
-                                    "Uncommitted component",
-                                    JOptionPane.OK_CANCEL_OPTION);
+                        int option = JOptionPane.showConfirmDialog((Component) linkedComponent,
+                            "This view contains an uncommited concept. If you continue, the "
+                                + "focused concept will change...", "Uncommitted component",
+                            JOptionPane.OK_CANCEL_OPTION);
                         if (JOptionPane.OK_OPTION == option) {
                             setLinkedComponent(e);
                         }
@@ -70,8 +64,7 @@ public class TermComponentListSelectionListener implements
                 setLinkedComponent(e);
             }
         } catch (IOException e1) {
-            AceLog.getAppLog().alertAndLog(Level.SEVERE,
-                e1.getLocalizedMessage(), e1);
+            AceLog.getAppLog().alertAndLog(Level.SEVERE, e1.getLocalizedMessage(), e1);
         }
     }
 
@@ -81,8 +74,7 @@ public class TermComponentListSelectionListener implements
         if (list.getSelectedIndex() == -1) {
             linkedComponent.setTermComponent(null);
         } else {
-            linkedComponent.setTermComponent(model.getElementAt(list
-                .getSelectedIndex()));
+            linkedComponent.setTermComponent(model.getElementAt(list.getSelectedIndex()));
         }
     }
 

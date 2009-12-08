@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,31 +25,32 @@ import java.util.concurrent.Callable;
 import com.sleepycat.je.DatabaseEntry;
 
 public abstract class TermWriter implements Callable<Object> {
-	DataOutputStream dos;
-	int count = 0;
-	protected boolean canceled = false;
+    DataOutputStream dos;
+    int count = 0;
+    protected boolean canceled = false;
 
-	public TermWriter(OutputStream outStream) {
-		dos = new DataOutputStream(new BufferedOutputStream(outStream));
-	}
+    public TermWriter(OutputStream outStream) {
+        dos = new DataOutputStream(new BufferedOutputStream(outStream));
+    }
 
-	public DatabaseEntry getDataEntry() {
-		return new DatabaseEntry(); 
-	}
+    public DatabaseEntry getDataEntry() {
+        return new DatabaseEntry();
+    }
 
-	public DatabaseEntry getKeyEntry() {
-		return new DatabaseEntry();
-	}
+    public DatabaseEntry getKeyEntry() {
+        return new DatabaseEntry();
+    }
 
-	public void close() throws IOException {
-		dos.close();
-	}
+    public void close() throws IOException {
+        dos.close();
+    }
 
-	public int getCount() {
-		return count;
-	}
-	public void cancel() {
-		canceled  = true;
-	}
+    public int getCount() {
+        return count;
+    }
+
+    public void cancel() {
+        canceled = true;
+    }
 
 }

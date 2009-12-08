@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,19 +26,16 @@ import com.sleepycat.je.DatabaseException;
 
 public interface I_StoreImages extends I_StoreInBdb {
 
-	public void writeImage(I_ImageVersioned image)
-			throws DatabaseException;
+    public void writeImage(I_ImageVersioned image) throws DatabaseException;
 
-	public boolean hasImage(int imageId) throws DatabaseException;
+    public boolean hasImage(int imageId) throws DatabaseException;
 
-	public I_ImageVersioned getImage(int nativeId)
-			throws DatabaseException;
+    public I_ImageVersioned getImage(int nativeId) throws DatabaseException;
 
-	public List<I_ImageVersioned> getImages(int conceptId)
-			throws DatabaseException;
-	
-	public void iterateImages(I_ProcessImageEntries processor) throws Exception;
+    public List<I_ImageVersioned> getImages(int conceptId) throws DatabaseException;
 
-	public I_ImageVersioned imageEntryToObject(DatabaseEntry key, DatabaseEntry value);
+    public void iterateImages(I_ProcessImageEntries processor) throws Exception;
+
+    public I_ImageVersioned imageEntryToObject(DatabaseEntry key, DatabaseEntry value);
 
 }

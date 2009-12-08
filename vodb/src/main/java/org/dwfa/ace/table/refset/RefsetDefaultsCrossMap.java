@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,29 +28,18 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
-public class RefsetDefaultsCrossMap extends RefsetDefaultsCrossMapForRel
-        implements I_RefsetDefaultsCrossMap {
+public class RefsetDefaultsCrossMap extends RefsetDefaultsCrossMapForRel implements I_RefsetDefaultsCrossMap {
 
     public RefsetDefaultsCrossMap() throws TerminologyException, IOException {
         super();
-        mapStatus =
-                ConceptBean.get(RefsetAuxiliary.Concept.UNMAPPABLE_MAP_STATUS
-                    .getUids());
+        mapStatus = ConceptBean.get(RefsetAuxiliary.Concept.UNMAPPABLE_MAP_STATUS.getUids());
         mapStatusPopupIds.add(mapStatus.getConceptId());
-        mapStatusPopupIds.add(ConceptBean.get(
-            RefsetAuxiliary.Concept.EXACT_MAP_STATUS.getUids()).getConceptId());
-        mapStatusPopupIds.add(ConceptBean.get(
-            RefsetAuxiliary.Concept.GENERAL_MAP_STATUS.getUids())
+        mapStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.EXACT_MAP_STATUS.getUids()).getConceptId());
+        mapStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.GENERAL_MAP_STATUS.getUids()).getConceptId());
+        mapStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.DEFAULT_MAP_STATUS.getUids()).getConceptId());
+        mapStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.REQUIRES_CHECKING_MAP_STATUS.getUids())
             .getConceptId());
-        mapStatusPopupIds.add(ConceptBean.get(
-            RefsetAuxiliary.Concept.DEFAULT_MAP_STATUS.getUids())
-            .getConceptId());
-        mapStatusPopupIds.add(ConceptBean.get(
-            RefsetAuxiliary.Concept.REQUIRES_CHECKING_MAP_STATUS.getUids())
-            .getConceptId());
-        mapStatusPopupIds.add(ConceptBean.get(
-            RefsetAuxiliary.Concept.ALTERNATIVE_MAP_STATUS.getUids())
-            .getConceptId());
+        mapStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.ALTERNATIVE_MAP_STATUS.getUids()).getConceptId());
     }
 
     /**
@@ -69,8 +58,7 @@ public class RefsetDefaultsCrossMap extends RefsetDefaultsCrossMapForRel
         IntList.writeIntList(out, mapStatusPopupIds);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             mapStatus = readConcept(in);
@@ -80,29 +68,42 @@ public class RefsetDefaultsCrossMap extends RefsetDefaultsCrossMapForRel
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.ace.table.refset.I_RefsetDefaultsCrossMap#getMapStatus()
      */
     public I_GetConceptData getMapStatus() {
         return mapStatus;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.ace.table.refset.I_RefsetDefaultsCrossMap#setMapStatus(org.dwfa.ace.api.I_GetConceptData)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.table.refset.I_RefsetDefaultsCrossMap#setMapStatus(org.dwfa
+     * .ace.api.I_GetConceptData)
      */
     public void setMapStatus(I_GetConceptData mapStatus) {
         this.mapStatus = mapStatus;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.ace.table.refset.I_RefsetDefaultsCrossMap#getMapStatusPopupIds()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.table.refset.I_RefsetDefaultsCrossMap#getMapStatusPopupIds()
      */
     public I_IntList getMapStatusPopupIds() {
         return mapStatusPopupIds;
     }
 
-    /* (non-Javadoc)
-     * @see org.dwfa.ace.table.refset.I_RefsetDefaultsCrossMap#setMapStatusPopupIds(org.dwfa.ace.api.I_IntList)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.table.refset.I_RefsetDefaultsCrossMap#setMapStatusPopupIds
+     * (org.dwfa.ace.api.I_IntList)
      */
     public void setMapStatusPopupIds(I_IntList mapStatusPopupIds) {
         this.mapStatusPopupIds = mapStatusPopupIds;

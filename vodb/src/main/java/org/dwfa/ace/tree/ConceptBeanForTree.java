@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,333 +45,318 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree {
-	ConceptBean bean;
-	int relId;
-	int parentDepth;
-	List<DefaultMutableTreeNode> extraParentNodes  = new ArrayList<DefaultMutableTreeNode>();
-	private boolean parentOpened;
-	private boolean secondaryParentNode;
-	private I_ConfigAceFrame config;
-	
-	public static ConceptBeanForTree get(int conceptId, int relId, int parentDepth, 
-			boolean secondaryParentNode, I_ConfigAceFrame config) {
-		ConceptBean bean = ConceptBean.get(conceptId);
-		return new ConceptBeanForTree(bean, relId, parentDepth, secondaryParentNode, config);
-	}
+    ConceptBean bean;
+    int relId;
+    int parentDepth;
+    List<DefaultMutableTreeNode> extraParentNodes = new ArrayList<DefaultMutableTreeNode>();
+    private boolean parentOpened;
+    private boolean secondaryParentNode;
+    private I_ConfigAceFrame config;
 
-	public ConceptBeanForTree(ConceptBean bean, int relId, int parentDepth,
-			boolean secondaryParentNode, I_ConfigAceFrame config) {
-		super();
-		this.bean = bean;
-		this.relId = relId;
-		this.parentDepth = parentDepth;
-		this.secondaryParentNode = secondaryParentNode;
-		this.config = config;
-	}
+    public static ConceptBeanForTree get(int conceptId, int relId, int parentDepth, boolean secondaryParentNode,
+            I_ConfigAceFrame config) {
+        ConceptBean bean = ConceptBean.get(conceptId);
+        return new ConceptBeanForTree(bean, relId, parentDepth, secondaryParentNode, config);
+    }
 
-	public I_ConceptAttributeVersioned getConceptAttributes() throws IOException {
-		return bean.getConceptAttributes();
-	}
+    public ConceptBeanForTree(ConceptBean bean, int relId, int parentDepth, boolean secondaryParentNode,
+            I_ConfigAceFrame config) {
+        super();
+        this.bean = bean;
+        this.relId = relId;
+        this.parentDepth = parentDepth;
+        this.secondaryParentNode = secondaryParentNode;
+        this.config = config;
+    }
 
-	public int getConceptId() {
-		return bean.getConceptId();
-	}
+    public I_ConceptAttributeVersioned getConceptAttributes() throws IOException {
+        return bean.getConceptAttributes();
+    }
 
-	public int getTermComponentId() {
-		return bean.getTermComponentId();
-	}
-	
-	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positions) throws IOException {
-		return bean.getConceptAttributeTuples(allowedStatus, positions);
-	}
+    public int getConceptId() {
+        return bean.getConceptId();
+    }
 
-	public List<I_DescriptionVersioned> getDescriptions() throws IOException {
-		return bean.getDescriptions();
-	}
+    public int getTermComponentId() {
+        return bean.getTermComponentId();
+    }
 
-	public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions) throws IOException {
-		return bean.getDescriptionTuples(allowedStatus, allowedTypes, positions);
-	}
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positions)
+            throws IOException {
+        return bean.getConceptAttributeTuples(allowedStatus, positions);
+    }
 
-	public List<I_RelVersioned> getDestRels() throws IOException {
-		if (parentDepth > 0) {
-			return new ArrayList<I_RelVersioned>();
-		}
-		return bean.getDestRels();
-	}
+    public List<I_DescriptionVersioned> getDescriptions() throws IOException {
+        return bean.getDescriptions();
+    }
 
-	public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, 
-			I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
-		if (parentDepth > 0) {
-			return new ArrayList<I_RelTuple>();
-		}
-		return bean.getDestRelTuples(allowedStatus, allowedTypes, positions, addUncommitted);
-	}
+    public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positions) throws IOException {
+        return bean.getDescriptionTuples(allowedStatus, allowedTypes, positions);
+    }
 
-	public List<I_ImageVersioned> getImages() throws IOException {
-		return bean.getImages();
-	}
+    public List<I_RelVersioned> getDestRels() throws IOException {
+        if (parentDepth > 0) {
+            return new ArrayList<I_RelVersioned>();
+        }
+        return bean.getDestRels();
+    }
 
-	public String getInitialText() throws IOException {
-		I_DescriptionTuple tuple = this.getDescTuple(
-				ConceptBeanForTree.this.config.getShortLabelDescPreferenceList(),
-				ConceptBeanForTree.this.config);
-		if (tuple != null) {
-			return tuple.getText();
-		}
+    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+            boolean addUncommitted) throws IOException {
+        if (parentDepth > 0) {
+            return new ArrayList<I_RelTuple>();
+        }
+        return bean.getDestRelTuples(allowedStatus, allowedTypes, positions, addUncommitted);
+    }
 
-		return bean.getInitialText();
-	}
+    public List<I_ImageVersioned> getImages() throws IOException {
+        return bean.getImages();
+    }
 
-	public List<I_RelVersioned> getSourceRels() throws IOException {
-		return bean.getSourceRels();
-	}
+    public String getInitialText() throws IOException {
+        I_DescriptionTuple tuple = this.getDescTuple(ConceptBeanForTree.this.config.getShortLabelDescPreferenceList(),
+            ConceptBeanForTree.this.config);
+        if (tuple != null) {
+            return tuple.getText();
+        }
 
-	public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, 
-			I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
-		return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted);
-	}
+        return bean.getInitialText();
+    }
 
-	public List<UUID> getUids() throws IOException {
-		return bean.getUids();
-	}
+    public List<I_RelVersioned> getSourceRels() throws IOException {
+        return bean.getSourceRels();
+    }
 
-	public List<I_ImageVersioned> getUncommittedImages() {
-		return bean.getUncommittedImages();
-	}
+    public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positions, boolean addUncommitted) throws IOException {
+        return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted);
+    }
 
-	public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted) throws IOException {
-		if (parentDepth > 0) {
-			return true;
-		}
-		return bean.isLeaf(aceConfig, addUncommitted);
-	}
+    public List<UUID> getUids() throws IOException {
+        return bean.getUids();
+    }
 
-	public String toString() {
-		return bean.toString();
-	}
+    public List<I_ImageVersioned> getUncommittedImages() {
+        return bean.getUncommittedImages();
+    }
 
-	public int getParentDepth() {
-		return parentDepth;
-	}
+    public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted) throws IOException {
+        if (parentDepth > 0) {
+            return true;
+        }
+        return bean.isLeaf(aceConfig, addUncommitted);
+    }
 
-	public boolean isParentOpened() {
-		return parentOpened;
-	}
+    public String toString() {
+        return bean.toString();
+    }
 
-	public boolean isSecondaryParentNode() {
-		return secondaryParentNode;
-	}
+    public int getParentDepth() {
+        return parentDepth;
+    }
 
-	public void setParentOpened(boolean opened) {
-		this.parentOpened = opened;
-		
-	}
+    public boolean isParentOpened() {
+        return parentOpened;
+    }
 
-	public ConceptBean getCoreBean() {
-		return bean;
-	}
+    public boolean isSecondaryParentNode() {
+        return secondaryParentNode;
+    }
 
-	public List<DefaultMutableTreeNode> getExtraParentNodes() {
-		return extraParentNodes;
-	}
+    public void setParentOpened(boolean opened) {
+        this.parentOpened = opened;
 
-	public I_ConceptAttributeVersioned getUncommittedConceptAttributes() {
-		return bean.getUncommittedConceptAttributes();
-	}
+    }
 
-	public List<I_DescriptionVersioned> getUncommittedDescriptions() {
-		return bean.getUncommittedDescriptions();
-	}
+    public ConceptBean getCoreBean() {
+        return bean;
+    }
 
-	public List<I_RelVersioned> getUncommittedSourceRels() {
-		return bean.getUncommittedSourceRels();
-	}
+    public List<DefaultMutableTreeNode> getExtraParentNodes() {
+        return extraParentNodes;
+    }
 
-	public I_IdVersioned getId() throws IOException {
-		return bean.getId();
-	}
+    public I_ConceptAttributeVersioned getUncommittedConceptAttributes() {
+        return bean.getUncommittedConceptAttributes();
+    }
 
-	public I_DescriptionTuple getDescTuple(I_ConfigAceFrame config) throws IOException {
-		return bean.getDescTuple(config.getTreeDescPreferenceList(), config);
-	}
+    public List<I_DescriptionVersioned> getUncommittedDescriptions() {
+        return bean.getUncommittedDescriptions();
+    }
 
-	public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_ConfigAceFrame config) throws IOException {
-		return bean.getDescTuple(prefOrder, config);
-	}
+    public List<I_RelVersioned> getUncommittedSourceRels() {
+        return bean.getUncommittedSourceRels();
+    }
 
-	public I_IntSet getUncommittedIds() {
-		return bean.getUncommittedIds();
-	}
+    public I_IdVersioned getId() throws IOException {
+        return bean.getId();
+    }
 
-	public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException {
-		return bean.getUniversalAceBean();
-	}
+    public I_DescriptionTuple getDescTuple(I_ConfigAceFrame config) throws IOException {
+        return bean.getDescTuple(config.getTreeDescPreferenceList(), config);
+    }
 
-	public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
-		return bean.getDestRelOrigins(allowedStatus, allowedTypes, positions, addUncommitted);
-	}
+    public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_ConfigAceFrame config) throws IOException {
+        return bean.getDescTuple(prefOrder, config);
+    }
 
-	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
-		return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted);
-	}
+    public I_IntSet getUncommittedIds() {
+        return bean.getUncommittedIds();
+    }
 
-	public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted) throws IOException {
-		return bean.isParentOf(child, allowedStatus, allowedTypes, positions, addUncommitted);
-	}
+    public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException {
+        return bean.getUniversalAceBean();
+    }
 
-   public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions) throws IOException {
-      return bean.getImageTuples(allowedStatus, allowedTypes, positions);
-   }
+    public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positions, boolean addUncommitted) throws IOException {
+        return bean.getDestRelOrigins(allowedStatus, allowedTypes, positions, addUncommitted);
+    }
 
-   public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
-			I_IntList langPrefOrder, I_IntSet allowedStatus,
-			Set<I_Position> positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException {
-      return bean.getDescTuple(typePrefOrder,
-			langPrefOrder, allowedStatus,
-			positionSet, sortPref);
-   }
+    public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positions, boolean addUncommitted) throws IOException {
+        return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted);
+    }
 
-   public int getRelId() {
-       return relId;
-   }
+    public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positions, boolean addUncommitted) throws IOException {
+        return bean.isParentOf(child, allowedStatus, allowedTypes, positions, addUncommitted);
+    }
 
-   public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-	   Set<I_Position> positions, boolean addUncommitted) throws IOException {
-	   return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, addUncommitted);
-   }
+    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions)
+            throws IOException {
+        return bean.getImageTuples(allowedStatus, allowedTypes, positions);
+    }
 
-   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
-			I_IntSet allowedStatus, Set<I_Position> positions,
-			boolean returnConflictResolvedLatestState) throws IOException {
-		
-		return bean.getConceptAttributeTuples(allowedStatus, positions,
-				returnConflictResolvedLatestState);
-	}
+    public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus,
+            Set<I_Position> positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException {
+        return bean.getDescTuple(typePrefOrder, langPrefOrder, allowedStatus, positionSet, sortPref);
+    }
 
-	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
-			boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getConceptAttributeTuples(returnConflictResolvedLatestState);
-	}
+    public int getRelId() {
+        return relId;
+    }
 
-	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
-			I_IntSet allowedStatus, Set<I_Position> positionSet,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getConceptAttributeTuples(allowedStatus, positionSet,
-				addUncommitted, returnConflictResolvedLatestState);
-	}
+    public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positions, boolean addUncommitted) throws IOException {
+        return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, addUncommitted);
+    }
 
-	public List<I_DescriptionTuple> getDescriptionTuples(
-			boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getDescriptionTuples(returnConflictResolvedLatestState);
-	}
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positions,
+            boolean returnConflictResolvedLatestState) throws IOException {
 
-	public List<I_DescriptionTuple> getDescriptionTuples(
-			I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positionSet, boolean addUncommitted,
-			boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getDescriptionTuples(allowedStatus, allowedTypes,
-				positionSet, addUncommitted, returnConflictResolvedLatestState);
-	}
+        return bean.getConceptAttributeTuples(allowedStatus, positions, returnConflictResolvedLatestState);
+    }
 
-	public List<I_DescriptionTuple> getDescriptionTuples(
-			I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positions, boolean returnConflictResolvedLatestState)
-			throws IOException {
-		return getDescriptionTuples(allowedStatus, allowedTypes, positions,
-				returnConflictResolvedLatestState);
-	}
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(boolean returnConflictResolvedLatestState)
+            throws IOException, TerminologyException {
+        return bean.getConceptAttributeTuples(returnConflictResolvedLatestState);
+    }
 
-	public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getDestRelOrigins(allowedTypes, addUncommitted,
-				returnConflictResolvedLatestState);
-	}
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
+            boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+        return bean.getConceptAttributeTuples(allowedStatus, positionSet, addUncommitted,
+            returnConflictResolvedLatestState);
+    }
 
-	public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getDestRelOrigins(allowedStatus, allowedTypes, positions,
-				addUncommitted, returnConflictResolvedLatestState);
-	}
+    public List<I_DescriptionTuple> getDescriptionTuples(boolean returnConflictResolvedLatestState) throws IOException,
+            TerminologyException {
+        return bean.getDescriptionTuples(returnConflictResolvedLatestState);
+    }
 
-	public List<I_RelTuple> getDestRelTuples(I_IntSet allowedTypes,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getDestRelTuples(allowedTypes, addUncommitted,
-				returnConflictResolvedLatestState);
-	}
+    public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positionSet, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            throws IOException, TerminologyException {
+        return bean.getDescriptionTuples(allowedStatus, allowedTypes, positionSet, addUncommitted,
+            returnConflictResolvedLatestState);
+    }
 
-	public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getDestRelTuples(allowedStatus, allowedTypes, positions,
-				addUncommitted, returnConflictResolvedLatestState);
-	}
+    public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positions, boolean returnConflictResolvedLatestState) throws IOException {
+        return getDescriptionTuples(allowedStatus, allowedTypes, positions, returnConflictResolvedLatestState);
+    }
 
-	public List<I_ImageTuple> getImageTuples(
-			boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getImageTuples(returnConflictResolvedLatestState);
-	}
+    public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes, boolean addUncommitted,
+            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+        return bean.getDestRelOrigins(allowedTypes, addUncommitted, returnConflictResolvedLatestState);
+    }
 
-	public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getImageTuples(allowedStatus, allowedTypes, positions,
-				returnConflictResolvedLatestState);
-	}
+    public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            throws IOException, TerminologyException {
+        return bean.getDestRelOrigins(allowedStatus, allowedTypes, positions, addUncommitted,
+            returnConflictResolvedLatestState);
+    }
 
-	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getSourceRelTargets(allowedTypes, addUncommitted,
-				returnConflictResolvedLatestState);
-	}
+    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedTypes, boolean addUncommitted,
+            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+        return bean.getDestRelTuples(allowedTypes, addUncommitted, returnConflictResolvedLatestState);
+    }
 
-	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions,
-				addUncommitted, returnConflictResolvedLatestState);
-	}
+    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+            boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+        return bean.getDestRelTuples(allowedStatus, allowedTypes, positions, addUncommitted,
+            returnConflictResolvedLatestState);
+    }
 
-	public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedTypes,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getSourceRelTuples(allowedTypes, addUncommitted,
-				returnConflictResolvedLatestState);
-	}
+    public List<I_ImageTuple> getImageTuples(boolean returnConflictResolvedLatestState) throws IOException,
+            TerminologyException {
+        return bean.getImageTuples(returnConflictResolvedLatestState);
+    }
 
-	public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-		return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions,
-				addUncommitted, returnConflictResolvedLatestState);
-	}
+    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+        return bean.getImageTuples(allowedStatus, allowedTypes, positions, returnConflictResolvedLatestState);
+    }
 
-	public boolean isParentOf(I_GetConceptData child, boolean addUncommitted) throws IOException, TerminologyException {
-		return bean.isParentOf(child, addUncommitted);
-	}
+    public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes, boolean addUncommitted,
+            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+        return bean.getSourceRelTargets(allowedTypes, addUncommitted, returnConflictResolvedLatestState);
+    }
 
-	public boolean isParentOfOrEqualTo(I_GetConceptData child,
-			boolean addUncommitted) throws IOException, TerminologyException {
-		return bean.isParentOfOrEqualTo(child, addUncommitted);
-	}
+    public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            throws IOException, TerminologyException {
+        return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted,
+            returnConflictResolvedLatestState);
+    }
 
-	public List<I_ThinExtByRefVersioned> getExtensions() throws IOException,
-			TerminologyException {
-		return bean.getExtensions();
-	}
+    public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedTypes, boolean addUncommitted,
+            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+        return bean.getSourceRelTuples(allowedTypes, addUncommitted, returnConflictResolvedLatestState);
+    }
 
-	public Object getId(int identifierScheme) throws IOException,
-			TerminologyException {
-		return bean.getId(identifierScheme);
-	}
+    public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            Set<I_Position> positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            throws IOException, TerminologyException {
+        return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted,
+            returnConflictResolvedLatestState);
+    }
 
-	
-	/*
-	 * 
-	 * @Override public boolean equals(Object another) { return
-	 * bean.equals(another); }
-	 * 
-	 * @Override public int hashCode() { return bean.hashCode(); }
-	 */
-	
+    public boolean isParentOf(I_GetConceptData child, boolean addUncommitted) throws IOException, TerminologyException {
+        return bean.isParentOf(child, addUncommitted);
+    }
+
+    public boolean isParentOfOrEqualTo(I_GetConceptData child, boolean addUncommitted) throws IOException,
+            TerminologyException {
+        return bean.isParentOfOrEqualTo(child, addUncommitted);
+    }
+
+    public List<I_ThinExtByRefVersioned> getExtensions() throws IOException, TerminologyException {
+        return bean.getExtensions();
+    }
+
+    public Object getId(int identifierScheme) throws IOException, TerminologyException {
+        return bean.getId(identifierScheme);
+    }
+
+    /*
+     * 
+     * @Override public boolean equals(Object another) { return
+     * bean.equals(another); }
+     * 
+     * @Override public int hashCode() { return bean.hashCode(); }
+     */
+
 }

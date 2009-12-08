@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,306 +49,313 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ThinDescVersioned implements I_DescriptionVersioned {
-   private int descId;
+    private int descId;
 
-   private int conceptId;
+    private int conceptId;
 
-   private List<I_DescriptionPart> versions;
+    private List<I_DescriptionPart> versions;
 
-   public ThinDescVersioned(int descId, int conceptId, int count) {
-      super();
-      this.descId = descId;
-      this.conceptId = conceptId;
-      this.versions = new ArrayList<I_DescriptionPart>(count);
-   }
+    public ThinDescVersioned(int descId, int conceptId, int count) {
+        super();
+        this.descId = descId;
+        this.conceptId = conceptId;
+        this.versions = new ArrayList<I_DescriptionPart>(count);
+    }
 
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#addVersion(org.dwfa.vodb.types.I_DescriptionPart)
-    */
-   public boolean addVersion(I_DescriptionPart newPart) {
-      int index = versions.size() - 1;
-      if (index == -1) {
-         return versions.add(newPart);
-      } else if (index >= 0) {
-         I_DescriptionPart prevDesc = versions.get(index);
-         if (prevDesc.hasNewData(newPart)) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_DescriptionVersioned#addVersion(org.dwfa.vodb.types
+     * .I_DescriptionPart)
+     */
+    public boolean addVersion(I_DescriptionPart newPart) {
+        int index = versions.size() - 1;
+        if (index == -1) {
             return versions.add(newPart);
-         }
-      }
-      return false;
-   }
-
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#getVersions()
-    */
-   public List<I_DescriptionPart> getVersions() {
-      return versions;
-   }
-
-   public List<I_DescriptionPart> getVersions(
-   		boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
-
-	  List<I_DescriptionPart> returnList = new ArrayList<I_DescriptionPart>(versions);
-
-	  if (returnConflictResolvedLatestState) {
-		 I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
-		 returnList = config.getConflictResolutionStrategy().resolveParts(returnList);
-	  }
-
-   	  return returnList;
-   }
-
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#versionCount()
-    */
-   public int versionCount() {
-      return versions.size();
-   }
-
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#matches(java.util.regex.Pattern)
-    */
-   public boolean matches(Pattern p) {
-      String lastText = null;
-      for (I_DescriptionPart desc : versions) {
-         if (desc.getText() != lastText) {
-            lastText = desc.getText();
-            Matcher m = p.matcher(lastText);
-            if (m.find()) {
-               return true;
+        } else if (index >= 0) {
+            I_DescriptionPart prevDesc = versions.get(index);
+            if (prevDesc.hasNewData(newPart)) {
+                return versions.add(newPart);
             }
-         }
-      }
-      return false;
-   }
+        }
+        return false;
+    }
 
-   public String toString() {
-      StringBuffer buff = new StringBuffer();
-      buff.append("ThinDescVersioned: desc: ");
-      buff.append(descId);
-      buff.append(" ConceptId: ");
-      buff.append(conceptId);
-      buff.append("\n");
-      for (I_DescriptionPart desl : versions) {
-         buff.append("     ");
-         buff.append(desl.toString());
-         buff.append("\n");
-      }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_DescriptionVersioned#getVersions()
+     */
+    public List<I_DescriptionPart> getVersions() {
+        return versions;
+    }
 
-      return buff.toString();
-   }
+    public List<I_DescriptionPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException,
+            IOException {
 
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#getConceptId()
-    */
-   public int getConceptId() {
-      return conceptId;
-   }
+        List<I_DescriptionPart> returnList = new ArrayList<I_DescriptionPart>(versions);
 
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#getDescId()
-    */
-   public int getDescId() {
-      return descId;
-   }
+        if (returnConflictResolvedLatestState) {
+            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+            returnList = config.getConflictResolutionStrategy().resolveParts(returnList);
+        }
 
-	public int getTermComponentId() {
-		return descId;
-	}
+        return returnList;
+    }
 
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#getTuples()
-    */
-   public List<I_DescriptionTuple> getTuples() {
-      List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-      for (I_DescriptionPart p : getVersions()) {
-         tuples.add(new ThinDescTuple(this, p));
-      }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_DescriptionVersioned#versionCount()
+     */
+    public int versionCount() {
+        return versions.size();
+    }
 
-      return tuples;
-   }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_DescriptionVersioned#matches(java.util.regex.Pattern
+     * )
+     */
+    public boolean matches(Pattern p) {
+        String lastText = null;
+        for (I_DescriptionPart desc : versions) {
+            if (desc.getText() != lastText) {
+                lastText = desc.getText();
+                Matcher m = p.matcher(lastText);
+                if (m.find()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
-   public List<I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
-      List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-      for (I_DescriptionPart p : getVersions(returnConflictResolvedLatestState)) {
-         tuples.add(new ThinDescTuple(this, p));
-      }
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+        buff.append("ThinDescVersioned: desc: ");
+        buff.append(descId);
+        buff.append(" ConceptId: ");
+        buff.append(conceptId);
+        buff.append("\n");
+        for (I_DescriptionPart desl : versions) {
+            buff.append("     ");
+            buff.append(desl.toString());
+            buff.append("\n");
+        }
 
-      return tuples;
-   }
+        return buff.toString();
+    }
 
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#getFirstTuple()
-    */
-   public I_DescriptionTuple getFirstTuple() {
-      return new ThinDescTuple(this, versions.get(0));
-   }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_DescriptionVersioned#getConceptId()
+     */
+    public int getConceptId() {
+        return conceptId;
+    }
 
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#getLastTuple()
-    */
-   public I_DescriptionTuple getLastTuple() {
-      if (versions == null || versions.isEmpty()) {
-          throw new DescriptionHasNoVersionsException();
-      }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_DescriptionVersioned#getDescId()
+     */
+    public int getDescId() {
+        return descId;
+    }
 
-      return new ThinDescTuple(this, versions.get(versions.size() - 1));
-   }
+    public int getTermComponentId() {
+        return descId;
+    }
 
-   private class DescTupleAdder extends TupleAdder<I_DescriptionTuple, ThinDescVersioned> {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_DescriptionVersioned#getTuples()
+     */
+    public List<I_DescriptionTuple> getTuples() {
+        List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
+        for (I_DescriptionPart p : getVersions()) {
+            tuples.add(new ThinDescTuple(this, p));
+        }
 
-	@Override
-	public I_DescriptionTuple makeTuple(I_AmPart part, ThinDescVersioned core) {
-		return new ThinDescTuple(core, (I_DescriptionPart) part);
-	}
+        return tuples;
+    }
 
-   }
+    public List<I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException,
+            IOException {
+        List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
+        for (I_DescriptionPart p : getVersions(returnConflictResolvedLatestState)) {
+            tuples.add(new ThinDescTuple(this, p));
+        }
 
-   DescTupleAdder adder = new DescTupleAdder();
+        return tuples;
+    }
 
-   public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
-	         List<I_DescriptionTuple> matchingTuples, boolean addUncommitted) {
-	   adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples, addUncommitted, versions, this);
-   }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_DescriptionVersioned#getFirstTuple()
+     */
+    public I_DescriptionTuple getFirstTuple() {
+        return new ThinDescTuple(this, versions.get(0));
+    }
 
-   public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			Set<I_Position> positionSet, List<I_DescriptionTuple> matchingTuples,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_DescriptionVersioned#getLastTuple()
+     */
+    public I_DescriptionTuple getLastTuple() {
+        if (versions == null || versions.isEmpty()) {
+            throw new DescriptionHasNoVersionsException();
+        }
 
-	    List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
+        return new ThinDescTuple(this, versions.get(versions.size() - 1));
+    }
 
-	    addTuples(allowedStatus, allowedTypes, positionSet, tuples, addUncommitted);
+    private class DescTupleAdder extends TupleAdder<I_DescriptionTuple, ThinDescVersioned> {
 
-		if (returnConflictResolvedLatestState) {
-		    I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
-			I_ManageConflict conflictResolutionStrategy;
-			if (config == null) {
-				conflictResolutionStrategy = new IdentifyAllConflictStrategy();
-			} else {
-				conflictResolutionStrategy = config.getConflictResolutionStrategy();
-			}
+        @Override
+        public I_DescriptionTuple makeTuple(I_AmPart part, ThinDescVersioned core) {
+            return new ThinDescTuple(core, (I_DescriptionPart) part);
+        }
 
-			tuples = conflictResolutionStrategy.resolveTuples(tuples);
-		}
+    }
 
-		matchingTuples.addAll(tuples);
-	}
+    DescTupleAdder adder = new DescTupleAdder();
 
-	public void addTuples(I_IntSet allowedTypes,
-			List<I_DescriptionTuple> matchingTuples, boolean addUncommitted,
-			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+            List<I_DescriptionTuple> matchingTuples, boolean addUncommitted) {
+        adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples, addUncommitted, versions, this);
+    }
 
-		I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positionSet,
+            List<I_DescriptionTuple> matchingTuples, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            throws TerminologyException, IOException {
 
-	    addTuples(config.getAllowedStatus(), allowedTypes, config
-				.getViewPositionSet(), matchingTuples, addUncommitted,
-				returnConflictResolvedLatestState);
-	}
+        List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
 
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)
-    */
-   public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
-      conceptId = jarToDbNativeMap.get(conceptId);
-      descId = jarToDbNativeMap.get(descId);
-      for (I_DescriptionPart p : versions) {
-         p.convertIds(jarToDbNativeMap);
-      }
+        addTuples(allowedStatus, allowedTypes, positionSet, tuples, addUncommitted);
 
-   }
+        if (returnConflictResolvedLatestState) {
+            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+            I_ManageConflict conflictResolutionStrategy;
+            if (config == null) {
+                conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+            } else {
+                conflictResolutionStrategy = config.getConflictResolutionStrategy();
+            }
 
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#merge(org.dwfa.vodb.types.ThinDescVersioned)
-    */
-   public boolean merge(I_DescriptionVersioned jarDesc) {
-      HashSet<I_DescriptionPart> versionSet = new HashSet<I_DescriptionPart>(versions);
-      boolean changed = false;
-      for (I_DescriptionPart jarPart : jarDesc.getVersions()) {
-         if (!versionSet.contains(jarPart)) {
-            changed = true;
-            versions.add(jarPart);
-         }
-      }
-      return changed;
+            tuples = conflictResolutionStrategy.resolveTuples(tuples);
+        }
 
-   }
+        matchingTuples.addAll(tuples);
+    }
 
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#getTimePathSet()
-    */
-   public Set<TimePathId> getTimePathSet() {
-      Set<TimePathId> tpSet = new HashSet<TimePathId>();
-      for (I_DescriptionPart p : versions) {
-         tpSet.add(new TimePathId(p.getVersion(), p.getPathId()));
-      }
-      return tpSet;
-   }
+    public void addTuples(I_IntSet allowedTypes, List<I_DescriptionTuple> matchingTuples, boolean addUncommitted,
+            boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
 
-   @Override
-   public boolean equals(Object obj) {
-      ThinDescVersioned another = (ThinDescVersioned) obj;
-      return descId == another.descId;
-   }
+        I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-   @Override
-   public int hashCode() {
-      return descId;
-   }
+        addTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSet(), matchingTuples, addUncommitted,
+            returnConflictResolvedLatestState);
+    }
 
-   /*
-    * (non-Javadoc)
-    *
-    * @see org.dwfa.vodb.types.I_DescriptionVersioned#toLocalFixedDesc()
-    */
-   public I_DescribeConceptLocally toLocalFixedDesc() {
-      I_DescriptionPart part = versions.get(versions.size() - 1);
-      return new LocalFixedDesc(descId, part.getStatusId(), conceptId, part.getInitialCaseSignificant(), part
-            .getTypeId(), part.getText(), part.getLang());
-   }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_DescriptionVersioned#convertIds(org.dwfa.vodb.jar
+     * .I_MapNativeToNative)
+     */
+    public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
+        conceptId = jarToDbNativeMap.get(conceptId);
+        descId = jarToDbNativeMap.get(descId);
+        for (I_DescriptionPart p : versions) {
+            p.convertIds(jarToDbNativeMap);
+        }
 
-   private static Collection<UUID> getUids(int id) throws IOException, TerminologyException {
-      return LocalFixedTerminology.getStore().getUids(id);
-   }
+    }
 
-   public UniversalAceDescription getUniversal() throws IOException, TerminologyException {
-      UniversalAceDescription universal = new UniversalAceDescription(getUids(descId), getUids(conceptId), this
-            .versionCount());
-      for (I_DescriptionPart part : versions) {
-         UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
-         universalPart.setInitialCaseSignificant(part.getInitialCaseSignificant());
-         universalPart.setLang(part.getLang());
-         universalPart.setPathId(getUids(part.getPathId()));
-         universalPart.setStatusId(getUids(part.getStatusId()));
-         universalPart.setText(part.getText());
-         universalPart.setTypeId(getUids(part.getTypeId()));
-         universalPart.setTime(ThinVersionHelper.convert(part.getVersion()));
-         universal.addVersion(universalPart);
-      }
-      return universal;
-   }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.vodb.types.I_DescriptionVersioned#merge(org.dwfa.vodb.types.
+     * ThinDescVersioned)
+     */
+    public boolean merge(I_DescriptionVersioned jarDesc) {
+        HashSet<I_DescriptionPart> versionSet = new HashSet<I_DescriptionPart>(versions);
+        boolean changed = false;
+        for (I_DescriptionPart jarPart : jarDesc.getVersions()) {
+            if (!versionSet.contains(jarPart)) {
+                changed = true;
+                versions.add(jarPart);
+            }
+        }
+        return changed;
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_DescriptionVersioned#getTimePathSet()
+     */
+    public Set<TimePathId> getTimePathSet() {
+        Set<TimePathId> tpSet = new HashSet<TimePathId>();
+        for (I_DescriptionPart p : versions) {
+            tpSet.add(new TimePathId(p.getVersion(), p.getPathId()));
+        }
+        return tpSet;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        ThinDescVersioned another = (ThinDescVersioned) obj;
+        return descId == another.descId;
+    }
+
+    @Override
+    public int hashCode() {
+        return descId;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.vodb.types.I_DescriptionVersioned#toLocalFixedDesc()
+     */
+    public I_DescribeConceptLocally toLocalFixedDesc() {
+        I_DescriptionPart part = versions.get(versions.size() - 1);
+        return new LocalFixedDesc(descId, part.getStatusId(), conceptId, part.getInitialCaseSignificant(),
+            part.getTypeId(), part.getText(), part.getLang());
+    }
+
+    private static Collection<UUID> getUids(int id) throws IOException, TerminologyException {
+        return LocalFixedTerminology.getStore().getUids(id);
+    }
+
+    public UniversalAceDescription getUniversal() throws IOException, TerminologyException {
+        UniversalAceDescription universal = new UniversalAceDescription(getUids(descId), getUids(conceptId),
+            this.versionCount());
+        for (I_DescriptionPart part : versions) {
+            UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
+            universalPart.setInitialCaseSignificant(part.getInitialCaseSignificant());
+            universalPart.setLang(part.getLang());
+            universalPart.setPathId(getUids(part.getPathId()));
+            universalPart.setStatusId(getUids(part.getStatusId()));
+            universalPart.setText(part.getText());
+            universalPart.setTypeId(getUids(part.getTypeId()));
+            universalPart.setTime(ThinVersionHelper.convert(part.getVersion()));
+            universal.addVersion(universalPart);
+        }
+        return universal;
+    }
 
 }

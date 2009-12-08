@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -806,8 +806,8 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     public void svnCommitNoPrompt(SubversionData svd) {
         throw new UnsupportedOperationException();
-    }    
-    
+    }
+
     public void svnPurge(SubversionData svd) {
         throw new UnsupportedOperationException();
 
@@ -1164,21 +1164,21 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setShowActivityViewer(show);
     }
 
-	public JPanel getWorkflowDetailsSheet() {
-		return baseFrame.getWorkflowDetailsSheet();
-	}
+    public JPanel getWorkflowDetailsSheet() {
+        return baseFrame.getWorkflowDetailsSheet();
+    }
 
-	public void setShowWorkflowDetailSheet(boolean visible) {
-		baseFrame.setShowWorkflowDetailSheet(visible);
-	}
+    public void setShowWorkflowDetailSheet(boolean visible) {
+        baseFrame.setShowWorkflowDetailSheet(visible);
+    }
 
-	public void setWorkflowDetailSheetDimensions(Dimension dim) {
-		baseFrame.setWorkflowDetailSheetDimensions(dim);
-	}
+    public void setWorkflowDetailSheetDimensions(Dimension dim) {
+        baseFrame.setWorkflowDetailSheetDimensions(dim);
+    }
 
-	public Map<Integer, Color> getPathColorMap() {
-		return baseFrame.getPathColorMap();
-	}
+    public Map<Integer, Color> getPathColorMap() {
+        return baseFrame.getPathColorMap();
+    }
 
     public Boolean getShowPathInfoInTaxonomy() {
         return baseFrame.getShowPathInfoInTaxonomy();

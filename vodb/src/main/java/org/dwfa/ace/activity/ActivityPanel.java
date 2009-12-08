@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,9 +65,9 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
         @Override
         public void doRun() {
-        	if (showDeleteButton) {
+            if (showDeleteButton) {
                 deleteButton.setVisible(true);
-        	}
+            }
         }
 
     }
@@ -129,19 +129,16 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
     JProgressBar progressBar = new ActivityProgress(100);
 
-    JButton stopButton = new JButton(new ImageIcon(ACE.class
-            .getResource("/24x24/plain/stop.png")));
+    JButton stopButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/stop.png")));
 
-    JButton deleteButton = new JButton(new ImageIcon(ACE.class
-            .getResource("/24x24/plain/delete2.png")));
+    JButton deleteButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/delete2.png")));
 
     JLabel progressInfoUpper = new JLabel();
 
     JLabel progressInfoLower = new JLabel();
     private boolean showDelete;
 
-    public ActivityPanel(boolean showBorder, boolean showDelete,
-            JPanel secondaryPanel) {
+    public ActivityPanel(boolean showBorder, boolean showDelete, JPanel secondaryPanel) {
         super(new GridBagLayout());
         this.showDelete = showDelete;
         progressInfoUpper.setFont(new Font("Dialog", java.awt.Font.BOLD, 10));
@@ -174,8 +171,7 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         deleteButton.addActionListener(new DeleteActionListener());
         add(deleteButton, c);
         if (showBorder) {
-            setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
-                    Color.lightGray));
+            setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray));
         }
     }
 

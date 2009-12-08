@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,71 +30,66 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.ConceptBean;
 
 public class ConflictPlugin extends AbstractPlugin {
-	private static final long serialVersionUID = 1L;
-	private static final int dataVersion = 1;
+    private static final long serialVersionUID = 1L;
+    private static final int dataVersion = 1;
 
-	private transient ConflictPanel conflictPanel;
+    private transient ConflictPanel conflictPanel;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	public ConflictPlugin(boolean shownByDefault, int sequence) {
-		super(shownByDefault, sequence);
-	}
+    public ConflictPlugin(boolean shownByDefault, int sequence) {
+        super(shownByDefault, sequence);
+    }
 
-	public UUID getId() {
-		return I_HostConceptPlugins.TOGGLES.CONFLICT.getPluginId();
-	}
+    public UUID getId() {
+        return I_HostConceptPlugins.TOGGLES.CONFLICT.getPluginId();
+    }
 
-	public ConflictPanel getComponent(I_HostConceptPlugins host) {
-		if (conflictPanel == null) {
-			setHost(host);
-			conflictPanel = new ConflictPanel();
-			host.addPropertyChangeListener(
-					I_ContainTermComponent.TERM_COMPONENT, this);
-			host.addPropertyChangeListener("commit", this);
-			try {
-				conflictPanel.setConcept((ConceptBean) host.getTermComponent(),
-						host.getConfig());
-			} catch (IOException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-		}
-		return conflictPanel;
-	}
+    public ConflictPanel getComponent(I_HostConceptPlugins host) {
+        if (conflictPanel == null) {
+            setHost(host);
+            conflictPanel = new ConflictPanel();
+            host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
+            host.addPropertyChangeListener("commit", this);
+            try {
+                conflictPanel.setConcept((ConceptBean) host.getTermComponent(), host.getConfig());
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+        return conflictPanel;
+    }
 
-	@Override
-	protected ImageIcon getImageIcon() {
-		return new ImageIcon(ACE.class
-				.getResource("/24x24/plain/transform.png"));
-	}
+    @Override
+    protected ImageIcon getImageIcon() {
+        return new ImageIcon(ACE.class.getResource("/24x24/plain/transform.png"));
+    }
 
-	@Override
-	public void update() throws IOException {
-		if (showComponent() && conflictPanel != null) {
-			conflictPanel.setConcept((ConceptBean) getHost().getTermComponent(),
-					getHost().getConfig());
-		}
-	}
+    @Override
+    public void update() throws IOException {
+        if (showComponent() && conflictPanel != null) {
+            conflictPanel.setConcept((ConceptBean) getHost().getTermComponent(), getHost().getConfig());
+        }
+    }
 
-	@Override
-	protected String getToolTipText() {
-		return "show/hide the conflict view for this concept";
-	}
+    @Override
+    protected String getToolTipText() {
+        return "show/hide the conflict view for this concept";
+    }
 
-	@Override
-	protected int getComponentId() {
-		return Integer.MIN_VALUE;
-	}
+    @Override
+    protected int getComponentId() {
+        return Integer.MIN_VALUE;
+    }
 
 }

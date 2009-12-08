@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,26 +26,27 @@ import org.dwfa.vodb.types.I_ProcessTimeBranchEntries;
 import com.sleepycat.je.DatabaseEntry;
 
 public class TimePathCollector implements I_ProcessTimeBranchEntries {
-	List<TimePathId> timePathList = new ArrayList<TimePathId>();
-	TimePathIdBinder binder = new TimePathIdBinder();
-	public TimePathCollector() {
+    List<TimePathId> timePathList = new ArrayList<TimePathId>();
+    TimePathIdBinder binder = new TimePathIdBinder();
 
-	}
+    public TimePathCollector() {
 
-	public List<TimePathId> getTimePathIdList() {
-		return timePathList;
-	}
+    }
 
-	public DatabaseEntry getDataEntry() {
-		return new DatabaseEntry(); 
-	}
+    public List<TimePathId> getTimePathIdList() {
+        return timePathList;
+    }
 
-	public DatabaseEntry getKeyEntry() {
-		return new DatabaseEntry();
-	}
+    public DatabaseEntry getDataEntry() {
+        return new DatabaseEntry();
+    }
 
-	public void processTimeBranch(DatabaseEntry key, DatabaseEntry value) throws Exception {
-		TimePathId timePathId = (TimePathId) binder.entryToObject(value);
-		timePathList.add(timePathId);
-	}
+    public DatabaseEntry getKeyEntry() {
+        return new DatabaseEntry();
+    }
+
+    public void processTimeBranch(DatabaseEntry key, DatabaseEntry value) throws Exception {
+        TimePathId timePathId = (TimePathId) binder.entryToObject(value);
+        timePathList.add(timePathId);
+    }
 }

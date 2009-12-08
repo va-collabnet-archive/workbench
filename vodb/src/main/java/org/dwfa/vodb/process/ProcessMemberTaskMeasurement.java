@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,55 +23,54 @@ import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ThinExtByRefPartMeasurement;
 
 public class ProcessMemberTaskMeasurement extends ProcessMemberTask {
-    
+
     private static ProcessMemberTaskMeasurement[] taskArray;
     private static Exception processException;
     protected static Semaphore semaphore = new Semaphore(TASK_SIZE, true);
-    
+
     private double measurementValue;
     private UUID unitsOfMeasureUuid;
 
     ProcessMemberTaskMeasurement(int arrayIndex) {
         super(arrayIndex);
     }
-    
-    
+
     protected EXT_TYPE getRefsetType() {
         return EXT_TYPE.MEASUREMENT;
     }
 
-    protected void reset(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid,
-        int version, int memberId, double measurementValue, UUID unitsOfMeasureUuid) {
-        resetCore(refsetUuid, statusUuid, componentUuid, pathUuid,
-              version, memberId);
+    protected void reset(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid, int version,
+            int memberId, double measurementValue, UUID unitsOfMeasureUuid) {
+        resetCore(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId);
         this.measurementValue = measurementValue;
         this.unitsOfMeasureUuid = unitsOfMeasureUuid;
     }
 
     protected ThinExtByRefPartMeasurement makeNewPart() throws Exception {
         ThinExtByRefPartMeasurement part = new ThinExtByRefPartMeasurement();
-        int unitsOfMeasureId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) unitsOfMeasureUuid, ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
+        int unitsOfMeasureId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) unitsOfMeasureUuid,
+            ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
         part.setUnitsOfMeasureId(unitsOfMeasureId);
         part.setMeasurementValue(measurementValue);
         return part;
     }
 
-    public static void acquire(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid,
-        int version, int memberId, double measurementValue, UUID unitsOfMeasureUuid) throws Exception {
+    public static void acquire(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid, int version,
+            int memberId, double measurementValue, UUID unitsOfMeasureUuid) throws Exception {
         check();
         semaphore.acquire();
-        
+
         if (taskArray == null) {
-            taskArray = new ProcessMemberTaskMeasurement[TASK_SIZE + 2]; 
+            taskArray = new ProcessMemberTaskMeasurement[TASK_SIZE + 2];
             for (int i = 0; i < taskArray.length; i++) {
                 taskArray[i] = new ProcessMemberTaskMeasurement(i);
             }
         }
         boolean foundUsableTask = false;
-        for (ProcessMemberTaskMeasurement task: taskArray) {
+        for (ProcessMemberTaskMeasurement task : taskArray) {
             if (task.isUsable()) {
-                task.reset(refsetUuid, statusUuid, componentUuid, pathUuid,
-                           version, memberId, measurementValue, unitsOfMeasureUuid);
+                task.reset(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId, measurementValue,
+                    unitsOfMeasureUuid);
                 ProcessAceFormatSources.executors.submit(task);
                 foundUsableTask = true;
                 break;
@@ -93,7 +92,7 @@ public class ProcessMemberTaskMeasurement extends ProcessMemberTask {
     public ProcessMemberTaskMeasurement[] getTaskArray() {
         return taskArray;
     }
-    
+
     public static void check() throws Exception {
         if (processException != null) {
             throw processException;

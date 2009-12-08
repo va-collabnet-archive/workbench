@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -163,42 +163,42 @@ public class CriterionPanel extends JPanel {
         setupCriterionOptions();
 
         criterionCombo = new JComboBox(comboItems.toArray()) {
-			/**
+            /**
 			 * 
 			 */
-			private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
-			@Override
-			public void setSize(Dimension d) {
-				d.width = getMinimumSize().width;
-				super.setSize(d);
-			}
+            @Override
+            public void setSize(Dimension d) {
+                d.width = getMinimumSize().width;
+                super.setSize(d);
+            }
 
-			@Override
-			public void setSize(int width, int height) {
-				super.setSize(getMinimumSize().width, height);
-			}
+            @Override
+            public void setSize(int width, int height) {
+                super.setSize(getMinimumSize().width, height);
+            }
 
-			@Override
-			public void setBounds(int x, int y, int width, int height) {
-				super.setBounds(x, y, getMinimumSize().width, height);
-			}
+            @Override
+            public void setBounds(int x, int y, int width, int height) {
+                super.setBounds(x, y, getMinimumSize().width, height);
+            }
 
-			@Override
-			public void setBounds(Rectangle r) {
-				r.width  = getMinimumSize().width;
-				super.setBounds(r);
-			}
+            @Override
+            public void setBounds(Rectangle r) {
+                r.width = getMinimumSize().width;
+                super.setBounds(r);
+            }
 
-			@Override
-			public Dimension getPreferredSize() {
-				Dimension d = super.getPreferredSize();
-				d.width  = getMinimumSize().width;
-				return d;
-			}
-        	
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension d = super.getPreferredSize();
+                d.width = getMinimumSize().width;
+                return d;
+            }
+
         };
-        criterionCombo.setMinimumSize(new Dimension(175,20));
+        criterionCombo.setMinimumSize(new Dimension(175, 20));
         gbc.fill = GridBagConstraints.BOTH;
         add(criterionCombo, gbc);
         criterionCombo.addActionListener(new CriterionListener());
@@ -210,10 +210,10 @@ public class CriterionPanel extends JPanel {
                     menuBeanMap.put(comboItem, beanToSet);
                     BeanInfo info = criterionMap.remove(menuBean);
                     criterionMap.put(beanToSet, info);
-                    
+
                     int index = criterionOptions.indexOf(menuBean);
                     criterionOptions.set(index, beanToSet);
-                    
+
                     criterionCombo.setSelectedItem(comboItem);
                     break;
                 }
@@ -243,36 +243,36 @@ public class CriterionPanel extends JPanel {
             }
         });
         if (searchPlugins != null) {
-	        for (File plugin : searchPlugins) {
-	            try {
-	                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(plugin)));
-	                Object pluginObj = ois.readObject();
-	                ois.close();
-	                if (I_TestSearchResults.class.isAssignableFrom(pluginObj.getClass())) {
-	                    criterionOptions.add((I_TestSearchResults) pluginObj);
-	                }
-	            } catch (IOException ex) {
-	                AceLog.getAppLog().alertAndLogException(ex);
-	            } catch (ClassNotFoundException ex) {
-	                AceLog.getAppLog().alertAndLogException(ex);
-	            }
-	        }
+            for (File plugin : searchPlugins) {
+                try {
+                    ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(plugin)));
+                    Object pluginObj = ois.readObject();
+                    ois.close();
+                    if (I_TestSearchResults.class.isAssignableFrom(pluginObj.getClass())) {
+                        criterionOptions.add((I_TestSearchResults) pluginObj);
+                    }
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } catch (ClassNotFoundException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
         } else {
-        	AceLog.getAppLog().alertAndLogException(this, new Exception("No search plugins in folder: " 
-        			+ searchPluginFolder.getAbsolutePath()));
+            AceLog.getAppLog().alertAndLogException(this,
+                new Exception("No search plugins in folder: " + searchPluginFolder.getAbsolutePath()));
         }
         for (I_TestSearchResults bean : criterionOptions) {
-        	try {
-	            String searchInfoClassName = bean.getClass().getName() + "SearchInfo";
-	            Class<BeanInfo> searchInfoClass = (Class<BeanInfo>) bean.getClass().getClassLoader()
-	                    .loadClass(searchInfoClassName);
-	            BeanInfo searchInfo = searchInfoClass.newInstance();
-	            comboItems.add(searchInfo.getBeanDescriptor().getDisplayName());
-	            menuInfoMap.put(searchInfo.getBeanDescriptor().getDisplayName(), searchInfo);
-	            menuBeanMap.put(searchInfo.getBeanDescriptor().getDisplayName(), bean);
-        	} catch (Exception ex) {
-        		AceLog.getAppLog().alertAndLogException(ex);
-        	}
+            try {
+                String searchInfoClassName = bean.getClass().getName() + "SearchInfo";
+                Class<BeanInfo> searchInfoClass = (Class<BeanInfo>) bean.getClass().getClassLoader().loadClass(
+                    searchInfoClassName);
+                BeanInfo searchInfo = searchInfoClass.newInstance();
+                comboItems.add(searchInfo.getBeanDescriptor().getDisplayName());
+                menuInfoMap.put(searchInfo.getBeanDescriptor().getDisplayName(), searchInfo);
+                menuBeanMap.put(searchInfo.getBeanDescriptor().getDisplayName(), bean);
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
         }
     }
 

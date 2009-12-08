@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,13 +20,9 @@ import javax.swing.ImageIcon;
 
 public class AceImages {
 
-    public static ImageIcon errorIcon =
-            new ImageIcon(ACE.class.getResource("/24x24/plain/forbidden.png"));
-    public static ImageIcon warningIcon =
-            new ImageIcon(ACE.class.getResource("/24x24/plain/warning.png"));
-    public static ImageIcon informationalIcon =
-            new ImageIcon(ACE.class.getResource("/24x24/plain/information.png"));
-    public static ImageIcon resolvedIcon =
-            new ImageIcon(ACE.class.getResource("/24x24/plain/transform.png"));
+    public static ImageIcon errorIcon = new ImageIcon(ACE.class.getResource("/24x24/plain/forbidden.png"));
+    public static ImageIcon warningIcon = new ImageIcon(ACE.class.getResource("/24x24/plain/warning.png"));
+    public static ImageIcon informationalIcon = new ImageIcon(ACE.class.getResource("/24x24/plain/information.png"));
+    public static ImageIcon resolvedIcon = new ImageIcon(ACE.class.getResource("/24x24/plain/transform.png"));
 
 }

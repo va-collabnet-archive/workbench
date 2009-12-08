@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,13 +18,13 @@ package org.dwfa.vodb.process;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,27 +58,31 @@ import com.sleepycat.je.DatabaseException;
 
 public abstract class ProcessSources {
 
-	private static final int THREAD_COUNT = 3;
+    private static final int THREAD_COUNT = 3;
 
-	public abstract Logger getLog();
+    public abstract Logger getLog();
 
     boolean skipFirstLine;
 
-    /** Used to store the set of path uuids so that the paths can be create in the path store. */
+    /**
+     * Used to store the set of path uuids so that the paths can be create in
+     * the path store.
+     */
     private HashSet<UUID> pathUuid = new HashSet<UUID>();;
 
     private TreeSet<Date> releaseDates = new TreeSet<Date>();
 
     protected ThinVersionHelper vh = new ThinVersionHelper();
 
-	private int batchSize = 10000;
+    private int batchSize = 10000;
 
     public ProcessSources(boolean skipFirstLine) throws DatabaseException {
         super();
         this.skipFirstLine = skipFirstLine;
     }
 
-    protected void readConcepts(Reader r, Date releaseDate, FORMAT format, CountDownLatch conceptLatch) throws Exception {
+    protected void readConcepts(Reader r, Date releaseDate, FORMAT format, CountDownLatch conceptLatch)
+            throws Exception {
         switch (format) {
         case SNOMED:
             processSnomedFormatConcepts(r, releaseDate, conceptLatch);
@@ -91,7 +95,7 @@ public abstract class ProcessSources {
             throw new Exception("Unsupported format: " + format);
         }
     }
-    
+
     private void processAceFormatConcepts(Reader r, CountDownLatch conceptLatch) throws IOException, Exception {
 
         long start = System.currentTimeMillis();
@@ -105,7 +109,7 @@ public abstract class ProcessSources {
 
         ProcessQueue processQueue = new ProcessQueue("AceConceptQueue", THREAD_COUNT);
         WriteConceptJob job = new WriteConceptJob(this);
-        
+
         skipLineOne(st, conceptLatch);
         int tokenType = st.nextToken();
         while (tokenType != StreamTokenizer.TT_EOF) {
@@ -126,9 +130,10 @@ public abstract class ProcessSources {
             pathUuid.add((UUID) pathId);
 
             if (concepts > 0 && concepts % batchSize == 0) {
-            	getLog().info("Added " + batchSize + " concepts, time to execute job - " + concepts + " concepts parsed");
-            	processQueue.execute(job);
-            	job = new WriteConceptJob(this);
+                getLog().info(
+                    "Added " + batchSize + " concepts, time to execute job - " + concepts + " concepts parsed");
+                processQueue.execute(job);
+                job = new WriteConceptJob(this);
             }
             job.addTask(conceptLatch, statusDate, conceptKey, conceptStatus, defChar, pathId);
             concepts++;
@@ -144,11 +149,13 @@ public abstract class ProcessSources {
             tokenType = st.nextToken();
         }
 
-    	getLog().info("Added final concepts processing job with " + job.batch.size() + " items to process - " + concepts + " concepts parsed");
-    	processQueue.execute(job);
+        getLog().info(
+            "Added final concepts processing job with " + job.batch.size() + " items to process - " + concepts
+                + " concepts parsed");
+        processQueue.execute(job);
 
-    	getLog().info("Awaiting completion of queued concept processing tasks");
-    	processQueue.awaitCompletion();
+        getLog().info("Awaiting completion of queued concept processing tasks");
+        processQueue.awaitCompletion();
         getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed concepts: " + concepts);
     }
 
@@ -194,22 +201,19 @@ public abstract class ProcessSources {
                 Object statusIdObject = getId(st);
                 UUID statusUuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
                 if (UUID.class.isAssignableFrom(statusIdObject.getClass()) == false) {
-                	AceLog.getAppLog().severe("Status id is not a UUID." +
-                			"\n    primaryUuid: " + primaryUuid +
-                			"\n    sourceSystemUuid: " + sourceSystemUuid +
-                			"\n    sourceId: " + sourceId +
-                			"\n    statusIdObject: " + statusIdObject
-                			);
+                    AceLog.getAppLog().severe(
+                        "Status id is not a UUID." + "\n    primaryUuid: " + primaryUuid + "\n    sourceSystemUuid: "
+                            + sourceSystemUuid + "\n    sourceId: " + sourceId + "\n    statusIdObject: "
+                            + statusIdObject);
                     tokenType = st.nextToken();
                 } else {
-                	statusUuid = (UUID) statusIdObject;
+                    statusUuid = (UUID) statusIdObject;
                 }
                 tokenType = st.nextToken();
                 Date statusDate = new Date();
                 if (st.sval.equals("null") == false) {
                     statusDate = getDate(st);
                 }
-
 
                 tokenType = st.nextToken();
                 if ((tokenType != 13) && (tokenType != 10)) {
@@ -220,7 +224,7 @@ public abstract class ProcessSources {
                 writeId(primaryUuid, sourceSystemUuid, sourceId, statusUuid, statusDate, pathUuid);
                 ids++;
                 if (ids % batchSize == 0) {
-                	getLog().info("Processed " + ids + " ids");
+                    getLog().info("Processed " + ids + " ids");
                 }
 
                 // CR or LF
@@ -242,9 +246,10 @@ public abstract class ProcessSources {
     }
 
     public abstract void writeId(UUID primaryUuid, UUID sourceSystemUuid, Object sourceId, UUID statusUuid,
-        Date statusDate, UUID pathUuid) throws Exception;
+            Date statusDate, UUID pathUuid) throws Exception;
 
-    private void processSnomedFormatConcepts(Reader r, Date releaseDate, CountDownLatch conceptLatch) throws IOException, Exception {
+    private void processSnomedFormatConcepts(Reader r, Date releaseDate, CountDownLatch conceptLatch)
+            throws IOException, Exception {
         // CONCEPTID CONCEPTSTATUS FULLYSPECIFIEDNAME CTV3ID SNOMEDID
         // ISPRIMITIVE
         long start = System.currentTimeMillis();
@@ -258,7 +263,7 @@ public abstract class ProcessSources {
 
         ProcessQueue processQueue = new ProcessQueue("SnomedConceptQueue", THREAD_COUNT);
         WriteConceptJob job = new WriteConceptJob(this);
-        
+
         skipLineOne(st, conceptLatch);
         int tokenType = st.nextToken();
         while (tokenType != StreamTokenizer.TT_EOF) {
@@ -281,12 +286,13 @@ public abstract class ProcessSources {
             boolean defChar = !parseBoolean(st);
 
             if (concepts > 0 && concepts % batchSize == 0) {
-            	getLog().info("Added " + batchSize + " concepts, time to execute job - " + concepts + " concepts parsed");
-            	processQueue.execute(job);
-            	job = new WriteConceptJob(this);
+                getLog().info(
+                    "Added " + batchSize + " concepts, time to execute job - " + concepts + " concepts parsed");
+                processQueue.execute(job);
+                job = new WriteConceptJob(this);
             }
             job.addTask(conceptLatch, releaseDate, conceptKey, conceptStatus, defChar,
-                         ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+                ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             concepts++;
 
             // CR or LF
@@ -299,15 +305,18 @@ public abstract class ProcessSources {
             // Beginning of loop
             tokenType = st.nextToken();
         }
-    	getLog().info("Added final concepts processing job with " + job.batch.size() + " items to process - " + concepts + " concepts parsed");
-    	processQueue.execute(job);
+        getLog().info(
+            "Added final concepts processing job with " + job.batch.size() + " items to process - " + concepts
+                + " concepts parsed");
+        processQueue.execute(job);
 
-    	getLog().info("Awaiting completion of queued concept processing tasks");
-    	processQueue.awaitCompletion();
+        getLog().info("Awaiting completion of queued concept processing tasks");
+        processQueue.awaitCompletion();
         getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed SNOMED concepts: " + concepts);
     }
 
-    protected void readRelationships(Reader r, Date releaseDate, FORMAT format, CountDownLatch relationshipLatch) throws Exception {
+    protected void readRelationships(Reader r, Date releaseDate, FORMAT format, CountDownLatch relationshipLatch)
+            throws Exception {
         switch (format) {
         case SNOMED:
             processSnomedFormatRelationships(r, releaseDate, relationshipLatch);
@@ -321,7 +330,8 @@ public abstract class ProcessSources {
         }
     }
 
-    private void processAceFormatRelationships(Reader r, CountDownLatch relationshipLatch) throws IOException, Exception {
+    private void processAceFormatRelationships(Reader r, CountDownLatch relationshipLatch) throws IOException,
+            Exception {
         // RELATIONSHIPID
         // STATUSID
         // CONCEPTID1
@@ -338,7 +348,7 @@ public abstract class ProcessSources {
         st.whitespaceChars('\t', '\t');
         st.eolIsSignificant(true);
         int rels = 0;
-        
+
         ProcessQueue processQueue = new ProcessQueue("AceRelationshipQueue", THREAD_COUNT);
         WriteRelationshipJob job = new WriteRelationshipJob(this);
 
@@ -377,14 +387,14 @@ public abstract class ProcessSources {
             pathUuid.add((UUID) pathId);
 
             if (rels > 0 && rels % batchSize == 0) {
-            	getLog().info("Added " + batchSize + " relationships, time to execute job - " + rels + " relationships parsed");
-            	processQueue.execute(job);
-            	job = new WriteRelationshipJob(this);
+                getLog().info(
+                    "Added " + batchSize + " relationships, time to execute job - " + rels + " relationships parsed");
+                processQueue.execute(job);
+                job = new WriteRelationshipJob(this);
             }
 
-			job.addTask(relationshipLatch, statusDate, relID, statusId,
-					conceptOneID, relationshipTypeConceptID, conceptTwoID,
-					characteristic, refinability, group, pathId);
+            job.addTask(relationshipLatch, statusDate, relID, statusId, conceptOneID, relationshipTypeConceptID,
+                conceptTwoID, characteristic, refinability, group, pathId);
 
             rels++;
 
@@ -398,15 +408,18 @@ public abstract class ProcessSources {
             // Beginning of loop
             tokenType = st.nextToken();
         }
-    	getLog().info("Added final relationships processing job with " + job.batch.size() + " items to process - " + rels + " relationships parsed");
-    	processQueue.execute(job);
+        getLog().info(
+            "Added final relationships processing job with " + job.batch.size() + " items to process - " + rels
+                + " relationships parsed");
+        processQueue.execute(job);
 
-    	getLog().info("Awaiting completion of queued relationships processing tasks");
-    	processQueue.awaitCompletion();
+        getLog().info("Awaiting completion of queued relationships processing tasks");
+        processQueue.awaitCompletion();
         getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed relationsips: " + rels);
     }
 
-    private void processSnomedFormatRelationships(Reader r, Date releaseDate, CountDownLatch relationshipLatch) throws IOException, Exception {
+    private void processSnomedFormatRelationships(Reader r, Date releaseDate, CountDownLatch relationshipLatch)
+            throws IOException, Exception {
         // RELATIONSHIPID
         // CONCEPTID1
         // RELATIONSHIPTYPE
@@ -425,7 +438,7 @@ public abstract class ProcessSources {
 
         ProcessQueue processQueue = new ProcessQueue("SnomedRelationshipQueue", THREAD_COUNT);
         WriteRelationshipJob job = new WriteRelationshipJob(this);
-        
+
         skipLineOne(st, relationshipLatch);
         int tokenType = st.nextToken();
         while (tokenType != StreamTokenizer.TT_EOF) {
@@ -449,16 +462,17 @@ public abstract class ProcessSources {
             // RELATIONSHIPGROUP
             tokenType = st.nextToken();
             int group = Integer.parseInt(st.sval);
-            
+
             if (rels > 0 && rels % batchSize == 0) {
-            	getLog().info("Added " + batchSize + " relationships, time to execute job - " + rels + " relationships parsed");
-            	processQueue.execute(job);
-            	job = new WriteRelationshipJob(this);
+                getLog().info(
+                    "Added " + batchSize + " relationships, time to execute job - " + rels + " relationships parsed");
+                processQueue.execute(job);
+                job = new WriteRelationshipJob(this);
             }
 
-			job.addTask(relationshipLatch, releaseDate, relID, ArchitectonicAuxiliary.Concept.CURRENT.getUids(),
-					conceptOneID, relationshipTypeConceptID, conceptTwoID,
-					characteristic, refinability, group, ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            job.addTask(relationshipLatch, releaseDate, relID, ArchitectonicAuxiliary.Concept.CURRENT.getUids(),
+                conceptOneID, relationshipTypeConceptID, conceptTwoID, characteristic, refinability, group,
+                ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
             rels++;
 
@@ -474,23 +488,24 @@ public abstract class ProcessSources {
             // Beginning of loop
             tokenType = st.nextToken();
         }
-    	getLog().info("Added final relationships processing job with " + job.batch.size() + " items to process - " + rels + " relationships parsed");
-    	processQueue.execute(job);
+        getLog().info(
+            "Added final relationships processing job with " + job.batch.size() + " items to process - " + rels
+                + " relationships parsed");
+        processQueue.execute(job);
 
-    	getLog().info("Awaiting completion of queued relationships processing tasks");
-    	processQueue.awaitCompletion();
+        getLog().info("Awaiting completion of queued relationships processing tasks");
+        processQueue.awaitCompletion();
         getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed relationsips: " + rels);
     }
 
     protected abstract Object getId(StreamTokenizer st);
 
-
-
     protected Date getDate(StreamTokenizer st) throws ParseException {
         return ProcessDates.getDate(st.sval);
     }
 
-    protected void readDescriptions(Reader r, Date releaseDate, FORMAT format, CountDownLatch descriptionLatch) throws Exception {
+    protected void readDescriptions(Reader r, Date releaseDate, FORMAT format, CountDownLatch descriptionLatch)
+            throws Exception {
         switch (format) {
         case SNOMED:
             processSnomedFormatDescriptions(r, releaseDate, descriptionLatch);
@@ -523,7 +538,7 @@ public abstract class ProcessSources {
 
         ProcessQueue processQueue = new ProcessQueue("AceDescriptionQueue", THREAD_COUNT);
         WriteDescriptionJob job = new WriteDescriptionJob(this);
-        
+
         skipLineOne(st, descriptionLatch);
         int tokenType = st.nextToken();
 
@@ -559,16 +574,18 @@ public abstract class ProcessSources {
             tokenType = st.nextToken();
             Object pathId = getId(st);
             pathUuid.add((UUID) pathId);
-            
 
-            if (descriptions > 0 &&descriptions % batchSize == 0) {
-            	getLog().info("Added " + batchSize + " descriptions, time to execute job - " + descriptions + " descriptions parsed");
-            	processQueue.execute(job);
-            	job = new WriteDescriptionJob(this);
+            if (descriptions > 0 && descriptions % batchSize == 0) {
+                getLog().info(
+                    "Added " + batchSize + " descriptions, time to execute job - " + descriptions
+                        + " descriptions parsed");
+                processQueue.execute(job);
+                job = new WriteDescriptionJob(this);
             }
-            job.addTask(descriptionLatch, statusDate, descriptionId, status, conceptId, text, capSignificant, typeInt, lang, pathId);
+            job.addTask(descriptionLatch, statusDate, descriptionId, status, conceptId, text, capSignificant, typeInt,
+                lang, pathId);
 
-           descriptions++;
+            descriptions++;
 
             // CR or LF
             tokenType = st.nextToken();
@@ -576,20 +593,22 @@ public abstract class ProcessSources {
                 // LF
                 tokenType = st.nextToken();
             }
-            
+
             // Beginning of loop
             tokenType = st.nextToken();
         }
-    	getLog().info("Added final descriptions processing job with " + job.batch.size() + " items to process - " + descriptions + " descriptions parsed");
-    	processQueue.execute(job);
+        getLog().info(
+            "Added final descriptions processing job with " + job.batch.size() + " items to process - " + descriptions
+                + " descriptions parsed");
+        processQueue.execute(job);
 
-    	getLog().info("Awaiting completion of queued descriptions processing tasks");
-    	processQueue.awaitCompletion();
-        getLog()
-                .info("Process time: " + (System.currentTimeMillis() - start) + " Parsed descriptions: " + descriptions);
+        getLog().info("Awaiting completion of queued descriptions processing tasks");
+        processQueue.awaitCompletion();
+        getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed descriptions: " + descriptions);
     }
 
-    private void processSnomedFormatDescriptions(Reader r, Date releaseDate, CountDownLatch descriptionLatch) throws IOException, Exception {
+    private void processSnomedFormatDescriptions(Reader r, Date releaseDate, CountDownLatch descriptionLatch)
+            throws IOException, Exception {
         // DESCRIPTIONID
         // DESCRIPTIONSTATUS
         // CONCEPTID
@@ -608,7 +627,7 @@ public abstract class ProcessSources {
 
         ProcessQueue processQueue = new ProcessQueue("SnomedDescriptionQueue", THREAD_COUNT);
         WriteDescriptionJob job = new WriteDescriptionJob(this);
-        
+
         skipLineOne(st, descriptionLatch);
         int tokenType = st.nextToken();
 
@@ -638,15 +657,15 @@ public abstract class ProcessSources {
             tokenType = st.nextToken();
             String lang = st.sval;
 
-            if (descriptions > 0 &&descriptions % batchSize == 0) {
-            	getLog().info("Added " + batchSize + " descriptions, time to execute job - " + descriptions + " descriptions parsed");
-            	processQueue.execute(job);
-            	job = new WriteDescriptionJob(this);
+            if (descriptions > 0 && descriptions % batchSize == 0) {
+                getLog().info(
+                    "Added " + batchSize + " descriptions, time to execute job - " + descriptions
+                        + " descriptions parsed");
+                processQueue.execute(job);
+                job = new WriteDescriptionJob(this);
             }
-			job.addTask(descriptionLatch, releaseDate, descriptionId, status,
-					conceptId, text, capSignificant, typeInt, lang,
-					ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
-							.getUids());
+            job.addTask(descriptionLatch, releaseDate, descriptionId, status, conceptId, text, capSignificant, typeInt,
+                lang, ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
             descriptions++;
 
@@ -661,13 +680,14 @@ public abstract class ProcessSources {
             // Beginning of loop
             tokenType = st.nextToken();
         }
-    	getLog().info("Added final descriptions processing job with " + job.batch.size() + " items to process - " + descriptions + " descriptions parsed");
-    	processQueue.execute(job);
+        getLog().info(
+            "Added final descriptions processing job with " + job.batch.size() + " items to process - " + descriptions
+                + " descriptions parsed");
+        processQueue.execute(job);
 
-    	getLog().info("Awaiting completion of queued descriptions processing tasks");
-    	processQueue.awaitCompletion();
-        getLog()
-                .info("Process time: " + (System.currentTimeMillis() - start) + " Parsed descriptions: " + descriptions);
+        getLog().info("Awaiting completion of queued descriptions processing tasks");
+        processQueue.awaitCompletion();
+        getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed descriptions: " + descriptions);
     }
 
     private boolean parseBoolean(StreamTokenizer st) {
@@ -705,32 +725,33 @@ public abstract class ProcessSources {
     public I_IntSet getReleaseDates() {
         IntSet intSet = new IntSet();
         for (Date rdate : releaseDates) {
-        	intSet.add(ThinVersionHelper.convert(rdate.getTime()));
+            intSet.add(ThinVersionHelper.convert(rdate.getTime()));
         }
         return intSet;
     }
 
     /**
-     * The set of edit path uuids in the concept, description and relationship files.
-     *
+     * The set of edit path uuids in the concept, description and relationship
+     * files.
+     * 
      * @return the pathUuid HashSet<UUID>
      */
     protected final HashSet<UUID> getPathUuids() {
         return pathUuid;
     }
 
-
     public abstract void execute(File snomedDir) throws Exception;
 
     public abstract void cleanupSNOMED(I_IntSet relsToIgnore) throws Exception;
 
-    public abstract void writeConcept(CountDownLatch conceptLatch, Date releaseDate, Object conceptKey, Object conceptStatus, boolean defChar,
-        Object pathId) throws Exception;
+    public abstract void writeConcept(CountDownLatch conceptLatch, Date releaseDate, Object conceptKey,
+            Object conceptStatus, boolean defChar, Object pathId) throws Exception;
 
-    public abstract void writeRelationship(CountDownLatch latch, Date releaseDate, Object relID, Object statusId, Object conceptOneID,
-        Object relationshipTypeConceptID, Object conceptTwoID, Object characteristic, Object refinability, int group,
-        Object pathId) throws Exception;
+    public abstract void writeRelationship(CountDownLatch latch, Date releaseDate, Object relID, Object statusId,
+            Object conceptOneID, Object relationshipTypeConceptID, Object conceptTwoID, Object characteristic,
+            Object refinability, int group, Object pathId) throws Exception;
 
-    public abstract void writeDescription(CountDownLatch descriptionLatch, Date releaseDate, Object descriptionId, Object status, Object conceptId,
-        String text, boolean capStatus, Object typeInt, String lang, Object pathId) throws Exception;
+    public abstract void writeDescription(CountDownLatch descriptionLatch, Date releaseDate, Object descriptionId,
+            Object status, Object conceptId, String text, boolean capStatus, Object typeInt, String lang, Object pathId)
+            throws Exception;
 }

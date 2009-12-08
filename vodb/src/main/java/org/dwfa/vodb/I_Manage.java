@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,18 +25,18 @@ import org.dwfa.tapi.TerminologyException;
  * 
  * This is an alternative to interfaces which extend {@link I_StoreInBdb}
  * 
- * Defines methods for retrieving and persisting a specific type of object 
+ * Defines methods for retrieving and persisting a specific type of object
  * without being logically bound to a specific database store.
  * 
  */
 public interface I_Manage<T> {
 
     public T get(int nid) throws TerminologyException;
-    
+
     public Set<T> getAll() throws TerminologyException;
-    
+
     public boolean exists(int nid) throws TerminologyException;
-    
+
     public void write(T object) throws TerminologyException;
-    
+
 }

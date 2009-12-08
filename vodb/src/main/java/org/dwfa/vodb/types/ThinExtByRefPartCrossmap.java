@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,36 +28,51 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinExtByRefPartCrossmap extends ThinExtByRefPartCrossmapForRel implements I_ThinExtByRefPartCrossmap {
-    
+
     int mapStatusId;
     int targetCodeId;
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmap#getReadCodeId()
      */
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmap#getMapStatusId()
      */
     public int getMapStatusId() {
         return mapStatusId;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmap#setMapStatusId(int)
      */
     public void setMapStatusId(int mapStatusId) {
         this.mapStatusId = mapStatusId;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmap#getTargetCodeId()
      */
     public int getTargetCodeId() {
         return targetCodeId;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartCrossmap#setTargetCodeId(int)
      */
     public void setTargetCodeId(int targetCodeId) {
         this.targetCodeId = targetCodeId;
     }
+
     public ThinExtByRefPartCrossmap(ThinExtByRefPartCrossmap another) {
         super(another);
         this.mapStatusId = another.mapStatusId;
@@ -68,8 +83,7 @@ public class ThinExtByRefPartCrossmap extends ThinExtByRefPartCrossmapForRel imp
         super();
     }
 
-    
-	public I_ThinExtByRefPart duplicate() {
+    public I_ThinExtByRefPart duplicate() {
         return new ThinExtByRefPartCrossmap(this);
     }
 

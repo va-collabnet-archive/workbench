@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,8 +27,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
-public class MultiLineCellRenderer extends JEditorPane implements
-        TableCellRenderer, Serializable {
+public class MultiLineCellRenderer extends JEditorPane implements TableCellRenderer, Serializable {
 
     /**
      * 
@@ -64,23 +63,15 @@ public class MultiLineCellRenderer extends JEditorPane implements
         setBackground(null);
     }
 
-    public Component getTableCellRendererComponent(JTable table, Object value,
-            boolean isSelected, boolean hasFocus, int row, int column) {
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
 
         if (isSelected) {
             super.setForeground(table.getSelectionForeground());
             super.setBackground(table.getSelectionBackground());
         } else {
-            super
-                .setForeground((unselectedForeground != null)
-                                                             ? unselectedForeground
-                                                             : table
-                                                                 .getForeground());
-            super
-                .setBackground((unselectedBackground != null)
-                                                             ? unselectedBackground
-                                                             : table
-                                                                 .getBackground());
+            super.setForeground((unselectedForeground != null) ? unselectedForeground : table.getForeground());
+            super.setBackground((unselectedBackground != null) ? unselectedBackground : table.getBackground());
         }
 
         setFont(table.getFont());
@@ -88,10 +79,8 @@ public class MultiLineCellRenderer extends JEditorPane implements
         if (hasFocus) {
             setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
             if (table.isCellEditable(row, column)) {
-                super.setForeground(UIManager
-                    .getColor("Table.focusCellForeground"));
-                super.setBackground(UIManager
-                    .getColor("Table.focusCellBackground"));
+                super.setForeground(UIManager.getColor("Table.focusCellForeground"));
+                super.setBackground(UIManager.getColor("Table.focusCellBackground"));
             }
         } else {
             setBorder(noFocusBorder);
@@ -106,8 +95,7 @@ public class MultiLineCellRenderer extends JEditorPane implements
         setText((value == null) ? "" : value.toString());
     }
 
-    public static class UIResource extends MultiLineCellRenderer implements
-            javax.swing.plaf.UIResource {
+    public static class UIResource extends MultiLineCellRenderer implements javax.swing.plaf.UIResource {
         /**
          * 
          */

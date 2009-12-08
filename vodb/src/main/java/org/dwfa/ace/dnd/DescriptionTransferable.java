@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,58 +41,43 @@ public class DescriptionTransferable implements Transferable {
 
     }
 
-    public Object getTransferData(DataFlavor flavor)
-            throws UnsupportedFlavorException, IOException {
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if (tuple == null) {
             return null;
         }
         if (flavor.equals(TerminologyTransferHandler.conceptBeanFlavor)) {
             return ConceptBean.get(tuple.getConceptId());
-        } else if (flavor
-            .equals(TerminologyTransferHandler.thinDescVersionedFlavor)) {
+        } else if (flavor.equals(TerminologyTransferHandler.thinDescVersionedFlavor)) {
             return tuple.getDescVersioned();
-        } else if (flavor
-            .equals(TerminologyTransferHandler.thinDescTupleFlavor)) {
+        } else if (flavor.equals(TerminologyTransferHandler.thinDescTupleFlavor)) {
             return tuple;
-        } else if (flavor
-            .equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
+        } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
             try {
-                return UniversalFixedConcept.get(ConceptBean.get(
-                    tuple.getConceptId()).getUids());
+                return UniversalFixedConcept.get(ConceptBean.get(tuple.getConceptId()).getUids());
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
-        } else if (flavor
-            .equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
+        } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
             try {
-                return UniversalFixedConcept.get(ConceptBean.get(
-                    tuple.getConceptId()).getUids());
+                return UniversalFixedConcept.get(ConceptBean.get(tuple.getConceptId()).getUids());
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
-        } else if (flavor
-            .equals(FixedTerminologyTransferable.universalFixedDescFlavor)) {
+        } else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescFlavor)) {
             try {
-                return new UniversalFixedDescription(tuple.getDescVersioned()
-                    .getUniversal().getDescId(), ConceptBean.get(
-                    tuple.getStatusId()).getUids(), ConceptBean.get(
-                    tuple.getConceptId()).getUids(), tuple
-                    .getInitialCaseSignificant(), ConceptBean.get(
-                    tuple.getTypeId()).getUids(), tuple.getText(), tuple
-                    .getLang());
+                return new UniversalFixedDescription(tuple.getDescVersioned().getUniversal().getDescId(),
+                    ConceptBean.get(tuple.getStatusId()).getUids(), ConceptBean.get(tuple.getConceptId()).getUids(),
+                    tuple.getInitialCaseSignificant(), ConceptBean.get(tuple.getTypeId()).getUids(), tuple.getText(),
+                    tuple.getLang());
             } catch (TerminologyException e) {
                 throw new ToIoException(e);
             }
-        } else if (flavor
-            .equals(FixedTerminologyTransferable.universalFixedDescInterfaceFlavor)) {
+        } else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescInterfaceFlavor)) {
             try {
-                return new UniversalFixedDescription(tuple.getDescVersioned()
-                    .getUniversal().getDescId(), ConceptBean.get(
-                    tuple.getStatusId()).getUids(), ConceptBean.get(
-                    tuple.getConceptId()).getUids(), tuple
-                    .getInitialCaseSignificant(), ConceptBean.get(
-                    tuple.getTypeId()).getUids(), tuple.getText(), tuple
-                    .getLang());
+                return new UniversalFixedDescription(tuple.getDescVersioned().getUniversal().getDescId(),
+                    ConceptBean.get(tuple.getStatusId()).getUids(), ConceptBean.get(tuple.getConceptId()).getUids(),
+                    tuple.getInitialCaseSignificant(), ConceptBean.get(tuple.getTypeId()).getUids(), tuple.getText(),
+                    tuple.getLang());
             } catch (TerminologyException e) {
                 throw new ToIoException(e);
             }
@@ -107,17 +92,17 @@ public class DescriptionTransferable implements Transferable {
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-		for (DataFlavor f : TerminologyTransferHandler.getSupportedFlavors()) {
-			if (f.equals(flavor)) {
-				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-					AceLog.getAppLog().fine("DT flavor supported: " + flavor);
-				}
-				return true;
-			}
-		}
-		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-			AceLog.getAppLog().fine("DT flavor not supported" + flavor);
-		}
-		return false;
-	}
+        for (DataFlavor f : TerminologyTransferHandler.getSupportedFlavors()) {
+            if (f.equals(flavor)) {
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine("DT flavor supported: " + flavor);
+                }
+                return true;
+            }
+        }
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            AceLog.getAppLog().fine("DT flavor not supported" + flavor);
+        }
+        return false;
+    }
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,171 +33,168 @@ import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
 
-public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel  {
+public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
 
-	/**
+    /**
      * 
      */
-	private static final long serialVersionUID = 1L;
-		
+    private static final long serialVersionUID = 1L;
 
-	public class TableChangedSwingWorker extends SwingWorker<Boolean> implements I_ChangeTableInSwing {
-		Integer memberId;
+    public class TableChangedSwingWorker extends SwingWorker<Boolean> implements I_ChangeTableInSwing {
+        Integer memberId;
 
-		private boolean stopWork = false;
+        private boolean stopWork = false;
 
-		public TableChangedSwingWorker(Integer componentId) {
-			super();
-			this.memberId = componentId;
-		}
+        public TableChangedSwingWorker(Integer componentId) {
+            super();
+            this.memberId = componentId;
+        }
 
-		@Override
-		protected Boolean construct() throws Exception {
-			if (refConWorker != null) {
-				refConWorker.stop();
-			}
-			if (memberId == null || memberId == Integer.MIN_VALUE) {
-				return true;
-			}
-			I_ThinExtByRefVersioned extension = null;
-			if (AceConfig.getVodb().hasExtension(memberId)) {
-				extension = ExtensionByReferenceBean.get(memberId).getExtension();
-			} else {
-				extension = ExtensionByReferenceBean.getNewExtensionMember(memberId);
-			}
+        @Override
+        protected Boolean construct() throws Exception {
+            if (refConWorker != null) {
+                refConWorker.stop();
+            }
+            if (memberId == null || memberId == Integer.MIN_VALUE) {
+                return true;
+            }
+            I_ThinExtByRefVersioned extension = null;
+            if (AceConfig.getVodb().hasExtension(memberId)) {
+                extension = ExtensionByReferenceBean.get(memberId).getExtension();
+            } else {
+                extension = ExtensionByReferenceBean.getNewExtensionMember(memberId);
+            }
 
-			if (stopWork || extension == null) {
-				return false;
-			}
-			I_IntSet statusSet = host.getConfig().getAllowedStatus();
-			Set<I_Position> positionSet = host.getConfig().getViewPositionSet();
-			if (host.getShowHistory() == true) {
-				statusSet = null;
-				positionSet = null;
-			}
-			for (I_ThinExtByRefPart part : extension.getTuples(statusSet, positionSet, true, false)) {
-				ThinExtByRefTuple ebrTuple = (ThinExtByRefTuple) part;
-				for (ReflexiveRefsetFieldData col: columns) {
-					if (col.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {
-						switch (col.invokeOnObjectType) {
-						case CONCEPT_COMPONENT:
-							if (col.readParamaters != null) {
-								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ConceptBean.get(extension.getComponentId()), col.readParamaters));
-							} else {
-								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ConceptBean.get(extension.getComponentId())));
-							}
-							break;
-						case COMPONENT:
-							throw new UnsupportedOperationException();
-						case CONCEPT:
-							throw new UnsupportedOperationException();
-						case IMMUTABLE:
-							if (col.readParamaters != null) {
-								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple, col.readParamaters));
-							} else {
-								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple));
-							}
-							break;
-						case PART:
-							if (col.readParamaters != null) {
-								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart(), col.readParamaters));
-							} else {
-								conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart()));
-							}
-							break;
-						}
-					}
+            if (stopWork || extension == null) {
+                return false;
+            }
+            I_IntSet statusSet = host.getConfig().getAllowedStatus();
+            Set<I_Position> positionSet = host.getConfig().getViewPositionSet();
+            if (host.getShowHistory() == true) {
+                statusSet = null;
+                positionSet = null;
+            }
+            for (I_ThinExtByRefPart part : extension.getTuples(statusSet, positionSet, true, false)) {
+                ThinExtByRefTuple ebrTuple = (ThinExtByRefTuple) part;
+                for (ReflexiveRefsetFieldData col : columns) {
+                    if (col.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {
+                        switch (col.invokeOnObjectType) {
+                        case CONCEPT_COMPONENT:
+                            if (col.readParamaters != null) {
+                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(
+                                    ConceptBean.get(extension.getComponentId()), col.readParamaters));
+                            } else {
+                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(
+                                    ConceptBean.get(extension.getComponentId())));
+                            }
+                            break;
+                        case COMPONENT:
+                            throw new UnsupportedOperationException();
+                        case CONCEPT:
+                            throw new UnsupportedOperationException();
+                        case IMMUTABLE:
+                            if (col.readParamaters != null) {
+                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple, col.readParamaters));
+                            } else {
+                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple));
+                            }
+                            break;
+                        case PART:
+                            if (col.readParamaters != null) {
+                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart(),
+                                    col.readParamaters));
+                            } else {
+                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart()));
+                            }
+                            break;
+                        }
+                    }
 
-				}
-				if (stopWork) {
-					return false;
-				}
-				if (allTuples == null) {
-					AceLog.getAppLog()
-					.info("all tuples for RefsetMemberTableModel is  null");
-					return false;
-				}
-				allTuples.add(ebrTuple);
-			}
+                }
+                if (stopWork) {
+                    return false;
+                }
+                if (allTuples == null) {
+                    AceLog.getAppLog().info("all tuples for RefsetMemberTableModel is  null");
+                    return false;
+                }
+                allTuples.add(ebrTuple);
+            }
 
+            refConWorker = new ReferencedConceptsSwingWorker();
+            refConWorker.start();
+            return true;
+        }
 
-			refConWorker = new ReferencedConceptsSwingWorker();
-			refConWorker.start();
-			return true;
-		}
+        @Override
+        protected void finished() {
+            super.finished();
+            try {
+                if (getProgress() != null) {
+                    getProgress().getProgressBar().setIndeterminate(false);
+                    if (conceptsToFetch.size() == 0) {
+                        getProgress().getProgressBar().setValue(1);
+                        getProgress().getProgressBar().setMaximum(1);
+                    } else {
+                        getProgress().getProgressBar().setValue(1);
+                        getProgress().getProgressBar().setMaximum(conceptsToFetch.size());
+                    }
+                }
+                if (get()) {
+                    tableComponentId = memberId;
+                }
+            } catch (InterruptedException e) {
+                ;
+            } catch (ExecutionException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+            fireTableDataChanged();
+        }
 
-		@Override
-		protected void finished() {
-			super.finished();
-			try {
-				if (getProgress() != null) {
-					getProgress().getProgressBar().setIndeterminate(false);
-					if (conceptsToFetch.size() == 0) {
-						getProgress().getProgressBar().setValue(1);
-						getProgress().getProgressBar().setMaximum(1);
-					} else {
-						getProgress().getProgressBar().setValue(1);
-						getProgress().getProgressBar().setMaximum(
-								conceptsToFetch.size());
-					}
-				}
-				if (get()) {
-					tableComponentId = memberId;
-				}
-			} catch (InterruptedException e) {
-				;
-			} catch (ExecutionException ex) {
-				AceLog.getAppLog().alertAndLogException(ex);
-			}
-			fireTableDataChanged();
-		}
+        public void stop() {
+            stopWork = true;
+        }
 
-		public void stop() {
-			stopWork = true;
-		}
+        public void setStopWork(boolean b) {
+            stopWork = b;
+        }
+    }
 
-		public void setStopWork(boolean b) {
-			stopWork = b;
-		}
-	}
+    public ReflexiveRefsetMemberTableModel(I_HostConceptPlugins host, ReflexiveRefsetFieldData[] columns) {
+        super(host, columns);
+    }
 
-	public ReflexiveRefsetMemberTableModel(I_HostConceptPlugins host,
-			ReflexiveRefsetFieldData[] columns) {
-		super(host, columns);
-	}
+    @Override
+    protected I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2) {
+        return new TableChangedSwingWorker(tableComponentId2);
+    }
 
-	@Override
-	protected I_ChangeTableInSwing getTableChangedSwingWorker(
-			int tableComponentId2) {
-		return new TableChangedSwingWorker(tableComponentId2);
-	}	
-	
-	public void propertyChange(PropertyChangeEvent arg0) {
-		if (tableChangeWorker != null) {
-			tableChangeWorker.setStopWork(true);
-		}
-		allTuples = null;
-		allExtensions = null;
-		if (getProgress() != null) {
-			getProgress().setVisible(true);
-			getProgress().getProgressBar().setValue(0);
-			getProgress().getProgressBar().setIndeterminate(true);
-		}
-		if (host.getConfig().getRefsetSpecInSpecEditor() == null) {
-			this.tableComponentId = Integer.MIN_VALUE;
-		}
-		fireTableDataChanged();
-	}
+    public void propertyChange(PropertyChangeEvent arg0) {
+        if (tableChangeWorker != null) {
+            tableChangeWorker.setStopWork(true);
+        }
+        allTuples = null;
+        allExtensions = null;
+        if (getProgress() != null) {
+            getProgress().setVisible(true);
+            getProgress().getProgressBar().setValue(0);
+            getProgress().getProgressBar().setIndeterminate(true);
+        }
+        if (host.getConfig().getRefsetSpecInSpecEditor() == null) {
+            this.tableComponentId = Integer.MIN_VALUE;
+        }
+        fireTableDataChanged();
+    }
 
-	public int getRowCount() {
-		if (tableComponentId == Integer.MIN_VALUE) {
-			return 1;
-		}
-		int count = super.getRowCount();
-		if (count == 0) {
-			return 1;
-		}
-		return count;
+    public int getRowCount() {
+        if (tableComponentId == Integer.MIN_VALUE) {
+            return 1;
+        }
+        int count = super.getRowCount();
+        if (count == 0) {
+            return 1;
+        }
+        return count;
 
-	}
+    }
 }

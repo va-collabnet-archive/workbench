@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,7 +61,10 @@ import org.dwfa.vodb.types.ThinRelVersioned;
 import com.sleepycat.je.DatabaseException;
 
 public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
-    /** Used to store the set of path int ids so that the paths can be create in the path store. */
+    /**
+     * Used to store the set of path int ids so that the paths can be create in
+     * the path store.
+     */
     private HashSet<Integer> pathUuid = new HashSet<Integer>();
 
     public void flushIdBuffer() throws Exception {
@@ -103,7 +106,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         }
 
         public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception {
-        	synchronized (ids) {
+            synchronized (ids) {
                 Integer nid = null;
                 boolean unmapped = false;
                 for (UUID uuid : uids) {
@@ -118,50 +121,49 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
                         nid = maxId.next();
                     }
                     for (UUID uuid : uids) {
-                         ids.put(uuid, nid);
+                        ids.put(uuid, nid);
                     }
                 }
                 return nid;
-			}
+            }
         }
 
-         public int getIntId(UUID uid, I_Path idPath, int version) throws Exception {
-         	synchronized (ids) {
-	            if (ids.containsKey(uid)) {
-	                return ids.get(uid);
-	            } else {
-	                int nid = maxId.next();
-	                ids.put(uid, nid);
-	                 return nid;
-	            }
-         	}
+        public int getIntId(UUID uid, I_Path idPath, int version) throws Exception {
+            synchronized (ids) {
+                if (ids.containsKey(uid)) {
+                    return ids.get(uid);
+                } else {
+                    int nid = maxId.next();
+                    ids.put(uid, nid);
+                    return nid;
+                }
+            }
         }
 
         public void flushIdBuffer() throws Exception {
-        	synchronized (ids) {
-	            getLog().info("ID Count: " + ids.size());
-	            int count = 0;
-	            for (Entry<UUID, Integer> entry : ids.entrySet()) {
-	                I_IdVersioned idv = vodb.getIdNullOk(entry.getValue());
-	                if (idv == null) {
-	                    idv = new ThinIdVersioned(entry.getValue(), 1);
-	                    addUuidPart(entry.getKey(), idv);
-	                }
-	                vodb.writeId(idv);
-	                count++;
-	                if (count % 100000 == 0) {
-	                    getLog().info("processed " + count + " identifiers. ");
-	                }
-	            }
-	
-	            map = new BerkeleyIdMapper();
-	            this.ids.clear();
-	            getLog().info("Converted to Berkeley-based id mapper");
-        	}
+            synchronized (ids) {
+                getLog().info("ID Count: " + ids.size());
+                int count = 0;
+                for (Entry<UUID, Integer> entry : ids.entrySet()) {
+                    I_IdVersioned idv = vodb.getIdNullOk(entry.getValue());
+                    if (idv == null) {
+                        idv = new ThinIdVersioned(entry.getValue(), 1);
+                        addUuidPart(entry.getKey(), idv);
+                    }
+                    vodb.writeId(idv);
+                    count++;
+                    if (count % 100000 == 0) {
+                        getLog().info("processed " + count + " identifiers. ");
+                    }
+                }
+
+                map = new BerkeleyIdMapper();
+                this.ids.clear();
+                getLog().info("Converted to Berkeley-based id mapper");
+            }
         }
 
-        private void addUuidPart(UUID uuid, I_IdVersioned idv)
-                throws TerminologyException, IOException {
+        private void addUuidPart(UUID uuid, I_IdVersioned idv) throws TerminologyException, IOException {
             ThinIdPart idPart = new ThinIdPart();
             idPart.setStatusId(currentStatusId);
             idPart.setPathId(encodingPathId);
@@ -181,70 +183,70 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         int encodingSource = PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE);
 
         public BerkeleyIdMapper() throws DatabaseException {
-			super();
-			vodb.logIdDbStats();
-		}
+            super();
+            vodb.logIdDbStats();
+        }
 
-		public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception {
-        	synchronized (ids) {
-	            Integer nid = idsFromCollection.get(uids);
-	            if (nid != null) {
-	                return nid;
-	            }
-	            if (vodb.hasId(uids)) {
-	                nid = vodb.getId(uids).getNativeId();
-	                idsFromCollection.put(uids, nid);
-	                return nid;
-	            }
-	
-	            Iterator<UUID> idsItr = uids.iterator();
-	            UUID firstId = idsItr.next();
-	
-	            int newId = vodb.uuidToNativeWithGeneration(firstId, encodingSource, idPath, version);
-	            idsFromCollection.put(uids, newId);
-	
-	            I_IdVersioned idv = new ThinIdVersioned(newId, 1);
-	            addUuidPart(idPath, version, firstId, idv);
-	            while (idsItr.hasNext()) {
-	                addUuidPart(idPath, version, idsItr.next(), idv);
-	            }
-	
-				vodb.writeId(idv);
-	            return newId;
-        	}
+        public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception {
+            synchronized (ids) {
+                Integer nid = idsFromCollection.get(uids);
+                if (nid != null) {
+                    return nid;
+                }
+                if (vodb.hasId(uids)) {
+                    nid = vodb.getId(uids).getNativeId();
+                    idsFromCollection.put(uids, nid);
+                    return nid;
+                }
+
+                Iterator<UUID> idsItr = uids.iterator();
+                UUID firstId = idsItr.next();
+
+                int newId = vodb.uuidToNativeWithGeneration(firstId, encodingSource, idPath, version);
+                idsFromCollection.put(uids, newId);
+
+                I_IdVersioned idv = new ThinIdVersioned(newId, 1);
+                addUuidPart(idPath, version, firstId, idv);
+                while (idsItr.hasNext()) {
+                    addUuidPart(idPath, version, idsItr.next(), idv);
+                }
+
+                vodb.writeId(idv);
+                return newId;
+            }
         }
 
         public int getIntId(UUID uid, I_Path idPath, int version) throws Exception {
-        	synchronized (ids) {
-	            Integer nid = ids.get(uid);
-	            if (nid != null) {
-	                return nid;
-	            }
-	            if (vodb.hasId(uid)) {
-	                nid = vodb.getId(uid).getNativeId();
-	                ids.put(uid, nid);
-	                return nid;
-	            }
-	
-	            int newId = vodb.uuidToNativeWithGeneration(uid, encodingSource, idPath, version);
-	            ids.put(uid, newId);
-	
-	            I_IdVersioned idv = new ThinIdVersioned(newId, 1);
-	
-	            addUuidPart(idPath, version, uid, idv);
-				vodb.writeId(idv);
-	
-	            return newId;
-        	}
+            synchronized (ids) {
+                Integer nid = ids.get(uid);
+                if (nid != null) {
+                    return nid;
+                }
+                if (vodb.hasId(uid)) {
+                    nid = vodb.getId(uid).getNativeId();
+                    ids.put(uid, nid);
+                    return nid;
+                }
+
+                int newId = vodb.uuidToNativeWithGeneration(uid, encodingSource, idPath, version);
+                ids.put(uid, newId);
+
+                I_IdVersioned idv = new ThinIdVersioned(newId, 1);
+
+                addUuidPart(idPath, version, uid, idv);
+                vodb.writeId(idv);
+
+                return newId;
+            }
         }
 
         private void addUuidPart(I_Path idPath, int version, UUID firstId, I_IdVersioned idv)
                 throws TerminologyException, IOException {
             ThinIdPart idPart = new ThinIdPart();
             idPart.setStatusId(vodb.uuidToNativeWithGeneration(ArchitectonicAuxiliary.Concept.CURRENT.getUids(),
-                                                               encodingSource, idPath, version));
-            idPart.setPathId(vodb.uuidToNativeWithGeneration(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
-                    .getUids(), encodingSource, idPath, version));
+                encodingSource, idPath, version));
+            idPart.setPathId(vodb.uuidToNativeWithGeneration(
+                ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids(), encodingSource, idPath, version));
             idPart.setSource(encodingSource);
             idPart.setSourceId(firstId);
             idPart.setVersion(version);
@@ -295,13 +297,13 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     public void cleanupSNOMED(I_IntSet relsToIgnore) throws Exception {
-        //nothing to clean up since using ace formats.
+        // nothing to clean up since using ace formats.
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void writeConcept(CountDownLatch latch, Date releaseDate, Object conceptKey, Object conceptStatus, boolean defChar, Object pathId)
-            throws Exception {
+    public void writeConcept(CountDownLatch latch, Date releaseDate, Object conceptKey, Object conceptStatus,
+            boolean defChar, Object pathId) throws Exception {
         int version = ThinVersionHelper.convert(releaseDate.getTime());
         ThinConPart con = new ThinConPart();
         con.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
@@ -320,15 +322,16 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             if (vcon.addVersion(con)) {
                 vodb.writeConceptAttributes(vcon);
             }
-		}
-        
+        }
+
         latch.countDown();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void writeDescription(CountDownLatch latch, Date releaseDate, Object descriptionId, Object status, Object conceptId, String text,
-        boolean capStatus, Object typeInt, String lang, Object pathID) throws Exception {
+    public void writeDescription(CountDownLatch latch, Date releaseDate, Object descriptionId, Object status,
+            Object conceptId, String text, boolean capStatus, Object typeInt, String lang, Object pathID)
+            throws Exception {
         int version = ThinVersionHelper.convert(releaseDate.getTime());
         ThinDescPart desc = new ThinDescPart();
         desc.setPathId(map.getIntId((Collection<UUID>) pathID, aceAuxPath, version));
@@ -347,22 +350,22 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             if (vodb.hasDescription(descId, concId)) {
                 vdesc = vodb.getDescription(descId, concId);
             } else {
-                vdesc = new ThinDescVersioned(map.getIntId((UUID) descriptionId, aceAuxPath, version), map
-                        .getIntId((UUID) conceptId, aceAuxPath, ThinVersionHelper.convert(releaseDate.getTime())), 1);
+                vdesc = new ThinDescVersioned(map.getIntId((UUID) descriptionId, aceAuxPath, version), map.getIntId(
+                    (UUID) conceptId, aceAuxPath, ThinVersionHelper.convert(releaseDate.getTime())), 1);
             }
             if (vdesc.addVersion(desc)) {
                 vodb.writeDescriptionNoLuceneUpdate(vdesc);
             }
-		}
+        }
 
         latch.countDown();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void writeRelationship(CountDownLatch latch, Date releaseDate, Object relID, Object statusId, Object conceptOneID,
-        Object relationshipTypeConceptID, Object conceptTwoID, Object characteristic, Object refinability, int group,
-        Object pathId) throws Exception {
+    public void writeRelationship(CountDownLatch latch, Date releaseDate, Object relID, Object statusId,
+            Object conceptOneID, Object relationshipTypeConceptID, Object conceptTwoID, Object characteristic,
+            Object refinability, int group, Object pathId) throws Exception {
         int version = ThinVersionHelper.convert(releaseDate.getTime());
         ThinRelPart part = new ThinRelPart();
         int c1id = map.getIntId((UUID) conceptOneID, aceAuxPath, version);
@@ -370,11 +373,11 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         if (c1id == c2id) {
             // log for now, throw exception later
             AceLog.getEditLog().log(
-                                    Level.SEVERE,
-                                    "*RECURSION* Rel points a concept to itself: " + relID + " c one id: "
-                                            + conceptOneID + " c two id: " + conceptTwoID);
+                Level.SEVERE,
+                "*RECURSION* Rel points a concept to itself: " + relID + " c one id: " + conceptOneID + " c two id: "
+                    + conceptTwoID);
             throw new Exception("*RECURSION* Rel points a concept to itself: " + relID + " c one id: " + conceptOneID
-                    + " c two id: " + conceptTwoID);
+                + " c two id: " + conceptTwoID);
 
         }
         part.setPathId(map.getIntId((Collection<UUID>) pathId, aceAuxPath, version));
@@ -388,32 +391,31 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         int relId = map.getIntId((UUID) relID, aceAuxPath, version);
         I_RelVersioned vrel;
         synchronized (vodb) {
-	        if (vodb.hasRel(relId, c1id)) {
-	            vrel = vodb.getRel(relId, c1id);
-	            if ((vrel.getC1Id() == c1id) && (vrel.getC2Id() == c2id)) {
-	                // rel ok
-	            } else {
-	                 throw new Exception("Duplicate rels with different c1 and c2 for: " + relID);
-	            }
-	        } else {
-	            vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version), map
-	                    .getIntId((UUID) conceptOneID, aceAuxPath, version), map.getIntId((UUID) conceptTwoID, aceAuxPath,
-	                                                                                      version), 1);
-	        }
-	        if (vrel.addVersionNoRedundancyCheck(part)) {
-	            vodb.writeRel(vrel);
-	        }
+            if (vodb.hasRel(relId, c1id)) {
+                vrel = vodb.getRel(relId, c1id);
+                if ((vrel.getC1Id() == c1id) && (vrel.getC2Id() == c2id)) {
+                    // rel ok
+                } else {
+                    throw new Exception("Duplicate rels with different c1 and c2 for: " + relID);
+                }
+            } else {
+                vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version), map.getIntId(
+                    (UUID) conceptOneID, aceAuxPath, version), map.getIntId((UUID) conceptTwoID, aceAuxPath, version),
+                    1);
+            }
+            if (vrel.addVersionNoRedundancyCheck(part)) {
+                vodb.writeRel(vrel);
+            }
         }
-        
+
         latch.countDown();
     }
 
-
     @Override
     public void writeId(UUID primaryUuid, UUID sourceSystemUuid, Object sourceId, UUID statusUuid, Date statusDate,
-        UUID pathUuid) throws Exception {
-        map.getIntId(Arrays.asList(new UUID[] { primaryUuid }), aceAuxPath, ThinVersionHelper.convert(statusDate
-                .getTime()));
+            UUID pathUuid) throws Exception {
+        map.getIntId(Arrays.asList(new UUID[] { primaryUuid }), aceAuxPath,
+            ThinVersionHelper.convert(statusDate.getTime()));
 
         ThinIdVersioned idv = ((VodbEnv) LocalVersionedTerminology.get()).getId(primaryUuid);
         ThinIdPart idPart = new ThinIdPart();
@@ -431,7 +433,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     /**
      * Write the new paths.
-     *
+     * 
      * @see org.dwfa.vodb.process.ProcessAceFormatSources#writeNewPaths()
      */
     public void writeNewPaths() throws Exception {
@@ -442,7 +444,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
     }
 
     protected void readBooleanMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
 
         st.nextToken();
         boolean booleanValue = st.sval.toLowerCase().startsWith("t");
@@ -453,12 +455,12 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         // control back to caller here.
 
         ProcessMemberTaskBoolean.acquire(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId,
-                                         booleanValue);
+            booleanValue);
     }
 
     @Override
     protected void readConIntMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
         st.nextToken();
         UUID conceptUuid = (UUID) getId(st);
         st.nextToken();
@@ -470,13 +472,13 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         // control back to caller here.
 
         ProcessMemberTaskConceptInt.acquire(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId,
-                                            conceptUuid, intValue);
+            conceptUuid, intValue);
 
     }
 
     @Override
     protected void readConceptMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
 
         ProcessMemberTaskConcept.check();
 
@@ -489,13 +491,13 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         // control back to caller here after launching new thread.
 
         ProcessMemberTaskConcept.acquire(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId,
-                                         conceptUuid);
+            conceptUuid);
 
     }
 
     @Override
     protected void readMeasurementMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
         st.nextToken();
         double doubleVal = Double.parseDouble(st.sval);
         st.nextToken();
@@ -508,13 +510,13 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         // control back to caller here.
 
         ProcessMemberTaskMeasurement.acquire(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId,
-                                             doubleVal, unitsOfMeasureUuid);
+            doubleVal, unitsOfMeasureUuid);
 
     }
 
     @Override
     protected void readIntegerMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
         st.nextToken();
         int intValue = Integer.parseInt(st.sval);
         int version = ThinVersionHelper.convert(statusDate.getTime());
@@ -529,7 +531,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readLanguageMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
         st.nextToken();
         UUID acceptabilityUuid = (UUID) getId(st);
 
@@ -546,12 +548,12 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         // control back to caller here.
 
         ProcessMemberTaskLanguage.acquire(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId,
-                                          acceptabilityUuid, correctnessUuid, synonymyUuid);
+            acceptabilityUuid, correctnessUuid, synonymyUuid);
     }
 
     @Override
     protected void readStringMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
         st.nextToken();
         String strExt = st.sval;
         int version = ThinVersionHelper.convert(statusDate.getTime());
@@ -564,7 +566,8 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
     }
 
     @Override
-    protected void finishRefsetRead(REFSET_FILE_TYPES refsetType, File refsetFile, CountDownLatch refsetLatch) throws Exception {
+    protected void finishRefsetRead(REFSET_FILE_TYPES refsetType, File refsetFile, CountDownLatch refsetLatch)
+            throws Exception {
         switch (refsetType) {
         case BOOLEAN:
             ProcessMemberTaskBoolean.check();

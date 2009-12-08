@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,9 +24,8 @@ import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class Counter implements I_ProcessConceptAttributeEntries,
-        I_ProcessRelationshipEntries, I_ProcessDescriptionEntries,
-        I_ProcessIdEntries, I_ProcessImageEntries {
+public class Counter implements I_ProcessConceptAttributeEntries, I_ProcessRelationshipEntries,
+        I_ProcessDescriptionEntries, I_ProcessIdEntries, I_ProcessImageEntries {
 
     int concepts = 0;
     int descriptions = 0;
@@ -39,32 +38,27 @@ public class Counter implements I_ProcessConceptAttributeEntries,
         super();
     }
 
-    public void processConceptAttributeEntry(DatabaseEntry key,
-            DatabaseEntry value) throws Exception {
+    public void processConceptAttributeEntry(DatabaseEntry key, DatabaseEntry value) throws Exception {
         concepts++;
         total++;
     }
 
-    public void processRel(DatabaseEntry key, DatabaseEntry value)
-            throws Exception {
+    public void processRel(DatabaseEntry key, DatabaseEntry value) throws Exception {
         relationships++;
         total++;
     }
 
-    public void processDesc(DatabaseEntry key, DatabaseEntry value)
-            throws Exception {
+    public void processDesc(DatabaseEntry key, DatabaseEntry value) throws Exception {
         descriptions++;
         total++;
     }
 
-    public void processId(DatabaseEntry key, DatabaseEntry value)
-            throws Exception {
+    public void processId(DatabaseEntry key, DatabaseEntry value) throws Exception {
         ids++;
         total++;
     }
 
-    public void processImages(DatabaseEntry key, DatabaseEntry value)
-            throws Exception {
+    public void processImages(DatabaseEntry key, DatabaseEntry value) throws Exception {
         images++;
         total++;
     }

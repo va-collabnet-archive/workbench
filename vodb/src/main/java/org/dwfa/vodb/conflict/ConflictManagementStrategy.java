@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,7 +51,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
      * to check the dependent entities of the concept (descriptions,
      * relationships,
      * extensions etc) it will check through each.
-     *
+     * 
      * @see org.dwfa.ace.api.I_ManageConflict#isInConflict(org.dwfa.ace.api.I_GetConceptData,
      *      boolean)
      */
@@ -112,8 +112,8 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
             return false;
         }
 
-        List<I_ConceptAttributeTuple> tuples =
-                concept.getConceptAttributeTuples(config.getAllowedStatus(), config.getViewPositionSet());
+        List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(config.getAllowedStatus(),
+            config.getViewPositionSet());
         return doesConflictExist(tuples);
     }
 
@@ -160,8 +160,8 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
         List<I_RelTuple> matchingTuples = new ArrayList<I_RelTuple>();
 
         I_IntSet srcTypes = config.getSourceRelTypes();
-        relationship.addTuples(config.getAllowedStatus(), srcTypes.getSetValues().length == 0 ? null : srcTypes, config
-            .getViewPositionSet(), matchingTuples, true);
+        relationship.addTuples(config.getAllowedStatus(), srcTypes.getSetValues().length == 0 ? null : srcTypes,
+            config.getViewPositionSet(), matchingTuples, true);
 
         return doesConflictExist(matchingTuples);
     }
@@ -198,18 +198,20 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
 
     protected abstract <T extends I_AmPart> boolean doesConflictExist(List<T> versions);
 
-    private boolean isNull(Object ... obj) {
+    private boolean isNull(Object... obj) {
         if (obj == null) {
             return true;
         }
         for (int i = 0; i < obj.length; i++) {
-            if (obj[i] == null) return true;
+            if (obj[i] == null)
+                return true;
         }
         return false;
     }
 
     /**
-     * Force implementation of equals by subclasses so that the conflict panel drop box can refer to them
+     * Force implementation of equals by subclasses so that the conflict panel
+     * drop box can refer to them
      * simply by generic instance
      */
     @Override

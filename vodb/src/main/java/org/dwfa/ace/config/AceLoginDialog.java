@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,16 +42,16 @@ import org.dwfa.bpa.process.TaskFailedException;
  * Login Dialog for ace.
  * 
  * Captures use subversion flag, profile and users password.
- *  
+ * 
  * @author steve crow, ean dungey, keith campbell
  */
-public class AceLoginDialog extends javax.swing.JDialog  {
-	private static final long serialVersionUID = -4458854470566944865L;
-	private File profile;
-	
+public class AceLoginDialog extends javax.swing.JDialog {
+    private static final long serialVersionUID = -4458854470566944865L;
+    private File profile;
+
     public AceLoginDialog(JFrame topFrame) {
-    	
-    	setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         initComponents();
     }
 
@@ -67,7 +67,7 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         passwordField.setColumns(20);
         profileSelectionBox = new javax.swing.JComboBox();
         svnConnectCheckBox = new javax.swing.JCheckBox();
-        
+
         cancelButton = new javax.swing.JButton();
         loginButton = new javax.swing.JButton();
 
@@ -76,9 +76,7 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         setResizable(false);
         setModal(true);
 
-
         profileSelectionBox.setBorder(null);
-        
 
         svnConnectCheckBox.setSelected(true);
         svnConnectCheckBox.setText("Connect to subversion");
@@ -90,7 +88,7 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         gbc.weighty = 0;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        
+
         content.add(userLabel, gbc);
         gbc.gridx++;
         gbc.gridwidth = 3;
@@ -104,7 +102,7 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         content.add(passwordField, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
-        
+
         cancelButton.setText("Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -114,10 +112,10 @@ public class AceLoginDialog extends javax.swing.JDialog  {
 
         loginButton.setText("Login");
         loginButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				loginButtonActionPerformed((File) profileSelectionBox.getSelectedItem());
-			}
-		});
+            public void actionPerformed(ActionEvent e) {
+                loginButtonActionPerformed((File) profileSelectionBox.getSelectedItem());
+            }
+        });
 
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridy++;
@@ -138,12 +136,12 @@ public class AceLoginDialog extends javax.swing.JDialog  {
         gbc.gridx++;
         content.add(loginButton, gbc);
         if (JComponent.class.isAssignableFrom(content.getClass())) {
-        	JComponent jc = (JComponent) content;
-        	jc.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            JComponent jc = (JComponent) content;
+            jc.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         } else {
-        	AceLog.getAppLog().info("Container class is: " + content.getClass());
+            AceLog.getAppLog().info("Container class is: " + content.getClass());
         }
-        
+
         getRootPane().setDefaultButton(loginButton);
         profileSelectionBox.requestFocusInWindow();
         pack();
@@ -165,93 +163,88 @@ public class AceLoginDialog extends javax.swing.JDialog  {
      * @param profile
      */
     private void loginButtonActionPerformed(File profile) {
-		if (profile != null) {
-    		setProfile(profile);
-    	}
+        if (profile != null) {
+            setProfile(profile);
+        }
         dispose();
     }
 
     private static class ProfileRenderer extends DefaultListCellRenderer {
 
-		/**
+        /**
 		 * 
 		 */
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		@Override
-		public Component getListCellRendererComponent(JList list,
-                Object value,
-                int index,
-                boolean isSelected,
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
                 boolean cellHasFocus) {
-			 super.getListCellRendererComponent(list,
-                    value,
-                    index,
-                    isSelected,
-                    cellHasFocus);
-			 if (value == null) {
-				 setText("");
-			 } else if (File.class.isAssignableFrom(value.getClass())) {
-				 File f = (File) value;
-				 setText(f.getName());
-			 }
-			 
-			 return this;
-		}
-    	
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (value == null) {
+                setText("");
+            } else if (File.class.isAssignableFrom(value.getClass())) {
+                File f = (File) value;
+                setText(f.getName());
+            }
+
+            return this;
+        }
+
     }
+
     /**
-     * Sets the profile dir and returns the 
+     * Sets the profile dir and returns the
      * 
      * @param profileDirToSet the last profile used.
      * @return File
-     * @throws TaskFailedException if there is no profile set. NB profileDirToSet can be null.
+     * @throws TaskFailedException if there is no profile set. NB
+     *             profileDirToSet can be null.
      */
     public File getUserProfile(File profileDirToSet) throws TaskFailedException {
-		if (profileDirToSet != null) {
-			List<File> profiles = new ArrayList<File>();
-			getProfiles(profiles, new File("profiles"));
-			profileSelectionBox.setModel(new DefaultComboBoxModel(profiles.toArray()));
-			profileSelectionBox.validate();
-			profileSelectionBox.setSelectedItem(profileDirToSet);
-			profileSelectionBox.setRenderer(new ProfileRenderer());
-		}
+        if (profileDirToSet != null) {
+            List<File> profiles = new ArrayList<File>();
+            getProfiles(profiles, new File("profiles"));
+            profileSelectionBox.setModel(new DefaultComboBoxModel(profiles.toArray()));
+            profileSelectionBox.validate();
+            profileSelectionBox.setSelectedItem(profileDirToSet);
+            profileSelectionBox.setRenderer(new ProfileRenderer());
+        }
 
-    	setVisible(true);
+        setVisible(true);
 
-    	return getProfile();
+        return getProfile();
     }
-    
+
     private void getProfiles(List<File> profiles, File dir) {
-    	if (dir.listFiles() != null) {
-    		for (File f: dir.listFiles()) {
-    			if (f.isDirectory()) {
-    				getProfiles(profiles, f);
-    			} else if (f.getName().toLowerCase().endsWith(".ace")) {
-    				profiles.add(f);
-    			}
-    		}
-    	}
+        if (dir.listFiles() != null) {
+            for (File f : dir.listFiles()) {
+                if (f.isDirectory()) {
+                    getProfiles(profiles, f);
+                } else if (f.getName().toLowerCase().endsWith(".ace")) {
+                    profiles.add(f);
+                }
+            }
+        }
     }
-    
-	/**
+
+    /**
      * Entered password.
      * 
      * @return String
      */
     public char[] getPassword() {
-    	return passwordField.getPassword();
+        return passwordField.getPassword();
     }
-    
+
     /**
      * True if the user is connecting to SVN
      * 
      * @return boolean
      */
     public boolean connectToSvn() {
-    	return svnConnectCheckBox.getModel().isSelected();
+        return svnConnectCheckBox.getModel().isSelected();
     }
-    
+
     /**
      * Get the profile file to use.
      * 
@@ -259,16 +252,15 @@ public class AceLoginDialog extends javax.swing.JDialog  {
      * @throws TaskFailedException if the profile is null.
      */
     private File getProfile() throws TaskFailedException {
-		if (profile == null) {
-			throw new TaskFailedException("No Profile selected.");
-		}
-		return profile;
-	}
+        if (profile == null) {
+            throw new TaskFailedException("No Profile selected.");
+        }
+        return profile;
+    }
 
-	private void setProfile(File profileToSet) {
-		this.profile = profileToSet;
-	}
-
+    private void setProfile(File profileToSet) {
+        this.profile = profileToSet;
+    }
 
     private javax.swing.JButton cancelButton;
     private javax.swing.JLabel userLabel;

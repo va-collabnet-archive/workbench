@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -148,10 +148,8 @@ public class ImportBaselineJarReader implements ActionListener {
 
     public ImportBaselineJarReader(final Configuration riverConfig) {
         try {
-            final File jarFile =
-                    FileDialogUtil.getExistingFile(
-                        "Select baseline jar file to import", null, null,
-                        config.getActiveFrame());
+            final File jarFile = FileDialogUtil.getExistingFile("Select baseline jar file to import", null, null,
+                config.getActiveFrame());
             ProgressUpdator updater = new ProgressUpdator();
             updater.activity.addActionListener(this);
             ACE.threadPool.execute(new Runnable() {
@@ -170,123 +168,115 @@ public class ImportBaselineJarReader implements ActionListener {
     }
 
     protected void importJar(File jarFile, final Configuration riverConfig) throws TaskFailedException {
-		try {
-			JarFile jf = new JarFile(jarFile);
-			Manifest mf = jf.getManifest();
-			Map<String, Attributes> attributeMap = mf.getEntries();
+        try {
+            JarFile jf = new JarFile(jarFile);
+            Manifest mf = jf.getManifest();
+            Map<String, Attributes> attributeMap = mf.getEntries();
 
-			for (String entry : attributeMap.keySet()) {
-				if (entry.equals("concepts.ace")) {
-					Attributes a = attributeMap.get(entry);
-					concepts = Integer.parseInt(a.getValue("count"));
-					System.out
-							.println(entry + " count: " + a.getValue("count"));
-				} else if (entry.equals("descriptions.ace")) {
-					Attributes a = attributeMap.get(entry);
-					descriptions = Integer.parseInt(a.getValue("count"));
-					System.out
-							.println(entry + " count: " + a.getValue("count"));
-				} else if (entry.equals("relationships.ace")) {
-					Attributes a = attributeMap.get(entry);
-					relationships = Integer.parseInt(a.getValue("count"));
-					System.out
-							.println(entry + " count: " + a.getValue("count"));
-				} else if (entry.equals("ids.ace")) {
-					Attributes a = attributeMap.get(entry);
-					ids = Integer.parseInt(a.getValue("count"));
-					System.out
-							.println(entry + " count: " + a.getValue("count"));
-				} else if (entry.equals("images.ace")) {
-					Attributes a = attributeMap.get(entry);
-					images = Integer.parseInt(a.getValue("count"));
-					System.out
-							.println(entry + " count: " + a.getValue("count"));
-				} else if (entry.equals("timePath.ace")) {
-					Attributes a = attributeMap.get(entry);
-					timePathEntries = Integer.parseInt(a.getValue("count"));
-					System.out
-							.println(entry + " count: " + a.getValue("count"));
-				}
-			}
+            for (String entry : attributeMap.keySet()) {
+                if (entry.equals("concepts.ace")) {
+                    Attributes a = attributeMap.get(entry);
+                    concepts = Integer.parseInt(a.getValue("count"));
+                    System.out.println(entry + " count: " + a.getValue("count"));
+                } else if (entry.equals("descriptions.ace")) {
+                    Attributes a = attributeMap.get(entry);
+                    descriptions = Integer.parseInt(a.getValue("count"));
+                    System.out.println(entry + " count: " + a.getValue("count"));
+                } else if (entry.equals("relationships.ace")) {
+                    Attributes a = attributeMap.get(entry);
+                    relationships = Integer.parseInt(a.getValue("count"));
+                    System.out.println(entry + " count: " + a.getValue("count"));
+                } else if (entry.equals("ids.ace")) {
+                    Attributes a = attributeMap.get(entry);
+                    ids = Integer.parseInt(a.getValue("count"));
+                    System.out.println(entry + " count: " + a.getValue("count"));
+                } else if (entry.equals("images.ace")) {
+                    Attributes a = attributeMap.get(entry);
+                    images = Integer.parseInt(a.getValue("count"));
+                    System.out.println(entry + " count: " + a.getValue("count"));
+                } else if (entry.equals("timePath.ace")) {
+                    Attributes a = attributeMap.get(entry);
+                    timePathEntries = Integer.parseInt(a.getValue("count"));
+                    System.out.println(entry + " count: " + a.getValue("count"));
+                }
+            }
 
-			total = concepts + descriptions + relationships + ids + images + timePathEntries;
+            total = concepts + descriptions + relationships + ids + images + timePathEntries;
 
-			JarEntry je = jf.getJarEntry("ids.ace");
-			lowerProgressMessage = "Processing ids. Total items: ";
-			processIds(jf.getInputStream(je));
+            JarEntry je = jf.getJarEntry("ids.ace");
+            lowerProgressMessage = "Processing ids. Total items: ";
+            processIds(jf.getInputStream(je));
 
-			for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
-				je = e.nextElement();
-				AceLog.getAppLog().info("Jar entry: " + je.getName()
-						+ " compressed: " + je.getCompressedSize() + " size: "
-						+ je.getSize() + " time: " + new Date(je.getTime())
-						+ " comment: " + je.getComment());
+            for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
+                je = e.nextElement();
+                AceLog.getAppLog().info(
+                    "Jar entry: " + je.getName() + " compressed: " + je.getCompressedSize() + " size: " + je.getSize()
+                        + " time: " + new Date(je.getTime()) + " comment: " + je.getComment());
 
-				if (je.getName().equals("concepts.ace")) {
-					lowerProgressMessage = "Processing concepts. Total items: ";
-					processConcepts(jf.getInputStream(je));
-				} else if (je.getName().equals("descriptions.ace")) {
-					lowerProgressMessage = "Processing descriptions. Total items: ";
-					processDescriptions(jf.getInputStream(je));
-				} else if (je.getName().equals("relationships.ace")) {
-					lowerProgressMessage = "Processing relationships. Total items: ";
-					processRelationships(jf.getInputStream(je));
-				} else if (je.getName().equals("ids.ace")) {
-					// already processed above...
-				} else if (je.getName().equals("images.ace")) {
-					lowerProgressMessage = "Processing images. Total items: ";
-					processImages(jf.getInputStream(je));
-				} else if (je.getName().equals("paths.ace")) {
-					lowerProgressMessage = "Processing paths. Total items: ";
-					processPaths(jf.getInputStream(je));
-				} else if (je.getName().equals("timePath.ace")) {
-					lowerProgressMessage = "Processing time/path entries. Total items: ";
-					processTimePaths(jf.getInputStream(je));
-				} else if (je.getName().equals("config.ace")) {
-					ObjectInputStream ois = new ObjectInputStream(jf.getInputStream(je));
-					config = (AceConfig) ois.readObject();
-				}
-			}
+                if (je.getName().equals("concepts.ace")) {
+                    lowerProgressMessage = "Processing concepts. Total items: ";
+                    processConcepts(jf.getInputStream(je));
+                } else if (je.getName().equals("descriptions.ace")) {
+                    lowerProgressMessage = "Processing descriptions. Total items: ";
+                    processDescriptions(jf.getInputStream(je));
+                } else if (je.getName().equals("relationships.ace")) {
+                    lowerProgressMessage = "Processing relationships. Total items: ";
+                    processRelationships(jf.getInputStream(je));
+                } else if (je.getName().equals("ids.ace")) {
+                    // already processed above...
+                } else if (je.getName().equals("images.ace")) {
+                    lowerProgressMessage = "Processing images. Total items: ";
+                    processImages(jf.getInputStream(je));
+                } else if (je.getName().equals("paths.ace")) {
+                    lowerProgressMessage = "Processing paths. Total items: ";
+                    processPaths(jf.getInputStream(je));
+                } else if (je.getName().equals("timePath.ace")) {
+                    lowerProgressMessage = "Processing time/path entries. Total items: ";
+                    processTimePaths(jf.getInputStream(je));
+                } else if (je.getName().equals("config.ace")) {
+                    ObjectInputStream ois = new ObjectInputStream(jf.getInputStream(je));
+                    config = (AceConfig) ois.readObject();
+                }
+            }
 
-			lowerProgressMessage = "Starting populateTimeBranchDb().";
-			AceConfig.getVodb().populatePositions();
-			lowerProgressMessage = "Starting sync.";
-			AceConfig.getVodb().sync();
-			
-			continueWork = false;
-			if (config != null) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						for (I_ConfigAceFrame ace: config.aceFrames) {
-							if (ace.isActive()) {
-								ACE cdePanel;
-								try {
-									cdePanel = new ACE(riverConfig);
-									cdePanel.setup(ace);
-									JFrame cdeFrame = new JFrame(ace.getFrameName());
-									cdeFrame.setContentPane(cdePanel);
-									cdeFrame.setJMenuBar(cdePanel.createMenuBar(cdeFrame));
+            lowerProgressMessage = "Starting populateTimeBranchDb().";
+            AceConfig.getVodb().populatePositions();
+            lowerProgressMessage = "Starting sync.";
+            AceConfig.getVodb().sync();
 
-									cdeFrame.setBounds(ace.getBounds());
-									cdeFrame.setVisible(true);
-								} catch (Exception e) {
-									AceLog.getAppLog().alertAndLogException(e);
-								}
-							}
-						}
-					}
-					
-				});
-			}
-		} catch (Exception e) {
-			continueWork = false;
-			throw new TaskFailedException(e);
-		}
-		
-	}
+            continueWork = false;
+            if (config != null) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        for (I_ConfigAceFrame ace : config.aceFrames) {
+                            if (ace.isActive()) {
+                                ACE cdePanel;
+                                try {
+                                    cdePanel = new ACE(riverConfig);
+                                    cdePanel.setup(ace);
+                                    JFrame cdeFrame = new JFrame(ace.getFrameName());
+                                    cdeFrame.setContentPane(cdePanel);
+                                    cdeFrame.setJMenuBar(cdePanel.createMenuBar(cdeFrame));
 
-    private void processIds(InputStream inputStream) throws IOException,
-            InterruptedException {
+                                    cdeFrame.setBounds(ace.getBounds());
+                                    cdeFrame.setVisible(true);
+                                } catch (Exception e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                }
+                            }
+                        }
+                    }
+
+                });
+            }
+        } catch (Exception e) {
+            continueWork = false;
+            throw new TaskFailedException(e);
+        }
+
+    }
+
+    private void processIds(InputStream inputStream) throws IOException, InterruptedException {
         ThinIdVersionedBinding binding = new ThinIdVersionedBinding();
         DataInputStream dis = new DataInputStream(inputStream);
         byte[] buffer = new byte[1024];
@@ -347,8 +337,7 @@ public class ImportBaselineJarReader implements ActionListener {
             int size = dis.readInt();
             if (size > buffer.length) {
                 buffer = new byte[size];
-                AceLog.getAppLog().info(
-                    "Increasing relationship buffer: " + size);
+                AceLog.getAppLog().info("Increasing relationship buffer: " + size);
             }
             int read = dis.read(buffer, 0, size);
             while (read != size) {
@@ -371,8 +360,7 @@ public class ImportBaselineJarReader implements ActionListener {
             int size = dis.readInt();
             if (size > buffer.length) {
                 buffer = new byte[size];
-                AceLog.getAppLog().info(
-                    "Increasing description buffer: " + size);
+                AceLog.getAppLog().info("Increasing description buffer: " + size);
             }
             int read = dis.read(buffer, 0, size);
             while (read != size) {
@@ -395,8 +383,7 @@ public class ImportBaselineJarReader implements ActionListener {
             int size = dis.readInt();
             if (size > buffer.length) {
                 buffer = new byte[size];
-                AceLog.getAppLog().info(
-                    "Setting concept buffer size to: " + size);
+                AceLog.getAppLog().info("Setting concept buffer size to: " + size);
             }
             int read = dis.read(buffer, 0, size);
             while (read != size) {
@@ -455,8 +442,7 @@ public class ImportBaselineJarReader implements ActionListener {
             }
             TupleInput input = new TupleInput(buffer);
             try {
-                TimePathId jarTimePath =
-                        (TimePathId) timePathIdBinder.entryToObject(input);
+                TimePathId jarTimePath = (TimePathId) timePathIdBinder.entryToObject(input);
                 AceConfig.getVodb().writeTimePath(jarTimePath);
             } catch (RuntimeException e) {
                 AceLog.getAppLog().info("processing paths: " + processed);

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,129 +41,131 @@ import org.dwfa.util.AceDateFormat;
  * 
  */
 public class ThinVersionHelper {
-	private static long timeZero = 1830407753464L;
-	private static int timeZeroInt = 1830407753;
+    private static long timeZero = 1830407753464L;
+    private static int timeZeroInt = 1830407753;
 
-	public static enum MAX_VALUE_TYPE { UNCOMITTED, LATEST };
-	
-	public ThinVersionHelper() {
-		/*
-		 * timeZero = Calendar.getInstance(); timeZero.set(2028, 0, 1); zeroRef
-		 * = timeZero.getTimeInMillis();
-		 */
-		AceLog.getAppLog().info("Zero ref is: " + timeZero);
-	}
+    public static enum MAX_VALUE_TYPE {
+        UNCOMITTED, LATEST
+    };
 
-	private static ThreadLocal<DateFormat> dateFormatterTL = new ThreadLocal<DateFormat>();
+    public ThinVersionHelper() {
+        /*
+         * timeZero = Calendar.getInstance(); timeZero.set(2028, 0, 1); zeroRef
+         * = timeZero.getTimeInMillis();
+         */
+        AceLog.getAppLog().info("Zero ref is: " + timeZero);
+    }
 
-	public static int convert(long time) {
-		if (time == Long.MAX_VALUE) {
-			return Integer.MAX_VALUE;
-		}
-		if (time == Long.MIN_VALUE) {
-			return Integer.MIN_VALUE;
-		}
-		int timeInSec = (int) (time / 1000);
-		return timeInSec - timeZeroInt;
-	}
+    private static ThreadLocal<DateFormat> dateFormatterTL = new ThreadLocal<DateFormat>();
 
-	public static long convert(int version) {
-		if (version == Integer.MAX_VALUE) {
-			return Long.MAX_VALUE;
-		}
-		if (version == Integer.MIN_VALUE) {
-			return Long.MIN_VALUE;
-		}
-		long added = timeZeroInt + version;
-		return added * 1000;
-	}
+    public static int convert(long time) {
+        if (time == Long.MAX_VALUE) {
+            return Integer.MAX_VALUE;
+        }
+        if (time == Long.MIN_VALUE) {
+            return Integer.MIN_VALUE;
+        }
+        int timeInSec = (int) (time / 1000);
+        return timeInSec - timeZeroInt;
+    }
 
-	public static int convert(String dateStr) throws ParseException {
-		if (dateStr.equalsIgnoreCase("latest")) {
-			return Integer.MAX_VALUE;
-		}
-		DateFormat formatter = dateFormatterTL.get();
-		if (formatter == null) {
-			formatter = AceDateFormat.getVersionHelperDateFormat();
-			dateFormatterTL.set(formatter);
-		}
-		Date d = formatter.parse(dateStr);
-		return convert(d.getTime());
-	}
+    public static long convert(int version) {
+        if (version == Integer.MAX_VALUE) {
+            return Long.MAX_VALUE;
+        }
+        if (version == Integer.MIN_VALUE) {
+            return Long.MIN_VALUE;
+        }
+        long added = timeZeroInt + version;
+        return added * 1000;
+    }
 
-	/*
-	 * Convert with time zone sensitivity
-	 * 
-	 * <br> 2009.07.31 00:00:00 GMT
-	 */
-	public static int convertTz(String dateStr) throws ParseException {
-		if (dateStr.equalsIgnoreCase("latest")) {
-			return Integer.MAX_VALUE;
-		}
-		DateFormat formatter = AceDateFormat.getVersionHelperWithTimezoneDateFormat();
-		Date d = formatter.parse(dateStr);
-		return convert(d.getTime());
-	}
+    public static int convert(String dateStr) throws ParseException {
+        if (dateStr.equalsIgnoreCase("latest")) {
+            return Integer.MAX_VALUE;
+        }
+        DateFormat formatter = dateFormatterTL.get();
+        if (formatter == null) {
+            formatter = AceDateFormat.getVersionHelperDateFormat();
+            dateFormatterTL.set(formatter);
+        }
+        Date d = formatter.parse(dateStr);
+        return convert(d.getTime());
+    }
 
-	public static String format(int version) {
-	    return format(version, MAX_VALUE_TYPE.UNCOMITTED);
-	}
-	
-	public static String format(int version, MAX_VALUE_TYPE maxValueType) {
-		if (version == Integer.MAX_VALUE) {
-		    return maxValueType.toString().toLowerCase();		    
-		}
-		if (version == Integer.MIN_VALUE) {
-			return "beginning of time";
-		}
-		long time = convert(version);
-		DateFormat formatter = dateFormatterTL.get();
-		if (formatter == null) {
-			formatter = AceDateFormat.getVersionHelperDateFormat();
-			dateFormatterTL.set(formatter);
-		}
-		return formatter.format(new Date(time));
-	}
+    /*
+     * Convert with time zone sensitivity
+     * 
+     * <br> 2009.07.31 00:00:00 GMT
+     */
+    public static int convertTz(String dateStr) throws ParseException {
+        if (dateStr.equalsIgnoreCase("latest")) {
+            return Integer.MAX_VALUE;
+        }
+        DateFormat formatter = AceDateFormat.getVersionHelperWithTimezoneDateFormat();
+        Date d = formatter.parse(dateStr);
+        return convert(d.getTime());
+    }
 
-	/*
-	 * Format using default time zone
-	 */
-	public static String formatTz(int version) {
-		return formatTz(version, null);
-	}
+    public static String format(int version) {
+        return format(version, MAX_VALUE_TYPE.UNCOMITTED);
+    }
 
-	/*
-	 * Format using specified time zone (e.g. GMT)
-	 */
-	public static String formatTz(int version, String tz) {
-		if (version == Integer.MAX_VALUE) {
-			return "uncommitted";
-		}
-		if (version == Integer.MIN_VALUE) {
-			return "beginning of time";
-		}
-		long time = convert(version);
-		DateFormat formatter = AceDateFormat.getVersionHelperWithTimezoneDateFormat();
-		if (tz != null)
-			formatter.setTimeZone(TimeZone.getTimeZone(tz));
-		return formatter.format(new Date(time));
-	}
+    public static String format(int version, MAX_VALUE_TYPE maxValueType) {
+        if (version == Integer.MAX_VALUE) {
+            return maxValueType.toString().toLowerCase();
+        }
+        if (version == Integer.MIN_VALUE) {
+            return "beginning of time";
+        }
+        long time = convert(version);
+        DateFormat formatter = dateFormatterTL.get();
+        if (formatter == null) {
+            formatter = AceDateFormat.getVersionHelperDateFormat();
+            dateFormatterTL.set(formatter);
+        }
+        return formatter.format(new Date(time));
+    }
 
-	public static String formatRf2(int version) {
-		long time = convert(version);
-		DateFormat formatter = AceDateFormat.getRf2DateFormat();
-		return formatter.format(new Date(time));
-	}
-	
-	public static long getTimeZero() {
-		return timeZero;
-	}
+    /*
+     * Format using default time zone
+     */
+    public static String formatTz(int version) {
+        return formatTz(version, null);
+    }
 
-	public static int getTimeZeroInt() {
-		return timeZeroInt;
-	}
+    /*
+     * Format using specified time zone (e.g. GMT)
+     */
+    public static String formatTz(int version, String tz) {
+        if (version == Integer.MAX_VALUE) {
+            return "uncommitted";
+        }
+        if (version == Integer.MIN_VALUE) {
+            return "beginning of time";
+        }
+        long time = convert(version);
+        DateFormat formatter = AceDateFormat.getVersionHelperWithTimezoneDateFormat();
+        if (tz != null)
+            formatter.setTimeZone(TimeZone.getTimeZone(tz));
+        return formatter.format(new Date(time));
+    }
 
-	public static String uncommittedHtml() {
-		return "<html><font color='80E048'>uncommitted";
-	}
+    public static String formatRf2(int version) {
+        long time = convert(version);
+        DateFormat formatter = AceDateFormat.getRf2DateFormat();
+        return formatter.format(new Date(time));
+    }
+
+    public static long getTimeZero() {
+        return timeZero;
+    }
+
+    public static int getTimeZeroInt() {
+        return timeZeroInt;
+    }
+
+    public static String uncommittedHtml() {
+        return "<html><font color='80E048'>uncommitted";
+    }
 }

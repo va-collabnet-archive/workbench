@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,15 +30,17 @@ public class ExtTableRenderer extends AceTableRenderer {
      * 
      */
     private static final long serialVersionUID = 1L;
+
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel renderComponent =  (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
-                row, column);
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
+        JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+            column);
         boolean same = false;
         if (value != null) {
             if (StringWithExtTuple.class.isAssignableFrom(value.getClass())) {
                 StringWithExtTuple swt = (StringWithExtTuple) value;
-                
+
                 boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
 
                 if (row > 0) {
@@ -55,17 +57,16 @@ public class ExtTableRenderer extends AceTableRenderer {
                 renderComponent.setText(value.toString());
                 setBorder(column, this, false, false);
             }
-        } 
-        
+        }
+
         if (isSelected == false) {
             renderComponent.setBackground(colorForRow(row));
             renderComponent.setForeground(UIManager.getColor("Table.foreground"));
         } else {
             renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
             renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
-        }       
-         return renderComponent;
+        }
+        return renderComponent;
     }
-
 
 }

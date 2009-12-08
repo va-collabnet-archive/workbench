@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,61 +23,55 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class WriteConceptJob implements Runnable {
-	public class WriteConceptData {
-		CountDownLatch conceptLatch;
-		Date statusDate;
-		Object conceptKey;
-		Object conceptStatus;
-		boolean defChar;
-		Object pathId;
+    public class WriteConceptData {
+        CountDownLatch conceptLatch;
+        Date statusDate;
+        Object conceptKey;
+        Object conceptStatus;
+        boolean defChar;
+        Object pathId;
 
-		public WriteConceptData(CountDownLatch conceptLatch, Date statusDate,
-				Object conceptKey, Object conceptStatus, boolean defChar,
-				Object pathId) {
-			super();
-			this.conceptLatch = conceptLatch;
-			this.statusDate = statusDate;
-			this.conceptKey = conceptKey;
-			this.conceptStatus = conceptStatus;
-			this.defChar = defChar;
-			this.pathId = pathId;
-		}
+        public WriteConceptData(CountDownLatch conceptLatch, Date statusDate, Object conceptKey, Object conceptStatus,
+                boolean defChar, Object pathId) {
+            super();
+            this.conceptLatch = conceptLatch;
+            this.statusDate = statusDate;
+            this.conceptKey = conceptKey;
+            this.conceptStatus = conceptStatus;
+            this.defChar = defChar;
+            this.pathId = pathId;
+        }
 
-		@Override
-		public String toString() {
-			return "WriteConceptData [conceptKey=" + conceptKey
-					+ ", conceptLatch=" + conceptLatch + ", conceptStatus="
-					+ conceptStatus + ", defChar=" + defChar + ", pathId="
-					+ pathId + ", statusDate=" + statusDate + "]";
-		}
-	}
+        @Override
+        public String toString() {
+            return "WriteConceptData [conceptKey=" + conceptKey + ", conceptLatch=" + conceptLatch + ", conceptStatus="
+                + conceptStatus + ", defChar=" + defChar + ", pathId=" + pathId + ", statusDate=" + statusDate + "]";
+        }
+    }
 
-	List<WriteConceptData> batch = new ArrayList<WriteConceptData>();
-	ProcessSources processor;
+    List<WriteConceptData> batch = new ArrayList<WriteConceptData>();
+    ProcessSources processor;
 
-	public WriteConceptJob(ProcessSources processor) {
-		super();
-		this.processor = processor;
-	}
+    public WriteConceptJob(ProcessSources processor) {
+        super();
+        this.processor = processor;
+    }
 
-	public void addTask(CountDownLatch conceptLatch, Date statusDate,
-			Object conceptKey, Object conceptStatus, boolean defChar,
-			Object pathId) {
-		batch.add(new WriteConceptData(conceptLatch, statusDate, conceptKey,
-				conceptStatus, defChar, pathId));
-	}
+    public void addTask(CountDownLatch conceptLatch, Date statusDate, Object conceptKey, Object conceptStatus,
+            boolean defChar, Object pathId) {
+        batch.add(new WriteConceptData(conceptLatch, statusDate, conceptKey, conceptStatus, defChar, pathId));
+    }
 
-	@Override
-	public void run() {
-		for (WriteConceptData data : batch) {
-			try {
-				processor.writeConcept(data.conceptLatch, data.statusDate,
-						data.conceptKey, data.conceptStatus, data.defChar,
-						Arrays.asList(new Object[] { data.pathId }));
-			} catch (Exception e) {
-				throw new RuntimeException("failed importing " + data, e);
-			}
-		}
-	}
+    @Override
+    public void run() {
+        for (WriteConceptData data : batch) {
+            try {
+                processor.writeConcept(data.conceptLatch, data.statusDate, data.conceptKey, data.conceptStatus,
+                    data.defChar, Arrays.asList(new Object[] { data.pathId }));
+            } catch (Exception e) {
+                throw new RuntimeException("failed importing " + data, e);
+            }
+        }
+    }
 
 }

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,42 +32,38 @@ import com.sleepycat.je.DatabaseException;
 
 public interface I_StoreIdentifiers extends I_StoreInBdb {
 
-	public int getMinId() throws DatabaseException;
+    public int getMinId() throws DatabaseException;
 
-	public int getMaxId() throws DatabaseException;
+    public int getMaxId() throws DatabaseException;
 
-	public I_IdVersioned getIdNullOk(int nativeId) throws IOException;
+    public I_IdVersioned getIdNullOk(int nativeId) throws IOException;
 
-	public List<UUID> nativeToUuid(int nativeId)
-			throws DatabaseException;
+    public List<UUID> nativeToUuid(int nativeId) throws DatabaseException;
 
-	public I_IdVersioned getId(int nativeId) throws IOException;
+    public I_IdVersioned getId(int nativeId) throws IOException;
 
-	public Collection<UUID> getUids(int nativeId)
-			throws TerminologyException, IOException;
+    public Collection<UUID> getUids(int nativeId) throws TerminologyException, IOException;
 
-	public void writeId(I_IdVersioned id) throws DatabaseException;
+    public void writeId(I_IdVersioned id) throws DatabaseException;
 
-	public void deleteId(I_IdVersioned id) throws DatabaseException;
+    public void deleteId(I_IdVersioned id) throws DatabaseException;
 
-	public int nativeGenerationForUuid(UUID uid, int source,
-			int pathId, int version) throws TerminologyException, IOException;
+    public int nativeGenerationForUuid(UUID uid, int source, int pathId, int version) throws TerminologyException,
+            IOException;
 
-	public int uuidToNativeWithGeneration(Collection<UUID> uids,
-			int source, I_Path idPath, int version)
-			throws TerminologyException, IOException;
+    public int uuidToNativeWithGeneration(Collection<UUID> uids, int source, I_Path idPath, int version)
+            throws TerminologyException, IOException;
 
-	public int uuidToNativeWithGeneration(UUID uid, int source,
-			Collection<I_Path> idPaths, int version)
-			throws TerminologyException, IOException;
+    public int uuidToNativeWithGeneration(UUID uid, int source, Collection<I_Path> idPaths, int version)
+            throws TerminologyException, IOException;
 
-	public void iterateIdEntries(I_ProcessIdEntries processor)
-			throws Exception;
+    public void iterateIdEntries(I_ProcessIdEntries processor) throws Exception;
 
-	public I_IdVersioned getId(Collection<UUID> uids)
-			throws TerminologyException, IOException;
-	/**
-     * Gets a collection of matching I_IdVersioned given an ID and an ID scheme -
+    public I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException;
+
+    /**
+     * Gets a collection of matching I_IdVersioned given an ID and an ID scheme
+     * -
      * if no matches are found an empty collection is returned.
      * 
      * Usually only one match will be returned, however given the data structure
@@ -76,37 +72,33 @@ public interface I_StoreIdentifiers extends I_StoreInBdb {
      * 
      * @param id identifier to find
      * @param scheme native id of the provided identifier's scheme
-     * @return Collection of matching I_IdVersioned objects, or an empty collection
-     * if none are found
+     * @return Collection of matching I_IdVersioned objects, or an empty
+     *         collection
+     *         if none are found
      * @throws TerminologyException
      * @throws IOException
      */
-    public Collection<I_IdVersioned> getId(String id, int source)
+    public Collection<I_IdVersioned> getId(String id, int source) throws TerminologyException, IOException;
+
+    public boolean hasId(Collection<UUID> uids) throws DatabaseException;
+
+    public boolean hasId(UUID uid) throws DatabaseException;
+
+    public int uuidToNativeWithGeneration(UUID uid, int source, I_Path idPath, int version)
             throws TerminologyException, IOException;
 
-	public boolean hasId(Collection<UUID> uids)
-			throws DatabaseException;
+    public ThinIdVersioned getId(UUID uid) throws TerminologyException, IOException;
 
-	public boolean hasId(UUID uid) throws DatabaseException;
+    public int uuidToNative(UUID uid) throws TerminologyException, IOException;
 
-	public int uuidToNativeWithGeneration(UUID uid, int source,
-			I_Path idPath, int version) throws TerminologyException,
-			IOException;
+    public int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException;
 
-	public ThinIdVersioned getId(UUID uid)
-			throws TerminologyException, IOException;
+    public void logIdDbStats() throws DatabaseException;
 
-	public int uuidToNative(UUID uid) throws TerminologyException,
-			IOException;
+    public int getCurrentStatusNid();
 
-	public int uuidToNative(Collection<UUID> uids)
-			throws TerminologyException, IOException;
+    public int getAceAuxillaryNid();
 
-	public void logIdDbStats() throws DatabaseException;
-	
-	public int getCurrentStatusNid();
-	public int getAceAuxillaryNid();
-
-	public I_IdVersioned idEntryToObject(DatabaseEntry key, DatabaseEntry value);
+    public I_IdVersioned idEntryToObject(DatabaseEntry key, DatabaseEntry value);
 
 }

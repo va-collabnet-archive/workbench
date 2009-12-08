@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,27 +29,22 @@ import com.sleepycat.je.SecondaryKeyCreator;
 public class ThinExtRefsetIdSecondaryKeyCreator implements SecondaryKeyCreator {
     private ThinExtBinder fixedOnlyBinder = new ThinExtBinder(true);
 
-    MemberAndSecondaryIdBinding memberAndSecondaryIdBinding =
-            new MemberAndSecondaryIdBinding();
+    MemberAndSecondaryIdBinding memberAndSecondaryIdBinding = new MemberAndSecondaryIdBinding();
 
     public ThinExtRefsetIdSecondaryKeyCreator() {
         super();
     }
 
-    public boolean createSecondaryKey(SecondaryDatabase secDb,
-            DatabaseEntry keyEntry, DatabaseEntry dataEntry,
+    public boolean createSecondaryKey(SecondaryDatabase secDb, DatabaseEntry keyEntry, DatabaseEntry dataEntry,
             DatabaseEntry resultEntry) throws DatabaseException {
-        I_ThinExtByRefVersioned core =
-                (I_ThinExtByRefVersioned) fixedOnlyBinder
-                    .entryToObject(dataEntry);
+        I_ThinExtByRefVersioned core = (I_ThinExtByRefVersioned) fixedOnlyBinder.entryToObject(dataEntry);
 
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine(
-                "Creating secondary RefsetId key (2) for m: "
-                    + core.getMemberId() + " refset: " + core.getRefsetId());
+                "Creating secondary RefsetId key (2) for m: " + core.getMemberId() + " refset: " + core.getRefsetId());
         }
-        memberAndSecondaryIdBinding.objectToEntry(new MemberAndSecondaryId(core
-            .getRefsetId(), core.getMemberId()), resultEntry);
+        memberAndSecondaryIdBinding.objectToEntry(new MemberAndSecondaryId(core.getRefsetId(), core.getMemberId()),
+            resultEntry);
         return true;
     }
 

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,27 +28,27 @@ import com.sleepycat.je.DatabaseEntry;
 
 @Deprecated
 public class PathCollector implements I_ProcessPathEntries {
-	List<I_Path> paths = new ArrayList<I_Path>();
-	PathBinder binder = new PathBinder();
-	public PathCollector() {
+    List<I_Path> paths = new ArrayList<I_Path>();
+    PathBinder binder = new PathBinder();
 
-	}
+    public PathCollector() {
 
-	public void processPath(DatabaseEntry key, DatabaseEntry value)
-			throws Exception {
-		Path p = (Path) binder.entryToObject(value);
-		paths.add(p);
-	}
+    }
 
-	public List<I_Path> getPaths() {
-		return paths;
-	}
+    public void processPath(DatabaseEntry key, DatabaseEntry value) throws Exception {
+        Path p = (Path) binder.entryToObject(value);
+        paths.add(p);
+    }
 
-	public DatabaseEntry getDataEntry() {
-		return new DatabaseEntry(); 
-	}
+    public List<I_Path> getPaths() {
+        return paths;
+    }
 
-	public DatabaseEntry getKeyEntry() {
-		return new DatabaseEntry();
-	}
+    public DatabaseEntry getDataEntry() {
+        return new DatabaseEntry();
+    }
+
+    public DatabaseEntry getKeyEntry() {
+        return new DatabaseEntry();
+    }
 }

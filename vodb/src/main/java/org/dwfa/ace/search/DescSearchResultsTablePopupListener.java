@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,8 +42,7 @@ import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 
-public class DescSearchResultsTablePopupListener implements MouseListener,
-        ActionListener {
+public class DescSearchResultsTablePopupListener implements MouseListener, ActionListener {
 
     private I_DescriptionTuple descTuple;
     private ConceptBean descConcept;
@@ -80,18 +79,16 @@ public class DescSearchResultsTablePopupListener implements MouseListener,
 
     private void handlePopup(MouseEvent e) {
         descTable = (JTable) e.getSource();
-        if (descTable.getCellRect(descTable.getSelectedRow(),
-            descTable.getSelectedColumn(), true).contains(e.getPoint())) {
+        if (descTable.getCellRect(descTable.getSelectedRow(), descTable.getSelectedColumn(), true).contains(
+            e.getPoint())) {
             selectedRow = descTable.getSelectedRow();
-            StringWithDescTuple swdt =
-                    (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
+            StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
             descTuple = swdt.getTuple();
             descConcept = ConceptBean.get(descTuple.getConceptId());
             JPopupMenu popup = new JPopupMenu();
             JMenuItem menuItem = new JMenuItem(" ");
             popup.add(menuItem);
-            addProcessItems(popup, new File(AceFrame.pluginRoot,
-                "search-results"));
+            addProcessItems(popup, new File(AceFrame.pluginRoot, "search-results"));
             popup.addSeparator();
             menuItem = new JMenuItem("Show in taxonomy");
             popup.add(menuItem);
@@ -125,8 +122,8 @@ public class DescSearchResultsTablePopupListener implements MouseListener,
         if (e.getActionCommand().equals("Show in taxonomy")) {
             try {
                 AceFrameConfig frameConfig = (AceFrameConfig) config;
-                new ExpandPathToNodeStateListener(frameConfig.getAceFrame()
-                    .getCdePanel().getTree(), config, descConcept);
+                new ExpandPathToNodeStateListener(frameConfig.getAceFrame().getCdePanel().getTree(), config,
+                    descConcept);
                 config.setHierarchySelection(descConcept);
             } catch (IOException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
@@ -148,16 +145,14 @@ public class DescSearchResultsTablePopupListener implements MouseListener,
             viewer.setTermComponent(descConcept);
         } else if (e.getActionCommand().equals("Add to list")) {
             JList conceptList = config.getBatchConceptList();
-            I_ModelTerminologyList model =
-                    (I_ModelTerminologyList) conceptList.getModel();
+            I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
             model.addElement(descConcept);
         }
     }
 
     private void addProcessItems(JPopupMenu popup, File directory) {
         try {
-            ProcessPopupUtil.addSubMenuItems(popup, directory, config
-                .getWorker(), null);
+            ProcessPopupUtil.addSubMenuItems(popup, directory, config.getWorker(), null);
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         }

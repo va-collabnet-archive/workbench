@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,31 +65,36 @@ public abstract class ProcessMemberTask implements Runnable {
     public void run() {
         if (getProcessException() != null) {
             getSemaphore().release();
-            //System.out.println("ProcessMemberTask release 1 memberId: " + memberId);
+            // System.out.println("ProcessMemberTask release 1 memberId: " +
+            // memberId);
             return;
         }
         boolean ready = true;
-        for (ProcessMemberTask task: getTaskArray()) {
-            if (task.usable == false && 
-                    task.componentUuid == this.componentUuid &&
-                    task.arrayIndex != this.arrayIndex &&
-                    task.taskSequence < this.taskSequence) {
+        for (ProcessMemberTask task : getTaskArray()) {
+            if (task.usable == false && task.componentUuid == this.componentUuid && task.arrayIndex != this.arrayIndex
+                && task.taskSequence < this.taskSequence) {
                 ready = false;
             }
         }
 
         if (getProcessException() != null) {
             getSemaphore().release();
-            //System.out.println("ProcessMemberTask release 2 memberId: " + memberId);
+            // System.out.println("ProcessMemberTask release 2 memberId: " +
+            // memberId);
             return;
         }
         if (ready) {
             try {
-                int refsetId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) refsetUuid, ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
-                int statusId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) statusUuid, ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
-                int componentId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) componentUuid, ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
-                int pathId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) pathUuid, ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
-                int typeId = ThinExtBinder.getExtensionTypeNid(getRefsetType(), ProcessAceFormatSourcesBerkeley.map, ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
+                int refsetId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) refsetUuid,
+                    ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
+                int statusId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) statusUuid,
+                    ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
+                int componentId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) componentUuid,
+                    ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
+                int pathId = ProcessAceFormatSourcesBerkeley.map.getIntId((UUID) pathUuid,
+                    ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
+                int typeId = ThinExtBinder.getExtensionTypeNid(getRefsetType(), ProcessAceFormatSourcesBerkeley.map,
+                    ProcessAceFormatSourcesBerkeley.aceAuxPath, version);
 
                 VodbEnv tf = (VodbEnv) LocalVersionedTerminology.get();
                 I_ThinExtByRefVersioned ext;
@@ -97,30 +102,31 @@ public abstract class ProcessMemberTask implements Runnable {
 
                 if (tf.hasExtension(memberId)) {
                     ext = tf.getExtension(memberId);
-                    for (Object version: ext.getVersions()) {
+                    for (Object version : ext.getVersions()) {
                         if (version.getClass().equals(part.getClass()) == false) {
                             throw new Exception("Extension classes do not match: " + version.getClass().getName() + " "
-                                                + part.getClass());
+                                + part.getClass());
                         }
                     }
                 } else {
                     ext = tf.newExtensionBypassCommit(refsetId, memberId, componentId, typeId);
                 }
-                
+
                 part.setPathId(pathId);
                 part.setStatus(statusId);
                 part.setVersion(version);
                 ext.addVersion(part);
-                
-                
+
                 tf.writeExt(ext);
                 usable = true;
                 getSemaphore().release();
-                //System.out.println("ProcessMemberTask release 3 memberId: " + memberId);
+                // System.out.println("ProcessMemberTask release 3 memberId: " +
+                // memberId);
             } catch (Exception ex) {
                 setProcessException(ex);
                 getSemaphore().release();
-                //System.out.println("ProcessMemberTask release 5 memberId: " + memberId);
+                // System.out.println("ProcessMemberTask release 5 memberId: " +
+                // memberId);
             }
         } else {
             ProcessAceFormatSources.executors.submit(this);
@@ -129,8 +135,8 @@ public abstract class ProcessMemberTask implements Runnable {
 
     protected abstract EXT_TYPE getRefsetType();
 
-    protected void resetCore(UUID refsetUuid, UUID statusUuid,
-            UUID componentUuid, UUID pathUuid, int version, int memberId) {
+    protected void resetCore(UUID refsetUuid, UUID statusUuid, UUID componentUuid, UUID pathUuid, int version,
+            int memberId) {
         this.usable = false;
         this.taskSequence = ProcessMemberTask.sequence++;
         this.refsetUuid = refsetUuid;

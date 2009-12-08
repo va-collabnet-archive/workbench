@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,8 +40,7 @@ public class AddCriterion implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         try {
-            this.searchPanel.criterionPanels.add(this.searchPanel
-                .makeCriterionPanel());
+            this.searchPanel.criterionPanels.add(this.searchPanel.makeCriterionPanel());
         } catch (ClassNotFoundException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InstantiationException e1) {

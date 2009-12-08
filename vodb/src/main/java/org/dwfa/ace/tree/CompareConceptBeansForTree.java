@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -93,7 +93,7 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
                         } else {
                             return compareDescriptions(cb1, cb2);
                         }
-                        
+
                     }
                 }
             } else {
@@ -103,8 +103,8 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
                         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                             AceLog.getAppLog().fine("Found tuple for c1: " + c1ExtTuple);
                         }
-                      return -1;
-                    } 
+                        return -1;
+                    }
                 }
             }
         } else {
@@ -124,8 +124,8 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
                         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                             AceLog.getAppLog().fine("Found tuple for c2: " + c2ExtTuple);
                         }
-                      return 1;
-                    } 
+                        return 1;
+                    }
                 }
             }
         }
@@ -135,8 +135,7 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
         return compareDescriptions(cb1, cb2);
     }
 
-    private I_ThinExtByRefTuple getExtensionTuple(List<I_GetExtensionData> extensions, int refsetId)
-            throws IOException {
+    private I_ThinExtByRefTuple getExtensionTuple(List<I_GetExtensionData> extensions, int refsetId) throws IOException {
         for (I_GetExtensionData ext : extensions) {
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                 AceLog.getAppLog().fine("Getting tuples for: " + extensions);
@@ -149,7 +148,7 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
                 }
                 List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
                 ext.getExtension().addTuples(this.aceConfig.getAllowedStatus(), this.aceConfig.getViewPositionSet(),
-                                             returnTuples, false);
+                    returnTuples, false);
                 if (returnTuples.size() > 0) {
                     return returnTuples.get(0);
                 }

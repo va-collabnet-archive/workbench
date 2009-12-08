@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,8 +32,7 @@ public class ThinRelVersionedBinding extends TupleBinding {
         int c1id = ti.readInt();
         int c2id = ti.readInt();
         int size = ti.readInt();
-        ThinRelVersioned versioned =
-                new ThinRelVersioned(relId, c1id, c2id, size);
+        ThinRelVersioned versioned = new ThinRelVersioned(relId, c1id, c2id, size);
         for (int x = 0; x < size; x++) {
             ThinRelPart rel = new ThinRelPart();
             rel.setPathId(ti.readInt());
@@ -49,19 +48,19 @@ public class ThinRelVersionedBinding extends TupleBinding {
     }
 
     public void objectToEntry(Object obj, TupleOutput to) {
-		I_RelVersioned versioned = (I_RelVersioned) obj;
-		to.writeInt(versioned.getRelId());
-		to.writeInt(versioned.getC1Id());
-		to.writeInt(versioned.getC2Id());
-		to.writeInt(versioned.versionCount());
-		for (I_RelPart rel: versioned.getVersions()) {
-			to.writeInt(rel.getPathId());
-			to.writeInt(rel.getVersion());
-			to.writeInt(rel.getStatusId());
-			to.writeInt(rel.getCharacteristicId());
-			to.writeInt(rel.getGroup());
-			to.writeInt(rel.getRefinabilityId());
-			to.writeInt(rel.getRelTypeId());
-		}
-	}
+        I_RelVersioned versioned = (I_RelVersioned) obj;
+        to.writeInt(versioned.getRelId());
+        to.writeInt(versioned.getC1Id());
+        to.writeInt(versioned.getC2Id());
+        to.writeInt(versioned.versionCount());
+        for (I_RelPart rel : versioned.getVersions()) {
+            to.writeInt(rel.getPathId());
+            to.writeInt(rel.getVersion());
+            to.writeInt(rel.getStatusId());
+            to.writeInt(rel.getCharacteristicId());
+            to.writeInt(rel.getGroup());
+            to.writeInt(rel.getRefinabilityId());
+            to.writeInt(rel.getRelTypeId());
+        }
+    }
 }

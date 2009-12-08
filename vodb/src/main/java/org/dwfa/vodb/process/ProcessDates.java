@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.dwfa.util.AceDateFormat;
-
 
 public class ProcessDates {
     private class DateFormatterThreadLocal extends ThreadLocal<SimpleDateFormat> {
@@ -37,8 +36,6 @@ public class ProcessDates {
             return new SimpleDateFormat(formatStr);
         }
 
-        
-        
     }
 
     DateFormatterThreadLocal formatter = new DateFormatterThreadLocal(AceDateFormat.DATA_INPUT_FORMAT);
@@ -46,33 +43,32 @@ public class ProcessDates {
     DateFormatterThreadLocal formatter2 = new DateFormatterThreadLocal(AceDateFormat.IDS_FORMAT);
 
     DateFormatterThreadLocal formatter3 = new DateFormatterThreadLocal(AceDateFormat.RF2_FORMAT);
-    
+
     DateFormatterThreadLocal formatter3Timezone = new DateFormatterThreadLocal(AceDateFormat.RF2_FORMAT);
-    
+
     DateFormatterThreadLocal formatter5 = new DateFormatterThreadLocal(AceDateFormat.OLD_ACE_EXPORT_FORMAT);
-    
+
     DateFormatterThreadLocal formatter4 = new DateFormatterThreadLocal(AceDateFormat.RF1_FORMAT);
 
     private static ProcessDates dateProcessor = new ProcessDates();
-    
+
     private Date getDateFromString(String dateStr) throws ParseException {
         if (dateStr.contains("-") && dateStr.contains(":") && dateStr.contains("T")) {
             return formatter5.get().parse(dateStr.replace("Z", "-0000"));
         } else if (dateStr.contains("-") && dateStr.contains(":")) {
             return formatter.get().parse(dateStr);
         } else if (dateStr.contains("T")) {
-        	if (dateStr.contains("Z")) {
-        		return formatter3.get().parse(dateStr);
-        	} else {
-        		return formatter3Timezone.get().parse(dateStr);
-        	}
+            if (dateStr.contains("Z")) {
+                return formatter3.get().parse(dateStr);
+            } else {
+                return formatter3Timezone.get().parse(dateStr);
+            }
         } else if (dateStr.length() < 9) {
             return formatter4.get().parse(dateStr);
         } else {
             return formatter2.get().parse(dateStr);
         }
     }
-    
 
     public static Date getDate(String dateStr) throws ParseException {
         return dateProcessor.getDateFromString(dateStr);

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,89 +41,87 @@ import org.dwfa.vodb.types.ExtensionByReferenceBean;
 
 public class RefsetViewerPanel extends JPanel {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private class LabelListener implements PropertyChangeListener {
+    private class LabelListener implements PropertyChangeListener {
 
-		public void propertyChange(PropertyChangeEvent evt) {
-			I_GetConceptData refset = (I_GetConceptData) editor.getTermComponent();
-			if (refset != null) {
-				viewerTreeModel.setRoot(new DefaultMutableTreeNode(refset));
-			} else {
-				viewerTreeModel.setRoot(new DefaultMutableTreeNode(null));
-			}
-			updateTree();
-			firePropertyChange(evt.getPropertyName(), evt.getOldValue(), 
-					evt.getNewValue());
-		}
-	}
+        public void propertyChange(PropertyChangeEvent evt) {
+            I_GetConceptData refset = (I_GetConceptData) editor.getTermComponent();
+            if (refset != null) {
+                viewerTreeModel.setRoot(new DefaultMutableTreeNode(refset));
+            } else {
+                viewerTreeModel.setRoot(new DefaultMutableTreeNode(null));
+            }
+            updateTree();
+            firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+        }
+    }
 
-	private JTree viewerTree;
-	private RefsetSpecEditor editor;
-	private DefaultTreeModel viewerTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode(null));
-	
+    private JTree viewerTree;
+    private RefsetSpecEditor editor;
+    private DefaultTreeModel viewerTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode(null));
 
-	public RefsetViewerPanel(I_ConfigAceFrame configAceFrame, RefsetSpecEditor editor) throws TerminologyException, IOException {
-		super(new GridLayout(1,1));
-		this.editor = editor;
-		editor.getLabel().addPropertyChangeListener("termComponent", new LabelListener());
+    public RefsetViewerPanel(I_ConfigAceFrame configAceFrame, RefsetSpecEditor editor) throws TerminologyException,
+            IOException {
+        super(new GridLayout(1, 1));
+        this.editor = editor;
+        editor.getLabel().addPropertyChangeListener("termComponent", new LabelListener());
 
-		viewerTree = new JTree(viewerTreeModel);
-		viewerTree.setCellRenderer(new RefsetMemberTreeRenderer(configAceFrame));
-		viewerTree.setRootVisible(false);
-		viewerTree.setShowsRootHandles(true);
-		add(new JScrollPane(viewerTree));
-	}
-	
-	public void updateTree() {
-		UpdateTree updater = new UpdateTree();
-		updater.start();
-	}
-	
-	private class UpdateTree extends SwingWorker<DefaultMutableTreeNode> {
+        viewerTree = new JTree(viewerTreeModel);
+        viewerTree.setCellRenderer(new RefsetMemberTreeRenderer(configAceFrame));
+        viewerTree.setRootVisible(false);
+        viewerTree.setShowsRootHandles(true);
+        add(new JScrollPane(viewerTree));
+    }
 
-		@Override
-		protected DefaultMutableTreeNode construct() throws Exception {
-			
-			DefaultMutableTreeNode oldRoot = (DefaultMutableTreeNode) viewerTreeModel.getRoot();
-			I_GetConceptData refsetConcept = (I_GetConceptData) oldRoot.getUserObject();
-			
-			DefaultMutableTreeNode newRoot = new DefaultMutableTreeNode();
-			if (refsetConcept != null) {
-				DefaultMutableTreeNode committedNodes = new DefaultMutableTreeNode("Committed Members");
-				DefaultMutableTreeNode uncommittedNodes = new DefaultMutableTreeNode("Uncommitted Members");
-				newRoot.add(committedNodes);
-				newRoot.add(uncommittedNodes);
-				List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getRefsetExtensionMembers(refsetConcept.getConceptId());
-				Collection<I_ThinExtByRefVersioned> uncommittedExtensions = ExtensionByReferenceBean.getNewThinExtensionsForRefset(refsetConcept.getConceptId());
-				
-				for (I_ThinExtByRefVersioned ext: extensions) {
-					committedNodes.add(new DefaultMutableTreeNode(ext));
-				}
-				for (I_ThinExtByRefVersioned ext: uncommittedExtensions) {
-					uncommittedNodes.add(new DefaultMutableTreeNode(ext));
-				}
-			}
-			return newRoot;
-		}
+    public void updateTree() {
+        UpdateTree updater = new UpdateTree();
+        updater.start();
+    }
 
-		@Override
-		protected void finished() {
-			try {
-				viewerTreeModel.setRoot(get());
-			} catch (InterruptedException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			} catch (ExecutionException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-			super.finished();
-		}
-		
-	}
+    private class UpdateTree extends SwingWorker<DefaultMutableTreeNode> {
 
-	
+        @Override
+        protected DefaultMutableTreeNode construct() throws Exception {
+
+            DefaultMutableTreeNode oldRoot = (DefaultMutableTreeNode) viewerTreeModel.getRoot();
+            I_GetConceptData refsetConcept = (I_GetConceptData) oldRoot.getUserObject();
+
+            DefaultMutableTreeNode newRoot = new DefaultMutableTreeNode();
+            if (refsetConcept != null) {
+                DefaultMutableTreeNode committedNodes = new DefaultMutableTreeNode("Committed Members");
+                DefaultMutableTreeNode uncommittedNodes = new DefaultMutableTreeNode("Uncommitted Members");
+                newRoot.add(committedNodes);
+                newRoot.add(uncommittedNodes);
+                List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getRefsetExtensionMembers(
+                    refsetConcept.getConceptId());
+                Collection<I_ThinExtByRefVersioned> uncommittedExtensions = ExtensionByReferenceBean.getNewThinExtensionsForRefset(refsetConcept.getConceptId());
+
+                for (I_ThinExtByRefVersioned ext : extensions) {
+                    committedNodes.add(new DefaultMutableTreeNode(ext));
+                }
+                for (I_ThinExtByRefVersioned ext : uncommittedExtensions) {
+                    uncommittedNodes.add(new DefaultMutableTreeNode(ext));
+                }
+            }
+            return newRoot;
+        }
+
+        @Override
+        protected void finished() {
+            try {
+                viewerTreeModel.setRoot(get());
+            } catch (InterruptedException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } catch (ExecutionException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+            super.finished();
+        }
+
+    }
 
 }

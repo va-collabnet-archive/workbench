@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,206 +49,187 @@ import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class DescPopupListener extends MouseAdapter {
 
-	enum FieldToChange {
-		TYPE, STATUS
-	};
+    enum FieldToChange {
+        TYPE, STATUS
+    };
 
-	private DescriptionsForConceptTableModel model;
+    private DescriptionsForConceptTableModel model;
 
-	private class ChangeActionListener implements ActionListener {
+    private class ChangeActionListener implements ActionListener {
 
-		public ChangeActionListener() {
-			super();
-		}
+        public ChangeActionListener() {
+            super();
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple()
-					.getConceptId());
-			for (I_Path p : config.getEditingPathSet()) {
-				I_DescriptionPart newPart = selectedObject.getTuple()
-						.duplicatePart();
-				newPart.setPathId(p.getConceptId());
-				newPart.setVersion(Integer.MAX_VALUE);
-				selectedObject.getTuple().getDescVersioned().getVersions().add(
-						newPart);
-			}
-			ACE.addUncommitted(sourceBean);
-			model.allTuples = null;
-			model.fireTableDataChanged();
-		}
-	}
+        public void actionPerformed(ActionEvent e) {
+            ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
+            for (I_Path p : config.getEditingPathSet()) {
+                I_DescriptionPart newPart = selectedObject.getTuple().duplicatePart();
+                newPart.setPathId(p.getConceptId());
+                newPart.setVersion(Integer.MAX_VALUE);
+                selectedObject.getTuple().getDescVersioned().getVersions().add(newPart);
+            }
+            ACE.addUncommitted(sourceBean);
+            model.allTuples = null;
+            model.fireTableDataChanged();
+        }
+    }
 
-	private class UndoActionListener implements ActionListener {
+    private class UndoActionListener implements ActionListener {
 
-		public UndoActionListener() {
-			super();
-		}
+        public UndoActionListener() {
+            super();
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple()
-					.getConceptId());
-			I_DescriptionTuple tuple = selectedObject.getTuple();
-			ThinDescVersioned versioned = (ThinDescVersioned) tuple.getDescVersioned();
-			versioned.getVersions().remove(tuple.getPart());
-			ACE.addUncommitted(sourceBean);
-			model.allTuples = null;
-			model.fireTableDataChanged();
-		}
-	}
+        public void actionPerformed(ActionEvent e) {
+            ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
+            I_DescriptionTuple tuple = selectedObject.getTuple();
+            ThinDescVersioned versioned = (ThinDescVersioned) tuple.getDescVersioned();
+            versioned.getVersions().remove(tuple.getPart());
+            ACE.addUncommitted(sourceBean);
+            model.allTuples = null;
+            model.fireTableDataChanged();
+        }
+    }
 
-	private class ChangeFieldActionListener implements ActionListener {
-		private Collection<UUID> ids;
+    private class ChangeFieldActionListener implements ActionListener {
+        private Collection<UUID> ids;
 
-		private FieldToChange field;
+        private FieldToChange field;
 
-		public ChangeFieldActionListener(Collection<UUID> ids,
-				FieldToChange field) {
-			super();
-			this.ids = ids;
-			this.field = field;
-		}
+        public ChangeFieldActionListener(Collection<UUID> ids, FieldToChange field) {
+            super();
+            this.ids = ids;
+            this.field = field;
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			try {
-				ConceptBean sourceBean = ConceptBean.get(selectedObject
-						.getTuple().getConceptId());
-				for (I_Path p : config.getEditingPathSet()) {
-					I_DescriptionPart newPart = selectedObject.getTuple().getPart();
-		        	if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
-		                newPart = selectedObject.getTuple().duplicatePart();
-		                selectedObject.getTuple().getDescVersioned().getVersions().add(newPart);
-		        	}
-					newPart.setPathId(p.getConceptId());
-					newPart.setVersion(Integer.MAX_VALUE);
-					switch (field) {
-					case STATUS:
-						newPart.setStatusId((AceConfig.getVodb()
-								.uuidToNative(ids)));
-						break;
-					case TYPE:
-						newPart.setTypeId((AceConfig.getVodb()
-								.uuidToNative(ids)));
-						newPart.setStatusId(config.getDefaultStatus()
-								.getConceptId());
-						break;
+        public void actionPerformed(ActionEvent e) {
+            try {
+                ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
+                for (I_Path p : config.getEditingPathSet()) {
+                    I_DescriptionPart newPart = selectedObject.getTuple().getPart();
+                    if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
+                        newPart = selectedObject.getTuple().duplicatePart();
+                        selectedObject.getTuple().getDescVersioned().getVersions().add(newPart);
+                    }
+                    newPart.setPathId(p.getConceptId());
+                    newPart.setVersion(Integer.MAX_VALUE);
+                    switch (field) {
+                    case STATUS:
+                        newPart.setStatusId((AceConfig.getVodb().uuidToNative(ids)));
+                        break;
+                    case TYPE:
+                        newPart.setTypeId((AceConfig.getVodb().uuidToNative(ids)));
+                        newPart.setStatusId(config.getDefaultStatus().getConceptId());
+                        break;
 
-					default:
-					}
+                    default:
+                    }
 
-					model.referencedConcepts.put(newPart.getStatusId(),
-							ConceptBean.get(newPart.getStatusId()));
-					model.referencedConcepts.put(newPart.getTypeId(),
-							ConceptBean.get(newPart.getTypeId()));
-				}
-				ACE.addUncommitted(sourceBean);
-				model.allTuples = null;
-				model.fireTableDataChanged();
-				model.propertyChange(new PropertyChangeEvent(this,
-						I_ContainTermComponent.TERM_COMPONENT, null, model.host
-								.getTermComponent()));
-			} catch (Exception ex) {
-				AceLog.getAppLog().alertAndLogException(ex);
-			}
-		}
-	}
+                    model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getTypeId(), ConceptBean.get(newPart.getTypeId()));
+                }
+                ACE.addUncommitted(sourceBean);
+                model.allTuples = null;
+                model.fireTableDataChanged();
+                model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null,
+                    model.host.getTermComponent()));
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+    }
 
-	JPopupMenu popup;
+    JPopupMenu popup;
 
-	JTable table;
+    JTable table;
 
-	ActionListener change;
+    ActionListener change;
 
-	StringWithDescTuple selectedObject;
+    StringWithDescTuple selectedObject;
 
-	I_ConfigAceFrame config;
+    I_ConfigAceFrame config;
 
-	public DescPopupListener(JTable table, I_ConfigAceFrame config,
-			DescriptionsForConceptTableModel model) {
-		super();
-		this.table = table;
-		this.config = config;
-		this.model = model;
-		change = new ChangeActionListener();
-	}
+    public DescPopupListener(JTable table, I_ConfigAceFrame config, DescriptionsForConceptTableModel model) {
+        super();
+        this.table = table;
+        this.config = config;
+        this.model = model;
+        change = new ChangeActionListener();
+    }
 
-	private void makePopup(MouseEvent e) {
-		try {
-			popup = null;
-			int column = table.columnAtPoint(e.getPoint());
-			int row = table.rowAtPoint(e.getPoint());
-			if ((row != -1) && (column != -1)) {
-				popup = new JPopupMenu();
-				JMenuItem noActionItem = new JMenuItem("");
-				popup.add(noActionItem);
-				selectedObject = (StringWithDescTuple) table.getValueAt(row,
-						column);
-				if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
-					JMenuItem undoActonItem = new JMenuItem("Undo");
-					undoActonItem.addActionListener(new UndoActionListener());
-					popup.add(undoActonItem);
-				}
-				JMenuItem changeItem = new JMenuItem("Change");
-				popup.add(changeItem);
-				changeItem.addActionListener(change);
-				/*
-				 * JMenuItem retireItem = new JMenuItem("Retire");
-				 * retireItem.addActionListener(new ChangeFieldActionListener(
-				 * ArchitectonicAuxiliary.Concept.RETIRED.getUids(),
-				 * FieldToChange.STATUS)); popup.add(retireItem);
-				 */
+    private void makePopup(MouseEvent e) {
+        try {
+            popup = null;
+            int column = table.columnAtPoint(e.getPoint());
+            int row = table.rowAtPoint(e.getPoint());
+            if ((row != -1) && (column != -1)) {
+                popup = new JPopupMenu();
+                JMenuItem noActionItem = new JMenuItem("");
+                popup.add(noActionItem);
+                selectedObject = (StringWithDescTuple) table.getValueAt(row, column);
+                if (selectedObject.getTuple().getVersion() == Integer.MAX_VALUE) {
+                    JMenuItem undoActonItem = new JMenuItem("Undo");
+                    undoActonItem.addActionListener(new UndoActionListener());
+                    popup.add(undoActonItem);
+                }
+                JMenuItem changeItem = new JMenuItem("Change");
+                popup.add(changeItem);
+                changeItem.addActionListener(change);
+                /*
+                 * JMenuItem retireItem = new JMenuItem("Retire");
+                 * retireItem.addActionListener(new ChangeFieldActionListener(
+                 * ArchitectonicAuxiliary.Concept.RETIRED.getUids(),
+                 * FieldToChange.STATUS)); popup.add(retireItem);
+                 */
 
-				JMenu changeType = new JMenu("Change Type");
-				popup.add(changeType);
-				addSubmenuItems(changeType, FieldToChange.TYPE, model.host
-						.getConfig().getEditDescTypePopup());
-				JMenu changeStatus = new JMenu("Change Status");
-				popup.add(changeStatus);
-				addSubmenuItems(changeStatus, FieldToChange.STATUS, model.host
-						.getConfig().getEditStatusTypePopup());
-			}
-		} catch (TerminologyException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		} catch (IOException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		}
-	}
+                JMenu changeType = new JMenu("Change Type");
+                popup.add(changeType);
+                addSubmenuItems(changeType, FieldToChange.TYPE, model.host.getConfig().getEditDescTypePopup());
+                JMenu changeStatus = new JMenu("Change Status");
+                popup.add(changeStatus);
+                addSubmenuItems(changeStatus, FieldToChange.STATUS, model.host.getConfig().getEditStatusTypePopup());
+            }
+        } catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
+    }
 
-	private void addSubmenuItems(JMenu menu, FieldToChange field,
-			I_IntList possibleValues) throws TerminologyException, IOException {
-		for (int id : possibleValues.getListValues()) {
-			I_GetConceptData possibleValue = LocalVersionedTerminology.get()
-					.getConcept(id);
-			JMenuItem changeStatusItem = new JMenuItem(possibleValue.toString());
-			changeStatusItem.addActionListener(new ChangeFieldActionListener(
-					possibleValue.getUids(), field));
-			menu.add(changeStatusItem);
-		}
-	}
+    private void addSubmenuItems(JMenu menu, FieldToChange field, I_IntList possibleValues)
+            throws TerminologyException, IOException {
+        for (int id : possibleValues.getListValues()) {
+            I_GetConceptData possibleValue = LocalVersionedTerminology.get().getConcept(id);
+            JMenuItem changeStatusItem = new JMenuItem(possibleValue.toString());
+            changeStatusItem.addActionListener(new ChangeFieldActionListener(possibleValue.getUids(), field));
+            menu.add(changeStatusItem);
+        }
+    }
 
-	public void mousePressed(MouseEvent e) {
-		maybeShowPopup(e);
-	}
+    public void mousePressed(MouseEvent e) {
+        maybeShowPopup(e);
+    }
 
-	public void mouseReleased(MouseEvent e) {
-		maybeShowPopup(e);
-	}
+    public void mouseReleased(MouseEvent e) {
+        maybeShowPopup(e);
+    }
 
-	private void maybeShowPopup(MouseEvent e) {
-		if (e.isPopupTrigger()) {
-			if (config.getEditingPathSet().size() > 0) {
-				int column = table.columnAtPoint(e.getPoint());
-				int row = table.rowAtPoint(e.getPoint());
-				selectedObject = (StringWithDescTuple) table.getValueAt(row,
-						column);
-				makePopup(e);
-				if (popup != null) {
-					popup.show(e.getComponent(), e.getX(), e.getY());
-				}
-			} else {
-				JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
-						"You must select at least one path to edit on...");
-			}
-			e.consume();
-		}
-	}
+    private void maybeShowPopup(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            if (config.getEditingPathSet().size() > 0) {
+                int column = table.columnAtPoint(e.getPoint());
+                int row = table.rowAtPoint(e.getPoint());
+                selectedObject = (StringWithDescTuple) table.getValueAt(row, column);
+                makePopup(e);
+                if (popup != null) {
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            } else {
+                JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
+                    "You must select at least one path to edit on...");
+            }
+            e.consume();
+        }
+    }
 }
