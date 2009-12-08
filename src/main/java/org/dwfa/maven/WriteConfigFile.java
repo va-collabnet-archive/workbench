@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,7 @@ import org.apache.maven.plugin.logging.Log;
 
 /**
  * Goal which writes a default startup config file.
- *
+ * 
  * @goal write-config
  * @requiresDependencyResolution compile
  */
@@ -47,26 +47,28 @@ public class WriteConfigFile extends AbstractMojo {
 
     /**
      * Location of the build directory.
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private File outputDirectory;
-    
+
     /**
-     * @parameter 
+     * @parameter
      * @required
      */
     ConfigSpec[] specs;
 
     /**
-     * The execution information for this commit operation. 
+     * The execution information for this commit operation.
+     * 
      * @parameter expression="${mojoExecution}"
      */
     MojoExecution execution;
 
     /**
      * Location of the build directory.
-     *
+     * 
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -74,13 +76,13 @@ public class WriteConfigFile extends AbstractMojo {
 
     /**
      * The dependency artifacts of this project, for resolving
-     *
+     * 
      * @pathOf(..)@ expressions. These are of type
      *              org.apache.maven.artifact.Artifact, and are keyed by
      *              groupId:artifactId, using
      *              org.apache.maven.artifact.ArtifactUtils.versionlessKey(..)
      *              for consistent formatting.
-     *
+     * 
      * @parameter expression="${project.artifacts}"
      * @required
      * @readonly
@@ -92,23 +94,23 @@ public class WriteConfigFile extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-		Log l = getLog();
+        Log l = getLog();
 
-		try {
-			if (MojoUtil.alreadyRun(l, execution.getExecutionId(), this.getClass(), targetDirectory)) {
-				return;
-			}
-		} catch (NoSuchAlgorithmException e1) {
-			throw new MojoExecutionException(e1.getMessage(), e1);
-		} catch (IOException e1) {
-			throw new MojoExecutionException(e1.getMessage(), e1);
-		}
+        try {
+            if (MojoUtil.alreadyRun(l, execution.getExecutionId(), this.getClass(), targetDirectory)) {
+                return;
+            }
+        } catch (NoSuchAlgorithmException e1) {
+            throw new MojoExecutionException(e1.getMessage(), e1);
+        } catch (IOException e1) {
+            throw new MojoExecutionException(e1.getMessage(), e1);
+        }
         List<Artifact> dependencyWithoutProvided = new ArrayList<Artifact>();
         for (Artifact a : artifacts) {
             if (a.getScope().equals("provided")) {
-            	getLog().info("Not adding provided: " + a);
+                getLog().info("Not adding provided: " + a);
             } else if (a.getGroupId().endsWith("runtime-directory") || a.getScope().equals("runtime-directory")) {
-               	getLog().info("Not adding runtime-directory: " + a);
+                getLog().info("Not adding runtime-directory: " + a);
             } else {
                 if (a.getScope().equals("system")) {
                     getLog().info("System dependency: " + a);
@@ -125,18 +127,16 @@ public class WriteConfigFile extends AbstractMojo {
                     Class<?> specClass = libLoader.loadClass(specs[i].getClassName());
                     Constructor<?> specConstructor = specClass.getConstructor(new Class[] {});
                     Object obj = specConstructor.newInstance(new Object[] {});
-                    Method m = specClass.getMethod(specs[i].getMethodName(), new Class[] {File.class});
-                    m.invoke(obj, new Object[] {new File(outputDirectory, specs[i].getConfigFileName())});
-                    
+                    Method m = specClass.getMethod(specs[i].getMethodName(), new Class[] { File.class });
+                    m.invoke(obj, new Object[] { new File(outputDirectory, specs[i].getConfigFileName()) });
+
                 } catch (Exception e) {
                     throw new MojoExecutionException("Problem writing config file: " + specs[i].getClassName(), e);
                 }
             }
         } catch (Exception e) {
-            throw new MojoExecutionException(e.getLocalizedMessage() , e);
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
- 
-        
 
     }
 

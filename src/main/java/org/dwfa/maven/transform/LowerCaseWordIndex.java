@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,17 +37,17 @@ public class LowerCaseWordIndex extends AbstractExport {
     private int maxLength = 0;
 
     public void writeColumns(Writer w) throws IOException {
-		w.write(descIdColumn);
-		w.write(getOutputColumnDelimiter());
-		w.write(conceptIdColumn);
-		for (String column: textColumns) {
-			w.write(getOutputColumnDelimiter());
-			w.write(column);
-			
-		}
-		w.write(WINDOWS_LINE_TERMINATOR);
+        w.write(descIdColumn);
+        w.write(getOutputColumnDelimiter());
+        w.write(conceptIdColumn);
+        for (String column : textColumns) {
+            w.write(getOutputColumnDelimiter());
+            w.write(column);
 
-	}
+        }
+        w.write(WINDOWS_LINE_TERMINATOR);
+
+    }
 
     public void addTransformToSubclass(I_ReadAndTransform t) {
         if (transformers == null) {
@@ -68,29 +68,29 @@ public class LowerCaseWordIndex extends AbstractExport {
     }
 
     public void writeRec() throws IOException {
-		
-		HashSet<String> words = new HashSet<String>();
-		for (int i = 0; i < transformers.length; i++) {
-			String stringField = transformers[i].getLastTransform();
-			StringTokenizer st=new StringTokenizer(stringField, StringToWord.WORD_DELIMITERS);
-//			 Split your words.
-			while(st.hasMoreTokens()){
-				String t=st.nextToken();
-				maxLength = Math.max(maxLength, t.length());
-				words.add(t.toLowerCase());
-			}
-		}
-		
-		for (Object word: words) {
-			w.append(descIdTransformer.getLastTransform());
-			w.append(getOutputColumnDelimiter());
-			w.append(conceptIdTransformer.getLastTransform());
-			w.append(getOutputColumnDelimiter());
-			w.append(word.toString());
-			w.append(WINDOWS_LINE_TERMINATOR);
-		}
 
-	}
+        HashSet<String> words = new HashSet<String>();
+        for (int i = 0; i < transformers.length; i++) {
+            String stringField = transformers[i].getLastTransform();
+            StringTokenizer st = new StringTokenizer(stringField, StringToWord.WORD_DELIMITERS);
+            // Split your words.
+            while (st.hasMoreTokens()) {
+                String t = st.nextToken();
+                maxLength = Math.max(maxLength, t.length());
+                words.add(t.toLowerCase());
+            }
+        }
+
+        for (Object word : words) {
+            w.append(descIdTransformer.getLastTransform());
+            w.append(getOutputColumnDelimiter());
+            w.append(conceptIdTransformer.getLastTransform());
+            w.append(getOutputColumnDelimiter());
+            w.append(word.toString());
+            w.append(WINDOWS_LINE_TERMINATOR);
+        }
+
+    }
 
     protected void prepareForClose() throws IOException {
         System.out.println("Max word length: " + maxLength);

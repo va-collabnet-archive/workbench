@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,35 +25,34 @@ import org.dwfa.util.id.Type3UuidFactory;
 
 public class SnomedType3UuidAndNative extends AbstractTransform implements I_ReadAndTransform {
 
-	private Map<UUID, Integer> uuidToNativeMap;
-	private Map<Integer, UUID> nativeToUuidMap;
-	private Map<String, UUID> sourceToUuidMap;
-	private Map<UUID, String> uuidToSourceMap;
-	
-	public void setupImpl(Transform transformer) {
-		uuidToNativeMap = transformer.getUuidToNativeMap();
-		nativeToUuidMap = transformer.getNativeToUuidMap();
-		sourceToUuidMap = transformer.getSourceToUuidMap("snomed");
-		uuidToSourceMap = transformer.getUuidToSourceMap("snomed");
-	}
+    private Map<UUID, Integer> uuidToNativeMap;
+    private Map<Integer, UUID> nativeToUuidMap;
+    private Map<String, UUID> sourceToUuidMap;
+    private Map<UUID, String> uuidToSourceMap;
 
-	public String transform(String input) throws Exception {
-		UUID snomedUuid = (UUID) sourceToUuidMap.get(input);
-		if (snomedUuid == null) {
-			snomedUuid = Type3UuidFactory.fromSNOMED(input);
+    public void setupImpl(Transform transformer) {
+        uuidToNativeMap = transformer.getUuidToNativeMap();
+        nativeToUuidMap = transformer.getNativeToUuidMap();
+        sourceToUuidMap = transformer.getSourceToUuidMap("snomed");
+        uuidToSourceMap = transformer.getUuidToSourceMap("snomed");
+    }
 
-			Integer nativeId = Integer.MIN_VALUE + nativeToUuidMap.size();
-			if (uuidToSourceMap.containsKey(snomedUuid)) {
-				throw new Exception("Duplicate UUID generated: " + 
-						snomedUuid.toString() + " for keys: " + input + " & " + uuidToSourceMap.get(snomedUuid));
-			}
-			uuidToNativeMap.put(snomedUuid, nativeId);
-			nativeToUuidMap.put(nativeId, snomedUuid);
-			sourceToUuidMap.put(input, snomedUuid);
-			uuidToSourceMap.put(snomedUuid, input);
-		}
-		return setLastTransform(uuidToNativeMap.get(snomedUuid).toString());
-	}
+    public String transform(String input) throws Exception {
+        UUID snomedUuid = (UUID) sourceToUuidMap.get(input);
+        if (snomedUuid == null) {
+            snomedUuid = Type3UuidFactory.fromSNOMED(input);
 
+            Integer nativeId = Integer.MIN_VALUE + nativeToUuidMap.size();
+            if (uuidToSourceMap.containsKey(snomedUuid)) {
+                throw new Exception("Duplicate UUID generated: " + snomedUuid.toString() + " for keys: " + input
+                    + " & " + uuidToSourceMap.get(snomedUuid));
+            }
+            uuidToNativeMap.put(snomedUuid, nativeId);
+            nativeToUuidMap.put(nativeId, snomedUuid);
+            sourceToUuidMap.put(input, snomedUuid);
+            uuidToSourceMap.put(snomedUuid, input);
+        }
+        return setLastTransform(uuidToNativeMap.get(snomedUuid).toString());
+    }
 
 }

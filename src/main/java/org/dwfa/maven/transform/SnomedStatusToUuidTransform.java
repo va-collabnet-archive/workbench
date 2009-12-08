@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,20 +24,18 @@ import org.dwfa.maven.Transform;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 
 /**
- * Creates a type 5 uuid for a path given a fully specified name. 
+ * Creates a type 5 uuid for a path given a fully specified name.
  * 
  * @author kec
- *
+ * 
  */
-public class SnomedStatusToUuidTransform extends AbstractTransform implements
-        I_ReadAndTransform {
+public class SnomedStatusToUuidTransform extends AbstractTransform implements I_ReadAndTransform {
 
     public void setupImpl(Transform transformer) {
     }
 
     public String transform(String input) throws Exception {
-        I_ConceptualizeUniversally status =
-                ArchitectonicAuxiliary.getStatusFromId(Integer.parseInt(input));
+        I_ConceptualizeUniversally status = ArchitectonicAuxiliary.getStatusFromId(Integer.parseInt(input));
         UUID statusUuid = status.getUids().iterator().next();
         return setLastTransform(statusUuid.toString());
     }

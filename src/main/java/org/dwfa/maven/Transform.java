@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,21 +52,19 @@ import org.dwfa.util.io.FileIO;
  * TODO Remove setMavenParameter() method, and replace with individual setters.
  * Problem occured when adding the method setOutputSpecs() - causes maven to
  * ignore the value specified in the pom and override the parameter with null.
+ * 
  * @goal transform
  * @phase generate-resources
  */
 public class Transform extends AbstractMojo {
 
-
     private static final int PROGRESS_LOGGING_SIZE = 10000;
 
-
-	/**
+    /**
      * @parameter
      * @required
      */
     private OutputSpec[] outputSpecs;
-
 
     /**
      * @parameter
@@ -76,7 +74,7 @@ public class Transform extends AbstractMojo {
 
     /**
      * @parameter
-     *
+     * 
      */
     private boolean appendIdFiles = false;
 
@@ -94,30 +92,30 @@ public class Transform extends AbstractMojo {
     private Character outputCharacterDelimiter = '"';
 
     /**
-    * List of source roots containing non-test code.
-    * @parameter default-value="${project.compileSourceRoots}"
-    * @required
-    * @readonly
-    */
+     * List of source roots containing non-test code.
+     * 
+     * @parameter default-value="${project.compileSourceRoots}"
+     * @required
+     * @readonly
+     */
     private List sourceRoots;
-    
+
     /**
      * @parameter default-value="${project.build.directory}"
      * @required
      * @readonly
      */
-     private File buildDirectory;
-    
-   /**
-    * Location of the source directory.
-    * 
-    * @parameter expression="${project.build.sourceDirectory}"
-    * @required
-    */
-   private File sourceDirectory;
+    private File buildDirectory;
+
+    /**
+     * Location of the source directory.
+     * 
+     * @parameter expression="${project.build.sourceDirectory}"
+     * @required
+     */
+    private File sourceDirectory;
 
     private boolean includeHeader = false;
-
 
     private Map<UUID, Integer> uuidToNativeMap;
 
@@ -126,8 +124,8 @@ public class Transform extends AbstractMojo {
     private Map<String, Map<String, UUID>> sourceToUuidMapMap = new HashMap<String, Map<String, UUID>>();
     private Map<String, Map<UUID, String>> uuidToSourceMapMap = new HashMap<String, Map<UUID, String>>();
 
-
     private int nextColumnId = 0;
+
     public int getNextColumnId() {
         int id = nextColumnId;
         nextColumnId++;
@@ -135,16 +133,16 @@ public class Transform extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-    	Log logger = getLog();
-		logger.info("starting transform: " + Arrays.asList(outputSpecs));
-    	
+        Log logger = getLog();
+        logger.info("starting transform: " + Arrays.asList(outputSpecs));
+
         // calculate the SHA-1 hashcode for this mojo based on input
         Sha1HashCodeGenerator generator;
         String hashCode = "";
         try {
             generator = new Sha1HashCodeGenerator();
 
-            for(int i = 0; i < outputSpecs.length; i++) {
+            for (int i = 0; i < outputSpecs.length; i++) {
                 generator.add(outputSpecs[i]);
             }
 
@@ -155,7 +153,7 @@ public class Transform extends AbstractMojo {
             generator.add(outputCharacterDelimiter);
 
             Iterator iter = sourceRoots.iterator();
-            while(iter.hasNext()) {
+            while (iter.hasNext()) {
                 generator.add(iter.next());
             }
 
@@ -164,22 +162,21 @@ public class Transform extends AbstractMojo {
             System.out.println(e);
         }
 
-        File goalFileDirectory = new File("target" + File.separator
-                + "completed-mojos");
+        File goalFileDirectory = new File("target" + File.separator + "completed-mojos");
         File goalFile = new File(goalFileDirectory, hashCode);
 
         // check to see if this goal has been executed previously
-        if(!goalFile.exists()) {
+        if (!goalFile.exists()) {
 
-    		logger.info("goal has not run before");
+            logger.info("goal has not run before");
             // hasn't been executed previously
             try {
-                for (OutputSpec outSpec: outputSpecs) {
+                for (OutputSpec outSpec : outputSpecs) {
 
-            		logger.info("processing " + outSpec);
-            		
+                    logger.info("processing " + outSpec);
+
                     I_TransformAndWrite[] writers = outSpec.getWriters();
-					for (I_TransformAndWrite tw: writers) {
+                    for (I_TransformAndWrite tw : writers) {
                         File outputFile = new File(tw.getFileName());
                         outputFile.getParentFile().mkdirs();
                         FileOutputStream fos = new FileOutputStream(outputFile, tw.append());
@@ -187,17 +184,17 @@ public class Transform extends AbstractMojo {
                         BufferedWriter bw = new BufferedWriter(osw);
                         tw.init(bw, this);
                     }
-                    if(outSpec.getConstantSpecs() != null) {
-                        for (I_ReadAndTransform constantTransform: outSpec.getConstantSpecs()) {
+                    if (outSpec.getConstantSpecs() != null) {
+                        for (I_ReadAndTransform constantTransform : outSpec.getConstantSpecs()) {
                             constantTransform.setup(this);
                             constantTransform.transform("test");
-                            for (I_TransformAndWrite tw: writers) {
+                            for (I_TransformAndWrite tw : writers) {
                                 tw.addTransform(constantTransform);
                             }
                         }
                     }
                     InputFileSpec[] inputSpecs = outSpec.getInputSpecs();
-					for (InputFileSpec spec : inputSpecs) {
+                    for (InputFileSpec spec : inputSpecs) {
                         nextColumnId = 0;
                         Map<Integer, Set<I_ReadAndTransform>> columnTransformerMap = new HashMap<Integer, Set<I_ReadAndTransform>>();
                         logger.info("Now processing file spec:\n\n" + spec);
@@ -211,23 +208,22 @@ public class Transform extends AbstractMojo {
                             }
                             transformerSet.add(t);
 
-                            for (I_TransformAndWrite tw: writers) {
+                            for (I_TransformAndWrite tw : writers) {
                                 tw.addTransform(t);
                             }
                         }
-                        
+
                         File inputFile = normalize(spec);
                         if (inputFile != null) {
                             if (inputFile.length() == 0) {
-                            	logger.warn("skipping 0 length file " + inputFile);
-                            	continue;
+                                logger.warn("skipping 0 length file " + inputFile);
+                                continue;
                             }
                         } else {
-                        	throw new MojoFailureException("Spec cannot be normalized. Does the input file exist?");
+                            throw new MojoFailureException("Spec cannot be normalized. Does the input file exist?");
                         }
                         FileInputStream fs = new FileInputStream(inputFile);
-                        InputStreamReader isr = new InputStreamReader(fs, spec
-                                .getInputEncoding());
+                        InputStreamReader isr = new InputStreamReader(fs, spec.getInputEncoding());
                         BufferedReader br = new BufferedReader(isr);
                         StreamTokenizer st = new StreamTokenizer(br);
                         st.resetSyntax();
@@ -242,63 +238,78 @@ public class Transform extends AbstractMojo {
                         while (tokenType != StreamTokenizer.TT_EOF) {
                             int currentColumn = 0;
                             while (tokenType != '\r' && tokenType != '\n' && tokenType != StreamTokenizer.TT_EOF) {
-                                /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-                                    getLog().info("Transforming column: " + currentColumn + " string token: " + st.sval);
-                                    getLog().info("Current row:" + rowCount);
-                                }*/
+                                /*
+                                 * if (rowCount >= spec.getDebugRowStart() &&
+                                 * rowCount <= spec.getDebugRowEnd()) {
+                                 * getLog().info("Transforming column: " +
+                                 * currentColumn + " string token: " + st.sval);
+                                 * getLog().info("Current row:" + rowCount);
+                                 * }
+                                 */
 
-                                if (columnTransformerMap.get((Integer)
-                                        currentColumn) == null) {
+                                if (columnTransformerMap.get((Integer) currentColumn) == null) {
                                 } else {
-                                    for (Object tObj: (Set)
-                                            columnTransformerMap.get((Integer)
-                                            currentColumn)) {
+                                    for (Object tObj : (Set) columnTransformerMap.get((Integer) currentColumn)) {
                                         I_ReadAndTransform t = (I_ReadAndTransform) tObj;
-                                        /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-                                            getLog().info("Transform for column: " + currentColumn + " is: " + t);
-                                        }*/
+                                        /*
+                                         * if (rowCount >=
+                                         * spec.getDebugRowStart() && rowCount
+                                         * <= spec.getDebugRowEnd()) {
+                                         * 
+                                         * 
+                                         * 
+                                         * 
+                                         * 
+                                         * 
+                                         * getLog().info("Transform for column: "
+                                         * + currentColumn + " is: " + t);
+                                         * }
+                                         */
                                         if (tokenType == spec.getInputColumnDelimiter().charValue()) {
-                                           t.transform(null);
+                                            t.transform(null);
                                         } else {
-                                           t.transform(st.sval);
+                                            t.transform(st.sval);
                                         }
-                                        /*if (rowCount >= spec.getDebugRowStart() && rowCount <= spec.getDebugRowEnd()) {
-                                            getLog().info("Transform: " + t + " result: " + result);
-                                        }*/
+                                        /*
+                                         * if (rowCount >=
+                                         * spec.getDebugRowStart() && rowCount
+                                         * <= spec.getDebugRowEnd()) {
+                                         * getLog().info("Transform: " + t +
+                                         * " result: " + result);
+                                         * }
+                                         */
                                     }
                                 }
                                 tokenType = st.nextToken();
                                 if (spec.getInputColumnDelimiter().charValue() == tokenType) {
-                                   // CR or LF
-                                   tokenType = st.nextToken();
-                                   if (spec.getInputColumnDelimiter().charValue() == tokenType) {
-                                      st.pushBack();
-                                   }
-                                } 
+                                    // CR or LF
+                                    tokenType = st.nextToken();
+                                    if (spec.getInputColumnDelimiter().charValue() == tokenType) {
+                                        st.pushBack();
+                                    }
+                                }
                                 currentColumn++;
                             }
 
-
-                            for (I_TransformAndWrite tw: writers) {
+                            for (I_TransformAndWrite tw : writers) {
                                 tw.processRec();
                             }
 
-
                             switch (tokenType) {
-                                case '\r': // is CR
-                                    // LF
-                                    tokenType = st.nextToken();
-                                    break;
-                                case '\n':  //LF
-                                    break;
-                                case StreamTokenizer.TT_EOF: // End of file
-                                    break;
-                                default:
-                                    throw new Exception("There are more columns than transformers. Tokentype: " + tokenType);
+                            case '\r': // is CR
+                                // LF
+                                tokenType = st.nextToken();
+                                break;
+                            case '\n': // LF
+                                break;
+                            case StreamTokenizer.TT_EOF: // End of file
+                                break;
+                            default:
+                                throw new Exception("There are more columns than transformers. Tokentype: " + tokenType);
                             }
                             rowCount++;
                             if (rowCount % PROGRESS_LOGGING_SIZE == 0) {
-                            	logger.info("processed " + rowCount + " rows of file " + inputFile.getAbsolutePath());
+                                logger.info("processed " + rowCount + " rows of file " + inputFile.getAbsolutePath());
                             }
                             // Beginning of loop
                             tokenType = st.nextToken();
@@ -308,30 +319,25 @@ public class Transform extends AbstractMojo {
                     }
                     logger.info("closing writers");
                     int count = 0;
-                    for (I_TransformAndWrite tw: writers) {
-                    	logger.info("closing " + ++count + " of " + writers.length);
+                    for (I_TransformAndWrite tw : writers) {
+                        logger.info("closing " + ++count + " of " + writers.length);
                         tw.close();
                     }
-                    
+
                     logger.info("cleanup inputs");
                     count = 0;
-					for (InputFileSpec ifs : inputSpecs) {
-						logger.info("cleaning input spec " + ++count + " of "
-								+ inputSpecs.length);
-						int transformCount = 0;
-						I_ReadAndTransform[] columnSpecs = ifs.getColumnSpecs();
-						for (I_ReadAndTransform t : columnSpecs) {
-							logger.info("cleaning column spec "
-									+ ++transformCount + " of "
-									+ columnSpecs.length);
-							t.cleanup(this);
-						}
-					}
+                    for (InputFileSpec ifs : inputSpecs) {
+                        logger.info("cleaning input spec " + ++count + " of " + inputSpecs.length);
+                        int transformCount = 0;
+                        I_ReadAndTransform[] columnSpecs = ifs.getColumnSpecs();
+                        for (I_ReadAndTransform t : columnSpecs) {
+                            logger.info("cleaning column spec " + ++transformCount + " of " + columnSpecs.length);
+                            t.cleanup(this);
+                        }
+                    }
 
-                 	  logger.info("cleanup inputs - done");
+                    logger.info("cleanup inputs - done");
                 }
-
-
 
                 if (uuidToNativeMap != null) {
                     logger.info("ID map is not null.");
@@ -340,7 +346,7 @@ public class Transform extends AbstractMojo {
                     outputFileLoc.getParentFile().mkdirs();
 
                     File file = new File(outputFileLoc, "uuidToNative.txt");
-					FileOutputStream fos = new FileOutputStream(file, appendIdFiles);
+                    FileOutputStream fos = new FileOutputStream(file, appendIdFiles);
                     OutputStreamWriter osw = new OutputStreamWriter(fos, idEncoding);
                     BufferedWriter bw = new BufferedWriter(osw);
                     if (includeHeader) {
@@ -358,7 +364,7 @@ public class Transform extends AbstractMojo {
                         bw.append("\n");
                         rowcount++;
                         if (rowcount++ % PROGRESS_LOGGING_SIZE == 0) {
-                        	logger.info("processed " + rowcount + " rows of file " + file.getAbsolutePath());
+                            logger.info("processed " + rowcount + " rows of file " + file.getAbsolutePath());
                         }
                     }
 
@@ -373,7 +379,7 @@ public class Transform extends AbstractMojo {
                     outputFileLoc.getParentFile().mkdirs();
 
                     File file = new File(outputFileLoc, key + "ToUuid.txt");
-					FileOutputStream fos = new FileOutputStream(file, appendIdFiles);
+                    FileOutputStream fos = new FileOutputStream(file, appendIdFiles);
                     OutputStreamWriter osw = new OutputStreamWriter(fos, idEncoding);
                     BufferedWriter bw = new BufferedWriter(osw);
                     if (includeHeader) {
@@ -393,7 +399,7 @@ public class Transform extends AbstractMojo {
                         bw.append("\n");
                         rowcount++;
                         if (rowcount++ % PROGRESS_LOGGING_SIZE == 0) {
-                        	logger.info("processed " + rowcount + " rows of file " + file.getAbsolutePath());
+                            logger.info("processed " + rowcount + " rows of file " + file.getAbsolutePath());
                         }
                     }
                     bw.close();
@@ -406,9 +412,9 @@ public class Transform extends AbstractMojo {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                
+
                 logger.info("execution complete");
-                
+
             } catch (FileNotFoundException e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             } catch (UnsupportedEncodingException e) {
@@ -439,8 +445,8 @@ public class Transform extends AbstractMojo {
     private void setupUuidMaps() {
         uuidToNativeMap = new HashMap<UUID, Integer>();
         nativeToUuidMap = new HashMap<Integer, UUID>();
-        for (PrimordialId pid: PrimordialId.values()) {
-            for (UUID uid: pid.getUids()) {
+        for (PrimordialId pid : PrimordialId.values()) {
+            for (UUID uid : pid.getUids()) {
                 uuidToNativeMap.put(uid, pid.getNativeId(Integer.MIN_VALUE));
                 nativeToUuidMap.put(pid.getNativeId(Integer.MIN_VALUE), uid);
             }
@@ -460,6 +466,7 @@ public class Transform extends AbstractMojo {
         }
         return sourceToUuidMapMap.get(source);
     }
+
     public Map<UUID, String> getUuidToSourceMap(String source) {
         if (uuidToSourceMapMap.get(source) == null) {
             uuidToSourceMapMap.put(source, new HashMap<UUID, String>());
@@ -496,11 +503,8 @@ public class Transform extends AbstractMojo {
         return sourceRoots;
     }
 
-    public void setMavenParameters(OutputSpec[] outputSpecs,
-            String idFileLoc, boolean appendIdFiles,
-            String idEncoding, Character outputColumnDelimiter,
-            Character outputCharacterDelimiter,
-            List sourceRoots) {
+    public void setMavenParameters(OutputSpec[] outputSpecs, String idFileLoc, boolean appendIdFiles,
+            String idEncoding, Character outputColumnDelimiter, Character outputCharacterDelimiter, List sourceRoots) {
         this.outputSpecs = outputSpecs;
         this.idFileLoc = idFileLoc;
         this.appendIdFiles = appendIdFiles;
@@ -510,12 +514,12 @@ public class Transform extends AbstractMojo {
         this.sourceRoots = sourceRoots;
     }
 
-   public File getBuildDirectory() {
-      return buildDirectory;
-   }
+    public File getBuildDirectory() {
+        return buildDirectory;
+    }
 
-   public File getSourceDirectory() {
-      return sourceDirectory;
-   }
+    public File getSourceDirectory() {
+        return sourceDirectory;
+    }
 
 }

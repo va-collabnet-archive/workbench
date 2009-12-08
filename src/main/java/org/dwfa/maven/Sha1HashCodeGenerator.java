@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Generates SHA-1 hash codes.
+ * 
  * @author Chrissy Hill
  */
 public class Sha1HashCodeGenerator {
@@ -32,8 +33,9 @@ public class Sha1HashCodeGenerator {
 
     /**
      * Creates a new instance of the hash function.
-     * @throws NoSuchAlgorithmException Encountered if an unsupported 
-     * algorithm is used.
+     * 
+     * @throws NoSuchAlgorithmException Encountered if an unsupported
+     *             algorithm is used.
      */
     public Sha1HashCodeGenerator() throws NoSuchAlgorithmException {
         sha1Algorithm = MessageDigest.getInstance("SHA-1");
@@ -42,6 +44,7 @@ public class Sha1HashCodeGenerator {
 
     /**
      * Adds the string representation of an object to the hash function.
+     * 
      * @param obj The object to be processed into the hash function.
      */
     public void add(Object obj) {
@@ -55,6 +58,7 @@ public class Sha1HashCodeGenerator {
 
     /**
      * Completes the hash function and gets the generated hash code.
+     * 
      * @return The generated hash code.
      */
     public String getHashCode() {

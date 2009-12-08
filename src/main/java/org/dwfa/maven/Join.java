@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -102,66 +102,62 @@ public class Join extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-		HashMap<String, ReadRecord> keyMap = new HashMap<String, ReadRecord>();
-		try {
-			BufferedReader fileOneReader = new BufferedReader(new FileReader(
-					inputFileOne));
-			try {
-				while (true) {
-					String line = fileOneReader.readLine();
-					String[] fields = line.split(columnDelimiter);
-					if (keyMap.containsKey(fields[fileOneKeyColumn])) {
-						throw new MojoExecutionException(
-								"Duplicate key in inputFileOne: "
-										+ fields[fileOneKeyColumn]);
-					}
-					ReadRecord rec = new ReadRecord();
-					rec.setFile1(fields);
-					keyMap.put(fields[fileOneKeyColumn], rec);
-				}
-			} catch (EOFException eof) {
-				fileOneReader.close();
-			}
-			BufferedReader fileTwoReader = new BufferedReader(new FileReader(
-					inputFileTwo));
-			try {
-				while (true) {
-					String line = fileTwoReader.readLine();
-					String[] fields = line.split(columnDelimiter);
-					if (keyMap.containsKey(fields[fileTwoKeyColumn])) {
-						ReadRecord rec = keyMap.get(fields[fileTwoKeyColumn]);
-						rec.setFile2(fields);
-					}
-				}
-			} catch (EOFException eof) {
-				fileTwoReader.close();
-			}
+        HashMap<String, ReadRecord> keyMap = new HashMap<String, ReadRecord>();
+        try {
+            BufferedReader fileOneReader = new BufferedReader(new FileReader(inputFileOne));
+            try {
+                while (true) {
+                    String line = fileOneReader.readLine();
+                    String[] fields = line.split(columnDelimiter);
+                    if (keyMap.containsKey(fields[fileOneKeyColumn])) {
+                        throw new MojoExecutionException("Duplicate key in inputFileOne: " + fields[fileOneKeyColumn]);
+                    }
+                    ReadRecord rec = new ReadRecord();
+                    rec.setFile1(fields);
+                    keyMap.put(fields[fileOneKeyColumn], rec);
+                }
+            } catch (EOFException eof) {
+                fileOneReader.close();
+            }
+            BufferedReader fileTwoReader = new BufferedReader(new FileReader(inputFileTwo));
+            try {
+                while (true) {
+                    String line = fileTwoReader.readLine();
+                    String[] fields = line.split(columnDelimiter);
+                    if (keyMap.containsKey(fields[fileTwoKeyColumn])) {
+                        ReadRecord rec = keyMap.get(fields[fileTwoKeyColumn]);
+                        rec.setFile2(fields);
+                    }
+                }
+            } catch (EOFException eof) {
+                fileTwoReader.close();
+            }
 
-			BufferedWriter outputWriter = new BufferedWriter(new FileWriter(outputFile));
-			for (ReadRecord rec: keyMap.values()) {
-				if (rec.getFile2() == null) {
-					throw new MojoExecutionException("No entry in file 2 for: " + Arrays.asList(rec.getFile1()));
-				}
-				for (String field: rec.getFile1()) {
-					outputWriter.append(field);
-					outputWriter.append(columnDelimiter);
-				}
-				for (int i = 0; i < rec.getFile2().length; i++) {
-					outputWriter.append(rec.getFile2()[i]);
-					if (i < rec.getFile2().length - 1) {
-						outputWriter.append(columnDelimiter);						
-					}
-				}
-				outputWriter.append("\n");						
-			}
-			outputWriter.close();
-		} catch (FileNotFoundException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		} catch (IOException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(outputFile));
+            for (ReadRecord rec : keyMap.values()) {
+                if (rec.getFile2() == null) {
+                    throw new MojoExecutionException("No entry in file 2 for: " + Arrays.asList(rec.getFile1()));
+                }
+                for (String field : rec.getFile1()) {
+                    outputWriter.append(field);
+                    outputWriter.append(columnDelimiter);
+                }
+                for (int i = 0; i < rec.getFile2().length; i++) {
+                    outputWriter.append(rec.getFile2()[i]);
+                    if (i < rec.getFile2().length - 1) {
+                        outputWriter.append(columnDelimiter);
+                    }
+                }
+                outputWriter.append("\n");
+            }
+            outputWriter.close();
+        } catch (FileNotFoundException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
 
-	}
+    }
 
     public String getColumnDelimiter() {
         return columnDelimiter;

@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,14 +24,14 @@ import org.dwfa.maven.I_ReadAndTransform;
 import org.dwfa.maven.Transform;
 
 /**
- * Converts a initial capitalisation status from the original SNOMED definition to
+ * Converts a initial capitalisation status from the original SNOMED definition
+ * to
  * the UUID of the concept enumeration equivalent
  * 
  * @author Dion McMurtrie
- *
+ * 
  */
-public class CaseSensitivityToUuidTransform extends AbstractTransform implements
-        I_ReadAndTransform {
+public class CaseSensitivityToUuidTransform extends AbstractTransform implements I_ReadAndTransform {
 
     public void setupImpl(Transform transformer) {
 
@@ -46,8 +46,7 @@ public class CaseSensitivityToUuidTransform extends AbstractTransform implements
         } else if (input.equals("1")) {
             concept = Concept.ALL_CHARACTERS_CASE_SENSITIVE;
         } else {
-            throw new Exception("Failed converting input " + input
-                + " not one of the expected values 0 and 1");
+            throw new Exception("Failed converting input " + input + " not one of the expected values 0 and 1");
         }
 
         UUID uuid = concept.getUids().iterator().next();

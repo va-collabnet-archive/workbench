@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,8 +35,7 @@ public class BeanSpec {
      * @param name
      * @param name2
      */
-    public BeanSpec(String sourceName, String dirName, String type,
-            String format, String constructArg, String beanName) {
+    public BeanSpec(String sourceName, String dirName, String type, String format, String constructArg, String beanName) {
         super();
         this.sourceName = sourceName;
         this.dirName = dirName;
@@ -78,8 +77,7 @@ public class BeanSpec {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return this.getType() + " " + this.sourceName + " write to: "
-            + this.dirName;
+        return this.getType() + " " + this.sourceName + " write to: " + this.dirName;
     }
 
     public String getType() {

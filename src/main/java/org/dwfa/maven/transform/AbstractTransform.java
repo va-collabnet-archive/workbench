@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,15 +68,13 @@ public abstract class AbstractTransform implements I_ReadAndTransform {
         this.columnId = columnId;
     }
 
-    public final void setup(Transform transformer) throws IOException,
-            ClassNotFoundException {
+    public final void setup(Transform transformer) throws IOException, ClassNotFoundException {
         if (columnId == -1) {
             columnId = transformer.getNextColumnId();
         }
         setupImpl(transformer);
     }
 
-    public abstract void setupImpl(Transform transformer) throws IOException,
-            ClassNotFoundException;
+    public abstract void setupImpl(Transform transformer) throws IOException, ClassNotFoundException;
 
 }

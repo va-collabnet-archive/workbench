@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,144 +50,142 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 /**
  * Goal which executes derby sql commands to generate a
  * database or perform other such tasks.
- *
+ * 
  * @goal generate-ids-file
  */
 public class IdsMojo extends AbstractMojo {
 
-	/**
-	 * @parameter
-	 * @required
-	 */
-	File uuidsFile;
+    /**
+     * @parameter
+     * @required
+     */
+    File uuidsFile;
 
-	/**
-	 * @parameter
-	 * @required
-	 */
-	File snomedMappingFile;
+    /**
+     * @parameter
+     * @required
+     */
+    File snomedMappingFile;
 
-	/**
-	 * @parameter
-	 * @required
-	 */
-	File outputFile;          
+    /**
+     * @parameter
+     * @required
+     */
+    File outputFile;
 
-	/**
-	 * @parameter
-	 * @required
-	 */
-	String path;
+    /**
+     * @parameter
+     * @required
+     */
+    String path;
 
-	/**
-	 * @parameter
-	 */
-	boolean skipFirstLine = true;          
+    /**
+     * @parameter
+     */
+    boolean skipFirstLine = true;
 
-	/**
-	 * @parameter
-	 */
-	boolean writeHeader = false;          
+    /**
+     * @parameter
+     */
+    boolean writeHeader = false;
 
-	/**
-	 * @parameter
-	 */
-	boolean append = false;          
+    /**
+     * @parameter
+     */
+    boolean append = false;
 
-	
-	/**
-	 * @parameter 
-	 * @required
-	 */
-	File checkFile;
-	
-	/**
-	 * @parameter 
-	 */
-	File reportFile;
-	
-	Set<UUID> allowedUuids = new HashSet<UUID>();
-	
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    /**
+     * @parameter
+     * @required
+     */
+    File checkFile;
 
-		// calculate the SHA-1 hashcode for this mojo based on input
-		Sha1HashCodeGenerator generator;
-		String hashCode = "";
-		try {
-			generator = new Sha1HashCodeGenerator();
-			generator.add(outputFile.getName());
-			generator.add(snomedMappingFile.getName());
-			generator.add(uuidsFile.getName());
-			hashCode = generator.getHashCode();
-		} catch (NoSuchAlgorithmException e) {
-			System.out.println(e);
-		}
+    /**
+     * @parameter
+     */
+    File reportFile;
 
-		File goalFileDirectory = new File("target" + File.separator
-				+ "completed-mojos");
-		File goalFile = new File(goalFileDirectory, hashCode);
+    Set<UUID> allowedUuids = new HashSet<UUID>();
 
-		// check to see if this goal has been executed previously
-		if(!goalFile.exists()) {
+    public void execute() throws MojoExecutionException, MojoFailureException {
 
-		
-			try {
-				
-				if (checkFile!=null) {
-					BufferedReader reader = new BufferedReader(new FileReader(checkFile));
-					String line = reader.readLine();
-					while ((line = reader.readLine())!=null) {					
-						allowedUuids.add(UUID.fromString(line.split("\t")[0]));
-					}
-					reader.close();
-				}
-				
-				outputFile.getParentFile().mkdirs();
-				reportFile.getParentFile().mkdirs();
-				BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile,append));
-				BufferedWriter report = new BufferedWriter(new FileWriter(reportFile));
+        // calculate the SHA-1 hashcode for this mojo based on input
+        Sha1HashCodeGenerator generator;
+        String hashCode = "";
+        try {
+            generator = new Sha1HashCodeGenerator();
+            generator.add(outputFile.getName());
+            generator.add(snomedMappingFile.getName());
+            generator.add(uuidsFile.getName());
+            hashCode = generator.getHashCode();
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println(e);
+        }
 
-				if (writeHeader) {
-					writer.write("Primary UUID\tSource System UUID\tSource Id\tStatus Id\tEffective Date\tPath UUID");
-					writer.newLine();
-				}
+        File goalFileDirectory = new File("target" + File.separator + "completed-mojos");
+        File goalFile = new File(goalFileDirectory, hashCode);
 
-				UuidSnomedMap map = UuidSnomedMap.read(snomedMappingFile);
-				String source = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next().toString();			
-				BufferedReader reader = new BufferedReader(new FileReader(uuidsFile));
-				String line = reader.readLine();
+        // check to see if this goal has been executed previously
+        if (!goalFile.exists()) {
 
-				if (skipFirstLine) {
-					line = reader.readLine();
-				}
+            try {
 
-				while (line!=null) {
-					String[] parts = line.split("\t");
-					String uuid = parts[0];			
-					String status = parts[1];
-					Long sctid = map.get(UUID.fromString(uuid));
-					if (sctid!=null) {
-						if (allowedUuids.contains(UUID.fromString(uuid))) {
-							String effective_date = map.getEffectiveDate(sctid);
-							writer.write(uuid + "\t" + source + "\t" + sctid + "\t" + status + "\t" + effective_date + "\t" + path);
-							writer.newLine();
-						} else {
-							report.write("UUID Not in release: " + uuid);
-							report.newLine();
-						}
-					}
-					line = reader.readLine();
-				}
+                if (checkFile != null) {
+                    BufferedReader reader = new BufferedReader(new FileReader(checkFile));
+                    String line = reader.readLine();
+                    while ((line = reader.readLine()) != null) {
+                        allowedUuids.add(UUID.fromString(line.split("\t")[0]));
+                    }
+                    reader.close();
+                }
 
-				writer.close();
-				report.close();
-			} catch (IOException e) {
-				throw new MojoExecutionException(e.getMessage(), e);
-			}
-		} else {
-			// skip execution as it has already been done previously
-			getLog().info("Skipping goal - executed previously.");
-		}
-	}
+                outputFile.getParentFile().mkdirs();
+                reportFile.getParentFile().mkdirs();
+                BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile, append));
+                BufferedWriter report = new BufferedWriter(new FileWriter(reportFile));
+
+                if (writeHeader) {
+                    writer.write("Primary UUID\tSource System UUID\tSource Id\tStatus Id\tEffective Date\tPath UUID");
+                    writer.newLine();
+                }
+
+                UuidSnomedMap map = UuidSnomedMap.read(snomedMappingFile);
+                String source = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next().toString();
+                BufferedReader reader = new BufferedReader(new FileReader(uuidsFile));
+                String line = reader.readLine();
+
+                if (skipFirstLine) {
+                    line = reader.readLine();
+                }
+
+                while (line != null) {
+                    String[] parts = line.split("\t");
+                    String uuid = parts[0];
+                    String status = parts[1];
+                    Long sctid = map.get(UUID.fromString(uuid));
+                    if (sctid != null) {
+                        if (allowedUuids.contains(UUID.fromString(uuid))) {
+                            String effective_date = map.getEffectiveDate(sctid);
+                            writer.write(uuid + "\t" + source + "\t" + sctid + "\t" + status + "\t" + effective_date
+                                + "\t" + path);
+                            writer.newLine();
+                        } else {
+                            report.write("UUID Not in release: " + uuid);
+                            report.newLine();
+                        }
+                    }
+                    line = reader.readLine();
+                }
+
+                writer.close();
+                report.close();
+            } catch (IOException e) {
+                throw new MojoExecutionException(e.getMessage(), e);
+            }
+        } else {
+            // skip execution as it has already been done previously
+            getLog().info("Skipping goal - executed previously.");
+        }
+    }
 
 }

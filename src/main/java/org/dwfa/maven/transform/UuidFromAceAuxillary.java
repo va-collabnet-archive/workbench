@@ -7,7 +7,7 @@
  * You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +24,7 @@ import org.dwfa.maven.transform.AbstractTransform;
 
 /**
  * Transforms a constant to a NID.
- *
+ * 
  */
 public class UuidFromAceAuxillary extends AbstractTransform {
 
@@ -35,19 +35,18 @@ public class UuidFromAceAuxillary extends AbstractTransform {
 
     /**
      * Transforms a constant to a UUID.
+     * 
      * @param input The input string (corresponds to one field in a
-     * table/file).
+     *            table/file).
      * @return String A string containing the result of the transformation.
      * @throws Exception Throws any exception caused by execution of the
-     * transform.
+     *             transform.
      */
     public final String transform(final String input) throws Exception {
-        ArchitectonicAuxiliary.Concept c =
-                ArchitectonicAuxiliary.Concept.valueOf(param);
+        ArchitectonicAuxiliary.Concept c = ArchitectonicAuxiliary.Concept.valueOf(param);
         UUID uid = c.getUids().iterator().next();
         if (getChainedTransform() != null) {
-            return setLastTransform(getChainedTransform().transform(
-                uid.toString()));
+            return setLastTransform(getChainedTransform().transform(uid.toString()));
         } else {
             return setLastTransform(uid.toString());
         }
@@ -56,6 +55,7 @@ public class UuidFromAceAuxillary extends AbstractTransform {
 
     /**
      * Sets up the transform.
+     * 
      * @param transformer Reference to caller of this transform.
      */
     public final void setupImpl(final Transform transformer) {
