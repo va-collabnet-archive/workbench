@@ -160,8 +160,7 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws IOException
      */
     private boolean conceptIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException, IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> children = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
 
@@ -294,11 +293,10 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws IOException
      * @throws TerminologyException
      */
-    private boolean conceptStatusIsChildOf(I_GetConceptData conceptBeingTested) throws IOException,
-            TerminologyException {
+    private boolean conceptStatusIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException, 
+        IOException {
 
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
         Set<I_GetConceptData> childStatuses = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true,
@@ -340,10 +338,9 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptStatusIsDescendantOf(I_GetConceptData conceptBeingTested, I_GetConceptData status)
-            throws IOException, TerminologyException {
+        throws TerminologyException, IOException {
 
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> childStatuses = status.getDestRelOrigins(null, allowedTypes, null, true, true);
 
