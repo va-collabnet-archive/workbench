@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- 
+ !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ !
+ !  Licensed under the Apache License, Version 2.0 (the "License");
+ !  you may not use this file except in compliance with the License.
+ !  You may obtain a copy of the License at
+ ! 
+ !      http://www.apache.org/licenses/LICENSE-2.0
+ !
+ !  Unless required by applicable law or agreed to in writing, software
+ !  distributed under the License is distributed on an "AS IS" BASIS,
+ !  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ !  See the License for the specific language governing permissions and
+ !  limitations under the License.
+ -->
+
+<project name="dwfa-mojo">
+  <bannerLeft>
+    <src>images/module.jpg</src>
+  </bannerLeft>
+  <bannerRight>
+    <name>Informatics, Inc.</name>
+    <src>images/informatics-logo-small.gif</src>
+    <href>http://www.informatics.com/</href>
+  </bannerRight>
+  <body>
+    <links>
+      <item name="DWFA Master" href="../index.html"/>
+      <item name="Informatics, Inc." href="http://www.informatics.com/"/>
+      <item name="Jini" href="http://www.jini.org/" />
+      <item name="Apache" href="http://www.apache.org/" />
+      <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
+    </links>
+    
+    <menu name="ACE Mojo Module">
+      <item name="ACE Mojo Home" href="index.html"/>
+      <item name="Parent Module: DWFA Master" href="../../dwfa/site/index.html"/>
+    </menu>
+    <menu name="Developer Guides">
+      <item name="Ace Format Data Import" href="dataimport.html"/>
+      <item name="SNOMED Format Data Import" href="snomed-dataimport.html"/>
+    </menu>
+    <menu name="Goals">
+      <item name="bcs-open" href="plugins/bcs-open-mojo.html"/>
+      <item name="bcs-read" href="plugins/bcs-read-mojo.html"/>
+      <item name="berkley-vodb-dir" href="plugins/berkley-vodb-dir-mojo.html"/>
+      <item name="berkley-vodb" href="plugins/berkley-vodb-mojo.html"/>
+      <item name="cs-close" href="plugins/cs-close-mojo.html"/>
+      <item name="derby-snomed" href="plugins/derby-snomed-mojo.html"/>
+      <item name="exportdata" href="plugins/exportdata-mojo.html"/>
+      <item name="merge-snomed" href="plugins/merge-snomed-mojo.html"/>
+      <item name="openbase-snomed" href="plugins/openbase-snomed-mojo.html"/>
+      <item name="reportstatus" href="plugins/reportstatus-mojo.html"/>
+      <item name="update-from-repository" href="plugins/update-from-repository-mojo.html"/>
+      <item name="vodb-add-change-set-writer" href="plugins/vodb-add-change-set-writer-mojo.html"/>
+      <item name="vodb-check-child-count" href="plugins/vodb-check-child-count-mojo.html"/>
+      <item name="vodb-checkpoint" href="plugins/vodb-checkpoint-mojo.html"/>
+      <item name="vodb-close" href="plugins/vodb-close-mojo.html"/>
+      <item name="vodb-commit" href="plugins/vodb-commit-mojo.html"/>
+      <item name="vodb-copy-latest" href="plugins/vodb-copy-latest-mojo.html"/>
+      <item name="vodb-count" href="plugins/vodb-count-mojo.html"/>
+      <item name="vodb-create-new-path" href="plugins/vodb-create-new-path-mojo.html"/>
+      <item name="vodb-create-paths-from-base" href="plugins/vodb-create-paths-from-base-mojo.html"/>
+      <item name="vodb-example-change" href="plugins/vodb-example-change-mojo.html"/>
+      <item name="vodb-find-duplicates" href="plugins/vodb-find-duplicates-mojo.html"/>
+      <item name="vodb-find-orphans" href="plugins/vodb-find-orphans-mojo.html"/>
+      <item name="vodb-import-jcs" href="plugins/vodb-import-jcs-mojo.html"/>
+      <item name="vodb-monitor-branches" href="plugins/vodb-monitor-branches-mojo.html"/>
+      <item name="vodb-open" href="plugins/vodb-open-mojo.html"/>
+      <item name="vodb-set-default-config" href="plugins/vodb-set-default-config-mojo.html"/>
+      <item name="vodb-set-edit-paths" href="plugins/vodb-set-edit-paths-mojo.html"/>
+      <item name="vodb-set-view-paths" href="plugins/vodb-set-view-paths-mojo.html"/>
+    </menu>
+    ${reports}
+   </body>
+</project>
