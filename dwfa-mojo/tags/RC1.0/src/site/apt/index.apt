@@ -1,0 +1,9 @@
+ -----
+ DWFA MOJO Module
+ -----
+ Keith Campbell
+ -----
+
+MOJO Module for DWFA
+
+ Provides Maven plugins helpful in building DWFA projects with maven. Some example inculde custom processing of configuration files using maven pom files, and customizaiton of workflow bundles.
