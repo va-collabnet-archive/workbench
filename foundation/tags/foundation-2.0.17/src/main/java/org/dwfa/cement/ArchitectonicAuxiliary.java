@@ -1,0 +1,1094 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.dwfa.cement;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
+import org.dwfa.tapi.I_ConceptualizeLocally;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
+import org.dwfa.tapi.I_DescribeConceptLocally;
+import org.dwfa.tapi.I_DescribeConceptUniversally;
+import org.dwfa.tapi.I_ManifestUniversally;
+import org.dwfa.tapi.I_RelateConceptsUniversally;
+import org.dwfa.tapi.I_StoreLocalFixedTerminology;
+import org.dwfa.tapi.I_StoreUniversalFixedTerminology;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.impl.LocalFixedConcept;
+import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.dwfa.tapi.impl.MemoryTermServer;
+import org.dwfa.tapi.impl.UniversalFixedDescription;
+import org.dwfa.tapi.impl.UniversalFixedRel;
+import org.dwfa.util.id.Type3UuidFactory;
+
+public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
+    public static final UUID NAME_SPACE = UUID.fromString("d0cb73c0-aaf7-11db-8294-0002a5d5c51b");
+
+    private static String getArchitectonicText() {
+        StringBuffer b = new StringBuffer();
+
+        b.append("<html>The subject matter of <font color=blue>architectonic</font> is the structure of all human knowledge. ");
+        b.append("The purpose of providing an architectonic scheme is to classify different types of knowledge and explain ");
+        b.append("the relationships that exist between these classifications. Peirce's own architectonic system divides ");
+        b.append("knowledge according to it status as a \"science\" and then explains the interrelation of these different ");
+        b.append("scientific disciplines. His belief was that philosophy must be placed within this systematic account of ");
+        b.append("knowledge as science. Peirce adopts his architectonic ambitions of structuring all knowledge, and ");
+        b.append("organizing philosophy within it, from his great philosophical hero, Kant. This systematizing approach ");
+        b.append("became crucial for Peirce in his later work. However, his belief in a structured philosophy related ");
+        b.append("systematically to all other scientific disciplines was important to him throughout his philosophical ");
+        b.append("life.");
+        b.append("<center><img src='ace:1c4214ec-147a-11db-ac5d-0800200c9a66'></center><br>");
+        b.append("Source:  <a href='http://www.iep.utm.edu/p/PeirceAr.htm'>The Internet Encyclopedia of Philosophy</a>");
+        b.append("</html>");
+        return b.toString();
+    }
+
+
+    public enum Concept implements I_ConceptualizeUniversally {
+
+        ARCHITECTONIC_ROOT_CONCEPT("ACE Auxiliary concept", getArchitectonicText(),
+            new I_ConceptualizeUniversally[] { }),
+        DEFINITION_TYPE("definition type",
+               new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+               PRIMITIVE_DEFINITION(new String[] {"necessary but not sufficient", "primitive"}, null,
+                             new I_ConceptualizeUniversally[] { DEFINITION_TYPE }),
+               DEFINED_DEFINITION(new String[] {"necessary and sufficient definition", "defined"}, null,
+                               new I_ConceptualizeUniversally[] { DEFINITION_TYPE }),
+        IMAGE_TYPE("image type",
+                new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+            AUXILLARY_IMAGE("auxiliary image",
+                    new I_ConceptualizeUniversally[] { IMAGE_TYPE }),
+            VIEWER_IMAGE("viewer image",
+                    new I_ConceptualizeUniversally[] { IMAGE_TYPE }),
+      LANGUAGE_CONCEPT("language concept",
+               new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+               CASE_SENSITIVITY(new String[] {"case sensitivity (language concept)","case sensitivity"}, null,
+                       new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }) ,
+                       INITIAL_CHARACTER_NOT_CASE_SENSITIVE(new String[] {"initial character not case sensitive (case sensitivity)","ic changable"}, null,
+                                                        new I_ConceptualizeUniversally[] { CASE_SENSITIVITY }) ,
+                       ALL_CHARACTERS_CASE_SENSITIVE(new String[] {"all characters case sensitive (language concept)","unchangable"}, null,
+                                                        new I_ConceptualizeUniversally[] { CASE_SENSITIVITY }) ,
+               LANGUAGE_SPECIFICATION(new String[] {"language specification (language concept)","language"}, null,
+                       new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }) ,
+                       EN_BZ(new String[] {"Belize English (language concept)","BZ English"}, null,
+                          new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                       EN_TT(new String[] {"Trinidad English (language concept)","TT English"}, null,
+                          new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                       EN(new String[] {"English (language concept)","English"}, null,
+                          new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                       EN_AU(new String[] {"Australian English (language concept)","AU English"}, null,
+                             new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                       EN_CA(new String[] {"Canadian English (language concept)","CA English"}, null,
+                             new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                       EN_US(new String[] {"United States English (language concept)","US English"}, null,
+                             new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                       EN_GB(new String[] {"United Kingdom English (language concept)","UK English"}, null,
+                             new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                       EN_NZ(new String[] {"New Zealand English (language concept)","NZ English"}, null,
+                             new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                       EN_IE(new String[] {"Ireland English (language concept)","IE English"}, null,
+                             new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                       EN_ZA(new String[] {"South Africa English (language concept)","ZA English"}, null,
+                             new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                       EN_JM(new String[] {"Jamica English (language concept)","JM English"}, null,
+                                       new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+               DESCRIPTION_FORM("description form",
+                     new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }),
+                     UNNABREV_SINGULAR("unabbreviated singular form",
+                           new I_ConceptualizeUniversally[] { DESCRIPTION_FORM }),
+                     PLURAL_FORM("plural form",
+                           new I_ConceptualizeUniversally[] { DESCRIPTION_FORM }),
+                     INCOMPLETE_OR_ABBREVIATED("incomplete or abbreviated form",
+                           new I_ConceptualizeUniversally[] { DESCRIPTION_FORM }),
+                     SYMBOLIC_FORM("symbolic form",
+                           new I_ConceptualizeUniversally[] { DESCRIPTION_FORM }),
+               DEGREE_OF_SYNONOMY("degree of synonomy",
+                     new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }),
+                     SYNONYMOUS("synonymous",
+                           new I_ConceptualizeUniversally[] { DEGREE_OF_SYNONOMY, }),
+                     NEAR_SYNONYMOUS("near synonymous (depending on context of use)",
+                           new I_ConceptualizeUniversally[] { DEGREE_OF_SYNONOMY, }),
+                     NON_SYNONYMOUS("non synonymous",
+                           new I_ConceptualizeUniversally[] { DEGREE_OF_SYNONOMY, }),
+               CORRECTNESS("correctness",
+                     new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }),
+                     RECOMMENDED("recommended",
+                           new I_ConceptualizeUniversally[] { CORRECTNESS, }),
+                     INCORRECT("incorrect",
+                           new I_ConceptualizeUniversally[] { CORRECTNESS, }),
+               ACCEPTABILITY("acceptability",
+                     new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }),
+                     NOT_SPECIFIED("not specified",
+                           new I_ConceptualizeUniversally[] { ACCEPTABILITY, CORRECTNESS, DEGREE_OF_SYNONOMY}),
+                     INVALID("invalid",
+                           new I_ConceptualizeUniversally[] { ACCEPTABILITY, CORRECTNESS, DEGREE_OF_SYNONOMY}),
+                     ACCEPTABLE("acceptable",
+                           new I_ConceptualizeUniversally[] { ACCEPTABILITY, CORRECTNESS, }),
+                     NOT_RECOMMENDED("not recommended",
+                           new I_ConceptualizeUniversally[] { ACCEPTABILITY, CORRECTNESS, }),
+                     NOT_ACCEPTABLE("not acceptable",
+                           new I_ConceptualizeUniversally[] { ACCEPTABILITY }),
+              DESCRIPTION_TYPE("description type",
+                      new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }),
+                  EXTERNAL_REFERENCE(new String[] {"external reference (description type)", "external reference"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                        
+                  READ_198_DESC(new String[] {"read 198 desc (description type)", "read 198 desc"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                                
+                  READ_60_DESC(new String[] {"read 60 desc (description type)", "read 60 desc"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                        
+                  READ_30_DESC(new String[] {"read 30 desc (description type)", "read 30 desc"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                        
+                  READ_SYN_198_DESC(new String[] {"synonym read 198 description (description type)", "synonym read 198 description"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                                        
+                  READ_SYN_60_DESC(new String[] {"synonym read 60 description (description type)", "synonym read 60 description"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                                
+                  READ_SYN_30_DESC(new String[] {"synonym read 30 description (description type)", "synonym read 30 description"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                        
+                  READ_KEY_DESC(new String[] {"read key (description type)", "read key"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                        
+                  FULLY_SPECIFIED_DESCRIPTION_TYPE(PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID,
+                          new String[] {"fully specified name (description type)", "fully specified name"}, null,
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  SYNONYM_DESCRIPTION_TYPE(new String[] {"synonym (description type)", "synonym"}, null,
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  UNSPECIFIED_DESCRIPTION_TYPE("unspecified  (description type)",
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  PREFERRED_DESCRIPTION_TYPE(PrimordialId.PREFERED_TERM_ID, new String[] {"preferred term (description type)", "preferred term"}, null,
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE,  ACCEPTABILITY}),
+                  ENTRY_DESCRIPTION_TYPE("entry term (description type)",
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  XHTML_PREFERRED_DESC_TYPE("xhtml preferred (description type)",
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  XHTML_SYNONYM_DESC_TYPE("xhtml synonym (description type)",
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  XHTML_FULLY_SPECIFIED_DESC_TYPE("xhtml fully specified (description type)",
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  XHTML_DEF(PrimordialId.XHTML_DEF_ID, new String[] {"xhtml def (description type)"}, null,
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  EXTENSION_TABLE(PrimordialId.EXTENSION_TABLE_ID, new String[] {"extension table (description type)"}, null,
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  CHANGE_COMMENT("change comment (description type)",
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+        RELATIONSHIP("relationship",
+                new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+            IS_A_REL(PrimordialId.IS_A_REL_ID, new String[] {"is a (relationship type)"}, null,
+                    new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_SAME_AS_REL("is same as (relationship type)",
+                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            DUP_REL_TYPE("dup rel type (terminology constant)",
+                    new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_POT_DUP_REL("is-a potential duplicate rel (terminology constant)",
+                    new I_ConceptualizeUniversally[] { DUP_REL_TYPE }),
+            IS_NOT_A_DUP_REL("is NOT a dup rel (terminology constant)",
+                    new I_ConceptualizeUniversally[] { DUP_REL_TYPE }),
+            IS_A_DUP_REL("is-a dup rel (terminology constant)",
+                    new I_ConceptualizeUniversally[] { DUP_REL_TYPE }),
+
+            ALLOWED_QUALIFIER_REL("allowed qualifier",
+                    new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            MAPPING_REL("mapping relationship",
+                    new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+                CLASSIFIED_SPECIFIC_REIMB_REL("classified, specific for reimbursement",
+                        new I_ConceptualizeUniversally[] { MAPPING_REL }),
+                CLASSIFIED_NOT_SPECIFIC_REIMB_REL("classified, NOT specific for reimbursement",
+                        new I_ConceptualizeUniversally[] { MAPPING_REL }),
+                NOT_VALID_AS_PRIMARY_REL("not valid as primary",
+                        new I_ConceptualizeUniversally[] { MAPPING_REL }),
+                NOT_VALID_WITHOUT_ADDITIONAL_CODES_REL("not valid without additional codes",
+                        new I_ConceptualizeUniversally[] { MAPPING_REL }),
+                PC_NEEDED_SPECIFIC_REIMB_REL("patient characteristics needed to classify, specific for reimbursement",
+                        new I_ConceptualizeUniversally[] { MAPPING_REL }),
+                PC_NEEDED_SPECIFIC_NOT_REIMB_REL("patient characteristics needed to classify, NOT specific for reimbursement",
+                        new I_ConceptualizeUniversally[] { MAPPING_REL }),
+                NO_MAPPING_REL("no mapping possible",
+                        new I_ConceptualizeUniversally[] { MAPPING_REL }),
+        CHARACTERISTIC_TYPE("characteristic type",
+                new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+            DEFINING_CHARACTERISTIC(PrimordialId.DEFINING_CHARACTERISTIC_ID,
+                    new String[] {"defining (characteristic type)"}, null,
+                    new I_ConceptualizeUniversally[] { CHARACTERISTIC_TYPE }),
+                 STATED_RELATIONSHIP(PrimordialId.STATED_CHARACTERISTIC_ID,
+                		 new String[] {"stated (defining characteristic type)"}, null,
+                		 new I_ConceptualizeUniversally[] { DEFINING_CHARACTERISTIC }),
+                 INFERRED_RELATIONSHIP(PrimordialId.INFERRED_CHARACTERISTIC_ID,
+                		 new String[] {"inferred (defining characteristic type)"}, null,
+                		 new I_ConceptualizeUniversally[] { DEFINING_CHARACTERISTIC }),
+                         STATED_AND_INFERRED_RELATIONSHIP("stated & inferred (defining characteristic type)",
+                         		new I_ConceptualizeUniversally[] { INFERRED_RELATIONSHIP,  STATED_RELATIONSHIP}),
+                         STATED_AND_SUBSUMED_RELATIONSHIP("subsumed (defining characteristic type)",
+                                 new I_ConceptualizeUniversally[] { INFERRED_RELATIONSHIP,  STATED_RELATIONSHIP }),
+            QUALIFIER_CHARACTERISTIC("qualifier (characteristic type)",
+                    new I_ConceptualizeUniversally[] { CHARACTERISTIC_TYPE }),
+            HISTORICAL_CHARACTERISTIC("historical (characteristic type)",
+                    new I_ConceptualizeUniversally[] { CHARACTERISTIC_TYPE }),
+            ADDITIONAL_CHARACTERISTIC("additional (characteristic type)",
+                    new I_ConceptualizeUniversally[] { CHARACTERISTIC_TYPE }),
+        RELATIONSHIP_REFINABILITY("relationship refinability",
+                new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+            NOT_REFINABLE(PrimordialId.NOT_REFINABLE_ID, new String[] {"not refinable (refinability type)"}, null,
+                    new I_ConceptualizeUniversally[] { RELATIONSHIP_REFINABILITY }),
+            OPTIONAL_REFINABILITY("optional (refinability type)",
+                    new I_ConceptualizeUniversally[] { RELATIONSHIP_REFINABILITY }),
+            MANDATORY_REFINABILITY("mandatory (refinability type)",
+                    new I_ConceptualizeUniversally[] { RELATIONSHIP_REFINABILITY }),
+        STATUS("status (status type)",
+                new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+            ACTIVE("active (active status type)",
+                    new I_ConceptualizeUniversally[] { STATUS }),
+                    PENDING_MOVE("pending move (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    CONCEPT_RETIRED("concept retired (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    LIMITED("limited (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    CURRENT(PrimordialId.CURRENT_ID, new String[] { "current (active status type)" }, null,
+                                    new I_ConceptualizeUniversally[] { ACTIVE }),
+                    FLAGGED_FOR_REVIEW("flagged (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    FLAGGED_FOR_DUAL_REVIEW("flagged for dual review (active status type)",
+                                    new I_ConceptualizeUniversally[] { ACTIVE }),
+                    DUAL_REVIEWED("dual reviewed (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    RESOLVED_IN_DUAL("resolved in dual (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    ADJUDICATED("adjudicated (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    READY_TO_PROMOTE("ready to promote (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    PROMOTED("promoted (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                            
+                    OPTIONAL("optional (active status type)",
+                             new I_ConceptualizeUniversally[] { ACTIVE }),
+               
+                                    
+                            REASSIGNED("reassigned (active status type)",
+                     new I_ConceptualizeUniversally[] { ACTIVE }),
+                     DUAL_REVIEWED_AND_REASSIGNED("dual reviewed and reassigned (active status type)",
+                           new I_ConceptualizeUniversally[] { REASSIGNED }),
+                     RESOLVED_IN_DUAL_AND_REASSIGNED("resolved in dual and reassigned (active status type)",
+                           new I_ConceptualizeUniversally[] { REASSIGNED }),
+                    PROCESSED("processed (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                     DUAL_REVIEWED_AND_PROCESSED("dual reviewed and processed (active status type)",
+                           new I_ConceptualizeUniversally[] { PROCESSED }),
+                     RESOLVED_IN_DUAL_AND_PROCESSED("resolved in dual and processed (active status type)",
+                           new I_ConceptualizeUniversally[] { PROCESSED }),
+                     ADJUDICATED_AND_PROCESSED("adjudicated and processed (active status type)",
+                           new I_ConceptualizeUniversally[] { PROCESSED }),
+                    DUPLICATE_PENDING_RETIREMENT("duplicate-pending retirement (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    INTERNAL_USE_ONLY("internal use only (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    DO_NOT_EDIT_INTERNAL_USE("do not edit, for internal use (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    DO_NOT_EDIT_FOR_RELEASE("do not edit, for release (active status type)",
+                            new I_ConceptualizeUniversally[] { ACTIVE }),
+                    FLAGGED_POTENTIAL_DUPLICATE("dup flag (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    FLAGGED_POTENTIAL_REL_ERROR("rel err flag (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    CURRENT_UNREVIEWED("unreviewed (active status type)",
+                                new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    CURRENT_TEMP_INTERNAL_USE("temp, internal use only (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    FLAGGED_POTENTIAL_DESC_STYLE_ERROR("desc style flag (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+            INACTIVE("inactive (inactive status type)",
+                    new I_ConceptualizeUniversally[] { STATUS }),
+                    CONFLICTING("conflicting (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    NOT_YET_CREATED("not yet created (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    RETIRED("retired (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    RETIRED_MISSPELLED("retired-misspelled (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    DUPLICATE("duplicate (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    OUTDATED("outdated (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    AMBIGUOUS("ambiguous (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    ERRONEOUS("erroneous (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    INAPPROPRIATE("inappropriate (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    IMPLIED_RELATIONSHIP("implied (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    MOVED_ELSEWHERE("moved elsewhere (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+                    EXTINCT("extinct (inactive status type)",
+                            new I_ConceptualizeUniversally[] { INACTIVE }),
+            CONSTANT("constant (status type)",
+                    new I_ConceptualizeUniversally[] { STATUS }),
+        USER_INFO("user info",
+            new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+            USER_NAME("user name",
+                    new I_ConceptualizeUniversally[] { USER_INFO }),
+            USER_INBOX("user inbox",
+                    new I_ConceptualizeUniversally[] { USER_INFO }),
+        PATH("path",
+                new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+            RELEASE("release",
+                    new I_ConceptualizeUniversally[] { PATH }),
+                SNOMED_CORE("SNOMED Core",
+                        new I_ConceptualizeUniversally[] { RELEASE }),
+                        SNOMED_20060731("SNOMED 2006-07-31",
+                                new I_ConceptualizeUniversally[] { SNOMED_CORE }),
+                        SNOMED_20060131("SNOMED 2006-01-31",
+                                new I_ConceptualizeUniversally[] { SNOMED_CORE }),
+                        SNOMED_20050731("SNOMED 2005-07-31",
+                                new I_ConceptualizeUniversally[] { SNOMED_CORE }),
+                        SNOMED_20050131("SNOMED 2005-01-31",
+                                new I_ConceptualizeUniversally[] { SNOMED_CORE }),
+                ARCHITECTONIC_BRANCH(PrimordialId.ACE_AUXILIARY_ID, new String[] {"ACE Auxiliary"}, null,
+                        new I_ConceptualizeUniversally[] { PATH }),
+        TEST("test",
+                new I_ConceptualizeUniversally[] { PATH }),
+        DEVELOPMENT("development",
+                new I_ConceptualizeUniversally[] { PATH }),
+            TGA_DATA("TGA Data", new I_ConceptualizeUniversally[] { DEVELOPMENT }),
+            AMT_SOURCE_DATA("AMT Source Data", new I_ConceptualizeUniversally[] { DEVELOPMENT }),
+    ID_SOURCE("identifier source",
+            new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+        SNOMED_INT_ID("SNOMED integer id",
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        SNOMED_T3_UUID("SNOMED Type 3 UUID",
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        UNSPECIFIED_UUID(PrimordialId.ACE_AUX_ENCODING_ID, new String[] {"generated UUID"}, null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        OID("OID", null,
+              new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        UNSPECIFIED_STRING("unspecified string", null,
+              new I_ConceptualizeUniversally[] { ID_SOURCE });
+        ;
+        private Collection<UUID> conceptUids = new ArrayList<UUID>();
+
+        private Boolean primitive = true;
+
+        private UniversalFixedRel[] rels;
+
+        private UniversalFixedDescription[] descriptions;
+
+        private static PrimordialId[] descTypeOrder;
+
+      private Concept(String descriptionString, I_ConceptualizeUniversally[] parents) {
+         this(new String[] {descriptionString}, null, parents);
+      }
+      private Concept(String descriptionString, String defString, I_ConceptualizeUniversally[] parents) {
+         this(new String[] {descriptionString}, defString, parents);
+      }
+        // PrimordialId
+        private Concept(String[] descriptionStrings, String defString, I_ConceptualizeUniversally[] parents) {
+            this.conceptUids.add(Type3UuidFactory.fromEnum(this));
+            init(descriptionStrings, defString, parents);
+        }
+        private Concept(PrimordialId id, String[] descriptionStrings, String defString, I_ConceptualizeUniversally[] parents) {
+            this.conceptUids = id.getUids();
+            init(descriptionStrings, defString, parents);
+        }
+        private void init(String[] descriptionStrings, String defString, I_ConceptualizeUniversally[] parents) {
+            try {
+            	if (descriptionStrings.length==1) {
+            		if (descriptionStrings[0].indexOf("(")!=-1) {
+            			String[] newDescriptionStrings = new String[2];
+                		newDescriptionStrings[0] = descriptionStrings[0].trim();
+                		newDescriptionStrings[1] = descriptionStrings[0].substring(0,descriptionStrings[0].indexOf("(")).trim();
+            			descriptionStrings = newDescriptionStrings;            			
+            		}
+            	}
+            	
+                this.rels = makeRels(this, parents);
+                this.descriptions = makeDescriptions(this, descriptionStrings, defString);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        public UniversalFixedRel[] makeRels(I_ConceptualizeUniversally source, I_ConceptualizeUniversally[] parents) throws Exception {
+            UniversalFixedRel[] rels = new UniversalFixedRel[parents.length];
+            int i = 0;
+            for (I_ConceptualizeUniversally p: parents) {
+                int relGrp = 0;
+                int parentIndex = i++;
+                rels[parentIndex] = new UniversalFixedRel(Type3UuidFactory.forRel(source.getUids(),
+                        PrimordialId.IS_A_REL_ID.getUids(), p.getUids()),
+                        source.getUids(),
+                        PrimordialId.IS_A_REL_ID.getUids(), p.getUids(),
+                        PrimordialId.STATED_CHARACTERISTIC_ID.getUids(),
+                        PrimordialId.NOT_REFINABLE_ID.getUids(), relGrp);
+            }
+            return rels;
+        }
+
+        public UniversalFixedDescription[] makeDescriptions(I_ConceptualizeUniversally source, String[] descriptionStrings, String defString) throws Exception {
+         if (descriptionStrings.length == 1) {
+            String[] newDescriptionArray = new String[2];
+            newDescriptionArray[0] = descriptionStrings[0];
+            newDescriptionArray[1] = descriptionStrings[0];
+            descriptionStrings = newDescriptionArray;
+         }
+            if (descTypeOrder == null) {
+                descTypeOrder = new PrimordialId[] {
+                        PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID,
+                        PrimordialId.PREFERED_TERM_ID };
+            }
+         UniversalFixedDescription[] descriptions;
+         if (defString == null) {
+            descriptions = new UniversalFixedDescription[descriptionStrings.length];
+         } else {
+            descriptions = new UniversalFixedDescription[descriptionStrings.length + 1];
+         }
+            int i = 0;
+            boolean initialCapSig = true;
+            String langCode = "en";
+            for (String descText: descriptionStrings) {
+                if (descText != null) {
+                    descriptions[i] = new UniversalFixedDescription(Type3UuidFactory.forDesc(source.getUids(), descTypeOrder[i].getUids(), descText),
+                            PrimordialId.CURRENT_ID.getUids(),
+                            source.getUids(),
+                            initialCapSig, descTypeOrder[i].getUids(), descText,
+                            langCode);
+                }
+                i++;
+            }
+         if (defString != null) {
+            descriptions[i] = new UniversalFixedDescription(Type3UuidFactory.forDesc(source.getUids(), PrimordialId.XHTML_DEF_ID.getUids(), defString),
+                  PrimordialId.CURRENT_ID.getUids(),
+                  source.getUids(),
+                  initialCapSig, PrimordialId.XHTML_DEF_ID.getUids(), defString,
+                  langCode);
+         }
+            return descriptions;
+        }
+
+
+        public boolean isPrimitive(I_StoreUniversalFixedTerminology server) {
+            return true;
+        }
+
+
+        public Collection<UUID> getUids() {
+            return conceptUids;
+        }
+
+        public boolean isUniversal() {
+            return true;
+        }
+
+
+        public I_DescribeConceptUniversally getDescription(List<I_ConceptualizeUniversally> typePriorityList, I_StoreUniversalFixedTerminology termStore)  {
+            throw new UnsupportedOperationException();
+        }
+
+        public Collection<I_DescribeConceptUniversally> getDescriptions(I_StoreUniversalFixedTerminology server)  {
+            throw new UnsupportedOperationException();
+        }
+
+
+
+        public Collection<I_ConceptualizeUniversally> getDestRelConcepts(I_StoreUniversalFixedTerminology server) {
+            throw new UnsupportedOperationException();
+        }
+
+
+
+        public Collection<I_ConceptualizeUniversally> getDestRelConcepts(
+                Collection<I_ConceptualizeUniversally> types, I_StoreUniversalFixedTerminology termStore) {
+            throw new UnsupportedOperationException();
+        }
+
+
+
+        public Collection<I_RelateConceptsUniversally> getDestRels(I_StoreUniversalFixedTerminology server) {
+            throw new UnsupportedOperationException();
+        }
+
+
+
+        public Collection<I_RelateConceptsUniversally> getSourceRels(I_StoreUniversalFixedTerminology server) {
+            throw new UnsupportedOperationException();
+        }
+
+
+
+        public Collection<I_ConceptualizeUniversally> getSrcRelConcepts(I_StoreUniversalFixedTerminology server) {
+            throw new UnsupportedOperationException();
+        }
+
+
+
+        public Collection<I_ConceptualizeUniversally> getSrcRelConcepts(
+                Collection<I_ConceptualizeUniversally> types, I_StoreUniversalFixedTerminology termStore) {
+            throw new UnsupportedOperationException();
+        }
+
+
+
+        public I_ManifestUniversally getExtension(I_ConceptualizeUniversally extensionType, I_StoreUniversalFixedTerminology extensionServer) {
+            throw new UnsupportedOperationException();
+        }
+
+
+
+        public I_ConceptualizeLocally localize() throws IOException, TerminologyException {
+            return LocalFixedConcept.get(getUids(), primitive);
+        }
+        public Collection<I_RelateConceptsUniversally> getDestRels(Collection<I_ConceptualizeUniversally> types, I_StoreUniversalFixedTerminology termStore) {
+            throw new UnsupportedOperationException();
+        }
+        public Collection<I_RelateConceptsUniversally> getSourceRels(Collection<I_ConceptualizeUniversally> types, I_StoreUniversalFixedTerminology termStore) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public void addToMemoryTermServer(MemoryTermServer server) throws Exception {
+        server.addRoot(Concept.ARCHITECTONIC_ROOT_CONCEPT);
+        for (Concept c: Concept.values()) {
+            server.add(c);
+            for (I_DescribeConceptUniversally d: c.descriptions) {
+                server.add(d);
+            }
+            for (I_RelateConceptsUniversally r: c.rels) {
+                server.add(r);
+            }
+        }
+    }
+
+    /**
+     * Values
+     * <li>0 Unspecified This may be assigned as either a Preferred Term or
+     * Synonym by a I_Describe Subset for a language, dialect or realm.
+     * <li>1 Preferred This is the Preferred Term for the associated I_Concept.
+     * <li>2 Synonym This is a Synonym for the associated I_Concept.
+     * <li>3 FullySpecifiedName This is the FullySpecifiedName for the
+     * associated I_Concept.
+     *
+     * @param type
+     * @return
+     * @throws IdentifierIsNotNativeException
+     * @throws QueryException
+     * @throws RemoteException
+     */
+    public static I_ConceptualizeUniversally getSnomedDescriptionType(int type) {
+        switch (type) {
+        case 0:
+            return ArchitectonicAuxiliary.Concept.UNSPECIFIED_DESCRIPTION_TYPE;
+        case 1:
+            return ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE;
+        case 2:
+            return ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE;
+        case 3:
+            return ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE;
+        }
+        return ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE;
+
+    }
+
+    /**
+     * Values
+     * <li>0 Unspecified This may be assigned as either a Preferred Term or
+     * Synonym by a I_Describe Subset for a language, dialect or realm.
+     * <li>1 Preferred This is the Preferred Term for the associated I_Concept.
+     * <li>2 Synonym This is a Synonym for the associated I_Concept.
+     * <li>3 FullySpecifiedName This is the FullySpecifiedName for the
+     * associated I_Concept.
+     *
+     * @param uuids
+     * @return int value representing the enumerated type
+     * @throws IdentifierIsNotNativeException
+     * @throws QueryException
+     * @throws RemoteException
+     */
+    public static int getSnomedDescriptionTypeId(Collection<UUID> uuids){
+        if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.UNSPECIFIED_DESCRIPTION_TYPE.getUids()))
+            return 0;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()))
+            return 1;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()))
+            return 2;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()))
+            return 3;
+
+        return 0;
+    }
+
+    /**
+     * Values
+     * <li>0 CURRENT.
+     * <li>1 NONCURRENT.
+     * <li>2 DUPLICATE.
+     * <li>3 OUTDATED.
+     * <li>5 ERRONEOUS.
+     * <li>6 LIMITED.
+     * <li>7 INAPPROPRIATE.
+     * <li>8 CONCEPTNONCURRENT
+     * <li>10 MOVEDELSEWHERE
+     * <li>11 PENDINGMOVE
+     *
+     * @param uuids
+     * @return int value representing the enumerated type
+     * @throws IdentifierIsNotNativeException
+     * @throws QueryException
+     * @throws RemoteException
+     */
+    public static int getSnomedDescriptionStatusId(Collection<UUID> uuids){
+        if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT.getUids()))
+            return 0;
+        else if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()))
+            return 0;
+        else if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()))
+            return 0; 
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.RETIRED.getUids()))
+            return 1;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DUPLICATE.getUids()))
+            return 2;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.OUTDATED.getUids()))
+            return 3;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ERRONEOUS.getUids()))
+            return 5;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.LIMITED.getUids()))
+            return 6;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.INAPPROPRIATE.getUids()))
+            return 7;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids()))
+            return 8;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.getUids()))
+            return 10;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()))
+            return 11;
+
+        return -1;
+    }
+
+    private static boolean containsUuidElement(Collection<UUID> parentUuids, Collection<UUID> childUuids){
+
+        Iterator<UUID> parentIt = parentUuids.iterator();
+        Iterator<UUID> childIt = childUuids.iterator();
+
+        while(parentIt.hasNext()){
+            parentIt.next();
+            while(childIt.hasNext()){
+                if(parentUuids.contains(childIt.next())){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Values
+     * <li>0 CURRENT.
+     * <li>1 RETIRED.
+     * <li>2 DUPLICATE.
+     * <li>3 OUTDATED.
+     * <li>4 AMBIGUOS
+     * <li>5 ERRONEOUS.
+     * <li>10 MOVEDELSEWHERE
+     * <li>11 PENDINGMOVE
+     *
+     * @param uuids
+     * @return int value representing the enumerated type
+     * @throws IdentifierIsNotNativeException
+     * @throws QueryException
+     * @throws RemoteException
+     */
+    public static int getSnomedConceptStatusId(Collection<UUID> uuids){
+      if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT.getUids()))
+         return 0;
+      else if (containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()))
+         return 0;
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.RETIRED.getUids()))
+            return 1;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DUPLICATE.getUids()))
+            return 2;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.OUTDATED.getUids()))
+            return 3;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.AMBIGUOUS.getUids()))
+            return 4;
+        else if(uuids.contains(ArchitectonicAuxiliary.Concept.ERRONEOUS.getUids()))
+            return 5;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.getUids()))
+            return 10;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()))
+            return 11;
+
+        return -1;
+    }
+
+    /**
+     * Values:
+     * <li>0 Defining This relationship represents a defining characteristic of
+     * the sourceId concept. Hierarchical relationships (e.g. �ISA� and
+     * �PART-OF�) are also regarded as defining relationships Example: ��Site� =
+     * �Liver�� is a defining characteristic of �Liver biopsy�.
+     * <li>1 Qualifier This relationship represents an optional qualifying
+     * characteristic. Example: ��Revision status� = �Conversion from other type
+     * of arthroplasty�� is a possible qualification of �Hip replacement�
+     * <li>2 Historical This is used to relate an inactive concept to another
+     * concept. Example: The �Same As� relationship connects an inactive concept
+     * with the concept it duplicated. Only used in the Historical Relationships
+     * File.
+     * <li>3 Additional This relationship represents a context specific
+     * characteristic. This is used to convey characteristics of a concept that
+     * apply at a particular time within a particular organization but which are
+     * not intrinsic to the concept. Example: �Prescription Only Medicine� is a
+     * context specific characteristic of the I_Concept �Amoxycillin 250mg
+     * capsule�. It is true currently in the UK but is not true in some other
+     * countries.
+     *
+     * @param type
+     * @return
+     * @throws IdentifierIsNotNativeException
+     * @throws QueryException
+     * @throws RemoteException
+     */
+    public static I_ConceptualizeUniversally getSnomedCharacteristicType(int type)  {
+        switch (type) {
+        case 0:
+            return ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC;
+        case 1:
+            return ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC;
+        case 2:
+            return ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC;
+        case 3:
+            return ArchitectonicAuxiliary.Concept.ADDITIONAL_CHARACTERISTIC;
+        }
+        return ArchitectonicAuxiliary.Concept.CHARACTERISTIC_TYPE;
+    }
+
+    public static int getSnomedCharacteristicTypeId(Collection<UUID> uuids){
+        if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()))
+            return 0;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()))
+         return 0;
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC.getUids()))
+            return 1;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids()))
+            return 2;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.ADDITIONAL_CHARACTERISTIC.getUids()))
+            return 3;
+
+        return -1;
+    }
+
+    /**
+     * An indication of whether it is possible to refine the target concept when
+     * this I_Relate is used as a template for clinical data entry.
+     * <p>
+     * <p>
+     * Values
+     * <li>0 Not refinable Not refinable.
+     * <li>1 Optional May be refined by selecting subtypes.
+     * <li>2 Mandatory Must be refined by selecting a subtype.
+     *
+     * @param type
+     * @return
+     * @throws IdentifierIsNotNativeException
+     * @throws QueryException
+     * @throws RemoteException
+     */
+    public static I_ConceptualizeUniversally getSnomedRefinabilityType(int type)  {
+        switch (type) {
+        case 0:
+            return ArchitectonicAuxiliary.Concept.NOT_REFINABLE;
+        case 1:
+            return ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY;
+        case 2:
+            return ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY;
+        }
+        return ArchitectonicAuxiliary.Concept.RELATIONSHIP_REFINABILITY;
+    }
+
+    public static int getSnomedRefinabilityTypeId(Collection<UUID> uuids){
+        if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()))
+            return 0;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()))
+            return 1;
+        else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids()))
+            return 2;
+
+        return -1;
+    }
+
+       /**
+         * Values
+         * <li>-2 Conflicting
+         * <li>-1 Not-yet created.
+         * <li>0 Current The Description and its associated Concept are in
+         * current use.
+         * <li>1 Non-Current The Description has been withdrawn without a
+         * specified reason.
+         * <li>2 Duplicate The Description has been withdrawn from current use
+         * because it duplicates another description containing the same term
+         * (or a very similar term) associated with the same Concept.
+         * <li>3 Outdated The Description has been withdrawn from current use
+         * because this Term is no longer in general clinical use as a label for
+         * the associated Concept.
+         * <li>4 Ambiguous The Concept has been withdrawn from current use
+         * because it is inherently ambiguous. These concepts are considered
+         * inactive.
+         * <li>5 Erroneous The Description has been withdrawn as the Term
+         * contains errors.
+         * <li>6 Limited The Description is a valid Description of a Concept
+         * which has �limited� status (i.e. the Concept has ConceptStatus = 6).
+         * <li>7 Inappropriate The Description has been withdrawn as the Term
+         * should not refer to this concept.
+         * <li>8 Concept noncurrent The Description is a valid Description of a
+         * Concept which has been made non-current (i.e. the Concept has
+         * ConceptStatus 1, 2, 3, 4, 5, or 10).
+         * <li>9 Implied Relationship withdrawn but is implied by other active
+         * Relationships.
+         * <li>10 Moved elsewhere The Description has been moved to an
+         * extension, to a different extension, or to the core. A reference will
+         * indicate the namespace to which the description has been moved.
+         * <li>11 Pending move The Description will be moved to an extension,
+         * to a different extension, or to the core. A reference will indicate
+         * the namespace to which the description has been moved when the
+         * recipient organization confirms the move (Future Use).
+         *
+         * @param statusCode
+         * @return
+         */
+    public static I_ConceptualizeUniversally getStatusFromId(int statusCode) {
+        switch (statusCode) {
+        case -2:
+            return ArchitectonicAuxiliary.Concept.CONFLICTING;
+        case -1:
+            return ArchitectonicAuxiliary.Concept.NOT_YET_CREATED;
+        case 0:
+            return ArchitectonicAuxiliary.Concept.CURRENT;
+        case 1:
+            return ArchitectonicAuxiliary.Concept.RETIRED;
+        case 2:
+            return ArchitectonicAuxiliary.Concept.DUPLICATE;
+        case 3:
+            return ArchitectonicAuxiliary.Concept.OUTDATED;
+        case 4:
+            return ArchitectonicAuxiliary.Concept.AMBIGUOUS;
+        case 5:
+            return ArchitectonicAuxiliary.Concept.ERRONEOUS;
+        case 6:
+            return ArchitectonicAuxiliary.Concept.LIMITED;
+        case 7:
+            return ArchitectonicAuxiliary.Concept.INAPPROPRIATE;
+        case 8:
+            return ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED;
+        case 9:
+            return ArchitectonicAuxiliary.Concept.IMPLIED_RELATIONSHIP;
+        case 10:
+            return ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE;
+        case 11:
+            return ArchitectonicAuxiliary.Concept.PENDING_MOVE;
+
+        }
+        throw new IllegalArgumentException("Unknown status code: " + statusCode);
+    }
+
+    public static void main(String[] args) throws Exception {
+        try {
+            File directory = new File(args[0]);
+            directory.mkdirs();
+            File conceptFile = new File(directory, "concepts.txt");
+            File descFile = new File(directory, "descriptions.txt");
+            File relFile = new File(directory, "relationships.txt");
+            File rootsFile = new File(directory, "roots.txt");
+            File extTypeFile = new File(directory, "extensions.txt");
+            File altIdFile = new File(directory, "alt_ids.txt");
+
+            MemoryTermServer mts = new MemoryTermServer();
+            LocalFixedTerminology.setStore(mts);
+            mts.setGenerateIds(true);
+            ArchitectonicAuxiliary aa = new ArchitectonicAuxiliary();
+            aa.addToMemoryTermServer(mts);
+            DocumentAuxiliary da = new DocumentAuxiliary();
+            da.addToMemoryTermServer(mts);
+            RefsetAuxiliary rsa = new RefsetAuxiliary();
+            rsa.addToMemoryTermServer(mts);
+
+            SNOMEDExtension sme = new SNOMEDExtension();
+            sme.addToMemoryTermServer(mts);
+
+            HL7 hl7 = new HL7();
+            hl7.addToMemoryTermServer(mts);
+
+            QueueType queueType = new QueueType();
+            queueType.addToMemoryTermServer(mts);
+
+            mts.setGenerateIds(false);
+
+               Writer altIdWriter = new FileWriter(altIdFile);
+
+               Writer conceptWriter = new FileWriter(conceptFile);
+            mts.writeConcepts(conceptWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
+            conceptWriter.close();
+
+            Writer descWriter = new FileWriter(descFile);
+            mts.writeDescriptions(descWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
+            descWriter.close();
+
+            Writer relWriter = new FileWriter(relFile);
+            mts.writeRelationships(relWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
+            relWriter.close();
+
+            Writer rootsWriter = new FileWriter(rootsFile);
+            mts.writeRoots(rootsWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
+            rootsWriter.close();
+
+            Writer extensionTypeWriter = new FileWriter(extTypeFile);
+            mts.writeExtensionTypes(extensionTypeWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
+            extensionTypeWriter.close();
+
+            I_ConceptualizeLocally[] descTypeOrder = new I_ConceptualizeLocally[] {
+                    mts.getConcept(mts.getNid(ArchitectonicAuxiliary.Concept.EXTENSION_TABLE.getUids())) };
+            List<I_ConceptualizeLocally> descTypePriorityList = Arrays.asList(descTypeOrder);
+
+            for (I_ConceptualizeLocally extensionType: mts.getExtensionTypes()) {
+                I_DescribeConceptLocally typeDesc = extensionType.getDescription(descTypePriorityList);
+                File extensionFile = new File(directory, typeDesc.getText() + ".txt");
+                Writer extensionWriter = new FileWriter(extensionFile);
+                mts.writeExtension(extensionType, extensionWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.SNOMED);
+                extensionWriter.close();
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    private static List<I_ConceptualizeUniversally> preferredDescPrefList;
+    public static List<I_ConceptualizeUniversally> getUniversalPreferredDescPrefList() {
+        if (preferredDescPrefList == null) {
+               preferredDescPrefList = new ArrayList<I_ConceptualizeUniversally>();
+
+               preferredDescPrefList.add(Concept.XHTML_PREFERRED_DESC_TYPE);
+            preferredDescPrefList.add(Concept.PREFERRED_DESCRIPTION_TYPE);
+            preferredDescPrefList.add(Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE);
+             preferredDescPrefList.add(Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE);
+             preferredDescPrefList.add(Concept.SYNONYM_DESCRIPTION_TYPE);
+             preferredDescPrefList.add(Concept.ENTRY_DESCRIPTION_TYPE);
+        }
+        return preferredDescPrefList;
+    }
+    public static List<I_ConceptualizeLocally> getLocalPreferredDescPrefList() throws IOException, TerminologyException {
+        List<I_ConceptualizeLocally> localList = new ArrayList<I_ConceptualizeLocally>();
+        for (I_ConceptualizeUniversally uc: getUniversalPreferredDescPrefList()) {
+            localList.add(uc.localize());
+        }
+        return localList;
+    }
+
+    private static List<I_ConceptualizeUniversally> toStringDescPrefList;
+    public static List<I_ConceptualizeUniversally> getToStringDescPrefList() {
+        if (toStringDescPrefList == null) {
+            toStringDescPrefList = new ArrayList<I_ConceptualizeUniversally>();
+            toStringDescPrefList.add(Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE);
+            toStringDescPrefList.add(Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE);
+            toStringDescPrefList.add(Concept.PREFERRED_DESCRIPTION_TYPE);
+            toStringDescPrefList.add(Concept.XHTML_PREFERRED_DESC_TYPE);
+        }
+        return toStringDescPrefList;
+    }
+
+    private static List<I_ConceptualizeUniversally> fullySpecifiedDescPrefList;
+    public static List<I_ConceptualizeUniversally> getFullySpecifiedDescPrefList() {
+        if (fullySpecifiedDescPrefList == null) {
+            fullySpecifiedDescPrefList = new ArrayList<I_ConceptualizeUniversally>();
+            fullySpecifiedDescPrefList.add(Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE);
+            fullySpecifiedDescPrefList.add(Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE);
+            fullySpecifiedDescPrefList.add(Concept.XHTML_PREFERRED_DESC_TYPE);
+            fullySpecifiedDescPrefList.add(Concept.PREFERRED_DESCRIPTION_TYPE);
+        }
+        return fullySpecifiedDescPrefList;
+    }
+
+    private static Map<I_StoreLocalFixedTerminology, List<I_ConceptualizeLocally>> localToStringDescPrefListMap = new HashMap<I_StoreLocalFixedTerminology, List<I_ConceptualizeLocally>>();
+    public static List<I_ConceptualizeLocally> getLocalToStringDescPrefList(I_StoreLocalFixedTerminology termServer) throws Exception {
+        if (localToStringDescPrefListMap.get(termServer) == null) {
+            List<I_ConceptualizeLocally> localList = new ArrayList<I_ConceptualizeLocally>();
+            for (I_ConceptualizeUniversally uc: getToStringDescPrefList()) {
+                localList.add(uc.localize());
+            }
+            localToStringDescPrefListMap.put(termServer, localList);
+        }
+        return localToStringDescPrefListMap.get(termServer);
+    }
+
+    private static List<I_ConceptualizeLocally> localFullySpecifiedDescPrefList;
+    ;
+    public static List<I_ConceptualizeLocally> getLocalFullySpecifiedDescPrefList() throws Exception {
+        if (localFullySpecifiedDescPrefList == null) {
+            localFullySpecifiedDescPrefList = new ArrayList<I_ConceptualizeLocally>();
+            for (I_ConceptualizeUniversally uc: getFullySpecifiedDescPrefList()) {
+                localFullySpecifiedDescPrefList.add(uc.localize());
+            }
+        }
+        return localFullySpecifiedDescPrefList;
+    }
+
+    public static String getLanguageCode(Collection<UUID> uuids) throws NoSuchElementException {
+      if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN.getUids()))
+          return "en";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_AU.getUids()))
+        return "en-AU";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_BZ.getUids()))
+        return "en-BZ";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_CA.getUids()))
+        return "en-CA";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_GB.getUids()))
+        return "en-GB";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_IE.getUids()))
+        return "en-IE";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_JM.getUids()))
+        return "en-JM";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_NZ.getUids()))
+        return "en-NZ";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_TT.getUids()))
+        return "en-TT";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_US.getUids()))
+        return "en-US";
+      else if(containsUuidElement(uuids, ArchitectonicAuxiliary.Concept.EN_ZA.getUids()))
+        return "en-ZA";
+      throw new NoSuchElementException("UNK: " + uuids);
+  }
+
+   
+}
