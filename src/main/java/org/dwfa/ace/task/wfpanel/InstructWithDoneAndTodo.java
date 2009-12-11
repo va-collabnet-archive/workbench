@@ -31,12 +31,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -141,12 +143,14 @@ public class InstructWithDoneAndTodo extends AbstractTask {
         c.gridx++;
         c.anchor = GridBagConstraints.SOUTHWEST;
 
-        JButton doneButton = new JButton("Done");
-        doneButton.setToolTipText("done");
+//        JButton doneButton = new JButton("Done");
+        JButton doneButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getStepForwardImage())));
+        doneButton.setToolTipText("Done");
         workflowPanel.add(doneButton, c);
         doneButton.addActionListener(new DoneActionListener());
         c.gridx++;
-        JButton saveButton = new JButton("Save");
+//        JButton saveButton = new JButton("Save");
+        JButton saveButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getToDoImage())));
         saveButton.setToolTipText("Save in todo queue");
         workflowPanel.add(saveButton, c);
         saveButton.addActionListener(new SaveActionListener());
@@ -282,4 +286,30 @@ public class InstructWithDoneAndTodo extends AbstractTask {
         }
         return returnCondition;
     }
+    
+    
+    protected static String getDoneImage() {
+        return "/24x24/plain/navigate_check.png";
+    }
+
+    protected static String getToDoImage() {
+        return "/24x24/plain/inbox_into.png";
+    }
+
+    protected static String getStepForwardImage() {
+        return "/24x24/plain/media_step_forward.png";
+    }
+
+    protected static String getPreviousImage() {
+        return "/16x16/plain/navigate_left.png";
+    }
+
+    protected static String getContinueImage() {
+        return "/16x16/plain/navigate_right.png";
+    }
+
+    protected static String getCancelImage() {
+        return "/16x16/plain/navigate_cross.png";
+    }
+
 }
