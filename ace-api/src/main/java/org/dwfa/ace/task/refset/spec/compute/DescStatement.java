@@ -184,8 +184,7 @@ public class DescStatement extends RefsetSpecStatement {
     private boolean descriptionTypeIsDescendentOf(I_GetConceptData requiredType,
             I_DescriptionTuple descriptionBeingChecked) throws IOException, TerminologyException {
 
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
         Set<I_GetConceptData> childDescTypes = requiredType.getDestRelOrigins(null, allowedTypes, null, true, true);
@@ -210,8 +209,7 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionTypeIsChildOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
             IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
         Set<I_GetConceptData> childDescTypes = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null,
@@ -238,8 +236,7 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionStatusIsChildOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
             IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null,
             allowedTypes, null, true, true);
@@ -260,8 +257,7 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionStatusIsDescendentOf(I_GetConceptData requiredStatus,
             I_DescriptionTuple descriptionBeingChecked) throws TerminologyException, IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> childStatuses = requiredStatus.getDestRelOrigins(null, allowedTypes, null, true, true);
 

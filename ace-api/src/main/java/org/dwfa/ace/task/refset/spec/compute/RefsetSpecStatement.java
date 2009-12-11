@@ -31,6 +31,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 
@@ -99,6 +100,19 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         this.queryConstraint = constraint;
         termFactory = LocalVersionedTerminology.get();
     }
+    
+    /**
+     * Creates an IntSet containing all the is-a relationship IDs present in the current database. Some databases use 
+     * the Terminology Auxiliary Is-a only. Others use the Snomed Is-a as well.
+     */
+    public I_IntSet getIsAIds() throws TerminologyException, IOException {
+        I_IntSet ids = termFactory.newIntSet();
+        ids.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        if (termFactory.hasId(SNOMED.Concept.IS_A.getUids())) {
+            ids.add(SNOMED.Concept.IS_A.localize().getNid());
+        }
+        return ids;
+    }
 
     public boolean isNegated() {
         return useNotQualifier;
@@ -152,7 +166,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         return isComponentStatus(requiredStatus, tuples);
     }
 
-    protected boolean componentStatusIsKindOf(I_AmTuple tuple) throws IOException, TerminologyException {
+    protected boolean componentStatusIsKindOf(I_AmTuple tuple) throws TerminologyException, IOException {
 
         List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
         tuples.add(tuple);
@@ -161,8 +175,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
             return true;
         }
 
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
         Set<I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint).getDestRelOrigins(

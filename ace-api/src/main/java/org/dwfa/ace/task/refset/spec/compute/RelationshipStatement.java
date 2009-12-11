@@ -179,8 +179,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relRefinabilityIsDescendentOf(I_GetConceptData requiredRefinability, I_RelTuple relTuple)
             throws TerminologyException, IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> children = requiredRefinability.getDestRelOrigins(null, allowedTypes, null, true, true);
 
@@ -196,8 +195,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relRefinabilityIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> children = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes,
             null, true, true);
@@ -235,8 +233,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relCharIsDescendentOf(I_GetConceptData requiredCharType, I_RelTuple relTuple) throws IOException,
             TerminologyException {
 
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> children = requiredCharType.getDestRelOrigins(null, allowedTypes, null, true, true);
 
@@ -252,8 +249,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relCharIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> children = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes,
             null, true, true);
@@ -307,8 +303,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relTypeIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> children = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes,
             null, true, true);
@@ -328,8 +323,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relTypeIsDescendentOf(I_GetConceptData requiredRelType, I_RelTuple relTuple) throws IOException,
             TerminologyException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> children = requiredRelType.getDestRelOrigins(null, allowedTypes, null, true, true);
 
@@ -350,8 +344,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relStatusIsDescendentOf(I_GetConceptData requiredStatus, I_RelTuple relTuple)
             throws TerminologyException, IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> children = requiredStatus.getDestRelOrigins(null, allowedTypes, null, true, true);
 
@@ -367,8 +360,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relStatusIsChildOf(I_RelTuple relTuple) throws IOException, TerminologyException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        I_IntSet allowedTypes = getIsAIds();
 
         Set<I_GetConceptData> children = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes,
             null, true, true);
