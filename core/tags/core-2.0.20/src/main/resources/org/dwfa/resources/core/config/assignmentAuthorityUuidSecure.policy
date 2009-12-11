@@ -1,0 +1,33 @@
+/* Security policy for SSL server */
+
+/* Keystore containing trusted certificates to use for authentication */
+keystore "..${/}prebuiltkeys${/}truststore";
+
+/* Grant all permissions to local JAR files */
+grant codeBase "file:${/}-" {
+    permission java.security.AllPermission;
+};
+
+/* Grant permissions to client principal */
+grant principal "client" {
+    permission org.dwfa.aa.AssignmentAuthorityPermission "createId";
+    permission org.dwfa.aa.AssignmentAuthorityPermission "createMappedId";
+};
+
+/* Grant permissions to client principal */
+grant principal "client1" {
+    permission org.dwfa.aa.AssignmentAuthorityPermission "createId";
+    permission org.dwfa.aa.AssignmentAuthorityPermission "createMappedId";
+};
+
+/* Grant permissions to client principal */
+grant principal "client2" {
+    permission org.dwfa.aa.AssignmentAuthorityPermission "createId";
+    permission org.dwfa.aa.AssignmentAuthorityPermission "createMappedId";
+};
+
+/* Grant permissions to all principals */
+grant {
+    /* Call getProxyVerifier method */
+    permission com.informatics.bpa.queue.QueueServerPermission "getProxyVerifier";
+};

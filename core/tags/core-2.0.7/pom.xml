@@ -1,0 +1,203 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- 
+ !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ !
+ !  Licensed under the Apache License, Version 2.0 (the "License");
+ !  you may not use this file except in compliance with the License.
+ !  You may obtain a copy of the License at
+ ! 
+ !      http://www.apache.org/licenses/LICENSE-2.0
+ !
+ !  Unless required by applicable law or agreed to in writing, software
+ !  distributed under the License is distributed on an "AS IS" BASIS,
+ !  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ !  See the License for the specific language governing permissions and
+ !  limitations under the License.
+ -->
+
+    <parent>
+        <groupId>org.dwfa</groupId>
+        <artifactId>dwfa-pom</artifactId>
+        <version>2.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dwfa</groupId>
+    <artifactId>core</artifactId>
+    <version>2.0.7</version>
+    <packaging>jar</packaging>
+    <name>Core Distributed Workflow Architecture Components</name>
+    <url>https://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/core/site/</url>
+    <issueManagement>
+        <system>Scarab</system>
+        <url>https://core.aceworkspace.net/servlets/Scarab</url>
+    </issueManagement>
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>aceworkspace.net</id>
+            <name>aceworkspace.net</name>
+            <url>file:///ciweb/webapps/maven2</url>
+            <layout>default</layout>
+        </repository>
+        <site>
+            <id>aceworkspace.net</id>
+            <url>file:///ciweb/webapps/core/site</url>
+        </site>
+    </distributionManagement>
+    <scm>
+        <connection>scm:svn:https://core.aceworkspace.net/svn/core/tags/core-2.0.7</connection>
+        <developerConnection>scm:svn:https://core.aceworkspace.net/svn/core/tags/core-2.0.7</developerConnection>
+        <url>https://core.aceworkspace.net/source/browse/core/tags/core-2.0.7</url>
+    </scm>
+    <dependencies>
+        <dependency>
+            <groupId>org.dwfa.jini</groupId>
+            <artifactId>mahalo</artifactId>
+            <scope>compile</scope>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.jini</groupId>
+            <artifactId>jsk-lib</artifactId>
+            <version>2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.jini</groupId>
+            <artifactId>jsk-platform</artifactId>
+            <version>2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.dwfa</groupId>
+            <artifactId>foundation</artifactId>
+            <version>2.0.13</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.dwfa.jini</groupId>
+            <artifactId>browser</artifactId>
+            <version>2.1</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.dwfa</groupId>
+                <artifactId>dwfa-mojo</artifactId>
+                <version>2.0.2</version>
+                <executions>
+                    <execution>
+                        <id>write-beans</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>write-beans</goal>
+                        </goals>
+                        <configuration>
+                            <targetSubDir>classes/org/dwfa/resources/core</targetSubDir>
+                            <specs>
+                                <beanSpec>
+                                    <sourceName>java.lang.Integer</sourceName>
+                                    <dirName>beans</dirName>
+                                    <type>bean</type>
+                                    <constructArg>0</constructArg>
+                                    <beanName>Integer-0</beanName>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>java.lang.Boolean</sourceName>
+                                    <dirName>beans</dirName>
+                                    <type>bean</type>
+                                    <constructArg>false</constructArg>
+                                    <beanName>Boolean-False</beanName>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>java.lang.Boolean</sourceName>
+                                    <dirName>beans</dirName>
+                                    <type>bean</type>
+                                    <constructArg>true</constructArg>
+                                    <beanName>Boolean-True</beanName>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>Break Password</sourceName>
+                                    <dirName>processes/grid</dirName>
+                                    <type>process</type>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>Break Password</sourceName>
+                                    <dirName>queue/static/Launcher</dirName>
+                                    <type>process</type>
+                                    <format>queue</format>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>MoveRootSafely</sourceName>
+                                    <dirName>processes/failsafe</dirName>
+                                    <type>process</type>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>MoveRootSafely</sourceName>
+                                    <dirName>tasks/failsafe</dirName>
+                                    <type>process</type>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>Test Failsafe</sourceName>
+                                    <dirName>queue/static/Launcher</dirName>
+                                    <type>process</type>
+                                    <format>queue</format>
+                                </beanSpec>
+
+                                <beanSpec>
+                                    <sourceName>org.dwfa.bpa.data.IntegerElement</sourceName>
+                                    <dirName>data</dirName>
+                                    <type>data</type>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>org.dwfa.bpa.data.SetDataContainer</sourceName>
+                                    <dirName>data</dirName>
+                                    <type>data</type>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>org.dwfa.bpa.data.StringElement</sourceName>
+                                    <dirName>data</dirName>
+                                    <type>data</type>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>org.dwfa.bpa.data.StringList</sourceName>
+                                    <dirName>data</dirName>
+                                    <type>data</type>
+                                </beanSpec>
+                                <beanSpec>
+                                    <sourceName>org.dwfa.bpa.data.ProcessContainer</sourceName>
+                                    <dirName>data</dirName>
+                                    <type>data</type>
+                                </beanSpec>
+                            </specs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.dwfa</groupId>
+                <artifactId>pbl-mojo</artifactId>
+                <version>1.1</version>
+                <configuration>
+                    <cubitProject>cubitci</cubitProject>
+                    <siteRoot>core</siteRoot>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
