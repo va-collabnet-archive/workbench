@@ -264,7 +264,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
         getLog().info("concept attribute part copied " + latestPart);
     }
 
-    private void processDescription(List<I_DescriptionVersioned> descriptions) throws Exception {
+    private void processDescription(List<? extends I_DescriptionVersioned> descriptions) throws Exception {
         for (I_DescriptionVersioned descriptionVersioned : descriptions) {
             processDescription(descriptionVersioned);
         }

@@ -82,7 +82,7 @@ public class VodbCreatePathsFromChildrenOfConcept extends AbstractMojo {
             List<I_Path> paths = termFactory.getPaths();
             for (I_Path path : paths) {
                 I_GetConceptData pathConcept = termFactory.getConcept(path.getConceptId());
-                List<I_RelVersioned> rels = pathConcept.getDestRels();
+                List<? extends I_RelVersioned> rels = pathConcept.getDestRels();
                 for (int i = 0; i < rels.size(); i++) {
                     int c1 = rels.get(i).getC1Id();
                     int c2 = rels.get(i).getC2Id();

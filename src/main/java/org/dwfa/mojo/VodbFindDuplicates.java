@@ -544,9 +544,9 @@ public class VodbFindDuplicates extends AbstractMojo {
         }
     }
 
-    private List<I_ConceptAttributeTuple> setStatusToCurrentUnreviewed(I_IntSet allowedStatus,
+    private List<? extends I_ConceptAttributeTuple> setStatusToCurrentUnreviewed(I_IntSet allowedStatus,
             Set<I_Position> positions, I_GetConceptData potDupConcept) throws IOException, TerminologyException {
-        List<I_ConceptAttributeTuple> attributeTuples = potDupConcept.getConceptAttributeTuples(allowedStatus,
+        List<? extends I_ConceptAttributeTuple> attributeTuples = potDupConcept.getConceptAttributeTuples(allowedStatus,
             new PositionSetReadOnly(positions));
         for (I_Position pos : positions) {
             I_ConceptAttributePart attributePart = attributeTuples.get(0).duplicatePart();

@@ -315,7 +315,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
                         // update the current concept with
                         // get latest concept attributes
-                        List<I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null,
+                        List<? extends I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null,
                             new PositionSetReadOnly(positionsToCheck));
                         // copy latest attributes and set status to unreviewed
                         for (I_ConceptAttributeTuple attribute : conceptAttributeTuples) {

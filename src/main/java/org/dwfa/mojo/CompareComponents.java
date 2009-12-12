@@ -16,10 +16,11 @@
  */
 package org.dwfa.mojo;
 
+import java.util.List;
+
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_RelTuple;
-import java.util.List;
 
 /**
  * Util class to compare tuples. Does not check version or branch information.
@@ -96,8 +97,8 @@ public class CompareComponents {
         }
     }
 
-    public static boolean attributeListsEqual(List<I_ConceptAttributeTuple> attributeList1,
-            List<I_ConceptAttributeTuple> attributeList2, int flaggedStatusId) {
+    public static boolean attributeListsEqual(List<? extends I_ConceptAttributeTuple> attributeList1,
+            List<? extends I_ConceptAttributeTuple> attributeList2, int flaggedStatusId) {
         if (attributeList1.size() != attributeList2.size()) {
             return false;
         } else {
@@ -139,8 +140,8 @@ public class CompareComponents {
         return true;
     }
 
-    public static boolean attributeListsEqual(List<I_ConceptAttributeTuple> attributeList1,
-            List<I_ConceptAttributeTuple> attributeList2) {
+    public static boolean attributeListsEqual(List<? extends I_ConceptAttributeTuple> attributeList1,
+            List<? extends I_ConceptAttributeTuple> attributeList2) {
         if (attributeList1.size() != attributeList2.size()) {
             return false;
         } else {

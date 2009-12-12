@@ -181,9 +181,9 @@ public class ReportConceptStatus extends AbstractMojo {
                 positionSet = activeConfig.getViewPositionSetReadOnly();
             }
 
-            List<I_ConceptAttributeTuple> statusTuples = concept.getConceptAttributeTuples(statusTypeSet, positionSet);
+            List<? extends I_ConceptAttributeTuple> statusTuples = concept.getConceptAttributeTuples(statusTypeSet, positionSet);
 
-            Iterator<I_ConceptAttributeTuple> it = statusTuples.iterator();
+            Iterator<? extends I_ConceptAttributeTuple> it = statusTuples.iterator();
 
             int conceptStatus = 0;
             int versionId = 0;

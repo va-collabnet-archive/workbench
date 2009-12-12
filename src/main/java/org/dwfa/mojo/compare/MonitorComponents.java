@@ -48,8 +48,8 @@ public class MonitorComponents {
         boolean descriptionsMatch = true;
         boolean relationshipsMatch = true;
 
-        List<I_ConceptAttributeTuple> conceptAttributeTuples1 = new LinkedList<I_ConceptAttributeTuple>();
-        List<I_ConceptAttributeTuple> conceptAttributeTuples2 = new LinkedList<I_ConceptAttributeTuple>();
+        List<? extends I_ConceptAttributeTuple> conceptAttributeTuples1 = new LinkedList<I_ConceptAttributeTuple>();
+        List<? extends I_ConceptAttributeTuple> conceptAttributeTuples2 = new LinkedList<I_ConceptAttributeTuple>();
 
         List<I_DescriptionTuple> descriptionTuples1 = new LinkedList<I_DescriptionTuple>();
         List<I_DescriptionTuple> descriptionTuples2 = new LinkedList<I_DescriptionTuple>();

@@ -240,7 +240,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		}
 		
 		public void processConcept(I_GetConceptData concept) throws Exception {
-			List<I_DescriptionVersioned> descs = concept.getDescriptions();
+			List<? extends I_DescriptionVersioned> descs = concept.getDescriptions();
 			if (++counter % 10000 == 0)
 				getLog().info("Iterated " + counter + " concepts");
 			int extensionsProcessed = 0;
@@ -511,8 +511,8 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    public String getDisplayName(I_GetConceptData conceptData) throws Exception {
 	    	String ret = null;
 	
-	    	List<I_DescriptionVersioned> descs = conceptData.getDescriptions();
-	    	for (Iterator<I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
+	    	List<? extends I_DescriptionVersioned> descs = conceptData.getDescriptions();
+	    	for (Iterator<? extends I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
 	    		I_DescriptionVersioned d = i.next();
 	    		I_DescriptionTuple dt = d.getLastTuple();
 	    		I_DescriptionPart part = dt.getPart();
@@ -525,9 +525,9 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    public String getPreviousDisplayName(I_GetConceptData conceptData) throws Exception {
 	    	String ret = null;
 	
-	    	List<I_DescriptionVersioned> descs = conceptData.getDescriptions();
+	    	List<? extends I_DescriptionVersioned> descs = conceptData.getDescriptions();
 	    	I_DescriptionTuple newestOldTuple = null;
-	    	for (Iterator<I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
+	    	for (Iterator<? extends I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
 	    		I_DescriptionVersioned d = i.next();
 	    		for (I_DescriptionTuple dt : d.getTuples()) {
 	    			if (dt.getVersion() < this.startingVersion)

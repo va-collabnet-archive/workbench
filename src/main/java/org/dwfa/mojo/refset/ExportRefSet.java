@@ -279,7 +279,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
         String fsn = null;
         String pft = null;
 
-        List<I_DescriptionVersioned> descriptions = termFactory.getConcept(ext.getRefsetId()).getDescriptions();
+        List<? extends I_DescriptionVersioned> descriptions = termFactory.getConcept(ext.getRefsetId()).getDescriptions();
         for (I_DescriptionVersioned desc : descriptions) {
             if (termFactory.getUids(desc.getTuples().get(0).getTypeId()).contains(fsn_uuid)) {
                 fsn = desc.getTuples().get(0).getText();
