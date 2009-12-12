@@ -23,7 +23,6 @@ import java.util.Set;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -151,7 +150,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 
                 hierarchyStatuses = new ConceptDescriptor[] { activeStatus, currentStatus };
 
-                Set<I_GetConceptData> children = activeStatus.getVerifiedConcept().getDestRelOrigins(
+                Set<? extends I_GetConceptData> children = activeStatus.getVerifiedConcept().getDestRelOrigins(
                     toIntSet(hierarchyStatuses), toIntSet(hierarchyRelationshipTypes), null, false);
 
                 ArrayList<ConceptDescriptor> statusDescriptors = new ArrayList<ConceptDescriptor>();
@@ -190,7 +189,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
             throws Exception {
         processConcept(concept);
 
-        Set<I_GetConceptData> children = concept.getDestRelOrigins(allowedStatus, allowedType, null, false);
+        Set<? extends I_GetConceptData> children = concept.getDestRelOrigins(allowedStatus, allowedType, null, false);
         for (I_GetConceptData getConceptData : children) {
             processAllChildren(getConceptData, allowedType, allowedStatus);
         }

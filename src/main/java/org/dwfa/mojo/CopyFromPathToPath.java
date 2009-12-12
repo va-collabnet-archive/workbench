@@ -16,17 +16,44 @@
  */
 package org.dwfa.mojo;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.*;
+import org.dwfa.ace.api.I_AmTypedTuple;
+import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_IdTuple;
+import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageTuple;
+import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ProcessConcepts;
+import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_WriteDirectToDb;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Copies from all the specified paths and their children to the new path. Note
@@ -184,7 +211,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             throws IOException {
         fromPathConcepts.add(verifiedConcept);
 
-        Set<I_GetConceptData> children = verifiedConcept.getDestRelOrigins(null, null, null, false);
+        Set<? extends I_GetConceptData> children = verifiedConcept.getDestRelOrigins(null, null, null, false);
         if (includeChildPaths) {
             for (I_GetConceptData concept : children) {
                 addToFromPaths(fromPathConcepts, concept);
@@ -233,7 +260,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    private void getFromPathIds(Collection<I_GetConceptData> pathDescriptors) throws Exception {
+    private void getFromPathIds(Collection<? extends I_GetConceptData> pathDescriptors) throws Exception {
         for (I_GetConceptData fromPath : pathDescriptors) {
             fromPathIds.add(fromPath.getConceptId());
 

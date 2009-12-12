@@ -102,7 +102,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
                 I_GetConceptData refsetRoot = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 
-                Set<I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(status, is_a, null, false);
+                Set<? extends I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(status, is_a, null, false);
                 for (I_GetConceptData refsetConcept : refsetChildren) {
 
                     Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
