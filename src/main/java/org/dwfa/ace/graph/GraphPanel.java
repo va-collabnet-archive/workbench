@@ -514,7 +514,7 @@ public class GraphPanel extends JPanel {
         }
         I_ConfigAceFrame config = parentPlugin.getHost().getConfig();
         List<I_RelTuple> sourceRelTuples = child.getSourceRelTuples(config.getAllowedStatus(),
-            config.getDestRelTypes(), config.getViewPositionSet(), false);
+            config.getDestRelTypes(), config.getViewPositionSetReadOnly(), false);
         try {
             boolean root = true;
             for (I_RelTuple srcRelTuple : sourceRelTuples) {

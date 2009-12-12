@@ -25,11 +25,11 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
@@ -60,7 +60,6 @@ import com.sleepycat.je.SecondaryConfig;
 import com.sleepycat.je.SecondaryCursor;
 import com.sleepycat.je.SecondaryDatabase;
 import com.sleepycat.je.StatsConfig;
-import com.sleepycat.je.Transaction;
 
 public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
 
@@ -325,7 +324,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
      * org.dwfa.ace.api.I_IntSet, org.dwfa.ace.api.I_IntSet, java.util.Set)
      */
     public boolean hasSrcRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet sourceRelTypes,
-            Set<I_Position> positions) throws DatabaseException {
+            PositionSetReadOnly positions) throws DatabaseException {
         Stopwatch timer = null;
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Getting src rels for: " + conceptId);
@@ -522,7 +521,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
      * org.dwfa.ace.api.I_IntSet, org.dwfa.ace.api.I_IntSet, java.util.Set)
      */
     public boolean hasDestRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet destRelTypes,
-            Set<I_Position> positions) throws DatabaseException {
+            PositionSetReadOnly positions) throws DatabaseException {
         Stopwatch timer = null;
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Getting dest rels for: " + conceptId);

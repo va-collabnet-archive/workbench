@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -46,8 +45,8 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_FilterTaxonomyRels;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
 
@@ -285,7 +284,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         I_IntSet allowedStatus = this.config.getAllowedStatus();
         I_IntSet destRelTypes = this.config.getDestRelTypes();
         I_IntSet sourceRelTypes = this.config.getSourceRelTypes();
-        Set<I_Position> positions = this.config.getViewPositionSet();
+        PositionSetReadOnly positions = this.config.getViewPositionSetReadOnly();
 
         if ((destRelTypes.getSetValues().length == 0) && (sourceRelTypes.getSetValues().length == 0)) {
             allowedStatus = null;

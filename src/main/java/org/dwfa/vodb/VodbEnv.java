@@ -80,6 +80,7 @@ import org.dwfa.ace.api.I_SupportClassifier;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
@@ -446,7 +447,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public boolean hasDestRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet destRelTypes,
-            Set<I_Position> positions) throws DatabaseException, IOException {
+    		PositionSetReadOnly positions) throws DatabaseException, IOException {
         return bdbEnv.hasDestRelTuple(conceptId, allowedStatus, destRelTypes, positions);
     }
 
@@ -491,7 +492,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public boolean hasSrcRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet sourceRelTypes,
-            Set<I_Position> positions) throws DatabaseException, IOException {
+    		PositionSetReadOnly positions) throws DatabaseException, IOException {
         return bdbEnv.hasSrcRelTuple(conceptId, allowedStatus, sourceRelTypes, positions);
     }
 

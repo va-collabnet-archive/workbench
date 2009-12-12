@@ -69,7 +69,7 @@ public class SimilarConceptQuery {
             queryBuff.append(" ");
         }
 
-        for (I_RelTuple rel : concept.getSourceRelTuples(config.getAllowedStatus(), null, config.getViewPositionSet(),
+        for (I_RelTuple rel : concept.getSourceRelTuples(config.getAllowedStatus(), null, config.getViewPositionSetReadOnly(),
             true)) {
             // Get "is-a" relationships for is-child-of queries...
             if (config.getSourceRelTypes().contains(rel.getTypeId())) {

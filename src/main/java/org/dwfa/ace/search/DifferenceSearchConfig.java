@@ -50,6 +50,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
@@ -1096,4 +1097,10 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.setSelectedPreferencesTab(tabName);
     }
 
+	@Override
+	public PositionSetReadOnly getViewPositionSetReadOnly() {
+		return new PositionSetReadOnly(positionSet);
+	}
+
+    
 }

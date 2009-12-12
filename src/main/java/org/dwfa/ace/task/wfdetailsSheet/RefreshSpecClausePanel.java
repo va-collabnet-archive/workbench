@@ -40,7 +40,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.TermComponentLabel;
@@ -54,6 +53,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
@@ -71,9 +71,9 @@ import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
-import org.dwfa.util.LogWithAlerts;
 
 
 public class RefreshSpecClausePanel extends JPanel implements ActionListener {
@@ -94,7 +94,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
 	private I_GetConceptData refsetSpec;
 	private Set<I_Position> refsetSpecVersionSet;
-	private Set<I_Position> sourceTerminologyVersionSet;
+	private PositionSetReadOnly sourceTerminologyVersionSet;
 	private I_GetConceptData conceptUnderReview;
 	private I_ConfigAceFrame frameConfig;
 	private List<Collection<UUID>> clausesToUpdate;
@@ -108,8 +108,8 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 	private HostProxy host = new HostProxy();
 
 	public RefreshSpecClausePanel(I_GetConceptData refsetSpec,
-			Set<I_Position> refsetSpecVersionSet,
-			Set<I_Position> sourceTerminologyVersionSet,
+			PositionSetReadOnly refsetSpecVersionSet,
+			PositionSetReadOnly sourceTerminologyVersionSet,
 			List<Collection<UUID>> clausesToUpdate, 
 			I_ConfigAceFrame frameConfig) throws IOException, TerminologyException {
 		super();

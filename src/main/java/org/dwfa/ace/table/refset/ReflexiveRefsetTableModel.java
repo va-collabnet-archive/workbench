@@ -31,7 +31,6 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
@@ -64,7 +63,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             try {
                 promotionRefsetIds.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
                 promotionTuples = refsetConcept.getSourceRelTuples(host.getConfig().getAllowedStatus(),
-                    promotionRefsetIds, host.getConfig().getViewPositionSet(), true);
+                    promotionRefsetIds, host.getConfig().getViewPositionSetReadOnly(), true);
                 Iterator<I_RelTuple> promotionIterator = promotionTuples.iterator();
                 if (promotionIterator.hasNext()) {
                     promotionRefsetId = promotionTuples.iterator().next().getC2Id();
