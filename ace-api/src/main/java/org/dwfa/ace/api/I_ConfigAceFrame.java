@@ -137,6 +137,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void replaceEditingPath(I_Path oldPath, I_Path newPath);
 
     public Set<I_Path> getEditingPathSet();
+    
+    public PathSetReadOnly getEditingPathSetReadOnly();
 
     public void addPromotionPath(I_Path p);
 

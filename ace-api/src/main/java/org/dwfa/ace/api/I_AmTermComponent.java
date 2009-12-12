@@ -17,7 +17,6 @@
 package org.dwfa.ace.api;
 
 import java.io.IOException;
-import java.util.Set;
 
 import org.dwfa.tapi.TerminologyException;
 
@@ -44,7 +43,7 @@ public interface I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus)
+    public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
             throws IOException, TerminologyException;
 
 }
