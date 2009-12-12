@@ -18,22 +18,43 @@ package org.dwfa.ace.api;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 
-public interface I_AmPart {
+public interface I_AmPart<P extends I_AmPart> {
+	
+	public int getPathId();
+	public int getVersion();
+	public long getTime();
+	public int getStatusId();
+	
+	public void setStatusId(int statusId);
+	
+	public P duplicate();
+	
+	public ArrayIntList getPartComponentNids();
+	
+	/**
+	 * 1. Analog, an object, concept or situation which in some way resembles a different situation
+	 * 2. Analogy, in language, a comparison between concepts
+	 * @param statusNid
+	 * @param pathNid
+	 * @param time
+	 * @return
+	 */
+	public P makeAnalog(int statusNid, int pathNid, long time);
 
-    public int getPathId();
-
-    public int getVersion();
-
-    public int getStatusId();
-
-    public void setPathId(int pathId);
-
-    public void setVersion(int version);
-
-    public void setStatusId(int statusId);
-
-    public I_AmPart duplicate();
-
-    public ArrayIntList getPartComponentNids();
+	/**
+	 * 
+	 * @param pathId
+	 * @deprecated use makeAnalog
+	 */
+	@Deprecated 
+	public void setPathId(int pathId);
+	/**
+	 * 
+	 * @param version
+	 * @deprecated use makeAnalog
+	 */
+	@Deprecated 
+	public void setVersion(int version);
+	
 
 }
