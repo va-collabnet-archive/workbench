@@ -51,8 +51,8 @@ public class MonitorComponents {
         List<? extends I_ConceptAttributeTuple> conceptAttributeTuples1 = new LinkedList<I_ConceptAttributeTuple>();
         List<? extends I_ConceptAttributeTuple> conceptAttributeTuples2 = new LinkedList<I_ConceptAttributeTuple>();
 
-        List<I_DescriptionTuple> descriptionTuples1 = new LinkedList<I_DescriptionTuple>();
-        List<I_DescriptionTuple> descriptionTuples2 = new LinkedList<I_DescriptionTuple>();
+        List<? extends I_DescriptionTuple> descriptionTuples1 = new LinkedList<I_DescriptionTuple>();
+        List<? extends I_DescriptionTuple> descriptionTuples2 = new LinkedList<I_DescriptionTuple>();
 
         List<I_RelTuple> relationshipTuples1 = new LinkedList<I_RelTuple>();
         List<I_RelTuple> relationshipTuples2 = new LinkedList<I_RelTuple>();

@@ -224,8 +224,8 @@ public class GenerateVivisimoThesaurus extends AbstractMojo {
 
         public void processConcept(I_GetConceptData concept) throws Exception {
             if (isExportable(concept)) {
-                List<I_DescriptionTuple> descTuples = concept.getDescriptionTuples(statusValues, preferred, positions);
-                List<I_DescriptionTuple> synonymTuples = concept.getDescriptionTuples(statusValues, synonym, positions);
+                List<? extends I_DescriptionTuple> descTuples = concept.getDescriptionTuples(statusValues, preferred, positions);
+                List<? extends I_DescriptionTuple> synonymTuples = concept.getDescriptionTuples(statusValues, synonym, positions);
                 if (Boolean.parseBoolean(suppressEntriesWithNoSynonyms)) {
                     if (synonymTuples.size() > 0) {
                         writeWordEntry(descTuples, synonymTuples);
@@ -236,7 +236,7 @@ public class GenerateVivisimoThesaurus extends AbstractMojo {
             }
         }
 
-        private void writeWordEntry(List<I_DescriptionTuple> descTuples, List<I_DescriptionTuple> synonymTuples)
+        private void writeWordEntry(List<? extends I_DescriptionTuple> descTuples, List<? extends I_DescriptionTuple> synonymTuples)
                 throws IOException {
             for (I_DescriptionTuple preferredDesc : descTuples) {
                 int words = preferredDesc.getText().split("\\s+").length;

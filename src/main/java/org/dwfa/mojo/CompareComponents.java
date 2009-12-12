@@ -111,8 +111,8 @@ public class CompareComponents {
         return true;
     }
 
-    public static boolean descriptionListsEqual(List<I_DescriptionTuple> descriptionList1,
-            List<I_DescriptionTuple> descriptionList2, int flaggedStatusId) {
+    public static boolean descriptionListsEqual(List<? extends I_DescriptionTuple> descriptionList1,
+            List<? extends I_DescriptionTuple> descriptionList2, int flaggedStatusId) {
         if (descriptionList1.size() != descriptionList2.size()) {
             System.out.println("list different size");
             return false;
@@ -154,8 +154,8 @@ public class CompareComponents {
         return true;
     }
 
-    public static boolean descriptionListsEqual(List<I_DescriptionTuple> descriptionList1,
-            List<I_DescriptionTuple> descriptionList2) {
+    public static boolean descriptionListsEqual(List<? extends I_DescriptionTuple> descriptionList1,
+            List<? extends I_DescriptionTuple> descriptionList2) {
         if (descriptionList1.size() != descriptionList2.size()) {
             return false;
         } else {

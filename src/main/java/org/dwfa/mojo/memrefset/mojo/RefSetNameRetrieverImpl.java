@@ -37,7 +37,7 @@ public final class RefSetNameRetrieverImpl implements RefSetNameRetriever {
             I_TermFactory termFactory = LocalVersionedTerminology.get();
             I_IntSet status = createCurrentStatus(termFactory);
             I_IntSet fsn = createFullySpecifiedUUIDs(termFactory);
-            List<I_DescriptionTuple> descriptions = termFactory.getConcept(new UUID[] { uuid }).getDescriptionTuples(
+            List<? extends I_DescriptionTuple> descriptions = termFactory.getConcept(new UUID[] { uuid }).getDescriptionTuples(
                 status, fsn, null);
             // TODO: may have to check for this.
             return descriptions.get(0).getText();
