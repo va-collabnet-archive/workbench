@@ -54,14 +54,14 @@ public class GetRefsetVersionPanelDataTaskBeanInfo extends SimpleBeanInfo {
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
             profilePropName.setShortDescription("[IN] The property that contains the working profile.");
 
-            PropertyDescriptor positionSetPropName = new PropertyDescriptor("positionSetPropName",
+            PropertyDescriptor refsetVersionPropName = new PropertyDescriptor("refsetVersionPropName",
                 getBeanDescriptor().getBeanClass());
-            positionSetPropName.setBound(true);
-            positionSetPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            positionSetPropName.setDisplayName("<html><font color='blue'>Refset position set prop:");
-            positionSetPropName.setShortDescription("[OUT] The property that will contain the Refset position set.");
+            refsetVersionPropName.setBound(true);
+            refsetVersionPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            refsetVersionPropName.setDisplayName("<html><font color='blue'>Refset version prop:");
+            refsetVersionPropName.setShortDescription("[OUT] The property that will contain the Refset version.");
 
-            PropertyDescriptor rv[] = { profilePropName, positionSetPropName };
+            PropertyDescriptor rv[] = { profilePropName, refsetVersionPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
