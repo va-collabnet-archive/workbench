@@ -155,7 +155,7 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
         return refsets;
     }
 
-    public Set<I_GetConceptData> getValidRefsetsFromIndividualUserPermissions(I_GetConceptData concept)
+    public Set<? extends I_GetConceptData> getValidRefsetsFromIndividualUserPermissions(I_GetConceptData concept)
             throws Exception {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         PositionSetReadOnly allPositions = getPositions(termFactory);
@@ -164,7 +164,7 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(reviewRefsetPermissionRel.getConceptId());
 
-        Set<I_GetConceptData> refsets = concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true,
+        Set<? extends I_GetConceptData> refsets = concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true,
             true);
 
         return refsets;

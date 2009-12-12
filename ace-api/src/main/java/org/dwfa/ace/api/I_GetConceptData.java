@@ -379,7 +379,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     @Deprecated
-    public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
+    public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
 
     /**
@@ -404,7 +404,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
+    public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException;
 
@@ -423,7 +423,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes, boolean addUncommitted,
+    public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
     /**
@@ -449,7 +449,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     @Deprecated
-    public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
+    public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
 
     /**
@@ -474,7 +474,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
+    public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException;
 
@@ -496,7 +496,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes, boolean addUncommitted,
+    public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
     public List<? extends I_DescriptionVersioned> getDescriptions() throws IOException;

@@ -381,7 +381,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         allowedTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
 
         for (I_GetConceptData parent : permissibleRefsetParents) {
-            Set<I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, true, true);
+            Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, true, true);
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
                 	refsetSpecs.add(child);

@@ -355,7 +355,7 @@ public class RefsetHelper extends LineageHelper {
             I_IntSet allowedTypes = termFactory.newIntSet();
             allowedTypes.add(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.localize().getNid());
 
-            Set<I_GetConceptData> destRelOrigins = purpose.getDestRelOrigins(allowedTypes, false, true);
+            Set<? extends I_GetConceptData> destRelOrigins = purpose.getDestRelOrigins(allowedTypes, false, true);
 
             HashSet<Integer> cachedOrigins = new HashSet<Integer>();
             for (I_GetConceptData concept : destRelOrigins) {
@@ -386,46 +386,46 @@ public class RefsetHelper extends LineageHelper {
         }
     }
 
-    public static Set<I_GetConceptData> getCommentsRefsetForRefset(I_GetConceptData refsetIdentityConcept,
+    public static Set<? extends I_GetConceptData> getCommentsRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.COMMENTS_REL.localize()
             .getNid());
     }
 
-    public static Set<I_GetConceptData> getMarkedParentRefsetForRefset(I_GetConceptData refsetIdentityConcept,
+    public static Set<? extends I_GetConceptData> getMarkedParentRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         return getSourceRelTarget(refsetIdentityConcept, config,
             RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
     }
 
-    public static Set<I_GetConceptData> getPromotionRefsetForRefset(I_GetConceptData refsetIdentityConcept,
+    public static Set<? extends I_GetConceptData> getPromotionRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.PROMOTION_REL.localize()
             .getNid());
     }
 
-    private static Set<I_GetConceptData> getSourceRelTarget(I_GetConceptData refsetIdentityConcept,
+    private static Set<? extends I_GetConceptData> getSourceRelTarget(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config, int refsetIdentityNid) throws IOException {
         I_TermFactory tf = LocalVersionedTerminology.get();
         I_IntSet allowedTypes = tf.newIntSet();
         allowedTypes.add(refsetIdentityNid);
-        Set<I_GetConceptData> matchingConcepts = refsetIdentityConcept.getSourceRelTargets(config.getAllowedStatus(),
+        Set<? extends I_GetConceptData> matchingConcepts = refsetIdentityConcept.getSourceRelTargets(config.getAllowedStatus(),
             allowedTypes, config.getViewPositionSetReadOnly(), false);
         return matchingConcepts;
     }
 
-    public static Set<I_GetConceptData> getSpecificationRefsetForRefset(I_GetConceptData refsetIdentityConcept,
+    public static Set<? extends I_GetConceptData> getSpecificationRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         return getDestRelOrigins(refsetIdentityConcept, config, RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize()
             .getNid());
     }
 
-    private static Set<I_GetConceptData> getDestRelOrigins(I_GetConceptData refsetIdentityConcept,
+    private static Set<? extends I_GetConceptData> getDestRelOrigins(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config, int refsetIdentityNid) throws IOException {
         I_TermFactory tf = LocalVersionedTerminology.get();
         I_IntSet allowedTypes = tf.newIntSet();
         allowedTypes.add(refsetIdentityNid);
-        Set<I_GetConceptData> matchingConcepts = refsetIdentityConcept.getDestRelOrigins(config.getAllowedStatus(),
+        Set<? extends I_GetConceptData> matchingConcepts = refsetIdentityConcept.getDestRelOrigins(config.getAllowedStatus(),
             allowedTypes, config.getViewPositionSetReadOnly(), false);
         return matchingConcepts;
     }

@@ -29,7 +29,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 /**
@@ -187,7 +186,7 @@ public class DescStatement extends RefsetSpecStatement {
         I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
-        Set<I_GetConceptData> childDescTypes = requiredType.getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<? extends I_GetConceptData> childDescTypes = requiredType.getDestRelOrigins(null, allowedTypes, null, true, true);
 
         // call descriptionTypeIs on each
         for (I_GetConceptData childDescType : childDescTypes) {
@@ -212,7 +211,7 @@ public class DescStatement extends RefsetSpecStatement {
         I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
-        Set<I_GetConceptData> childDescTypes = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null,
+        Set<? extends I_GetConceptData> childDescTypes = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null,
             allowedTypes, null, true, true);
 
         // call descriptionTypeIs on each
@@ -238,7 +237,7 @@ public class DescStatement extends RefsetSpecStatement {
             IOException {
         I_IntSet allowedTypes = getIsAIds();
 
-        Set<I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null,
+        Set<? extends I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null,
             allowedTypes, null, true, true);
 
         for (I_GetConceptData childStatus : childStatuses) {
@@ -259,7 +258,7 @@ public class DescStatement extends RefsetSpecStatement {
             I_DescriptionTuple descriptionBeingChecked) throws TerminologyException, IOException {
         I_IntSet allowedTypes = getIsAIds();
 
-        Set<I_GetConceptData> childStatuses = requiredStatus.getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<? extends I_GetConceptData> childStatuses = requiredStatus.getDestRelOrigins(null, allowedTypes, null, true, true);
 
         for (I_GetConceptData childStatus : childStatuses) {
             if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {

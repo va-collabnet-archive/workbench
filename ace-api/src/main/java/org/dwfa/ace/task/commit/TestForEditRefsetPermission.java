@@ -27,7 +27,6 @@ import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -171,7 +170,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         return refsets;
     }
 
-    public Set<I_GetConceptData> getValidRefsetsFromIndividualUserPermissions(I_GetConceptData concept)
+    public Set<? extends I_GetConceptData> getValidRefsetsFromIndividualUserPermissions(I_GetConceptData concept)
             throws Exception {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         PositionSetReadOnly allPositions = getPositions(termFactory);
@@ -180,7 +179,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(createNewRefsetPermissionRel.getConceptId());
 
-        Set<I_GetConceptData> refsets = concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true,
+        Set<? extends I_GetConceptData> refsets = concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true,
             true);
 
         return refsets;

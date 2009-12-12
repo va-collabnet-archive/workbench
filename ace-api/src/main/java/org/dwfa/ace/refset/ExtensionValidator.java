@@ -130,7 +130,7 @@ public class ExtensionValidator {
             /*
              * Get "is a" source rels for concept
              */
-            Set<I_GetConceptData> inclusionTypes = inclusionTypeConcept.getDestRelOrigins(null, allowedTypes, null,
+            Set<? extends I_GetConceptData> inclusionTypes = inclusionTypeConcept.getDestRelOrigins(null, allowedTypes, null,
                 false);
 
             for (I_ThinExtByRefVersioned ext : termFactory.getAllExtensionsForComponent(componentId, true)) {
