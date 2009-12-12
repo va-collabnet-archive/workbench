@@ -185,7 +185,7 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	        
 	        I_GetConceptData refsetSpecConcept = null;
 	    	if (refsetConcept != null) {
-	    		Set<I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept, config);
+	    		Set<? extends I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept, config);
 	    		if (specs.size() > 0) {
 	    			refsetSpecConcept = specs.iterator().next();
 	    		}

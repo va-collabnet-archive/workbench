@@ -101,7 +101,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
             allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
             // create list of editors -> FSN, for use in the drop down list
-            final Set<I_GetConceptData> allValidUsers = userParent.getDestRelOrigins(allowedTypes, true, true);
+            final Set<? extends I_GetConceptData> allValidUsers = userParent.getDestRelOrigins(allowedTypes, true, true);
             final HashMap<String, I_GetConceptData> validUserMap = new HashMap<String, I_GetConceptData>();
             I_GetConceptData fsnConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
             I_IntSet fsnAllowedTypes = termFactory.newIntSet();

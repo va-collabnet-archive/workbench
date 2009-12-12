@@ -178,7 +178,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
-        Set<I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint).getDestRelOrigins(
+        Set<? extends I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint).getDestRelOrigins(
             termFactory.getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, null, true, true);
 
         // call conceptStatusIs on each

@@ -192,7 +192,7 @@ public abstract class RefsetUtilities {
 
         I_GetConceptData refsetRoot = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 
-        Set<I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(status, is_a, null, false);
+        Set<? extends I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(status, is_a, null, false);
         for (I_GetConceptData refsetConcept : refsetChildren) {
             Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
 
@@ -446,7 +446,7 @@ public abstract class RefsetUtilities {
     public int getRelTypeTarget(int conceptId, ConceptSpec relType) throws Exception {
         I_GetConceptData concept = getConcept(conceptId);
 
-        Set<I_GetConceptData> membershipTypes = concept.getSourceRelTargets(
+        Set<? extends I_GetConceptData> membershipTypes = concept.getSourceRelTargets(
             getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), getIntSet(relType), null, false);
 
         if (membershipTypes.size() == 0) {

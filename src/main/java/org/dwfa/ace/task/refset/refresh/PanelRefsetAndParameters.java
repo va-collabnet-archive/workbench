@@ -346,7 +346,7 @@ public class PanelRefsetAndParameters extends JPanel {
     }
 
     
-    private Set<I_GetConceptData> getAllUsers() throws IOException, TerminologyException {
+    private Set<? extends I_GetConceptData> getAllUsers() throws IOException, TerminologyException {
         I_GetConceptData userParent = LocalVersionedTerminology.get().getConcept(
         		ArchitectonicAuxiliary.Concept.USER.getUids());
         I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();

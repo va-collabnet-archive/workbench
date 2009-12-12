@@ -133,7 +133,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         I_IntSet allowedType = termFactory.newIntSet();
         allowedType.add(termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptId());
 
-        Set<I_GetConceptData> targetParentRefsets = memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType,
+        Set<? extends I_GetConceptData> targetParentRefsets = memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType,
             null, false, true);
 
         if (targetParentRefsets == null || targetParentRefsets.size() == 0) {
@@ -161,7 +161,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
                 isATypes.add(termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids())
                     .getConceptId());
                 I_GetConceptData memberRefset = termFactory.getConcept(this.refsetId);
-                Set<I_GetConceptData> requiredIsAType = memberRefset.getSourceRelTargets(getAllowedStatuses(),
+                Set<? extends I_GetConceptData> requiredIsAType = memberRefset.getSourceRelTargets(getAllowedStatuses(),
                     isATypes, null, false, true);
 
                 if (requiredIsAType != null && requiredIsAType.size() > 0) {

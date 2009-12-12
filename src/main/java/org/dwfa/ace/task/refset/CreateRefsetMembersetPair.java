@@ -211,7 +211,7 @@ public class CreateRefsetMembersetPair extends AbstractTask {
                 return true;
             }
 
-            Set<I_GetConceptData> grandParentConcepts = parentConcept.getSourceRelTargets(null, null, null, false);
+            Set<? extends I_GetConceptData> grandParentConcepts = parentConcept.getSourceRelTargets(null, null, null, false);
             while (!grandParentConcepts.isEmpty()) {
 
                 if (grandParentConcepts.size() > 1) {

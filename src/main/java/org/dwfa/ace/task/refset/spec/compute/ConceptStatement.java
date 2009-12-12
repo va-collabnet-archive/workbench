@@ -161,7 +161,7 @@ public class ConceptStatement extends RefsetSpecStatement {
     private boolean conceptIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException, IOException {
         I_IntSet allowedTypes = getIsAIds();
 
-        Set<I_GetConceptData> children = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<? extends I_GetConceptData> children = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
 
         for (I_GetConceptData child : children) {
             if (conceptBeingTested.equals(child)) {
@@ -298,7 +298,7 @@ public class ConceptStatement extends RefsetSpecStatement {
         I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
-        Set<I_GetConceptData> childStatuses = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true,
+        Set<? extends I_GetConceptData> childStatuses = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true,
             true);
 
         // call conceptStatusIs on each
@@ -341,7 +341,7 @@ public class ConceptStatement extends RefsetSpecStatement {
 
         I_IntSet allowedTypes = getIsAIds();
 
-        Set<I_GetConceptData> childStatuses = status.getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<? extends I_GetConceptData> childStatuses = status.getDestRelOrigins(null, allowedTypes, null, true, true);
 
         for (I_GetConceptData childStatus : childStatuses) {
             if (conceptStatusIs(conceptBeingTested, childStatus)) {
