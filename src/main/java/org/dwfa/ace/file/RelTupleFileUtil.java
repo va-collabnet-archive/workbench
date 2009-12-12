@@ -193,7 +193,7 @@ public class RelTupleFileUtil {
             boolean addUncommitted = true;
 
             // check if the part exists
-            List<I_RelTuple> parts = concept.getSourceRelTuples(allowedStatus, allowedTypes, null, addUncommitted,
+            List<? extends I_RelTuple> parts = concept.getSourceRelTuples(allowedStatus, allowedTypes, null, addUncommitted,
                 returnConflictResolvedLatestState);
             I_RelTuple latestTuple = null;
             for (I_RelTuple part : parts) {

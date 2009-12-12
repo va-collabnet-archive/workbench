@@ -396,7 +396,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
 
-        List<I_RelTuple> relationships = child.getDestRelTuples(null, allowedTypes, null, true, true);
+        List<? extends I_RelTuple> relationships = child.getDestRelTuples(null, allowedTypes, null, true, true);
         if (relationships.size() > 0) {
             return true;
         } else {

@@ -152,7 +152,7 @@ public class RefsetSpec {
         I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
-        List<I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
+        List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {
                 latestVersion = rel.getVersion();
@@ -179,7 +179,7 @@ public class RefsetSpec {
         I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
-        List<I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, null, true, true);
+        List<? extends I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, null, true, true);
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {
                 latestVersion = rel.getVersion();
@@ -206,7 +206,7 @@ public class RefsetSpec {
         I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
-        List<I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
+        List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {
                 latestVersion = rel.getVersion();

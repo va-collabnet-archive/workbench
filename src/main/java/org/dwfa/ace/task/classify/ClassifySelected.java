@@ -173,7 +173,7 @@ public class ClassifySelected extends AbstractTask {
                     "Add concept: " + conceptId + " : " + concept.getId() + ": " + tuples.get(0).isDefined());
                 rocket.addConcept(conceptId, tuples.get(0).isDefined());
 
-                final List<I_RelTuple> relTuples = concept.getSourceRelTuples(activeStatus, null, latestStated, true);
+                final List<? extends I_RelTuple> relTuples = concept.getSourceRelTuples(activeStatus, null, latestStated, true);
                 for (I_RelTuple relTuple : relTuples) {
                     if (definingCharacteristic == relTuple.getCharacteristicId()) {
                         worker.getLogger().info(

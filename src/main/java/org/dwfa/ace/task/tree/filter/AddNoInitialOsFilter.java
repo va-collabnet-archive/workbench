@@ -113,7 +113,7 @@ public class AddNoInitialOsFilter extends AbstractTask {
 
     private static class NoInitialOsFilter implements I_FilterTaxonomyRels {
 
-        public void filter(I_GetConceptData node, List<I_RelTuple> srcRels, List<I_RelTuple> destRels,
+        public void filter(I_GetConceptData node, List<? extends I_RelTuple> srcRels, List<? extends I_RelTuple> destRels,
                 I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
             List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
             AceLog.getAppLog().info("Filtering srcRels: " + srcRels + " destRels: " + destRels + " for: " + node);
