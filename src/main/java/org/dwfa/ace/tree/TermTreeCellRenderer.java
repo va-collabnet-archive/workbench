@@ -149,7 +149,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                 if (I_GetConceptDataForTree.class.isAssignableFrom(node.getUserObject().getClass())) {
                     I_GetConceptDataForTree cb = (I_GetConceptDataForTree) node.getUserObject();
                     List<Color> pathColors = new ArrayList<Color>();
-                    List<I_ConceptAttributeTuple> attributes = cb.getConceptAttributeTuples(
+                    List<? extends I_ConceptAttributeTuple> attributes = cb.getConceptAttributeTuples(
                         aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(), true);
                     for (I_ConceptAttributeTuple t : attributes) {
                         Color pathColor = aceConfig.getColorForPath(t.getPathId());

@@ -122,7 +122,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
         private Iterator<I_GetConceptData> conItr = getConceptIterator();
 
-        private Iterator<I_RelVersioned> relItr;
+        private Iterator<? extends I_RelVersioned> relItr;
 
         private RelationshipIterator() throws IOException {
             super();
@@ -1284,7 +1284,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
         private Iterator<I_GetConceptData> conItr = getConceptIterator();
 
-        private Iterator<I_DescriptionVersioned> descItr;
+        private Iterator<? extends I_DescriptionVersioned> descItr;
 
         private DescriptionIterator() throws IOException {
             super();
@@ -1731,7 +1731,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         while (conItr.hasNext()) {
             I_GetConceptData concept = conItr.next();
             if (tracker.continueWork()) {
-                List<I_DescriptionVersioned> descriptions = concept.getDescriptions();
+                List<? extends I_DescriptionVersioned> descriptions = concept.getDescriptions();
                 CountDownLatch descriptionLatch = new CountDownLatch(descriptions.size());
                 for (I_DescriptionVersioned descV : descriptions) {
                     try {
