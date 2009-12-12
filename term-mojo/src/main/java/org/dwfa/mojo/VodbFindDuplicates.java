@@ -41,7 +41,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -53,6 +52,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
@@ -334,7 +334,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 
             // searches in children of a the root concept
             Set<I_GetConceptData> rootChildren = rootConcept.getDestRelOrigins(allowedStatus, allowedRelTypes,
-                positions, false);
+            		new PositionSetReadOnly(positions), false);
 
             for (I_GetConceptData rootChild : rootChildren) {
                 // print out rootChild description here...
@@ -348,7 +348,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 
                 I_IntSet allowedTypes = descTypeSet;
                 for (I_DescriptionTuple childDesc : rootChild.getDescriptionTuples(allowedStatus, allowedTypes,
-                    positions)) {
+                    new PositionSetReadOnly(positions))) {
                     BooleanQuery apiQuery = new BooleanQuery();
 
                     for (String word : StringToWord.get(childDesc.getText())) {
@@ -395,7 +395,7 @@ public class VodbFindDuplicates extends AbstractMojo {
                                 I_IntSet allowedIsaTypes = new IntSet();
                                 allowedIsaTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
                                 boolean addUncommitted = false;
-                                if (rootConcept.isParentOf(hitConcept, allowedStatus, allowedIsaTypes, positions,
+                                if (rootConcept.isParentOf(hitConcept, allowedStatus, allowedIsaTypes, new PositionSetReadOnly(positions),
                                     addUncommitted)) {
                                     ;
                                 } else {
@@ -547,7 +547,7 @@ public class VodbFindDuplicates extends AbstractMojo {
     private List<I_ConceptAttributeTuple> setStatusToCurrentUnreviewed(I_IntSet allowedStatus,
             Set<I_Position> positions, I_GetConceptData potDupConcept) throws IOException, TerminologyException {
         List<I_ConceptAttributeTuple> attributeTuples = potDupConcept.getConceptAttributeTuples(allowedStatus,
-            positions);
+            new PositionSetReadOnly(positions));
         for (I_Position pos : positions) {
             I_ConceptAttributePart attributePart = attributeTuples.get(0).duplicatePart();
             attributePart.setConceptStatus(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid());
@@ -721,7 +721,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 
             // searches in children of a the root concept
             Set<I_GetConceptData> rootChildren = rootConcept.getDestRelOrigins(allowedStatus, allowedRelTypes,
-                positions, false);
+                new PositionSetReadOnly(positions), false);
             for (I_GetConceptData rootChild : rootChildren) {
                 // print out rootChild description here...
                 // getLog().info("Checking for dups on: " +
@@ -731,7 +731,7 @@ public class VodbFindDuplicates extends AbstractMojo {
 
                 I_IntSet allowedTypes = descTypeSet;
                 for (I_DescriptionTuple childDesc : rootChild.getDescriptionTuples(allowedStatus, allowedTypes,
-                    positions)) {
+                    new PositionSetReadOnly(positions))) {
                     BooleanQuery apiQuery = new BooleanQuery();
 
                     for (String word : StringToWord.get(childDesc.getText())) {
@@ -835,14 +835,14 @@ public class VodbFindDuplicates extends AbstractMojo {
             I_IntSet allowedRelTypes = null;
             Set<I_Position> positions = null;
             Set<I_GetConceptData> rootChildren = rootConcept.getDestRelOrigins(allowedStatus, allowedRelTypes,
-                positions, false);
+                new PositionSetReadOnly(positions), false);
             for (I_GetConceptData rootChild : rootChildren) {
                 // print out rootChild description here...
                 // getLog().info("Checking for dups on: " +
                 // rootChild.toString());
                 I_IntSet allowedTypes = descTypeSet;
                 for (I_DescriptionTuple childDesc : rootChild.getDescriptionTuples(allowedStatus, allowedTypes,
-                    positions)) {
+                    new PositionSetReadOnly(positions))) {
                     Hits hits = termFactory.doLuceneSearch(childDesc.getText());
                     for (int i = 0; i < hits.length(); i++) {
                         Document d = hits.doc(i);

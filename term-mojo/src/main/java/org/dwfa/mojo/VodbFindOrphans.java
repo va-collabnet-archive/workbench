@@ -27,7 +27,6 @@ import java.util.Set;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -36,6 +35,7 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -124,7 +124,7 @@ public class VodbFindOrphans extends AbstractMojo {
             I_IntSet isARel = termFactory.newIntSet();
             isARel.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-            List<I_RelTuple> results = concept.getSourceRelTuples(null, isARel, branchPositions, false);
+            List<I_RelTuple> results = concept.getSourceRelTuples(null, isARel, new PositionSetReadOnly(branchPositions), false);
             if (results.size() == 0) {
                 String message = "Found an orphaned concept: " + concept;
                 getLog().info(message);

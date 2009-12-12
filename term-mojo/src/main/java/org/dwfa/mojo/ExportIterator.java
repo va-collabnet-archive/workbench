@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.maven.plugin.logging.Log;
@@ -46,6 +45,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -74,7 +74,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
     private Writer errorWriter;
 
-    private Set<I_Position> positions;
+    private PositionSetReadOnly positions;
 
     private I_IntSet allowedStatus;
 
@@ -128,7 +128,7 @@ public class ExportIterator implements I_ProcessConcepts {
     }
 
     public ExportIterator(Writer concepts, Writer descriptions, Writer relationships, Writer idsWriter,
-            Writer idMapWriter, Writer errorWriter, Set<I_Position> positions, I_IntSet allowedStatus,
+            Writer idMapWriter, Writer errorWriter, PositionSetReadOnly positions, I_IntSet allowedStatus,
             ExportSpecification[] specs, Log log) throws IOException, TerminologyException {
 
         super();

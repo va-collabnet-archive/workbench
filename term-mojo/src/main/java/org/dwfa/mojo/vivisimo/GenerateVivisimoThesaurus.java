@@ -35,6 +35,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.mojo.ConceptDescriptor;
@@ -152,7 +153,7 @@ public class GenerateVivisimoThesaurus extends AbstractMojo {
      */
     private File targetDirectory;
 
-    private HashSet<I_Position> positions;
+    private PositionSetReadOnly positions;
 
     private I_IntSet statusValues;
 
@@ -166,10 +167,11 @@ public class GenerateVivisimoThesaurus extends AbstractMojo {
             getLog().info("suppressEntriesWithNoSynonyms: " + suppressEntriesWithNoSynonyms);
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            positions = new HashSet<I_Position>(positionsForExport.length);
+            HashSet<I_Position> positionSet = new HashSet<I_Position>(positionsForExport.length);
             for (PositionDescriptor pd : positionsForExport) {
-                positions.add(pd.getPosition());
+                positionSet.add(pd.getPosition());
             }
+            positions = new PositionSetReadOnly(positionSet);
             statusValues = termFactory.newIntSet();
             List<I_GetConceptData> statusValueList = new ArrayList<I_GetConceptData>();
             for (ConceptDescriptor status : statusValuesForExport) {

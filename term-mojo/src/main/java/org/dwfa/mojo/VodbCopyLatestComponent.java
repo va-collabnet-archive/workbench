@@ -26,7 +26,6 @@ import java.util.Set;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -39,6 +38,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -114,7 +114,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             positions.add(oldPosition);
 
             // get latest concept attributes
-            List<I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null, positions);
+            List<I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(positions));
             // copy latest attributes to new path/version
             for (I_ConceptAttributeTuple tuple : conceptAttributeTuples) {
                 I_ConceptAttributePart newPart = tuple.duplicatePart();
@@ -124,7 +124,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             }
 
             // get latest descriptions
-            List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, positions);
+            List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(positions));
             // copy latest descriptions to new path/version
             for (I_DescriptionTuple tuple : descriptionTuples) {
                 I_DescriptionPart newPart = tuple.duplicatePart();
@@ -134,7 +134,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             }
 
             // get latest relationships
-            List<I_RelTuple> relationshipTuples = concept.getSourceRelTuples(null, null, positions, false);
+            List<I_RelTuple> relationshipTuples = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(positions), false);
             // copy latest relationships to new path/version
             for (I_RelTuple tuple : relationshipTuples) {
                 I_RelPart newPart = tuple.duplicatePart();

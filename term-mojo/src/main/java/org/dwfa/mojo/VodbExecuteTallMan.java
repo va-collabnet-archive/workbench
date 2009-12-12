@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -43,6 +42,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -282,7 +282,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
             // get latest descriptions
             List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, descriptionTypesToCheck,
-                positionsToCheck);
+                new PositionSetReadOnly(positionsToCheck));
 
             // copy latest descriptions to new path/version
             for (I_DescriptionTuple tuple : descriptionTuples) {
@@ -316,7 +316,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
                         // update the current concept with
                         // get latest concept attributes
                         List<I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null,
-                            positionsToCheck);
+                            new PositionSetReadOnly(positionsToCheck));
                         // copy latest attributes and set status to unreviewed
                         for (I_ConceptAttributeTuple attribute : conceptAttributeTuples) {
                             I_ConceptAttributePart newAttributePart = attribute.duplicatePart();

@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -66,7 +67,7 @@ public class VodbExampleChange extends AbstractMojo {
             positions.add(latestOnArchitectonicPath);
             I_GetConceptData flaggedStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids());
 
-            for (I_ConceptAttributeTuple tuple : architectonicRoot.getConceptAttributeTuples(null, positions)) {
+            for (I_ConceptAttributeTuple tuple : architectonicRoot.getConceptAttributeTuples(null, new PositionSetReadOnly(positions))) {
                 I_ConceptAttributePart part = tuple.duplicatePart();
                 part.setVersion(Integer.MAX_VALUE);
                 part.setConceptStatus(flaggedStatus.getConceptId());
