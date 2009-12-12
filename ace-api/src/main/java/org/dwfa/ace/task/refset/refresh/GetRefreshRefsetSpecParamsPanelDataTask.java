@@ -222,8 +222,8 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                         return Condition.ITEM_CANCELED;
                     } else {
                     	// Set the Refset property 
-                        process.setSubject("Refresh Refset : " + refset.getInitialText());
-                        process.setName("Refresh Refset : " + refset.getInitialText());
+                        process.setSubject("SNOMED Version (TBD) REFRESH");
+                        process.setName(refset.getInitialText());
                         process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
                     }
                     
