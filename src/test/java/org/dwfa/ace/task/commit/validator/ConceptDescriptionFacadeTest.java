@@ -180,7 +180,7 @@ public final class ConceptDescriptionFacadeTest {
     }
 
     private ConceptDescriptionFacadeTest expectGetUncommittedDescOnConcept() throws Exception {
-        expect(mockConcept.getUncommittedDescriptions()).andReturn(uncommittedDescriptions).once();
+    	//TODO modify to work with generics expect(mockConcept.getUncommittedDescriptions()).andReturn(uncommittedDescriptions).once();
         return this;
     }
 }

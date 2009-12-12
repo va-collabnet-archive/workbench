@@ -57,7 +57,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
             throws TaskFailedException {
         ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
-        List<I_RelVersioned> usrl = concept.getUncommittedSourceRels();
+        List<? extends I_RelVersioned> usrl = concept.getUncommittedSourceRels();
 
         boolean foundCycle = false;
         for (I_RelVersioned rv : usrl) {
