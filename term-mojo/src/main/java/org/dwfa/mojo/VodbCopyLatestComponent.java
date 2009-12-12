@@ -124,7 +124,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             }
 
             // get latest descriptions
-            List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(positions));
+            List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(positions));
             // copy latest descriptions to new path/version
             for (I_DescriptionTuple tuple : descriptionTuples) {
                 I_DescriptionPart newPart = tuple.duplicatePart();

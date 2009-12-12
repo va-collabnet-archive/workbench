@@ -281,7 +281,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
             positionsToCheck.add(oldPosition);
 
             // get latest descriptions
-            List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, descriptionTypesToCheck,
+            List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, descriptionTypesToCheck,
                 new PositionSetReadOnly(positionsToCheck));
 
             // copy latest descriptions to new path/version

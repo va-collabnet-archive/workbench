@@ -16,13 +16,14 @@
  */
 package org.dwfa.mojo;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
+
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import java.util.LinkedList;
-import java.util.List;
 
 public class ConceptDescriptor {
 
@@ -40,7 +41,7 @@ public class ConceptDescriptor {
     public static boolean verify(I_GetConceptData concept, String description) throws Exception {
         // check that the description parameter corresponds to one of the
         // concept's descriptions
-        List<I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, null);
+        List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, null);
         for (I_DescriptionTuple tuple : descriptionTuples) {
             if (description.toLowerCase().trim().equals(tuple.getText().toLowerCase().trim())) {
                 return true;

@@ -298,8 +298,8 @@ public class ExportIterator implements I_ProcessConcepts {
 
         I_IntSet fsn = termFactory.newIntSet();
         fsn.add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
-        List<I_DescriptionTuple> descTuples = concept.getDescriptionTuples(null, fsn, positions);
-        List<I_DescriptionTuple> latestDescTuples = getLatestTuples(descTuples);
+        List<? extends I_DescriptionTuple> descTuples = concept.getDescriptionTuples(null, fsn, positions);
+        List<? extends I_DescriptionTuple> latestDescTuples = getLatestTuples(descTuples);
 
         I_DescriptionTuple descForConceptFile = null;
 
@@ -428,7 +428,7 @@ public class ExportIterator implements I_ProcessConcepts {
         return latestVersion;
     }
 
-    private List<I_DescriptionTuple> getLatestTuples(List<I_DescriptionTuple> descTuples) {
+    private List<? extends I_DescriptionTuple> getLatestTuples(List<? extends I_DescriptionTuple> descTuples) {
 
         // Sort and reverse the tuples so that the list is ordered by the latest
         // description and then the latest version
@@ -647,7 +647,7 @@ public class ExportIterator implements I_ProcessConcepts {
     private void writeUuidBasedDescriptionDetails(I_GetConceptData concept, I_IntSet allowedStatus,
             I_IntSet allowedTypes) throws Exception {
 
-        List<I_DescriptionTuple> tuples = concept.getDescriptionTuples(null, null, positions);
+        List<? extends I_DescriptionTuple> tuples = concept.getDescriptionTuples(null, null, positions);
 
         int descId = 0;
 
