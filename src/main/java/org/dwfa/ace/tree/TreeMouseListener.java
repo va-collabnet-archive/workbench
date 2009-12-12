@@ -188,7 +188,7 @@ public class TreeMouseListener implements MouseListener {
         }
         if (addNodes) {
             ace.getAceFrameConfig().getParentExpandedNodes().add(treeBean.getConceptId());
-            List<I_RelTuple> tuples;
+            List<? extends I_RelTuple> tuples;
             try {
                 tuples = treeBean.getSourceRelTuples(ace.getAceFrameConfig().getAllowedStatus(),
                     ace.getAceFrameConfig().getDestRelTypes(), ace.getAceFrameConfig().getViewPositionSetReadOnly(), false);

@@ -403,7 +403,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
             try {
                 allowedTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
                 boolean addUncommitted = true;
-                List<I_RelTuple> markedParentRefset = refset.getSourceRelTuples(frameConfig.getAllowedStatus(),
+                List<? extends I_RelTuple> markedParentRefset = refset.getSourceRelTuples(frameConfig.getAllowedStatus(),
                     allowedTypes, frameConfig.getViewPositionSetReadOnly(), addUncommitted);
                 for (I_RelTuple rel : markedParentRefset) {
                     refsetsToShow.add(rel.getC2Id());
@@ -504,7 +504,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     private class RefsetParentOnlyFilter implements I_FilterTaxonomyRels {
 
-        public void filter(I_GetConceptData node, List<I_RelTuple> srcRels, List<I_RelTuple> destRels,
+        public void filter(I_GetConceptData node, List<? extends I_RelTuple> srcRels, List<? extends I_RelTuple> destRels,
                 I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
 
             List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
