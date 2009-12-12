@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.util.HashFunction;
@@ -258,5 +259,18 @@ public class ThinDescPartWithCoreDelegate implements I_DescriptionPart {
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
     }
+	@Override
+	public long getTime() {
+		return ThinVersionHelper.convert(getVersion());
+	}
+
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		ThinDescPart newPart = duplicate();
+		newPart.setStatusId(statusNid);
+		newPart.setPathId(pathNid);
+		newPart.setVersion(ThinVersionHelper.convert(time));
+		return newPart;
+	}
 
 }

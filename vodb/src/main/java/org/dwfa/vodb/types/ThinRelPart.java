@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.util.HashFunction;
@@ -280,5 +282,18 @@ public class ThinRelPart implements I_RelPart {
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
     }
+	@Override
+	public long getTime() {
+		return ThinVersionHelper.convert(getVersion());
+	}
+
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		ThinRelPart newPart = duplicate();
+		newPart.setStatusId(statusNid);
+		newPart.setPathId(pathNid);
+		newPart.setVersion(ThinVersionHelper.convert(time));
+		return newPart;
+	}
 
 }

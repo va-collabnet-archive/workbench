@@ -17,6 +17,7 @@
 package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -282,5 +283,13 @@ public class ThinRelTuple implements I_RelTuple {
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
     }
+
+	public long getTime() {
+		return part.getTime();
+	}
+
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		return part.makeAnalog(statusNid, pathNid, time);
+	}
 
 }

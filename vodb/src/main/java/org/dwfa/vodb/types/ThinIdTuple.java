@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
@@ -206,5 +207,25 @@ public class ThinIdTuple implements I_IdTuple {
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
     }
+
+	public long getTime() {
+		return part.getTime();
+	}
+
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		return part.makeAnalog(statusNid, pathNid, time);
+	}
+
+	public void setIdStatus(int idStatus) {
+		part.setIdStatus(idStatus);
+	}
+
+	public void setSource(int source) {
+		part.setSource(source);
+	}
+
+	public void setSourceId(Object sourceId) {
+		part.setSourceId(sourceId);
+	}
 
 }
