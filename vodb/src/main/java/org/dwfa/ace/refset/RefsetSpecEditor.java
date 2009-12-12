@@ -88,7 +88,6 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
-import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -1018,7 +1017,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             ;
             if (refsetConcept != null) {
                 relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
-                List<I_RelTuple> refsetSpecTuples = refsetConcept.getDestRelTuples(ace.getAceFrameConfig()
+                List<? extends I_RelTuple> refsetSpecTuples = refsetConcept.getDestRelTuples(ace.getAceFrameConfig()
                     .getAllowedStatus(), relTypes, ace.getAceFrameConfig().getViewPositionSetReadOnly(), true);
                 if (refsetSpecTuples != null && refsetSpecTuples.size() > 0) {
                     refsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());

@@ -257,9 +257,9 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
 
     CountDownLatch completeLatch;
 
-    List<I_RelTuple> destRels;
+    List<? extends I_RelTuple> destRels;
 
-    List<I_RelTuple> srcRels;
+    List<? extends I_RelTuple> srcRels;
 
     SortedSet<DefaultMutableTreeNode> sortedNodes;
 

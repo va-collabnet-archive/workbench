@@ -59,12 +59,12 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             refsetId = componentId;
             I_GetConceptData refsetConcept = ConceptBean.get(refsetId);
             IntSet promotionRefsetIds = new IntSet();
-            List<I_RelTuple> promotionTuples;
+            List<? extends I_RelTuple> promotionTuples;
             try {
                 promotionRefsetIds.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
                 promotionTuples = refsetConcept.getSourceRelTuples(host.getConfig().getAllowedStatus(),
                     promotionRefsetIds, host.getConfig().getViewPositionSetReadOnly(), true);
-                Iterator<I_RelTuple> promotionIterator = promotionTuples.iterator();
+                Iterator<? extends I_RelTuple> promotionIterator = promotionTuples.iterator();
                 if (promotionIterator.hasNext()) {
                     promotionRefsetId = promotionTuples.iterator().next().getC2Id();
                     promotionRefsetIdentify = ConceptBean.get(promotionRefsetId);

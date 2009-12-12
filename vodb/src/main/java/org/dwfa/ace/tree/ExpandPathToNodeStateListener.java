@@ -49,7 +49,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
         tree.addWorkerFinishedListener(this);
         ancestors = new ArrayList<I_GetConceptData>();
         ancestors.add(focus);
-        List<I_RelTuple> rels = focus.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(),
+        List<? extends I_RelTuple> rels = focus.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(),
             config.getViewPositionSetReadOnly(), true);
         while (rels.size() > 0) {
             for (I_RelTuple r : rels) {
