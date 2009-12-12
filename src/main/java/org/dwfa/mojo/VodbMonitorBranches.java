@@ -169,8 +169,8 @@ public class VodbMonitorBranches extends AbstractMojo {
             List<? extends I_DescriptionTuple> descriptionTuples2 = new LinkedList<I_DescriptionTuple>();
 
             List<I_RelTuple> allRelationshipTuples = new LinkedList<I_RelTuple>();
-            List<I_RelTuple> relationshipTuples1 = new LinkedList<I_RelTuple>();
-            List<I_RelTuple> relationshipTuples2 = new LinkedList<I_RelTuple>();
+            List<? extends I_RelTuple> relationshipTuples1 = new LinkedList<I_RelTuple>();
+            List<? extends I_RelTuple> relationshipTuples2 = new LinkedList<I_RelTuple>();
 
             // get latest concept attributes/descriptions/relationships
             boolean attributesMatch = true;

@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.maven.plugin.logging.Log;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -419,7 +418,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
             }
         }
 
-        List<I_RelTuple> children = concept.getDestRelTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT,
+        List<? extends I_RelTuple> children = concept.getDestRelTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT,
             ArchitectonicAuxiliary.Concept.PENDING_MOVE), getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
 
         getLog().debug("processConcept(I_GetConceptData) - processing " + children.size() + " children");
@@ -567,7 +566,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
             "markAllChildren(I_GetConceptData=" + concept.getDescriptions().iterator().next() + ", boolean="
                 + includeChildren + ") - start");
 
-        List<I_RelTuple> children = concept.getDestRelTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT,
+        List<? extends I_RelTuple> children = concept.getDestRelTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT,
             ArchitectonicAuxiliary.Concept.PENDING_MOVE), getIntSet(ConceptConstants.SNOMED_IS_A), null, false);
 
         getLog().debug("markAllChildren(I_GetConceptData, boolean) - concept has " + children.size() + " children");

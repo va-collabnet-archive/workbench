@@ -134,7 +134,7 @@ public class VodbCheckChildCount extends AbstractMojo {
             I_IntSet isARel = termFactory.newIntSet();
             isARel.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-            List<I_RelTuple> results = concept.getDestRelTuples(null, isARel, new PositionSetReadOnly(branchPositions), false);
+            List<? extends I_RelTuple> results = concept.getDestRelTuples(null, isARel, new PositionSetReadOnly(branchPositions), false);
             if (results.size() > count) {
                 String message = "Concept: " + concept + " has > 20 children.";
                 getLog().info(message);

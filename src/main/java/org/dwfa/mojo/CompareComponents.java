@@ -126,8 +126,8 @@ public class CompareComponents {
         return true;
     }
 
-    public static boolean relationshipListsEqual(List<I_RelTuple> relationshipList1,
-            List<I_RelTuple> relationshipList2, int flaggedStatusId) {
+    public static boolean relationshipListsEqual(List<? extends I_RelTuple> relationshipList1,
+            List<? extends I_RelTuple> relationshipList2, int flaggedStatusId) {
         if (relationshipList1.size() != relationshipList2.size()) {
             return false;
         } else {
@@ -168,7 +168,7 @@ public class CompareComponents {
         return true;
     }
 
-    public static boolean relationshipListsEqual(List<I_RelTuple> relationshipList1, List<I_RelTuple> relationshipList2) {
+    public static boolean relationshipListsEqual(List<? extends I_RelTuple> relationshipList1, List<? extends I_RelTuple> relationshipList2) {
         if (relationshipList1.size() != relationshipList2.size()) {
             return false;
         } else {

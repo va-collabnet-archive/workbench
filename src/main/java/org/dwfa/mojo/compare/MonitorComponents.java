@@ -54,8 +54,8 @@ public class MonitorComponents {
         List<? extends I_DescriptionTuple> descriptionTuples1 = new LinkedList<I_DescriptionTuple>();
         List<? extends I_DescriptionTuple> descriptionTuples2 = new LinkedList<I_DescriptionTuple>();
 
-        List<I_RelTuple> relationshipTuples1 = new LinkedList<I_RelTuple>();
-        List<I_RelTuple> relationshipTuples2 = new LinkedList<I_RelTuple>();
+        List<? extends I_RelTuple> relationshipTuples1 = new LinkedList<I_RelTuple>();
+        List<? extends I_RelTuple> relationshipTuples2 = new LinkedList<I_RelTuple>();
 
         List<Match> matches = new ArrayList<Match>();
 

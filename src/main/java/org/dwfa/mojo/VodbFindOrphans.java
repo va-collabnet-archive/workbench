@@ -124,7 +124,7 @@ public class VodbFindOrphans extends AbstractMojo {
             I_IntSet isARel = termFactory.newIntSet();
             isARel.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-            List<I_RelTuple> results = concept.getSourceRelTuples(null, isARel, new PositionSetReadOnly(branchPositions), false);
+            List<? extends I_RelTuple> results = concept.getSourceRelTuples(null, isARel, new PositionSetReadOnly(branchPositions), false);
             if (results.size() == 0) {
                 String message = "Found an orphaned concept: " + concept;
                 getLog().info(message);
