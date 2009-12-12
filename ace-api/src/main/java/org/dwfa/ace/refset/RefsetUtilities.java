@@ -96,7 +96,7 @@ public abstract class RefsetUtilities {
         Set<Integer> parents = new HashSet<Integer>();
 
         I_GetConceptData concept = getConcept(conceptId);
-        List<I_RelTuple> parenttuples = concept.getSourceRelTuples(getStatuses(),
+        List<? extends I_RelTuple> parenttuples = concept.getSourceRelTuples(getStatuses(),
             (this.altIsA == null ? getIntSet(ConceptConstants.SNOMED_IS_A) : getIntSet(this.altIsA)), null, false);
 
         /*
@@ -158,7 +158,7 @@ public abstract class RefsetUtilities {
         /*
          * Find all children
          */
-        List<I_RelTuple> childrentuples = concept.getDestRelTuples(getStatuses(),
+        List<? extends I_RelTuple> childrentuples = concept.getDestRelTuples(getStatuses(),
             (this.altIsA == null ? getIntSet(ConceptConstants.SNOMED_IS_A) : getIntSet(this.altIsA)), null, false);
 
         /*

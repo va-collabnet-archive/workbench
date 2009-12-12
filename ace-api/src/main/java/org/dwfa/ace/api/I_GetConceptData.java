@@ -246,7 +246,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     @Deprecated
-    public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+    public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
 
     /**
@@ -271,7 +271,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+    public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException;
 
@@ -287,7 +287,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedTypes, boolean addUncommitted,
+    public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedTypes, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
     /**
@@ -312,7 +312,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     @Deprecated
-    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
+    public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             boolean addUncommitted) throws IOException;
 
     /**
@@ -333,7 +333,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
+    public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
     /**
@@ -350,7 +350,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedTypes, boolean addUncommitted,
+    public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
     /**

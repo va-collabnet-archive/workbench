@@ -40,7 +40,7 @@ public interface I_FilterTaxonomyRels {
      * @throws IOException
      * @throws TerminologyException
      */
-    public void filter(I_GetConceptData node, List<I_RelTuple> srcRels, List<I_RelTuple> destRels,
+    public void filter(I_GetConceptData node, List<? extends I_RelTuple> srcRels, List<? extends I_RelTuple> destRels,
             I_ConfigAceFrame frameConfig) throws TerminologyException, IOException;
 
 }

@@ -79,7 +79,7 @@ public abstract class AbstractDifferenceRels extends AbstractSearchTest {
                 Set<I_Position> positionSet = new HashSet<I_Position>();
                 positionSet.add(p);
                 PositionSetReadOnly viewSet = new PositionSetReadOnly(positionSet);
-                List<I_RelTuple> tuples = getTuplesToCompare(frameConfig, conceptToTest, viewSet);
+                List<? extends I_RelTuple> tuples = getTuplesToCompare(frameConfig, conceptToTest, viewSet);
                 if (firstSet == null) {
                     firstSet = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
                     firstSet.addAll(tuples);
@@ -102,7 +102,7 @@ public abstract class AbstractDifferenceRels extends AbstractSearchTest {
         }
     }
 
-    protected abstract List<I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig,
+    protected abstract List<? extends I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig,
             I_GetConceptData conceptToTest, PositionSetReadOnly viewSet) throws IOException;
 
 }

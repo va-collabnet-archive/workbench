@@ -27,7 +27,6 @@ import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -36,9 +35,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.util.bean.BeanList;
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
 
 public class TestForReviewRefsetPermission extends AbstractExtensionTest {
 
@@ -137,7 +133,7 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
         I_GetConceptData isARel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
         isAAllowedTypes.add(isARel.getConceptId());
 
-        List<I_RelTuple> roleRels = concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true,
+        List<? extends I_RelTuple> roleRels = concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true,
             true);
 
         for (I_RelTuple roleRel : roleRels) {
@@ -145,7 +141,7 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
             I_GetConceptData roleType = termFactory.getConcept(roleRel.getTypeId());
             I_GetConceptData hierarchyPermission = termFactory.getConcept(roleRel.getC2Id());
 
-            List<I_RelTuple> permissionRels = roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions,
+            List<? extends I_RelTuple> permissionRels = roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions,
                 true, true);
 
             for (I_RelTuple permissionRel : permissionRels) {
@@ -194,7 +190,7 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
         PositionSetReadOnly allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
 
-        List<I_RelTuple> relationships = concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true,
+        List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true,
             true);
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {

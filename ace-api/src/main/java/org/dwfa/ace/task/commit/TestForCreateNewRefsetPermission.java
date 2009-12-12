@@ -146,7 +146,7 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
         I_GetConceptData isARel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
         isAAllowedTypes.add(isARel.getConceptId());
 
-        List<I_RelTuple> roleRels = concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true,
+        List<? extends I_RelTuple> roleRels = concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true,
             true);
 
         for (I_RelTuple roleRel : roleRels) {
@@ -154,7 +154,7 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
             I_GetConceptData roleType = termFactory.getConcept(roleRel.getTypeId());
             I_GetConceptData hierarchyPermission = termFactory.getConcept(roleRel.getC2Id());
 
-            List<I_RelTuple> permissionRels = roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions,
+            List<? extends I_RelTuple> permissionRels = roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions,
                 true, true);
 
             for (I_RelTuple permissionRel : permissionRels) {

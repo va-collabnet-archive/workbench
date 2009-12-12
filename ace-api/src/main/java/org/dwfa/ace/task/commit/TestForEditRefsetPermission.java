@@ -149,7 +149,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         I_GetConceptData isARel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
         isAAllowedTypes.add(isARel.getConceptId());
 
-        List<I_RelTuple> roleRels = concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true,
+        List<? extends I_RelTuple> roleRels = concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true,
             true);
 
         for (I_RelTuple roleRel : roleRels) {
@@ -157,7 +157,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
             I_GetConceptData roleType = termFactory.getConcept(roleRel.getTypeId());
             I_GetConceptData hierarchyPermission = termFactory.getConcept(roleRel.getC2Id());
 
-            List<I_RelTuple> permissionRels = roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions,
+            List<? extends I_RelTuple> permissionRels = roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions,
                 true, true);
 
             for (I_RelTuple permissionRel : permissionRels) {
@@ -206,7 +206,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         PositionSetReadOnly allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
 
-        List<I_RelTuple> relationships = concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true,
+        List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true,
             true);
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {

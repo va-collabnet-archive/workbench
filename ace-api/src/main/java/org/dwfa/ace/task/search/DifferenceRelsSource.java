@@ -49,7 +49,7 @@ public class DifferenceRelsSource extends AbstractDifferenceRels {
         }
     }
 
-    protected List<I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig, I_GetConceptData conceptToTest,
+    protected List<? extends I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig, I_GetConceptData conceptToTest,
     		PositionSetReadOnly viewSet) throws IOException {
         return conceptToTest.getSourceRelTuples(frameConfig.getAllowedStatus(), null, viewSet, false);
     }

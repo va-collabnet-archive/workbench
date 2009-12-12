@@ -273,7 +273,7 @@ public class Classify extends AbstractTask {
             if (tuples.size() == 1) {
                 snorocketFactory.addConcept(conceptId, tuples.get(0).isDefined());
 
-                final List<I_RelTuple> relTuples = concept.getSourceRelTuples(activeStatus, null, latestStated,
+                final List<? extends I_RelTuple> relTuples = concept.getSourceRelTuples(activeStatus, null, latestStated,
                     addUncommitted);
                 for (I_RelTuple relTuple : relTuples) {
                     if (definingCharacteristic == relTuple.getCharacteristicId()) {
@@ -283,7 +283,7 @@ public class Classify extends AbstractTask {
                 }
 
                 if (visitChildren) {
-                    List<I_RelTuple> childTuples = concept.getDestRelTuples(activeStatus, isaTypes, latestStated,
+                    List<? extends I_RelTuple> childTuples = concept.getDestRelTuples(activeStatus, isaTypes, latestStated,
                         addUncommitted);
 
                     for (I_RelTuple childTuple : childTuples) {

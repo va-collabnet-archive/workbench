@@ -107,7 +107,7 @@ public class ChangeRelsOfTypeToStatusFromProperties extends AbstractTask {
             for (I_RelTuple relTuple : concept.getSourceRelTuples(config.getAllowedStatus(), typeSet, positionsForEdit,
                 false)) {
                 for (I_Path editPath : config.getEditingPathSet()) {
-                    List<I_RelTuple> editTuples = concept.getSourceRelTuples(config.getAllowedStatus(), typeSet,
+                    List<? extends I_RelTuple> editTuples = concept.getSourceRelTuples(config.getAllowedStatus(), typeSet,
                         positionsForEdit, false);
                     Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
                     for (I_RelTuple t : editTuples) {

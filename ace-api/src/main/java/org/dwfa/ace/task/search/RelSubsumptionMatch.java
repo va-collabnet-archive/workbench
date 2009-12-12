@@ -107,7 +107,7 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
                 AceLog.getAppLog().fine("### testing rel subsumption: " + testConcept);
             }
 
-            List<I_RelTuple> tuples = testConcept.getSourceRelTuples(frameConfig.getAllowedStatus(), null,
+            List<? extends I_RelTuple> tuples = testConcept.getSourceRelTuples(frameConfig.getAllowedStatus(), null,
                 frameConfig.getViewPositionSetReadOnly(), false);
 
             for (I_RelTuple tuple : tuples) {

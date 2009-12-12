@@ -362,7 +362,7 @@ public class TupleFileUtil {
         }
 
         // relationships (need to be created after the descriptions)
-        List<I_RelTuple> relTuples = memberRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, true, true);
+        List<? extends I_RelTuple> relTuples = memberRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, true, true);
         for (I_RelTuple tuple : relTuples) {
             exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
             relTupleCount++;
@@ -575,7 +575,7 @@ public class TupleFileUtil {
         I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
-        List<I_RelTuple> relationships = concept.getSourceRelTuples(LocalVersionedTerminology.get()
+        List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(LocalVersionedTerminology.get()
             .getActiveAceFrameConfig()
             .getAllowedStatus(), allowedTypes, LocalVersionedTerminology.get()
             .getActiveAceFrameConfig()
