@@ -34,14 +34,13 @@ package org.dwfa.ace.task.commit.validator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
@@ -97,7 +96,7 @@ public final class ConceptDescriptionFacade {
      * @throws Exception when there is an error retrieving the Uncommitted
      *             Descriptions from the {@code concept}
      */
-    public List<I_DescriptionVersioned> getUncommittedDescriptions(final I_GetConceptData concept) throws Exception {
+    public List<? extends I_DescriptionVersioned> getUncommittedDescriptions(final I_GetConceptData concept) throws Exception {
         return concept.getUncommittedDescriptions();
     }
 

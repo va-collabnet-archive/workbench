@@ -515,7 +515,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
     public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted) throws IOException;
 
-    public List<I_ImageVersioned> getImages() throws IOException;
+    public List<? extends I_ImageVersioned> getImages() throws IOException;
 
     public List<UUID> getUids() throws IOException;
 
