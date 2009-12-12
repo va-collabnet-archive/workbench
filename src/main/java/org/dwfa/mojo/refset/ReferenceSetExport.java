@@ -43,6 +43,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
@@ -240,7 +241,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     @SuppressWarnings("deprecation")
     I_ConceptAttributePart getLatestAttributePart(I_GetConceptData concept) throws IOException {
         I_ConceptAttributePart latest = null;
-        for (I_ConceptAttributeTuple tuple : concept.getConceptAttributeTuples(allowedStatuses, positions)) {
+        for (I_ConceptAttributeTuple tuple : concept.getConceptAttributeTuples(allowedStatuses, new PositionSetReadOnly(positions))) {
             if (latest == null || latest.getVersion() < tuple.getVersion()) {
                 latest = tuple.getPart();
             }
@@ -580,7 +581,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         statusSet.add(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.localize().getNid());
         statusSet.add(ArchitectonicAuxiliary.Concept.PROMOTED.localize().getNid());
 
-        I_DescriptionTuple descTuple = conceptData.getDescTuple(descTypeList, null, statusSet, positions,
+        I_DescriptionTuple descTuple = conceptData.getDescTuple(descTypeList, null, statusSet, new PositionSetReadOnly(positions),
             LANGUAGE_SORT_PREF.TYPE_B4_LANG);
         if (descTuple == null) {
             UUID conceptUuid = conceptData.getUids().iterator().next();

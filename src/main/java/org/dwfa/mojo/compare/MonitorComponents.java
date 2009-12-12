@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.mojo.CompareComponents;
 
 public class MonitorComponents {
@@ -66,9 +67,9 @@ public class MonitorComponents {
         if (positions.size() == 1) {
             Set<I_Position> firstPosition = new HashSet<I_Position>();
             firstPosition.add(positions.get(0));
-            conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, firstPosition);
-            descriptionTuples1 = concept.getDescriptionTuples(null, null, firstPosition);
-            relationshipTuples1 = concept.getSourceRelTuples(null, null, firstPosition, false);
+            conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(firstPosition));
+            descriptionTuples1 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(firstPosition));
+            relationshipTuples1 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(firstPosition), false);
 
             /*
              * Is the status correct??
@@ -114,18 +115,18 @@ public class MonitorComponents {
         for (int j = 0; j < positions.size() - 1; j++) {
             Set<I_Position> firstPosition = new HashSet<I_Position>();
             firstPosition.add(positions.get(j));
-            conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, firstPosition);
-            descriptionTuples1 = concept.getDescriptionTuples(null, null, firstPosition);
-            relationshipTuples1 = concept.getSourceRelTuples(null, null, firstPosition, false);
+            conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(firstPosition));
+            descriptionTuples1 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(firstPosition));
+            relationshipTuples1 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(firstPosition), false);
 
             for (int i = j; i < positions.size() - 1; i++) {
 
                 Set<I_Position> secondPosition = new HashSet<I_Position>();
                 secondPosition.add(positions.get(i + 1));
 
-                conceptAttributeTuples2 = concept.getConceptAttributeTuples(null, secondPosition);
-                descriptionTuples2 = concept.getDescriptionTuples(null, null, secondPosition);
-                relationshipTuples2 = concept.getSourceRelTuples(null, null, secondPosition, false);
+                conceptAttributeTuples2 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(secondPosition));
+                descriptionTuples2 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(secondPosition));
+                relationshipTuples2 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(secondPosition), false);
 
                 if (!CompareComponents.attributeListsEqual(conceptAttributeTuples1, conceptAttributeTuples2)) {
                     attributesMatch = false;

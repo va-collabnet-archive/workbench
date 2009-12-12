@@ -40,6 +40,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -341,7 +342,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                 allowedTypes.add(tf.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids()).getConceptId());
 
                 Set<I_GetConceptData> concepts = refsetConcept.getDestRelOrigins(allowedStatuses, allowedTypes,
-                    positions, true, true);
+                    new PositionSetReadOnly(positions), true, true);
                 for (I_GetConceptData concept : concepts) {
                     subOriginalId = refsetType.getRefsetHandler().getSnomedIntegerId(tf, concept.getConceptId());
                     if (subOriginalId != null) {

@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -38,6 +37,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.maven.graph.MojoGraph;
@@ -170,15 +170,15 @@ public class ReportConceptStatus extends AbstractMojo {
             // positionSet.add(latestOnArchitectonicPath);
 
             I_ConfigAceFrame activeConfig = LocalVersionedTerminology.get().getActiveAceFrameConfig();
-            Set<I_Position> positionSet = new HashSet<I_Position>();
+            PositionSetReadOnly positionSet = null;
 
             if (!viewPath.equalsIgnoreCase("DEFAULT")) {
 
-                positionSet.addAll(termFactory.getPath(ArchitectonicAuxiliary.Concept.valueOf(viewPath).getUids())
-                    .getOrigins());
+                positionSet = new PositionSetReadOnly(new HashSet<I_Position>((termFactory.getPath(ArchitectonicAuxiliary.Concept.valueOf(viewPath).getUids())
+                    .getOrigins())));
 
             } else {
-                positionSet = activeConfig.getViewPositionSet();
+                positionSet = activeConfig.getViewPositionSetReadOnly();
             }
 
             List<I_ConceptAttributeTuple> statusTuples = concept.getConceptAttributeTuples(statusTypeSet, positionSet);

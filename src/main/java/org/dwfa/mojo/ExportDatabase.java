@@ -32,6 +32,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.mojo.refset.ExportSpecification;
 
@@ -171,10 +172,11 @@ public class ExportDatabase extends AbstractMojo {
 
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
-            HashSet<I_Position> positions = new HashSet<I_Position>(positionsForExport.length);
+            HashSet<I_Position> positionSet = new HashSet<I_Position>(positionsForExport.length);
             for (PositionDescriptor pd : positionsForExport) {
-                positions.add(pd.getPosition());
+                positionSet.add(pd.getPosition());
             }
+            PositionSetReadOnly positions = new PositionSetReadOnly(positionSet);
             I_IntSet statusValues = termFactory.newIntSet();
             List<I_GetConceptData> statusValueList = new ArrayList<I_GetConceptData>();
             for (ConceptDescriptor status : statusValuesForExport) {

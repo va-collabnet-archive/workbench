@@ -27,7 +27,6 @@ import java.util.Set;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -40,6 +39,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -183,8 +183,8 @@ public class VodbMonitorBranches extends AbstractMojo {
                 Set<I_Position> secondPosition = new HashSet<I_Position>();
                 secondPosition.add(positions.get(i + 1));
 
-                conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, firstPosition);
-                conceptAttributeTuples2 = concept.getConceptAttributeTuples(null, secondPosition);
+                conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(firstPosition));
+                conceptAttributeTuples2 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(secondPosition));
                 if (flaggedConcept != null) {
                     if (!CompareComponents.attributeListsEqual(conceptAttributeTuples1, conceptAttributeTuples2,
                         flaggedStatusId)) {
@@ -196,8 +196,8 @@ public class VodbMonitorBranches extends AbstractMojo {
                     break;
                 }
 
-                descriptionTuples1 = concept.getDescriptionTuples(null, null, firstPosition);
-                descriptionTuples2 = concept.getDescriptionTuples(null, null, secondPosition);
+                descriptionTuples1 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(firstPosition));
+                descriptionTuples2 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(secondPosition));
                 if (flaggedConcept != null) {
                     if (!CompareComponents.descriptionListsEqual(descriptionTuples1, descriptionTuples2,
                         flaggedStatusId)) {
@@ -209,8 +209,8 @@ public class VodbMonitorBranches extends AbstractMojo {
                     break;
                 }
 
-                relationshipTuples1 = concept.getSourceRelTuples(null, null, firstPosition, false);
-                relationshipTuples2 = concept.getSourceRelTuples(null, null, secondPosition, false);
+                relationshipTuples1 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(firstPosition), false);
+                relationshipTuples2 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(secondPosition), false);
                 if (flaggedConcept != null) {
                     if (!CompareComponents.relationshipListsEqual(relationshipTuples1, relationshipTuples2,
                         flaggedStatusId)) {
