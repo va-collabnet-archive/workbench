@@ -162,7 +162,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public List<? extends I_DescriptionTuple> getDescriptionTuples(boolean returnConflictResolvedLatestState) throws IOException,
             TerminologyException;
 
-    public List<I_ThinExtByRefVersioned> getExtensions() throws IOException, TerminologyException;
+    public List<? extends I_ThinExtByRefVersioned> getExtensions() throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
