@@ -53,6 +53,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
@@ -604,6 +605,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 				List<I_ThinExtByRefTuple> tuples = new ArrayList<I_ThinExtByRefTuple>();
 				member.addTuples(config.getAllowedStatus(), config
 						.getViewPositionSet(), tuples, false);
+				PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
 				for (I_Path p : config.getEditingPathSet()) {
 					for (I_ThinExtByRefTuple tuple : tuples) {
 						I_ThinExtByRefPart newPart = tuple.getPart().duplicate();
@@ -662,12 +664,12 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 						//
 					}
 					tf.commit();
-					member.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+					member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
 					if (comment != null) {
-						comment.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+						comment.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
 						tf.addUncommitted(comment);
 						if (commentId != null) {
-							commentId.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+							commentId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
 							commentRefset.getUncommittedIdVersioned().add(commentId);
 							tf.addUncommitted(commentRefset);
 						}
@@ -688,6 +690,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 			List<I_ThinExtByRefTuple> tuples = new ArrayList<I_ThinExtByRefTuple>();
 			member.addTuples(config.getAllowedStatus(), config
 					.getViewPositionSet(), tuples, false);
+			PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
 			for (I_Path p : config.getEditingPathSet()) {
 				for (I_ThinExtByRefTuple tuple : tuples) {
 					I_ThinExtByRefPart newPart = tuple.getPart().duplicate();
@@ -719,12 +722,12 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 					//
 				}
 				tf.commit();
-				member.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+				member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
 				if (comment != null) {
-					comment.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+					comment.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
 					tf.addUncommitted(comment);
 					if (commentId != null) {
-						commentId.promote(new Position(Integer.MAX_VALUE, p), config.getPromotionPathSet(), currentSet);
+						commentId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
 						commentRefset.getUncommittedIdVersioned().add(commentId);
 						tf.addUncommitted(commentRefset);
 					}
