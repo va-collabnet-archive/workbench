@@ -171,7 +171,7 @@ public class DescTupleFileUtil {
             boolean returnConflictResolvedLatestState = true;
 
             // check if the part exists
-            List<I_DescriptionTuple> parts = concept.getDescriptionTuples(allowedStatus, allowedTypes, null,
+            List<? extends I_DescriptionTuple> parts = concept.getDescriptionTuples(allowedStatus, allowedTypes, null,
                 returnConflictResolvedLatestState);
             I_DescriptionTuple latestTuple = null;
             for (I_DescriptionTuple part : parts) {

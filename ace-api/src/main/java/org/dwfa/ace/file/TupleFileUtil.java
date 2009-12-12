@@ -314,7 +314,7 @@ public class TupleFileUtil {
         // refset spec
         exportFileWriter.append(ConceptTupleFileUtil.exportTuple(refsetSpec));
         conceptTupleCount++;
-        List<I_DescriptionTuple> descTuples = refsetSpec.getDescriptionTuples(allowedStatus, allowedTypes, positions,
+        List<? extends I_DescriptionTuple> descTuples = refsetSpec.getDescriptionTuples(allowedStatus, allowedTypes, positions,
             true);
         for (I_DescriptionTuple tuple : descTuples) {
             exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));

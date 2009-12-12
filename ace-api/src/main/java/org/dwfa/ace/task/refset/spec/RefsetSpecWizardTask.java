@@ -109,7 +109,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
             for (I_GetConceptData validUser : allValidUsers) {
                 String latestDescription = null;
                 int latestVersion = Integer.MIN_VALUE;
-                List<I_DescriptionTuple> descriptionResults = validUser.getDescriptionTuples(null, fsnAllowedTypes,
+                List<? extends I_DescriptionTuple> descriptionResults = validUser.getDescriptionTuples(null, fsnAllowedTypes,
                     null, true);
 
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
@@ -288,7 +288,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
         activeStatuses.add(LocalVersionedTerminology.get().getConcept(
             (ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())).getConceptId());
 
-        List<I_DescriptionTuple> descriptionResults = concept.getDescriptionTuples(activeStatuses, allowedTypes, null,
+        List<? extends I_DescriptionTuple> descriptionResults = concept.getDescriptionTuples(activeStatuses, allowedTypes, null,
             true);
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
             if (descriptionTuple.getVersion() > latestVersion) {

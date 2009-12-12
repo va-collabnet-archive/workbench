@@ -134,15 +134,17 @@ public final class RefsetWriterImplTest {
 
         List<I_DescriptionTuple> refsetDescriptionsList = Arrays.asList(mockRefsetName);
         EasyMock.expect(mockRefset.getRefsetId()).andReturn(REFSET_ID);
+        /*
         EasyMock.expect(mockRefsetUtil.getFSNDescriptionsForConceptHavingCurrentStatus(mockTermFactory, REFSET_ID))
             .andReturn(refsetDescriptionsList);
-
+		*/
         EasyMock.expect(mockRefset.getComponentId()).andReturn(COMPONENT_ID);
         EasyMock.expect(mockTermFactory.getConcept(COMPONENT_ID)).andReturn(mockConcept);
         EasyMock.expect(mockRefsetUtil.assertExactlyOne(refsetDescriptionsList)).andReturn(mockRefsetName);
+        /*
         EasyMock.expect(mockRefsetUtil.getPTDescriptionsForConceptHavingCurrentStatus(mockTermFactory, COMPONENT_ID))
             .andReturn(conceptDescriptionList);
-
+		*/
         EasyMock.expect(mockRefsetName.getText()).andReturn(REFSET_NAME);
         mockProgressLogger.logProgress(REFSET_NAME);
 

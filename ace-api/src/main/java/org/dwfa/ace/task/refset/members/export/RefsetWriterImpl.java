@@ -52,13 +52,13 @@ public final class RefsetWriterImpl implements RefsetWriter {
 
     public void write(final I_ThinExtByRefVersioned refset) throws Exception {
         try {
-            List<I_DescriptionTuple> refsetDescriptionsList = refsetUtil.getFSNDescriptionsForConceptHavingCurrentStatus(
+            List<? extends I_DescriptionTuple> refsetDescriptionsList = refsetUtil.getFSNDescriptionsForConceptHavingCurrentStatus(
                 termFactory, refset.getRefsetId());
 
             int componentId = refset.getComponentId();
             I_GetConceptData concept = termFactory.getConcept(componentId);
             I_DescriptionTuple refsetNameDescription = refsetUtil.assertExactlyOne(refsetDescriptionsList);
-            List<I_DescriptionTuple> descriptionTuples = refsetUtil.getPTDescriptionsForConceptHavingCurrentStatus(
+            List<I_DescriptionTuple> descriptionTuples = (List<I_DescriptionTuple>) refsetUtil.getPTDescriptionsForConceptHavingCurrentStatus(
                 termFactory, componentId);
 
             if (descSelector != null) {
