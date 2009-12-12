@@ -62,7 +62,7 @@ public class IdPlugin extends AbstractPlugin {
 
     // @TODO find a way to handle this field dynamically, like pressing the
     // shift key...
-    private static boolean showNids = true;
+    private static boolean showNids = false;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
