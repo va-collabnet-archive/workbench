@@ -153,6 +153,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void replaceViewPosition(I_Position oldPosition, I_Position newPosition);
 
     public Set<I_Position> getViewPositionSet();
+    
+    public PositionSetReadOnly getViewPositionSetReadOnly();
 
     public I_IntSet getChildrenExpandedNodes();
 

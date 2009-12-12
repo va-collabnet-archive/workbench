@@ -50,6 +50,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
@@ -1092,4 +1093,8 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public void validate() {
         config.validate();
     }
+
+	public PositionSetReadOnly getViewPositionSetReadOnly() {
+		return config.getViewPositionSetReadOnly();
+	}
 }

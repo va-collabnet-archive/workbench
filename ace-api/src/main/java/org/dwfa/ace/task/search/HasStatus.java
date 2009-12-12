@@ -84,12 +84,12 @@ public class HasStatus extends AbstractSearchTest {
             }
 
             List<I_ConceptAttributeTuple> attributeTuples = conceptToTest.getConceptAttributeTuples(null,
-                frameConfig.getViewPositionSet());
+                frameConfig.getViewPositionSetReadOnly());
 
             for (I_ConceptAttributeTuple tuple : attributeTuples) {
                 I_GetConceptData statusToTest = LocalVersionedTerminology.get().getConcept(tuple.getConceptStatus());
                 if (statusToMatch.isParentOfOrEqualTo(statusToTest, frameConfig.getAllowedStatus(),
-                    frameConfig.getDestRelTypes(), frameConfig.getViewPositionSet(), false)) {
+                    frameConfig.getDestRelTypes(), frameConfig.getViewPositionSetReadOnly(), false)) {
                     if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                         AceLog.getAppLog().fine("    status check " + statusToTest + "true for " + conceptToTest);
                         AceLog.getAppLog().info("Status OK: " + conceptToTest.getUids());

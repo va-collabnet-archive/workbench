@@ -130,12 +130,12 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                     buff.append("  </concept-ids>\n");
                     buff.append("  <descriptions>\n");
                     for (I_DescriptionTuple dt : concept.getDescriptionTuples(config.getAllowedStatus(), null,
-                        config.getViewPositionSet())) {
+                        config.getViewPositionSetReadOnly())) {
                         buff.append("    <description type='");
                         I_GetConceptData type = tf.getConcept(dt.getTypeId());
 
                         I_DescriptionTuple typeDesc = type.getDescTuple(config.getLongLabelDescPreferenceList(),
-                            config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSet(),
+                            config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
                             config.getLanguageSortPref());
                         buff.append(typeDesc.getText());
                         buff.append("'\n                 text='");
@@ -167,7 +167,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                 throw new IOException(e);
             }
             I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(),
-                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSet(),
+                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
                 config.getLanguageSortPref());
             buff.append(sourceDesc.getText());
             buff.append("' value='");
@@ -213,7 +213,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                 throw new IOException(e);
             }
             I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(),
-                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSet(),
+                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
                 config.getLanguageSortPref());
             buff.append(sourceDesc.getText());
             buff.append("\t");

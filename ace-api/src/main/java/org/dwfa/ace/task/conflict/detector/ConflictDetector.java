@@ -27,6 +27,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.PositionSetReadOnly;
 
 public class ConflictDetector {
     /**
@@ -41,8 +42,9 @@ public class ConflictDetector {
         Set<I_DescriptionTuple> descTuples = null;
         Set<I_RelTuple> relTuples = null;
         for (I_Position viewPos : profileForConflictDetection.getViewPositionSet()) {
-            Set<I_Position> viewPositionSet = new HashSet<I_Position>();
-            viewPositionSet.add(viewPos);
+            Set<I_Position> positionSet = new HashSet<I_Position>();
+            positionSet.add(viewPos);
+            PositionSetReadOnly viewPositionSet = new PositionSetReadOnly(positionSet);
             if (attributeTuples == null) {
                 attributeTuples = new TreeSet<I_ConceptAttributeTuple>(new AttrTupleConflictComparator());
                 attributeTuples.addAll(concept.getConceptAttributeTuples(null, viewPositionSet));

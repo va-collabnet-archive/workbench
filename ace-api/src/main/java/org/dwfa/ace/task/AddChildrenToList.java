@@ -74,7 +74,7 @@ public class AddChildrenToList extends AbstractTask {
             I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 
             for (I_GetConceptData child : concept.getDestRelOrigins(config.getAllowedStatus(),
-                config.getDestRelTypes(), config.getViewPositionSet(), true)) {
+                config.getDestRelTypes(), config.getViewPositionSetReadOnly(), true)) {
                 model.addElement(child);
             }
 

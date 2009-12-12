@@ -42,6 +42,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -99,8 +100,9 @@ public class CopyConceptFromPathToPath extends AbstractTask {
                 .getUids());
             I_Path toPath = tf.getPath(AceTaskUtil.getConceptFromObject(process.readProperty(toPathPropName)).getUids());
             I_GetConceptData concept = AceTaskUtil.getConceptFromObject(process.readProperty(conceptPropName));
-            Set<I_Position> fromSet = new HashSet<I_Position>();
-            fromSet.add(tf.newPosition(fromPath, Integer.MAX_VALUE));
+            Set<I_Position> positionSet = new HashSet<I_Position>();
+            positionSet.add(tf.newPosition(fromPath, Integer.MAX_VALUE));
+            PositionSetReadOnly fromSet = new PositionSetReadOnly(positionSet);
             copyFromPathToPath(tf, toPath, concept, fromSet, null, null);
 
             tf.addUncommitted(concept);
@@ -125,7 +127,7 @@ public class CopyConceptFromPathToPath extends AbstractTask {
     }
 
     public static void copyFromPathToPath(I_TermFactory tf, I_Path toPath, I_GetConceptData concept,
-            Set<I_Position> fromSet, I_GetConceptData conceptStatus, I_GetConceptData copyStatus) throws IOException,
+    		PositionSetReadOnly fromSet, I_GetConceptData conceptStatus, I_GetConceptData copyStatus) throws IOException,
             TerminologyException {
         copyId(toPath, concept.getId(), copyStatus);
         for (I_ConceptAttributeTuple t : concept.getConceptAttributeTuples(null, fromSet)) {

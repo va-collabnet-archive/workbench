@@ -90,7 +90,7 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
             throws TerminologyException, IOException {
         I_GetConceptData concept = LocalVersionedTerminology.get().getConcept(nid);
         List<I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(),
-            activeProfile.getViewPositionSet());
+            activeProfile.getViewPositionSetReadOnly());
         if (attributes == null || attributes.size() == 0) {
             String alertString = "<html>Inactive concept in refset:<br> <font color='blue'>" + concept.toString()
                 + "</font><br>If appropriate, please change prior to commit...";

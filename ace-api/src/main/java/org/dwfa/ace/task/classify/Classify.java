@@ -35,6 +35,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -215,7 +216,7 @@ public class Classify extends AbstractTask {
         final protected I_IntSet isaTypes;
         final protected int definingCharacteristic;
         final protected I_IntSet activeStatus;
-        final protected Set<I_Position> latestStated;
+        final protected PositionSetReadOnly latestStated;
         final protected boolean addUncommitted;
         final protected I_IntSet processed;
 
@@ -240,7 +241,7 @@ public class Classify extends AbstractTask {
             final I_ConfigAceFrame frameConfig = termFactory.getActiveAceFrameConfig();
             activeStatus = frameConfig.getAllowedStatus();
             isaTypes = frameConfig.getDestRelTypes();
-            latestStated = frameConfig.getViewPositionSet();
+            latestStated = frameConfig.getViewPositionSetReadOnly();
 
             // activeStatus = termFactory.newIntSet();
             // activeStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getConceptId());
@@ -313,7 +314,7 @@ public class Classify extends AbstractTask {
             final I_ConfigAceFrame frameConfig = termFactory.getActiveAceFrameConfig();
             final I_IntSet allowedStatus = frameConfig.getAllowedStatus();
             final I_IntSet allowedTypes = frameConfig.getDestRelTypes();
-            final Set<I_Position> positions = frameConfig.getViewPositionSet();
+            final PositionSetReadOnly positions = frameConfig.getViewPositionSetReadOnly();
             int i = 0;
             final Iterator<I_GetConceptData> itr = termFactory.getConceptIterator();
             while (itr.hasNext() && i++ < 1000) {

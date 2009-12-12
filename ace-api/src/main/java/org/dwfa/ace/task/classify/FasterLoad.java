@@ -46,6 +46,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -148,7 +149,7 @@ public class FasterLoad extends AbstractTask {
 
         final private I_IntSet activeStatus;
         final private I_IntSet allowedTypes;
-        final private Set<I_Position> positions;
+        final private PositionSetReadOnly positions;
         final private int definingCharacteristic;
         final private I_GetConceptData root;
 
@@ -161,7 +162,7 @@ public class FasterLoad extends AbstractTask {
             final I_ConfigAceFrame frameConfig = termFactory.getActiveAceFrameConfig();
             activeStatus = frameConfig.getAllowedStatus();
             allowedTypes = frameConfig.getDestRelTypes();
-            positions = frameConfig.getViewPositionSet();
+            positions = frameConfig.getViewPositionSetReadOnly();
 
             definingCharacteristic = termFactory.getConcept(
                 ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()).getConceptId();

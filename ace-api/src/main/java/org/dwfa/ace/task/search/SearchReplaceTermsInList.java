@@ -41,9 +41,9 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -178,7 +178,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                     // Get the current concept
                     I_GetConceptData child = model.getElementAt(i);
 
-                    Set<I_Position> positionsToCheck = config.getViewPositionSet();
+                    PositionSetReadOnly positionsToCheck = config.getViewPositionSetReadOnly();
 
                     // get latest descriptions
                     List<I_DescriptionTuple> descriptionTuples = child.getDescriptionTuples(config.getAllowedStatus(),

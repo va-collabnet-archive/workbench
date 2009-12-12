@@ -43,6 +43,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
 
 /**
@@ -131,7 +132,7 @@ public final class ConceptDescriptionFacade {
      */
     public List<I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept) throws Exception {
         I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
-        Set<I_Position> allPositions = conceptTest.getPositions(termFactory);
+        PositionSetReadOnly allPositions = conceptTest.getPositions(termFactory);
 
         return concept.getDescriptionTuples(activeProfile.getAllowedStatus(), null, allPositions, true);
     }

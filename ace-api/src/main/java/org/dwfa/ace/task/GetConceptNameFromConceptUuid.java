@@ -100,7 +100,7 @@ public class GetConceptNameFromConceptUuid extends AbstractTask {
             }
 
             I_DescriptionTuple desc = concept.getDescTuple(config.getLongLabelDescPreferenceList(),
-                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSet(),
+                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
                 config.getLanguageSortPref());
 
             process.setProperty(this.conceptPropName, desc.getText());

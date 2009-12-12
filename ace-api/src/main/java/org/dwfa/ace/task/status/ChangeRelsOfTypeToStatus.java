@@ -34,6 +34,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -95,10 +96,11 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
                 throw new TaskFailedException("You must select at least one editing path. ");
             }
 
-            Set<I_Position> positionsForEdit = new HashSet<I_Position>();
+            Set<I_Position> positionSet = new HashSet<I_Position>();
             for (I_Path editPath : config.getEditingPathSet()) {
-                positionsForEdit.add(LocalVersionedTerminology.get().newPosition(editPath, Integer.MAX_VALUE));
+                positionSet.add(LocalVersionedTerminology.get().newPosition(editPath, Integer.MAX_VALUE));
             }
+            PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = LocalVersionedTerminology.get().getConcept(newStatus.ids);
             I_GetConceptData relTypeConcept = LocalVersionedTerminology.get().getConcept(relType.ids);
             I_IntSet typeSet = LocalVersionedTerminology.get().newIntSet();

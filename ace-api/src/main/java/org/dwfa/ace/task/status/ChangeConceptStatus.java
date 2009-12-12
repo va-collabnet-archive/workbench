@@ -34,6 +34,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -94,10 +95,11 @@ public class ChangeConceptStatus extends AbstractTask {
 
             Set<I_ConceptAttributePart> partsToAdd = new HashSet<I_ConceptAttributePart>();
 
-            Set<I_Position> positionsForEdit = new HashSet<I_Position>();
+            Set<I_Position> positionSet = new HashSet<I_Position>();
             for (I_Path editPath : config.getEditingPathSet()) {
-                positionsForEdit.add(LocalVersionedTerminology.get().newPosition(editPath, Integer.MAX_VALUE));
+                positionSet.add(LocalVersionedTerminology.get().newPosition(editPath, Integer.MAX_VALUE));
             }
+            PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = LocalVersionedTerminology.get().getConcept(newStatus.ids);
             if (newStatusConcept == null) {
                 throw new TaskFailedException("newStatusConcept is null. Ids: " + Arrays.asList(newStatus.ids));

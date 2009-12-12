@@ -34,6 +34,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
@@ -204,15 +205,15 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 
 	        // Get the SNOMED Position (must convert from UniversalAcePosition type) 
 			// Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
-			Set<I_Position> snomedPositionSet = new HashSet<I_Position>();			
+			Set<I_Position> positionSet = new HashSet<I_Position>();			
 			Set<UniversalAcePosition> universalSnomedPositions = 
 				(Set<UniversalAcePosition>) process.getProperty(snomedVersionPropName);			        
 	        for (UniversalAcePosition univPos: universalSnomedPositions) {
 	           I_Path path = termFactory.getPath(univPos.getPathId());
 	           I_Position thinPos = termFactory.newPosition(path, termFactory.convertToThinVersion(univPos.getTime()));
-	           snomedPositionSet.add(thinPos);
+	           positionSet.add(thinPos);
 	        }
-
+	        PositionSetReadOnly snomedPositionSet = new PositionSetReadOnly(positionSet);
 	        // DEBUG:  Echo out the retrieved values 
 	        System.out.println("PARAMETERS PASSED IN THROUGH KEYS");
 	        System.out.println("=================================");

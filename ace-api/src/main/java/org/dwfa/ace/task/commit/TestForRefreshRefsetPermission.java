@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -125,7 +126,7 @@ public class TestForRefreshRefsetPermission extends AbstractConceptTest {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         Set<I_GetConceptData> refsets = new HashSet<I_GetConceptData>();
 
-        Set<I_Position> allPositions = getPositions(termFactory);
+        PositionSetReadOnly allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
 
         I_GetConceptData createNewRefsetPermission = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CREATE_NEW_REFSET_PERMISSION.getUids());
@@ -170,7 +171,7 @@ public class TestForRefreshRefsetPermission extends AbstractConceptTest {
     public Set<I_GetConceptData> getValidRefsetsFromIndividualUserPermissions(I_GetConceptData concept)
             throws Exception {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        Set<I_Position> allPositions = getPositions(termFactory);
+        PositionSetReadOnly allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
         I_GetConceptData createNewRefsetPermissionRel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CREATE_NEW_REFSET_PERMISSION.getUids());
         I_IntSet allowedTypes = termFactory.newIntSet();

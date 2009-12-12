@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.conflict.detector.DescriptionTupleConflictComparator;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
@@ -82,8 +83,9 @@ public abstract class AbstractDifferenceDescription extends AbstractSearchTest {
 
             Set<I_DescriptionTuple> firstSet = null;
             for (I_Position p : frameConfig.getViewPositionSet()) {
-                Set<I_Position> viewSet = new HashSet<I_Position>();
-                viewSet.add(p);
+                Set<I_Position> positionSet = new HashSet<I_Position>();
+                positionSet.add(p);
+                PositionSetReadOnly viewSet = new PositionSetReadOnly(positionSet);
                 List<I_DescriptionTuple> tuples = conceptToTest.getDescriptionTuples(frameConfig.getAllowedStatus(),
                     allowedTypes, viewSet);
                 if (firstSet == null) {

@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.classify.I_SnorocketFactory.I_Callback;
 import org.dwfa.bpa.process.Condition;
@@ -137,7 +138,7 @@ public class ClassifySelected extends AbstractTask {
         final protected I_IntSet isaTypes;
         final protected int definingCharacteristic;
         final protected I_IntSet activeStatus;
-        final protected Set<I_Position> latestStated;
+        final protected PositionSetReadOnly latestStated;
 
         ConceptProcesser(final I_TermFactory termFactory, final I_SnorocketFactory rocket) throws TerminologyException,
                 IOException {
@@ -149,7 +150,7 @@ public class ClassifySelected extends AbstractTask {
             final I_ConfigAceFrame frameConfig = termFactory.getActiveAceFrameConfig();
             activeStatus = frameConfig.getAllowedStatus();
             isaTypes = frameConfig.getDestRelTypes();
-            latestStated = frameConfig.getViewPositionSet();
+            latestStated = frameConfig.getViewPositionSetReadOnly();
 
             // activeStatus = termFactory.newIntSet();
             // activeStatus.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getConceptId());

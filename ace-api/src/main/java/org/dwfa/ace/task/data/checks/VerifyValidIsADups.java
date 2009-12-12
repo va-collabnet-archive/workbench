@@ -139,12 +139,12 @@ public class VerifyValidIsADups extends AbstractTask {
             pendingRetirementStatusSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
             for (I_GetConceptData child : selectedConcept.getSourceRelTargets(pendingRetirementStatusSet, isDupTypeSet,
-                config.getViewPositionSet(), true)) {
+                config.getViewPositionSetReadOnly(), true)) {
                 return Condition.FALSE;
             }
 
             for (I_GetConceptData child : selectedConcept.getDestRelOrigins(pendingRetirementStatusSet, isDupTypeSet,
-                config.getViewPositionSet(), true)) {
+                config.getViewPositionSetReadOnly(), true)) {
                 return Condition.FALSE;
             }
 

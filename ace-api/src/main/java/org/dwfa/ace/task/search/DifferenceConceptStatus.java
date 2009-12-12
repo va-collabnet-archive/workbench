@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
 
@@ -74,8 +75,9 @@ public class DifferenceConceptStatus extends AbstractSearchTest {
             I_ConceptAttributeTuple firstTuple = null;
             boolean firstPass = true;
             for (I_Position p : frameConfig.getViewPositionSet()) {
-                Set<I_Position> positionSet = new HashSet<I_Position>();
-                positionSet.add(p);
+                Set<I_Position> positions = new HashSet<I_Position>();
+                positions.add(p);
+                PositionSetReadOnly positionSet = new PositionSetReadOnly(positions);
                 List<I_ConceptAttributeTuple> tuples = conceptToTest.getConceptAttributeTuples(
                     frameConfig.getAllowedStatus(), positionSet);
                 if (firstPass) {

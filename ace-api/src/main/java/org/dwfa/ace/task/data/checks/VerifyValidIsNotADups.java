@@ -140,13 +140,13 @@ public class VerifyValidIsNotADups extends AbstractTask {
             pendingRetirementStatusSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
             for (I_GetConceptData notDupConcept : selectedConcept.getSourceRelTargets(pendingRetirementStatusSet,
-                isNotDupTypeSet, config.getViewPositionSet(), true)) {
+                isNotDupTypeSet, config.getViewPositionSetReadOnly(), true)) {
 
                 I_IntSet statusTypeSet = termFact.newIntSet();
                 statusTypeSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
                 List<I_ConceptAttributeTuple> statusTuples = notDupConcept.getConceptAttributeTuples(statusTypeSet,
-                    config.getViewPositionSet());
+                    config.getViewPositionSetReadOnly());
 
                 for (I_ConceptAttributeTuple tuple : statusTuples)
                     return Condition.FALSE;
@@ -154,13 +154,13 @@ public class VerifyValidIsNotADups extends AbstractTask {
             }// End for loop
 
             for (I_GetConceptData notDupConcept : selectedConcept.getDestRelOrigins(pendingRetirementStatusSet,
-                isNotDupTypeSet, config.getViewPositionSet(), true)) {
+                isNotDupTypeSet, config.getViewPositionSetReadOnly(), true)) {
 
                 I_IntSet statusTypeSet = termFact.newIntSet();
                 statusTypeSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
                 List<I_ConceptAttributeTuple> statusTuples = notDupConcept.getConceptAttributeTuples(statusTypeSet,
-                    config.getViewPositionSet());
+                    config.getViewPositionSetReadOnly());
 
                 for (I_ConceptAttributeTuple tuple : statusTuples)
                     return Condition.FALSE;

@@ -27,6 +27,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
@@ -89,7 +90,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
     private List<I_DescriptionTuple> getDescriptionTupleList(final I_GetConceptData concept,
             final I_ConfigAceFrame activeProfile) throws IOException {
 
-        Set<I_Position> allPositions = null;
+        PositionSetReadOnly allPositions = null;
         I_IntSet allTypes = null;
         boolean conflictResolvedLatestState = true;
         return concept.getDescriptionTuples(activeProfile.getAllowedStatus(), allTypes, allPositions,
