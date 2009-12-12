@@ -78,7 +78,7 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
 
     // Task Attribute Properties
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-    private String positionSetPropName = ProcessAttachmentKeys.POSITION_SET.getAttachmentKey();
+    private String refsetVersionPropName = ProcessAttachmentKeys.REFSET_VERSION.getAttachmentKey();
 
     private I_TermFactory termFactory;
 
@@ -90,7 +90,7 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(profilePropName);
-        out.writeObject(positionSetPropName);
+        out.writeObject(refsetVersionPropName);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -99,7 +99,7 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
             if (objDataVersion >= 1) {
                 // Read version 1 data fields
                 profilePropName = (String) in.readObject();
-                positionSetPropName = (String) in.readObject();
+                refsetVersionPropName = (String) in.readObject();
             }
             // Initialize transient properties...
         } else {
@@ -184,7 +184,7 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
                             }
                         }
 
-                        process.setProperty(positionSetPropName, universalPositions);
+                        process.setProperty(refsetVersionPropName, universalPositions);
                         return Condition.ITEM_COMPLETE;
                     }
                 }
@@ -212,13 +212,13 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
         return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
     }
 
-    public String getPositionSetPropName() {
-        return positionSetPropName;
-    }
+    public String getRefsetVersionPropName() {
+		return refsetVersionPropName;
+	}
 
-    public void setPositionSetPropName(String positionSetPropName) {
-        this.positionSetPropName = positionSetPropName;
-    }
+	public void setRefsetVersionPropName(String refsetVersionPropName) {
+		this.refsetVersionPropName = refsetVersionPropName;
+	}
 
     public String getProfilePropName() {
         return profilePropName;
