@@ -93,7 +93,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
 	 */
     private static final long serialVersionUID = 1L;
 
-    List<I_ConceptAttributeTuple> allTuples;
+    List<? extends I_ConceptAttributeTuple> allTuples;
 
     private TableChangedSwingWorker tableChangeWorker;
 
@@ -183,7 +183,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             if ((cb == null) || (cb.getConceptAttributes() == null)) {
                 return true;
             }
-            List<I_ConceptAttributeTuple> tuples = getConceptTuples(cb);
+            List<? extends I_ConceptAttributeTuple> tuples = getConceptTuples(cb);
             for (I_ConceptAttributeTuple conVersion : tuples) {
                 conceptsToFetch.add(conVersion.getConceptStatus());
                 conceptsToFetch.add(conVersion.getPathId());
@@ -366,7 +366,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         return null;
     }
 
-    private List<I_ConceptAttributeTuple> getConceptTuples(I_GetConceptData cb) throws IOException {
+    private List<? extends I_ConceptAttributeTuple> getConceptTuples(I_GetConceptData cb) throws IOException {
     	PositionSetReadOnly positions = null;
         positions = host.getConfig().getViewPositionSetReadOnly();
         if (host.getShowHistory()) {

@@ -112,7 +112,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
             return false;
         }
 
-        List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(config.getAllowedStatus(),
+        List<? extends I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(config.getAllowedStatus(),
             config.getViewPositionSetReadOnly());
         return doesConflictExist(tuples);
     }

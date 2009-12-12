@@ -130,7 +130,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
             if (cb == null) {
                 return true;
             }
-            List<I_DescriptionVersioned> descs = cb.getDescriptions();
+            List<? extends I_DescriptionVersioned> descs = cb.getDescriptions();
             addToConceptsToFetch(descs);
             if (stopWork) {
                 return false;
@@ -169,7 +169,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
             }
         }
 
-        private void addToConceptsToFetch(List<I_DescriptionVersioned> descs) {
+        private void addToConceptsToFetch(List<? extends I_DescriptionVersioned> descs) {
             for (I_DescriptionVersioned d : descs) {
                 if (stopWork) {
                     return;
