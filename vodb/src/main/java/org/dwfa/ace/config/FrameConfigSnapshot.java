@@ -51,6 +51,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
@@ -1220,5 +1221,9 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 	@Override
 	public PositionSetReadOnly getViewPositionSetReadOnly() {
 		return new PositionSetReadOnly(viewPositionSet);
+	}
+
+	public PathSetReadOnly getEditingPathSetReadOnly() {
+		return baseFrame.getEditingPathSetReadOnly();
 	}
 }

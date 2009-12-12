@@ -34,6 +34,7 @@ import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.TupleAdder;
@@ -278,7 +279,7 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
         return returnList;
     }
 
-    public boolean promote(I_Position viewPosition, Set<I_Path> promotionPaths, I_IntSet allowedStatus) {
+    public boolean promote(I_Position viewPosition, PathSetReadOnly promotionPaths, I_IntSet allowedStatus) {
         int viewPathId = viewPosition.getPath().getConceptId();
         Set<I_Position> viewPositionSet = new HashSet<I_Position>();
         viewPositionSet.add(viewPosition);

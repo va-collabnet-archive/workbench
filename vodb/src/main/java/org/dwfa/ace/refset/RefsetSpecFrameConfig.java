@@ -52,6 +52,7 @@ import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
@@ -1203,5 +1204,9 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
 	public PositionSetReadOnly getViewPositionSetReadOnly() {
 		return frameConfig.getViewPositionSetReadOnly();
+	}
+
+	public PathSetReadOnly getEditingPathSetReadOnly() {
+		return frameConfig.getEditingPathSetReadOnly();
 	}
 }

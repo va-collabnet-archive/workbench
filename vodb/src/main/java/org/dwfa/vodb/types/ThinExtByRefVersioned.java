@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -412,7 +413,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
         return memberId;
     }
 
-    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+    public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus) {
         int viewPathId = viewPosition.getPath().getConceptId();
         Set<I_Position> positions = new HashSet<I_Position>();
         positions.add(viewPosition);

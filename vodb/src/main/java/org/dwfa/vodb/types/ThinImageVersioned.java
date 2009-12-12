@@ -32,6 +32,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceImage;
@@ -230,7 +231,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
         return imageId;
     }
 
-    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+    public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus) {
         int viewPathId = viewPosition.getPath().getConceptId();
         Set<I_Position> positions = new HashSet<I_Position>();
         positions.add(viewPosition);
