@@ -50,6 +50,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
@@ -268,6 +269,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 
     public Set<I_Path> getEditingPathSet() {
         return config.getPromotionPathSet();
+    }
+    
+    public PathSetReadOnly getEditingPathSetReadOnly() {
+    	return new PathSetReadOnly(config.getPromotionPathSet());
     }
 
     public I_IntList getEditRelCharacteristicPopup() {

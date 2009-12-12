@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.RefsetHelper;
@@ -81,7 +82,7 @@ public class PromoteRefset extends AbstractTask {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(profilePropName);
             Set<I_Position> viewPositionSet = config.getViewPositionSet();
-            Set<I_Path> promotionPaths = config.getPromotionPathSet();
+            PathSetReadOnly promotionPaths = new PathSetReadOnly(config.getPromotionPathSet());
             if (viewPositionSet.size() != 1 || promotionPaths.size() != 1) {
                 throw new TaskFailedException(
                     "There must be only one view position, and one promotion path: viewPaths " + viewPositionSet
@@ -120,7 +121,7 @@ public class PromoteRefset extends AbstractTask {
         return Condition.CONTINUE;
     }
 
-    private void promoteRefset(I_ConfigAceFrame config, I_Position viewPosition, Set<I_Path> promotionPaths,
+    private void promoteRefset(I_ConfigAceFrame config, I_Position viewPosition, PathSetReadOnly promotionPaths,
             I_TermFactory tf, I_GetConceptData refsetIdentity) throws TerminologyException, IOException {
         refsetIdentity.promote(viewPosition, promotionPaths, config.getAllowedStatus());
         tf.addUncommittedNoChecks(refsetIdentity);
