@@ -19,6 +19,7 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.util.Date;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -26,6 +27,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable<I_ThinExtByRefPart> {
     private int pathId;
@@ -173,5 +175,18 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
     }
+	@Override
+	public long getTime() {
+		return ThinVersionHelper.convert(getVersion());
+	}
+
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		I_ThinExtByRefPart newPart = duplicate();
+		newPart.setStatusId(statusNid);
+		newPart.setPathId(pathNid);
+		newPart.setVersion(ThinVersionHelper.convert(time));
+		return newPart;
+	}
 
 }

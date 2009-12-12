@@ -19,6 +19,7 @@ package org.dwfa.vodb.types;
 import java.util.Date;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.util.HashFunction;
@@ -174,4 +175,18 @@ public class ThinConPart implements I_ConceptAttributePart {
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
     }
+
+	@Override
+	public long getTime() {
+		return ThinVersionHelper.convert(version);
+	}
+
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		I_ConceptAttributePart newPart = duplicate();
+		newPart.setStatusId(statusNid);
+		newPart.setPathId(pathNid);
+		newPart.setVersion(ThinVersionHelper.convert(time));
+		return newPart;
+	}
 }

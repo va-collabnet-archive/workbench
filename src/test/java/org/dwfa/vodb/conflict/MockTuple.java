@@ -28,6 +28,8 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.types.ThinRelPart;
 
 public class MockTuple implements I_AmTuple {
 
@@ -127,5 +129,19 @@ public class MockTuple implements I_AmTuple {
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
     }
+
+	@Override
+	public long getTime() {
+		return ThinVersionHelper.convert(getVersion());
+	}
+
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		I_AmPart newPart = duplicate();
+		newPart.setStatusId(statusNid);
+		newPart.setPathId(pathNid);
+		newPart.setVersion(ThinVersionHelper.convert(time));
+		return newPart;
+	}
 
 }

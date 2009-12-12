@@ -23,6 +23,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -83,6 +84,19 @@ public class PartDateOrderSortComparatorTest {
         public void setPositionId(int pid) {
             throw new UnsupportedOperationException();
         }
+    	@Override
+    	public long getTime() {
+    		return ThinVersionHelper.convert(getVersion());
+    	}
+
+    	@Override
+    	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+    		I_AmPart newPart = duplicate();
+    		newPart.setStatusId(statusNid);
+    		newPart.setPathId(pathNid);
+    		newPart.setVersion(ThinVersionHelper.convert(time));
+    		return newPart;
+    	}
 
     }
 

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -221,4 +222,12 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
         addVersion(promotionPart);
         return true;
     }
+
+	public long getTime() {
+		return part.getTime();
+	}
+
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		return part.makeAnalog(statusNid, pathNid, time);
+	}
 }

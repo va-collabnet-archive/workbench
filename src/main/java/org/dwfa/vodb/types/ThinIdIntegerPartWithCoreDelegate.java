@@ -17,8 +17,11 @@
 package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.util.HashFunction;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
     private ThinIdPartCore core;
@@ -191,5 +194,18 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
     }
+	@Override
+	public long getTime() {
+		return ThinVersionHelper.convert(getVersion());
+	}
+
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		I_IdPart newPart = duplicate();
+		newPart.setStatusId(statusNid);
+		newPart.setPathId(pathNid);
+		newPart.setVersion(ThinVersionHelper.convert(time));
+		return newPart;
+	}
 
 }

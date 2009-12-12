@@ -17,6 +17,7 @@
 package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -197,4 +198,12 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
     public int getFixedPartId() {
         return core.getTermComponentId();
     }
+
+	public long getTime() {
+		return part.getTime();
+	}
+
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		return part.makeAnalog(statusNid, pathNid, time);
+	}
 }
