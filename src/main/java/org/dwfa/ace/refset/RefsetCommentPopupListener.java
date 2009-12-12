@@ -70,7 +70,7 @@ public class RefsetCommentPopupListener extends MouseAdapter {
                     I_TermFactory tf = LocalVersionedTerminology.get();
                     I_IntSet allowedTypes = new IntSet();
                     allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
-                    Set<I_GetConceptData> commentRefsets = refsetIdentityConcept.getSourceRelTargets(
+                    Set<? extends I_GetConceptData> commentRefsets = refsetIdentityConcept.getSourceRelTargets(
                         config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), false);
                     int newMemberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(),
                         ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
