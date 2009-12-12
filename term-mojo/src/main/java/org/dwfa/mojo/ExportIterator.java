@@ -476,7 +476,7 @@ public class ExportIterator implements I_ProcessConcepts {
     private void writeUuidBasedRelDetails(I_GetConceptData concept, I_IntSet allowedStatus, I_IntSet allowedTypes)
             throws Exception {
 
-        List<I_RelTuple> tuples = concept.getSourceRelTuples(null, null, positions, false);
+        List<? extends I_RelTuple> tuples = concept.getSourceRelTuples(null, null, positions, false);
 
         HashMap<Integer, I_RelTuple> latestRel = new HashMap<Integer, I_RelTuple>();
         for (I_RelTuple tuple : tuples) {

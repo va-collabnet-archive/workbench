@@ -134,7 +134,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             }
 
             // get latest relationships
-            List<I_RelTuple> relationshipTuples = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(positions), false);
+            List<? extends I_RelTuple> relationshipTuples = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(positions), false);
             // copy latest relationships to new path/version
             for (I_RelTuple tuple : relationshipTuples) {
                 I_RelPart newPart = tuple.duplicatePart();
