@@ -531,6 +531,10 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
 	    	System.out.println("DEBUG: Summary Message=" + summaryMessage);
 	    	newPanel.setMessageText(summaryMessage);
 
+	    	
+	    	// FINALLY... Set the process Name and Subject based on the values above
+	    	process.setName(refsetSpecName +  " - " + resetSpecVersionName);
+	    	process.setSubject("SNOMED Version " + snomedVersionName + " Refresh");
 	        
 	        /*----------------------------------------------------------------------------------
 	         *  Add the initialized panel to the Workflow Details Sheet
