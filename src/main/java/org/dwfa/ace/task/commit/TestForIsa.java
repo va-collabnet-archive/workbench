@@ -23,6 +23,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
@@ -121,7 +122,7 @@ public class TestForIsa extends AbstractConceptTest {
 
     private List<I_RelTuple> getSourceRelationships(final I_GetConceptData concept) throws Exception {
         I_IntSet isARelationships = getIsARelationshipList(getTermFactory());
-        Set<I_Position> allPositions = null;
+        PositionSetReadOnly allPositions = null;
         boolean uncommited = true;
         boolean conflictResolved = true;
 

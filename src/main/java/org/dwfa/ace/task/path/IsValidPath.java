@@ -20,14 +20,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -90,7 +89,7 @@ public class IsValidPath extends AbstractTask {
                 I_IntSet allowedTypes = termFactory.newIntSet();
                 allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
                     .getConceptId());
-                Set<I_Position> positions = termFactory.getActiveAceFrameConfig().getViewPositionSet();
+                PositionSetReadOnly positions = termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly();
 
                 if (pathTopHierarchy.isParentOf(path, allowedStatus, allowedTypes, positions, true)) {
                     return Condition.TRUE;

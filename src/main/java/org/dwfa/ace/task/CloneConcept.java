@@ -33,6 +33,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -80,11 +81,11 @@ public class CloneConcept extends AbstractTask {
         try {
             I_TermFactory tf = LocalVersionedTerminology.get();
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            Set<I_Position> clonePositions = new HashSet<I_Position>();
+            Set<I_Position> positionSet = new HashSet<I_Position>();
             for (I_Path path : config.getEditingPathSet()) {
-                clonePositions.add(tf.newPosition(path, Integer.MAX_VALUE));
+            	positionSet.add(tf.newPosition(path, Integer.MAX_VALUE));
             }
-
+            PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
             I_HostConceptPlugins host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
 
             I_GetConceptData conceptToClone = (I_GetConceptData) host.getTermComponent();

@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.conflict.detector.RelTupleConflictComparator;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
@@ -75,8 +76,9 @@ public abstract class AbstractDifferenceRels extends AbstractSearchTest {
 
             TreeSet<I_RelTuple> firstSet = null;
             for (I_Position p : frameConfig.getViewPositionSet()) {
-                Set<I_Position> viewSet = new HashSet<I_Position>();
-                viewSet.add(p);
+                Set<I_Position> positionSet = new HashSet<I_Position>();
+                positionSet.add(p);
+                PositionSetReadOnly viewSet = new PositionSetReadOnly(positionSet);
                 List<I_RelTuple> tuples = getTuplesToCompare(frameConfig, conceptToTest, viewSet);
                 if (firstSet == null) {
                     firstSet = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
@@ -101,6 +103,6 @@ public abstract class AbstractDifferenceRels extends AbstractSearchTest {
     }
 
     protected abstract List<I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig,
-            I_GetConceptData conceptToTest, Set<I_Position> viewSet) throws IOException;
+            I_GetConceptData conceptToTest, PositionSetReadOnly viewSet) throws IOException;
 
 }

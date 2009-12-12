@@ -40,6 +40,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
@@ -308,7 +309,7 @@ public class TupleFileUtil {
 
         I_IntSet allowedStatus = termFactory.getActiveAceFrameConfig().getAllowedStatus();
         I_IntSet allowedTypes = null;
-        Set<I_Position> positions = termFactory.getActiveAceFrameConfig().getViewPositionSet();
+        PositionSetReadOnly positions = termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly();
 
         // refset spec
         exportFileWriter.append(ConceptTupleFileUtil.exportTuple(refsetSpec));
@@ -578,7 +579,7 @@ public class TupleFileUtil {
             .getActiveAceFrameConfig()
             .getAllowedStatus(), allowedTypes, LocalVersionedTerminology.get()
             .getActiveAceFrameConfig()
-            .getViewPositionSet(), true, true);
+            .getViewPositionSetReadOnly(), true, true);
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {
                 latestVersion = rel.getVersion();

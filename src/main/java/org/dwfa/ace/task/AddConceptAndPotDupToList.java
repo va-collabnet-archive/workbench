@@ -92,11 +92,11 @@ public class AddConceptAndPotDupToList extends AbstractTask {
             model.addElement(conceptWithPotDup);
 
             for (I_GetConceptData child : conceptWithPotDup.getSourceRelTargets(config.getAllowedStatus(),
-                potDupTypeSet, config.getViewPositionSet(), true)) {
+                potDupTypeSet, config.getViewPositionSetReadOnly(), true)) {
                 worker.getLogger().info("Found child with view positions: " + child);
             }
             for (I_GetConceptData child : conceptWithPotDup.getSourceRelTargets(config.getAllowedStatus(),
-                potDupTypeSet, config.getViewPositionSet(), true)) {
+                potDupTypeSet, config.getViewPositionSetReadOnly(), true)) {
                 model.addElement(child);
             }
 

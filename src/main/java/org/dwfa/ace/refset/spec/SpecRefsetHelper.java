@@ -36,6 +36,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
@@ -62,7 +63,7 @@ public class SpecRefsetHelper {
 
     protected int unspecifiedUuid;
 
-    protected Set<I_Position> viewPositions;
+    protected PositionSetReadOnly viewPositions;
     protected Set<I_Path> editPaths;
     protected I_IntSet allowedStatuses;
     protected I_IntSet isARelTypes;
@@ -1029,7 +1030,7 @@ public class SpecRefsetHelper {
     }
 
     protected Set<I_GetConceptData> getAllDescendants(Set<I_GetConceptData> resultSet, I_GetConceptData parent,
-            I_IntSet allowedStatuses, I_IntSet allowedTypes, Set<I_Position> positions, Condition... conditions)
+            I_IntSet allowedStatuses, I_IntSet allowedTypes, PositionSetReadOnly positions, Condition... conditions)
             throws Exception {
 
         ITERATE_CHILDREN: for (I_RelTuple childTuple : parent.getDestRelTuples(allowedStatuses, allowedTypes,
@@ -1069,7 +1070,7 @@ public class SpecRefsetHelper {
     }
 
     protected Set<I_GetConceptData> getAllAncestors(Set<I_GetConceptData> resultSet, I_GetConceptData child,
-            I_IntSet allowedStatuses, I_IntSet allowedTypes, Set<I_Position> positions, Condition... conditions)
+            I_IntSet allowedStatuses, I_IntSet allowedTypes, PositionSetReadOnly positions, Condition... conditions)
             throws Exception {
 
         ITERATE_PARENTS: for (I_RelTuple childTuple : child.getSourceRelTuples(allowedStatuses, allowedTypes,
@@ -1098,16 +1099,16 @@ public class SpecRefsetHelper {
      *         Returns null if no config set or config contains no view
      *         positions.
      */
-    protected Set<I_Position> getViewPositions() throws Exception {
+    protected PositionSetReadOnly getViewPositions() throws Exception {
         if (this.viewPositions == null) {
             I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
             if (config != null) {
-                this.viewPositions = config.getViewPositionSet();
+                this.viewPositions = config.getViewPositionSetReadOnly();
             }
 
             if (this.viewPositions == null) {
-                this.viewPositions = new HashSet<I_Position>();
+                this.viewPositions = new PositionSetReadOnly( new HashSet<I_Position>());
             }
         }
 

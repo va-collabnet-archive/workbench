@@ -301,7 +301,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
         I_GetConceptData descriptionConcept = (I_GetConceptData) component;
         List<I_DescriptionTuple> descriptionTuples = descriptionConcept.getDescriptionTuples(null, null,
-            termFactory.getActiveAceFrameConfig().getViewPositionSet(), true);
+            termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
 
         for (I_DescriptionTuple tuple : descriptionTuples) {
             I_DescriptionVersioned descVersioned = tuple.getDescVersioned();

@@ -20,12 +20,11 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -52,7 +51,7 @@ public class DifferenceRelsSourceOrDestination extends AbstractDifferenceRels {
     }
 
     protected List<I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig, I_GetConceptData conceptToTest,
-            Set<I_Position> viewSet) throws IOException {
+    		PositionSetReadOnly viewSet) throws IOException {
         ArrayList<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
         tuples.addAll(conceptToTest.getSourceRelTuples(frameConfig.getAllowedStatus(), null, viewSet, false));
         tuples.addAll(conceptToTest.getDestRelTuples(frameConfig.getAllowedStatus(), null, viewSet, false));

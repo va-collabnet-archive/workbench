@@ -125,13 +125,13 @@ public class VerifyNoPotentialDups extends AbstractTask {
 
             boolean statusValid = false;
             for (I_GetConceptData potDupConcept : selectedConcept.getSourceRelTargets(config.getAllowedStatus(),
-                potDupTypeSet, config.getViewPositionSet(), true)) {
+                potDupTypeSet, config.getViewPositionSetReadOnly(), true)) {
                 statusValid = false;
                 I_IntSet statusTypeSet = termFact.newIntSet();
                 statusTypeSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
                 List<I_ConceptAttributeTuple> statusTuples = potDupConcept.getConceptAttributeTuples(statusTypeSet,
-                    config.getViewPositionSet());
+                    config.getViewPositionSetReadOnly());
 
                 for (I_ConceptAttributeTuple tuple : statusTuples) {
                     statusValid = true;
@@ -140,13 +140,13 @@ public class VerifyNoPotentialDups extends AbstractTask {
             }
 
             for (I_GetConceptData potDupConcept : selectedConcept.getDestRelOrigins(config.getAllowedStatus(),
-                potDupTypeSet, config.getViewPositionSet(), true)) {
+                potDupTypeSet, config.getViewPositionSetReadOnly(), true)) {
                 statusValid = false;
                 I_IntSet statusTypeSet = termFact.newIntSet();
                 statusTypeSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
                 List<I_ConceptAttributeTuple> statusTuples = potDupConcept.getConceptAttributeTuples(statusTypeSet,
-                    config.getViewPositionSet());
+                    config.getViewPositionSetReadOnly());
 
                 for (I_ConceptAttributeTuple tuple : statusTuples) {
                     statusValid = true;

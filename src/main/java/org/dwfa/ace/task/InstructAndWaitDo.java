@@ -54,6 +54,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -229,10 +230,11 @@ public class InstructAndWaitDo extends AbstractTask {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         I_GetConceptData current_status = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
         I_GetConceptData fully_specified_description_type = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-        Set<I_Position> clonePositions = new HashSet<I_Position>();
+        Set<I_Position> positionSet = new HashSet<I_Position>();
         for (I_Path path : config.getEditingPathSet()) {
-            clonePositions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+        	positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
         }
+        PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
         for (I_DescriptionTuple desc : con.getDescriptionTuples(null, null, clonePositions)) {
             // Description is current
             if (desc.getStatusId() != current_status.getConceptId())
@@ -275,10 +277,11 @@ public class InstructAndWaitDo extends AbstractTask {
                 I_GetConceptData newConcept = createNewConcept(newDescrString, getSemanticTag(con));
                 // Now copy the rels from the exiting to the new
                 I_TermFactory termFactory = LocalVersionedTerminology.get();
-                Set<I_Position> clonePositions = new HashSet<I_Position>();
+                Set<I_Position> positionSet = new HashSet<I_Position>();
                 for (I_Path path : config.getEditingPathSet()) {
-                    clonePositions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+                	positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
                 }
+                PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
                 for (I_RelTuple rel : con.getSourceRelTuples(config.getAllowedStatus(), null, clonePositions, false)) {
                     termFactory.newRelationship(UUID.randomUUID(), newConcept,
                         termFactory.getConcept(rel.getRelTypeId()), termFactory.getConcept(rel.getC2Id()),

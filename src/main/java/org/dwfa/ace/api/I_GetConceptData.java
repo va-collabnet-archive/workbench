@@ -53,7 +53,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      */
     @Deprecated
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positions)
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions)
             throws IOException;
 
     /**
@@ -72,7 +72,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positions,
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
             boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
     /**
@@ -94,7 +94,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      */
     @Deprecated
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positions,
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
             boolean addUncommitted) throws IOException;
 
     /**
@@ -129,7 +129,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      */
     @Deprecated
     public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions) throws IOException;
+            PositionSetReadOnly positions) throws IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -147,7 +147,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      */
     public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean returnConflictResolvedLatestState) throws IOException;
+            PositionSetReadOnly positions, boolean returnConflictResolvedLatestState) throws IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -182,7 +182,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     @Deprecated
-    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions)
+    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions)
             throws IOException;
 
     /**
@@ -201,7 +201,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
     /**
@@ -247,7 +247,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      */
     @Deprecated
     public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted) throws IOException;
+            PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
 
     /**
      * If you want to get all the is-a relationships for this concept, pass in
@@ -272,7 +272,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException;
 
     /**
@@ -312,7 +312,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     @Deprecated
-    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             boolean addUncommitted) throws IOException;
 
     /**
@@ -333,7 +333,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
     /**
@@ -380,7 +380,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      */
     @Deprecated
     public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted) throws IOException;
+            PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
 
     /**
      * If you want to get all the is-a immediate parents for this concept, pass
@@ -405,7 +405,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException;
 
     /**
@@ -450,7 +450,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      */
     @Deprecated
     public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted) throws IOException;
+            PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
 
     /**
      * Gets the relationship origins based on the passed statuses, relationship
@@ -475,7 +475,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException;
 
     /**
@@ -530,7 +530,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public I_IdVersioned getId() throws IOException;
 
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus,
-            Set<I_Position> positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException;
+            PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException;
 
     public I_DescriptionTuple getDescTuple(I_IntList descTypePreferenceList, I_ConfigAceFrame config)
             throws IOException;
@@ -540,12 +540,12 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException;
 
     public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted) throws IOException;
+            PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
 
     public boolean isParentOf(I_GetConceptData child, boolean addUncommitted) throws IOException, TerminologyException;
 
     public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted) throws IOException;
+            PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
 
     public boolean isParentOfOrEqualTo(I_GetConceptData child, boolean addUncommitted) throws IOException,
             TerminologyException;

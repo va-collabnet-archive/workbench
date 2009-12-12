@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -39,11 +38,11 @@ import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -112,7 +111,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
             Map<TermEntry, TermEntry> elementStatusMap = (Map<TermEntry, TermEntry>) process.readProperty(elementStatusMapPropName);
             Map<Integer, Integer> elementStatusNidMap = makeNidMap(elementStatusMap);
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-            copyFromPathToPath(tf, toPath, concept, profile.getViewPositionSet(), conceptStatusNidMap,
+            copyFromPathToPath(tf, toPath, concept, profile.getViewPositionSetReadOnly(), conceptStatusNidMap,
                 elementStatusNidMap);
             tf.addUncommitted(concept);
             tf.commit();
@@ -149,7 +148,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
     }
 
     public static void copyFromPathToPath(I_TermFactory tf, I_Path toPath, I_GetConceptData concept,
-            Set<I_Position> fromSet, Map<Integer, Integer> conceptStatusNidMap,
+    		PositionSetReadOnly fromSet, Map<Integer, Integer> conceptStatusNidMap,
             Map<Integer, Integer> elementStatusNidMap) throws IOException, TerminologyException {
         copyId(toPath, concept.getId(), elementStatusNidMap);
         for (I_ConceptAttributeTuple t : concept.getConceptAttributeTuples(null, fromSet)) {

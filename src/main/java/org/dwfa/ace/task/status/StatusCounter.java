@@ -72,7 +72,7 @@ public class StatusCounter implements I_ProcessConcepts {
             attrTupels = concept.getConceptAttributeTuples(null, null);
         } else {
             attrTupels = concept.getConceptAttributeTuples(profileForConflictDetection.getAllowedStatus(),
-                profileForConflictDetection.getViewPositionSet());
+                profileForConflictDetection.getViewPositionSetReadOnly());
         }
         int tupleListSize = attrTupels.size();
         if (upperBound != null) {

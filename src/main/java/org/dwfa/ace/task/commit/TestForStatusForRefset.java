@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -70,7 +71,7 @@ public class TestForStatusForRefset extends AbstractConceptTest {
 
             I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
 
-            Set<I_Position> allPositions = getPositions(termFactory);
+            PositionSetReadOnly allPositions = getPositions(termFactory);
 
             I_IntSet actives = getActiveStatus(termFactory);
 

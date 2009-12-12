@@ -34,6 +34,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
@@ -81,7 +82,7 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
         return null;
     }
 
-    public Set<I_Position> getPositions(I_TermFactory termFactory) throws Exception {
+    public PositionSetReadOnly getPositions(I_TermFactory termFactory) throws Exception {
         I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
         Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
         Set<I_Position> allPositions = new HashSet<I_Position>();
@@ -91,7 +92,7 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
                 addOriginPositions(termFactory, position, allPositions);
             }
         }
-        return allPositions;
+        return new PositionSetReadOnly(allPositions);
     }
 
     private void addOriginPositions(I_TermFactory termFactory, I_Position position, Set<I_Position> allPositions) {

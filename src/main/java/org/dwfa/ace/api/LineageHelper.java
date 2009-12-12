@@ -16,7 +16,6 @@
  */
 package org.dwfa.ace.api;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -30,7 +29,7 @@ public class LineageHelper {
 
     protected I_TermFactory termFactory;
 
-    protected Set<I_Position> viewPositions;
+    protected PositionSetReadOnly viewPositions;
     protected I_IntSet allowedStatuses;
     protected I_IntSet isARelTypes;
 
@@ -72,7 +71,7 @@ public class LineageHelper {
     }
 
     protected Set<I_GetConceptData> getAllAncestors(Set<I_GetConceptData> resultSet, I_GetConceptData child,
-            I_IntSet allowedStatuses, I_IntSet allowedTypes, Set<I_Position> positions, Condition... conditions)
+            I_IntSet allowedStatuses, I_IntSet allowedTypes, PositionSetReadOnly positions, Condition... conditions)
             throws Exception {
 
         ITERATE_PARENTS: for (I_RelTuple childTuple : child.getSourceRelTuples(allowedStatuses, allowedTypes,
@@ -116,7 +115,7 @@ public class LineageHelper {
     }
 
     protected Set<I_GetConceptData> getAllDescendants(Set<I_GetConceptData> resultSet, I_GetConceptData parent,
-            I_IntSet allowedStatuses, I_IntSet allowedTypes, Set<I_Position> positions, Condition... conditions)
+            I_IntSet allowedStatuses, I_IntSet allowedTypes, PositionSetReadOnly positions, Condition... conditions)
             throws Exception {
 
         ITERATE_CHILDREN: for (I_RelTuple childTuple : parent.getDestRelTuples(allowedStatuses, allowedTypes,
@@ -168,16 +167,16 @@ public class LineageHelper {
      *         Returns null if no config set or config contains no view
      *         positions.
      */
-    protected Set<I_Position> getViewPositions() throws Exception {
+    protected PositionSetReadOnly getViewPositions() throws Exception {
         if (this.viewPositions == null) {
             I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
             if (config != null) {
-                this.viewPositions = config.getViewPositionSet();
+                this.viewPositions = config.getViewPositionSetReadOnly();
             }
 
             if (this.viewPositions == null) {
-                this.viewPositions = new HashSet<I_Position>();
+                this.viewPositions = new PositionSetReadOnly(new HashSet<I_Position>());
             }
         }
 

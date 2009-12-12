@@ -88,7 +88,7 @@ public class CopyConceptFromViewsInProfileToPathWithStatus extends AbstractTask 
             I_GetConceptData concept = AceTaskUtil.getConceptFromObject(process.readProperty(conceptPropName));
             I_GetConceptData newStatus = AceTaskUtil.getConceptFromObject(process.readProperty(statusPropName));
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
-            CopyConceptFromPathToPath.copyFromPathToPath(tf, toPath, concept, profile.getViewPositionSet(), newStatus,
+            CopyConceptFromPathToPath.copyFromPathToPath(tf, toPath, concept, profile.getViewPositionSetReadOnly(), newStatus,
                 null);
             tf.addUncommitted(concept);
             tf.commit();

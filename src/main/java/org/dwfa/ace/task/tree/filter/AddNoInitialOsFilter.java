@@ -138,7 +138,7 @@ public class AddNoInitialOsFilter extends AbstractTask {
             boolean initialO = false;
             AceLog.getAppLog().info("Testing: " + concept);
             for (I_DescriptionTuple dt : concept.getDescriptionTuples(frameConfig.getAllowedStatus(), null,
-                frameConfig.getViewPositionSet())) {
+                frameConfig.getViewPositionSetReadOnly())) {
                 AceLog.getAppLog().info("Testing tuple for supression: " + dt.getText());
                 if (dt.getText().toLowerCase().startsWith("o")) {
                     initialO = true;

@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -128,7 +129,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         Set<I_GetConceptData> refsets = new HashSet<I_GetConceptData>();
 
-        Set<I_Position> allPositions = getPositions(termFactory);
+        PositionSetReadOnly allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
 
         I_GetConceptData editRefsetPermission = termFactory.getConcept(ArchitectonicAuxiliary.Concept.EDIT_REFSET.getUids());
@@ -173,7 +174,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
     public Set<I_GetConceptData> getValidRefsetsFromIndividualUserPermissions(I_GetConceptData concept)
             throws Exception {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        Set<I_Position> allPositions = getPositions(termFactory);
+        PositionSetReadOnly allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
         I_GetConceptData createNewRefsetPermissionRel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.EDIT_REFSET.getUids());
         I_IntSet allowedTypes = termFactory.newIntSet();
@@ -202,7 +203,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         allowedTypes.add(relationshipType.getConceptId());
 
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        Set<I_Position> allPositions = getPositions(termFactory);
+        PositionSetReadOnly allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
 
         List<I_RelTuple> relationships = concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true,

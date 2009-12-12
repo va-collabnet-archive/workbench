@@ -410,7 +410,7 @@ public class RefsetHelper extends LineageHelper {
         I_IntSet allowedTypes = tf.newIntSet();
         allowedTypes.add(refsetIdentityNid);
         Set<I_GetConceptData> matchingConcepts = refsetIdentityConcept.getSourceRelTargets(config.getAllowedStatus(),
-            allowedTypes, config.getViewPositionSet(), false);
+            allowedTypes, config.getViewPositionSetReadOnly(), false);
         return matchingConcepts;
     }
 
@@ -426,7 +426,7 @@ public class RefsetHelper extends LineageHelper {
         I_IntSet allowedTypes = tf.newIntSet();
         allowedTypes.add(refsetIdentityNid);
         Set<I_GetConceptData> matchingConcepts = refsetIdentityConcept.getDestRelOrigins(config.getAllowedStatus(),
-            allowedTypes, config.getViewPositionSet(), false);
+            allowedTypes, config.getViewPositionSetReadOnly(), false);
         return matchingConcepts;
     }
 

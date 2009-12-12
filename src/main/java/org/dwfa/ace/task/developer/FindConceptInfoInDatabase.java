@@ -75,7 +75,7 @@ public class FindConceptInfoInDatabase extends AbstractTask {
             worker.getLogger().info("Concept attributes: " + concept.getConceptAttributes());
 
             List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null,
-                termFactory.getActiveAceFrameConfig().getViewPositionSet(), true);
+                termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
             worker.getLogger().info("Concept attribute tuples: " + tuples);
 
         } catch (Exception e) {
