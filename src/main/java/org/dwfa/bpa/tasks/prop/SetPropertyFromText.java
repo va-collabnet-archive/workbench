@@ -38,7 +38,8 @@ import org.dwfa.util.bean.Spec;
  *         Sets the specified property to the text provided in the task.
  * 
  * */
-@BeanList(specs = { @Spec(directory = "tasks/set tasks", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/set tasks", type = BeanType.TASK_BEAN),
+		@Spec(directory = "tasks/property tasks", type = BeanType.TASK_BEAN)})
 public class SetPropertyFromText extends AbstractTask {
 
     private String localPropName = "";
