@@ -108,24 +108,26 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "CHANGED RELATIONSHIP CHARACTERISTIC", "changed relationship characteristic" }, DIFFERENCE_QUERY), CHANGED_RELATIONSHIP_TYPE(new String[] {
             "CHANGED RELATIONSHIP TYPE", "changed relationship type" }, DIFFERENCE_QUERY), CHANGED_RELATIONSHIP_REFINABILITY(new String[] {
             "CHANGED RELATIONSHIP REFINABILITY", "changed relationship language" }, DIFFERENCE_QUERY), CHANGED_RELATIONSHIP_GROUP(new String[] {
-            "CHANGED RELATIONSHIP GROUP", "changed relationship group" }, DIFFERENCE_QUERY), REFSET_TYPE(new String[] {
-            "refset type", "refset type" }, REFSET_AUXILIARY), BOOLEAN_EXTENSION(new String[] {
-            "boolean extension by reference", "boolean extension" }, REFSET_TYPE), STRING_EXTENSION(new String[] {
-            "string extension by reference", "string extension" }, REFSET_TYPE), INT_EXTENSION(new String[] {
-            "int extension by reference", "int extension" }, REFSET_TYPE), CONCEPT_EXTENSION(new String[] {
-            "concept extension by reference", "concept extension" }, REFSET_TYPE), CONCEPT_CONCEPT_EXTENSION(new String[] {
-            "concept-concept extension by reference", "concept-concept extension" }, REFSET_TYPE), CONCEPT_STRING_EXTENSION(new String[] {
-            "concept-string extension by reference", "concept-string extension" }, REFSET_TYPE), CONCEPT_CONCEPT_CONCEPT_EXTENSION(new String[] {
-            "concept-concept-concept extension by reference", "concept-concept-concept extension" }, REFSET_TYPE), CONCEPT_CONCEPT_STRING_EXTENSION(new String[] {
-            "concept-concept-string extension by reference", "concept-concept-string extension" }, REFSET_TYPE), CONCEPT_INT_EXTENSION(new String[] {
-            "concept int extension by reference", "concept int extension" }, REFSET_TYPE), MEASUREMENT_EXTENSION(new String[] {
-            "measurement extension by reference", "measurement extension" }, REFSET_TYPE), LANGUAGE_EXTENSION(new String[] {
-            "rf1b language extension by reference", "rf1b language extension" }, REFSET_TYPE), SCOPED_LANGUAGE_EXTENSION(new String[] {
-            "rf1b scoped language extension by reference", "rf1b scoped language extension" }, REFSET_TYPE), CROSS_MAP_REL_EXTENSION(new String[] {
-            "cross map relationship extenstion", "cross map for rel" }, REFSET_TYPE), CROSS_MAP_EXTENSION(new String[] {
-            "cross map extension", "cross map" }, REFSET_TYPE), TEMPLATE_REL_EXTENSION(new String[] {
-            "template relationship extension", "template for rel" }, REFSET_TYPE), TEMPLATE_EXTENSION(new String[] {
-            "template extension", "template" }, REFSET_TYPE),
+            "CHANGED RELATIONSHIP GROUP", "changed relationship group" }, DIFFERENCE_QUERY), 
+            
+            REFSET_TYPE(new String[] {"refset type", "refset type" }, REFSET_AUXILIARY), 
+        		MEMBERSHIP_EXTENSION(new String[] {"membership extension by reference", "membership extension" }, REFSET_TYPE), 
+        		BOOLEAN_EXTENSION(new String[] {"boolean extension by reference", "boolean extension" }, REFSET_TYPE), 
+            	STRING_EXTENSION(new String[] {"string extension by reference", "string extension" }, REFSET_TYPE), 
+            	INT_EXTENSION(new String[] {"int extension by reference", "int extension" }, REFSET_TYPE), 
+            	CONCEPT_EXTENSION(new String[] {"concept extension by reference", "concept extension" }, REFSET_TYPE), 
+            	CONCEPT_CONCEPT_EXTENSION(new String[] {"concept-concept extension by reference", "concept-concept extension" }, REFSET_TYPE), 
+            	CONCEPT_STRING_EXTENSION(new String[] {"concept-string extension by reference", "concept-string extension" }, REFSET_TYPE), 
+            	CONCEPT_CONCEPT_CONCEPT_EXTENSION(new String[] {"concept-concept-concept extension by reference", "concept-concept-concept extension" }, REFSET_TYPE), 
+            	CONCEPT_CONCEPT_STRING_EXTENSION(new String[] {"concept-concept-string extension by reference", "concept-concept-string extension" }, REFSET_TYPE), 
+            	CONCEPT_INT_EXTENSION(new String[] {"concept int extension by reference", "concept int extension" }, REFSET_TYPE), 
+            	MEASUREMENT_EXTENSION(new String[] {"measurement extension by reference", "measurement extension" }, REFSET_TYPE), 
+            	LANGUAGE_EXTENSION(new String[] {"rf1b language extension by reference", "rf1b language extension" }, REFSET_TYPE), 
+            	SCOPED_LANGUAGE_EXTENSION(new String[] {"rf1b scoped language extension by reference", "rf1b scoped language extension" }, REFSET_TYPE), 
+            	CROSS_MAP_REL_EXTENSION(new String[] {"cross map relationship extenstion", "cross map for rel" }, REFSET_TYPE), 
+            	CROSS_MAP_EXTENSION(new String[] { "cross map extension", "cross map" }, REFSET_TYPE), 
+            	TEMPLATE_REL_EXTENSION(new String[] { "template relationship extension", "template for rel" }, REFSET_TYPE), 
+            	TEMPLATE_EXTENSION(new String[] {"template extension", "template" }, REFSET_TYPE),
 
         BOOLEAN_CIRCLE_ICONS(new String[] { "boolean with circle icon", "boolean with circle" }, REFSET_AUXILIARY), BOOLEAN_CIRCLE_ICONS_TRUE(new String[] {
             "true with circle check icon", "true" }, BOOLEAN_CIRCLE_ICONS), BOOLEAN_CIRCLE_ICONS_FALSE(new String[] {
