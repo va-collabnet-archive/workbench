@@ -53,7 +53,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      */
     @Deprecated
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions)
+    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions)
             throws IOException;
 
     /**
@@ -72,7 +72,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
+    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
             boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
     /**
@@ -94,7 +94,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      */
     @Deprecated
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
+    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
             boolean addUncommitted) throws IOException;
 
     /**
@@ -106,7 +106,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(boolean returnConflictResolvedLatestState)
+    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException;
 
     /**
@@ -499,9 +499,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
-    public List<I_DescriptionVersioned> getDescriptions() throws IOException;
+    public List<? extends I_DescriptionVersioned> getDescriptions() throws IOException;
 
-    public List<I_RelVersioned> getDestRels() throws IOException;
+    public List<? extends I_RelVersioned> getDestRels() throws IOException;
 
     /**
      * 
@@ -509,7 +509,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      *         of status.
      * @throws IOException
      */
-    public List<I_RelVersioned> getSourceRels() throws IOException;
+    public List<? extends I_RelVersioned> getSourceRels() throws IOException;
 
     public String getInitialText() throws IOException;
 

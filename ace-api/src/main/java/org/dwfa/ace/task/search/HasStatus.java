@@ -83,7 +83,7 @@ public class HasStatus extends AbstractSearchTest {
                 AceLog.getAppLog().fine("### testing status for: " + conceptToTest);
             }
 
-            List<I_ConceptAttributeTuple> attributeTuples = conceptToTest.getConceptAttributeTuples(null,
+            List<? extends I_ConceptAttributeTuple> attributeTuples = conceptToTest.getConceptAttributeTuples(null,
                 frameConfig.getViewPositionSetReadOnly());
 
             for (I_ConceptAttributeTuple tuple : attributeTuples) {

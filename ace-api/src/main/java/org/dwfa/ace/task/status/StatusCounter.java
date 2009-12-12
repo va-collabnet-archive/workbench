@@ -67,7 +67,7 @@ public class StatusCounter implements I_ProcessConcepts {
 
     public void processConcept(I_GetConceptData concept) throws Exception {
         conceptsProcessed++;
-        List<I_ConceptAttributeTuple> attrTupels;
+        List<? extends I_ConceptAttributeTuple> attrTupels;
         if (profileForConflictDetection == null) {
             attrTupels = concept.getConceptAttributeTuples(null, null);
         } else {

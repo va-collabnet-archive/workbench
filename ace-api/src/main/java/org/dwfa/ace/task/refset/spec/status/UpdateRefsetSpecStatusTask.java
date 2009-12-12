@@ -242,7 +242,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
     private void updateStatusOfDescriptions(Set<I_GetConceptData> concepts, I_GetConceptData statusConcept)
             throws IOException, TerminologyException {
         for (I_GetConceptData currentConcept : concepts) {
-            List<I_DescriptionVersioned> descs = currentConcept.getDescriptions();
+            List<? extends I_DescriptionVersioned> descs = currentConcept.getDescriptions();
             for (I_DescriptionVersioned descVersioned : descs) {
                 for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
                     I_DescriptionPart newPart = descVersioned.getLastTuple().getPart().duplicate();

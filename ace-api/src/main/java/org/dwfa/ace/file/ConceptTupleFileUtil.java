@@ -147,7 +147,7 @@ public class ConceptTupleFileUtil {
                 boolean returnConflictResolvedLatestState = true;
 
                 // check if the part exists
-                List<I_ConceptAttributeTuple> parts = concept.getConceptAttributeTuples(allowedStatus, null,
+                List<? extends I_ConceptAttributeTuple> parts = concept.getConceptAttributeTuples(allowedStatus, null,
                     addUncommitted, returnConflictResolvedLatestState);
                 /*
                  * List<I_ConceptAttributeTuple> parts =

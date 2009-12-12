@@ -89,7 +89,7 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
     private void checkForInactive(I_ConfigAceFrame activeProfile, List<AlertToDataConstraintFailure> alerts2, int nid)
             throws TerminologyException, IOException {
         I_GetConceptData concept = LocalVersionedTerminology.get().getConcept(nid);
-        List<I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(),
+        List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(),
             activeProfile.getViewPositionSetReadOnly());
         if (attributes == null || attributes.size() == 0) {
             String alertString = "<html>Inactive concept in refset:<br> <font color='blue'>" + concept.toString()

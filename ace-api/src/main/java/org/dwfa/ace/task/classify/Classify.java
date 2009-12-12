@@ -269,7 +269,7 @@ public class Classify extends AbstractTask {
 
             processed.add(conceptId);
 
-            final List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, latestStated);
+            final List<? extends I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, latestStated);
             if (tuples.size() == 1) {
                 snorocketFactory.addConcept(conceptId, tuples.get(0).isDefined());
 

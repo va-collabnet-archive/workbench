@@ -29,7 +29,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -130,7 +129,7 @@ public class VerifyNoPotentialDups extends AbstractTask {
                 I_IntSet statusTypeSet = termFact.newIntSet();
                 statusTypeSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
-                List<I_ConceptAttributeTuple> statusTuples = potDupConcept.getConceptAttributeTuples(statusTypeSet,
+                List<? extends I_ConceptAttributeTuple> statusTuples = potDupConcept.getConceptAttributeTuples(statusTypeSet,
                     config.getViewPositionSetReadOnly());
 
                 for (I_ConceptAttributeTuple tuple : statusTuples) {
@@ -145,7 +144,7 @@ public class VerifyNoPotentialDups extends AbstractTask {
                 I_IntSet statusTypeSet = termFact.newIntSet();
                 statusTypeSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
-                List<I_ConceptAttributeTuple> statusTuples = potDupConcept.getConceptAttributeTuples(statusTypeSet,
+                List<? extends I_ConceptAttributeTuple> statusTuples = potDupConcept.getConceptAttributeTuples(statusTypeSet,
                     config.getViewPositionSetReadOnly());
 
                 for (I_ConceptAttributeTuple tuple : statusTuples) {

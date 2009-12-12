@@ -194,7 +194,7 @@ public class FasterLoad extends AbstractTask {
                 // return false;
                 // }
 
-                final List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, positions);
+                final List<? extends I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, positions);
                 if (tuples.size() > 1) {
                     throw new AssertionError("Unexpected number of tuples: " + tuples.size() + " for " + concept);
                 }
@@ -219,7 +219,7 @@ public class FasterLoad extends AbstractTask {
          */
         boolean isDefined(I_GetConceptData concept) {
             try {
-                final List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, positions);
+                final List<? extends I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(activeStatus, positions);
                 if (tuples.size() > 1) {
                     throw new AssertionError("Unexpected number of tuples: " + tuples.size() + " for " + concept);
                 }

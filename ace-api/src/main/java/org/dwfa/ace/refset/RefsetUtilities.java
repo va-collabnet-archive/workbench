@@ -104,7 +104,7 @@ public abstract class RefsetUtilities {
          */
         for (I_RelTuple parent : parenttuples) {
 
-            List<I_ConceptAttributeTuple> atts = getConcept(parent.getC2Id()).getConceptAttributeTuples(null, null);
+            List<? extends I_ConceptAttributeTuple> atts = getConcept(parent.getC2Id()).getConceptAttributeTuples(null, null);
             I_ConceptAttributeTuple att = getLatestAttribute(atts);
             if (isValidStatus(att)) {
                 parents.add(parent.getC2Id());
@@ -166,7 +166,7 @@ public abstract class RefsetUtilities {
          */
         for (I_RelTuple child : childrentuples) {
 
-            List<I_ConceptAttributeTuple> atts = getConcept(child.getC1Id()).getConceptAttributeTuples(null, null);
+            List<? extends I_ConceptAttributeTuple> atts = getConcept(child.getC1Id()).getConceptAttributeTuples(null, null);
             I_ConceptAttributeTuple att = getLatestAttribute(atts);
             if (isValidStatus(att)) {
                 children.add(child.getC1Id());
@@ -312,7 +312,7 @@ public abstract class RefsetUtilities {
 
     }
 
-    public I_ConceptAttributeTuple getLatestAttribute(List<I_ConceptAttributeTuple> atts) {
+    public I_ConceptAttributeTuple getLatestAttribute(List<? extends I_ConceptAttributeTuple> atts) {
         I_ConceptAttributeTuple latest = null;
         for (I_ConceptAttributeTuple att : atts) {
             if (latest == null) {

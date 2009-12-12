@@ -105,13 +105,11 @@ public class ChangeConceptStatus extends AbstractTask {
                 throw new TaskFailedException("newStatusConcept is null. Ids: " + Arrays.asList(newStatus.ids));
             }
             for (I_Path editPath : config.getEditingPathSet()) {
-                List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null, positionsForEdit);
+                List<? extends I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null, positionsForEdit);
                 for (I_ConceptAttributeTuple t : tuples) {
                     if (t.getConceptStatus() != newStatusConcept.getConceptId()) {
-                        I_ConceptAttributePart newPart = t.duplicatePart();
-                        newPart.setPathId(editPath.getConceptId());
-                        newPart.setVersion(Integer.MAX_VALUE);
-                        newPart.setConceptStatus(newStatusConcept.getConceptId());
+                        I_ConceptAttributePart newPart = 
+                        	(I_ConceptAttributePart) t.makeAnalog(t.getStatusId(), editPath.getConceptId(), Long.MAX_VALUE);
                         partsToAdd.add(newPart);
                     }
                 }

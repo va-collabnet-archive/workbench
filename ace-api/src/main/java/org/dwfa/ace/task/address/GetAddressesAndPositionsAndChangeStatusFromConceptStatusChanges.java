@@ -108,7 +108,7 @@ public class GetAddressesAndPositionsAndChangeStatusFromConceptStatusChanges ext
             Object conceptObj = process.readProperty(activeConceptPropName);
             I_GetConceptData concept = AceTaskUtil.getConceptFromObject(conceptObj);
 
-            List<I_ConceptAttributeTuple> attrTupels = concept.getConceptAttributeTuples(
+            List<? extends I_ConceptAttributeTuple> attrTupels = concept.getConceptAttributeTuples(
                 workingProfile.getAllowedStatus(), workingProfile.getViewPositionSetReadOnly());
 
             I_GetConceptData newStatus = AceTaskUtil.getConceptFromProperty(process, statusValuePropName);
