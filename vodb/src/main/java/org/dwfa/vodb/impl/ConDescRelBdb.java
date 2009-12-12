@@ -68,7 +68,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -76,6 +75,7 @@ import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.IdentifierSetReadOnly;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.CheckAndProcessLuceneMatch;
@@ -1871,7 +1871,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
     }
 
     public boolean hasSrcRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet sourceRelTypes,
-            Set<I_Position> positions) throws DatabaseException, IOException {
+    		PositionSetReadOnly positions) throws DatabaseException, IOException {
         ConceptBean concept = ConceptBean.get(conceptId);
         return concept.getSourceRelTuples(allowedStatus, sourceRelTypes, positions, false).size() > 0;
     }
@@ -1930,7 +1930,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
     }
 
     public boolean hasDestRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet destRelTypes,
-            Set<I_Position> positions) throws DatabaseException, IOException {
+            PositionSetReadOnly positions) throws DatabaseException, IOException {
         ConceptBean concept = ConceptBean.get(conceptId);
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         if (concept.getRelOrigins() != null) {

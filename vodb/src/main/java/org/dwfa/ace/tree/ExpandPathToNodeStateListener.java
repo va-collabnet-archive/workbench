@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JTree;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -51,14 +50,14 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
         ancestors = new ArrayList<I_GetConceptData>();
         ancestors.add(focus);
         List<I_RelTuple> rels = focus.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(),
-            config.getViewPositionSet(), true);
+            config.getViewPositionSetReadOnly(), true);
         while (rels.size() > 0) {
             for (I_RelTuple r : rels) {
                 ConceptBean parent = ConceptBean.get(r.getC2Id());
                 ancestors.add(0, parent);
                 AceLog.getAppLog().info("Adding parent: " + parent);
                 rels = parent.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(),
-                    config.getViewPositionSet(), true);
+                    config.getViewPositionSetReadOnly(), true);
                 break;
             }
         }

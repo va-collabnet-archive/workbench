@@ -43,10 +43,10 @@ import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -410,7 +410,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
     }
 
     public boolean hasDestRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet destRelTypes,
-            Set<I_Position> positions) throws DatabaseException, IOException {
+            PositionSetReadOnly positions) throws DatabaseException, IOException {
         return relBdb.hasDestRelTuple(conceptId, allowedStatus, destRelTypes, positions);
     }
 
@@ -427,7 +427,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
     }
 
     public boolean hasSrcRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet sourceRelTypes,
-            Set<I_Position> positions) throws DatabaseException, IOException {
+            PositionSetReadOnly positions) throws DatabaseException, IOException {
         return relBdb.hasSrcRelTuple(conceptId, allowedStatus, sourceRelTypes, positions);
     }
 

@@ -52,6 +52,7 @@ import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
@@ -402,7 +403,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                 allowedTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
                 boolean addUncommitted = true;
                 List<I_RelTuple> markedParentRefset = refset.getSourceRelTuples(frameConfig.getAllowedStatus(),
-                    allowedTypes, frameConfig.getViewPositionSet(), addUncommitted);
+                    allowedTypes, frameConfig.getViewPositionSetReadOnly(), addUncommitted);
                 for (I_RelTuple rel : markedParentRefset) {
                     refsetsToShow.add(rel.getC2Id());
                 }
@@ -1199,4 +1200,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public void setSelectedPreferencesTab(String tabName) {
         frameConfig.setSelectedPreferencesTab(tabName);
     }
+
+	public PositionSetReadOnly getViewPositionSetReadOnly() {
+		return frameConfig.getViewPositionSetReadOnly();
+	}
 }

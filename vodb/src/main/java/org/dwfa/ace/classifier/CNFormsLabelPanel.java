@@ -51,6 +51,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoGrp;
 import org.dwfa.ace.task.classify.SnoGrpList;
@@ -446,8 +447,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         // FIND ALL...
         for (I_Position p : config.getViewPositionSet()) {
-            Set<I_Position> posSet = new HashSet<I_Position>();
-            posSet.add(p);
+            Set<I_Position> pSet = new HashSet<I_Position>();
+            pSet.add(p);
+            PositionSetReadOnly posSet = new PositionSetReadOnly(pSet);
 
             // concept attributes
             List<I_ConceptAttributeTuple> conTuplesForPosition = this.theCBean.getConceptAttributeTuples(

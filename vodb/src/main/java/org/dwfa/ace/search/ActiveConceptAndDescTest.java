@@ -30,7 +30,6 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class ActiveConceptAndDescTest implements I_TestSearchResults {
@@ -40,7 +39,7 @@ public class ActiveConceptAndDescTest implements I_TestSearchResults {
         ConceptBean concept = ConceptBean.get(descV.getConceptId());
         try {
             List<I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(
-                frameConfig.getAllowedStatus(), frameConfig.getViewPositionSet(), true, false);
+                frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), true, false);
             if (attributes == null || attributes.size() == 0) {
                 return false;
             }

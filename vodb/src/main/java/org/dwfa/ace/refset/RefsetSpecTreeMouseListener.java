@@ -214,7 +214,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
                     I_IntSet allowedTypes = new IntSet();
                     allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
                     Set<I_GetConceptData> commentRefsets = refsetIdentityConcept.getSourceRelTargets(
-                        aceConfig.getAllowedStatus(), allowedTypes, aceConfig.getViewPositionSet(), false);
+                        aceConfig.getAllowedStatus(), allowedTypes, aceConfig.getViewPositionSetReadOnly(), false);
                     int newMemberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(),
                         ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
                         aceConfig.getEditingPathSet(), Integer.MAX_VALUE);

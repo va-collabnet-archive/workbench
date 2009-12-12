@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.vodb.types.I_ProcessRelationshipEntries;
 
 import com.sleepycat.je.DatabaseEntry;
@@ -42,7 +42,7 @@ public interface I_StoreRelationships extends I_StoreInBdb {
     public boolean hasSrcRels(int conceptId) throws DatabaseException, IOException;
 
     public boolean hasSrcRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet sourceRelTypes,
-            Set<I_Position> positions) throws DatabaseException, IOException;
+    		PositionSetReadOnly positions) throws DatabaseException, IOException;
 
     public List<I_RelVersioned> getSrcRels(int conceptId) throws DatabaseException, IOException;
 
@@ -53,7 +53,7 @@ public interface I_StoreRelationships extends I_StoreInBdb {
     public List<I_RelVersioned> getDestRels(int conceptId) throws DatabaseException, IOException;
 
     public boolean hasDestRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet destRelTypes,
-            Set<I_Position> positions) throws DatabaseException, IOException;
+            PositionSetReadOnly positions) throws DatabaseException, IOException;
 
     public void iterateRelationshipEntries(I_ProcessRelationshipEntries processor) throws Exception;
 

@@ -59,6 +59,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -242,12 +243,12 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
      * ,
      * java.util.Set)
      */
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positionSet)
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet)
             throws IOException {
         return getConceptAttributeTuples(allowedStatus, positionSet, true);
     }
 
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
             boolean addUncommitted) throws IOException {
 
         List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
@@ -255,7 +256,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         return returnTuples;
     }
 
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
             boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
         List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
         I_ConceptAttributeVersioned attr = getConceptAttributes();
@@ -271,7 +272,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getConceptAttributeTuples(config.getAllowedStatus(), config.getViewPositionSet(), true,
+        return getConceptAttributeTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), true,
             returnConflictResolvedLatestState);
     }
 
@@ -280,17 +281,17 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSet(),
+        return getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
             true, returnConflictResolvedLatestState);
     }
 
     public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positionSet) throws IOException {
+            PositionSetReadOnly positionSet) throws IOException {
         return getDescriptionTuples(allowedStatus, allowedTypes, positionSet, true);
     }
 
     public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positionSet, boolean addUncommitted) throws IOException {
+            PositionSetReadOnly positionSet, boolean addUncommitted) throws IOException {
 
         List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
         for (I_DescriptionVersioned desc : getDescriptions()) {
@@ -300,7 +301,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positionSet, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            PositionSetReadOnly positionSet, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException {
         List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
         for (I_DescriptionVersioned desc : getDescriptions()) {
@@ -310,7 +311,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         return returnDescriptions;
     }
 
-    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
 
         List<I_ImageTuple> returnTuples = getImageTuples(allowedStatus, allowedTypes, positions);
@@ -320,7 +321,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             .resolveTuples(returnTuples);
     }
 
-    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions)
+    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions)
             throws IOException {
         List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
         for (I_ImageVersioned img : getImages()) {
@@ -333,12 +334,12 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             TerminologyException {
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getImageTuples(config.getAllowedStatus(), null, config.getViewPositionSet(),
+        return getImageTuples(config.getAllowedStatus(), null, config.getViewPositionSetReadOnly(),
             returnConflictResolvedLatestState);
     }
 
     public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException {
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         for (I_RelVersioned rel : getSourceRels()) {
@@ -359,7 +360,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getSourceRelTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSet(), addUncommitted,
+        return getSourceRelTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), addUncommitted,
             returnConflictResolvedLatestState);
     }
 
@@ -372,7 +373,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
      * org.dwfa.ace.IntSet, java.util.Set)
      */
     public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positionSet, boolean addUncommitted) throws IOException {
+            PositionSetReadOnly positionSet, boolean addUncommitted) throws IOException {
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         for (I_RelVersioned rel : getSourceRels()) {
             rel.addTuples(allowedStatus, allowedTypes, positionSet, returnRels, addUncommitted);
@@ -385,7 +386,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         return returnRels;
     }
 
-    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
 
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
@@ -401,7 +402,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getSourceRelTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSet(), addUncommitted,
+        return getSourceRelTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), addUncommitted,
             returnConflictResolvedLatestState);
 
     }
@@ -414,7 +415,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
      * ,
      * org.dwfa.ace.IntSet, java.util.Set)
      */
-    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             boolean addUncommitted) throws IOException {
 
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
@@ -577,11 +578,11 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         try {
             if (aceConfig != null) {
                 if (hasDestRelTuples(aceConfig.getAllowedStatus(), aceConfig.getDestRelTypes(),
-                    aceConfig.getViewPositionSet(), addUncommitted)) {
+                    aceConfig.getViewPositionSetReadOnly(), addUncommitted)) {
                     return false;
                 }
                 if (hasSourceRelTuples(aceConfig.getAllowedStatus(), aceConfig.getSourceRelTypes(),
-                    aceConfig.getViewPositionSet(), addUncommitted)) {
+                    aceConfig.getViewPositionSetReadOnly(), addUncommitted)) {
                     return false;
                 }
             } else {
@@ -610,7 +611,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         }
     }
 
-    private boolean hasDestRelTuples(I_IntSet allowedStatus, I_IntSet destRelTypes, Set<I_Position> positions,
+    private boolean hasDestRelTuples(I_IntSet allowedStatus, I_IntSet destRelTypes, PositionSetReadOnly positions,
             boolean addUncommitted) throws IOException {
         if (destRelTypes.getSetValues().length > 0) {
             List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
@@ -632,7 +633,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         return false;
     }
 
-    private boolean hasSourceRelTuples(I_IntSet allowedStatus, I_IntSet sourceRelTypes, Set<I_Position> positions,
+    private boolean hasSourceRelTuples(I_IntSet allowedStatus, I_IntSet sourceRelTypes, PositionSetReadOnly positions,
             boolean addUncommitted) throws IOException {
         if (sourceRelTypes.getSetValues().length > 0) {
             List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
@@ -942,11 +943,11 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_ConfigAceFrame config) throws IOException {
         return getDescTuple(typePrefOrder, config.getLanguagePreferenceList(), config.getAllowedStatus(),
-            config.getViewPositionSet(), config.getLanguageSortPref());
+            config.getViewPositionSetReadOnly(), config.getLanguageSortPref());
     }
 
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus,
-            Set<I_Position> positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException {
+            PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException {
         try {
             I_IntSet typeSet = new IntSet();
             for (int nid : typePrefOrder.getListArray()) {
@@ -968,7 +969,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     private I_DescriptionTuple getTypePreferredDesc(Collection<I_DescriptionTuple> descriptions,
-            I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus, Set<I_Position> positionSet,
+            I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus, PositionSetReadOnly positionSet,
             I_IntSet typeSet) throws IOException, ToIoException {
         if (descriptions.size() > 0) {
             if (descriptions.size() > 1) {
@@ -999,7 +1000,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     private I_DescriptionTuple getLangPreferredDesc(Collection<I_DescriptionTuple> descriptions,
-            I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus, Set<I_Position> positionSet,
+            I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus, PositionSetReadOnly positionSet,
             I_IntSet typeSet) throws IOException, ToIoException {
         if (descriptions.size() > 0) {
             if (descriptions.size() > 1) {
@@ -1223,7 +1224,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException {
         Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
         for (I_RelTuple rel : getDestRelTuples(allowedStatus, allowedTypes, positions, addUncommitted,
@@ -1238,12 +1239,12 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSet(), addUncommitted,
+        return getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), addUncommitted,
             returnConflictResolvedLatestState);
     }
 
     public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted) throws IOException {
+            PositionSetReadOnly positions, boolean addUncommitted) throws IOException {
 
         Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
         for (I_RelTuple rel : getDestRelTuples(allowedStatus, allowedTypes, positions, addUncommitted)) {
@@ -1253,7 +1254,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws IOException, TerminologyException {
         Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
         for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted,
@@ -1267,12 +1268,12 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getSourceRelTargets(config.getAllowedStatus(), allowedTypes, config.getViewPositionSet(),
+        return getSourceRelTargets(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(),
             addUncommitted, returnConflictResolvedLatestState);
     }
 
     public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted) throws IOException {
+            PositionSetReadOnly positions, boolean addUncommitted) throws IOException {
         Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
         for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted)) {
             returnValues.add(ConceptBean.get(rel.getC2Id()));
@@ -1285,11 +1286,11 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
         return isParentOfOrEqualTo(child, config.getAllowedStatus(), config.getDestRelTypes(),
-            config.getViewPositionSet(), addUncommitted);
+            config.getViewPositionSetReadOnly(), addUncommitted);
     }
 
     public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted) throws IOException {
+            PositionSetReadOnly positions, boolean addUncommitted) throws IOException {
         if (this.conceptId == child.getConceptId()) {
             return true;
         }
@@ -1299,19 +1300,19 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     public boolean isParentOf(I_GetConceptData child, boolean addUncommitted) throws IOException, TerminologyException {
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return isParentOf(child, config.getAllowedStatus(), config.getDestRelTypes(), config.getViewPositionSet(),
+        return isParentOf(child, config.getAllowedStatus(), config.getDestRelTypes(), config.getViewPositionSetReadOnly(),
             addUncommitted);
     }
 
     public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted) throws IOException {
+            PositionSetReadOnly positions, boolean addUncommitted) throws IOException {
         return isParentWithDepthCutoffStartup(child, allowedStatus, allowedTypes, positions, addUncommitted, 0);
     }
 
     private transient Map<List<Integer>, SoftReference<Map<Integer, Boolean>>> isParentCacheMap;
     private transient int isParentCacheMapCommitSequence = 0;
 
-    private List<Integer> getParentCriterion(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions) {
+    private List<Integer> getParentCriterion(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions) {
         List<Integer> intList = new ArrayList<Integer>();
 
         if (allowedStatus != null) {
@@ -1338,7 +1339,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     private boolean isParentWithDepthCutoffStartup(I_GetConceptData child, I_IntSet allowedStatus,
-            I_IntSet allowedTypes, Set<I_Position> positions, boolean addUncommitted, int depth) throws IOException {
+            I_IntSet allowedTypes, PositionSetReadOnly positions, boolean addUncommitted, int depth) throws IOException {
         Map<Integer, Boolean> isParentCache = null;
 
         if (isParentCacheMap == null || isParentCacheMapCommitSequence != ACE.commitSequence) {
@@ -1358,7 +1359,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     private boolean isParentWithDepthCutoff(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            Set<I_Position> positions, boolean addUncommitted, int depth, Map<Integer, Boolean> isParentCache)
+            PositionSetReadOnly positions, boolean addUncommitted, int depth, Map<Integer, Boolean> isParentCache)
             throws IOException {
         if (isParentCache.containsKey(child.getConceptId())) {
             return isParentCache.get(child.getConceptId());

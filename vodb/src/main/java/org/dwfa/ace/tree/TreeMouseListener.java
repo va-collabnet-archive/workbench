@@ -191,7 +191,7 @@ public class TreeMouseListener implements MouseListener {
             List<I_RelTuple> tuples;
             try {
                 tuples = treeBean.getSourceRelTuples(ace.getAceFrameConfig().getAllowedStatus(),
-                    ace.getAceFrameConfig().getDestRelTypes(), ace.getAceFrameConfig().getViewPositionSet(), false);
+                    ace.getAceFrameConfig().getDestRelTypes(), ace.getAceFrameConfig().getViewPositionSetReadOnly(), false);
                 int[] newNodeIndices = new int[tuples.size()];
                 int index = 0;
                 int insertIndex = parentNode.getIndex(node);

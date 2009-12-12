@@ -274,7 +274,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
     private void addPrefixImage(List<String> htmlParts, int prefixConceptId) throws IOException {
         ConceptBean prefixConcept = ConceptBean.get(prefixConceptId);
         for (I_ImageTuple imageTuple : prefixConcept.getImageTuples(configAceFrame.getAllowedStatus(),
-            viewerImageTypes, configAceFrame.getViewPositionSet())) {
+            viewerImageTypes, configAceFrame.getViewPositionSetReadOnly())) {
             htmlParts.add("<img src='ace:" + imageTuple.getImageId() + "$" + imageTuple.getConceptId()
                 + "' align=absbottom>");
         }

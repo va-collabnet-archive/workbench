@@ -42,7 +42,7 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
@@ -367,8 +367,8 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
     }
 
     private List<I_ConceptAttributeTuple> getConceptTuples(I_GetConceptData cb) throws IOException {
-        Set<I_Position> positions = null;
-        positions = host.getConfig().getViewPositionSet();
+    	PositionSetReadOnly positions = null;
+        positions = host.getConfig().getViewPositionSetReadOnly();
         if (host.getShowHistory()) {
             positions = null;
         }

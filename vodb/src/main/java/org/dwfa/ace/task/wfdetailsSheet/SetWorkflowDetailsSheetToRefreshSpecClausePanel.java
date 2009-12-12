@@ -35,6 +35,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.bpa.process.Condition;
@@ -144,22 +145,23 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             
            UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
            Set<UniversalAcePosition> universalRefsetSpecVersionSet = (Set<UniversalAcePosition>) process.getProperty(refsetPositionSetPropName);
-           Set<I_Position> refsetSpecVersionSet = new HashSet<I_Position>();
+           Set<I_Position> refsetSpecPositionSet = new HashSet<I_Position>();
 	        for (UniversalAcePosition univPos: universalRefsetSpecVersionSet) {
 		           I_Path path = tf.getPath(univPos.getPathId());
 		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
-		           refsetSpecVersionSet.add(thinPos);
+		           refsetSpecPositionSet.add(thinPos);
 		        }
 
+	        PositionSetReadOnly refsetSpecVersionSet = new PositionSetReadOnly(refsetSpecPositionSet);
 	        Set<UniversalAcePosition> universalSourceTerminologyVersionSet = (Set<UniversalAcePosition>) process.getProperty(snomedPositionSetPropName);
-           Set<I_Position> sourceTerminologyVersionSet = new HashSet<I_Position>();
+           Set<I_Position> sourceTerminologyPositionSet = new HashSet<I_Position>();
 	        for (UniversalAcePosition univPos: universalSourceTerminologyVersionSet) {
 		           I_Path path = tf.getPath(univPos.getPathId());
 		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
-		           sourceTerminologyVersionSet.add(thinPos);
+		           sourceTerminologyPositionSet.add(thinPos);
 		        }
 
-           
+	        PositionSetReadOnly sourceTerminologyVersionSet = new PositionSetReadOnly(sourceTerminologyPositionSet);
            I_ConfigAceFrame frameConfig = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
            List<Collection<UUID>> clausesToUpdate = (List<Collection<UUID>>) process.getProperty(clausesToUpdateMemberUuidPropName);
 

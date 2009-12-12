@@ -226,7 +226,7 @@ public class LineagePlugin extends AbstractPlugin {
         List<List<ConceptBean>> lineage = new ArrayList<List<ConceptBean>>();
 
         List<I_RelTuple> sourceRelTuples = bean.getSourceRelTuples(getHost().getConfig().getAllowedStatus(),
-            getHost().getConfig().getDestRelTypes(), getHost().getConfig().getViewPositionSet(), false);
+            getHost().getConfig().getDestRelTypes(), getHost().getConfig().getViewPositionSetReadOnly(), false);
         if ((sourceRelTuples.size() > 0) && (depth < 40)) {
             if (depth > 3) {
                 String test = "test";

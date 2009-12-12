@@ -1019,7 +1019,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             if (refsetConcept != null) {
                 relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
                 List<I_RelTuple> refsetSpecTuples = refsetConcept.getDestRelTuples(ace.getAceFrameConfig()
-                    .getAllowedStatus(), relTypes, ace.getAceFrameConfig().getViewPositionSet(), true);
+                    .getAllowedStatus(), relTypes, ace.getAceFrameConfig().getViewPositionSetReadOnly(), true);
                 if (refsetSpecTuples != null && refsetSpecTuples.size() > 0) {
                     refsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
                     localRefsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());

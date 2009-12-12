@@ -67,6 +67,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -933,9 +934,9 @@ public class ConflictPanel extends JPanel implements ActionListener {
         Set<I_RelTuple> allRelTuples = new HashSet<I_RelTuple>();
 
         for (I_Position p : config.getViewPositionSet()) {
-            Set<I_Position> positionSet = new HashSet<I_Position>();
-            positionSet.add(p);
-
+            Set<I_Position> posSet = new HashSet<I_Position>();
+            posSet.add(p);
+            PositionSetReadOnly positionSet = new PositionSetReadOnly(posSet);
             // concept attributes
             List<I_ConceptAttributeTuple> conAttrTuplesForPosition = this.cb.getConceptAttributeTuples(
                 config.getAllowedStatus(), positionSet, false);
@@ -1003,8 +1004,9 @@ public class ConflictPanel extends JPanel implements ActionListener {
         c.weighty = 0;
         c.gridx = 0;
         c.gridy = 0;
-        Set<I_Position> posSet = new HashSet<I_Position>(1);
-        posSet.add(p);
+        Set<I_Position> pSet = new HashSet<I_Position>(1);
+        pSet.add(p);
+        PositionSetReadOnly posSet = new PositionSetReadOnly(pSet);
         c.gridx = 1;
 
         JButton addAll = new JButton("add all");
