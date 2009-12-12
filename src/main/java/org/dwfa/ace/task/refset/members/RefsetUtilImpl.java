@@ -122,7 +122,7 @@ public final class RefsetUtilImpl implements RefsetUtil {
         return ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
     }
 
-    public List<I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept,
+    public List<? extends I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept,
             final I_IntSet allowedStatuses, final I_IntSet allowedTypes) throws Exception {
         return concept.getDescriptionTuples(allowedStatuses, allowedTypes, null);
 
@@ -140,14 +140,14 @@ public final class RefsetUtilImpl implements RefsetUtil {
         return createIntSet(termFactory, PREFERED_TERM_UUIDS);
     }
 
-    public List<I_DescriptionTuple> getFSNDescriptionsForConceptHavingCurrentStatus(final I_TermFactory termFactory,
+    public List<? extends I_DescriptionTuple> getFSNDescriptionsForConceptHavingCurrentStatus(final I_TermFactory termFactory,
             final int conceptId) throws Exception {
         I_GetConceptData refsetConcept = termFactory.getConcept(conceptId);
         return getDescriptionTuples(refsetConcept, createCurrentStatus(termFactory),
             createFullySpecifiedName(termFactory));
     }
 
-    public List<I_DescriptionTuple> getPTDescriptionsForConceptHavingCurrentStatus(final I_TermFactory termFactory,
+    public List<? extends I_DescriptionTuple> getPTDescriptionsForConceptHavingCurrentStatus(final I_TermFactory termFactory,
             final int conceptId) throws Exception {
         I_GetConceptData refsetConcept = termFactory.getConcept(conceptId);
         return getDescriptionTuples(refsetConcept, createCurrentStatus(termFactory), createPreferredTerm(termFactory));

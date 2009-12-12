@@ -269,7 +269,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         String latestDescription = null;
         int latestVersion = Integer.MIN_VALUE;
 
-        List<I_DescriptionTuple> descriptionResults = concept.getDescriptionTuples(helper.getCurrentStatusIntSet(),
+        List<? extends I_DescriptionTuple> descriptionResults = concept.getDescriptionTuples(helper.getCurrentStatusIntSet(),
             allowedTypes, null, true);
 
         // find the latest tuple, so that the latest edited version of the

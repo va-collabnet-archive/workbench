@@ -128,7 +128,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      */
     @Deprecated
-    public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+    public List<? extends I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions) throws IOException;
 
     /**
@@ -146,7 +146,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      *            current profile's conflict resolution strategy is required
      * @return List of matching tuples
      */
-    public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+    public List<? extends I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, boolean returnConflictResolvedLatestState) throws IOException;
 
     /**
@@ -159,7 +159,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_DescriptionTuple> getDescriptionTuples(boolean returnConflictResolvedLatestState) throws IOException,
+    public List<? extends I_DescriptionTuple> getDescriptionTuples(boolean returnConflictResolvedLatestState) throws IOException,
             TerminologyException;
 
     public List<I_ThinExtByRefVersioned> getExtensions() throws IOException, TerminologyException;

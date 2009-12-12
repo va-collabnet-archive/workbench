@@ -73,7 +73,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             Set<I_Position> allPositions = getPositions(termFactory);
 
             ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
-            List<I_DescriptionTuple> descriptionTupleList = getDescriptionTupleList(concept, activeProfile);
+            List<? extends I_DescriptionTuple> descriptionTupleList = getDescriptionTupleList(concept, activeProfile);
             for (I_DescriptionTuple desc : descriptionTupleList) {
                 descriptions.add(desc.getDescVersioned());
             }
@@ -87,7 +87,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
         }
     }
 
-    private List<I_DescriptionTuple> getDescriptionTupleList(final I_GetConceptData concept,
+    private List<? extends I_DescriptionTuple> getDescriptionTupleList(final I_GetConceptData concept,
             final I_ConfigAceFrame activeProfile) throws IOException {
 
         PositionSetReadOnly allPositions = null;

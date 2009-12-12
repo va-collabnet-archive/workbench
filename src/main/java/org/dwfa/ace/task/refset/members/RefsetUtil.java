@@ -52,7 +52,7 @@ public interface RefsetUtil {
 
     int getLocalizedCurrentConceptNid() throws Exception;
 
-    List<I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept, I_IntSet allowedStatuses,
+    List<? extends I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept, I_IntSet allowedStatuses,
             I_IntSet allowedTypes) throws Exception;
 
     I_IntSet createCurrentStatus(I_TermFactory termFactory) throws Exception;
@@ -61,9 +61,9 @@ public interface RefsetUtil {
 
     I_IntSet createPreferredTerm(I_TermFactory termFactory) throws Exception;
 
-    List<I_DescriptionTuple> getFSNDescriptionsForConceptHavingCurrentStatus(I_TermFactory termFactory, int conceptId)
+    List<? extends I_DescriptionTuple> getFSNDescriptionsForConceptHavingCurrentStatus(I_TermFactory termFactory, int conceptId)
             throws Exception;
 
-    List<I_DescriptionTuple> getPTDescriptionsForConceptHavingCurrentStatus(I_TermFactory termFactory, int conceptId)
+    List<? extends I_DescriptionTuple> getPTDescriptionsForConceptHavingCurrentStatus(I_TermFactory termFactory, int conceptId)
             throws Exception;
 }

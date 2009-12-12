@@ -113,7 +113,7 @@ public final class ConceptDescriptionFacade {
      */
     public List<I_DescriptionVersioned> getVersionedDescriptions(final I_GetConceptData concept) throws Exception {
         List<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
-        List<I_DescriptionTuple> descriptionTuples = getDescriptionTuples(concept);
+        List<? extends I_DescriptionTuple> descriptionTuples = getDescriptionTuples(concept);
         for (I_DescriptionTuple desc : descriptionTuples) {
             descriptions.add(desc.getDescVersioned());
         }
@@ -130,7 +130,7 @@ public final class ConceptDescriptionFacade {
      * @throws Exception when there is an error retrieving the Description
      *             Tuples from the {@code concept}
      */
-    public List<I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept) throws Exception {
+    public List<? extends I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept) throws Exception {
         I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
         PositionSetReadOnly allPositions = conceptTest.getPositions(termFactory);
 
