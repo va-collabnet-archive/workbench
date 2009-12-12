@@ -561,7 +561,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         t.getIdVersioned().addVersion(newPart);
     }
 
-    private void processImages(List<I_ImageVersioned> images) throws Exception {
+    private void processImages(List<? extends I_ImageVersioned> images) throws Exception {
         for (I_ImageVersioned imageVersioned : images) {
             processImages(imageVersioned);
         }
