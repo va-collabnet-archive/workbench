@@ -18,7 +18,7 @@ package org.dwfa.ace.api;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 
-public interface I_AmPart<P extends I_AmPart> {
+public interface I_AmPart {
 	
 	public int getPathId();
 	public int getVersion();
@@ -27,7 +27,7 @@ public interface I_AmPart<P extends I_AmPart> {
 	
 	public void setStatusId(int statusId);
 	
-	public P duplicate();
+	public I_AmPart duplicate();
 	
 	public ArrayIntList getPartComponentNids();
 	
@@ -39,7 +39,7 @@ public interface I_AmPart<P extends I_AmPart> {
 	 * @param time
 	 * @return
 	 */
-	public P makeAnalog(int statusNid, int pathNid, long time);
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time);
 
 	/**
 	 * 

@@ -26,6 +26,7 @@ import org.dwfa.ace.api.I_GetConceptData;
  */
 public class TupleListUtil {
 
+	
     public static void setStatus(I_GetConceptData status, List<? extends I_AmTuple> tuples) {
         for (I_AmTuple t : tuples) {
             t.setStatusId(status.getConceptId());

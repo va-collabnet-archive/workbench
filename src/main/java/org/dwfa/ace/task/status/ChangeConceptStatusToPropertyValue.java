@@ -99,13 +99,11 @@ public class ChangeConceptStatusToPropertyValue extends AbstractTask {
             PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = (I_GetConceptData) process.readProperty(newStatusPropName);
             for (I_Path editPath : config.getEditingPathSet()) {
-                List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null, positionsForEdit);
+                List<? extends I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null, positionsForEdit);
                 for (I_ConceptAttributeTuple t : tuples) {
                     if (t.getConceptStatus() != newStatusConcept.getConceptId()) {
-                        I_ConceptAttributePart newPart = t.duplicatePart();
-                        newPart.setPathId(editPath.getConceptId());
-                        newPart.setVersion(Integer.MAX_VALUE);
-                        newPart.setConceptStatus(newStatusConcept.getConceptId());
+                        I_ConceptAttributePart newPart = 
+                        	(I_ConceptAttributePart) t.makeAnalog(t.getStatusId(), editPath.getConceptId(), Long.MAX_VALUE);
                         partsToAdd.add(newPart);
                     }
                 }

@@ -343,7 +343,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         }
 
         I_GetConceptData relQueryConcept = (I_GetConceptData) component;
-        List<I_RelVersioned> relTuples = relQueryConcept.getSourceRels();
+        List<? extends I_RelVersioned> relTuples = relQueryConcept.getSourceRels();
 
         for (I_RelVersioned versionedTuple : relTuples) {
             boolean valid = false;
