@@ -1364,7 +1364,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         if (isParentCache.containsKey(child.getConceptId())) {
             return isParentCache.get(child.getConceptId());
         }
-        Set<I_GetConceptData> parents = child.getSourceRelTargets(allowedStatus, allowedTypes, positions,
+        Set<? extends I_GetConceptData> parents = child.getSourceRelTargets(allowedStatus, allowedTypes, positions,
             addUncommitted);
         if (depth == 90) {
             AceLog.getAppLog().log(

@@ -1163,7 +1163,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         I_GetConceptData refsetConcept = (I_GetConceptData) getLabel().getTermComponent();
         if (refsetConcept != null) {
-            Set<I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept,
+            Set<? extends I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept,
                 ace.getAceFrameConfig());
             if (specs.size() > 0) {
                 refsetSpecConcept = specs.iterator().next();

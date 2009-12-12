@@ -55,7 +55,7 @@ public class ReflexiveRefsetCommentTableModel extends ReflexiveRefsetTableModel 
             I_IntSet allowedTypes = new IntSet();
             try {
                 allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
-                Set<I_GetConceptData> commentRefsets = refsetConcept.getSourceRelTargets(host.getConfig()
+                Set<? extends I_GetConceptData> commentRefsets = refsetConcept.getSourceRelTargets(host.getConfig()
                     .getAllowedStatus(), allowedTypes, host.getConfig().getViewPositionSetReadOnly(), false);
                 if (commentRefsets.size() > 0) {
                     this.tableComponentId = commentRefsets.iterator().next().getConceptId();
