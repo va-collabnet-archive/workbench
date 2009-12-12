@@ -341,7 +341,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                 I_IntSet allowedTypes = tf.newIntSet();
                 allowedTypes.add(tf.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids()).getConceptId());
 
-                Set<I_GetConceptData> concepts = refsetConcept.getDestRelOrigins(allowedStatuses, allowedTypes,
+                Set<? extends I_GetConceptData> concepts = refsetConcept.getDestRelOrigins(allowedStatuses, allowedTypes,
                     new PositionSetReadOnly(positions), true, true);
                 for (I_GetConceptData concept : concepts) {
                     subOriginalId = refsetType.getRefsetHandler().getSnomedIntegerId(tf, concept.getConceptId());

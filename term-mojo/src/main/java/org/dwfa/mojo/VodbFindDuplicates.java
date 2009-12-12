@@ -333,7 +333,7 @@ public class VodbFindDuplicates extends AbstractMojo {
             setupTable();
 
             // searches in children of a the root concept
-            Set<I_GetConceptData> rootChildren = rootConcept.getDestRelOrigins(allowedStatus, allowedRelTypes,
+            Set<? extends I_GetConceptData> rootChildren = rootConcept.getDestRelOrigins(allowedStatus, allowedRelTypes,
             		new PositionSetReadOnly(positions), false);
 
             for (I_GetConceptData rootChild : rootChildren) {
@@ -720,7 +720,7 @@ public class VodbFindDuplicates extends AbstractMojo {
             setupTable();
 
             // searches in children of a the root concept
-            Set<I_GetConceptData> rootChildren = rootConcept.getDestRelOrigins(allowedStatus, allowedRelTypes,
+            Set<? extends I_GetConceptData> rootChildren = rootConcept.getDestRelOrigins(allowedStatus, allowedRelTypes,
                 new PositionSetReadOnly(positions), false);
             for (I_GetConceptData rootChild : rootChildren) {
                 // print out rootChild description here...
@@ -834,7 +834,7 @@ public class VodbFindDuplicates extends AbstractMojo {
             I_IntSet allowedStatus = null;
             I_IntSet allowedRelTypes = null;
             Set<I_Position> positions = null;
-            Set<I_GetConceptData> rootChildren = rootConcept.getDestRelOrigins(allowedStatus, allowedRelTypes,
+            Set<? extends I_GetConceptData> rootChildren = rootConcept.getDestRelOrigins(allowedStatus, allowedRelTypes,
                 new PositionSetReadOnly(positions), false);
             for (I_GetConceptData rootChild : rootChildren) {
                 // print out rootChild description here...

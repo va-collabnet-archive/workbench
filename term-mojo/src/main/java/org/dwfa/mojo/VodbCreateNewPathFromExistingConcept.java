@@ -26,7 +26,6 @@ import java.util.Set;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -100,7 +99,7 @@ public class VodbCreateNewPathFromExistingConcept extends AbstractMojo {
             I_IntSet allowedTypes = tf.newIntSet();
 
             allowedTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-            Set<I_GetConceptData> s = parent.getDestRelOrigins(allowedStatus, allowedTypes, null, false);
+            Set<? extends I_GetConceptData> s = parent.getDestRelOrigins(allowedStatus, allowedTypes, null, false);
             if (s.size() > 0) {
                 for (I_GetConceptData child : s) {
                     if (tf.hasId(child.getUids())) {

@@ -544,7 +544,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
     private int getMembershipType(int includeTypeConceptId) throws Exception {
         I_GetConceptData includeConcept = termFactory.getConcept(includeTypeConceptId);
 
-        Set<I_GetConceptData> membershipTypes = includeConcept.getSourceRelTargets(
+        Set<? extends I_GetConceptData> membershipTypes = includeConcept.getSourceRelTargets(
             getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), getIntSet(ConceptConstants.CREATES_MEMBERSHIP_TYPE),
             null, false);
 
