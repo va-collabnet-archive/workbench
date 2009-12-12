@@ -161,8 +161,8 @@ public class VodbMonitorBranches extends AbstractMojo {
                 positions.add(comparePosition);
             }
             List<I_ConceptAttributeTuple> allConceptAttributeTuples = new LinkedList<I_ConceptAttributeTuple>();
-            List<I_ConceptAttributeTuple> conceptAttributeTuples1 = new LinkedList<I_ConceptAttributeTuple>();
-            List<I_ConceptAttributeTuple> conceptAttributeTuples2 = new LinkedList<I_ConceptAttributeTuple>();
+            List<? extends I_ConceptAttributeTuple> conceptAttributeTuples1 = new LinkedList<I_ConceptAttributeTuple>();
+            List<? extends I_ConceptAttributeTuple> conceptAttributeTuples2 = new LinkedList<I_ConceptAttributeTuple>();
 
             List<I_DescriptionTuple> allDescriptionTuples = new LinkedList<I_DescriptionTuple>();
             List<I_DescriptionTuple> descriptionTuples1 = new LinkedList<I_DescriptionTuple>();

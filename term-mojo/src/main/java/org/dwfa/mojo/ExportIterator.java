@@ -332,7 +332,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
             StringBuilder stringBuilder = new StringBuilder("");
 
-            List<I_ConceptAttributeTuple> firstMatches = concept.getConceptAttributeTuples(null, positions);
+            List<? extends I_ConceptAttributeTuple> firstMatches = concept.getConceptAttributeTuples(null, positions);
             List<I_ConceptAttributeTuple> matches = new LinkedList<I_ConceptAttributeTuple>();
             for (int i = 0; i < firstMatches.size(); i++) {
                 if (allowedStatus.contains(firstMatches.get(i).getConceptStatus())) {
