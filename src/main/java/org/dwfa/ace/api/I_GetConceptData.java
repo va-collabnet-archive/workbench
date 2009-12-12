@@ -182,7 +182,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     @Deprecated
-    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions)
+    public List<? extends I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions)
             throws IOException;
 
     /**
@@ -201,7 +201,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
+    public List<? extends I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
     /**
@@ -214,7 +214,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<I_ImageTuple> getImageTuples(boolean returnConflictResolvedLatestState) throws IOException,
+    public List<? extends I_ImageTuple> getImageTuples(boolean returnConflictResolvedLatestState) throws IOException,
             TerminologyException;
 
     /**
