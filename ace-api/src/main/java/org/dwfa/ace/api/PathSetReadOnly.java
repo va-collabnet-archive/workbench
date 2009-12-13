@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -115,6 +116,11 @@ public class PathSetReadOnly implements Set<I_Path> {
 	@Override
 	public <T> T[] toArray(T[] a) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String toString() {
+		return Arrays.asList(paths).toString();
 	}
 	
 	
