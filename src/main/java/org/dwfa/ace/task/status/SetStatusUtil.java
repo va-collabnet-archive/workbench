@@ -35,7 +35,7 @@ public class SetStatusUtil {
         }
     }
 
-    public static void setStatusOfConceptInfo(I_GetConceptData status, List<I_ConceptAttributeTuple> contuples) {
+    public static void setStatusOfConceptInfo(I_GetConceptData status, List<? extends I_ConceptAttributeTuple> contuples) {
         for (I_ConceptAttributeTuple cat : contuples) {
             cat.setStatusId(status.getConceptId());
         }

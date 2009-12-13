@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.Currency;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -156,7 +154,7 @@ public class ClassifyCurrent extends AbstractTask {
             conceptAttributes = concept.getConceptAttributes();
         }
 
-        final List<I_ConceptAttributeTuple> tuples = conceptAttributes.getTuples();
+        final List<? extends I_ConceptAttributeTuple> tuples = conceptAttributes.getTuples();
         boolean isDefined = false;
 
         I_ConceptAttributeTuple tu = tuples.get(tuples.size() - 1);
