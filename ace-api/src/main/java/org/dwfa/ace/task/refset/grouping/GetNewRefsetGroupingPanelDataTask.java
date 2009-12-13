@@ -112,8 +112,6 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
                                 .getUids());
                     I_GetConceptData ptConcept =
                             termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
-                    I_GetConceptData crossMapConcept =
-                            termFactory.getConcept(RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids());
                     I_GetConceptData isA = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
                     I_GetConceptData purposeRel =
                             termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
@@ -123,6 +121,8 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
                             termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.getUids());
                     I_GetConceptData crossMap =
                             termFactory.getConcept(RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids());
+                    I_GetConceptData extensionTable =
+                            termFactory.getConcept(ArchitectonicAuxiliary.Concept.EXTENSION_TABLE.getUids());
 
                     SpecRefsetHelper helper = new SpecRefsetHelper();
 
@@ -135,7 +135,7 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
                         .getConcept(statusTermEntry.getIds()));
                     helper.newDescription(newRefset, ptConcept, refsetName, config, termFactory
                         .getConcept(statusTermEntry.getIds()));
-                    helper.newDescription(newRefset, crossMapConcept, "ORG_DWFA_CTV3_CROSS_MAP", config, termFactory
+                    helper.newDescription(newRefset, extensionTable, "ORG_DWFA_CTV3_CROSS_MAP", config, termFactory
                         .getConcept(statusTermEntry.getIds()));
 
                     // create relationships
