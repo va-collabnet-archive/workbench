@@ -61,7 +61,7 @@ import org.dwfa.tapi.TerminologyException;
  * 6) priority (from pulldown menu)
  * 7) request attachments (file chooser)
  * 
- * @author Chrissy
+ * @author Chrissy Hill
  * 
  */
 public class RequestForChangePanel extends JPanel {
@@ -362,11 +362,10 @@ public class RequestForChangePanel extends JPanel {
     }
 
     private Set<? extends I_GetConceptData> getAllUsers() throws IOException, TerminologyException {
-        I_GetConceptData userParent = LocalVersionedTerminology.get().getConcept(
-            ArchitectonicAuxiliary.Concept.USER.getUids());
+        I_GetConceptData userParent =
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
         I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
-        allowedTypes.add(LocalVersionedTerminology.get()
-            .getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
+        allowedTypes.add(LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
             .getConceptId());
 
         return userParent.getDestRelOrigins(allowedTypes, true, true);

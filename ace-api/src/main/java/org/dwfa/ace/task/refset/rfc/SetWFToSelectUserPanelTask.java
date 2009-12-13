@@ -111,12 +111,12 @@ public class SetWFToSelectUserPanelTask extends AbstractTask {
 
             wfSheet.setLayout(new GridLayout(1, 1));
             SelectUserPanel innerPanel = new SelectUserPanel();
-            
+
             wfSheet.setSize(innerPanel.getPreferredSize());
             wfSheet.setPreferredSize(innerPanel.getPreferredSize());
             wfSheet.setMaximumSize(innerPanel.getMaximumSize());
             wfSheet.setMinimumSize(innerPanel.getMinimumSize());
-            
+
             wfSheet.add(innerPanel);
             wfSheet.validate();
             wfSheet.repaint();

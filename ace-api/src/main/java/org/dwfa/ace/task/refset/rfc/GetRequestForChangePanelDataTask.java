@@ -34,7 +34,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.RefsetHelper;
-import org.dwfa.ace.refset.RefsetUtilImpl;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpecWizardTask;
 import org.dwfa.bpa.process.Condition;
@@ -86,9 +85,9 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
             refsetUuidPropName = (String) in.readObject();
             originalRequestPropName = (String) in.readObject();
             if (objDataVersion >= 2) {
-            	refsetSpecUuidPropName = (String) in.readObject();
+                refsetSpecUuidPropName = (String) in.readObject();
             } else {
-            	refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
+                refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -179,7 +178,8 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                     }
                     process.setSubject("Request a change for refset");
                     process.setName(refset.getInitialText());
-                    process.setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refset.getInitialText());
+                    process.setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refset
+                        .getInitialText());
                     process.setPriority(p);
 
                     if (deadline == null) {
@@ -190,8 +190,8 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                     process.setDeadline(deadline.getTime());
 
                     process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
-                    process.setProperty(refsetSpecUuidPropName, 
-                    		RefsetHelper.getSpecificationRefsetForRefset(refset, config).iterator().next().getUids().iterator().next());
+                    process.setProperty(refsetSpecUuidPropName, RefsetHelper.getSpecificationRefsetForRefset(refset,
+                        config).iterator().next().getUids().iterator().next());
                     process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { config
                         .getDbConfig().getUserConcept().getUids().iterator().next() });
                     process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { editor
@@ -251,12 +251,12 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
         this.originalRequestPropName = originalRequestPropName;
     }
 
-	public String getRefsetSpecUuidPropName() {
-		return refsetSpecUuidPropName;
-	}
+    public String getRefsetSpecUuidPropName() {
+        return refsetSpecUuidPropName;
+    }
 
-	public void setRefsetSpecUuidPropName(String refsetSpecUuidPropName) {
-		this.refsetSpecUuidPropName = refsetSpecUuidPropName;
-	}
+    public void setRefsetSpecUuidPropName(String refsetSpecUuidPropName) {
+        this.refsetSpecUuidPropName = refsetSpecUuidPropName;
+    }
 
 }

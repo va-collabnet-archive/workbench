@@ -26,10 +26,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -88,8 +86,8 @@ public class GetSelectedRoleModificationTask extends AbstractTask {
                     }
                 }
             }
-            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Error : no selection made. ",
-                "", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Error : no selection made. ", "",
+                JOptionPane.ERROR_MESSAGE);
             return Condition.PREVIOUS;
         } catch (Exception e) {
             e.printStackTrace();

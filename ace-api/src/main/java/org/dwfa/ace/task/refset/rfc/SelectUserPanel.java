@@ -43,7 +43,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 /**
  * The select user panel allows the user to select a particular user from the drop down list.
  * 
- * @author Chrissy
+ * @author Chrissy Hill
  * 
  */
 public class SelectUserPanel extends JPanel {
@@ -155,8 +155,8 @@ public class SelectUserPanel extends JPanel {
                 int latestVersion = Integer.MIN_VALUE;
 
                 List<? extends I_DescriptionTuple> descriptionResults =
-                        user.getDescriptionTuples(null, descAllowedTypes, 
-                            LocalVersionedTerminology.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
+                        user.getDescriptionTuples(null, descAllowedTypes, LocalVersionedTerminology.get()
+                            .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
 
                     if (descriptionTuple.getVersion() > latestVersion) {
