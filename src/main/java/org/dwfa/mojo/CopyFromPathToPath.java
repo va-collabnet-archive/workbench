@@ -311,7 +311,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    private I_ConceptAttributeTuple getLatestAttributes(List<I_ConceptAttributeTuple> tuples) {
+    private I_ConceptAttributeTuple getLatestAttributes(List<? extends I_ConceptAttributeTuple> tuples) {
         I_ConceptAttributeTuple latest = null;
         for (I_ConceptAttributeTuple conceptAttributeTuple : tuples) {
             if (latest == null || latest.getVersion() < conceptAttributeTuple.getVersion()) {
