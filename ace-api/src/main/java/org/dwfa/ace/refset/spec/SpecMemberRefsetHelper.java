@@ -80,7 +80,8 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
             @Override
             public void onComplete() throws Exception {
-                List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
+                List<UUID> markedParentsUuid =
+                        Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
 
                 if (termFactory.hasId(markedParentsUuid)) {
                     if (useMonitor) {
@@ -150,7 +151,8 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
             @Override
             public void onComplete() throws Exception {
-                List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
+                List<UUID> markedParentsUuid =
+                        Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
 
                 if (termFactory.hasId(markedParentsUuid)) {
                     if (useMonitor) {
@@ -241,8 +243,9 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
 
-            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(config.getAllowedStatus(),
-                config.getViewPositionSet(), true, false);
+            List<I_ThinExtByRefTuple> extensions =
+                    thinExtByRefVersioned
+                        .getTuples(config.getAllowedStatus(), config.getViewPositionSet(), true, false);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == memberRefsetId) {
