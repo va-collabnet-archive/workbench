@@ -16,35 +16,18 @@
  */
 package org.dwfa.ace.task.refset.rfc;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import javax.swing.Box;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.ButtonGroup;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.refset.spec.SpecRefsetHelper;
-import org.dwfa.ace.task.util.DynamicWidthComboBox;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
  * This panel allows the user to select whether they want to remove an existing user/role or create a new one.
- *  
+ * 
  * @author Chrissy Hill
  * 
  */
@@ -123,9 +106,9 @@ public class ChooseRoleModificationPanel extends JPanel {
     public boolean deleteOptionSelected() {
         return deleteRoleOption.isSelected();
     }
-    
+
     public boolean addNewRoleOptionSelected() {
-        return  newRoleOption.isSelected();
+        return newRoleOption.isSelected();
     }
 
 }

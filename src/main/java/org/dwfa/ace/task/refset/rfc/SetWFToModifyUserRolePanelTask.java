@@ -109,18 +109,18 @@ public class SetWFToModifyUserRolePanelTask extends AbstractTask {
                 wfSheet.remove(components[i]);
             }
 
-            //int width = 475;
-            //int height = 180;
+            // int width = 475;
+            // int height = 180;
 
-            //wfSheet.setSize(width, height);
+            // wfSheet.setSize(width, height);
             wfSheet.setLayout(new GridLayout(1, 1));
             ModifyUserRolePanel innerPanel = new ModifyUserRolePanel();
-            
+
             wfSheet.setSize(innerPanel.getPreferredSize());
             wfSheet.setPreferredSize(innerPanel.getPreferredSize());
             wfSheet.setMaximumSize(innerPanel.getMaximumSize());
             wfSheet.setMinimumSize(innerPanel.getMinimumSize());
-            
+
             wfSheet.add(innerPanel);
             wfSheet.validate();
             wfSheet.repaint();

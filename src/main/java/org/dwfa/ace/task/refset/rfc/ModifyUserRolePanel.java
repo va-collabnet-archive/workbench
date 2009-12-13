@@ -47,10 +47,10 @@ import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
- * The modify user role panel allows the user to select a user from the drop down list and add/remove/modify their roles
+ * The modify user role panel allows the user to select a user from the drop down list and remove their roles
  * as required.
  * 
- * @author Chrissy
+ * @author Chrissy Hill
  * 
  */
 public class ModifyUserRolePanel extends JPanel {
@@ -65,8 +65,8 @@ public class ModifyUserRolePanel extends JPanel {
     private JLabel roleLabel;
     private JLabel hierarchyLabel;
     private JButton removeRoleButton;
-    private JButton addRoleButton;
-    private JButton modifyRoleButton;
+    // private JButton addRoleButton;
+    // private JButton modifyRoleButton;
     private DynamicWidthComboBox userComboBox;
     private DynamicWidthComboBox roleComboBox;
     private DynamicWidthComboBox hierarchyComboBox;
@@ -91,8 +91,8 @@ public class ModifyUserRolePanel extends JPanel {
 
         // buttons and boxes
         removeRoleButton = new JButton("Remove role");
-        addRoleButton = new JButton("Add new role");
-        modifyRoleButton = new JButton("Modify role");
+        // addRoleButton = new JButton("Add new role");
+        // modifyRoleButton = new JButton("Modify role");
         userComboBox = new DynamicWidthComboBox(getValidUsers().toArray());
         userComboBox.setMaximumSize(new Dimension(200, 25));
         userComboBox.setMinimumSize(new Dimension(200, 25));
@@ -110,8 +110,8 @@ public class ModifyUserRolePanel extends JPanel {
 
     private void addListeners() {
         removeRoleButton.addActionListener(new RemoveRoleButtonListener());
-        addRoleButton.addActionListener(new AddRoleButtonListener());
-        modifyRoleButton.addActionListener(new ModifyRoleButtonListener());
+        // addRoleButton.addActionListener(new AddRoleButtonListener());
+        // .addActionListener(new ModifyRoleButtonListener());
         userComboBox.addActionListener(new UserComboBoxListener());
         hierarchyComboBox.addActionListener(new HierarchyComboBoxListener());
     }
@@ -237,7 +237,7 @@ public class ModifyUserRolePanel extends JPanel {
         } else {
             removeRoleButton.setEnabled(true);
         }
-        modifyRoleButton.setEnabled(false); // TODO
+        // modifyRoleButton.setEnabled(false); // TODO
 
         this.repaint();
         this.revalidate();
@@ -275,8 +275,8 @@ public class ModifyUserRolePanel extends JPanel {
                 int latestVersion = Integer.MIN_VALUE;
 
                 List<? extends I_DescriptionTuple> descriptionResults =
-                        user.getDescriptionTuples(null, descAllowedTypes, 
-                            LocalVersionedTerminology.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
+                        user.getDescriptionTuples(null, descAllowedTypes, LocalVersionedTerminology.get()
+                            .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
 
                     if (descriptionTuple.getVersion() > latestVersion) {
@@ -367,7 +367,8 @@ public class ModifyUserRolePanel extends JPanel {
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids())
                 .getConceptId());
 
-            List<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();// (null, roleAllowedTypes, positions, true,
+            List<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();// (null, roleAllowedTypes, positions,
+            // true,
             // true);
 
             for (I_RelVersioned roleRel : roleRels) {
@@ -434,8 +435,8 @@ public class ModifyUserRolePanel extends JPanel {
                     I_IntSet currentStatus = helper.getCurrentStatusIntSet();
 
                     List<? extends I_RelTuple> roleRels =
-                            currentUser.getSourceRelTuples(currentStatus, roleAllowedTypes, 
-                                termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                            currentUser.getSourceRelTuples(currentStatus, roleAllowedTypes, termFactory
+                                .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
 
                     for (I_RelTuple roleRel : roleRels) {
                         if (currentHierarchy.getConceptId() == roleRel.getC2Id()) {
