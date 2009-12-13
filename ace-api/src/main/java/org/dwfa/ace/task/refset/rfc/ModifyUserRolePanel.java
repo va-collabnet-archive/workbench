@@ -262,7 +262,7 @@ public class ModifyUserRolePanel extends JPanel {
             SpecRefsetHelper helper = new SpecRefsetHelper();
             Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
-            Set<I_GetConceptData> allUsers = userParent.getDestRelOrigins(allowedTypes, true, true);
+            Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(allowedTypes, true, true);
             I_GetConceptData descriptionType =
                     LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
             I_IntSet descAllowedTypes = LocalVersionedTerminology.get().newIntSet();
@@ -274,8 +274,9 @@ public class ModifyUserRolePanel extends JPanel {
                 I_DescriptionTuple latestTuple = null;
                 int latestVersion = Integer.MIN_VALUE;
 
-                List<I_DescriptionTuple> descriptionResults =
-                        user.getDescriptionTuples(null, descAllowedTypes, positions, true);
+                List<? extends I_DescriptionTuple> descriptionResults =
+                        user.getDescriptionTuples(null, descAllowedTypes, 
+                            LocalVersionedTerminology.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
 
                     if (descriptionTuple.getVersion() > latestVersion) {
@@ -321,7 +322,7 @@ public class ModifyUserRolePanel extends JPanel {
 
             Set<I_Position> positions = getPositions(termFactory);
 
-            List<I_RelVersioned> roleRels = currentUser.getSourceRels();
+            List<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();
             // (null, roleAllowedTypes, positions, true, true);
 
             for (I_RelVersioned versioned : roleRels) {
@@ -366,7 +367,7 @@ public class ModifyUserRolePanel extends JPanel {
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids())
                 .getConceptId());
 
-            List<I_RelVersioned> roleRels = currentUser.getSourceRels();// (null, roleAllowedTypes, positions, true,
+            List<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();// (null, roleAllowedTypes, positions, true,
             // true);
 
             for (I_RelVersioned roleRel : roleRels) {
@@ -432,8 +433,9 @@ public class ModifyUserRolePanel extends JPanel {
                     SpecRefsetHelper helper = new SpecRefsetHelper();
                     I_IntSet currentStatus = helper.getCurrentStatusIntSet();
 
-                    List<I_RelTuple> roleRels =
-                            currentUser.getSourceRelTuples(currentStatus, roleAllowedTypes, null, true, true);
+                    List<? extends I_RelTuple> roleRels =
+                            currentUser.getSourceRelTuples(currentStatus, roleAllowedTypes, 
+                                termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
 
                     for (I_RelTuple roleRel : roleRels) {
                         if (currentHierarchy.getConceptId() == roleRel.getC2Id()) {
