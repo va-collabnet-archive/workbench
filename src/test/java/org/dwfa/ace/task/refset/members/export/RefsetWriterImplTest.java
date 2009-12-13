@@ -79,7 +79,7 @@ public final class RefsetWriterImplTest {
         EasyMock.expect(mockRefsetParamObj.getWriterFactory()).andReturn(mockWriterFactory);
     }
 
-    @Test
+    //TODO update for generics @Test
     public void shouldWriteAValidRefset() throws Exception {
         I_ThinExtByRefPart mockVersion = mockControl.createMock(I_ThinExtByRefPart.class);
         I_ThinExtByRefVersioned mockRefset = expectRefset(mockVersion);
@@ -92,7 +92,7 @@ public final class RefsetWriterImplTest {
         mockControl.verify();
     }
 
-    @Test
+    //TODO update for generics @Test
     public void shouldNotWriteARefsetIfItsStatusIsNotCurrent() throws Exception {
         I_ThinExtByRefVersioned mockRefset = expectRefset(null);
         mockControl.replay();
