@@ -53,6 +53,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class GrantPanel extends JPanel {
+    I_GetConceptData userConcept;
 
     private class CreateGrants implements ActionListener {
 
@@ -64,11 +65,11 @@ public class GrantPanel extends JPanel {
                     I_GetConceptData taxonomy = (I_GetConceptData) taxonomyLabel.getTermComponent();
                     for (int i = 0; i < roleGrantTableModel.getSize(); i++) {
                         I_GetConceptData grant = roleGrantTableModel.getElementAt(i);
-                        I_RelVersioned grantRel = tf.newRelationship(UUID.randomUUID(), config.getDbConfig()
-                            .getUserConcept(), grant, taxonomy,
-                            tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
-                            tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-                            tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, grantorConfig);
+                        I_RelVersioned grantRel =
+                                tf.newRelationship(UUID.randomUUID(), userConcept, grant, taxonomy, tf
+                                    .getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), tf
+                                    .getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), tf
+                                    .getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, grantorConfig);
                         uncommittedGrants.add(grantRel);
 
                     }
@@ -156,8 +157,8 @@ public class GrantPanel extends JPanel {
             try {
                 I_RelVersioned grant = (I_RelVersioned) addedGrantList.getSelectedValue();
                 uncommittedGrants.remove(grant);
-                config.getDbConfig().getUserConcept().getUncommittedSourceRels().remove(grant);
-                LocalVersionedTerminology.get().addUncommitted(config.getDbConfig().getUserConcept());
+                userConcept.getUncommittedSourceRels().remove(grant);
+                LocalVersionedTerminology.get().addUncommitted(userConcept);
 
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
@@ -181,9 +182,16 @@ public class GrantPanel extends JPanel {
     private JList addedGrantList;
 
     public GrantPanel(I_ConfigAceFrame config, I_ConfigAceFrame grantorConfig) throws Exception {
+        this(config, grantorConfig, config.getDbConfig().getUserConcept());
+    }
+
+    public GrantPanel(I_ConfigAceFrame config, I_ConfigAceFrame grantorConfig, I_GetConceptData userConcept)
+            throws Exception {
+
         super(new GridBagLayout());
         this.config = config;
         this.grantorConfig = grantorConfig;
+        this.userConcept = userConcept;
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridheight = 1;
@@ -196,7 +204,7 @@ public class GrantPanel extends JPanel {
         gbc.weighty = 0;
 
         TermComponentLabel userLabel = new TermComponentLabel(config);
-        userLabel.setTermComponent(config.getDbConfig().getUserConcept());
+        userLabel.setTermComponent(userConcept);
         userLabel.setFrozen(true);
         JPanel userPanel = new JPanel(new GridLayout(1, 1));
         userPanel.add(userLabel);
