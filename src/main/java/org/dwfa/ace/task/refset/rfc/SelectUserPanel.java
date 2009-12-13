@@ -142,7 +142,7 @@ public class SelectUserPanel extends JPanel {
             SpecRefsetHelper helper = new SpecRefsetHelper();
             Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
-            Set<I_GetConceptData> allUsers = userParent.getDestRelOrigins(allowedTypes, true, true);
+            Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(allowedTypes, true, true);
             I_GetConceptData descriptionType =
                     LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
             I_IntSet descAllowedTypes = LocalVersionedTerminology.get().newIntSet();
@@ -154,8 +154,9 @@ public class SelectUserPanel extends JPanel {
                 I_DescriptionTuple latestTuple = null;
                 int latestVersion = Integer.MIN_VALUE;
 
-                List<I_DescriptionTuple> descriptionResults =
-                        user.getDescriptionTuples(null, descAllowedTypes, positions, true);
+                List<? extends I_DescriptionTuple> descriptionResults =
+                        user.getDescriptionTuples(null, descAllowedTypes, 
+                            LocalVersionedTerminology.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
 
                     if (descriptionTuple.getVersion() > latestVersion) {
