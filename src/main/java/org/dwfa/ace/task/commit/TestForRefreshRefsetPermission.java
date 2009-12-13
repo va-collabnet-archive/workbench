@@ -27,7 +27,6 @@ import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -35,13 +34,12 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.util.bean.BeanList;
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+/*
+ * @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
+ * @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
+ * @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+ */
 public class TestForRefreshRefsetPermission extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
@@ -112,7 +110,7 @@ public class TestForRefreshRefsetPermission extends AbstractConceptTest {
 
             if (!foundMatch) {
                 alertList.add(new AlertToDataConstraintFailure(alertType,
-                    "<html>User does not have permission to create<br>a new refset in this hierarchy.", concept));
+                    "<html>User does not have permission to refresh<br>a refset in this hierarchy.", concept));
             }
 
             return alertList;
@@ -129,7 +127,8 @@ public class TestForRefreshRefsetPermission extends AbstractConceptTest {
         PositionSetReadOnly allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
 
-        I_GetConceptData createNewRefsetPermission = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CREATE_NEW_REFSET_PERMISSION.getUids());
+        I_GetConceptData createNewRefsetPermission =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.CREATE_NEW_REFSET_PERMISSION.getUids());
         I_GetConceptData ownerRole = termFactory.getConcept(ArchitectonicAuxiliary.Concept.OWNER_ROLE.getUids());
         I_GetConceptData adminRole = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ADMIN_ROLE.getUids());
         I_GetConceptData authorRole = termFactory.getConcept(ArchitectonicAuxiliary.Concept.AUTHOR_ROLE.getUids());
@@ -146,16 +145,16 @@ public class TestForRefreshRefsetPermission extends AbstractConceptTest {
         I_GetConceptData isARel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
         isAAllowedTypes.add(isARel.getConceptId());
 
-        List<? extends I_RelTuple> roleRels = concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true,
-            true);
+        List<? extends I_RelTuple> roleRels =
+                concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true, true);
 
         for (I_RelTuple roleRel : roleRels) {
 
             I_GetConceptData roleType = termFactory.getConcept(roleRel.getTypeId());
             I_GetConceptData hierarchyPermission = termFactory.getConcept(roleRel.getC2Id());
 
-            List<? extends I_RelTuple> permissionRels = roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions,
-                true, true);
+            List<? extends I_RelTuple> permissionRels =
+                    roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions, true, true);
 
             for (I_RelTuple permissionRel : permissionRels) {
                 I_GetConceptData permission = termFactory.getConcept(permissionRel.getC1Id());
@@ -173,12 +172,13 @@ public class TestForRefreshRefsetPermission extends AbstractConceptTest {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         PositionSetReadOnly allPositions = getPositions(termFactory);
         I_IntSet activeStatuses = getActiveStatus(termFactory);
-        I_GetConceptData createNewRefsetPermissionRel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CREATE_NEW_REFSET_PERMISSION.getUids());
+        I_GetConceptData createNewRefsetPermissionRel =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.CREATE_NEW_REFSET_PERMISSION.getUids());
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(createNewRefsetPermissionRel.getConceptId());
 
-        Set<? extends I_GetConceptData> refsets = concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true,
-            true);
+        Set<? extends I_GetConceptData> refsets =
+                concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true, true);
 
         return refsets;
     }
