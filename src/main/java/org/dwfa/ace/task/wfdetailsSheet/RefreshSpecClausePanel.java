@@ -651,7 +651,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 						commentId = tf.getId(commentNid);
 						if (commentRefset != null && commentId != null) {
 							commentRefset.getUncommittedIdVersioned().add(commentId);
-							comment = tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, member.getComponentId(), 
+							comment = tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, member.getMemberId(), 
 									RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
 							I_ThinExtByRefPartString commentExtPart = tf.newExtensionPart(I_ThinExtByRefPartString.class);
 							commentExtPart.setStringValue(editorComments.getText());
@@ -710,7 +710,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 							Integer.MAX_VALUE);
 					commentId = tf.getId(commentNid);
 					commentRefset.getUncommittedIdVersioned().add(commentId);
-					comment = tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, member.getComponentId(), 
+					comment = tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, member.getMemberId(), 
 							RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
 					I_ThinExtByRefPartString commentExtPart = tf.newExtensionPart(I_ThinExtByRefPartString.class);
 					commentExtPart.setStringValue(editorComments.getText());
