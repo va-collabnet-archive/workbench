@@ -419,7 +419,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    		//previousStringValue = getPreviousDisplayName(conceptForDescription); 
 	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
 	    		if (doAdd.getValue()) {
-		    		List<I_DescriptionVersioned> descs = conceptForDescription.getDescriptions();
+		    		List<? extends I_DescriptionVersioned> descs = conceptForDescription.getDescriptions();
 		    		for(I_DescriptionVersioned d: descs) {
 		    			int type = d.getFirstTuple().getTypeId();
 		    			if (type == -2147078660 || type == -2143913499) {
