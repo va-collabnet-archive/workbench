@@ -127,28 +127,32 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
                     SpecRefsetHelper helper = new SpecRefsetHelper();
 
                     // create concept
-                    I_GetConceptData newRefset =
+                    I_GetConceptData newRefsetGroupingConcept =
                             helper.newConcept(config, termFactory.getConcept(statusTermEntry.getIds()));
 
                     // create descriptions
-                    helper.newDescription(newRefset, fsnConcept, refsetName, config, termFactory
+                    helper.newDescription(newRefsetGroupingConcept, fsnConcept, refsetName, config, termFactory
                         .getConcept(statusTermEntry.getIds()));
-                    helper.newDescription(newRefset, ptConcept, refsetName, config, termFactory
+                    helper.newDescription(newRefsetGroupingConcept, ptConcept, refsetName, config, termFactory
                         .getConcept(statusTermEntry.getIds()));
-                    helper.newDescription(newRefset, extensionTable, "ORG_DWFA_CTV3_CROSS_MAP", config, termFactory
+                    helper.newDescription(newRefsetGroupingConcept, extensionTable, "ORG_DWFA_CTV3_CROSS_MAP", config, termFactory
                         .getConcept(statusTermEntry.getIds()));
 
                     // create relationships
-                    helper.newRelationship(newRefset, isA, parent, config, termFactory.getConcept(statusTermEntry
+                    helper.newRelationship(newRefsetGroupingConcept, isA, parent, config, termFactory.getConcept(statusTermEntry
                         .getIds()));
-                    helper.newRelationship(newRefset, purposeRel, ancillaryPurpose, config, termFactory
+                    helper.newRelationship(newRefsetGroupingConcept, purposeRel, ancillaryPurpose, config, termFactory
                         .getConcept(statusTermEntry.getIds()));
-                    helper.newRelationship(newRefset, refsetTypeRel, crossMap, config, termFactory
+                    helper.newRelationship(newRefsetGroupingConcept, refsetTypeRel, crossMap, config, termFactory
                         .getConcept(statusTermEntry.getIds()));
 
                     // save newly created concept UUID
-                    process.setProperty(refsetUuidPropName, newRefset.getUids().iterator().next());
+                    process.setProperty(refsetUuidPropName, newRefsetGroupingConcept.getUids().iterator().next());
 
+                    newRefsetGroupingConcept.promote(config.getViewPositionSet().iterator().next(), 
+                    		config.getPromotionPathSetReadOnly(), 
+                    		config.getAllowedStatus());
+                    
                     return Condition.ITEM_COMPLETE;
 
                 }

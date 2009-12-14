@@ -1102,4 +1102,8 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 	public PositionSetReadOnly getViewPositionSetReadOnly() {
 		return config.getViewPositionSetReadOnly();
 	}
+
+	public PathSetReadOnly getPromotionPathSetReadOnly() {
+		return config.getPromotionPathSetReadOnly();
+	}
 }
