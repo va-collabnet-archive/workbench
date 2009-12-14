@@ -90,6 +90,7 @@ import org.dwfa.vodb.I_StoreDescriptions;
 import org.dwfa.vodb.I_StoreIdentifiers;
 import org.dwfa.vodb.I_StoreRelationships;
 import org.dwfa.vodb.ToIoException;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.I_ProcessConceptAttributeEntries;
 import org.dwfa.vodb.types.I_ProcessDescriptionEntries;
@@ -1353,9 +1354,19 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
         if (bean.uncommittedIdVersioned != null) {
             for (I_IdVersioned idv : bean.uncommittedIdVersioned) {
+            	List<I_IdPart> partsToRemove = new ArrayList<I_IdPart>();
+            	List<I_IdPart> partsToAdd = new ArrayList<I_IdPart>();
                 for (I_IdPart p : idv.getVersions()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
-                        p.setVersion(version);
+                        try {
+							p.setVersion(version);
+						} catch (UnsupportedOperationException e) {
+							e.printStackTrace();
+							AceLog.getAppLog().warning(e.getLocalizedMessage());
+							AceLog.getAppLog().warning("Creating duplicate...");
+							I_IdPart newPart = (I_IdPart) p.makeAnalog(p.getStatusId(), p.getPathId(), ThinVersionHelper.convert(version));
+							partsToAdd.add(newPart);
+						}
                         values.add(new TimePathId(version, p.getPathId()));
                         for (I_DescriptionVersioned desc : bean.getDescriptions()) {
                             if (desc.getDescId() == idv.getNativeId()) {
@@ -1373,6 +1384,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                         }
                     }
                 }
+                idv.getVersions().removeAll(partsToRemove);
+                idv.getVersions().addAll(partsToAdd);
                 identifierDb.writeId(idv);
                 if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                     AceLog.getEditLog().fine("Committing: " + idv);
