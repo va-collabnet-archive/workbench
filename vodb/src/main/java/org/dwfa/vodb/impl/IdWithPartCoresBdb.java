@@ -111,23 +111,27 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                 switch (idType) {
                 case INTEGER_ID:
                     idPart = new ThinIdIntegerPartWithCoreDelegate(ti.readInt(), core);
-                    assert versioned.getVersions().contains(idPart) == false;
-                    versioned.addVersion(idPart);
+                    if (versioned.getVersions().contains(idPart) == false) {
+                        versioned.addVersion(idPart);
+                    }
                     break;
                 case LONG_ID:
                     idPart = new ThinIdLongPartWithCoreDelegate(ti.readLong(), core);
-                    assert versioned.getVersions().contains(idPart) == false;
-                    versioned.addVersion(idPart);
+                    if (versioned.getVersions().contains(idPart) == false) {
+                        versioned.addVersion(idPart);
+                    }
                     break;
                 case UUID_ID:
                     idPart = new ThinIdUuidPartWithCoreDelegate(ti.readLong(), ti.readLong(), core);
-                    assert versioned.getVersions().contains(idPart) == false;
-                    versioned.addVersion(idPart);
+                    if (versioned.getVersions().contains(idPart) == false) {
+                        versioned.addVersion(idPart);
+                    }
                     break;
                 case STRING_ID:
                     idPart = new ThinIdPartWithCoreDelegate(ti.readString(), core);
-                    assert versioned.getVersions().contains(idPart) == false;
-                    versioned.addVersion(idPart);
+                    if (versioned.getVersions().contains(idPart) == false) {
+                        versioned.addVersion(idPart);
+                    }
                     break;
                 }
             }
