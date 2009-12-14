@@ -43,6 +43,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LineageHelper;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
@@ -120,6 +121,13 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
       * @required
       */
      
+ 	/**
+ 	 * The name of the writer, used to determine the output
+ 	 *
+ 	 * @parameter
+ 	 * @required
+ 	 */
+ 	private String writerName;
      /**
       * The date to start looking for changes
       * 
@@ -178,7 +186,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 				outputDirectory = outputDirectory + "/";
 			}
 			
-			ExportIterator expItr = new ExportIterator(outputDirectory, dropName, deltaStartDate);
+			ExportIterator expItr = new ExportIterator(this);
 			
 			
 			/*
@@ -209,25 +217,33 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		private String currentItem;
 		
 		private String currentMasterFile;
-		private EpicLoadFileFactory exportFactory;
+		private I_ExportFactory exportFactory;
 		private EpicExportManager exportManager;
 		private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
 		private int startingVersion;
 		private String dropName;
 		private int counter = 0;
 		private Date startingDate;
+		private List<String> masterFilesImpacted;
 		
-		public ExportIterator(String outputDir, String drop, String start)
+		public ExportIterator(ExportToEpicLoadFilesMojo parent) throws Exception
 		{
 			Date parsedDate = new Date();
 			
-			exportFactory = new EpicLoadFileFactory();
-			exportManager = exportFactory.getExportManager(outputDir);
-			this.dropName = drop;
+			if (parent.writerName.equals("kp loadfile export")) {
+				exportFactory = new EpicLoadFileFactory();
+				exportManager = exportFactory.getExportManager(parent.outputDirectory);
+			}
+			else if (parent.writerName.equals("kp term warehouse build")){
+				
+			}
+			else
+				throw new Exception("Unknown writer name: " + parent.writerName);
+			this.dropName = parent.dropName;
 			try {
-				parsedDate = dateFormat.parse(start);
+				parsedDate = dateFormat.parse(parent.deltaStartDate);
 			} catch (java.text.ParseException e) {
-				getLog().error("Invalid date: " + start + " - use format yyyymmssThhmmssZ+8");
+				getLog().error("Invalid date: " + parent.deltaStartDate + " - use format yyyymmssThhmmssZ+8");
 				e.printStackTrace();
 			}
 	    	
@@ -240,19 +256,31 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		}
 		
 		public void processConcept(I_GetConceptData concept) throws Exception {
+			masterFilesImpacted = new ArrayList<String>();
 			List<? extends I_DescriptionVersioned> descs = concept.getDescriptions();
+
 			if (++counter % 10000 == 0)
 				getLog().info("Iterated " + counter + " concepts");
+			this.setCurrentItem(null, null);
 			int extensionsProcessed = 0;
 			for (I_DescriptionVersioned desc : descs) {
 				// String name = desc.getLastTuple().getPart().getText();
 				I_GetConceptData descriptionConcept = termFactory.getConcept(desc.getConceptId());
 				extensionsProcessed += processDescriptionConcept(descriptionConcept, desc);
 			}
-			// Finally, process this concept directly if it is a description concept.
-			// getLog().info("Processing concept as description");
-			if (extensionsProcessed == 0)
-				processDescriptionConcept(concept, null);
+			// Finally, process this concept directly if it is a description concept, or process the root concept
+			// for extensions attached to the root concept
+			// getLog().info("Processing root concept");
+			// if (extensionsProcessed == 0)
+			processDescriptionConcept(concept, null);
+	        for (String masterfile: masterFilesImpacted) {
+		        I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(masterfile);
+		        if (exportWriter != null) { 
+			        exportWriter.writeRecord(this.dropName);
+			        exportWriter.clearRecordContents();
+		        }
+		        this.currentMasterFile = null;
+	        }
 		}
 		
 
@@ -264,7 +292,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    		extensions = termFactory.getAllExtensionsForComponent(concept.getConceptId());
 	    	// getLog().info("Found " + extensions.size() + " extensions");
 	    	// getLog().info("--------------------------------- Processing extensions: " );
-	    	this.setCurrentItem(null, null);
+	    	
 	    	I_ThinExtByRefTuple lastTuple = null;
 	    	for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
 	    		// getLog().info("Processing extension: " + thinExtByRefVersioned );
@@ -278,16 +306,8 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	        		throw new Exception("No concept for ID " + thinExtByRefVersioned.getRefsetId());
 	        	}
 	        }
-	        if (!(this.currentMasterFile == null)) {
-	        	if (lastTuple != null)
-	        		this.writeRecordIds(lastTuple);
-		        I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(this.currentMasterFile);
-		        if (exportWriter != null) { 
-			        exportWriter.writeRecord(this.dropName);
-			        exportWriter.clearRecordContents();
-		        }
-		        this.currentMasterFile = null;
-	        }
+        	if (lastTuple != null)
+        		this.writeRecordIds(lastTuple);
 	        
 	        return extensions.size();
 	    }
@@ -327,40 +347,34 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	String refsetName = refsetConcept.getInitialText();
 	    	String stringValue = null;
 	    	String previousStringValue = null;
+	    	List<EpicItemIdentifier> refsetAppliesTo = new ArrayList<EpicItemIdentifier>();
+	    	
 	    	I_ThinExtByRefPart extensionTuplePart = extensionTuple.getPart();
 	    	// getLog().info("Processing refset: " + refsetName);	    	
 	    	//TODO: Re-factor into separate class, allow pattern matching, store and read from pom.xml
 	    	if(refsetName.equals("EDG Billing Item 207")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "207");
+	    		refsetAppliesTo.add(new EpicItemIdentifier(
+	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "207"));
+	    		refsetAppliesTo.add(new EpicItemIdentifier(
+	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "207"));
 	    	}
-	    	else if(refsetName.equals("EDG Billing Item 2000")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "2000");
+	    	else if(refsetName.equals("EDG Billing Item 91")) {
+	    		refsetAppliesTo.add(new EpicItemIdentifier(
+	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "91"));
+	    		refsetAppliesTo.add(new EpicItemIdentifier(
+	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "91"));
+// getLog().info("Found billing 91");
 	    	}
 	    	else if(refsetName.equals("EDG Billing Item 2")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "2");
+	    		refsetAppliesTo.add(new EpicItemIdentifier(
+	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "2"));
 	    		stringValue = getDisplayName(conceptForDescription); 
 	    		previousStringValue = getPreviousDisplayName(conceptForDescription); 
 	    	}
-	    	else if(refsetName.equals("EDG Billing Item 40")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "40");
-	    	}
-	    	else if(refsetName.equals("EDG Billing Item 11")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "11");
-	    	}
-	    	else if(refsetName.equals("EDG Billing Item 46")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "46");
-	    	}
-	    	else if(refsetName.equals("EDG Billing Item 47")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "47");
-	    	}
-	    	else if(refsetName.equals("EDG Billing Item 100")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "100");
-	    	}
-	    	else if(refsetName.equals("EDG Billing Item 7000")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "7000");
-	    	}
-	    	else if(refsetName.equals("EDG Billing Item 91")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "91");
+	    	else if(refsetName.startsWith("EDG Billing Item ")) {
+	    		String item = refsetName.substring(17);
+	    		refsetAppliesTo.add(new EpicItemIdentifier(
+	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, item));
 	    	}
 	    	else if(refsetName.equals("EDG Billing Contact Date")) {
 	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "20");
@@ -370,11 +384,10 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	/**
 	    	 *  EDG Clinical refsets
 	    	 */
-	    	else if(refsetName.equals("EDG Clinical Item 11")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "11");
-	    	}
 	    	else if(refsetName.equals("EDG Clinical Item 2 National")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2");
+	    		refsetAppliesTo.add(new EpicItemIdentifier(
+	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2"));
+
 	    		if (description != null) {
 	    			stringValue = description.getLastTuple().getPart().getText();
 	    			previousStringValue = getPreviousDisplayName(description);
@@ -384,7 +397,8 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	else if (refsetName.startsWith("EDG Clinical Item 2 "))
 	    	{
 	    		// String region = refsetName.substring(20);
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2");
+	    		refsetAppliesTo.add(new EpicItemIdentifier(
+	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2"));
 	    		if (description != null) {
 	    			stringValue = description.getLastTuple().getPart().getText();
 	    			previousStringValue = stringValue;
@@ -392,37 +406,38 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    		
 	    	}
 	    	else if(refsetName.equals("EDG Clinical Item 2")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2");
+	    		refsetAppliesTo.add(new EpicItemIdentifier(
+	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2"));
 	    		stringValue = getDisplayName(conceptForDescription); 
 	    		previousStringValue = getPreviousDisplayName(conceptForDescription); 
 	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 200")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "200");
+	    	else if(refsetName.equals("EDG Clinical Item 50")) {
+	    		
+	    		//refsetAppliesTo.add(new EpicItemIdentifier(
+	    		//		EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "50"));
+	    		// stringValue = getDisplayName(conceptForDescription);
+	    		//previousStringValue = getPreviousDisplayName(conceptForDescription); 
+	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
+	    		if (doAdd.getValue()) {
+		    		List<I_DescriptionVersioned> descs = conceptForDescription.getDescriptions();
+		    		for(I_DescriptionVersioned d: descs) {
+		    			int type = d.getFirstTuple().getTypeId();
+		    			if (type == -2147078660 || type == -2143913499) {
+		    				String syn = d.getFirstTuple().getPart().getText();
+	// getLog().info("Synonym: " + syn + " type=" + type); 
+		    				if (!getDisplayName(conceptForDescription).equals(syn))
+		    					exportManager.getLoadFileBuilder(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL)
+									.addItemForExport("50", syn, null);
+		    			}
+		    		}
+	    		}
 	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 2000")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2000");
+	    	else if(refsetName.startsWith("EDG Clinical Item ")) {
+	    		String item = refsetName.substring(18);
+	    		refsetAppliesTo.add(new EpicItemIdentifier(
+	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, item));
 	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 40")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "40");
-	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 80")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "80");
-	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 91")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "91");
-	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 100")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "100");
-	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 207")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "207");
-	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 7000")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "7000");
-	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 7010")) {
-		    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "7010");
-	    	}
+
 	    	else if(refsetName.equals("Reason for Soft Delete")) {
 	    		this.currentItem = "5";
 	    		stringValue = "*SD";
@@ -437,17 +452,20 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	else 
 	    		getLog().warn("Unhandled refset name: " + refsetName);
 	    	
-	    	if (this.currentItem != null) {
+	    	for (EpicItemIdentifier e: refsetAppliesTo) {
+	    		if (e.getItemNumber().equals("2"))
+	    			masterFilesImpacted.add(e.getMasterfile());
 	    		if (stringValue == null)
 	    			stringValue = getValueAsString(extensionTuplePart);
-	    		I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(this.currentMasterFile);
+	    		I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(e.getMasterfile());
 	    		if (previousStringValue == null)
 	    			previousStringValue = getValueAsString(previousPart);
 	    		//getLog().info("Exporting item " + this.currentItem + " with a value of " + stringValue +
 	    		//		" and a previous value of " + previousStringValue);
 	    		
-	    		exportWriter.addItemForExport(this.currentItem, stringValue, previousStringValue);
+	    		exportWriter.addItemForExport(e.getItemNumber(), stringValue, previousStringValue);
 	    	}
+	    	
 	    }
 	    
 	    public void writeRecordIds(I_ThinExtByRefTuple extensionTuple) throws Exception {
@@ -456,24 +474,28 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	String dot1 = null;
 	    	String uuid = null;
 	    	
-	    	I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(this.currentMasterFile);
-    		I_GetConceptData idConcept = termFactory.getConcept(extensionTuple.getComponentId());
-    		exportWriter.setIdConcept(idConcept);
-    		uuid = getIdForConcept(idConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
-    		
-    		if(this.currentMasterFile.equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
-				dot11 = getIdForConcept(idConcept, "e3dadc2a-196d-5525-879a-3037af99607d");
-				dot1 = getIdForConcept(idConcept, "e49a55a7-319d-5744-b8a9-9b7cc86fd1c6");
-    		}
-    		else if(this.currentMasterFile.equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
-				dot11 = getIdForConcept(idConcept, "bf3e7556-38cb-5395-970d-f11851c9f41e");
-				dot1 = getIdForConcept(idConcept, "af8be384-dc60-5b56-9ad8-bc1e4b5dfbae");
-    		}
-    		if (dot11 != null)
-    			exportWriter.addItemForExport("11", dot11, dot11);
-    		if (dot1 != null)
-   				exportWriter.addItemForExport("1", dot1, dot1);
-   			exportWriter.addItemForExport("35", uuid, uuid);
+	    	I_GetConceptData idConcept = termFactory.getConcept(extensionTuple.getComponentId());
+	    	
+	    	for (String masterfile: masterFilesImpacted) {
+		    	I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(masterfile);
+	    		
+	    		exportWriter.setIdConcept(idConcept);
+	    		uuid = getIdForConcept(idConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
+	    		
+	    		if(masterfile.equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
+					dot11 = getIdForConcept(idConcept, "e3dadc2a-196d-5525-879a-3037af99607d");
+					dot1 = getIdForConcept(idConcept, "e49a55a7-319d-5744-b8a9-9b7cc86fd1c6");
+	    		}
+	    		else if(masterfile.equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
+					dot11 = getIdForConcept(idConcept, "bf3e7556-38cb-5395-970d-f11851c9f41e");
+					dot1 = getIdForConcept(idConcept, "af8be384-dc60-5b56-9ad8-bc1e4b5dfbae");
+	    		}
+	    		if (dot11 != null)
+	    			exportWriter.addItemForExport("11", dot11, dot11);
+	    		if (dot1 != null)
+	   				exportWriter.addItemForExport("1", dot1, dot1);
+	   			exportWriter.addItemForExport("35", uuid, uuid);
+	    	}
 	    }
 	    
 	    
@@ -498,6 +520,10 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		    	if (I_ThinExtByRefPartInteger.class.isAssignableFrom(thinExtByRefPart.getClass())) {
 		    		I_ThinExtByRefPartInteger str = (I_ThinExtByRefPartInteger) thinExtByRefPart;
 		    		value = new Integer(str.getIntValue()).toString();
+		    	}
+		    	if (I_ThinExtByRefPartBoolean.class.isAssignableFrom(thinExtByRefPart.getClass())) {
+		    		I_ThinExtByRefPartBoolean str = (I_ThinExtByRefPartBoolean) thinExtByRefPart;
+		    		value = (str.getValue()) ? "1" : "0";
 		    	}
 	    	}
 	    	return value;
@@ -577,6 +603,32 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 				}
 			}
 			return ret;
+	    }
+	    
+	    private class EpicItemIdentifier {
+	    	String masterfile;
+	    	String itemNumber;
+			
+	    	public EpicItemIdentifier(String masterfile, String ItemNumber) {
+	    		this.setMasterfile(masterfile);
+	    		this.setItemNumber(ItemNumber);
+	    	}
+	    	
+	    	public String getMasterfile() {
+				return masterfile;
+			}
+			public void setMasterfile(String masterfile) {
+				this.masterfile = masterfile;
+			}
+			public String getItemNumber() {
+				return itemNumber;
+			}
+			public void setItemNumber(String itemNumber) {
+				this.itemNumber = itemNumber;
+			}
+	    	
+	    	
+	    	
 	    }
     }
 

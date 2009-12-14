@@ -26,19 +26,19 @@ import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.EpicExportWriter;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
+import org.dwfa.mojo.epicexport.I_ExportFactory;
 
 public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder implements I_EpicLoadFileBuilder {
 	public static final int DISPLAY_NAME = 2;
 	public static final int ITEM_11 = 11;
 	public static final String[] INTERESTED_ITEMS = {"2", "40", "50", "100", "2000", "200", "7010", "7000", "80", "91", "207"};
 	public static final String[] EREC_ITEMS = {"50", "7010"};
-	// public static final String[] MANDATORY_ITEMS = {"2", "40", "7000", "7010", "91", "80", "100", "207"};
-	public static final String[] MANDATORY_ITEMS = {"2", "40", "7000", "7010", "100", "207"};
+	public static final String[] MANDATORY_ITEMS = {"2", "40", "7000", "7010", "91", "80", "100", "207"};
 	
-	private String masterfile = EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL;
+	public String masterfile = EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL;
 	
-	public EpicExportBuilderEDGClinical(EpicLoadFileFactory exportManager, EpicExportManager em) {
-		super(exportManager, em);
+	public EpicExportBuilderEDGClinical(I_ExportFactory factory, EpicExportManager em) {
+		super(factory, em);
 		this.setExportIfTheseItemsChanged(INTERESTED_ITEMS);
 	}
 
@@ -54,12 +54,12 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 			if (getFirstItem("11") == null) {
 				//"NRNC" Its a new record
 				if (! this.allItemsArePopulated(MANDATORY_ITEMS))
-					AceLog.getAppLog().warning("One or more mandatory items are missing");
+					AceLog.getAppLog().warning("One or more mandatory items are missing for record " + super.toString());
 				//	throw new Exception("One or more mandatory items are missing");
 				I_EpicExportRecordWriter writer = getExportManager().getWriter(getWriterName(masterfile, version, "nrnc"));
 				this.setWriter(writer);
 				writer.newRecord();
-				writeLiteralItem("1", "*");
+				writeLiteralItem("1", "");
 				writeItem("2");
 				//writeItem("35");
 				writeLiteralItem("35", this.getParentUUID());
@@ -73,11 +73,12 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					*/
 				writeItemIfChanged("100");
 				writeItemIfChanged("207");
+				writeItemIfChanged("50");
 				writeItemIfChanged("80");
 				writeItemIfChanged("91");
+				writeItemIfChanged("7000");
 				writeItemIfChanged("7010");
 				writer.saveRecord();
-				
 			}
 			else {
 				if (this.onlyHasChangesIn(EREC_ITEMS)) {
@@ -96,8 +97,10 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					else if (this.itemIsPopulated("200"))
 						writeItem("200");
 					writeItemIfChanged("207");
+					writeItemIfChanged("50");
 					writeItemIfChanged("80");
 					writeItemIfChanged("91");
+					writeItemIfChanged("7000");
 					writeItemIfChanged("7010");
 					writer.saveRecord();
 				} else {
@@ -115,8 +118,10 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					writeItem("40");
 					writeItemIfChanged("100");
 					writeItemIfChanged("207");
+					writeItemIfChanged("50");
 					writeItemIfChanged("80");
 					writeItemIfChanged("91");
+					writeItemIfChanged("7000");
 					writeItemIfChanged("7010");
 					writer.saveRecord();
 				}

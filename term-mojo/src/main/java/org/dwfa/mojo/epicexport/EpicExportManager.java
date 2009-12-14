@@ -25,6 +25,8 @@ import java.util.Iterator;
 
 import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 
+import com.mysql.jdbc.Connection;
+
 /**
  * Class used to manage a list of export writers, and export builders. Used to
  * determine
@@ -39,13 +41,14 @@ public class EpicExportManager {
     // private List<EpicExportWriter> writers;
     // private List<AbstractEpicLoadFileBuilder> builders;
     private String baseDir;
-    private EpicLoadFileFactory exportFactory;
+    private I_ExportFactory exportFactory;
     private HashMap<String, I_EpicExportRecordWriter> writers = new HashMap<String, I_EpicExportRecordWriter>();
     private HashMap<String, I_EpicLoadFileBuilder> builders = new HashMap<String, I_EpicLoadFileBuilder>();
     public static final String EPIC_MASTERFILE_NAME_EDG_CLINICAL = "edgclinical";
     public static final String EPIC_MASTERFILE_NAME_EDG_BILLING = "edgbilling";
+    private Connection connection;
 
-    public EpicExportManager(String baseDir, EpicLoadFileFactory exportFactory) {
+    public EpicExportManager(String baseDir, I_ExportFactory exportFactory) {
         this.baseDir = baseDir;
         if (!this.baseDir.endsWith("/")) {
             this.baseDir = this.baseDir.concat("/");
@@ -108,4 +111,14 @@ public class EpicExportManager {
             ret = c1.compareToIgnoreCase(c2) == 0;
         return ret;
     }
+
+	public Connection getConnection() {
+		return connection;
+	}
+
+	public void setConnection(Connection connection) {
+		this.connection = connection;
+	}
+    
+    
 }

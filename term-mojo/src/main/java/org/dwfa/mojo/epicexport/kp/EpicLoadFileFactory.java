@@ -25,11 +25,16 @@ import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.EpicExportWriter;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
+import org.dwfa.mojo.epicexport.I_ExportFactory;
 
-public class EpicLoadFileFactory {
+public class EpicLoadFileFactory implements I_ExportFactory {
 
     public EpicExportManager getExportManager(String baseDir) {
         return new EpicExportManager(baseDir, this);
+    }
+
+    public EpicExportManager getExportManager() {
+    	return new EpicExportManager(null, this);
     }
 
     public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile, EpicExportManager em) throws Exception {
@@ -47,6 +52,10 @@ public class EpicLoadFileFactory {
         BufferedWriter bw = new BufferedWriter(new FileWriter(fw));
         EpicExportWriter ret = new EpicExportWriter(bw, fw.getName());
         return ret;
+    }
+    
+    public I_EpicExportRecordWriter getWriter(String name) {
+    	throw new UnsupportedOperationException();
     }
 
 }
