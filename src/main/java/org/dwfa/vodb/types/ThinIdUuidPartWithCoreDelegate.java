@@ -229,7 +229,7 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
 	}
 
 	@Override
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+	public I_IdPart makeAnalog(int statusNid, int pathNid, long time) {
 		I_IdPart newPart = duplicate();
 		newPart.setStatusId(statusNid);
 		newPart.setPathId(pathNid);
