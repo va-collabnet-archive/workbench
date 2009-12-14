@@ -609,26 +609,23 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 				PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
 				for (I_Path p : config.getEditingPathSet()) {
 					for (I_ThinExtByRefTuple tuple : tuples) {
-						I_ThinExtByRefPart newPart = tuple.getPart().duplicate();
+						I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) tuple.getPart().makeAnalog(currentNid, p.getConceptId(), Long.MAX_VALUE);
 						if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
 							I_ThinExtByRefPartConceptConcept newCCPart = (I_ThinExtByRefPartConceptConcept) newPart;
-							newCCPart.setStatusId(currentNid);
-							newCCPart.setPathId(p.getConceptId());
-							newCCPart.setVersion(Integer.MAX_VALUE);
-							tuple.getCore().addVersion(newCCPart);
+							tuple.addVersion(newCCPart);
+							tf.addUncommitted(tuple.getCore());
 							if (newCCPart.getC1id() == conceptUnderReview.getConceptId()) {
 								newCCPart.setC1id(replacementConceptLabel.getTermComponent().getNid());
-							}
+								tf.addUncommitted(comment);
+								tf.addUncommitted(commentRefset);					}
 							if (newCCPart.getC2id() == conceptUnderReview.getConceptId()) {
 								newCCPart.setC2id(replacementConceptLabel.getTermComponent().getNid());
 							}
 						} else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION
 								.localize().getNid()) {
 							I_ThinExtByRefPartConceptConceptConcept newCCCPart = (I_ThinExtByRefPartConceptConceptConcept) newPart;
-							newCCCPart.setStatusId(currentNid);
-							newCCCPart.setVersion(Integer.MAX_VALUE);
-							newCCCPart.setPathId(p.getConceptId());
 							tuple.getCore().addVersion(newCCCPart);
+							tf.addUncommitted(tuple.getCore());
 							if (newCCCPart.getC1id() == conceptUnderReview.getConceptId()) {
 								newCCCPart.setC1id(replacementConceptLabel.getTermComponent().getNid());
 							}
