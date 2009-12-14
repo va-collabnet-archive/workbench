@@ -37,12 +37,12 @@ public class GetNewRefsetGroupingPanelDataTaskBeanInfo extends SimpleBeanInfo {
 
         try {
 
-            PropertyDescriptor refsetUuidPropName;
-            refsetUuidPropName = new PropertyDescriptor("refsetUuidPropName", getBeanDescriptor().getBeanClass());
-            refsetUuidPropName.setBound(true);
-            refsetUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            refsetUuidPropName.setDisplayName("<html><font color='green'>new refset UUID prop:");
-            refsetUuidPropName.setShortDescription("The property to put the new refset UUID into.");
+            PropertyDescriptor groupingConceptUuidPropName;
+            groupingConceptUuidPropName = new PropertyDescriptor("groupingConceptUuidPropName", getBeanDescriptor().getBeanClass());
+            groupingConceptUuidPropName.setBound(true);
+            groupingConceptUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            groupingConceptUuidPropName.setDisplayName("<html><font color='green'>new concept UUID prop:");
+            groupingConceptUuidPropName.setShortDescription("The property to put the new refset grouping concept UUID into.");
 
             PropertyDescriptor statusTermEntry;
             statusTermEntry = new PropertyDescriptor("statusTermEntry", getBeanDescriptor().getBeanClass());
@@ -51,7 +51,7 @@ public class GetNewRefsetGroupingPanelDataTaskBeanInfo extends SimpleBeanInfo {
             statusTermEntry.setDisplayName("<html><font color='green'>status concept to use:");
             statusTermEntry.setShortDescription("The status concept to use.");
 
-            PropertyDescriptor rv[] = { refsetUuidPropName, statusTermEntry };
+            PropertyDescriptor rv[] = { groupingConceptUuidPropName, statusTermEntry };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

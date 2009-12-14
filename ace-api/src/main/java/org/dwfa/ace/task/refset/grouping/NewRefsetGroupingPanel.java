@@ -72,8 +72,8 @@ public class NewRefsetGroupingPanel extends JPanel {
     private void setDefaultValues() {
 
         // labels
-        refsetParentLabel = new JLabel("Refset parent (required):");
-        refsetNameLabel = new JLabel("Refset name (required):");
+        refsetParentLabel = new JLabel("Refset grouping parent (required):");
+        refsetNameLabel = new JLabel("Grouping name (required):");
 
         // combo box
         refsetParentComboBox = new DynamicWidthComboBox(getValidParents().toArray());
