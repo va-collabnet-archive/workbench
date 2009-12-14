@@ -28,26 +28,30 @@ import org.dwfa.tapi.TerminologyException;
 public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
 
     /**
-     * @return the membership identifier - this is the surrogate key for the
-     *         I_ThinExtByRefVersioned object itself which represents a
-     *         component's membership of a given reference set
+     * @return <code><b>int</b></code> -- native identifier (nid) of this reference set member.<br>
+     *         This is the surrogate key <code>I_ThinExtByRefVersioned</code> object itself.<br> 
+     *         The <code>I_ThinExtByRefVersioned</code> object associates a
+     *         concept, description or relationship component as member of a given reference set
      */
     public int getMemberId();
 
     /**
-     * @return the component that is "in the reference set" - really the
-     *         component that this I_ThinExtByRefVersioned represents the
-     *         membership of relative to a given reference set
+     * @return <code><b>int</b></code> -- native identifier (nid) of the component which this reference set member extends.<br> 
+     *         The component extended by this <code>I_ThinExtByRefVersioned</code> may be a concept, description or relationship.<br> 
      */
     public int getComponentId();
 
+    /**
+     * @return <code><b>int</b></code> -- native identifier (nid) for the concept which represent this reference set member's extension type.<br> 
+     *         Example types which this <code>I_ThinExtByRefVersioned</code> reference set member type are boolean, String, Concept and so on...<br> 
+     */
     public int getTypeId();
 
     public List<? extends I_ThinExtByRefPart> getVersions();
 
     /**
-     * @return the id of the reference set which this I_ThinExtByRefVersioned
-     *         represents a component's membership of
+     * @return <code><b>int</b></code> -- native identifier (nid) for the reference set to which this <code>I_ThinExtByRefVersioned</code>
+     *         extension is a member.
      */
     public int getRefsetId();
 
@@ -70,7 +74,7 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
-     *            postions a tuple must be on to be returned
+     *            positions a tuple must be on to be returned
      * @param returnTuples
      *            List to be populated with the result of the search
      * @param addUncommitted
@@ -90,7 +94,7 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
-     *            postions a tuple must be on to be returned
+     *            positions a tuple must be on to be returned
      * @param returnTuples
      *            List to be populated with the result of the search
      * @param addUncommitted
@@ -150,7 +154,7 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
-     *            postions a tuple must be on to be returned
+     *            positions a tuple must be on to be returned
      * @param addUncommitted
      *            if true matching items from the uncommitted list will be
      *            added, if false the uncommitted list is ignored
@@ -171,7 +175,7 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
-     *            postions a tuple must be on to be returned
+     *            positions a tuple must be on to be returned
      * @param addUncommitted
      *            if true matching items from the uncommitted list will be
      *            added, if false the uncommitted list is ignored
