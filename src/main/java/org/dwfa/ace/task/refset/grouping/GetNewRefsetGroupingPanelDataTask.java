@@ -57,21 +57,21 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
-    private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
+    private String groupingConceptUuidPropName = ProcessAttachmentKeys.CONCEPT_UUID.getAttachmentKey();
     private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
     private I_TermFactory termFactory;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(refsetUuidPropName);
+        out.writeObject(groupingConceptUuidPropName);
         out.writeObject(statusTermEntry);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
-            refsetUuidPropName = (String) in.readObject();
+            groupingConceptUuidPropName = (String) in.readObject();
             statusTermEntry = (TermEntry) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -147,11 +147,7 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
                         .getConcept(statusTermEntry.getIds()));
 
                     // save newly created concept UUID
-                    process.setProperty(refsetUuidPropName, newRefsetGroupingConcept.getUids().iterator().next());
-
-                    newRefsetGroupingConcept.promote(config.getViewPositionSet().iterator().next(), 
-                    		config.getPromotionPathSetReadOnly(), 
-                    		config.getAllowedStatus());
+                    process.setProperty(groupingConceptUuidPropName, newRefsetGroupingConcept.getUids().iterator().next());
                     
                     return Condition.ITEM_COMPLETE;
 
@@ -172,14 +168,6 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
         return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
     }
 
-    public String getRefsetUuidPropName() {
-        return refsetUuidPropName;
-    }
-
-    public void setRefsetUuidPropName(String refsetUuidPropName) {
-        this.refsetUuidPropName = refsetUuidPropName;
-    }
-
     public TermEntry getStatusTermEntry() {
         return statusTermEntry;
     }
@@ -187,4 +175,12 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
     public void setStatusTermEntry(TermEntry statusTermEntry) {
         this.statusTermEntry = statusTermEntry;
     }
+
+	public String getGroupingConceptUuidPropName() {
+		return groupingConceptUuidPropName;
+	}
+
+	public void setGroupingConceptUuidPropName(String groupingConceptUuidPropName) {
+		this.groupingConceptUuidPropName = groupingConceptUuidPropName;
+	}
 }
