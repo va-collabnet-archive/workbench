@@ -1107,5 +1107,9 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 		return frameConfig.getEditingPathSetReadOnly();
 	}
 
+	public PathSetReadOnly getPromotionPathSetReadOnly() {
+		return frameConfig.getPromotionPathSetReadOnly();
+	}
+
     
 }
