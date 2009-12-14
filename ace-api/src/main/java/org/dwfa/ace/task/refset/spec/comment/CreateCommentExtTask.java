@@ -20,12 +20,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.RefsetHelper;
 import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
@@ -98,6 +100,13 @@ public class CreateCommentExtTask extends AbstractTask {
                 if (refsetSpecConcept != null) {
                     RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept);
                     I_GetConceptData commentsRefset = refsetSpec.getCommentsRefsetConcept();
+                    if (commentsRefset == null) {
+                    	// Try again, and assume the wrong thing was passed in...
+                    	Set<? extends I_GetConceptData> commentRefsetSet  = RefsetHelper.getCommentsRefsetForRefset(refsetSpecConcept, LocalVersionedTerminology.get().getActiveAceFrameConfig());
+                    	if (commentRefsetSet != null && commentRefsetSet.size() > 0) {
+                    		commentsRefset = commentRefsetSet.iterator().next();
+                    	}
+                    }
                     I_GetConceptData memberRefset = refsetSpec.getMemberRefsetConcept();
                     if (commentsRefset != null && memberRefset != null) {
                         SpecRefsetHelper specRefsetHelper = new SpecRefsetHelper();
