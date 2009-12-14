@@ -62,6 +62,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.RefsetHelper;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.RelationshipTableRenderer;
 import org.dwfa.ace.table.SrcRelTableModel;
@@ -108,7 +109,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
 	private HostProxy host = new HostProxy();
 
-	public RefreshSpecClausePanel(I_GetConceptData refsetSpec,
+	public RefreshSpecClausePanel(I_GetConceptData refsetIdentityConcept,
 			PositionSetReadOnly refsetSpecVersionSet,
 			PositionSetReadOnly sourceTerminologyVersionSet,
 			List<Collection<UUID>> clausesToUpdate, 
@@ -116,7 +117,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 		super();
 		replacementConceptLabel = null;
 		replacementConceptLabel = new TermComponentLabel(frameConfig);
-		this.refsetSpec = refsetSpec;
+		this.refsetSpec = RefsetHelper.getSpecificationRefsetForRefset(refsetIdentityConcept, frameConfig).iterator().next();
 		this.refsetSpecVersionSet = refsetSpecVersionSet;
 		this.sourceTerminologyVersionSet = sourceTerminologyVersionSet;
 		this.clausesToUpdate = clausesToUpdate;
