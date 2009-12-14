@@ -5,7 +5,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.ace.task.profile.PutCurrentProfileInProperty;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class CommitAndPromoteBeanInfo extends SimpleBeanInfo {

@@ -42,8 +42,10 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.util.DynamicWidthComboBox;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -455,6 +457,19 @@ public class ModifyUserRolePanel extends JPanel {
                         }
                     }
                 }
+                termFactory.addUncommittedNoChecks(currentUser);
+                termFactory.commit();
+                I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+                Set<I_Position> viewPositionSet = config.getViewPositionSet();
+                PathSetReadOnly promotionPaths = new PathSetReadOnly(config.getPromotionPathSet());
+                if (viewPositionSet.size() != 1 || promotionPaths.size() != 1) {
+                    throw new TaskFailedException(
+                        "There must be only one view position, and one promotion path: viewPaths " + viewPositionSet
+                            + " promotionPaths: " + promotionPaths);
+                }
+                I_Position viewPosition = viewPositionSet.iterator().next();
+               currentUser.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+            		   config.getAllowedStatus());
                 termFactory.addUncommittedNoChecks(currentUser);
                 termFactory.commit();
 
