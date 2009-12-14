@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,14 +15,6 @@
  * limitations under the License.
  */
 package org.dwfa.mojo;
-
-import java.io.File;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
@@ -32,12 +24,20 @@ import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
 
+import java.io.File;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
 /**
  * Import SNOMED format data files from a jar and load into an ACE Berkeley
  * database.
- * 
+ *
  * @goal berkley-vodb
- * 
+ *
  * @phase generate-resources
  * @requiresDependencyResolution compile
  */
@@ -46,11 +46,18 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     * 
+     *
      * @parameter expression="${project.build.directory}/classes/berkeley-db"
      * @required
      */
     File outputDirectory;
+
+    /**
+     * This is the target directory to unjar files to . We need this because of the multimodule build.
+     * We can't simply reference "target" anymore.
+     * @parameter default-value="${project.build.directory}/unjar"
+     */
+    File unjaringDir;
 
     /**
      * @parameter expression="${project.dependencies}"
@@ -75,7 +82,7 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
      * date is used to provide a status date for the relationship status (since
      * SNOMED does not provide them)</li>
      * </ol>
-     * 
+     *
      * @parameter
      * @required
      */
@@ -95,7 +102,7 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
 
     /**
      * The maven session
-     * 
+     *
      * @parameter expression="${session}"
      * @required
      */
@@ -158,10 +165,10 @@ public class GenerateBerkeleyVodb extends AbstractMojo {
                 }
                 if (dataLocationInJar == null) {
                     LocalVersionedTerminology.createFactory(outputDirectory, false, 600000000L, dbSetupConfig);
-                    LocalVersionedTerminology.get().loadFromMultipleJars(args);
+                    LocalVersionedTerminology.get().loadFromMultipleJars(args, unjaringDir);
                 } else {
                     LocalVersionedTerminology.createFactory(outputDirectory, false, 600000000L, dbSetupConfig);
-                    LocalVersionedTerminology.get().loadFromSingleJar(args[1], dataLocationInJar);
+                    LocalVersionedTerminology.get().loadFromSingleJar(args[1], dataLocationInJar, unjaringDir);
                 }
 
             } catch (Exception ex) {

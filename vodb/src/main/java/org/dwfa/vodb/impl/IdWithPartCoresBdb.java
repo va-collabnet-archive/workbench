@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,18 +16,21 @@
  */
 package org.dwfa.vodb.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
-
+import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
+import com.sleepycat.je.Cursor;
+import com.sleepycat.je.Database;
+import com.sleepycat.je.DatabaseConfig;
+import com.sleepycat.je.DatabaseEntry;
+import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.DatabaseStats;
+import com.sleepycat.je.Environment;
+import com.sleepycat.je.LockMode;
+import com.sleepycat.je.OperationStatus;
+import com.sleepycat.je.SecondaryConfig;
+import com.sleepycat.je.SecondaryDatabase;
+import com.sleepycat.je.StatsConfig;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_Path;
@@ -53,21 +56,17 @@ import org.dwfa.vodb.types.ThinIdPartWithCoreDelegate;
 import org.dwfa.vodb.types.ThinIdUuidPartWithCoreDelegate;
 import org.dwfa.vodb.types.ThinIdVersioned;
 
-import com.sleepycat.bind.tuple.TupleBinding;
-import com.sleepycat.bind.tuple.TupleInput;
-import com.sleepycat.bind.tuple.TupleOutput;
-import com.sleepycat.je.Cursor;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseConfig;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.DatabaseStats;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
-import com.sleepycat.je.SecondaryConfig;
-import com.sleepycat.je.SecondaryDatabase;
-import com.sleepycat.je.StatsConfig;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
 
 public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
@@ -188,6 +187,9 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
         idCoreDb = env.openDatabase(null, "idCoreDb", mapDbConfig);
         uuidToNidDb = env.openDatabase(null, "uuidToNidDb", mapDbConfig);
         SecondaryConfig indexConfig = new SecondaryConfig();
+        nidGenerator = new NidGenerator();
+        idPartCoreBdb = new IdPartCoreBdb(env, mapDbConfig);
+
         indexConfig.setReadOnly(VodbEnv.isReadOnly());
         indexConfig.setDeferredWrite(VodbEnv.isDeferredWrite());
         indexConfig.setAllowCreate(!VodbEnv.isReadOnly());
@@ -200,9 +202,6 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
         // preloadConfig.setLoadLNs(true);
         // uuidToNidDb.preload(preloadConfig);
         // logIdDbStats();
-        nidGenerator = new NidGenerator();
-        idPartCoreBdb = new IdPartCoreBdb(env, mapDbConfig);
-
     }
 
     public void logIdDbStats() throws DatabaseException {
@@ -219,7 +218,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#sync()
      */
     public void sync() throws DatabaseException {
@@ -239,7 +238,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#close()
      */
     public void close() throws DatabaseException {
@@ -259,7 +258,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#getMinId()
      */
     public int getMinId() throws DatabaseException {
@@ -276,7 +275,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#getMaxId()
      */
     public int getMaxId() throws DatabaseException {
@@ -293,7 +292,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#getIdNullOk(int)
      */
     public I_IdVersioned getIdNullOk(int nativeId) throws IOException {
@@ -324,7 +323,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#nativeToUuid(int)
      */
     public List<UUID> nativeToUuid(int nativeId) throws DatabaseException {
@@ -349,7 +348,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#getId(int)
      */
     public I_IdVersioned getId(int nativeId) throws IOException {
@@ -399,7 +398,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#getUids(int)
      */
     public Collection<UUID> getUids(int nativeId) throws TerminologyException, IOException {
@@ -412,7 +411,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#writeId(org.dwfa.ace.api.I_IdVersioned)
      */
@@ -459,7 +458,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#deleteId(org.dwfa.ace.api.I_IdVersioned)
      */
@@ -475,7 +474,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#nativeGenerationForUuid(java.util.UUID,
      * int, int, int)
@@ -503,7 +502,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#uuidToNativeWithGeneration(java.util
      * .Collection,
@@ -542,7 +541,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#uuidToNativeWithGeneration(java.util
      * .UUID,
@@ -578,7 +577,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#iterateIdEntries(org.dwfa.vodb.types
      * .I_ProcessIdEntries)
@@ -600,7 +599,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#getId(java.util.Collection)
      */
     public I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException {
@@ -621,7 +620,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#hasId(java.util.Collection)
      */
     public boolean hasId(Collection<UUID> uids) throws DatabaseException {
@@ -635,7 +634,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#hasId(java.util.UUID)
      */
     public boolean hasId(UUID uid) throws DatabaseException {
@@ -660,7 +659,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#uuidToNativeWithGeneration(java.util
      * .UUID,
@@ -683,7 +682,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#uuidToNative(java.util.UUID)
      */
     public int uuidToNative(UUID uid) throws TerminologyException, IOException {
@@ -736,7 +735,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#uuidToNative(java.util.Collection)
      */
     public int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException {
@@ -751,7 +750,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.I_StoreIdentifiers#getId(java.util.UUID)
      */
     public ThinIdVersioned getId(UUID uid) throws TerminologyException, IOException {
