@@ -148,6 +148,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public Set<I_Path> getPromotionPathSet();
 
+    public PathSetReadOnly getPromotionPathSetReadOnly();
+
     public void addViewPosition(I_Position p);
 
     public void removeViewPosition(I_Position p);
