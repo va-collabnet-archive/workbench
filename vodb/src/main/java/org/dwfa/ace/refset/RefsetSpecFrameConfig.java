@@ -1209,4 +1209,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 	public PathSetReadOnly getEditingPathSetReadOnly() {
 		return frameConfig.getEditingPathSetReadOnly();
 	}
+
+	public PathSetReadOnly getPromotionPathSetReadOnly() {
+		return frameConfig.getPromotionPathSetReadOnly();
+	}
 }

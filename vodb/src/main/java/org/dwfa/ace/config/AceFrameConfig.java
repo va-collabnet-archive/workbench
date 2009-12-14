@@ -3073,4 +3073,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 		return new PathSetReadOnly(getEditingPathSet());
 	}
 
+	@Override
+	public PathSetReadOnly getPromotionPathSetReadOnly() {
+		return new PathSetReadOnly(getPromotionPathSet());
+	}
+
 }

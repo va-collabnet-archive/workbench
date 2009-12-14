@@ -1226,4 +1226,8 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 	public PathSetReadOnly getEditingPathSetReadOnly() {
 		return baseFrame.getEditingPathSetReadOnly();
 	}
+
+	public PathSetReadOnly getPromotionPathSetReadOnly() {
+		return baseFrame.getPromotionPathSetReadOnly();
+	}
 }
