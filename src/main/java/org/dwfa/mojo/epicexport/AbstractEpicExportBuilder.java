@@ -38,25 +38,25 @@ import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
  * @parameter exportManager - The export manager
  */
 public abstract class AbstractEpicExportBuilder {
-	EpicLoadFileFactory exportFactory;
+	I_ExportFactory exportFactory;
 	EpicExportManager exportManager;
-	String masterfile;
+	protected String masterfile;
 	I_GetConceptData parentConcept;
 	List<EpicItem> epicItems = new ArrayList<EpicItem>();
 	private I_EpicExportRecordWriter writer;
 	private String[] exportIfTheseItemsChanged;
 	
-	public AbstractEpicExportBuilder(EpicLoadFileFactory exportFactory, EpicExportManager em) {
+	public AbstractEpicExportBuilder(I_ExportFactory exportFactory, EpicExportManager em) {
 		this.exportFactory = exportFactory;
 		this.exportManager = em;
 	}
 	
-	public EpicLoadFileFactory getExportFactory() {
+	public I_ExportFactory getExportFactory() {
 		return exportFactory;
 	}
 
-	public void setExportFactory(EpicLoadFileFactory exportManager) {
-		this.exportFactory = exportManager;
+	public void setExportFactory(I_ExportFactory ef) {
+		this.exportFactory = ef;
 	}
 
 	public I_EpicExportRecordWriter getWriter() {
@@ -125,6 +125,12 @@ public abstract class AbstractEpicExportBuilder {
 		}
 	}
 	
+	public void writeAll() {
+		for (Iterator<EpicItem> i = epicItems.iterator(); i.hasNext();) {
+			EpicItem ei = (EpicItem) i.next();
+			writer.addItemValue(ei.itemNumber, ei.value);
+		}
+	}
 	/**
 	 * Writes an item to the Epic load file
 	 * 
@@ -286,7 +292,22 @@ public abstract class AbstractEpicExportBuilder {
 		ret = ret && !anyItemsHaveChanges(checkFor.toArray(new String[0]));
 		return ret;
 	}
-	
+
+	public String toString() {
+		StringBuffer ret = new StringBuffer();
+		EpicItem dot11 = getFirstItem("11");
+		if (dot11 != null) {
+			ret.append(" CID(11): ");
+			ret.append(dot11.value);
+		}
+		EpicItem dot2 = getFirstItem("2");
+		if (dot2 != null) {
+			ret.append(" Display Name(2): ");
+			ret.append(dot2.value);
+		}
+		return ret.toString();
+	}
+
 	public class EpicItem {
 		String itemNumber;
 		Object value;
@@ -322,6 +343,7 @@ public abstract class AbstractEpicExportBuilder {
 			else
 				return !value.equals(previousValue);
 		}
+		
 	}
 	
 }

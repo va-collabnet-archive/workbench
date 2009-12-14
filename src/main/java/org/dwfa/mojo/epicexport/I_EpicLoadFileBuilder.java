@@ -25,9 +25,9 @@ import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 
 public interface I_EpicLoadFileBuilder {
 
-	public EpicLoadFileFactory getExportFactory();
+	public I_ExportFactory getExportFactory();
 
-	public void setExportFactory(EpicLoadFileFactory exportManager);
+	public void setExportFactory(I_ExportFactory exportManager);
 
 	public I_EpicExportRecordWriter getWriter();
 
