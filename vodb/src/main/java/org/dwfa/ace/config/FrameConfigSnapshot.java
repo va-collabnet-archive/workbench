@@ -1014,10 +1014,6 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getShortLabelDescPreferenceList();
     }
 
-    public Boolean getShowInferredInTaxonomy() {
-        return baseFrame.getShowInferredInTaxonomy();
-    }
-
     public Boolean getShowRefsetInfoInTaxonomy() {
         return baseFrame.getShowRefsetInfoInTaxonomy();
     }
