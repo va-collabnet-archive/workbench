@@ -71,7 +71,7 @@ public class ThinIdVersionedBinding extends TupleBinding {
         for (I_IdPart id : versioned.getVersions()) {
             to.writeInt(id.getPathId());
             to.writeInt(id.getVersion());
-            to.writeInt(id.getIdStatus());
+            to.writeInt(id.getStatusId());
             to.writeInt(id.getSource());
             if (Integer.class.isAssignableFrom(id.getSourceId().getClass())) {
                 to.writeByte(INTEGER_ID);
