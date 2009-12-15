@@ -226,18 +226,6 @@ public class NewDefaultProfile extends NewProfile {
         addIfNotNull(allowedStatus, Concept.XHTML_DEF, tf);
         activeConfig.setDescTypes(descTypes);
 
-        I_IntSet inferredViewTypes = tf.newIntSet();
-        inferredViewTypes.add(tf.uuidToNative(Concept.INFERRED_RELATIONSHIP.getUids()));
-        activeConfig.setInferredViewTypes(inferredViewTypes);
-
-        I_IntSet statedViewTypes = tf.newIntSet();
-        statedViewTypes.add(tf.uuidToNative(Concept.STATED_RELATIONSHIP.getUids()));
-        statedViewTypes.add(tf.uuidToNative(Concept.DEFINING_CHARACTERISTIC.getUids()));
-        statedViewTypes.add(tf.uuidToNative(Concept.ADDITIONAL_CHARACTERISTIC.getUids()));
-        statedViewTypes.add(tf.uuidToNative(Concept.HISTORICAL_CHARACTERISTIC.getUids()));
-        statedViewTypes.add(tf.uuidToNative(Concept.QUALIFIER_CHARACTERISTIC.getUids()));
-        activeConfig.setStatedViewTypes(statedViewTypes);
-
         activeConfig.setDefaultDescriptionType(tf.getConcept(Concept.SYNONYM_DESCRIPTION_TYPE.getUids()));
         try {
             activeConfig.setDefaultImageType(tf.getConcept(Concept.AUXILLARY_IMAGE.getUids()));
