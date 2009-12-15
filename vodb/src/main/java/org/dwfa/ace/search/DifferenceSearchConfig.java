@@ -302,10 +302,6 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         return frameConfig.getHighlightConflictsInTaxonomyView();
     }
 
-    public I_IntSet getInferredViewTypes() {
-        return frameConfig.getInferredViewTypes();
-    }
-
     public I_IntList getLanguagePreferenceList() {
         return frameConfig.getLanguagePreferenceList();
     }
@@ -421,10 +417,6 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     public I_IntSet getSourceRelTypes() {
         return frameConfig.getSourceRelTypes();
-    }
-
-    public I_IntSet getStatedViewTypes() {
-        return frameConfig.getStatedViewTypes();
     }
 
     public String getStatusMessage() {
@@ -775,10 +767,6 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.setInboxToggleVisible(visible);
     }
 
-    public void setInferredViewTypes(I_IntSet inferredViewTypes) {
-        frameConfig.setInferredViewTypes(inferredViewTypes);
-    }
-
     public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
         frameConfig.setLanguageSortPref(langSortPref);
     }
@@ -889,10 +877,6 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     public void setSourceRelTypes(I_IntSet browseDownRels) {
         frameConfig.setSourceRelTypes(browseDownRels);
-    }
-
-    public void setStatedViewTypes(I_IntSet statedViewTypes) {
-        frameConfig.setStatedViewTypes(statedViewTypes);
     }
 
     public void setStatusMessage(String statusMessage) {

@@ -961,10 +961,6 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getHierarchySelection();
     }
 
-    public I_IntSet getInferredViewTypes() {
-        return baseFrame.getInferredViewTypes();
-    }
-
     public I_GetConceptData getLastViewed() {
         return baseFrame.getLastViewed();
     }
@@ -1032,10 +1028,6 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     public JPanel getSignpostPanel() {
         return baseFrame.getSignpostPanel();
-    }
-
-    public I_IntSet getStatedViewTypes() {
-        return baseFrame.getStatedViewTypes();
     }
 
     public Map<String, SubversionData> getSubversionMap() {
