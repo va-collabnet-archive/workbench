@@ -326,7 +326,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
         if (statusId != 0) {
-            newPart.setConceptStatus(statusId);
+            newPart.setStatusId(statusId);
         }
         latestPart.getConVersioned().addVersion(newPart);
     }

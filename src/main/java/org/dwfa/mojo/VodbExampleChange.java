@@ -70,7 +70,7 @@ public class VodbExampleChange extends AbstractMojo {
             for (I_ConceptAttributeTuple tuple : architectonicRoot.getConceptAttributeTuples(null, new PositionSetReadOnly(positions))) {
                 I_ConceptAttributePart part = tuple.duplicatePart();
                 part.setVersion(Integer.MAX_VALUE);
-                part.setConceptStatus(flaggedStatus.getConceptId());
+                part.setStatusId(flaggedStatus.getConceptId());
                 conceptAttributes.addVersion(part);
                 termFactory.addUncommitted(architectonicRoot);
             }

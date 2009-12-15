@@ -240,7 +240,7 @@ public class VodbMonitorBranches extends AbstractMojo {
                     I_ConceptAttributePart newPart = tuple.duplicatePart();
                     newPart.setVersion(Integer.MAX_VALUE);
                     newPart.setPathId(copyToPath.getConceptId());
-                    newPart.setConceptStatus(updatedStatusId);
+                    newPart.setStatusId(updatedStatusId);
                     tuple.getConVersioned().addVersion(newPart);
                 }
                 // copy latest descriptions to new path/version
