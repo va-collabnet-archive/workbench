@@ -210,7 +210,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
     }
 
     public int getFixedPartId() {
-        return core.getTermComponentId();
+        return core.getNid();
     }
 
     public I_ThinExtByRefPart makePromotionPart(I_Path promotionPath) {

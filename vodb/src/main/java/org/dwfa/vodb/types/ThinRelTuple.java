@@ -273,7 +273,7 @@ public class ThinRelTuple implements I_RelTuple {
     }
 
     public int getFixedPartId() {
-        return fixedPart.getTermComponentId();
+        return fixedPart.getNid();
     }
 
     public int getPositionId() {

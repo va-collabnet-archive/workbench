@@ -236,7 +236,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
     }
 
     public int getFixedPartId() {
-        return fixedPart.getTermComponentId();
+        return fixedPart.getNid();
     }
 
     public int getPositionId() {

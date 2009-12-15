@@ -162,7 +162,7 @@ public class ThinImageTuple implements I_ImageTuple {
     }
 
     public int getFixedPartId() {
-        return core.getTermComponentId();
+        return core.getNid();
     }
 
     public int getPositionId() {

@@ -197,7 +197,7 @@ public class ThinIdTuple implements I_IdTuple {
     }
 
     public int getFixedPartId() {
-        return core.getTermComponentId();
+        return core.getNid();
     }
 
     public int getPositionId() {

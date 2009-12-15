@@ -57,32 +57,32 @@ public class ConflictManagementStrategyTest {
         private static final long serialVersionUID = 1L;
 
         public boolean isInConflict(I_GetConceptData concept) throws IOException, TerminologyException {
-            return concept.getTermComponentId() == 0;
+            return concept.getNid() == 0;
         }
 
         public boolean isInConflict(I_DescriptionVersioned description) throws IOException, TerminologyException {
-            return description.getTermComponentId() == 0;
+            return description.getNid() == 0;
         }
 
         public boolean isInConflict(I_ThinExtByRefVersioned extension) throws TerminologyException, IOException {
-            return extension.getTermComponentId() == 0;
+            return extension.getNid() == 0;
         }
 
         public boolean isInConflict(I_IdVersioned id) throws IOException {
-            return id.getTermComponentId() == 0;
+            return id.getNid() == 0;
         }
 
         public boolean isInConflict(I_ImageVersioned image) throws IOException, TerminologyException {
-            return image.getTermComponentId() == 0;
+            return image.getNid() == 0;
         }
 
         public boolean isInConflict(I_RelVersioned relationship) throws IOException, TerminologyException {
-            return relationship.getTermComponentId() == 0;
+            return relationship.getNid() == 0;
         }
 
         public boolean isInConflict(I_ConceptAttributeVersioned conceptAttribute) throws TerminologyException,
                 IOException {
-            return conceptAttribute.getTermComponentId() == 0;
+            return conceptAttribute.getNid() == 0;
         }
 
         public List<I_ConceptAttributePart> resolveConceptAttributeParts(List<I_ConceptAttributePart> parts) {
@@ -163,34 +163,34 @@ public class ConflictManagementStrategyTest {
     public void initialise() {
     	/* TODO fix to work with generics
         conceptWithoutConflict = createMock(I_GetConceptData.class);
-        expect(conceptWithoutConflict.getTermComponentId()).andReturn(1);
+        expect(conceptWithoutConflict.getNid()).andReturn(1);
         conceptWithConflict = createMock(I_GetConceptData.class);
-        expect(conceptWithConflict.getTermComponentId()).andReturn(0);
+        expect(conceptWithConflict.getNid()).andReturn(0);
 
         descriptionWithoutConflict = createMock(I_DescriptionVersioned.class);
-        expect(descriptionWithoutConflict.getTermComponentId()).andReturn(1);
+        expect(descriptionWithoutConflict.getNid()).andReturn(1);
         descriptionWithConflict = createMock(I_DescriptionVersioned.class);
-        expect(descriptionWithConflict.getTermComponentId()).andReturn(0);
+        expect(descriptionWithConflict.getNid()).andReturn(0);
 
         relationshipWithoutConflcit = createMock(I_RelVersioned.class);
-        expect(relationshipWithoutConflcit.getTermComponentId()).andReturn(1);
+        expect(relationshipWithoutConflcit.getNid()).andReturn(1);
         relationshipWithConflcit = createMock(I_RelVersioned.class);
-        expect(relationshipWithConflcit.getTermComponentId()).andReturn(0);
+        expect(relationshipWithConflcit.getNid()).andReturn(0);
 
         extensionWithoutConflcit = createMock(I_ThinExtByRefVersioned.class);
-        expect(extensionWithoutConflcit.getTermComponentId()).andReturn(1);
+        expect(extensionWithoutConflcit.getNid()).andReturn(1);
         extensionWithConflcit = createMock(I_ThinExtByRefVersioned.class);
-        expect(extensionWithConflcit.getTermComponentId()).andReturn(0);
+        expect(extensionWithConflcit.getNid()).andReturn(0);
 
         idWithoutConflict = createMock(I_IdVersioned.class);
-        expect(idWithoutConflict.getTermComponentId()).andReturn(1);
+        expect(idWithoutConflict.getNid()).andReturn(1);
         idWithConflict = createMock(I_IdVersioned.class);
-        expect(idWithConflict.getTermComponentId()).andReturn(0);
+        expect(idWithConflict.getNid()).andReturn(0);
 
         imageWithoutConflict = createMock(I_ImageVersioned.class);
-        expect(imageWithoutConflict.getTermComponentId()).andReturn(1);
+        expect(imageWithoutConflict.getNid()).andReturn(1);
         imageWithConflict = createMock(I_ImageVersioned.class);
-        expect(imageWithConflict.getTermComponentId()).andReturn(0);
+        expect(imageWithConflict.getNid()).andReturn(0);
         */
     }
 

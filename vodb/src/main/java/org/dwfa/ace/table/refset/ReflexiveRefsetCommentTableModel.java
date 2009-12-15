@@ -51,7 +51,7 @@ public class ReflexiveRefsetCommentTableModel extends ReflexiveRefsetTableModel 
         }
         if (host.getTermComponent() != null) {
             this.tableComponentId = Integer.MIN_VALUE;
-            I_GetConceptData refsetConcept = ConceptBean.get(host.getTermComponent().getTermComponentId());
+            I_GetConceptData refsetConcept = ConceptBean.get(host.getTermComponent().getNid());
             I_IntSet allowedTypes = new IntSet();
             try {
                 allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
