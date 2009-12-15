@@ -62,7 +62,7 @@ public class ConceptAttributeValidator extends SimpleValidator {
                 startParts++;
                 boolean match = false;
                 for (I_ConceptAttributePart conceptAttributePart : thinConAttr.getVersions()) {
-                    if (conceptAttributePart.getConceptStatus() == getNativeId(part.getConceptStatus())
+                    if (conceptAttributePart.getStatusId() == getNativeId(part.getConceptStatus())
                         && conceptAttributePart.getPathId() == getNativeId(part.getPathId())
                         && (timeLenient || conceptAttributePart.getVersion() == tf.convertToThinVersion(part.getTime()))) {
                         match = true;
@@ -73,7 +73,7 @@ public class ConceptAttributeValidator extends SimpleValidator {
                 if (!match) {
                     failureReport.append("\nConcept does not contain a concept attribute part match.");
                     I_ConceptAttributePart newConceptAttributePart = tf.newConceptAttributePart();
-                    newConceptAttributePart.setConceptStatus(getNativeId(part.getConceptStatus()));
+                    newConceptAttributePart.setStatusId(getNativeId(part.getConceptStatus()));
                     newConceptAttributePart.setDefined(part.isDefined());
                     newConceptAttributePart.setPathId(getNativeId(part.getPathId()));
                     newConceptAttributePart.setVersion(tf.convertToThinVersion(part.getTime()));
