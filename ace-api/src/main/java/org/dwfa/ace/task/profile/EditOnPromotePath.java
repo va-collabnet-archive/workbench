@@ -408,10 +408,6 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getShortLabelDescPreferenceList();
     }
 
-    public Boolean getShowInferredInTaxonomy() {
-        return config.getShowInferredInTaxonomy();
-    }
-
     public Boolean getShowPathInfoInTaxonomy() {
         return config.getShowPathInfoInTaxonomy();
     }
@@ -862,10 +858,6 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 
     public void setShowHistory(boolean shown) {
         config.setShowHistory(shown);
-    }
-
-    public void setShowInferredInTaxonomy(Boolean showInferredInTaxonomy) {
-        config.setShowInferredInTaxonomy(showInferredInTaxonomy);
     }
 
     public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy) {

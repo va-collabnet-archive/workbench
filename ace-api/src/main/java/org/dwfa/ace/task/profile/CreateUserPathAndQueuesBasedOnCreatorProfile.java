@@ -101,10 +101,10 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
      */
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.readProperty(newProfilePropName);
+            I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(newProfilePropName);
             newConfig.getViewPositionSet().clear();
             newConfig.getEditingPathSet().clear();
-            I_ConfigAceFrame creatorConfig = (I_ConfigAceFrame) process.readProperty(creatorProfilePropName);
+            I_ConfigAceFrame creatorConfig = (I_ConfigAceFrame) process.getProperty(creatorProfilePropName);
             I_TermFactory tf = LocalVersionedTerminology.get();
 
             String userDirStr = "profiles" + File.separator + newConfig.getUsername();
