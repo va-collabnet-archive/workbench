@@ -16,16 +16,16 @@
  */
 package org.dwfa.mojo;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
-
-import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * @goal vodb-open

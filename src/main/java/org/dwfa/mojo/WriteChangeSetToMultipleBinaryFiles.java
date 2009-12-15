@@ -17,7 +17,6 @@
 package org.dwfa.mojo;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +25,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
-import org.dwfa.ace.cs.BinaryChangeSetWriter;
 
 public class WriteChangeSetToMultipleBinaryFiles implements org.dwfa.ace.api.cs.I_WriteChangeSet {
 

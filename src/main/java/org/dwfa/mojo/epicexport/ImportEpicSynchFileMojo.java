@@ -17,57 +17,22 @@
 package org.dwfa.mojo.epicexport;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-import java.security.NoSuchAlgorithmException;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.task.profile.NewDefaultProfile;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.maven.MojoUtil;
-import org.dwfa.mojo.ConceptDescriptor;
-import org.dwfa.mojo.PositionDescriptor;
-import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
-import org.dwfa.mojo.refset.ExportSpecification; // import
-// org.dwfa.mojo.refset.RefsetType;
-// import org.dwfa.mojo.vivisimo.IntSet;
-// import org.dwfa.mojo.vivisimo.GenerateVivisimoThesaurus.ExportIterator;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.IntSet;
 
 /**
  * * ImportEpicSynchFile <br/>

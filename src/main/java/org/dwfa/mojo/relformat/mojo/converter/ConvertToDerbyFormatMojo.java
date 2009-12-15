@@ -16,6 +16,10 @@
  */
 package org.dwfa.mojo.relformat.mojo.converter;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -34,10 +38,6 @@ import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtilImpl;
 import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 import org.dwfa.mojo.relformat.xml.ReleaseConfigReader;
 import org.dwfa.mojo.relformat.xml.ReleaseConfigReaderImpl;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * This plugin processes files from au-ct-release and converts them into a

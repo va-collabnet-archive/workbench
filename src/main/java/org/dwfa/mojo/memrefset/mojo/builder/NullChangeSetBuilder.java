@@ -16,9 +16,9 @@
  */
 package org.dwfa.mojo.memrefset.mojo.builder;
 
-import org.dwfa.mojo.memrefset.mojo.ChangeSet;
-
 import java.util.UUID;
+
+import org.dwfa.mojo.memrefset.mojo.ChangeSet;
 
 /**
  * This class follows the null object pattern. We can use this class whereever a

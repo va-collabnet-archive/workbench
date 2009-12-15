@@ -16,12 +16,12 @@
  */
 package org.dwfa.mojo.memrefset.mojo;
 
-import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtil;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+
+import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtil;
 
 public final class TextFileWriterImpl implements TextFileWriter {
 

@@ -16,10 +16,10 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql.converter;
 
+import java.util.Map;
+
 import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 import org.dwfa.mojo.relformat.mojo.sql.parser.TableColumn;
-
-import java.util.Map;
 
 public final class LineValueToSQLTypeConverterImpl implements LineValueToSQLTypeConverter {
 

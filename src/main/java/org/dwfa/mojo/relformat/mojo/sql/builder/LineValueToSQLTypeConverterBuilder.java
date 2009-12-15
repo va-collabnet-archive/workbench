@@ -16,19 +16,20 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql.builder;
 
+import static org.dwfa.mojo.relformat.mojo.sql.converter.LineValueToSQLTypeConverter.DEFAULT_CONVERTER;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.dwfa.mojo.relformat.mojo.sql.converter.DateSQLTypeConverter;
 import org.dwfa.mojo.relformat.mojo.sql.converter.GenericSQLTypeConverter;
 import org.dwfa.mojo.relformat.mojo.sql.converter.LineValueToSQLTypeConverter;
-import static org.dwfa.mojo.relformat.mojo.sql.converter.LineValueToSQLTypeConverter.DEFAULT_CONVERTER;
 import org.dwfa.mojo.relformat.mojo.sql.converter.LineValueToSQLTypeConverterImpl;
 import org.dwfa.mojo.relformat.mojo.sql.converter.SQLTimeStampConverterImpl;
 import org.dwfa.mojo.relformat.mojo.sql.converter.SQLTypeConverter;
 import org.dwfa.mojo.relformat.mojo.sql.converter.StringSQLTypeConverter;
 import org.dwfa.mojo.relformat.mojo.sql.converter.TimeSQLTypeConverter;
 import org.dwfa.mojo.relformat.mojo.sql.converter.TimestampSQLTypeConverter;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public final class LineValueToSQLTypeConverterBuilder {
 

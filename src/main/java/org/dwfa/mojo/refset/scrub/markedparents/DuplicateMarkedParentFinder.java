@@ -16,6 +16,10 @@
  */
 package org.dwfa.mojo.refset.scrub.markedparents;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -24,10 +28,6 @@ import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.ConceptExtFinder;
 import org.dwfa.mojo.refset.scrub.util.CandidateWriter;
 import org.dwfa.mojo.refset.scrub.util.TerminologyFactoryUtil;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Finds duplicate marked parents which should be "retired".

@@ -16,10 +16,10 @@
  */
 package org.dwfa.mojo.refset.scrub.markedparents;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-
-import java.util.Comparator;
 import java.io.Serializable;
+import java.util.Comparator;
+
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 
 /**
  * Comparator that sorts versions by commit time.

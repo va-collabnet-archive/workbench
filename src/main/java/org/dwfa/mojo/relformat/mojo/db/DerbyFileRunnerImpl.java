@@ -16,12 +16,12 @@
  */
 package org.dwfa.mojo.relformat.mojo.db;
 
-import org.apache.maven.plugin.logging.Log;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import org.apache.maven.plugin.logging.Log;
 
 public final class DerbyFileRunnerImpl implements DerbyFileRunner {
 

@@ -25,8 +25,8 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.mojo.ImportFromFile;
 import org.dwfa.maven.MojoUtil;
+import org.dwfa.mojo.ImportFromFile;
 
 /**
  * Imports the contents of a file as a sequence of extensions and adds them to

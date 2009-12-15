@@ -16,10 +16,10 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql.io;
 
+import java.io.File;
+
 import org.dwfa.mojo.relformat.mojo.sql.converter.LineToSQLConverter;
 import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
-
-import java.io.File;
 
 public interface SQLFileWriter {
 

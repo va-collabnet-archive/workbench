@@ -16,17 +16,17 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql.io;
 
-import org.dwfa.mojo.relformat.mojo.sql.FileNameExtractor;
-import org.dwfa.mojo.relformat.mojo.sql.converter.LineToSQLConverter;
-import org.dwfa.mojo.relformat.mojo.sql.io.util.Directory;
-import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtil;
-import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintWriter;
+
+import org.dwfa.mojo.relformat.mojo.sql.FileNameExtractor;
+import org.dwfa.mojo.relformat.mojo.sql.converter.LineToSQLConverter;
+import org.dwfa.mojo.relformat.mojo.sql.io.util.Directory;
+import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtil;
+import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 
 public final class SQLFileWriterImpl implements SQLFileWriter {
 

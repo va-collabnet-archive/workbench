@@ -16,14 +16,14 @@
  */
 package org.dwfa.mojo.memrefset.mojo.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dwfa.mojo.memrefset.mojo.ChangeSet;
 import org.dwfa.mojo.memrefset.mojo.CmrscsResult;
 import org.dwfa.mojo.memrefset.mojo.CmrscsResultImpl;
 import org.dwfa.mojo.memrefset.mojo.RefSetNameRetriever;
 import org.dwfa.mojo.memrefset.mojo.RefSetNameRetrieverImpl;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public final class CmrscsResultBuilder {
 

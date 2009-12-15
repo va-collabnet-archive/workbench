@@ -16,12 +16,12 @@
  */
 package org.dwfa.mojo.memrefset.mojo.builder;
 
-import org.dwfa.mojo.memrefset.mojo.ChangeSet;
-import org.dwfa.mojo.memrefset.mojo.RefSetNameRetriever;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import org.dwfa.mojo.memrefset.mojo.ChangeSet;
+import org.dwfa.mojo.memrefset.mojo.RefSetNameRetriever;
 
 public final class CmrscsChangeSetBuilder implements ChangeSetBuilder {
 

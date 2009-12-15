@@ -17,17 +17,17 @@
 package org.dwfa.mojo.refset;
 
 import java.io.File;
-import java.util.UUID;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.refset.MemberRefsetCalculator;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.MemberRefsetCalculator;
 import org.dwfa.mojo.ConceptDescriptor;
 
 /**

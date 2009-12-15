@@ -16,9 +16,9 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql;
 
-import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
-
 import java.io.File;
+
+import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 
 public interface FileNameExtractor {
 

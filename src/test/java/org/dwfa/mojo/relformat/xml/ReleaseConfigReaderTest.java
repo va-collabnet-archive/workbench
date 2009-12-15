@@ -18,10 +18,11 @@ package org.dwfa.mojo.relformat.xml;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class ReleaseConfigReaderTest {
 

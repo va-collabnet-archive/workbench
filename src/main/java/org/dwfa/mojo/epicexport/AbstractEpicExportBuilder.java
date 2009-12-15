@@ -17,16 +17,14 @@
 
 package org.dwfa.mojo.epicexport;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 
 /**
  * A load file builder is a class that is used to determines which items will

@@ -16,10 +16,10 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql;
 
-import org.dwfa.mojo.relformat.util.SystemPropertyReaderImpl;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.dwfa.mojo.relformat.util.SystemPropertyReaderImpl;
 
 public final class SchemaBuilder {
 

@@ -16,37 +16,19 @@
  */
 package org.dwfa.mojo;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.I_ProcessPaths;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.mojo.compare.CompareOperator;
-import org.dwfa.mojo.compare.Match;
-import org.dwfa.mojo.compare.MonitorComponents;
 
 /**
  * Goal which monitors two branches for changes. Agreed changes are copied

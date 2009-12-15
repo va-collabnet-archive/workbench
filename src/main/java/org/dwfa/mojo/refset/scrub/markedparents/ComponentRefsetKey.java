@@ -16,9 +16,9 @@
  */
 package org.dwfa.mojo.refset.scrub.markedparents;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-
 import java.io.Serializable;
+
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 
 /**
  * Uniquely identifies a component in a specific reference set.

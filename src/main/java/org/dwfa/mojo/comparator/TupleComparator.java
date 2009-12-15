@@ -16,9 +16,9 @@
  */
 package org.dwfa.mojo.comparator;
 
-import org.dwfa.ace.api.I_DescriptionTuple;
-
 import java.util.Comparator;
+
+import org.dwfa.ace.api.I_DescriptionTuple;
 
 /**
  * This comparator sorts a list of tuples, firstly by description id (arbitrary

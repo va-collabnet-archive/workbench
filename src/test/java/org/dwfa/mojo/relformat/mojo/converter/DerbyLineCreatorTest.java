@@ -19,6 +19,7 @@ package org.dwfa.mojo.relformat.mojo.converter;
 import static org.dwfa.mojo.relformat.mojo.sql.parser.Table.nullTable;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
+
 import org.junit.Before;
 import org.junit.Test;
 

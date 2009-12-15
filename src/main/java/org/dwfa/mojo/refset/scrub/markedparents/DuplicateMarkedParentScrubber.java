@@ -16,6 +16,9 @@
  */
 package org.dwfa.mojo.refset.scrub.markedparents;
 
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -25,9 +28,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.ConceptExtFinder;
 import org.dwfa.mojo.refset.scrub.ConceptExtHandler;
-
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * This scrubber removes duplicate "marked parents" changing their status to

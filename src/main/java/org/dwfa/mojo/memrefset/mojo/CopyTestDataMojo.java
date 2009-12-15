@@ -16,6 +16,12 @@
  */
 package org.dwfa.mojo.memrefset.mojo;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -23,12 +29,6 @@ import org.dwfa.mojo.relformat.mojo.sql.filter.FileMatcherImpl;
 import org.dwfa.mojo.relformat.mojo.sql.io.FileLister;
 import org.dwfa.mojo.relformat.mojo.sql.io.FileListerImpl;
 import org.dwfa.util.io.FileIO;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * This plugin copies unique test cases for the refset test framework from

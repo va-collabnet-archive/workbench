@@ -16,9 +16,9 @@
  */
 package org.dwfa.mojo;
 
-import org.apache.maven.plugin.logging.Log;
-
 import java.io.File;
+
+import org.apache.maven.plugin.logging.Log;
 
 /**
  * Wraps {@link org.dwfa.maven.MojoUtil} so it can be mocked out.

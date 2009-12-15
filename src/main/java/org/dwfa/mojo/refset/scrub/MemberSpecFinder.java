@@ -16,6 +16,10 @@
  */
 package org.dwfa.mojo.refset.scrub;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -26,10 +30,6 @@ import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.util.CandidateWriter;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Finds concept extensions that match a particular criteria.<br>

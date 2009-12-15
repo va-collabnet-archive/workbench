@@ -16,14 +16,15 @@
  */
 package org.dwfa.mojo.relformat.xml;
 
-import com.thoughtworks.xstream.XStream;
-import org.dwfa.mojo.relformat.exception.ExportDDLMojoException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.dwfa.mojo.relformat.exception.ExportDDLMojoException;
+
+import com.thoughtworks.xstream.XStream;
 
 public final class ReleaseConfigReaderImpl implements ReleaseConfigReader {
 

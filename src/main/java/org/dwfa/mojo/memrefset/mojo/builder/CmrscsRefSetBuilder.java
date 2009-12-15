@@ -16,10 +16,10 @@
  */
 package org.dwfa.mojo.memrefset.mojo.builder;
 
+import java.util.UUID;
+
 import org.dwfa.mojo.memrefset.mojo.RefSet;
 import org.dwfa.mojo.memrefset.mojo.RefSetNameRetriever;
-
-import java.util.UUID;
 
 public final class CmrscsRefSetBuilder {
 

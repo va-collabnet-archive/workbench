@@ -16,16 +16,16 @@
  */
 package org.dwfa.mojo.memrefset.mojo;
 
-import org.dwfa.mojo.memrefset.mojo.builder.ChangeSetBuilder;
-import org.dwfa.mojo.memrefset.mojo.builder.CmrscsResultBuilder;
-import org.dwfa.mojo.memrefset.mojo.builder.NullChangeSetBuilder;
-
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.UUID;
+
+import org.dwfa.mojo.memrefset.mojo.builder.ChangeSetBuilder;
+import org.dwfa.mojo.memrefset.mojo.builder.CmrscsResultBuilder;
+import org.dwfa.mojo.memrefset.mojo.builder.NullChangeSetBuilder;
 
 public final class CmrscsReaderImpl implements CmrscsReader {
 

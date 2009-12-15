@@ -16,6 +16,13 @@
  */
 package org.dwfa.mojo;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.dwfa.ace.api.I_TermFactory;
@@ -26,12 +33,6 @@ import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.notNullValue;
-
-import java.io.File;
 
 public final class WriteRefsetDescriptionsTest {
 

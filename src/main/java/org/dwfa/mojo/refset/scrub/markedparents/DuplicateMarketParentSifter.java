@@ -16,10 +16,10 @@
  */
 package org.dwfa.mojo.refset.scrub.markedparents;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 
 /**
  * Sifts through the list of supplied "normal members" and "marked parents".

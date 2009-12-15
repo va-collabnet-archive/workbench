@@ -3,19 +3,16 @@ package org.dwfa.mojo.epicexport.kp;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.Statement;
 
 /** 
  * Class used to store values to be written to a load file, and write to that load file.

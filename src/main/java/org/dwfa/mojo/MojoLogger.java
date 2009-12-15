@@ -16,8 +16,8 @@
  */
 package org.dwfa.mojo;
 
-import org.dwfa.ace.task.util.Logger;
 import org.apache.maven.plugin.logging.Log;
+import org.dwfa.ace.task.util.Logger;
 
 public final class MojoLogger implements Logger {
 

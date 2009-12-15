@@ -16,19 +16,20 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.dwfa.mojo.relformat.mojo.sql.builder.TableCacheBuilder;
 import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 import org.dwfa.mojo.relformat.mojo.sql.parser.TableColumn;
 import org.dwfa.mojo.relformat.xml.ReleaseConfig;
 import org.dwfa.mojo.relformat.xml.ReleaseFormat;
 import org.hamcrest.core.IsEqual;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.List;
 
 public final class TableCacheTest {
 

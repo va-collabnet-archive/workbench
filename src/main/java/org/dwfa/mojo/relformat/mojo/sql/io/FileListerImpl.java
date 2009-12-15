@@ -16,11 +16,11 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql.io;
 
-import org.dwfa.mojo.relformat.mojo.sql.filter.FileMatcher;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.dwfa.mojo.relformat.mojo.sql.filter.FileMatcher;
 
 public final class FileListerImpl implements FileLister {
 
