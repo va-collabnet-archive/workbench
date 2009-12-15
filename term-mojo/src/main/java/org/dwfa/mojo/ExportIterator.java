@@ -230,7 +230,7 @@ public class ExportIterator implements I_ProcessConcepts {
             I_IdTuple tuple = (I_IdTuple) obj;
             I_IdPart part = tuple.getPart();
             I_IdVersioned id = tuple.getIdVersioned();
-            if (allowedStatus.contains(part.getIdStatus())
+            if (allowedStatus.contains(part.getStatusId())
                 && (!exportCohesiveSet || isExportable(ConceptBean.get(part.getSource())))
                 && (!validatePositions || validPosition(part.getPathId()))) {
 
@@ -253,7 +253,7 @@ public class ExportIterator implements I_ProcessConcepts {
                 createRecord(stringBuilder, part.getSourceId());
 
                 // status UUID
-                createRecord(stringBuilder, getBinaryStatusValue(part.getIdStatus()));
+                createRecord(stringBuilder, getBinaryStatusValue(part.getStatusId()));
 
                 // Effective time
                 createVersion(stringBuilder, part.getVersion(), part.getPathId());

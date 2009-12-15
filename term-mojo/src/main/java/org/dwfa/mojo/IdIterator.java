@@ -64,7 +64,7 @@ public class IdIterator implements I_ProcessIds {
 
                 if (termFactory.hasConcept(idvPart.getSource())) {
                     UUID sourceUuid = getFirstUuid(idvPart.getSource());
-                    UUID statusUuid = getFirstUuid(idvPart.getIdStatus());
+                    UUID statusUuid = getFirstUuid(idvPart.getStatusId());
                     UUID pathUuid = getFirstUuid(idvPart.getPathId());
                     output.write(uuid.toString() + "\t" + sourceUuid + "\t" + idvPart.getSourceId() + "\t" + statusUuid
                         + "\t" + dateFormat.format(date) + "\t" + pathUuid);
