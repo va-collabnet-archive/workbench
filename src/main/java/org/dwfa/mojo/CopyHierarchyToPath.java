@@ -257,7 +257,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
     }
 
     private void duplicateConceptAttributeTuple(I_ConceptAttributeTuple latestPart) {
-        I_ConceptAttributePart newPart = latestPart.duplicatePart();
+        I_ConceptAttributePart newPart = latestPart.duplicate();
         newPart.setPathId(toPathId);
         latestPart.getConVersioned().addVersion(newPart);
         getLog().info("concept attribute part copied " + latestPart);

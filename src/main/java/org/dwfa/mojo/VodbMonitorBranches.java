@@ -237,7 +237,7 @@ public class VodbMonitorBranches extends AbstractMojo {
                 agreedChanges++;
                 // copy latest attributes to new path/version
                 for (I_ConceptAttributeTuple tuple : allConceptAttributeTuples) {
-                    I_ConceptAttributePart newPart = tuple.duplicatePart();
+                    I_ConceptAttributePart newPart = tuple.duplicate();
                     newPart.setVersion(Integer.MAX_VALUE);
                     newPart.setPathId(copyToPath.getConceptId());
                     newPart.setStatusId(updatedStatusId);

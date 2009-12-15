@@ -319,7 +319,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
                             new PositionSetReadOnly(positionsToCheck));
                         // copy latest attributes and set status to unreviewed
                         for (I_ConceptAttributeTuple attribute : conceptAttributeTuples) {
-                            I_ConceptAttributePart newAttributePart = attribute.duplicatePart();
+                            I_ConceptAttributePart newAttributePart = attribute.duplicate();
                             newAttributePart.setStatusId(currentUnreviewedId);
                             newAttributePart.setVersion(Integer.MAX_VALUE);
                             newAttributePart.setPathId(copyToPath.getConceptId());
