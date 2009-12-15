@@ -62,7 +62,7 @@ public class AttributePopupListener extends MouseAdapter {
             try {
                 ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConId());
                 for (I_Path p : config.getEditingPathSet()) {
-                    I_ConceptAttributePart newPart = selectedObject.getTuple().duplicatePart();
+                    I_ConceptAttributePart newPart = selectedObject.getTuple().duplicate();
                     newPart.setPathId(p.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);
                     sourceBean.getConceptAttributes().getVersions().add(newPart);
@@ -112,7 +112,7 @@ public class AttributePopupListener extends MouseAdapter {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ConceptAttributePart newPart = selectedObject.getTuple().getPart();
                     if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
-                        newPart = selectedObject.getTuple().duplicatePart();
+                        newPart = selectedObject.getTuple().duplicate();
                         selectedObject.getTuple().getConVersioned().getVersions().add(newPart);
                     }
                     newPart.setPathId(p.getConceptId());
