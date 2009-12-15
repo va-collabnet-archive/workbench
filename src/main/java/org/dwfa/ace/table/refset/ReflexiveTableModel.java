@@ -459,6 +459,29 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                             }
 
                             return new StringWithExtTuple(buff.toString(), tuple, id);
+                        } else {
+                        	tuples = ext.getTuples(null,
+                                    config.getViewPositionSet(), false);
+                            if (tuples.size() > 0) {
+                                I_ThinExtByRefTuple obj = tuples.iterator().next();
+                                ConceptBean componentRefset = ConceptBean.get(obj.getRefsetId());
+                                I_DescriptionTuple refsetDesc = componentRefset.getDescTuple(host.getConfig()
+                                    .getTableDescPreferenceList(), host.getConfig());
+                                StringBuffer buff = new StringBuffer();
+                                buff.append("<html>");
+                                buff.append(refsetDesc.getText());
+                                buff.append(" member: ");
+                                // @TODO replace this test with a call to determine
+                                // "refset purpose" once the purpose is available.
+                                if (refsetDesc.getText().toLowerCase().endsWith("refset spec")) {
+                                    RefsetSpecTreeCellRenderer renderer = new RefsetSpecTreeCellRenderer(host.getConfig());
+                                    buff.append(renderer.getHtmlRendering(obj));
+                                } else {
+                                    buff.append(obj.getPart().toString());
+                                }
+
+                                return new StringWithExtTuple(buff.toString(), tuple, id);
+                            }
                         }
                     } else {
                         throw new UnsupportedOperationException("Can't find component for id: " + id);
