@@ -34,7 +34,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
     }
 
     public void setConceptStatus(int conceptStatus) {
-        part.setConceptStatus(conceptStatus);
+        part.setStatusId(conceptStatus);
     }
 
     transient Integer hash;
@@ -61,7 +61,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
      */
     @Deprecated
     public int getConceptStatus() {
-        return part.getConceptStatus();
+        return part.getStatusId();
     }
 
     /*
