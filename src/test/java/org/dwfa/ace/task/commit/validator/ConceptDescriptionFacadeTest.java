@@ -32,9 +32,12 @@
  */
 package org.dwfa.ace.task.commit.validator;
 
+import static org.easymock.EasyMock.expect;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -51,8 +54,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.easymock.internal.MocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import static junit.framework.Assert.assertEquals;
-import static org.easymock.EasyMock.expect;
 
 public final class ConceptDescriptionFacadeTest {
 

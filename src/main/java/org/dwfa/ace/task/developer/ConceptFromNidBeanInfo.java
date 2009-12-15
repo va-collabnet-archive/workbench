@@ -21,7 +21,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.ace.task.refset.CreateRefsetMembersetPair;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class ConceptFromNidBeanInfo extends SimpleBeanInfo {

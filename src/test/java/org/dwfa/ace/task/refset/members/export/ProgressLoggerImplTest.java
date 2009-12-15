@@ -16,16 +16,17 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.dwfa.ace.task.util.Logger;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public final class ProgressLoggerImplTest {
 

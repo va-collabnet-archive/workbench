@@ -16,15 +16,10 @@
  */
 package org.dwfa.ace.task.refset.members;
 
-import org.dwfa.bpa.process.I_DefineTask;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,6 +27,12 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import org.dwfa.bpa.process.I_DefineTask;
+import org.easymock.classextension.EasyMock;
+import org.easymock.classextension.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
 
 public final class WriteSingleRefsetDescriptionSerializationTest {
 

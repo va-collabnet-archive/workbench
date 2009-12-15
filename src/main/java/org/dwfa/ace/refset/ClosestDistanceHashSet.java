@@ -16,16 +16,10 @@
  */
 package org.dwfa.ace.refset;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
-
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.tapi.TerminologyException;
 
 public class ClosestDistanceHashSet implements Map<Integer, ConceptRefsetInclusionDetails> {
 

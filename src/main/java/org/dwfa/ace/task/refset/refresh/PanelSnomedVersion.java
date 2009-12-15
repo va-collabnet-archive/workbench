@@ -37,10 +37,9 @@ import javax.swing.KeyStroke;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.tapi.TerminologyException;
-
-import org.dwfa.ace.path.*;
 
 /**
  * The PanelSnomedVersion class displays a list of paths and lets the user

@@ -16,11 +16,11 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
+import java.util.List;
+
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-
-import java.util.List;
 
 public interface RefsetTextWriter {
 

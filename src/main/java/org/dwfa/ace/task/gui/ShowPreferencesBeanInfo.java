@@ -20,6 +20,7 @@ import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
+
 import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 
 /**

@@ -18,6 +18,7 @@ package org.dwfa.ace.task.refset.members;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
+
 import org.junit.Test;
 
 public final class PropertyValidatorTest {

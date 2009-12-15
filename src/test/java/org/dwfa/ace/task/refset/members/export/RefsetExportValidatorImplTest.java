@@ -16,16 +16,17 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.task.refset.members.RefsetUtil;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.notNullValue;
 import org.junit.Assert;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 

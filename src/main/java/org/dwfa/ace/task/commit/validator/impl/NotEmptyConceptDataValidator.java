@@ -32,12 +32,13 @@
  */
 package org.dwfa.ace.task.commit.validator.impl;
 
-import org.dwfa.ace.task.commit.validator.GetConceptDataValidationStrategy;
 import java.util.List;
+
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.task.commit.validator.ConceptDataComparerStrategy;
+import org.dwfa.ace.task.commit.validator.GetConceptDataValidationStrategy;
 import org.dwfa.ace.task.commit.validator.ValidationException;
 
 /**

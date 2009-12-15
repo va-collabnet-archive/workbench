@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
+import java.util.List;
+
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -24,8 +26,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.select.DescriptionSelector;
 import org.dwfa.ace.task.refset.members.RefsetUtil;
 import org.dwfa.ace.task.util.Logger;
-
-import java.util.List;
 
 // TODO: This class does too much. Refactor.
 public final class RefsetWriterImpl implements RefsetWriter {

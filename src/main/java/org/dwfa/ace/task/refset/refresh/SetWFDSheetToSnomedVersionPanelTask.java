@@ -17,9 +17,6 @@
 package org.dwfa.ace.task.refset.refresh;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridLayout;
-import java.awt.Insets;
 import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -30,8 +27,6 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Path;

@@ -16,13 +16,13 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
+import java.io.Writer;
+import java.util.List;
+
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.task.refset.members.RefsetUtil;
-
-import java.io.Writer;
-import java.util.List;
 
 public final class DescriptionWriterImpl implements DescriptionWriter {
 

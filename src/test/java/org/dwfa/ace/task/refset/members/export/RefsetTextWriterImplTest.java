@@ -16,6 +16,9 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -25,9 +28,6 @@ import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.List;
 
 public final class RefsetTextWriterImplTest {
 

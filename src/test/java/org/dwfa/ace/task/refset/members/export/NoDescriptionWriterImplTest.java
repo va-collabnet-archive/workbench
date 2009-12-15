@@ -16,16 +16,16 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
+import java.io.Writer;
+import java.util.Arrays;
+import java.util.UUID;
+
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.task.util.Logger;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.Writer;
-import java.util.Arrays;
-import java.util.UUID;
 
 public final class NoDescriptionWriterImplTest {
 

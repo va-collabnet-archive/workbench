@@ -17,13 +17,14 @@
 package org.dwfa.ace.task.refset.members.export;
 
 import static junit.framework.Assert.fail;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.task.refset.members.RefsetUtil;
 import org.dwfa.ace.task.util.Logger;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 

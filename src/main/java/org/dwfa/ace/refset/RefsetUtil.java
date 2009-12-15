@@ -16,6 +16,10 @@
  */
 package org.dwfa.ace.refset;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.UUID;
+
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -23,10 +27,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
-
-import java.io.IOException;
-import java.util.UUID;
-import java.util.Collection;
 
 public interface RefsetUtil {
 

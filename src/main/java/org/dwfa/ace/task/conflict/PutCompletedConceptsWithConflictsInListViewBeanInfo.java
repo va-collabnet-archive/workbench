@@ -22,7 +22,6 @@ import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class PutCompletedConceptsWithConflictsInListViewBeanInfo extends SimpleBeanInfo {

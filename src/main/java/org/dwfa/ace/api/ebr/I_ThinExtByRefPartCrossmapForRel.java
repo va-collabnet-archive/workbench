@@ -16,7 +16,6 @@
  */
 package org.dwfa.ace.api.ebr;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 
 public interface I_ThinExtByRefPartCrossmapForRel extends I_ThinExtByRefPart {
 

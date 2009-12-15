@@ -30,7 +30,6 @@ import javax.swing.TransferHandler;
 
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
-import org.apache.lucene.util.OpenBitSet;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
