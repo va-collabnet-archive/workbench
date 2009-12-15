@@ -18,18 +18,6 @@ package org.dwfa.ace.api;
 
 public interface I_IdPart extends I_AmPart {
 
-    /**
-     * @deprecated Use {@link #getStatusId()}
-     */
-    @Deprecated
-    public int getIdStatus();
-
-    /**
-     * @deprecated Use {@link #setStatusId(int)}
-     */
-    @Deprecated
-    public void setIdStatus(int idStatus);
-
     public int getSource();
 
     public void setSource(int source);
