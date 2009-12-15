@@ -129,6 +129,11 @@ public abstract class AbstractEpicExportBuilder {
 			writer.addItemValue(ei.itemNumber, ei.value);
 		}
 	}
+	
+	public void writeItems(String... items) {
+		for (String i: items)
+			writeItem(i, i);
+	}
 	/**
 	 * Writes an item to the Epic load file
 	 * 
@@ -179,6 +184,11 @@ public abstract class AbstractEpicExportBuilder {
 		if (itemHasChanges(epicItemNumber)) {
 			writeItem(epicItemNumber, aliasItemNumber);
 		}
+	}
+	
+	public void writeItemsIfChanged(String... items) {
+		for (String i: items)
+			writeItemIfChanged(i);
 	}
 	
 	/**

@@ -68,6 +68,8 @@ import org.dwfa.tapi.TerminologyException;
  * @goal generate-epic-loadfiles
  */
 public class ExportToEpicLoadFilesMojo extends AbstractMojo {
+	public final static String DESCRIPTION_PREFERED_TERM = "prefered term";
+	public final static String DESCRIPTION_SYNONYM = "synonym";
 	/**
 	 * Location of the directory to output data files to.
 	 *
@@ -263,9 +265,8 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			}
 			// Finally, process this concept directly if it is a description concept, or process the root concept
 			// for extensions attached to the root concept
-			// getLog().info("Processing root concept");
-			// if (extensionsProcessed == 0)
 			processDescriptionConcept(concept, null);
+			// Write all of the records
 	        for (String masterfile: masterFilesImpacted) {
 		        I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(masterfile);
 		        if (exportWriter != null) { 
@@ -274,6 +275,10 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		        }
 		        this.currentMasterFile = null;
 	        }
+	        // Need to clear any "orphaned" items, so they do not get put into the next concept.
+	        // This may happen if a refset for a description is not associated with the master file
+	        // of the other refsets.
+	        exportManager.clearAllContents();
 		}
 		
 
@@ -299,8 +304,8 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	        		throw new Exception("No concept for ID " + thinExtByRefVersioned.getRefsetId());
 	        	}
 	        }
-        	if (lastTuple != null)
-        		this.writeRecordIds(lastTuple);
+        	// if (lastTuple != null)
+        		
 	        
 	        return extensions.size();
 	    }
@@ -345,7 +350,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	I_ThinExtByRefPart extensionTuplePart = extensionTuple.getPart();
 	    	// getLog().info("Processing refset: " + refsetName);	    	
 	    	//TODO: Re-factor into separate class, allow pattern matching, store and read from pom.xml
-	    	if(refsetName.equals("EDG Billing Item 207")) {
+	    	/* if(refsetName.equals("EDG Billing Item 207")) {
 	    		refsetAppliesTo.add(new EpicItemIdentifier(
 	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "207"));
 	    		refsetAppliesTo.add(new EpicItemIdentifier(
@@ -358,7 +363,8 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "91"));
 // getLog().info("Found billing 91");
 	    	}
-	    	else if(refsetName.equals("EDG Billing Item 2")) {
+	    	else */
+	    	if(refsetName.equals("EDG Billing Item 2")) {
 	    		refsetAppliesTo.add(new EpicItemIdentifier(
 	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "2"));
 	    		stringValue = getDisplayName(conceptForDescription); 
@@ -389,6 +395,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	}
 	    	else if (refsetName.startsWith("EDG Clinical Item 2 "))
 	    	{
+	    		
 	    		// String region = refsetName.substring(20);
 	    		refsetAppliesTo.add(new EpicItemIdentifier(
 	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2"));
@@ -405,24 +412,17 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    		previousStringValue = getPreviousDisplayName(conceptForDescription); 
 	    	}
 	    	else if(refsetName.equals("EDG Clinical Item 50")) {
-	    		
-	    		//refsetAppliesTo.add(new EpicItemIdentifier(
-	    		//		EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "50"));
-	    		// stringValue = getDisplayName(conceptForDescription);
-	    		//previousStringValue = getPreviousDisplayName(conceptForDescription); 
 	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
-	    		if (doAdd.getValue()) {
-		    		List<? extends I_DescriptionVersioned> descs = conceptForDescription.getDescriptions();
-		    		for(I_DescriptionVersioned d: descs) {
-		    			int type = d.getFirstTuple().getTypeId();
-		    			if (type == -2147078660 || type == -2143913499) {
-		    				String syn = d.getFirstTuple().getPart().getText();
-	// getLog().info("Synonym: " + syn + " type=" + type); 
-		    				if (!getDisplayName(conceptForDescription).equals(syn))
-		    					exportManager.getLoadFileBuilder(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL)
-									.addItemForExport("50", syn, null);
-		    			}
-		    		}
+	    		if (doAdd.getValue() && description != null) {
+	    			stringValue = description.getLastTuple().getPart().getText();
+	    			previousStringValue = getPreviousDisplayName(description);
+		    		refsetAppliesTo.add(new EpicItemIdentifier(
+		    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "50"));
+	    			/* String[] types = {ExportToEpicLoadFilesMojo.DESCRIPTION_SYNONYM, 
+			    			ExportToEpicLoadFilesMojo.DESCRIPTION_PREFERED_TERM};
+	    			addSynonyms(conceptForDescription, types, 
+		    			EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "50");
+		    			*/
 	    		}
 	    	}
 	    	else if(refsetName.startsWith("EDG Clinical Item ")) {
@@ -446,8 +446,11 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    		getLog().warn("Unhandled refset name: " + refsetName);
 	    	
 	    	for (EpicItemIdentifier e: refsetAppliesTo) {
-	    		if (e.getItemNumber().equals("2"))
+	    		if (e.getItemNumber().equals("2")) {
 	    			masterFilesImpacted.add(e.getMasterfile());
+	    			this.writeRecordIds(extensionTuple);
+	    		}
+	    			
 	    		if (stringValue == null)
 	    			stringValue = getValueAsString(extensionTuplePart);
 	    		I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(e.getMasterfile());
@@ -461,6 +464,28 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	
 	    }
 	    
+	    public void addSynonyms(I_GetConceptData conceptForDescription, String[] displayTypes, 
+	    		String masterFile, String itemNumber) throws Exception {
+	    	
+    		List<? extends I_DescriptionVersioned> descs = conceptForDescription.getDescriptions();
+    		for(I_DescriptionVersioned d: descs) {
+    			int type = d.getFirstTuple().getTypeId();
+    			String descType = getDisplayName(termFactory.getConcept(type));
+    			//if (descType.equals(ExportToEpicLoadFilesMojo.DESCRIPTION_SYNONYM) || 
+    			//	descType.equals(ExportToEpicLoadFilesMojo.DESCRIPTION_PREFERED_TERM)) {
+    			boolean doAdd = false;
+    			for (String t : displayTypes)
+    				doAdd = doAdd || t.equals(descType);
+    			if (doAdd) {
+    				String syn = d.getFirstTuple().getPart().getText();
+// getLog().info("Synonym: " + syn + " type=" + type); 
+    				if (!getDisplayName(conceptForDescription).equals(syn))
+    					exportManager.getLoadFileBuilder(masterFile)
+							.addItemForExport(itemNumber, syn, null);
+    			}
+    		}
+
+	    }
 	    public void writeRecordIds(I_ThinExtByRefTuple extensionTuple) throws Exception {
     		/* Special post handling, such writing id when we encounter a display name */
 	    	String dot11 = null;

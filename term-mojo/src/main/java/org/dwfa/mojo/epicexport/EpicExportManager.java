@@ -115,5 +115,13 @@ public class EpicExportManager {
 		this.connection = connection;
 	}
     
+	public void clearAllContents() {
+		for (int i = 0; i < builders.size(); i++) {
+			
+			I_EpicLoadFileBuilder b = builders.get(i);
+			if (b != null)
+				b.clearRecordContents();
+		}
+	}
     
 }
