@@ -163,28 +163,22 @@ public class SnoTable {
 
         // GET ALL EDIT_PATH ORIGINS
         I_GetConceptData cEditPathObj = config.getClassifierInputPath();
-        if (cEditPathObj == null) {
-            String errStr = "Classifier Input (Edit) Path -- not set in Classifier preferences tab!";
-            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-            return;
+        if (cEditPathObj != null) {
+            I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
+            cStatedPath = new ArrayList<I_Position>();
+            cStatedPath.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
+            addPathOrigins(cStatedPath, cEditIPath);
         }
 
-        I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
-        cStatedPath = new ArrayList<I_Position>();
-        cStatedPath.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
-        addPathOrigins(cStatedPath, cEditIPath);
 
         // GET ALL CLASSIFER_PATH ORIGINS
         I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
-        if (cClassPathObj == null) {
-            String errStr = "Classifier Output (Inferred) Path -- not set in Classifier preferences tab!";
-            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-            return;
+        if (cClassPathObj != null) {
+            I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
+            cInferredPath = new ArrayList<I_Position>();
+            cInferredPath.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
+            addPathOrigins(cInferredPath, cClassIPath);
         }
-        I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
-        cInferredPath = new ArrayList<I_Position>();
-        cInferredPath.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
-        addPathOrigins(cInferredPath, cClassIPath);
 
     }
 
