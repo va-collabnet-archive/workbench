@@ -1875,7 +1875,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         ConceptBean concept = ConceptBean.get(conceptId);
         for (I_RelVersioned rel : concept.getSourceRels()) {
             for (I_RelPart part : rel.getVersions()) {
-                if (srcRelTypeIds.contains(part.getRelTypeId())) {
+                if (srcRelTypeIds.contains(part.getTypeId())) {
                     return true;
                 }
             }
@@ -1915,7 +1915,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                 for (I_RelVersioned rel : relOrigin.getSourceRels()) {
                     if (rel.getC2Id() == conceptId) {
                         for (I_RelPart part : rel.getVersions()) {
-                            if (destRelTypeIds.contains(part.getRelTypeId())) {
+                            if (destRelTypeIds.contains(part.getTypeId())) {
                                 return true;
                             }
                         }

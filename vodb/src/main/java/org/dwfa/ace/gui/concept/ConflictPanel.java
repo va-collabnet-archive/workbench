@@ -467,7 +467,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
             } else {
                 // already there with active status...
                 I_RelTuple resolutionTuple = relsForResolution.get(rel.getRelId());
-                I_RelPart possiblePart = resolutionTuple.duplicatePart();
+                I_RelPart possiblePart = resolutionTuple.duplicate();
                 if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                     AceLog.getEditLog().fine("   possiblePart: " + possiblePart);
                 }
@@ -560,7 +560,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
             } else {
                 // already there with active status...
                 I_DescriptionTuple descTuple = descsForResolution.get(desc.getDescId());
-                I_DescriptionPart possiblePart = descTuple.duplicatePart();
+                I_DescriptionPart possiblePart = descTuple.duplicate();
                 I_IntSet allowedStatus = null;
                 I_IntSet allowedTypes = null;
                 boolean addUncommitted = true;
@@ -699,7 +699,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 
     private void addDescPart(HashMap<Integer, I_DescriptionTuple> descsForResolution, I_Path editPath,
             I_DescriptionVersioned desc) {
-        I_DescriptionPart newPart = descsForResolution.get(desc.getDescId()).duplicatePart();
+        I_DescriptionPart newPart = descsForResolution.get(desc.getDescId()).duplicate();
         newPart.setVersion(Integer.MAX_VALUE);
         newPart.setPathId(editPath.getConceptId());
         newPart.setStatusId(config.getDefaultStatus().getConceptId());
@@ -707,7 +707,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
     }
 
     private void retireDescPart(I_Path editPath, I_DescriptionVersioned desc) throws IOException, TerminologyException {
-        I_DescriptionPart newPart = desc.getLastTuple().duplicatePart();
+        I_DescriptionPart newPart = desc.getLastTuple().duplicate();
         newPart.setVersion(Integer.MAX_VALUE);
         newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
         newPart.setPathId(editPath.getConceptId());
@@ -715,7 +715,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
     }
 
     private void addRelPart(HashMap<Integer, I_RelTuple> relsForResolution, I_Path editPath, I_RelVersioned rel) {
-        I_RelPart newPart = relsForResolution.get(rel.getRelId()).duplicatePart();
+        I_RelPart newPart = relsForResolution.get(rel.getRelId()).duplicate();
         newPart.setVersion(Integer.MAX_VALUE);
         newPart.setStatusId(config.getDefaultStatus().getConceptId());
         newPart.setPathId(editPath.getConceptId());
@@ -723,7 +723,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
     }
 
     private void retireRelPart(I_Path editPath, I_RelVersioned rel) throws IOException, TerminologyException {
-        I_RelPart newPart = rel.getLastTuple().duplicatePart();
+        I_RelPart newPart = rel.getLastTuple().duplicate();
         newPart.setVersion(Integer.MAX_VALUE);
         newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
         newPart.setPathId(editPath.getConceptId());

@@ -64,7 +64,7 @@ public class ThinRelVersionedTest extends TestCase {
         part0.setGroup(0);
         part0.setPathId(path0);
         part0.setRefinabilityId(refinability);
-        part0.setRelTypeId(type0);
+        part0.setTypeId(type0);
         part0.setStatusId(stat0);
         part0.setVersion(time0);
         rel.addVersion(part0);
@@ -74,7 +74,7 @@ public class ThinRelVersionedTest extends TestCase {
         part1.setGroup(0);
         part1.setPathId(path1);
         part1.setRefinabilityId(refinability);
-        part1.setRelTypeId(type1);
+        part1.setTypeId(type1);
         part1.setStatusId(stat1);
         part1.setVersion(time1);
         rel.addVersion(part1);
@@ -84,7 +84,7 @@ public class ThinRelVersionedTest extends TestCase {
         part2.setGroup(0);
         part2.setPathId(path2);
         part2.setRefinabilityId(refinability);
-        part2.setRelTypeId(type2);
+        part2.setTypeId(type2);
         part2.setStatusId(stat2);
         part2.setVersion(time2);
         rel.addVersion(part2);
@@ -215,7 +215,7 @@ public class ThinRelVersionedTest extends TestCase {
         part0.setGroup(0);
         part0.setPathId(path0);
         part0.setRefinabilityId(refinability);
-        part0.setRelTypeId(type0);
+        part0.setTypeId(type0);
         part0.setStatusId(stat0);
         part0.setVersion(time0);
         rel.addVersion(part0);
@@ -225,7 +225,7 @@ public class ThinRelVersionedTest extends TestCase {
         part1.setGroup(0);
         part1.setPathId(path0);
         part1.setRefinabilityId(refinability);
-        part1.setRelTypeId(type0);
+        part1.setTypeId(type0);
         part1.setStatusId(stat1);
         part1.setVersion(time1);
         rel.addVersion(part1);

@@ -64,7 +64,7 @@ public class DescPopupListener extends MouseAdapter {
         public void actionPerformed(ActionEvent e) {
             ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
             for (I_Path p : config.getEditingPathSet()) {
-                I_DescriptionPart newPart = selectedObject.getTuple().duplicatePart();
+                I_DescriptionPart newPart = selectedObject.getTuple().duplicate();
                 newPart.setPathId(p.getConceptId());
                 newPart.setVersion(Integer.MAX_VALUE);
                 selectedObject.getTuple().getDescVersioned().getVersions().add(newPart);
@@ -109,7 +109,7 @@ public class DescPopupListener extends MouseAdapter {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_DescriptionPart newPart = selectedObject.getTuple().getPart();
                     if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
-                        newPart = selectedObject.getTuple().duplicatePart();
+                        newPart = selectedObject.getTuple().duplicate();
                         selectedObject.getTuple().getDescVersioned().getVersions().add(newPart);
                     }
                     newPart.setPathId(p.getConceptId());

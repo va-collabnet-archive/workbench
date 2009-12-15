@@ -643,7 +643,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     newPart.setGroup(part.getGroup());
                     newPart.setPathId(getNid(part.getPathId()));
                     newPart.setRefinabilityId(getNid(part.getRefinabilityId()));
-                    newPart.setTypeId(getNid(part.getRelTypeId()));
+                    newPart.setTypeId(getNid(part.getTypeId()));
                     newPart.setStatusId(getNid(part.getStatusId()));
                     newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
                     if (part.getTime() == Long.MAX_VALUE) {
@@ -700,7 +700,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         newPart.setGroup(part.getGroup());
                         newPart.setPathId(getNid(part.getPathId()));
                         newPart.setRefinabilityId(getNid(part.getRefinabilityId()));
-                        newPart.setTypeId(getNid(part.getRelTypeId()));
+                        newPart.setTypeId(getNid(part.getTypeId()));
                         newPart.setStatusId(getNid(part.getStatusId()));
                         if (part.getTime() == Long.MAX_VALUE) {
                             newPart.setVersion(ThinVersionHelper.convert(time));
@@ -728,7 +728,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                             newPart.setGroup(part.getGroup());
                             newPart.setPathId(getNid(part.getPathId()));
                             newPart.setRefinabilityId(getNid(part.getRefinabilityId()));
-                            newPart.setTypeId(getNid(part.getRelTypeId()));
+                            newPart.setTypeId(getNid(part.getTypeId()));
                             newPart.setStatusId(getNid(part.getStatusId()));
                             newPart.setVersion(ThinVersionHelper.convert(time));
                             if (thinRel.getVersions().contains(newPart)) {

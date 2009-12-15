@@ -73,7 +73,7 @@ public class RelPartBdb implements I_StoreInBdb, I_StoreRelParts<Integer> {
             part.setCharacteristicId(ti.readInt());
             part.setGroup(ti.readInt());
             part.setRefinabilityId(ti.readInt());
-            part.setRelTypeId(ti.readInt());
+            part.setTypeId(ti.readInt());
             return part;
         }
 
@@ -85,7 +85,7 @@ public class RelPartBdb implements I_StoreInBdb, I_StoreRelParts<Integer> {
             to.writeInt(part.getCharacteristicId());
             to.writeInt(part.getGroup());
             to.writeInt(part.getRefinabilityId());
-            to.writeInt(part.getRelTypeId());
+            to.writeInt(part.getTypeId());
         }
 
     }

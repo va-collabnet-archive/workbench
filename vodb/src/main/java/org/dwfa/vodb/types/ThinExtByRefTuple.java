@@ -180,10 +180,6 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
             + " componentId: " + core.getComponentId() + " typeId: " + core.getTypeId() + " version: " + part;
     }
 
-    public I_ThinExtByRefPart duplicate() {
-        return part.duplicate();
-    }
-
     public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
         return part.getUniversalPart();
     }
@@ -204,8 +200,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
         part.setStatusId(statusId);
     }
 
-    @Deprecated
-    public I_ThinExtByRefPart duplicatePart() {
+     public I_ThinExtByRefPart duplicate() {
         return duplicate();
     }
 

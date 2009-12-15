@@ -64,7 +64,7 @@ public class ImagePopupListener extends MouseAdapter {
         public void actionPerformed(ActionEvent e) {
             ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
             for (I_Path p : config.getEditingPathSet()) {
-                I_ImagePart newPart = selectedObject.getTuple().duplicatePart();
+                I_ImagePart newPart = selectedObject.getTuple().duplicate();
                 newPart.setPathId(p.getConceptId());
                 newPart.setVersion(Integer.MAX_VALUE);
                 newPart.setStatusId(config.getDefaultStatus().getConceptId());
@@ -108,7 +108,7 @@ public class ImagePopupListener extends MouseAdapter {
             try {
                 ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
                 for (I_Path p : config.getEditingPathSet()) {
-                    I_ImagePart newPart = selectedObject.getTuple().duplicatePart();
+                    I_ImagePart newPart = selectedObject.getTuple().duplicate();
                     newPart.setPathId(p.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);
                     switch (field) {

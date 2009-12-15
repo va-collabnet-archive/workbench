@@ -78,7 +78,7 @@ public class RelPartBdbEphMapIntKey implements I_StoreInBdb, I_StoreRelParts<Int
             part.setCharacteristicId(ti.readInt());
             part.setGroup(ti.readInt());
             part.setRefinabilityId(ti.readInt());
-            part.setRelTypeId(ti.readInt());
+            part.setTypeId(ti.readInt());
             return part;
         }
 
@@ -90,7 +90,7 @@ public class RelPartBdbEphMapIntKey implements I_StoreInBdb, I_StoreRelParts<Int
             to.writeInt(part.getCharacteristicId());
             to.writeInt(part.getGroup());
             to.writeInt(part.getRefinabilityId());
-            to.writeInt(part.getRelTypeId());
+            to.writeInt(part.getTypeId());
         }
 
     }
