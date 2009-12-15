@@ -38,8 +38,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 
-import com.sleepycat.je.DeadlockException;
-
 /**
  * Path management.
  * 

@@ -25,7 +25,6 @@ import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.I_ProcessExtByRefEntries;
 
 import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.DatabaseException;
 
 public interface I_StoreExtensions extends I_StoreInBdb {
 
