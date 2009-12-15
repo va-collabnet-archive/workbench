@@ -127,7 +127,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(positions));
             // copy latest descriptions to new path/version
             for (I_DescriptionTuple tuple : descriptionTuples) {
-                I_DescriptionPart newPart = tuple.duplicatePart();
+                I_DescriptionPart newPart = tuple.duplicate();
                 newPart.setVersion(Integer.MAX_VALUE);
                 newPart.setPathId(copyToPath.getConceptId());
                 tuple.getDescVersioned().addVersion(newPart);
@@ -137,7 +137,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             List<? extends I_RelTuple> relationshipTuples = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(positions), false);
             // copy latest relationships to new path/version
             for (I_RelTuple tuple : relationshipTuples) {
-                I_RelPart newPart = tuple.duplicatePart();
+                I_RelPart newPart = tuple.duplicate();
                 newPart.setVersion(Integer.MAX_VALUE);
                 newPart.setPathId(copyToPath.getConceptId());
                 tuple.getRelVersioned().addVersion(newPart);

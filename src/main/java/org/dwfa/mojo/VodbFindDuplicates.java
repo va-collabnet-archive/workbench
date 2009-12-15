@@ -452,7 +452,7 @@ public class VodbFindDuplicates extends AbstractMojo {
                                      * if (t.getConceptStatus() !=
                                      * flaggedPotDup.getConceptId()) {
                                      * I_ConceptAttributePart newPart =
-                                     * t.duplicatePart();
+                                     * t.duplicate();
                                      * 
                                      * 
                                      * 
@@ -563,7 +563,7 @@ public class VodbFindDuplicates extends AbstractMojo {
         for (I_RelVersioned rel : list) {
             for (I_RelTuple rt : rel.getTuples()) {
                 if ((rt.getC2Id() == destConcept.getConceptId()) || (rt.getC1Id() == destConcept.getConceptId())) {
-                    if (dupRelTypeSet.contains(rt.getRelTypeId())) {
+                    if (dupRelTypeSet.contains(rt.getTypeId())) {
                         // Already done...
                         return true;
                     }

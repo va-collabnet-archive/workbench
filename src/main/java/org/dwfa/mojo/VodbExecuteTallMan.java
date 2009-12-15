@@ -305,7 +305,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
                         modifiedUuids.add(uuids);
 
                         // update the description with the tall man alternative
-                        I_DescriptionPart newPart = tuple.duplicatePart();
+                        I_DescriptionPart newPart = tuple.duplicate();
                         newPart.setText(updatedCurrentDescription);
                         newPart.setStatusId(currentUnreviewedId);
                         newPart.setVersion(Integer.MAX_VALUE);

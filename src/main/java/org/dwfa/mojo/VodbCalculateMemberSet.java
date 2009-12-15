@@ -112,7 +112,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
                         for (I_RelTuple tuple : tuples) {
                             if (tuple.getStatusId() == termFactory.getConcept(
                                 ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId()
-                                && tuple.getRelTypeId() == termFactory.getConcept(
+                                && tuple.getTypeId() == termFactory.getConcept(
                                     RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()).getConceptId()) {
 
                                 purposeConcepts.add(termFactory.getConcept(tuple.getC2Id()));

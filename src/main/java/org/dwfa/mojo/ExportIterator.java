@@ -502,7 +502,7 @@ public class ExportIterator implements I_ProcessConcepts {
             if (allowedStatus.contains(part.getStatusId())
                 && isExportable(ConceptBean.get(rel.getC2Id()))
                 && (!exportCohesiveSet || (isExportable(ConceptBean.get(part.getCharacteristicId()))
-                    && isExportable(ConceptBean.get(part.getRefinabilityId())) && isExportable(ConceptBean.get(part.getRelTypeId()))))) {
+                    && isExportable(ConceptBean.get(part.getRefinabilityId())) && isExportable(ConceptBean.get(part.getTypeId()))))) {
 
                 if (relId != tuple.getRelId()) {
                     relId = tuple.getRelId();
@@ -521,7 +521,7 @@ public class ExportIterator implements I_ProcessConcepts {
                 createRecord(stringBuilder, getFirstUuid((rel.getC1Id())));
 
                 // Relationship type UUID
-                createRecord(stringBuilder, getFirstUuid((part.getRelTypeId())));
+                createRecord(stringBuilder, getFirstUuid((part.getTypeId())));
 
                 // Concept Id 2 UUID
                 createRecord(stringBuilder, getFirstUuid(rel.getC2Id()));
@@ -549,7 +549,7 @@ public class ExportIterator implements I_ProcessConcepts {
                 createRecord(stringBuilder, getFirstUuid(rel.getC1Id()));
 
                 // Relationship type UUID
-                createRecord(stringBuilder, getFirstUuid(part.getRelTypeId()));
+                createRecord(stringBuilder, getFirstUuid(part.getTypeId()));
 
                 // Concept2 UUID
                 createRecord(stringBuilder, getFirstUuid(rel.getC2Id()));

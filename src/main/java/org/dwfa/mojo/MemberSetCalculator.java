@@ -480,7 +480,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
             if (extensionParts.size() > 0) {
                 I_ThinExtByRefPart latestVersion = assertExactlyOne(extensionParts);
 
-                I_ThinExtByRefPart clone = latestVersion.duplicatePart();
+                I_ThinExtByRefPart clone = latestVersion.duplicate();
                 clone.setStatus(retiredConceptId);
                 clone.setVersion(Integer.MAX_VALUE);
                 extensionPart.addVersion(clone);

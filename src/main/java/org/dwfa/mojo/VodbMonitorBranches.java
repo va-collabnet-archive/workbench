@@ -245,7 +245,7 @@ public class VodbMonitorBranches extends AbstractMojo {
                 }
                 // copy latest descriptions to new path/version
                 for (I_DescriptionTuple tuple : allDescriptionTuples) {
-                    I_DescriptionPart newPart = tuple.duplicatePart();
+                    I_DescriptionPart newPart = tuple.duplicate();
                     newPart.setVersion(Integer.MAX_VALUE);
                     newPart.setPathId(copyToPath.getConceptId());
                     newPart.setStatusId(updatedStatusId);
@@ -253,7 +253,7 @@ public class VodbMonitorBranches extends AbstractMojo {
                 }
                 // copy latest relationships to new path/version
                 for (I_RelTuple tuple : allRelationshipTuples) {
-                    I_RelPart newPart = tuple.duplicatePart();
+                    I_RelPart newPart = tuple.duplicate();
                     newPart.setVersion(Integer.MAX_VALUE);
                     newPart.setPathId(copyToPath.getConceptId());
                     newPart.setStatusId(updatedStatusId);
