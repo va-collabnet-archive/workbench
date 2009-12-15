@@ -429,7 +429,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateDescriptionTuple(I_DescriptionTuple t) {
-        I_DescriptionPart newPart = t.duplicatePart();
+        I_DescriptionPart newPart = t.duplicate();
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
         if (statusId != 0) {
@@ -490,7 +490,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateExtensionTuple(I_ThinExtByRefTuple t) {
-        I_ThinExtByRefPart newPart = t.duplicatePart();
+        I_ThinExtByRefPart newPart = t.duplicate();
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
         if (statusId != 0) {
@@ -552,7 +552,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateIdTuple(I_IdTuple t) {
-        I_IdPart newPart = t.duplicatePart();
+        I_IdPart newPart = t.duplicate();
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
         if (statusId != 0) {
@@ -620,7 +620,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateImageTuple(I_ImageTuple t) {
-        I_ImagePart newPart = t.duplicatePart();
+        I_ImagePart newPart = t.duplicate();
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
         if (statusId != 0) {
@@ -726,7 +726,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateRelationshipTuple(I_RelTuple t) {
-        I_RelPart newPart = t.duplicatePart();
+        I_RelPart newPart = t.duplicate();
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
         if (statusId != 0) {

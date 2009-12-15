@@ -207,7 +207,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
             I_RelPart latest = null;
             for (I_RelPart part : versionedRel.getVersions()) {
                 if (testSpecification(part.getCharacteristicId()) && testSpecification(part.getPathId())
-                    && testSpecification(part.getRefinabilityId()) && testSpecification(part.getRelTypeId())
+                    && testSpecification(part.getRefinabilityId()) && testSpecification(part.getTypeId())
                     && allowedStatuses.contains(part.getStatusId()) && referenceSetExport.checkPath(part.getPathId())) {
 
                     exportableVersionFound = true;

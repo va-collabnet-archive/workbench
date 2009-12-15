@@ -81,7 +81,7 @@ public class CompareComponents {
     public static boolean relationshipEqual(I_RelTuple tuple1, I_RelTuple tuple2) {
         if ((tuple1.getCharacteristicId() != tuple2.getCharacteristicId()) || (tuple1.getGroup() != tuple2.getGroup())
             || (tuple1.getRefinabilityId() != tuple2.getRefinabilityId())
-            || (tuple1.getRelTypeId() != tuple2.getRelTypeId()) || (tuple1.getStatusId() != tuple2.getStatusId())) {
+            || (tuple1.getTypeId() != tuple2.getTypeId()) || (tuple1.getStatusId() != tuple2.getStatusId())) {
             return false;
         }
         return true;

@@ -283,7 +283,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             I_RelPart latest = null;
             for (I_RelPart part : versionedRel.getVersions()) {
                 if (testSpecification(part.getCharacteristicId()) && testSpecification(part.getPathId())
-                    && testSpecification(part.getRefinabilityId()) && testSpecification(part.getRelTypeId())
+                    && testSpecification(part.getRefinabilityId()) && testSpecification(part.getTypeId())
                     && allowedStatuses.contains(part.getStatusId()) && checkPath(part.getPathId())) {
 
                     exportableVersionFound = true;
