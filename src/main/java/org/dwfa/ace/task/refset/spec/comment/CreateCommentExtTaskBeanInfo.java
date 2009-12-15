@@ -34,16 +34,22 @@ public class CreateCommentExtTaskBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
 
-        PropertyDescriptor commentsPropName;
         try {
-            commentsPropName = new PropertyDescriptor("commentsPropName", getBeanDescriptor().getBeanClass());
+        	PropertyDescriptor  refsetSpecUuidPropName = new PropertyDescriptor("refsetSpecUuidPropName", getBeanDescriptor().getBeanClass());
+
+        	refsetSpecUuidPropName.setBound(true);
+        	refsetSpecUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+        	refsetSpecUuidPropName.setDisplayName("<html><font color='green'>refset UUID prop name:");
+        	refsetSpecUuidPropName.setShortDescription("The property that contains the UUID for the refset.");
+
+            PropertyDescriptor commentsPropName = new PropertyDescriptor("commentsPropName", getBeanDescriptor().getBeanClass());
 
             commentsPropName.setBound(true);
             commentsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             commentsPropName.setDisplayName("<html><font color='green'>comments prop name:");
             commentsPropName.setShortDescription("The property that contains the text to be put into the comments ext.");
 
-            PropertyDescriptor rv[] = { commentsPropName };
+            PropertyDescriptor rv[] = { commentsPropName, refsetSpecUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

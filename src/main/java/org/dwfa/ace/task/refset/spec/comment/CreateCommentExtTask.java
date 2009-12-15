@@ -27,8 +27,10 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.RefsetHelper;
 import org.dwfa.ace.refset.spec.SpecRefsetHelper;
+import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.Condition;
@@ -92,38 +94,49 @@ public class CreateCommentExtTask extends AbstractTask {
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
             termFactory = LocalVersionedTerminology.get();
-            UUID refsetSpecUuid = (UUID) process.readProperty(refsetSpecUuidPropName);
-            I_GetConceptData refsetSpecConcept = termFactory.getConcept(refsetSpecUuid);
-            String comments = (String) process.readProperty(commentsPropName);
+            I_GetConceptData refsetSpecConcept = AceTaskUtil.getConceptFromProperty(process, refsetSpecUuidPropName);
+            String comments = (String) process.getProperty(commentsPropName);
             if (comments != null && !comments.trim().equals("")) {
+            	AceLog.getAppLog().info("Found comment to add: " + comments);
                 UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
                 if (refsetSpecConcept != null) {
                     RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept);
                     I_GetConceptData commentsRefset = refsetSpec.getCommentsRefsetConcept();
+                    I_GetConceptData memberRefset = refsetSpec.getMemberRefsetConcept();
                     if (commentsRefset == null) {
                     	// Try again, and assume the wrong thing was passed in...
                     	Set<? extends I_GetConceptData> commentRefsetSet  = RefsetHelper.getCommentsRefsetForRefset(refsetSpecConcept, LocalVersionedTerminology.get().getActiveAceFrameConfig());
                     	if (commentRefsetSet != null && commentRefsetSet.size() > 0) {
                     		commentsRefset = commentRefsetSet.iterator().next();
+                    		memberRefset = refsetSpecConcept;
+                    	} else {
+                        	AceLog.getAppLog().info("commentsRefset is null");
                     	}
                     }
-                    I_GetConceptData memberRefset = refsetSpec.getMemberRefsetConcept();
                     if (commentsRefset != null && memberRefset != null) {
                         SpecRefsetHelper specRefsetHelper = new SpecRefsetHelper();
                         for (I_Path path : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                            specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptId(),
+                            boolean added = specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptId(),
                                 memberRefset.getConceptId(), comments, UUID.randomUUID(), termFactory.getConcept(
                                     path.getConceptId()).getUids().iterator().next(), currentUuid, Integer.MAX_VALUE);
+                            if (added) {
+                            	AceLog.getAppLog().info("added comment: " + comments);
+                            } else {
+                            	AceLog.getAppLog().info("failed to add comment: " + comments);
+                            }
                         }
                     }
+                } else {
+                	AceLog.getAppLog().info("refsetSpecConcept is null for: " + process.getProperty(refsetSpecUuidPropName));
                 }
+            } else {
+            	AceLog.getAppLog().info("No comment to add: " + comments);
             }
 
             return Condition.CONTINUE;
         } catch (Exception e) {
-
+        	throw new TaskFailedException(e);
         }
-        return Condition.CONTINUE;
     }
 
     public int[] getDataContainerIds() {
