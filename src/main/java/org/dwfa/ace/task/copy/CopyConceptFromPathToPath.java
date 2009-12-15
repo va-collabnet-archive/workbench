@@ -135,7 +135,7 @@ public class CopyConceptFromPathToPath extends AbstractTask {
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (conceptStatus != null) {
-                newPart.setConceptStatus(conceptStatus.getConceptId());
+                newPart.setStatusId(conceptStatus.getConceptId());
             }
             t.getConVersioned().addVersion(newPart);
         }

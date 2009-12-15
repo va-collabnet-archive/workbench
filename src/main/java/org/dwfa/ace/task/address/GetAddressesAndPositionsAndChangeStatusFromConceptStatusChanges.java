@@ -121,7 +121,7 @@ public class GetAddressesAndPositionsAndChangeStatusFromConceptStatusChanges ext
                     tf.convertToThickVersion(t.getVersion())));
                 pathSet.add(t.getPathId());
                 I_ConceptAttributePart part = t.duplicatePart();
-                part.setConceptStatus(newStatus.getConceptId());
+                part.setStatusId(newStatus.getConceptId());
                 part.setVersion(Integer.MAX_VALUE);
                 t.getConVersioned().addVersion(part);
                 LocalVersionedTerminology.get().addUncommitted(concept);
