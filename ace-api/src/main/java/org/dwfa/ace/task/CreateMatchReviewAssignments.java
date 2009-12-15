@@ -16,31 +16,24 @@
  */
 package org.dwfa.ace.task;
 
-import java.beans.IntrospectionException;
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.bpa.process.I_RenderMessage;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.dwfa.util.io.FileIO;
 
 /**
  * Reads match review item from URL/File and attaches the components to the

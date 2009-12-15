@@ -16,6 +16,15 @@
  */
 package org.dwfa.ace.task.refset.members;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.task.refset.TaskLogger;
 import org.dwfa.bpa.process.Condition;
@@ -23,16 +32,8 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class WriteRefsetDescriptionsTest {
 

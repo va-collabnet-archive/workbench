@@ -16,19 +16,19 @@
  */
 package org.dwfa.ace.task.refset.members;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
-
-import java.io.IOException;
-import java.util.UUID;
-import java.util.Collection;
-import java.util.List;
 
 public interface RefsetUtil {
 

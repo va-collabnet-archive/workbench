@@ -16,16 +16,17 @@
  */
 package org.dwfa.ace.task.refset.members;
 
-import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.junit.Test;
 
 import java.beans.BeanDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
+
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
+import org.junit.Test;
 
 public final class WriteSingleRefsetDescriptionBeanInfoTest {
 

@@ -16,10 +16,10 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
-import org.dwfa.ace.task.util.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.dwfa.ace.task.util.Logger;
 
 public final class ProgressLoggerImpl implements ProgressLogger {
 

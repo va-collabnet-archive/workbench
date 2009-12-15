@@ -32,6 +32,8 @@
  */
 package org.dwfa.ace.task.commit.failureconstraintfactory;
 
+import org.dwfa.ace.task.commit.AbstractConceptTest;
+
 /**
  * This class represents and implementation of
  * {@link AlertToDataConstraintFailureAbstractFactory} that

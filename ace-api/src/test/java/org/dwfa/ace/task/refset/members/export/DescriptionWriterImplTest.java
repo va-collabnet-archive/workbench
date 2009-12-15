@@ -16,6 +16,9 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
+import java.io.Writer;
+import java.util.Arrays;
+
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -24,9 +27,6 @@ import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.Writer;
-import java.util.Arrays;
 
 public final class DescriptionWriterImplTest {
 

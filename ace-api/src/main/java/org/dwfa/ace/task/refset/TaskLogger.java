@@ -16,10 +16,10 @@
  */
 package org.dwfa.ace.task.refset;
 
-import org.dwfa.bpa.process.I_Work;
-import org.dwfa.ace.task.util.Logger;
-
 import java.util.logging.Level;
+
+import org.dwfa.ace.task.util.Logger;
+import org.dwfa.bpa.process.I_Work;
 
 public final class TaskLogger implements Logger {
 

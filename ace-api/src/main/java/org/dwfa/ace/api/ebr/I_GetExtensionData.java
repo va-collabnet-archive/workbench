@@ -16,10 +16,10 @@
  */
 package org.dwfa.ace.api.ebr;
 
+import java.io.IOException;
+
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.tapi.TerminologyException;
-
-import java.io.IOException;
 
 public interface I_GetExtensionData {
 

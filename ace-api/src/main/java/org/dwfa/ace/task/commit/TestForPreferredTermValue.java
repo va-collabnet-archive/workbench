@@ -32,12 +32,11 @@
  */
 package org.dwfa.ace.task.commit;
 
-import org.dwfa.ace.task.commit.validator.impl.NotEmptyConceptDataValidator;
-import org.dwfa.ace.task.commit.validator.GetConceptDataValidationStrategy;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -45,7 +44,9 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.commit.failureconstraintfactory.AlertToDataConstraintFailureFactory;
 import org.dwfa.ace.task.commit.failureconstraintfactory.SimpleConstraintFailureChooser;
 import org.dwfa.ace.task.commit.validator.ConceptDescriptionFacade;
+import org.dwfa.ace.task.commit.validator.GetConceptDataValidationStrategy;
 import org.dwfa.ace.task.commit.validator.ValidationException;
+import org.dwfa.ace.task.commit.validator.impl.NotEmptyConceptDataValidator;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;

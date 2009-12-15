@@ -33,6 +33,7 @@
 package org.dwfa.ace.task.commit.validator.impl;
 
 import java.util.List;
+
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;

@@ -16,10 +16,10 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
+import java.io.Writer;
+
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.task.util.Logger;
-
-import java.io.Writer;
 
 public final class NoDescriptionWriterImpl implements NoDescriptionWriter {
 

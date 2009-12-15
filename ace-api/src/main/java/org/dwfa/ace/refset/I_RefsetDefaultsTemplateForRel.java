@@ -18,7 +18,6 @@ package org.dwfa.ace.refset;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.refset.I_RefsetDefaults;
 
 public interface I_RefsetDefaultsTemplateForRel extends I_RefsetDefaults {
 

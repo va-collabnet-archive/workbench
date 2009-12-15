@@ -16,12 +16,12 @@
  */
 package org.dwfa.ace.task.refset.members;
 
-import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
-
 import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
+
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public final class WriteRefsetDescriptionsBeanInfo extends SimpleBeanInfo {
 

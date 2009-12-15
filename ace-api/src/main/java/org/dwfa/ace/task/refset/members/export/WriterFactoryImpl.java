@@ -16,16 +16,16 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.task.refset.members.RefsetUtil;
-import org.dwfa.ace.task.util.Logger;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.task.refset.members.RefsetUtil;
+import org.dwfa.ace.task.util.Logger;
 
 // TODO:This has to be integration tested.
 public final class WriterFactoryImpl implements WriterFactory {

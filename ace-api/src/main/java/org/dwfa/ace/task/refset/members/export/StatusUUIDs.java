@@ -16,10 +16,10 @@
  */
 package org.dwfa.ace.task.refset.members.export;
 
-import org.dwfa.cement.ArchitectonicAuxiliary;
-
-import java.util.UUID;
 import java.util.Collection;
+import java.util.UUID;
+
+import org.dwfa.cement.ArchitectonicAuxiliary;
 
 public interface StatusUUIDs {
 
