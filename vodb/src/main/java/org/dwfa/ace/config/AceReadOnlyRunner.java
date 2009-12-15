@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.URL;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
@@ -35,7 +34,6 @@ import net.jini.config.ConfigurationProvider;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.jini.JiniManager;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.VodbEnv;

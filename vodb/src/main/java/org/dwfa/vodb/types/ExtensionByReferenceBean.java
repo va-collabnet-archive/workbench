@@ -16,18 +16,6 @@
  */
 package org.dwfa.vodb.types;
 
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.api.ebr.I_GetExtensionData;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.config.AceConfig;
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
-import org.dwfa.tapi.TerminologyException;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -42,6 +30,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
+
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.api.ebr.I_GetExtensionData;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
+import org.dwfa.tapi.TerminologyException;
 
 public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData {
 

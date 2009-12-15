@@ -21,8 +21,6 @@ import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
-import javax.swing.plaf.basic.BasicHTML;
-import javax.swing.text.View;
 
 import org.dwfa.ace.table.AceTableRenderer;
 

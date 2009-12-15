@@ -38,7 +38,6 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
-import org.dwfa.ace.gui.concept.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.JTableWithDragImage;

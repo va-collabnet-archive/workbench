@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.table.AceTableRenderer;
 

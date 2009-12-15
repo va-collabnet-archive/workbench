@@ -18,10 +18,8 @@ package org.dwfa.ace;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -39,9 +37,7 @@ import org.dwfa.bpa.gui.ProcessBuilderPanel;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.util.FrameWithOpenFramesListener;
-import org.dwfa.bpa.util.SwingWorker;
 import org.dwfa.bpa.worker.MasterWorker;
-import org.dwfa.queue.ObjectServerCore;
 
 public class ProcessBuilderContainer extends JPanel implements I_HandleDoubleClickInTaskProcess {
 

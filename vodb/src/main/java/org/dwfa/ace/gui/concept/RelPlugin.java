@@ -27,7 +27,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
