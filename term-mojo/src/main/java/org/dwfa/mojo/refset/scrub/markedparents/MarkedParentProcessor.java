@@ -16,6 +16,9 @@
  */
 package org.dwfa.mojo.refset.scrub.markedparents;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -23,9 +26,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.util.CandidateWriter;
 import org.dwfa.mojo.refset.scrub.util.TerminologyFactoryUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Puts "marked parents" and "normal members" into logical structures that can

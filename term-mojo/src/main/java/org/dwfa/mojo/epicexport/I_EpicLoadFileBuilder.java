@@ -16,12 +16,8 @@
  */
 package org.dwfa.mojo.epicexport;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.mojo.epicexport.AbstractEpicExportBuilder.EpicItem;
-import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 
 public interface I_EpicLoadFileBuilder {
 

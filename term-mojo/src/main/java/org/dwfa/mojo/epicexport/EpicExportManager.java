@@ -16,16 +16,11 @@
  */
 package org.dwfa.mojo.epicexport;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
-
-import com.mysql.jdbc.Connection;
 
 /**
  * Class used to manage a list of export writers, and export builders. Used to

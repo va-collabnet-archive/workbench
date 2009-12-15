@@ -16,6 +16,10 @@
  */
 package org.dwfa.mojo.memrefset.mojo;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -24,10 +28,6 @@ import org.dwfa.mojo.relformat.mojo.sql.io.FileLister;
 import org.dwfa.mojo.relformat.mojo.sql.io.FileListerImpl;
 import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtil;
 import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtilImpl;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * This plugin exports ddl statements (Schema) from a release format config

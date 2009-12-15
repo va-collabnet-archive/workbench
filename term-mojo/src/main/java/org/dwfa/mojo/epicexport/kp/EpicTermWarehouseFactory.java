@@ -16,13 +16,10 @@
  */
 package org.dwfa.mojo.epicexport.kp;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.dwfa.mojo.epicexport.EpicExportManager;
-import org.dwfa.mojo.epicexport.EpicExportWriter;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 import org.dwfa.mojo.epicexport.I_ExportFactory;

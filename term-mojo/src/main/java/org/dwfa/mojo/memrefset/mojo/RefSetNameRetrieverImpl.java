@@ -16,16 +16,16 @@
  */
 package org.dwfa.mojo.memrefset.mojo;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import static org.dwfa.cement.ArchitectonicAuxiliary.Concept;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 
 public final class RefSetNameRetrieverImpl implements RefSetNameRetriever {
 

@@ -16,18 +16,19 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
+import java.util.List;
+
 import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 import org.dwfa.mojo.relformat.mojo.sql.parser.TableColumn;
 import org.dwfa.mojo.relformat.mojo.sql.parser.TableSchemaParser;
 import org.dwfa.mojo.relformat.mojo.sql.parser.TableSchemaParserImpl;
 import org.dwfa.mojo.relformat.util.StringArrayCleaner;
 import org.dwfa.mojo.relformat.util.StringArrayCleanerImpl;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
 
 public final class TableSchemaParserTest {
 

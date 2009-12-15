@@ -16,6 +16,9 @@
  */
 package org.dwfa.mojo.refset.scrub;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -23,9 +26,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * This implementation will take each candidate concept extensions and ensure

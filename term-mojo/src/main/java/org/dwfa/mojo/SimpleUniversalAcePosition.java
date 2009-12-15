@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class SimpleUniversalAcePosition {

@@ -16,10 +16,10 @@
  */
 package org.dwfa.mojo;
 
+import java.io.File;
+
 import org.apache.maven.plugin.logging.Log;
 import org.dwfa.maven.MojoUtil;
-
-import java.io.File;
 
 /**
  * Default implementation of <code>MojoUtilWrapper</code> which degelates to

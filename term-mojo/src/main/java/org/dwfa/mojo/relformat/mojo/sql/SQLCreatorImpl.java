@@ -16,10 +16,10 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql;
 
+import java.util.List;
+
 import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 import org.dwfa.mojo.relformat.mojo.sql.parser.TableColumn;
-
-import java.util.List;
 
 public final class SQLCreatorImpl implements SQLCreator {
 

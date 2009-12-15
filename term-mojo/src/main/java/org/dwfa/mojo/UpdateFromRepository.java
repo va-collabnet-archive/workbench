@@ -16,28 +16,25 @@
  */
 package org.dwfa.mojo;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
-
-import java.net.MalformedURLException;
-import java.net.URLConnection;
-import java.net.URL;
-import java.net.PasswordAuthentication;
 import java.net.Authenticator;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.HashMap;
-import java.util.Iterator;
-
 import org.dwfa.util.io.FileIO;
 import org.dwfa.util.io.JarExtractor;
 

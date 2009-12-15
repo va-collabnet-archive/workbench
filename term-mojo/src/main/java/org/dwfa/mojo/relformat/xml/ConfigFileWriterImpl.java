@@ -16,15 +16,15 @@
  */
 package org.dwfa.mojo.relformat.xml;
 
-import org.apache.maven.plugin.logging.Log;
-import org.dwfa.mojo.relformat.exception.ExportDDLMojoException;
-import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtil;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+
+import org.apache.maven.plugin.logging.Log;
+import org.dwfa.mojo.relformat.exception.ExportDDLMojoException;
+import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtil;
 
 public final class ConfigFileWriterImpl implements ConfigFileWriter {
 

@@ -16,13 +16,13 @@
  */
 package org.dwfa.mojo.relformat.mojo.sql;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 import org.dwfa.mojo.relformat.mojo.sql.parser.TableSchemaParser;
 import org.dwfa.mojo.relformat.xml.ReleaseConfig;
 import org.dwfa.mojo.relformat.xml.ReleaseFormat;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public final class TableCacheImpl implements TableCache {
 

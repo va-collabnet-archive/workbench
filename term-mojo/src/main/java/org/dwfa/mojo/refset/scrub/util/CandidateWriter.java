@@ -16,16 +16,16 @@
  */
 package org.dwfa.mojo.refset.scrub.util;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TreeMap;
+
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.I_TermFactory;
-
-import java.util.TreeMap;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.io.PrintWriter;
-import java.io.FileNotFoundException;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 
 public final class CandidateWriter {
 

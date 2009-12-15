@@ -16,12 +16,13 @@
  */
 package org.dwfa.mojo.memrefset.mojo;
 
-import com.thoughtworks.xstream.XStream;
-import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtilImpl;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Reader;
+
+import org.dwfa.mojo.relformat.mojo.sql.io.util.FileUtilImpl;
+
+import com.thoughtworks.xstream.XStream;
 
 public final class CmrscsXMLReaderImpl implements CmrscsXMLReader {
 

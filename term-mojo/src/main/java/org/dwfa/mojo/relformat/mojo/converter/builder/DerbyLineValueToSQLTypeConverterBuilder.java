@@ -16,16 +16,17 @@
  */
 package org.dwfa.mojo.relformat.mojo.converter.builder;
 
-import org.dwfa.mojo.relformat.mojo.converter.DerbyStringConverter;
-import org.dwfa.mojo.relformat.mojo.sql.converter.GenericSQLTypeConverter;
-import org.dwfa.mojo.relformat.mojo.sql.converter.LineValueToSQLTypeConverter;
 import static org.dwfa.mojo.relformat.mojo.sql.converter.LineValueToSQLTypeConverter.DEFAULT_CONVERTER;
-import org.dwfa.mojo.relformat.mojo.sql.converter.LineValueToSQLTypeConverterImpl;
-import org.dwfa.mojo.relformat.mojo.sql.converter.SQLTimeStampConverterImpl;
-import org.dwfa.mojo.relformat.mojo.sql.converter.SQLTypeConverter;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.dwfa.mojo.relformat.mojo.converter.DerbyStringConverter;
+import org.dwfa.mojo.relformat.mojo.sql.converter.GenericSQLTypeConverter;
+import org.dwfa.mojo.relformat.mojo.sql.converter.LineValueToSQLTypeConverter;
+import org.dwfa.mojo.relformat.mojo.sql.converter.LineValueToSQLTypeConverterImpl;
+import org.dwfa.mojo.relformat.mojo.sql.converter.SQLTimeStampConverterImpl;
+import org.dwfa.mojo.relformat.mojo.sql.converter.SQLTypeConverter;
 
 public final class DerbyLineValueToSQLTypeConverterBuilder {
 

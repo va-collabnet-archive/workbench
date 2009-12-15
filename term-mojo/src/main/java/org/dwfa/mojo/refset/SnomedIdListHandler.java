@@ -18,15 +18,17 @@ package org.dwfa.mojo.refset;
 
 import java.util.UUID;
 
-import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.file.ConceptListReader;
 import org.dwfa.ace.file.IterableFileReader;
+import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.mojo.ConceptDescriptor;
 
 /**
  * Processes a tab delimited file containing a snomed concept id in the first
