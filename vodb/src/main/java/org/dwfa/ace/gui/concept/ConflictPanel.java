@@ -642,7 +642,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
             } else {
                 // already there with active status...
                 I_ConceptAttributeTuple attrTuple = attributesForResolution.get(attributes.getConId());
-                I_ConceptAttributePart possiblePart = attrTuple.duplicatePart();
+                I_ConceptAttributePart possiblePart = attrTuple.duplicate();
                 I_IntSet allowedStatus = null;
                 ArrayList<I_ConceptAttributeTuple> currentParts = new ArrayList<I_ConceptAttributeTuple>();
                 attributes.addTuples(allowedStatus, positions, currentParts);
@@ -690,7 +690,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 
     private void addAttrPart(HashMap<Integer, I_ConceptAttributeTuple> attrsForResolution, I_Path editPath,
             I_ConceptAttributeVersioned attr) {
-        I_ConceptAttributePart newPart = attrsForResolution.get(attr.getConId()).duplicatePart();
+        I_ConceptAttributePart newPart = attrsForResolution.get(attr.getConId()).duplicate();
         newPart.setVersion(Integer.MAX_VALUE);
         newPart.setPathId(editPath.getConceptId());
         newPart.setStatusId(config.getDefaultStatus().getConceptId());
