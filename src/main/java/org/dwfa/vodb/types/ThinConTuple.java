@@ -196,7 +196,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
     }
 
     public int getFixedPartId() {
-        return core.getTermComponentId();
+        return core.getNid();
     }
 
 	public long getTime() {

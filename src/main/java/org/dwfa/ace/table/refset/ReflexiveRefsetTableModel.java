@@ -267,7 +267,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             getProgress().getProgressBar().setIndeterminate(true);
         }
         if (host.getTermComponent() != null) {
-            this.tableComponentId = host.getTermComponent().getTermComponentId();
+            this.tableComponentId = host.getTermComponent().getNid();
         }
         fireTableDataChanged();
     }

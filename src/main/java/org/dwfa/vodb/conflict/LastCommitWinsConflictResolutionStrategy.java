@@ -75,13 +75,13 @@ public class LastCommitWinsConflictResolutionStrategy extends ConflictManagement
         for (T t : originalTuples) {
             I_AmTermComponent fixedPart = t.getFixedPart();
             List<T> tuples;
-            if (map.containsKey(fixedPart.getTermComponentId())) {
-                tuples = map.get(fixedPart.getTermComponentId());
+            if (map.containsKey(fixedPart.getNid())) {
+                tuples = map.get(fixedPart.getNid());
             } else {
                 tuples = new ArrayList<T>();
             }
             tuples.add(t);
-            map.put(fixedPart.getTermComponentId(), tuples);
+            map.put(fixedPart.getNid(), tuples);
         }
 
         for (List<T> list : map.values()) {
