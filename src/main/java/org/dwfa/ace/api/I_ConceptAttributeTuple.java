@@ -28,12 +28,6 @@ public interface I_ConceptAttributeTuple extends I_AmTuple {
 
     public abstract I_ConceptAttributeVersioned getConVersioned();
 
-    /**
-     * @deprecated Use {@link #duplicate()}
-     */
-    @Deprecated
-    public abstract I_ConceptAttributePart duplicatePart();
-
     public I_ConceptAttributePart duplicate();
 
     public abstract I_ConceptAttributePart getPart();

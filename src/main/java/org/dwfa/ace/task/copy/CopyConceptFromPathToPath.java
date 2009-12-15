@@ -131,7 +131,7 @@ public class CopyConceptFromPathToPath extends AbstractTask {
             TerminologyException {
         copyId(toPath, concept.getId(), copyStatus);
         for (I_ConceptAttributeTuple t : concept.getConceptAttributeTuples(null, fromSet)) {
-            I_ConceptAttributePart newPart = t.duplicatePart();
+            I_ConceptAttributePart newPart = t.duplicate();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (conceptStatus != null) {

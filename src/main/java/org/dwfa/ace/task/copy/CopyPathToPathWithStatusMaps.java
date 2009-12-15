@@ -152,7 +152,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
             Map<Integer, Integer> elementStatusNidMap) throws IOException, TerminologyException {
         copyId(toPath, concept.getId(), elementStatusNidMap);
         for (I_ConceptAttributeTuple t : concept.getConceptAttributeTuples(null, fromSet)) {
-            I_ConceptAttributePart newPart = t.duplicatePart();
+            I_ConceptAttributePart newPart = t.duplicate();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (conceptStatusNidMap != null) {
