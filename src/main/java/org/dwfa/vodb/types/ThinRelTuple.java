@@ -107,11 +107,11 @@ public class ThinRelTuple implements I_RelTuple {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_RelTuple#getRelTypeId()
+     * @see org.dwfa.vodb.types.I_RelTuple#getTypeId()
      */
     @Deprecated
-    public int getRelTypeId() {
-        return part.getRelTypeId();
+    public int getTypeId() {
+        return part.getTypeId();
     }
 
     /*
@@ -135,11 +135,11 @@ public class ThinRelTuple implements I_RelTuple {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_RelTuple#setRelTypeId(java.lang.Integer)
+     * @see org.dwfa.vodb.types.I_RelTuple#setTypeId(java.lang.Integer)
      */
     @Deprecated
-    public void setRelTypeId(Integer typeId) {
-        part.setRelTypeId(typeId);
+    public void setTypeId(Integer typeId) {
+        part.setTypeId(typeId);
 
     }
 
@@ -187,10 +187,10 @@ public class ThinRelTuple implements I_RelTuple {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_RelTuple#duplicatePart()
+     * @see org.dwfa.vodb.types.I_RelTuple#duplicate()
      */
     @Deprecated
-    public I_RelPart duplicatePart() {
+    public I_RelPart duplicate() {
         return part.duplicate();
     }
 
@@ -256,20 +256,12 @@ public class ThinRelTuple implements I_RelTuple {
         part.setVersion(version);
     }
 
-    public int getTypeId() {
-        return part.getTypeId();
-    }
-
     public void setTypeId(int type) {
         part.setTypeId(type);
     }
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
         // TODO
-    }
-
-    public I_RelPart duplicate() {
-        return duplicatePart();
     }
 
     public int getFixedPartId() {

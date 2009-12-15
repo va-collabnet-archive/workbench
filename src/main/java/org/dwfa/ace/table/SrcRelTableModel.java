@@ -92,7 +92,7 @@ public class SrcRelTableModel extends RelTableModel {
          * relPart.setGroup(0);
          * relPart.setPathId(pathId);
          * relPart.setRefinabilityId(refinabilityId);
-         * relPart.setRelTypeId(relTypeId);
+         * relPart.setTypeId(relTypeId);
          * relPart.setStatusId(statusId);
          * relPart.setVersion(version);
          * rel.addVersion(relPart);

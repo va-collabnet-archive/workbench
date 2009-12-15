@@ -155,10 +155,10 @@ public class ThinIdTuple implements I_IdTuple {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_IdTuple#duplicatePart()
+     * @see org.dwfa.vodb.types.I_IdTuple#duplicate()
      */
     @Deprecated
-    public I_IdPart duplicatePart() {
+    public I_IdPart duplicate() {
         ThinIdPart newPart = new ThinIdPart();
         newPart.setPathId(getPathId());
         newPart.setVersion(getVersion());
@@ -190,10 +190,6 @@ public class ThinIdTuple implements I_IdTuple {
 
     public I_AmTermComponent getFixedPart() {
         return core;
-    }
-
-    public I_IdPart duplicate() {
-        return duplicatePart();
     }
 
     public int getFixedPartId() {

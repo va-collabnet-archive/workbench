@@ -121,7 +121,7 @@ public class ThinImageTuple implements I_ImageTuple {
     }
 
     @Deprecated
-    public I_ImagePart duplicatePart() {
+    public I_ImagePart duplicate() {
         return new ThinImagePart(this.part);
     }
 
@@ -147,10 +147,6 @@ public class ThinImageTuple implements I_ImageTuple {
 
     public I_AmTermComponent getFixedPart() {
         return core;
-    }
-
-    public I_ImagePart duplicate() {
-        return duplicatePart();
     }
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap) {

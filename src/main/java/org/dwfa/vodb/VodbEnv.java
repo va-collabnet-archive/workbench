@@ -1462,7 +1462,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         part.setGroup(relGroup);
         part.setPathId(pathNid);
         part.setRefinabilityId(relRefinabilityNid);
-        part.setRelTypeId(relTypeNid);
+        part.setTypeId(relTypeNid);
         part.setStatusId(relStatusNid);
         part.setVersion(version);
         rel.addVersion(part);

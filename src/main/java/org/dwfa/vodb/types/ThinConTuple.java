@@ -142,16 +142,6 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
         return core;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#duplicatePart()
-     */
-    @Deprecated
-    public I_ConceptAttributePart duplicatePart() {
-        return part.duplicate();
-    }
-
     @Override
     public boolean equals(Object obj) {
         ThinConTuple another = (ThinConTuple) obj;

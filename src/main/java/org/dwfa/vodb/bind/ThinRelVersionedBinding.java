@@ -41,7 +41,7 @@ public class ThinRelVersionedBinding extends TupleBinding {
             rel.setCharacteristicId(ti.readInt());
             rel.setGroup(ti.readInt());
             rel.setRefinabilityId(ti.readInt());
-            rel.setRelTypeId(ti.readInt());
+            rel.setTypeId(ti.readInt());
             versioned.addVersionNoRedundancyCheck(rel);
         }
         return versioned;
@@ -60,7 +60,7 @@ public class ThinRelVersionedBinding extends TupleBinding {
             to.writeInt(rel.getCharacteristicId());
             to.writeInt(rel.getGroup());
             to.writeInt(rel.getRefinabilityId());
-            to.writeInt(rel.getRelTypeId());
+            to.writeInt(rel.getTypeId());
         }
     }
 }

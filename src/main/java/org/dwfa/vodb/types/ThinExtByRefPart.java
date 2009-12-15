@@ -157,7 +157,7 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
     }
 
     @Deprecated
-    public I_ThinExtByRefPart duplicatePart() {
+    public I_ThinExtByRefPart duplicate() {
         return duplicate();
     }
 

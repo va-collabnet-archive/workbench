@@ -189,16 +189,6 @@ public class ThinDescTuple implements I_DescriptionTuple {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_DescriptionTuple#duplicatePart()
-     */
-    @Deprecated
-    public I_DescriptionPart duplicatePart() {
-        return part.duplicate();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getDescVersioned()
      */
     public I_DescriptionVersioned getDescVersioned() {
@@ -228,7 +218,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
     }
 
     public I_DescriptionPart duplicate() {
-        return duplicatePart();
+        return duplicate();
     }
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap) {

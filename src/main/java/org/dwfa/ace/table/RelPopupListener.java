@@ -123,7 +123,7 @@ public class RelPopupListener extends MouseAdapter {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_RelPart newPart = selectedObject.getTuple().getPart();
                     if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
-                        newPart = selectedObject.getTuple().duplicatePart();
+                        newPart = selectedObject.getTuple().duplicate();
                         srcRel.addVersion(newPart);
                     }
                     newPart.setPathId(p.getConceptId());

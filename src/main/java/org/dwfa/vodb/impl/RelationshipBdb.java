@@ -265,7 +265,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
                     mySecCursor.close();
                     return true;
                 }
-                if (srcRelTypeIds.contains(relFromConceptId.getVersions().get(0).getRelTypeId())) {
+                if (srcRelTypeIds.contains(relFromConceptId.getVersions().get(0).getTypeId())) {
                     mySecCursor.close();
                     return true;
                 }
@@ -423,7 +423,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
                     mySecCursor.close();
                     return true;
                 }
-                if (destRelTypeIds.contains(relFromConceptId.getVersions().get(0).getRelTypeId())) {
+                if (destRelTypeIds.contains(relFromConceptId.getVersions().get(0).getTypeId())) {
                     mySecCursor.close();
                     return true;
                 }

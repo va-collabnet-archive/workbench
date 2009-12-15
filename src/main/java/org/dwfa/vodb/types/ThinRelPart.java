@@ -133,20 +133,20 @@ public class ThinRelPart implements I_RelPart {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_RelPart#getRelTypeId()
+     * @see org.dwfa.vodb.types.I_RelPart#getTypeId()
      */
     @Deprecated
-    public int getRelTypeId() {
+    public int getTypeId() {
         return relTypeId;
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_RelPart#setRelTypeId(int)
+     * @see org.dwfa.vodb.types.I_RelPart#setTypeId(int)
      */
     @Deprecated
-    public void setRelTypeId(int relTypeId) {
+    public void setTypeId(int relTypeId) {
         this.relTypeId = relTypeId;
     }
 
@@ -260,18 +260,10 @@ public class ThinRelPart implements I_RelPart {
         part.setGroup(group);
         part.setPathId(pathId);
         part.setRefinabilityId(refinabilityId);
-        part.setRelTypeId(relTypeId);
+        part.setTypeId(relTypeId);
         part.setStatusId(statusId);
         part.setVersion(version);
         return part;
-    }
-
-    public int getTypeId() {
-        return getRelTypeId();
-    }
-
-    public void setTypeId(int type) {
-        setRelTypeId(type);
     }
 
     public int getPositionId() {
