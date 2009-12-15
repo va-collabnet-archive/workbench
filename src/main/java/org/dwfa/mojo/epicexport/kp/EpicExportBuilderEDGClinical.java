@@ -56,10 +56,8 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 				this.setWriter(writer);
 				writer.newRecord();
 				writeLiteralItem("1", "");
-				writeItem("2");
-				//writeItem("35");
-				writeLiteralItem("35", this.getParentUUID());
-				writeItem("40");
+				writeItems("2", "35", "40");
+				// writeLiteralItem("35x", this.getParentUUID());
 				if (this.itemIsPopulated("2000"))
 					writeItem("2000");
 				else if (this.itemIsPopulated("200"))
@@ -67,13 +65,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 				/* else
 					throw new Exception("Missing both items 200 and 2000");
 					*/
-				writeItemIfChanged("100");
-				writeItemIfChanged("207");
-				writeItemIfChanged("50");
-				writeItemIfChanged("80");
-				writeItemIfChanged("91");
-				writeItemIfChanged("7000");
-				writeItemIfChanged("7010");
+				writeItemsIfChanged("50", "80", "91", "100", "207", "7000", "7010");
 				writer.saveRecord();
 			}
 			else {
@@ -86,6 +78,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					writeItem("2");
 					writeLiteralItem("20", "L");
 					writeItem("40");
+					// writeLiteralItem("35x", this.getParentUUID());
 					writeItem("35");
 					writeItemIfChanged("100");
 					if (this.itemIsPopulated("2000"))
@@ -110,6 +103,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 						writeItem("2000");
 					else if (this.itemIsPopulated("200"))
 						writeItem("200");
+					// writeLiteralItem("35x", this.getParentUUID());
 					writeItem("35");
 					writeItem("40");
 					writeItemIfChanged("100");
