@@ -194,7 +194,7 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
             matchRelationshipTuples.addAll(match.matchRelationshipTuples);
 
             for (I_ConceptAttributeTuple tuple : matchConceptAttributeTuples) {
-                I_ConceptAttributePart newPartOnNewPath = tuple.duplicatePart();
+                I_ConceptAttributePart newPartOnNewPath = tuple.duplicate();
 
                 if ((rejectedStatus == null || (rejectedStatus != null && !rejectedStatusIds.contains(newPartOnNewPath.getStatusId())))
                     && (acceptedStatus == null || (acceptedStatus != null && acceptedStatusIds.contains(newPartOnNewPath.getStatusId())))) {
@@ -204,7 +204,7 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
                     newPartOnNewPath.setStatusId(updatedStatusOnNewPathId);
                     tuple.getConVersioned().addVersion(newPartOnNewPath);
                     for (I_GetConceptData cd : totalBranches) {
-                        I_ConceptAttributePart newPart = tuple.duplicatePart();
+                        I_ConceptAttributePart newPart = tuple.duplicate();
                         newPart.setVersion(Integer.MAX_VALUE);
                         newPart.setPathId(cd.getConceptId());
                         newPart.setStatusId(updatedStatusId);
