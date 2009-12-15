@@ -186,9 +186,9 @@ public class ClassifyCurrent extends AbstractTask {
                 if (definingCharacteristic == lastTuple.getCharacteristicId()
                     || statedCharacteristic == lastTuple.getCharacteristicId()) {
                     if (lastTuple.getStatusId() == currentStatus || lastTuple.getStatusId() == limitedStatus) {
-                        logger.info("Add relationship: " + lastTuple.getC1Id() + " " + lastTuple.getRelTypeId() + " "
+                        logger.info("Add relationship: " + lastTuple.getC1Id() + " " + lastTuple.getTypeId() + " "
                             + lastTuple.getC2Id());
-                        rocket.addRelationship(lastTuple.getC1Id(), lastTuple.getRelTypeId(), lastTuple.getC2Id(),
+                        rocket.addRelationship(lastTuple.getC1Id(), lastTuple.getTypeId(), lastTuple.getC2Id(),
                             lastTuple.getGroup());
                     }
 

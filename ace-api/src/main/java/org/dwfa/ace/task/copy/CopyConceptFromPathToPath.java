@@ -143,7 +143,7 @@ public class CopyConceptFromPathToPath extends AbstractTask {
 
         for (I_DescriptionTuple t : concept.getDescriptionTuples(null, null, fromSet)) {
             idsToCopy.add(t.getDescId());
-            I_DescriptionPart newPart = t.duplicatePart();
+            I_DescriptionPart newPart = t.duplicate();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (copyStatus != null) {
@@ -153,7 +153,7 @@ public class CopyConceptFromPathToPath extends AbstractTask {
         }
         for (I_RelTuple t : concept.getSourceRelTuples(null, null, fromSet, false)) {
             idsToCopy.add(t.getRelId());
-            I_RelPart newPart = t.duplicatePart();
+            I_RelPart newPart = t.duplicate();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (copyStatus != null) {
@@ -163,7 +163,7 @@ public class CopyConceptFromPathToPath extends AbstractTask {
         }
         for (I_ImageTuple t : concept.getImageTuples(null, null, fromSet)) {
             idsToCopy.add(t.getImageId());
-            I_ImagePart newPart = t.duplicatePart();
+            I_ImagePart newPart = t.duplicate();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (copyStatus != null) {

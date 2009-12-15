@@ -226,7 +226,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                 I_DescriptionPart newLastPart = newDesc.getLastTuple().getPart();
                                 for (I_Path path : paths) {
                                     // retire the existing description
-                                    I_DescriptionPart newRetiredPart = description.duplicatePart();
+                                    I_DescriptionPart newRetiredPart = description.duplicate();
                                     newRetiredPart.setPathId(path.getConceptId());
                                     newRetiredPart.setVersion(Integer.MAX_VALUE);
                                     if (retireAsStatus != -1) {

@@ -207,7 +207,7 @@ public class FasterLoad extends AbstractTask {
         boolean ok(I_RelTuple relTuple) {
             return definingCharacteristic == relTuple.getCharacteristicId()
                 && activeStatus.contains(relTuple.getStatusId()) && ok(relTuple.getC1Id()) && ok(relTuple.getC2Id())
-                && ok(relTuple.getRelTypeId());
+                && ok(relTuple.getTypeId());
         }
 
         /**
@@ -289,7 +289,7 @@ public class FasterLoad extends AbstractTask {
             // check if defining and active
             if (filter.ok(relTuple)) {
                 final int cId1 = relTuple.getC1Id();
-                final int relTypeId = relTuple.getRelTypeId();
+                final int relTypeId = relTuple.getTypeId();
                 final int cId2 = relTuple.getC2Id();
                 final int group = relTuple.getGroup();
 

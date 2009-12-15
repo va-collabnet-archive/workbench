@@ -34,12 +34,6 @@ public interface I_DescriptionTuple extends I_AmTypedTuple {
 
     public abstract void setText(String text);
 
-    /**
-     * @deprecated Use {@link #duplicate()}
-     */
-    @Deprecated
-    public abstract I_DescriptionPart duplicatePart();
-
     public I_DescriptionPart duplicate();
 
     public abstract I_DescriptionPart getPart();

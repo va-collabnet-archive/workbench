@@ -177,8 +177,8 @@ public class ClassifySelected extends AbstractTask {
                 for (I_RelTuple relTuple : relTuples) {
                     if (definingCharacteristic == relTuple.getCharacteristicId()) {
                         worker.getLogger().info(
-                            "Add relationship: " + relTuple.getRelTypeId() + " " + relTuple.getC2Id());
-                        rocket.addRelationship(relTuple.getC1Id(), relTuple.getRelTypeId(), relTuple.getC2Id(),
+                            "Add relationship: " + relTuple.getTypeId() + " " + relTuple.getC2Id());
+                        rocket.addRelationship(relTuple.getC1Id(), relTuple.getTypeId(), relTuple.getC2Id(),
                             relTuple.getGroup());
                     }
                 }

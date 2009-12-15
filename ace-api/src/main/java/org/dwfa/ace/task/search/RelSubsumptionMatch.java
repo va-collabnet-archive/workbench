@@ -111,7 +111,7 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
                 frameConfig.getViewPositionSetReadOnly(), false);
 
             for (I_RelTuple tuple : tuples) {
-                I_GetConceptData relType = LocalVersionedTerminology.get().getConcept(tuple.getRelTypeId());
+                I_GetConceptData relType = LocalVersionedTerminology.get().getConcept(tuple.getTypeId());
                 I_GetConceptData relRestriction = LocalVersionedTerminology.get().getConcept(tuple.getC2Id());
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine(

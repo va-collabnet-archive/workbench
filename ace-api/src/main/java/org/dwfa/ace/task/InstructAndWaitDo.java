@@ -284,7 +284,7 @@ public class InstructAndWaitDo extends AbstractTask {
                 PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
                 for (I_RelTuple rel : con.getSourceRelTuples(config.getAllowedStatus(), null, clonePositions, false)) {
                     termFactory.newRelationship(UUID.randomUUID(), newConcept,
-                        termFactory.getConcept(rel.getRelTypeId()), termFactory.getConcept(rel.getC2Id()),
+                        termFactory.getConcept(rel.getTypeId()), termFactory.getConcept(rel.getC2Id()),
                         termFactory.getConcept(rel.getCharacteristicId()),
                         termFactory.getConcept(rel.getRefinabilityId()), termFactory.getConcept(rel.getStatusId()),
                         rel.getGroup(), config);

@@ -172,7 +172,7 @@ public class TermLabelMaker {
     public static I_ImplementActiveLabel newLabel(I_RelTuple rel, boolean showLongForm, boolean showStatus)
             throws IOException {
         try {
-            I_GetConceptData typeBean = LocalVersionedTerminology.get().getConcept(rel.getRelTypeId());
+            I_GetConceptData typeBean = LocalVersionedTerminology.get().getConcept(rel.getTypeId());
             I_GetConceptData destBean = LocalVersionedTerminology.get().getConcept(rel.getC2Id());
             I_GetConceptData refinabilityBean = LocalVersionedTerminology.get().getConcept(rel.getRefinabilityId());
             I_GetConceptData characteristicBean = LocalVersionedTerminology.get().getConcept(rel.getCharacteristicId());

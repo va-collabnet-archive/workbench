@@ -166,7 +166,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
 
         for (I_DescriptionTuple t : concept.getDescriptionTuples(null, null, fromSet)) {
             idsToCopy.add(t.getDescId());
-            I_DescriptionPart newPart = t.duplicatePart();
+            I_DescriptionPart newPart = t.duplicate();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (elementStatusNidMap != null) {
@@ -178,7 +178,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
         }
         for (I_RelTuple t : concept.getSourceRelTuples(null, null, fromSet, false)) {
             idsToCopy.add(t.getRelId());
-            I_RelPart newPart = t.duplicatePart();
+            I_RelPart newPart = t.duplicate();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (elementStatusNidMap != null) {
@@ -190,7 +190,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
         }
         for (I_ImageTuple t : concept.getImageTuples(null, null, fromSet)) {
             idsToCopy.add(t.getImageId());
-            I_ImagePart newPart = t.duplicatePart();
+            I_ImagePart newPart = t.duplicate();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (elementStatusNidMap != null) {
@@ -207,7 +207,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
 
     public static void copyId(I_Path toPath, I_IdVersioned id, Map<Integer, Integer> statusMap) {
         for (I_IdTuple t : id.getTuples()) {
-            I_IdPart newPart = t.duplicatePart();
+            I_IdPart newPart = t.duplicate();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (statusMap != null) {
