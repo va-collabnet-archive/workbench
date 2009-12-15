@@ -403,19 +403,6 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setVariableHeightTaxonomyView(Boolean variableHeightTaxonomyView);
 
-    /**
-     * 
-     * @return
-     * @deprecated view on the classifier path instead...
-     */
-    public Boolean getShowInferredInTaxonomy();
-
-    /**
-     * 
-     * @deprecated view on the classifier path instead...
-     */
-    public void setShowInferredInTaxonomy(Boolean showInferredInTaxonomy);
-
     public Boolean getShowPathInfoInTaxonomy();
 
     public void setShowPathInfoInTaxonomy(Boolean showPathInfoInTaxonomy);
