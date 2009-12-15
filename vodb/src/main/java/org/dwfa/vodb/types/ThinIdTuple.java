@@ -216,10 +216,6 @@ public class ThinIdTuple implements I_IdTuple {
 		return part.makeAnalog(statusNid, pathNid, time);
 	}
 
-	public void setIdStatus(int idStatus) {
-		part.setIdStatus(idStatus);
-	}
-
 	public void setSource(int source) {
 		part.setSource(source);
 	}

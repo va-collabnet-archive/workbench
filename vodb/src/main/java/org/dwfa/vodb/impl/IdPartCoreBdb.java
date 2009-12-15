@@ -138,7 +138,7 @@ public class IdPartCoreBdb implements I_StoreInBdb {
 
     public short getIdPartCoreId(I_IdPart idPart) throws DatabaseException {
         ThinIdPartCore idPartCore = new ThinIdPartCore();
-        idPartCore.setIdStatus(idPart.getIdStatus());
+        idPartCore.setIdStatus(idPart.getStatusId());
         idPartCore.setPathId(idPart.getPathId());
         idPartCore.setSource(idPart.getSource());
         idPartCore.setVersion(idPart.getVersion());
