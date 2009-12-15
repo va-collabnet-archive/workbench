@@ -350,10 +350,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getHighlightConflictsInTaxonomyView();
     }
 
-    public I_IntSet getInferredViewTypes() {
-        return frameConfig.getInferredViewTypes();
-    }
-
     public I_GetConceptData getLastViewed() {
         return frameConfig.getLastViewed();
     }
@@ -480,10 +476,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     public I_IntSet getSourceRelTypes() {
         return frameConfig.getSourceRelTypes();
-    }
-
-    public I_IntSet getStatedViewTypes() {
-        return frameConfig.getStatedViewTypes();
     }
 
     public String getStatusMessage() {
@@ -863,10 +855,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setInboxToggleVisible(visible);
     }
 
-    public void setInferredViewTypes(I_IntSet inferredViewTypes) {
-        frameConfig.setInferredViewTypes(inferredViewTypes);
-    }
-
     public void setLastViewed(I_GetConceptData conceptBean) {
         frameConfig.setLastViewed(conceptBean);
     }
@@ -957,10 +945,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     public void setSourceRelTypes(I_IntSet browseDownRels) {
         frameConfig.setSourceRelTypes(browseDownRels);
-    }
-
-    public void setStatedViewTypes(I_IntSet statedViewTypes) {
-        frameConfig.setStatedViewTypes(statedViewTypes);
     }
 
     public void setStatusMessage(String statusMessage) {
