@@ -658,7 +658,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
                         AceLog.getEditLog().fine("   attr already there, but needs updated part...");
                     }
                     possiblePart.setPathId(editPath.getConceptId());
-                    possiblePart.setConceptStatus(config.getDefaultStatus().getConceptId());
+                    possiblePart.setStatusId(config.getDefaultStatus().getConceptId());
                     possiblePart.setVersion(Integer.MAX_VALUE);
                     boolean containsPart = false;
                     for (I_ConceptAttributePart currentPart : attributes.getVersions()) {
@@ -693,7 +693,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
         I_ConceptAttributePart newPart = attrsForResolution.get(attr.getConId()).duplicatePart();
         newPart.setVersion(Integer.MAX_VALUE);
         newPart.setPathId(editPath.getConceptId());
-        newPart.setConceptStatus(config.getDefaultStatus().getConceptId());
+        newPart.setStatusId(config.getDefaultStatus().getConceptId());
         attr.addVersion(newPart);
     }
 

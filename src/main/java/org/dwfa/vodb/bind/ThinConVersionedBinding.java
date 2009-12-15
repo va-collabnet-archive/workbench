@@ -49,7 +49,7 @@ public class ThinConVersionedBinding extends TupleBinding {
         for (I_ConceptAttributePart con : versioned.getVersions()) {
             to.writeInt(con.getPathId());
             to.writeInt(con.getVersion());
-            to.writeInt(con.getConceptStatus());
+            to.writeInt(con.getStatusId());
             to.writeBoolean(con.isDefined());
         }
     }

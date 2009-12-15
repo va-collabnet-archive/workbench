@@ -120,19 +120,19 @@ public class AttributePopupListener extends MouseAdapter {
                     switch (field) {
                     case STATUS:
                         Collection<UUID> ids = (Collection<UUID>) obj;
-                        newPart.setConceptStatus((AceConfig.getVodb().uuidToNative(ids)));
+                        newPart.setStatusId((AceConfig.getVodb().uuidToNative(ids)));
                         break;
                     case DEFINED:
                         newPart.setDefined((Boolean) obj);
-                        newPart.setConceptStatus(config.getDefaultStatus().getConceptId());
+                        newPart.setStatusId(config.getDefaultStatus().getConceptId());
                         break;
 
                     default:
 
                     }
 
-                    model.referencedConcepts.put(newPart.getConceptStatus(),
-                        ConceptBean.get(newPart.getConceptStatus()));
+                    model.referencedConcepts.put(newPart.getStatusId(),
+                        ConceptBean.get(newPart.getStatusId()));
                 }
                 ACE.addUncommitted(sourceBean);
             } catch (Exception ex) {
