@@ -116,18 +116,18 @@ public class UniversalAceRelationshipPart implements Serializable, I_VersionComp
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_RelPart#getRelTypeId()
+     * @see org.dwfa.vodb.types.I_RelPart#getTypeId()
      */
-    public Collection<UUID> getRelTypeId() {
+    public Collection<UUID> getTypeId() {
         return relTypeId;
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_RelPart#setRelTypeId(int)
+     * @see org.dwfa.vodb.types.I_RelPart#setTypeId(int)
      */
-    public void setRelTypeId(Collection<UUID> relTypeId) {
+    public void setTypeId(Collection<UUID> relTypeId) {
         this.relTypeId = relTypeId;
     }
 

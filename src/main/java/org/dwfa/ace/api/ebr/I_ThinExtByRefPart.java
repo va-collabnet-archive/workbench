@@ -39,12 +39,6 @@ public interface I_ThinExtByRefPart extends Comparable<I_ThinExtByRefPart>, I_Am
 
     public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException;
 
-    /**
-     * @deprecated Use {@link #duplicate()}
-     */
-    @Deprecated
-    public I_ThinExtByRefPart duplicatePart();
-
     public I_ThinExtByRefPart duplicate();
 
     public I_ThinExtByRefPart makePromotionPart(I_Path promotionPath);

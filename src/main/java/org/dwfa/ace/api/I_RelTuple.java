@@ -30,18 +30,6 @@ public interface I_RelTuple extends I_AmTypedTuple {
 
     public abstract int getRefinabilityId();
 
-    /**
-     * @deprecated Use {@link #getTypeId()}
-     */
-    @Deprecated
-    public abstract int getRelTypeId();
-
-    /**
-     * @deprecated Use {@link #setTypeId(int)}
-     */
-    @Deprecated
-    public abstract void setRelTypeId(Integer typeId);
-
     public abstract void setStatusId(Integer statusId);
 
     public abstract void setCharacteristicId(Integer characteristicId);
@@ -49,12 +37,6 @@ public interface I_RelTuple extends I_AmTypedTuple {
     public abstract void setRefinabilityId(Integer refinabilityId);
 
     public abstract void setGroup(Integer group);
-
-    /**
-     * @deprecated Use {@link #duplicate()}
-     */
-    @Deprecated
-    public abstract I_RelPart duplicatePart();
 
     public I_RelPart duplicate();
 

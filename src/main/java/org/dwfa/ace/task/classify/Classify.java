@@ -277,7 +277,7 @@ public class Classify extends AbstractTask {
                     addUncommitted);
                 for (I_RelTuple relTuple : relTuples) {
                     if (definingCharacteristic == relTuple.getCharacteristicId()) {
-                        snorocketFactory.addRelationship(relTuple.getC1Id(), relTuple.getRelTypeId(),
+                        snorocketFactory.addRelationship(relTuple.getC1Id(), relTuple.getTypeId(),
                             relTuple.getC2Id(), relTuple.getGroup());
                     }
                 }

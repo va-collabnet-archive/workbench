@@ -41,8 +41,8 @@ public class RelTupleConflictComparator implements Comparator<I_RelTuple> {
         if (t1.getRefinabilityId() != t2.getRefinabilityId()) {
             return t1.getRefinabilityId() - t2.getRefinabilityId();
         }
-        if (t1.getRelTypeId() != t2.getRelTypeId()) {
-            return t1.getRelTypeId() - t2.getRelTypeId();
+        if (t1.getTypeId() != t2.getTypeId()) {
+            return t1.getTypeId() - t2.getTypeId();
         }
         return 0;
     }

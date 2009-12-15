@@ -34,23 +34,11 @@ public interface I_IdTuple extends I_AmTuple {
 
     public abstract void setNativeId(int nativeId);
 
-    /**
-     * @deprecated Use {@link #getStatusId()}
-     */
-    @Deprecated
-    public abstract int getIdStatus();
-
     public abstract int getSource();
 
     public abstract Object getSourceId();
 
     public abstract I_IdVersioned getIdVersioned();
-
-    /**
-     * @deprecated Use {@link #duplicate()}
-     */
-    @Deprecated
-    public abstract I_IdPart duplicatePart();
 
     public I_IdPart duplicate();
 

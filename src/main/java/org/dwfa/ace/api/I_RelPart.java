@@ -32,18 +32,6 @@ public interface I_RelPart extends I_AmTypedPart {
 
     public void setRefinabilityId(int refinabilityId);
 
-    /**
-     * @deprecated Use {@link #getTypeId()}
-     */
-    @Deprecated
-    public int getRelTypeId();
-
-    /**
-     * @deprecated Use {@link #setTypeId(int)}
-     */
-    @Deprecated
-    public void setRelTypeId(int relTypeId);
-
     public I_RelPart duplicate();
 
 }

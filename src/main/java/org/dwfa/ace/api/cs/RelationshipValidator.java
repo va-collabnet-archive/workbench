@@ -130,7 +130,7 @@ public class RelationshipValidator extends SimpleValidator {
                 newPart.setCharacteristicId(getNativeId(part.getCharacteristicId()));
                 newPart.setGroup(part.getGroup());
                 newPart.setRefinabilityId(getNativeId(part.getRefinabilityId()));
-                newPart.setRelTypeId(getNativeId(part.getRelTypeId()));
+                newPart.setTypeId(getNativeId(part.getTypeId()));
                 newPart.setStatusId(getNativeId(part.getStatusId()));
 
                 if (containsPart(databaseRelationship, newPart) == false) {
@@ -168,7 +168,7 @@ public class RelationshipValidator extends SimpleValidator {
                     && relPart.getCharacteristicId() == newPart.getCharacteristicId()
                     && relPart.getGroup() == newPart.getGroup()
                     && relPart.getRefinabilityId() == newPart.getRefinabilityId()
-                    && relPart.getRelTypeId() == newPart.getRelTypeId()
+                    && relPart.getTypeId() == newPart.getTypeId()
                     && relPart.getStatusId() == newPart.getStatusId()) {
 
                     // found a match, no need to keep looking

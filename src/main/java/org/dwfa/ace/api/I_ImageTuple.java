@@ -30,12 +30,6 @@ public interface I_ImageTuple extends I_AmTypedTuple {
 
     public I_ImageVersioned getVersioned();
 
-    /**
-     * @deprecated Use {@link #duplicate()}
-     */
-    @Deprecated
-    public I_ImagePart duplicatePart();
-
     public I_ImagePart duplicate();
 
     public I_ImagePart getPart();

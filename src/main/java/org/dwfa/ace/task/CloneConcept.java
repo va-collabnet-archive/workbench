@@ -103,7 +103,7 @@ public class CloneConcept extends AbstractTask {
 
             for (I_RelTuple rel : conceptToClone.getSourceRelTuples(config.getAllowedStatus(), null, clonePositions,
                 false)) {
-                tf.newRelationship(UUID.randomUUID(), newConcept, tf.getConcept(rel.getRelTypeId()),
+                tf.newRelationship(UUID.randomUUID(), newConcept, tf.getConcept(rel.getTypeId()),
                     tf.getConcept(rel.getC2Id()), tf.getConcept(rel.getCharacteristicId()),
                     tf.getConcept(rel.getRefinabilityId()), tf.getConcept(rel.getStatusId()), rel.getGroup(), config);
             }

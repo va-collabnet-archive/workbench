@@ -202,7 +202,7 @@ public abstract class RefsetUtilities {
                 for (I_RelTuple tuple : tuples) {
                     if (tuple.getStatusId() == termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids())
                         .getConceptId()
-                        && tuple.getRelTypeId() == termFactory.getConcept(
+                        && tuple.getTypeId() == termFactory.getConcept(
                             RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()).getConceptId()) {
 
                         purposeConcepts.add(getConcept(tuple.getC2Id()));
@@ -302,7 +302,7 @@ public abstract class RefsetUtilities {
         if (extensionPart != null) {
             I_ThinExtByRefPart latestVersion = getLatestVersion(extensionPart);
 
-            I_ThinExtByRefPart clone = latestVersion.duplicatePart();
+            I_ThinExtByRefPart clone = latestVersion.duplicate();
             clone.setStatus(retiredConceptId);
             clone.setVersion(Integer.MAX_VALUE);
             extensionPart.addVersion(clone);
@@ -354,7 +354,7 @@ public abstract class RefsetUtilities {
         I_ThinExtByRefVersioned ext = getExtensionForComponent(conceptId, memberSetId);
         if (ext != null) {
 
-            I_ThinExtByRefPart clone = getLatestVersion(ext).duplicatePart();
+            I_ThinExtByRefPart clone = getLatestVersion(ext).duplicate();
             I_ThinExtByRefPartConcept conceptClone = (I_ThinExtByRefPartConcept) clone;
             conceptClone.setPathId(pathConcept.getConceptId());
             conceptClone.setConceptId(getMembershipType(includeTypeConceptId));
@@ -396,7 +396,7 @@ public abstract class RefsetUtilities {
         I_ThinExtByRefVersioned ext = getExtensionForComponent(conceptId, memberSetId);
         if (ext != null) {
 
-            I_ThinExtByRefPart clone = getLatestVersion(ext).duplicatePart();
+            I_ThinExtByRefPart clone = getLatestVersion(ext).duplicate();
             I_ThinExtByRefPartConcept conceptClone = (I_ThinExtByRefPartConcept) clone;
             conceptClone.setPathId(pathConcept.getConceptId());
             conceptClone.setConceptId(ConceptConstants.PARENT_MARKER.localize().getNid());
