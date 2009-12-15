@@ -23,12 +23,6 @@ import org.dwfa.tapi.TerminologyException;
 public interface I_AmTermComponent {
 
     /**
-     * @deprecated use getNid();
-     * @return The terminology component's identifier
-     */
-    public int getTermComponentId();
-
-    /**
      * @return The terminology component's identifier
      */
     public int getNid();
