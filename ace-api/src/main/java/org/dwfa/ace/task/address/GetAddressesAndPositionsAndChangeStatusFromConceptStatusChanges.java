@@ -120,7 +120,7 @@ public class GetAddressesAndPositionsAndChangeStatusFromConceptStatusChanges ext
                 positionList.add(new UniversalAcePosition(tf.getUids(t.getPathId()),
                     tf.convertToThickVersion(t.getVersion())));
                 pathSet.add(t.getPathId());
-                I_ConceptAttributePart part = t.duplicatePart();
+                I_ConceptAttributePart part = t.duplicate();
                 part.setStatusId(newStatus.getConceptId());
                 part.setVersion(Integer.MAX_VALUE);
                 t.getConVersioned().addVersion(part);
