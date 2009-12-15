@@ -454,10 +454,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getShortLabelDescPreferenceList();
     }
 
-    public Boolean getShowInferredInTaxonomy() {
-        return frameConfig.getShowInferredInTaxonomy();
-    }
-
     public Boolean getShowRefsetInfoInTaxonomy() {
         return true;
     }
@@ -893,10 +889,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     public void setShowHistory(boolean shown) {
         frameConfig.setShowHistory(shown);
-    }
-
-    public void setShowInferredInTaxonomy(Boolean showInferredInTaxonomy) {
-        frameConfig.setShowInferredInTaxonomy(showInferredInTaxonomy);
     }
 
     public void setShowPreferences(boolean shown) {
