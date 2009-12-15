@@ -196,27 +196,21 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
 
             // CHECK & GET EDIT_PATH
             I_GetConceptData cEditPathObj = config.getClassifierInputPath();
-            if (cEditPathObj == null) {
-                String errStr = "Classifier Input (Edit) Path -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-                return;
+            if (cEditPathObj != null) {
+                I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
+                cEditPathPos = new ArrayList<I_Position>();
+                cEditPathPos.add(new Position(Integer.MAX_VALUE, cEditIPath));
+                addPathOrigins(cEditPathPos, cEditIPath);
             }
-            I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
-            cEditPathPos = new ArrayList<I_Position>();
-            cEditPathPos.add(new Position(Integer.MAX_VALUE, cEditIPath));
-            addPathOrigins(cEditPathPos, cEditIPath);
 
             // CHECK & GET CLASSIFER_PATH
             I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
-            if (cClassPathObj == null) {
-                String errStr = "Classifier Output (Inferred) Path -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-                return;
+            if (cClassPathObj != null) {
+                I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
+                cClassPathPos = new ArrayList<I_Position>();
+                cClassPathPos.add(new Position(Integer.MAX_VALUE, cClassIPath));
+                addPathOrigins(cClassPathPos, cClassIPath);
             }
-            I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
-            cClassPathPos = new ArrayList<I_Position>();
-            cClassPathPos.add(new Position(Integer.MAX_VALUE, cClassIPath));
-            addPathOrigins(cClassPathPos, cClassIPath);
 
             //
         } catch (TerminologyException e) {
