@@ -202,30 +202,6 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setEditStatusTypePopup(I_IntList editStatusTypePopup);
 
-    /**
-     * 
-     * @deprecated view on the classifier path instead...
-     */
-    public I_IntSet getInferredViewTypes();
-
-    /**
-     * 
-     * @deprecated view on the classifier path instead...
-     */
-    public void setInferredViewTypes(I_IntSet inferredViewTypes);
-
-    /**
-     * 
-     * @deprecated view on the classifier path instead...
-     */
-    public I_IntSet getStatedViewTypes();
-
-    /**
-     * 
-     * @deprecated view on the classifier path instead...
-     */
-    public void setStatedViewTypes(I_IntSet statedViewTypes);
-
     public I_GetConceptData getDefaultImageType();
 
     public I_GetConceptData getDefaultDescriptionType();

@@ -311,10 +311,6 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getHighlightConflictsInTaxonomyView();
     }
 
-    public I_IntSet getInferredViewTypes() {
-        return config.getInferredViewTypes();
-    }
-
     public I_IntList getLanguagePreferenceList() {
         return config.getLanguagePreferenceList();
     }
@@ -438,10 +434,6 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 
     public I_IntSet getSourceRelTypes() {
         return config.getSourceRelTypes();
-    }
-
-    public I_IntSet getStatedViewTypes() {
-        return config.getStatedViewTypes();
     }
 
     public String getStatusMessage() {
@@ -808,10 +800,6 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.setInboxToggleVisible(visible);
     }
 
-    public void setInferredViewTypes(I_IntSet inferredViewTypes) {
-        config.setInferredViewTypes(inferredViewTypes);
-    }
-
     public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref) {
         config.setLanguageSortPref(langSortPref);
     }
@@ -934,10 +922,6 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 
     public void setSourceRelTypes(I_IntSet browseDownRels) {
         config.setSourceRelTypes(browseDownRels);
-    }
-
-    public void setStatedViewTypes(I_IntSet statedViewTypes) {
-        config.setStatedViewTypes(statedViewTypes);
     }
 
     public void setStatusMessage(String statusMessage) {
