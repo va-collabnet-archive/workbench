@@ -43,6 +43,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.TestForCreateNewRefsetPermission;
+import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
 import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -365,8 +366,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     private Set<I_GetConceptData> getValidRefsetSpecs() throws Exception {
         Set<I_GetConceptData> refsetSpecs = new HashSet<I_GetConceptData>();
 
-        //TODO Replace this test with a TestForRefreshRefsetPermission 
-        TestForCreateNewRefsetPermission permissionTest = new TestForCreateNewRefsetPermission();
+        TestForEditRefsetPermission permissionTest = new TestForEditRefsetPermission();
         Set<I_GetConceptData> permissibleRefsetParents = new HashSet<I_GetConceptData>();
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(this.owner));
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(this.owner));
