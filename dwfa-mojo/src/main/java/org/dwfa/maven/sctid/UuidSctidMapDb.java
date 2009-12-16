@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 /**
  * Derby DB containing the Uuid-SctId mappings for an id mapping file.
- * 
+ *
  * @author Ean Dungey
  */
 public class UuidSctidMapDb {
@@ -87,7 +87,7 @@ public class UuidSctidMapDb {
 
     /**
      * Returns the signaltion.
-     * 
+     *
      * @return UuidSctidMapDb
      */
     public static UuidSctidMapDb getInstance() {
@@ -99,10 +99,10 @@ public class UuidSctidMapDb {
 
     /**
      * Creates or Opens a Derby DB.
-     * 
+     *
      * If the DB files exits it is simply opened other wise a new database is
      * created.
-     * 
+     *
      * @param dbFolder File
      * @throws IOException error opening or creating the DB.
      * @throws ClassNotFoundException
@@ -118,17 +118,17 @@ public class UuidSctidMapDb {
 
     /**
      * Creates or Opens a Derby DB.
-     * 
+     *
      * If the DB files exits it is simply opened other wise a new database is
      * created.
-     * 
+     *
      * If <code>validate</code> is true the uniqueness of the UUIDs is checked
      * before adding to the DB. If there are duplicate UUIDs a error is logged
      * and the UUID is not added to the DB.
-     * 
+     *
      * Performance is degraded if <code>validate</code> is true but all the map
      * files will be validated.
-     * 
+     *
      * @param databaseFile File
      * @param fixedMapDirectory File
      * @param idMapDirectory File
@@ -153,9 +153,9 @@ public class UuidSctidMapDb {
 
     /**
      * Open the exiting DB.
-     * 
+     *
      * Setup the PreparedStatement of the DB.
-     * 
+     *
      * @param databaseDirectory File
      * @throws IOException error opening the DB.
      * @throws ClassNotFoundException
@@ -178,7 +178,7 @@ public class UuidSctidMapDb {
 
     /**
      * Create a new DB and load with the contents of the UUIDSctIdMapFile
-     * 
+     *
      * @param dbFolder File
      * @param fixedMapFile File
      * @throws IOException reading the map file or creating the DB.
@@ -208,7 +208,7 @@ public class UuidSctidMapDb {
     /**
      * Creates a new database using the files in the fixed map directory and
      * read write map directory.
-     * 
+     *
      * @param databaseFile File
      * @param fixedMapDirectory File
      * @param idMapDirectory File
@@ -233,7 +233,7 @@ public class UuidSctidMapDb {
 
     /**
      * Updates DB from the if map directories.
-     * 
+     *
      * @param fixedMapDirectory File
      * @param idMapDirectory File can be null if no generated ids to load.
      * @throws SQLException
@@ -257,8 +257,39 @@ public class UuidSctidMapDb {
     }
 
     /**
+     * Updated the DB using a rf2 id file
+     *
+     * @param rf2IdFile File rf2 ids
+     * @throws SQLException DB error
+     * @throws IOException File error
+     */
+    public void updateDbFromRf2IdFile(File rf2IdFile) throws SQLException, IOException {
+        BufferedReader br = new BufferedReader(new FileReader(rf2IdFile));
+        int insertCount = 0;
+
+        try {
+            br.readLine();
+            String lineStr;
+            while ((lineStr = br.readLine()) != null) {
+                String[] columns = lineStr.split("\t");
+                UUID uuid = UUID.fromString(columns[1]);
+                Long sctId = Long.parseLong(columns[5]);
+
+                if (!validate || validateFileUuid(uuid, sctId, rf2IdFile)) {
+                    addUUIDSctIdEntry(uuid, sctId, false);
+                    insertCount++;
+                    commitBatch(insertCount);
+                }
+            }
+        } finally {
+            br.close();
+            conn.commit();
+        }
+    }
+
+    /**
      * Creates a new DB from a UUID sctId map file.
-     * 
+     *
      * @param mapFile mapping flat file.
      * @throws SQLException creating the DB
      * @throws IOException reading the map file.
@@ -291,7 +322,7 @@ public class UuidSctidMapDb {
 
     /**
      * Creates a new DB from a UUID sctId map file.
-     * 
+     *
      * @param mapFile mapping flat file.
      * @throws SQLException creating the DB
      * @throws IOException reading the map file.
@@ -326,7 +357,7 @@ public class UuidSctidMapDb {
 
     /**
      * Commit on the 10 000th insert.
-     * 
+     *
      * @param insertCount int
      * @throws SQLException if commit fails.
      */
@@ -339,7 +370,7 @@ public class UuidSctidMapDb {
 
     /**
      * Validate the UUID is not currently in the DB
-     * 
+     *
      * @param uuid UUID to check
      * @param sctId Long sctId mapped in the files.
      * @param mapFile file that contains the UUID, for reporting purposes
@@ -359,10 +390,10 @@ public class UuidSctidMapDb {
 
     /**
      * Get the TYPE from the sctid string
-     * 
+     *
      * Type for our purposes is the second last number ie 0=concept
      * 1=description etc.
-     * 
+     *
      * @param sctId String
      * @return TYPE
      * @throws SQLException
@@ -376,7 +407,7 @@ public class UuidSctidMapDb {
 
     /**
      * Gets the primary key for a TYPE.
-     * 
+     *
      * @param type TYPE
      * @return int primary key
      * @throws SQLException cannot find the TYPE in the DB
@@ -400,7 +431,7 @@ public class UuidSctidMapDb {
 
     /**
      * Gets the namespace key from the sctid.
-     * 
+     *
      * @param sctId String SctId
      * @return int primary key
      * @throws NoSuchElementException cannot find the NAMESPACE
@@ -418,7 +449,7 @@ public class UuidSctidMapDb {
 
     /**
      * Gets the primary key for a NAMESPACE.
-     * 
+     *
      * @param type NAMESPACE
      * @return int primary key
      * @throws SQLException cannot find the NAMESPACE in the DB
@@ -443,7 +474,7 @@ public class UuidSctidMapDb {
 
     /**
      * Adds SCTID types to the type table
-     * 
+     *
      * @throws SQLException running SQL statement
      */
     private void updateTypeTable() throws SQLException {
@@ -467,7 +498,7 @@ public class UuidSctidMapDb {
 
     /**
      * Gets the <code>TYPE</code> for the string
-     * 
+     *
      * @param typeStr String code eg 0, 1, 6.
      * @return TYPE
      * @throws SQLException running SQL statement
@@ -494,7 +525,7 @@ public class UuidSctidMapDb {
 
     /**
      * Adds SCTID namespaces to the namespace table
-     * 
+     *
      * @throws SQLException running SQL statement
      */
     private void updateNamespaceTable() throws SQLException {
@@ -521,7 +552,7 @@ public class UuidSctidMapDb {
 
     /**
      * Gets the <code>NAMESPACE</code> for the string
-     * 
+     *
      * @param namespaceStr String code eg 19999991.
      * @return NAMESPACE
      * @throws SQLException running SQL statement
@@ -547,7 +578,7 @@ public class UuidSctidMapDb {
 
     /**
      * Create the DB tables and indexes.
-     * 
+     *
      * @throws SQLException creating the tables/indexes.
      */
     private void createTables() throws SQLException {
@@ -558,7 +589,7 @@ public class UuidSctidMapDb {
 
     /**
      * Add referential integrity and unique constraints.
-     * 
+     *
      * @throws SQLException create constraints.
      */
     private void createConstraints() throws SQLException {
@@ -584,8 +615,21 @@ public class UuidSctidMapDb {
     }
 
     /**
+     * Runs the sql against the DB.
+     *
+     * Commits the current connection.
+     *
+     * @param sql String SQL
+     * @throws SQLException
+     */
+    public void runAndCommitSql(String sql) throws SQLException {
+        runSql(sql);
+        conn.commit();
+    }
+
+    /**
      * Creates the prepare statements for this DB.
-     * 
+     *
      * @throws SQLException creating the prepare statements
      */
     private void createStatements() throws SQLException {
@@ -609,7 +653,7 @@ public class UuidSctidMapDb {
 
     /**
      * Creates the DB indexes.
-     * 
+     *
      * @throws SQLException if index cannot be created
      */
     private void createIndexes() throws SQLException {
@@ -621,7 +665,7 @@ public class UuidSctidMapDb {
     /**
      * Connects to the database, if no database exists then a new one is
      * created.
-     * 
+     *
      * @param databaseDirectory File
      * @param autoCommit boolean
      * @throws SQLException connecting to the DB.
@@ -642,7 +686,7 @@ public class UuidSctidMapDb {
 
     /**
      * Is the UUID in the DB.
-     * 
+     *
      * @param uuid UUID
      * @return boolean true if UUID in DB else false
      * @throws SQLException finding uuid
@@ -669,7 +713,7 @@ public class UuidSctidMapDb {
 
     /**
      * Gets the SCTID for the UUID
-     * 
+     *
      * @param uuid UUID
      * @return SCTID as a Long
      * @throws SQLException finding the SCTID
@@ -699,7 +743,7 @@ public class UuidSctidMapDb {
 
     /**
      * Gets the list of SCTID for a UUID
-     * 
+     *
      * @param sctId Long
      * @return List of UUIDs
      * @throws SQLException finding UUIDs
@@ -725,7 +769,7 @@ public class UuidSctidMapDb {
 
     /**
      * Removes a UUID from the DB
-     * 
+     *
      * @param uuid UUID
      * @throws SQLException deleting the UUID
      */
@@ -739,10 +783,10 @@ public class UuidSctidMapDb {
 
     /**
      * Adds an entry to the UUID SctId map table.
-     * 
+     *
      * This will check the the UUID is unique
      * The SCTID is valid (TYPE and NAMESPACE exist)
-     * 
+     *
      * @param uuid UUID
      * @param sctId LONG
      * @param commit boolean true to changes.
@@ -765,10 +809,10 @@ public class UuidSctidMapDb {
 
     /**
      * Adds an entry to the UUID SctId map table.
-     * 
+     *
      * This will check the the UUID is unique
      * The SCTID is valid (TYPE and NAMESPACE exist)
-     * 
+     *
      * @param uuid UUID
      * @param sctId LONG
      * @throws SQLException adding new mapping row.
@@ -779,7 +823,7 @@ public class UuidSctidMapDb {
 
     /**
      * Adds all the elements in the Map to the DB.
-     * 
+     *
      * @param entryList Map of UUID,Long
      * @throws SQLException adding new mapping row.
      */
@@ -792,7 +836,7 @@ public class UuidSctidMapDb {
 
     /**
      * Size of the DB
-     * 
+     *
      * @return int
      * @throws SQLException
      */
@@ -822,9 +866,9 @@ public class UuidSctidMapDb {
 
     /**
      * Commits and closes the connection.
-     * 
+     *
      * Closes all PreparedStatement objects
-     * 
+     *
      * @throws SQLException error closing connection
      */
     public void close() throws SQLException {
@@ -854,7 +898,7 @@ public class UuidSctidMapDb {
 
     /**
      * Is the connected not null and connected.
-     * 
+     *
      * @return true if connection is open.
      */
     public boolean isDbConnectted() {
@@ -867,7 +911,7 @@ public class UuidSctidMapDb {
 
     /**
      * This is a workaround for derby not removing lock files at runtime.
-     * 
+     *
      * deletes the lock files.
      */
     private void deleteLockFiles() {
@@ -884,7 +928,7 @@ public class UuidSctidMapDb {
 
     /**
      * Gets the sequence number from the DB based on the TYPE and NAMESPACE.
-     * 
+     *
      * @param namespace NAMESPACE
      * @param type TYPE
      * @return Long 1 is returned for the first sequence number.
