@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -94,12 +94,12 @@ enum RefsetType {
     public static RefsetType findByExtension(I_ThinExtByRefPart part) {
         if (part instanceof I_ThinExtByRefPartBoolean) {
             return BOOLEAN;
-        } else if (part instanceof I_ThinExtByRefPartConcept) {
-            return CONCEPT;
-        } else if (part instanceof I_ThinExtByRefPartConceptConcept) {
-            return CONCEPT_CONCEPT;
         } else if (part instanceof I_ThinExtByRefPartConceptConceptConcept) {
             return CONCEPT_CONCEPT_CONCEPT;
+        } else if (part instanceof I_ThinExtByRefPartConceptConcept) {
+            return CONCEPT_CONCEPT;
+        } else if (part instanceof I_ThinExtByRefPartConcept) {
+            return CONCEPT;
         } else if (part instanceof I_ThinExtByRefPartConceptInt) {
             return CONCEPT_INTEGER;
         } else if (part instanceof I_ThinExtByRefPartInteger) {
@@ -152,7 +152,7 @@ enum RefsetType {
      * determine its structural type.
      * <p>
      * See {@link #refsetTypeParents}
-     * 
+     *
      * @param file
      * @return appropriate RefsetType for the passed file, or an exception if
      *         one can't be found

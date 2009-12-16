@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@ import org.dwfa.tapi.spec.ConceptSpec;
 /**
  * Concept constants file - used to statically reference required concepts from
  * the terminology
- * 
+ *
  * @author Dion McMurtrie
  */
 public class ConceptConstants {
@@ -32,11 +32,11 @@ public class ConceptConstants {
     public static final ConceptSpec SNOMED_IS_A = new ConceptSpec("Is a (attribute)",
         "c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
     public static final ConceptSpec RELATIONSHIP_REFINABILITY_EXTENSION = new ConceptSpec(
-        "Relationship refinability reference set", "a69353f3-fcb2-488f-ad00-84152672ef49");
+        "Relationship refinability reference set", "c4367277-ed2a-4641-b35c-8e4c6d92a3c9");
     public static final ConceptSpec MODIFIER_SOME = new ConceptSpec("Some (core meta-data concept)",
         "082b9bd6-0e3d-4f8d-8d22-85e956feeaef");
     public static final ConceptSpec DEFINITION_TYPE_EXTENSION = new ConceptSpec("Definition status reference set",
-        "6e88ee62-3fa0-495f-945f-809723a78c4b");
+        "422c5f85-175a-4138-a7a0-331dcd7cc9ec");
     public static final ConceptSpec UNIVERSALLY_UNIQUE_IDENTIFIER = new ConceptSpec(
         "Universally Unique Identifier (foundation meta-data concept)", "689572c2-103c-4892-aaad-c30ffa6b4b1c");
     public static final ConceptSpec SNOMED_ID_MAP_EXTENSION = new ConceptSpec(
@@ -66,4 +66,32 @@ public class ConceptConstants {
         "Inappropriate component (foundation metadata concept)", "eddca00d-583c-455f-af08-5fea1adc08dc");
     public static final ConceptSpec MOVED_ELSEWHERE_STATUS = new ConceptSpec(
         "Component moved elsewhere (foundation metadata concept)", "0f726025-6b09-41de-a59c-e8309afaf987");
+
+    public static final ConceptSpec MAY_BE_A_HISTORY = new ConceptSpec("MAY BE A (attribute)",
+        "721dadc2-53a0-3ffa-8abd-80ff6aa87db2");
+    public static final ConceptSpec MOVED_FROM_HISTORY = new ConceptSpec("MOVED FROM (attribute)",
+        "9ceab5fa-7b4c-3618-b229-6997dc69ad65");
+    public static final ConceptSpec MOVED_TO_HISTORY = new ConceptSpec("MOVED TO (attribute)",
+        "c3394436-568c-327a-9d20-4a258d65a936");
+    public static final ConceptSpec REPLACED_BY_HISTORY = new ConceptSpec("REPLACED BY (attribute)",
+        "0b010f24-523b-3ae4-b3a2-ec1f425c8a85");
+    public static final ConceptSpec SAME_AS_HISTORY = new ConceptSpec("SAME AS (attribute)",
+        "87594159-50f0-3b5f-aa4f-f6061c0ce497");
+    public static final ConceptSpec WAS_A_HISTORY = new ConceptSpec("WAS A (attribute)",
+        "a1a598c0-7988-3c8e-9ba2-342f24de7c6b");
+
+    public static final ConceptSpec MOVED_FROM_HISTORY_REFSET = new ConceptSpec(
+        "MOVED FROM association reference set (foundation metadata concept)", "aa1698ba-8bff-4e9d-abdf-a0cb47b7bc5e");
+    public static final ConceptSpec MOVED_TO_HISTORY_REFSET = new ConceptSpec(
+        "MOVED TO association reference set (foundation metadata concept)", "6dba82a0-c89d-4ee5-91e4-cb63787447fa");
+    public static final ConceptSpec REPLACED_BY_HISTORY_REFSET = new ConceptSpec(
+        "REPLACED BY association reference set (foundation metadata concept)", "856c8043-6890-42c2-bb4b-b97d127b7f5c");
+    public static final ConceptSpec SAME_AS_HISTORY_REFSET = new ConceptSpec(
+        "SAME AS association reference set (foundation metadata concept)", "622aa587-2e34-43b3-b3d4-53561aa3c7be");
+    public static final ConceptSpec WAS_A_HISTORY_REFSET = new ConceptSpec(
+        "WAS A association reference set (foundation metadata concept)", "6c441f26-ed8a-42ff-91b7-fcb27191f9f6");
+    //TODO
+//    public static final ConceptSpec MAY_BE_A_HISTORY_REFSET = new ConceptSpec(
+//        "MOVED FROM association reference set (foundation metadata concept)", "76765f82-f9cb-349c-88b0-8261e4b46421");
+
 }
