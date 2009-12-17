@@ -31,7 +31,8 @@ public class Handler extends URLStreamHandler {
     @Override
     protected void parseURL(URL u, String spec, int start, int limit) {
 
-        this.setURL(u, ExtendedUrlStreamHandlerFactory.PROTOCOL, "", -1, "", "", "", spec.substring(start), "");
+        this.setURL(u, ExtendedUrlStreamHandlerFactory.PROTOCOL, "", -1, "", "", spec.substring(start),
+            spec.substring(start), "");
     }
 
     @Override

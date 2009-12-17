@@ -136,7 +136,13 @@ public class NewRefsetSpecForm1 extends JPanel {
         gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(refsetParentComboBox, gridBagConstraints);
+        if (refsetNames.size() != 0) {
+            this.add(refsetParentComboBox, gridBagConstraints);
+        } else {
+            JLabel noParentsAvailLabel = new JLabel(
+                "No refset parents available - current user does not have permission to create new refsets.");
+            this.add(noParentsAvailLabel, gridBagConstraints);
+        }
 
         // requirements label & text box
         gridBagConstraints = new GridBagConstraints();
@@ -280,5 +286,9 @@ public class NewRefsetSpecForm1 extends JPanel {
 
     public HashSet<File> getAttachments() {
         return attachments;
+    }
+
+    public Set<String> getRefsetNames() {
+        return refsetNames;
     }
 }

@@ -148,15 +148,19 @@ public class PlatformWebBrowser {
         if (tryNativeBrowser) {
             try {
                 if (opener == null) {
-                    if (MAC_OS_X) {
-                        opener = new OpenMacWebBrowser();
-                    } else {
-                        opener = new DesktopOpener();
-                    }
+                    opener = new DesktopOpener();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                opener = new GenericOpener();
+                try {
+                    if (MAC_OS_X) {
+                        opener = new OpenMacWebBrowser();
+                    } else {
+                        opener = new GenericOpener();
+                    }
+                } catch (Exception e2) {
+                    opener = new GenericOpener();
+                }
             }
 
         } else {

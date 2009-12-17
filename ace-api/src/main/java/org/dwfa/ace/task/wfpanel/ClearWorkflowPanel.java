@@ -82,22 +82,16 @@ public class ClearWorkflowPanel extends AbstractTask {
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
             ex = null;
-            SwingUtilities.invokeAndWait(new Runnable() {
+            if (SwingUtilities.isEventDispatchThread()) {
+                doRun(process);
+            } else {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        doRun(process);
 
-                public void run() {
-                    I_ConfigAceFrame config;
-                    try {
-                        config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
-                        JPanel workflowPanel = config.getWorkflowPanel();
-                        Component[] components = workflowPanel.getComponents();
-                        for (int i = 0; i < components.length; i++) {
-                            workflowPanel.remove(components[i]);
-                        }
-                    } catch (Exception e) {
-                        ex = e;
                     }
-                }
-            });
+                });
+            }
         } catch (InterruptedException e) {
             throw new TaskFailedException(e);
         } catch (InvocationTargetException e) {
@@ -125,6 +119,22 @@ public class ClearWorkflowPanel extends AbstractTask {
      */
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
+    }
+
+    private void doRun(final I_EncodeBusinessProcess process) {
+        I_ConfigAceFrame config;
+        try {
+            config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+            JPanel workflowPanel = config.getWorkflowPanel();
+            Component[] components = workflowPanel.getComponents();
+            for (int i = 0; i < components.length; i++) {
+                workflowPanel.remove(components[i]);
+            }
+            workflowPanel.setVisible(false);
+            workflowPanel.repaint();
+        } catch (Exception e) {
+            ex = e;
+        }
     }
 
 }

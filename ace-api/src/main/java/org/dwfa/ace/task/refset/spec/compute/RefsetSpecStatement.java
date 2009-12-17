@@ -30,6 +30,8 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 
 /**
@@ -39,7 +41,29 @@ import org.dwfa.tapi.TerminologyException;
  * @author Chrissy Hill
  * 
  */
-public abstract class RefsetSpecStatement {
+public abstract class RefsetSpecStatement extends RefsetSpecComponent {
+
+    protected enum QUERY_TOKENS {
+        CONCEPT_IS(RefsetAuxiliary.Concept.CONCEPT_IS), CONCEPT_IS_CHILD_OF(RefsetAuxiliary.Concept.CONCEPT_IS_CHILD_OF), CONCEPT_IS_KIND_OF(RefsetAuxiliary.Concept.CONCEPT_IS_KIND_OF), CONCEPT_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.CONCEPT_IS_DESCENDENT_OF), CONCEPT_IS_MEMBER_OF(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF), CONCEPT_STATUS_IS(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS), CONCEPT_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_CHILD_OF), CONCEPT_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_KIND_OF), CONCEPT_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_DESCENDENT_OF), CONCEPT_CONTAINS_REL_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING), CONCEPT_CONTAINS_DESC_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING),
+
+        DESC_IS(RefsetAuxiliary.Concept.DESC_IS), DESC_IS_MEMBER_OF(RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF), DESC_STATUS_IS(RefsetAuxiliary.Concept.DESC_STATUS_IS), DESC_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.DESC_STATUS_IS_CHILD_OF), DESC_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.DESC_STATUS_IS_KIND_OF), DESC_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.DESC_STATUS_IS_DESCENDENT_OF), DESC_TYPE_IS(RefsetAuxiliary.Concept.DESC_TYPE_IS), DESC_TYPE_IS_CHILD_OF(RefsetAuxiliary.Concept.DESC_TYPE_IS_CHILD_OF), DESC_TYPE_IS_KIND_OF(RefsetAuxiliary.Concept.DESC_TYPE_IS_KIND_OF), DESC_TYPE_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.DESC_TYPE_IS_DESCENDENT_OF), DESC_REGEX_MATCH(RefsetAuxiliary.Concept.DESC_REGEX_MATCH), DESC_LUCENE_MATCH(RefsetAuxiliary.Concept.DESC_LUCENE_MATCH),
+
+        REL_IS(RefsetAuxiliary.Concept.REL_IS), REL_RESTRICTION_IS(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF), REL_IS_MEMBER_OF(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF), REL_STATUS_IS(RefsetAuxiliary.Concept.REL_STATUS_IS), REL_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.REL_STATUS_IS_KIND_OF), REL_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_STATUS_IS_CHILD_OF), REL_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_STATUS_IS_DESCENDENT_OF), REL_TYPE_IS(RefsetAuxiliary.Concept.REL_TYPE_IS), REL_TYPE_IS_KIND_OF(RefsetAuxiliary.Concept.REL_TYPE_IS_KIND_OF), REL_TYPE_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_TYPE_IS_CHILD_OF), REL_TYPE_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_TYPE_IS_DESCENDENT_OF), REL_LOGICAL_QUANTIFIER_IS(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS), REL_LOGICAL_QUANTIFIER_IS_KIND_OF(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_KIND_OF), REL_LOGICAL_QUANTIFIER_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_CHILD_OF), REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF), REL_CHARACTERISTIC_IS(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS), REL_CHARACTERISTIC_IS_KIND_OF(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_KIND_OF), REL_CHARACTERISTIC_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_CHILD_OF), REL_CHARACTERISTIC_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_DESCENDENT_OF), REL_REFINABILITY_IS(RefsetAuxiliary.Concept.REL_REFINABILITY_IS), REL_REFINABILITY_IS_KIND_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_KIND_OF), REL_REFINABILITY_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_CHILD_OF), REL_REFINABILITY_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_DESCENDENT_OF);
+
+        protected int nid;
+
+        private QUERY_TOKENS(I_ConceptualizeUniversally concept) {
+            try {
+                this.nid = concept.localize().getNid();
+            } catch (TerminologyException e) {
+                throw new RuntimeException(this.toString(), e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    };
+
+    protected QUERY_TOKENS tokenEnum = null;
 
     /**
      * Whether to use the NOT qualifier.
@@ -52,12 +76,12 @@ public abstract class RefsetSpecStatement {
     protected I_GetConceptData queryToken;
 
     /**
-     * The concept to which the query type is applied.
+     * The component to which the query type is applied.
      * e.g. if query type is "concept is" and query destination is
      * "paracetamol",
      * then the statement would be "concept is":"paracetamol".
      */
-    protected I_GetConceptData queryConstraint;
+    protected I_AmTermComponent queryConstraint;
 
     protected I_TermFactory termFactory;
 
@@ -69,10 +93,15 @@ public abstract class RefsetSpecStatement {
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
     public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, I_GetConceptData constraint) {
+
         this.useNotQualifier = useNotQualifier;
         this.queryToken = groupingToken;
         this.queryConstraint = constraint;
         termFactory = LocalVersionedTerminology.get();
+    }
+
+    public boolean isNegated() {
+        return useNotQualifier;
     }
 
     public boolean execute(I_AmTermComponent component) throws IOException, TerminologyException {
@@ -113,7 +142,14 @@ public abstract class RefsetSpecStatement {
         List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
         tuples.add(tuple);
 
-        return isComponentStatus(queryConstraint, tuples);
+        return isComponentStatus((I_GetConceptData) queryConstraint, tuples);
+    }
+
+    protected boolean componentStatusIs(I_GetConceptData requiredStatus, I_AmTuple tuple) {
+        List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
+        tuples.add(tuple);
+
+        return isComponentStatus(requiredStatus, tuples);
     }
 
     protected boolean componentStatusIsKindOf(I_AmTuple tuple) throws IOException, TerminologyException {
@@ -121,7 +157,7 @@ public abstract class RefsetSpecStatement {
         List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
         tuples.add(tuple);
 
-        if (isComponentStatus(queryConstraint, tuples)) {
+        if (isComponentStatus((I_GetConceptData) queryConstraint, tuples)) {
             return true;
         }
 
@@ -129,8 +165,8 @@ public abstract class RefsetSpecStatement {
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
         // get list of all children of input concept
-        Set<I_GetConceptData> childStatuses = queryConstraint.getDestRelOrigins(termFactory.getActiveAceFrameConfig()
-            .getAllowedStatus(), allowedTypes, null, true, true);
+        Set<I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint).getDestRelOrigins(
+            termFactory.getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, null, true, true);
 
         // call conceptStatusIs on each
         for (I_GetConceptData childStatus : childStatuses) {
@@ -142,17 +178,13 @@ public abstract class RefsetSpecStatement {
         return false;
     }
 
+    // ** checked
     protected boolean componentIsMemberOf(int componentId) throws IOException, TerminologyException {
         // get all extensions for this concept
         List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(componentId);
 
         for (I_ThinExtByRefVersioned ext : extensions) {
-            if (ext.getRefsetId() == queryConstraint.getConceptId()) { // check
-                                                                       // they
-                                                                       // are of
-                                                                       // the
-                                                                       // specified
-                                                                       // refset
+            if (ext.getRefsetId() == ((I_GetConceptData) queryConstraint).getConceptId()) { // check
 
                 List<? extends I_ThinExtByRefPart> parts = ext.getVersions();
 
@@ -167,14 +199,16 @@ public abstract class RefsetSpecStatement {
                     }
                 }
 
-                if (latestPart.getStatusId() == termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-                    .getConceptId()) {
-                    return true;
+                for (Integer currentStatusId : getCurrentStatusIds()) {
+                    if (latestPart.getStatusId() == currentStatusId) {
+                        return true;
+                    }
                 }
             }
         }
 
         return false;
+
     }
 
     /**
@@ -182,5 +216,13 @@ public abstract class RefsetSpecStatement {
      */
     public void negateStatement() {
         useNotQualifier = !useNotQualifier;
+    }
+
+    public QUERY_TOKENS getTokenEnum() {
+        return tokenEnum;
+    }
+
+    public void setTokenEnum(QUERY_TOKENS tokenEnum) {
+        this.tokenEnum = tokenEnum;
     }
 }

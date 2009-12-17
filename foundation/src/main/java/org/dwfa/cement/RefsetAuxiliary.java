@@ -38,7 +38,7 @@ import org.dwfa.util.id.Type3UuidFactory;
 
 public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 
-    public enum Concept implements I_ConceptualizeUniversally {
+    public enum Concept implements I_ConceptEnumeration, I_ConceptualizeUniversally {
         REFSET_AUXILIARY(new String[] { "Refset Auxiliary Concept", "Refset Auxiliary Concept" }), REFSET_SPEC(new String[] {
             "refset specification concept", "refset spec" }, REFSET_AUXILIARY), SPEC_GROUPING(new String[] {
             "Refset specification grouping", "Refset specification grouping" }, REFSET_SPEC), REFSET_AND_GROUPING(new String[] {
@@ -48,28 +48,67 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "Refset specification token", "Refset specification token" }, REFSET_SPEC), CONCEPT_IS_MEMBER_OF(new String[] {
             "CONCEPT IS MEMBER OF", "concept is member of" }, SPEC_QUERY_TOKEN), CONCEPT_STATUS_IS(new String[] {
             "CONCEPT STATUS IS", "concept status is" }, SPEC_QUERY_TOKEN), CONCEPT_STATUS_IS_KIND_OF(new String[] {
-            "CONCEPT STATUS IS KIND OF", "concept status is kind of" }, SPEC_QUERY_TOKEN), CONCEPT_IS(new String[] {
+            "CONCEPT STATUS IS KIND OF", "concept status is kind of" }, SPEC_QUERY_TOKEN), CONCEPT_STATUS_IS_CHILD_OF(new String[] {
+            "CONCEPT STATUS IS CHILD OF", "concept status is child of" }, SPEC_QUERY_TOKEN), CONCEPT_STATUS_IS_DESCENDENT_OF(new String[] {
+            "CONCEPT STATUS IS DESCENDENT OF", "concept status is descendent of" }, SPEC_QUERY_TOKEN), CONCEPT_IS(new String[] {
             "CONCEPT IS", "concept is" }, SPEC_QUERY_TOKEN), CONCEPT_IS_CHILD_OF(new String[] { "CONCEPT IS CHILD OF",
             "concept is child of" }, SPEC_QUERY_TOKEN), CONCEPT_IS_DESCENDENT_OF(new String[] {
             "CONCEPT IS DESCENDENT OF", "concept is descendent of" }, SPEC_QUERY_TOKEN), CONCEPT_IS_KIND_OF(new String[] {
-            "CONCEPT IS KIND OF", "concept is kind of" }, SPEC_QUERY_TOKEN), DESC_IS_MEMBER_OF(new String[] {
-            "DESC IS MEMBER OF", "desc is member of" }, SPEC_QUERY_TOKEN), DESC_STATUS_IS(new String[] {
+            "CONCEPT IS KIND OF", "concept is kind of" }, SPEC_QUERY_TOKEN), DESC_IS(new String[] { "DESC IS",
+            "desc is" }, SPEC_QUERY_TOKEN), DESC_IS_MEMBER_OF(new String[] { "DESC IS MEMBER OF", "desc is member of" }, SPEC_QUERY_TOKEN), DESC_STATUS_IS(new String[] {
             "DESC STATUS IS", "desc status is" }, SPEC_QUERY_TOKEN), DESC_STATUS_IS_KIND_OF(new String[] {
-            "DESC STATUS IS KIND OF", "desc status is kind of" }, SPEC_QUERY_TOKEN), DESC_TYPE_IS(new String[] {
+            "DESC STATUS IS KIND OF", "desc status is kind of" }, SPEC_QUERY_TOKEN), DESC_STATUS_IS_CHILD_OF(new String[] {
+            "DESC STATUS IS CHILD OF", "desc status is child of" }, SPEC_QUERY_TOKEN), DESC_STATUS_IS_DESCENDENT_OF(new String[] {
+            "DESC STATUS IS DESCENDENT OF", "desc status is descendent of" }, SPEC_QUERY_TOKEN), DESC_TYPE_IS(new String[] {
             "DESC TYPE IS", "desc type is" }, SPEC_QUERY_TOKEN), DESC_TYPE_IS_KIND_OF(new String[] {
-            "DESC TYPE IS KIND OF", "desc type is kind of" }, SPEC_QUERY_TOKEN), DESC_REGEX_MATCH(new String[] {
+            "DESC TYPE IS KIND OF", "desc type is kind of" }, SPEC_QUERY_TOKEN), DESC_TYPE_IS_CHILD_OF(new String[] {
+            "DESC TYPE IS CHILD OF", "desc type is child of" }, SPEC_QUERY_TOKEN), DESC_TYPE_IS_DESCENDENT_OF(new String[] {
+            "DESC TYPE IS DESCENDENT OF", "desc type is descendent of" }, SPEC_QUERY_TOKEN), DESC_REGEX_MATCH(new String[] {
             "DESC REGEX MATCH", "desc regex match" }, SPEC_QUERY_TOKEN), DESC_LUCENE_MATCH(new String[] {
-            "DESC LUCENE MATCH", "desc lucene match" }, SPEC_QUERY_TOKEN), REL_IS_MEMBER_OF(new String[] {
+            "DESC LUCENE MATCH", "desc lucene match" }, SPEC_QUERY_TOKEN), REL_IS(new String[] { "REL IS", "rel is" }, SPEC_QUERY_TOKEN), REL_RESTRICTION_IS(new String[] {
+            "REL RESTRICTION IS", "rel restriction is" }, SPEC_QUERY_TOKEN), REL_IS_MEMBER_OF(new String[] {
             "REL IS MEMBER OF", "rel is member of" }, SPEC_QUERY_TOKEN), REL_STATUS_IS(new String[] { "REL STATUS IS",
             "rel status is" }, SPEC_QUERY_TOKEN), REL_STATUS_IS_KIND_OF(new String[] { "REL STATUS IS KIND OF",
-            "rel status is kind of" }, SPEC_QUERY_TOKEN), REL_TYPE_IS(new String[] { "REL TYPE IS", "rel type is" }, SPEC_QUERY_TOKEN), REL_TYPE_IS_KIND_OF(new String[] {
-            "REL TYPE IS KIND OF", "rel type is kind of" }, SPEC_QUERY_TOKEN), REL_LOGICAL_QUANTIFIER_IS(new String[] {
+            "rel status is kind of" }, SPEC_QUERY_TOKEN), REL_STATUS_IS_CHILD_OF(new String[] {
+            "REL STATUS IS CHILD OF", "rel status is child of" }, SPEC_QUERY_TOKEN), REL_STATUS_IS_DESCENDENT_OF(new String[] {
+            "REL STATUS IS DESCENDENT OF", "rel status is descendent of" }, SPEC_QUERY_TOKEN), REL_TYPE_IS(new String[] {
+            "REL TYPE IS", "rel type is" }, SPEC_QUERY_TOKEN), REL_TYPE_IS_KIND_OF(new String[] {
+            "REL TYPE IS KIND OF", "rel type is kind of" }, SPEC_QUERY_TOKEN), REL_TYPE_IS_CHILD_OF(new String[] {
+            "REL TYPE IS CHILD OF", "rel type is child of" }, SPEC_QUERY_TOKEN), REL_TYPE_IS_DESCENDENT_OF(new String[] {
+            "REL TYPE IS DESCENDENT OF", "rel type is descendent of" }, SPEC_QUERY_TOKEN), REL_LOGICAL_QUANTIFIER_IS(new String[] {
             "REL LOGICAL QUANTIFIER IS", "rel logical quantifier is" }, SPEC_QUERY_TOKEN), REL_LOGICAL_QUANTIFIER_IS_KIND_OF(new String[] {
-            "REL LOGICAL QUANTIFIER IS KIND OF", "rel logical quantifier is kind of" }, SPEC_QUERY_TOKEN), REL_CHARACTERISTIC_IS(new String[] {
+            "REL LOGICAL QUANTIFIER IS KIND OF", "rel logical quantifier is kind of" }, SPEC_QUERY_TOKEN), REL_LOGICAL_QUANTIFIER_IS_CHILD_OF(new String[] {
+            "REL LOGICAL QUANTIFIER IS CHILD OF", "rel logical quantifier is child of" }, SPEC_QUERY_TOKEN), REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF(new String[] {
+            "REL LOGICAL QUANTIFIER IS DESCENDENT OF", "rel logical quantifier is descendent of" }, SPEC_QUERY_TOKEN), REL_CHARACTERISTIC_IS(new String[] {
             "REL CHARACTERISTIC IS", "rel characteristic is" }, SPEC_QUERY_TOKEN), REL_CHARACTERISTIC_IS_KIND_OF(new String[] {
-            "REL CHARACTERISTIC IS KIND OF", "rel characteristic is kind of" }, SPEC_QUERY_TOKEN), REL_REFINABILITY_IS(new String[] {
-            "REL REFINABILITY IS", "rel refinability is" }, SPEC_QUERY_TOKEN), REL_REFINABILITY_IS_KIND_OF(new String[] {
-            "REL REFINABILITY IS KIND OF", "rel refinability is kind of" }, SPEC_QUERY_TOKEN), REFSET_TYPE(new String[] {
+            "REL CHARACTERISTIC IS KIND OF", "rel characteristic is kind of" }, SPEC_QUERY_TOKEN), REL_CHARACTERISTIC_IS_CHILD_OF(new String[] {
+            "REL CHARACTERISTIC IS CHILD OF", "rel characteristic is child of" }, SPEC_QUERY_TOKEN), REL_CHARACTERISTIC_IS_DESCENDENT_OF(new String[] {
+            "REL CHARACTERISTIC IS DESCENDENT OF", "rel characteristic is descendent of" }, SPEC_QUERY_TOKEN), REL_REFINABILITY_IS(new String[] {
+            "REL REFINABILITY IS", "rel refinability is" }, SPEC_QUERY_TOKEN), REL_REFINABILITY_IS_CHILD_OF(new String[] {
+            "REL REFINABILITY IS CHILD OF", "rel refinability is child of" }, SPEC_QUERY_TOKEN), REL_REFINABILITY_IS_DESCENDENT_OF(new String[] {
+            "REL REFINABILITY IS DESCENDENT OF", "rel refinability is descendent of" }, SPEC_QUERY_TOKEN), REL_REFINABILITY_IS_KIND_OF(new String[] {
+            "REL REFINABILITY IS KIND OF", "rel refinability is kind of" }, SPEC_QUERY_TOKEN), DIFFERENCE_QUERY(new String[] {
+            "Difference Query", "difference query" }, SPEC_QUERY_TOKEN), DIFFERENCE_CONFIGURATION(new String[] {
+            "DIFFERENCE CONFIGURATION", "difference configuration" }, DIFFERENCE_QUERY), DIFFERENCE_STATISTICS(new String[] {
+            "DIFFERENCE STATISTICS", "difference statistics" }, DIFFERENCE_QUERY), ADDED_CONCEPT(new String[] {
+            "ADDED CONCEPT", "added concept" }, DIFFERENCE_QUERY), DELETED_CONCEPT(new String[] { "DELETED CONCEPT",
+            "deleted concept" }, DIFFERENCE_QUERY), CHANGED_CONCEPT_STATUS(new String[] { "CHANGED CONCEPT STATUS",
+            "changed concept status" }, DIFFERENCE_QUERY), CHANGED_DEFINED(new String[] { "CHANGED DEFINED",
+            "changed defined" }, DIFFERENCE_QUERY), ADDED_DESCRIPTION(new String[] { "ADDED DESCRIPTION",
+            "added description" }, DIFFERENCE_QUERY), DELETED_DESCRIPTION(new String[] { "DELETED DESCRIPTION",
+            "deleted description" }, DIFFERENCE_QUERY), CHANGED_DESCRIPTION_STATUS(new String[] {
+            "CHANGED DESCRIPTION STATUS", "changed description status" }, DIFFERENCE_QUERY), CHANGED_DESCRIPTION_TERM(new String[] {
+            "CHANGED DESCRIPTION TERM", "changed description term" }, DIFFERENCE_QUERY), CHANGED_DESCRIPTION_TYPE(new String[] {
+            "CHANGED DESCRIPTION TYPE", "changed description type" }, DIFFERENCE_QUERY), CHANGED_DESCRIPTION_LANGUAGE(new String[] {
+            "CHANGED DESCRIPTION LANGUAGE", "changed description language" }, DIFFERENCE_QUERY), CHANGED_DESCRIPTION_CASE(new String[] {
+            "CHANGED DESCRIPTION CASE", "changed description case" }, DIFFERENCE_QUERY), ADDED_RELATIONSHIP(new String[] {
+            "ADDED RELATIONSHIP", "added relationship" }, DIFFERENCE_QUERY), DELETED_RELATIONSHIP(new String[] {
+            "DELETED RELATIONSHIP", "deleted relationship" }, DIFFERENCE_QUERY), CHANGED_RELATIONSHIP_STATUS(new String[] {
+            "CHANGED RELATIONSHIP STATUS", "changed relationship status" }, DIFFERENCE_QUERY), CHANGED_RELATIONSHIP_CHARACTERISTIC(new String[] {
+            "CHANGED RELATIONSHIP CHARACTERISTIC", "changed relationship characteristic" }, DIFFERENCE_QUERY), CHANGED_RELATIONSHIP_TYPE(new String[] {
+            "CHANGED RELATIONSHIP TYPE", "changed relationship type" }, DIFFERENCE_QUERY), CHANGED_RELATIONSHIP_REFINABILITY(new String[] {
+            "CHANGED RELATIONSHIP REFINABILITY", "changed relationship language" }, DIFFERENCE_QUERY), CHANGED_RELATIONSHIP_GROUP(new String[] {
+            "CHANGED RELATIONSHIP GROUP", "changed relationship group" }, DIFFERENCE_QUERY), REFSET_TYPE(new String[] {
             "refset type", "refset type" }, REFSET_AUXILIARY), BOOLEAN_EXTENSION(new String[] {
             "boolean extension by reference", "boolean extension" }, REFSET_TYPE), STRING_EXTENSION(new String[] {
             "string extension by reference", "string extension" }, REFSET_TYPE), INT_EXTENSION(new String[] {
@@ -109,7 +148,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "annotation purpose", "annotation purpose" }, REFSET_PURPOSE), ENUMERATED_ANNOTATION_PURPOSE(new String[] {
             "enumerated annotation", "enumerated annotation" }, ANNOTATION_PURPOSE), STRING_ANNOTATION_PURPOSE(new String[] {
             "string annotation", "string annotation" }, ANNOTATION_PURPOSE), ATTRIBUTE_VALUE(new String[] {
-            "annotation", "annotation" }, REFSET_PURPOSE), ENUMERATED_ATTRIBUTE_VALUE_PURPOSE(new String[] {
+            "attribute value", "attribute value" }, REFSET_PURPOSE), ENUMERATED_ATTRIBUTE_VALUE_PURPOSE(new String[] {
             "enumerated attribute value", "enumerated attribute value" }, ATTRIBUTE_VALUE), STRING_ATTRIBUTE_VALUE_PURPOSE(new String[] {
             "string attribute value", "string attribute value" }, ATTRIBUTE_VALUE), NAVIGATION(new String[] {
             "navigation", "navigation" }, REFSET_PURPOSE), RELATIONSHIP_ORDER(new String[] { "relationship order",
@@ -120,21 +159,27 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "linguistic role", "lingiustic role" }, REFSET_PURPOSE), SUBJECT_TYPE(new String[] { "subject type",
             "subject type" }, REFSET_PURPOSE), INDEX_KEYS(new String[] { "index key", "index key" }, REFSET_PURPOSE), ANCILLARY_DATA(new String[] {
             "ancillary data", "ancillary data" }, REFSET_PURPOSE), DIALECT(new String[] { "dialect", "dialect" }, REFSET_PURPOSE), QUERY_SPECIFICATION(new String[] {
-            "query specification", "query specification" }, REFSET_PURPOSE), SIMPLE_COMPONENT(new String[] {
+            "query specification", "query specification" }, REFSET_PURPOSE), MAPPING_PURPOSE(new String[] {
+            "mapping purpose", "mapping purpose" }, REFSET_PURPOSE), SIMPLE_MAP_PURPOSE(new String[] {
+            "simple mapping purpose", "simple mapping purpose" }, REFSET_PURPOSE), ALTERNATE_MAP_PURPOSE(new String[] {
+            "alternate mapping purpose", "alternate mapping purpose" }, REFSET_PURPOSE), TYPED_MAP_PURPOSE(new String[] {
+            "typed mapping purpose", "typed mapping purpose" }, REFSET_PURPOSE), SIMPLE_COMPONENT(new String[] {
             "simple component", "simple component" }, REFSET_PURPOSE), LANGUAGE_PURPOSE(new String[] {
-            "language purpose", "language purpose" }, REFSET_PURPOSE), MEASUREMENT_ASSOCIATION(new String[] {
+            "language purpose", "language purpose" }, REFSET_PURPOSE), DESCRIPTION_TYPE_PURPOSE(new String[] {
+            "description type purpose", "desc type purpose" }, REFSET_PURPOSE), MEASUREMENT_ASSOCIATION(new String[] {
             "measurement association", "measurement association" }, SIMPLE_COMPONENT), INT_MEASUREMENT_ASSOCIATION(new String[] {
             "integer measurement association", "integer measurement association" }, MEASUREMENT_ASSOCIATION), FLOAT_MEASUREMENT_ASSOCIATION(new String[] {
             "float measurement association", "float measurement association" }, MEASUREMENT_ASSOCIATION), REFSET_MEMBER_PURPOSE(new String[] {
             "refset membership", "refset membership" }, new I_ConceptualizeUniversally[] { REFSET_PURPOSE }, UUID.fromString("090a41ac-3299-54b4-a287-4f279b85d059")), REFSET_PARENT_MEMBER_PURPOSE(new String[] {
             "marked parent membership", "marked parent membership" }, new I_ConceptualizeUniversally[] { REFSET_PURPOSE }, UUID.fromString("7dd8fa86-7a20-56ab-8606-f82d28f6fd67")), MODULE_DEPENDENCY(new String[] {
-            "module dependency", "module dependency" }, REFSET_PURPOSE), REFSET_PURPOSE_PATH(new String[] { "path",
-            "path" }, REFSET_PURPOSE), REFSET_PURPOSE_POSITION(new String[] { "position", "position" }, REFSET_PURPOSE), TEMPLATE_VALUE_TYPE(new String[] {
-            "template value type", "value type" }, REFSET_AUXILIARY), TEMPLATE_CODE_VALUE_TYPE(new String[] {
-            "template code value type", "code" }, TEMPLATE_VALUE_TYPE), TEMPLATE_NUMBER_VALUE_TYPE(new String[] {
-            "template number value type", "number" }, TEMPLATE_VALUE_TYPE), TEMPLATE_DATE_VALUE_TYPE(new String[] {
-            "template date value type", "date" }, TEMPLATE_VALUE_TYPE), TEMPLATE_SEMANTIC_STATUS(new String[] {
-            "template semantic status", "template semantic status" }, REFSET_AUXILIARY), TEMPLATE_FINAL_SEMANTIC_STATUS(new String[] {
+            "module dependency", "module dependency" }, REFSET_PURPOSE), PATH_ORIGIN(new String[] { "path origin",
+            "path origin" }, REFSET_PURPOSE), REFSET_PURPOSE_PATH(new String[] { "path", "path" }, REFSET_PURPOSE), REFSET_PURPOSE_POSITION(new String[] {
+            "position", "position" }, REFSET_PURPOSE), TEMPLATE_VALUE_TYPE(new String[] { "template value type",
+            "value type" }, REFSET_AUXILIARY), TEMPLATE_CODE_VALUE_TYPE(new String[] { "template code value type",
+            "code" }, TEMPLATE_VALUE_TYPE), TEMPLATE_NUMBER_VALUE_TYPE(new String[] { "template number value type",
+            "number" }, TEMPLATE_VALUE_TYPE), TEMPLATE_DATE_VALUE_TYPE(new String[] { "template date value type",
+            "date" }, TEMPLATE_VALUE_TYPE), TEMPLATE_SEMANTIC_STATUS(new String[] { "template semantic status",
+            "template semantic status" }, REFSET_AUXILIARY), TEMPLATE_FINAL_SEMANTIC_STATUS(new String[] {
             "template final semantic status", "final" }, TEMPLATE_SEMANTIC_STATUS), TEMPLATE_REFINABLE_SEMANTIC_STATUS(new String[] {
             "template refinable semantic status", "refinable" }, TEMPLATE_SEMANTIC_STATUS), TEMPLATE_NUMERIC_QUALIFIER_REFINE_SEMANTIC_STATUS(new String[] {
             "template numeric qualifier refine semantic status", "numeric qualifier" }, TEMPLATE_SEMANTIC_STATUS), TEMPLATE_MANDATORY_TO_REFINE_SEMANTIC_STATUS(new String[] {
@@ -329,6 +374,9 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 
         CTV3_CROSS_MAP(new String[] { "Clinical Terms Version 3 Cross Map", "CTV3 cross map", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] {
             REFSET_IDENTITY, ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), CTV3_RELEASED_BOOL(new String[] {
+            "Clinical Terms Version 2 and 3 Released ", "CTV2-3 released flag", "ORG_DWFA_CTV3_RELEASED_BOOL" }, new I_ConceptualizeUniversally[] {
+            REFSET_IDENTITY, SUBJECT_TYPE, BOOLEAN_EXTENSION }, new I_ConceptualizeUniversally[] {
             ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
 
         REFSET_PATHS(new String[] { "Path reference set", "Path reference set" }, new I_ConceptualizeUniversally[] {
@@ -354,6 +402,17 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 
         private UniversalFixedDescription[] descriptions;
 
+        public String[] parents_S;
+        public String[] descriptions_S;
+
+        public String[] getParents_S() {
+            return parents_S;
+        }
+
+        public String[] getDescriptions_S() {
+            return descriptions_S;
+        }
+
         private Concept(String[] descriptions) {
             this(descriptions, new I_ConceptualizeUniversally[] {});
         }
@@ -364,6 +423,16 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 
         private Concept(String[] descriptionStrings, I_ConceptualizeUniversally[] parents) {
             this.conceptUids.add(Type3UuidFactory.fromEnum(this));
+            if (parents.length > 0) {
+                parents_S = new String[parents.length];
+                for (int i = 0; i < parents.length; i++) {
+                    parents_S[i] = parents[i].toString();
+                }
+            }
+            if (descriptionStrings.length > 0) {
+                descriptions_S = descriptionStrings;
+            }
+
             try {
                 this.rels = DocumentAuxiliary.makeRels(this, parents);
                 this.descriptions = DocumentAuxiliary.makeDescriptions(this, descriptionStrings, descTypeOrder);

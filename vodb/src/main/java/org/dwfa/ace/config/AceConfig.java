@@ -132,6 +132,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
+        if (username == null || username.equals("null")) {
+            username = aceFrames.get(0).getUsername();
+        }
         out.writeObject(username);
         out.writeObject(null); // for historic password...
         out.writeObject(dbFolder);
@@ -149,7 +152,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
             }
             if (userPath == null) {
-                userPath = ConceptBean.get(ArchitectonicAuxiliary.Concept.PATH.getUids());
+                userPath = ConceptBean.get(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
             }
             out.writeObject(AceConfig.getVodb().nativeToUuid(userConcept.getConceptId()));
             out.writeObject(AceConfig.getVodb().nativeToUuid(userPath.getConceptId()));
@@ -274,6 +277,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                     afc.setMasterConfig(this);
                 }
             }
+            if (username == null || username.equals("null")) {
+                username = aceFrames.get(0).getUsername();
+            }
             if (objDataVersion >= 2) {
                 loggerRiverConfigFile = (String) in.readObject();
             } else {
@@ -325,6 +331,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
+        AceLog.getAppLog().info("changeSetWriterFileName: " + changeSetWriterFileName);
+        renameChangeSetFile();
+        AceLog.getAppLog().info("changeSetWriterFileName: " + changeSetWriterFileName);
+
         this.vetoSupport = new VetoableChangeSupport(this);
         this.changeSupport = new PropertyChangeSupport(this);
     }
@@ -512,10 +522,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         if (changeSetFile.exists()) {
             int maxSize = 512000;
             if (changeSetFile.length() > maxSize) {
-                String[] nameParts = getChangeSetWriterFileName().split("#");
-                int sequence = Integer.parseInt(nameParts[1]);
-                sequence++;
-                setChangeSetWriterFileName(nameParts[0] + '#' + sequence + "#" + nameParts[2]);
+                renameChangeSetFile();
                 AceLog.getAppLog().info(
                     "change set exceeds " + maxSize + " bytes. Incrementing file to: " + getChangeSetWriterFileName());
             }
@@ -525,6 +532,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(this);
         oos.close();
+    }
+
+    private void renameChangeSetFile() {
+        String[] nameParts = getChangeSetWriterFileName().split("#");
+        int sequence = Integer.parseInt(nameParts[1]);
+        sequence++;
+        setChangeSetWriterFileName(getUsername() + '#' + sequence + "#" + UUID.randomUUID() + ".jcs");
     }
 
     public File getChangeSetRoot() {

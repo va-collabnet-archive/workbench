@@ -21,6 +21,7 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.util.HashFunction;
 
 public class ThinRelTuple implements I_RelTuple {
 
@@ -273,4 +274,13 @@ public class ThinRelTuple implements I_RelTuple {
     public int getFixedPartId() {
         return fixedPart.getTermComponentId();
     }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPositionId(int pid) {
+        throw new UnsupportedOperationException();
+    }
+
 }

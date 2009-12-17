@@ -24,12 +24,12 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
-public class ConceptConceptExtTupleFileUtil extends ExtTupleFileUtil {
+public class ConceptConceptExtTupleFileUtil {
 
     public static String exportTuple(I_ThinExtByRefTuple tuple) throws TerminologyException, IOException {
 
@@ -108,7 +108,7 @@ public class ConceptConceptExtTupleFileUtil extends ExtTupleFileUtil {
                 return false;
             }
 
-            RefsetHelper refsetHelper = new RefsetHelper();
+            SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
             TupleFileUtil.pathUuids.add(pathUuid);
@@ -165,9 +165,9 @@ public class ConceptConceptExtTupleFileUtil extends ExtTupleFileUtil {
             }
 
             try {
-                newConceptConceptRefsetExtension(refsetUuid, componentUuid, c1Uuid, c2Uuid, memberUuid, pathUuid,
-                    statusUuid, effectiveDate);
-
+                refsetHelper.newConceptConceptRefsetExtension(termFactory.getId(refsetUuid).getNativeId(),
+                    termFactory.getId(componentUuid).getNativeId(), termFactory.getId(c1Uuid).getNativeId(),
+                    termFactory.getId(c2Uuid).getNativeId(), memberUuid, pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Exception thrown while creating new concept-concept refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
@@ -178,7 +178,8 @@ public class ConceptConceptExtTupleFileUtil extends ExtTupleFileUtil {
 
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage = "Exception of unknown cause thrown while importing concept-concept ext tuple";
+            String errorMessage = "Exception of unknown cause thrown while importing concept-concept ext tuple : "
+                + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

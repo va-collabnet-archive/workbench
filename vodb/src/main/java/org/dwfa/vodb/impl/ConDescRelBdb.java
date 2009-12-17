@@ -41,6 +41,7 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 
+import org.apache.commons.collections.primitives.IntList;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -56,6 +57,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.DatabaseSetupConfig;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -70,6 +72,9 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.IdentifierSet;
+import org.dwfa.ace.api.IdentifierSetReadOnly;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
@@ -120,7 +125,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
         boolean hasNext;
 
-        private ConceptIterator conItr = new ConceptIterator();
+        private Iterator<I_GetConceptData> conItr = getConceptIterator();
 
         private Iterator<I_RelVersioned> relItr;
 
@@ -230,7 +235,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                         ThinRelVersioned relv = new ThinRelVersioned(relId, conceptNid, c2Id, versionCount);
                         conceptBean.sourceRels.add(relv);
                         for (int y = 0; y < versionCount; y++) {
-                            relv.addVersionNoRedundancyCheck(relPartBdb.getRelPart(ti.readInt()));
+                            I_RelPart relPart = relPartBdb.getRelPart(ti.readInt());
+                            assert relPart.getTypeId() != Integer.MAX_VALUE;
+                            relv.addVersionNoRedundancyCheck(relPart);
                         }
                     }
                     int relOriginCount = ti.readInt();
@@ -316,6 +323,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                             to.writeShort(rel.versionCount());
                             for (I_RelPart part : rel.getVersions()) {
                                 try {
+                                    assert part.getTypeId() != Integer.MAX_VALUE;
                                     to.writeInt(relPartBdb.getRelPartId(part));
                                 } catch (DatabaseException e) {
                                     throw new RuntimeException(e);
@@ -593,7 +601,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                         ThinRelVersioned relv = new ThinRelVersioned(relId, conceptNid, c2Id, versionCount);
                         conceptBean.sourceRels.add(relv);
                         for (int y = 0; y < versionCount; y++) {
-                            relv.addVersionNoRedundancyCheck(relPartBdb.getRelPart(ti.readShort()));
+                            I_RelPart relPart = relPartBdb.getRelPart(ti.readShort());
+                            assert relPart.getTypeId() != Integer.MAX_VALUE;
+                            relv.addVersionNoRedundancyCheck(relPart);
                         }
                     }
                     int relOriginCount = ti.readInt();
@@ -768,7 +778,18 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                             } catch (IndexOutOfBoundsException e) {
                                 throw new RuntimeException(e);
                             } catch (DatabaseException e) {
-                                throw new RuntimeException(e);
+                                descMapFuture.get();
+                                StringBuffer buff = new StringBuffer();
+                                buff.append(e.getLocalizedMessage());
+                                buff.append("desc map size: ");
+                                buff.append(descMap.nextId);
+                                for (short i = 0; i < descMap.nextId; i++) {
+                                    buff.append("\n  desc[");
+                                    buff.append(i);
+                                    buff.append("]: ");
+                                    buff.append(descMap.getText(i));
+                                }
+                                throw new RuntimeException(buff.toString(), e);
                             }
                             conceptAttributes.addVersion(conAttrPart);
                         }
@@ -787,7 +808,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                         ThinRelVersioned relv = new ThinRelVersioned(relId, conceptNid, c2Id, versionCount);
                         conceptBean.sourceRels.add(relv);
                         for (int y = 0; y < versionCount; y++) {
-                            relv.addVersionNoRedundancyCheck(relPartBdb.getRelPart(ti.readShort()));
+                            I_RelPart relPart = relPartBdb.getRelPart(ti.readShort());
+                            assert relPart.getTypeId() != Integer.MAX_VALUE;
+                            relv.addVersionNoRedundancyCheck(relPart);
                         }
                     }
                     int relOriginCount = ti.readInt();
@@ -859,6 +882,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                             }
                             to.writeShort(rel.versionCount());
                             for (I_RelPart part : rel.getVersions()) {
+                                assert part.getTypeId() != Integer.MAX_VALUE;
                                 try {
                                     to.writeShort(relPartBdb.getRelPartId(part));
                                 } catch (DatabaseException e) {
@@ -988,6 +1012,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
     public void writeConceptAttributes(I_ConceptAttributeVersioned conceptAttributes) throws DatabaseException,
             IOException {
 
+        if (conceptNids != null) {
+            checkConceptNids(conceptAttributes.getConId());
+        }
         ConceptBean bean = ConceptBean.get(conceptAttributes.getConId());
         bean.conceptAttributes = conceptAttributes;
 
@@ -996,7 +1023,14 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         intBinder.objectToEntry(conceptAttributes.getConId(), key);
         conDescRelBinding.objectToEntry(bean, value);
         conDescRelDb.put(BdbEnv.transaction, key, value);
+        conceptNids = null;
         // logStats();
+    }
+
+    private void checkConceptNids(int conceptId) throws DatabaseException {
+        if (hasConcept(conceptId) == false) {
+            conceptNids = null;
+        }
     }
 
     public void logStats() throws DatabaseException {
@@ -1041,7 +1075,12 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
      * @see org.dwfa.vodb.impl.I_StoreConceptAttributes#getConceptIterator()
      */
     public Iterator<I_GetConceptData> getConceptIterator() throws IOException {
-        return new ConceptIterator();
+        // return new ConceptIterator();
+        try {
+            return new ConceptIdArrayIterator();
+        } catch (DatabaseException e) {
+            throw new IOException(e);
+        }
     }
 
     /*
@@ -1065,6 +1104,119 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             }
         }
         concCursor.close();
+    }
+
+    public IdentifierSet getConceptIdSet() throws IOException {
+        try {
+            IdentifierSet cidSet = new IdentifierSet(identifierDb.getMaxId() - Integer.MIN_VALUE);
+            refreshConceptNids();
+            for (int nid : conceptNids) {
+                cidSet.setMember(nid);
+            }
+            return cidSet;
+        } catch (DatabaseException e) {
+            throw new IOException(e);
+        }
+    }
+
+    public IdentifierSet getEmptyIdSet() throws IOException {
+        try {
+            return new IdentifierSet(identifierDb.getMaxId() - Integer.MIN_VALUE);
+        } catch (DatabaseException e) {
+            throw new IOException(e);
+        }
+    }
+
+    public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids) throws IOException {
+        IdentifierSet newSet = getEmptyIdSet();
+        for (int nid : ids) {
+            newSet.setMember(nid);
+        }
+        return newSet;
+    }
+
+    public I_RepresentIdSet getIdSetfromTermCollection(Collection<? extends I_AmTermComponent> components)
+            throws IOException {
+        IdentifierSet newSet = getEmptyIdSet();
+        for (I_AmTermComponent component : components) {
+            newSet.setMember(component.getNid());
+        }
+        return newSet;
+    }
+
+    public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
+        refreshConceptNids();
+        return idSet;
+    }
+
+    private static int[] conceptNids;
+    private static IdentifierSetReadOnly idSet;
+
+    private void refreshConceptNids() throws IOException {
+        Cursor concCursor = null;
+        try {
+            if (conceptNids == null || getConceptCount() != conceptNids.length) {
+                IdentifierSet tempIdSet = getEmptyIdSet();
+                conceptNids = new int[getConceptCount()];
+                concCursor = conDescRelDb.openCursor(null, null);
+                DatabaseEntry foundKey = new DatabaseEntry();
+                DatabaseEntry foundData = new DatabaseEntry();
+                for (int i = 0; i < conceptNids.length; i++) {
+                    if (concCursor.getNext(foundKey, foundData, LockMode.DEFAULT) != OperationStatus.SUCCESS) {
+                        AceLog.getAppLog().alertAndLogException(new Exception("premature end of concept cursor: " + i));
+                    }
+                    conceptNids[i] = (Integer) intBinder.entryToObject(foundKey);
+                    tempIdSet.setMember(conceptNids[i]);
+                }
+                idSet = new IdentifierSetReadOnly(tempIdSet);
+            }
+        } catch (DatabaseException ex) {
+            throw new IOException(ex);
+        } finally {
+            if (concCursor != null) {
+                try {
+                    concCursor.close();
+                } catch (DatabaseException e) {
+                    throw new IOException(e);
+                }
+            }
+        }
+    }
+
+    private class ConceptIdArrayIterator implements Iterator<I_GetConceptData> {
+
+        int index = 0;
+        Cursor concCursor;
+        int[] iteratorNids;
+
+        private ConceptIdArrayIterator() throws DatabaseException, IOException {
+            super();
+            refreshConceptNids();
+            iteratorNids = conceptNids.clone();
+        }
+
+        public boolean hasNext() {
+            if (index >= iteratorNids.length) {
+                if (concCursor != null) {
+                    try {
+                        concCursor.close();
+                    } catch (DatabaseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return index < iteratorNids.length;
+        }
+
+        public I_GetConceptData next() {
+            index++;
+            return ConceptBean.get(iteratorNids[index - 1]);
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException("Remove is not supported. ");
+        }
+
     }
 
     private class ConceptIterator implements Iterator<I_GetConceptData> {
@@ -1099,11 +1251,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                     concCursor.close();
                 }
             } catch (Exception ex) {
-                try {
-                    concCursor.close();
-                } catch (DatabaseException e) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                }
                 AceLog.getAppLog().alertAndLogException(ex);
                 hasNext = false;
             }
@@ -1136,7 +1283,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
         boolean hasNext;
 
-        private ConceptIterator conItr = new ConceptIterator();
+        private Iterator<I_GetConceptData> conItr = getConceptIterator();
 
         private Iterator<I_DescriptionVersioned> descItr;
 
@@ -1204,6 +1351,37 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     public void commit(ConceptBean bean, int version, Set<TimePathId> values) throws DatabaseException, IOException {
         boolean changed = false;
+
+        if (bean.uncommittedIdVersioned != null) {
+            for (I_IdVersioned idv : bean.uncommittedIdVersioned) {
+                for (I_IdPart p : idv.getVersions()) {
+                    if (p.getVersion() == Integer.MAX_VALUE) {
+                        p.setVersion(version);
+                        values.add(new TimePathId(version, p.getPathId()));
+                        for (I_DescriptionVersioned desc : bean.getDescriptions()) {
+                            if (desc.getDescId() == idv.getNativeId()) {
+                                Document doc = new Document();
+                                doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES,
+                                    Field.Index.UN_TOKENIZED));
+                                doc.add(new Field("cnid", Integer.toString(desc.getConceptId()), Field.Store.YES,
+                                    Field.Index.UN_TOKENIZED));
+                                addIdsToIndex(doc, identifierDb.getId(desc.getDescId()));
+                                addIdsToIndex(doc, identifierDb.getId(desc.getConceptId()));
+                                IndexWriter writer = new IndexWriter(luceneDir, new StandardAnalyzer(), false);
+                                writer.addDocument(doc);
+                                writer.close();
+                            }
+                        }
+                    }
+                }
+                identifierDb.writeId(idv);
+                if (AceLog.getEditLog().isLoggable(Level.FINE)) {
+                    AceLog.getEditLog().fine("Committing: " + idv);
+                }
+            }
+            bean.uncommittedIdVersioned = null;
+        }
+
         if (bean.conceptAttributes != null) {
             for (I_ConceptAttributePart p : bean.conceptAttributes.getVersions()) {
                 if (p.getVersion() == Integer.MAX_VALUE) {
@@ -1310,6 +1488,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
     }
 
     private void writeConceptToBdb(ConceptBean bean) throws DatabaseException {
+        if (conceptNids != null) {
+            checkConceptNids(bean.getConceptId());
+        }
         DatabaseEntry key = new DatabaseEntry();
         DatabaseEntry value = new DatabaseEntry();
         intBinder.objectToEntry(bean.getConceptId(), key);
@@ -1484,6 +1665,55 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             updater.setIndeterminate(false);
             updater.setHits(0);
             return new CountDownLatch(0);
+        }
+    }
+
+    public void searchConcepts(I_TrackContinuation tracker, IntList matches, CountDownLatch conceptLatch,
+            List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws IOException {
+
+        Stopwatch timer = null;
+        if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+            timer = new Stopwatch();
+            timer.start();
+        }
+        Iterator<I_GetConceptData> conItr = getConceptIterator();
+        Semaphore checkSemaphore = new Semaphore(15);
+        Semaphore addSemaphore = new Semaphore(1);
+        while (conItr.hasNext()) {
+            I_GetConceptData concept = conItr.next();
+            if (tracker.continueWork()) {
+                try {
+                    checkSemaphore.acquire();
+                } catch (InterruptedException e) {
+                    AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+                }
+                // Semaphore checkSemaphore, IntList matches,
+                ACE.threadPool.execute(new CheckAndProcessSearchTest(conceptLatch, checkSemaphore, addSemaphore,
+                    matches, concept, checkList, config));
+            } else {
+                while (conceptLatch.getCount() > 0) {
+                    conceptLatch.countDown();
+                }
+                try {
+                    checkSemaphore.acquire(15);
+                } catch (InterruptedException e) {
+                    AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+                }
+                break;
+            }
+        }
+        try {
+            conceptLatch.await();
+        } catch (InterruptedException e) {
+            AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+        }
+        if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+            if (tracker.continueWork()) {
+                AceLog.getAppLog().info("Search 2 time: " + timer.getElapsedTime());
+            } else {
+                AceLog.getAppLog().info("Canceled. Elapsed time: " + timer.getElapsedTime());
+            }
+            timer.stop();
         }
     }
 
@@ -1879,4 +2109,14 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         return (int) conDescRelDb.count();
     }
 
+    public I_IntSet getConceptNids() throws IOException {
+        if (conceptNids != null) {
+            try {
+                new ConceptIdArrayIterator();
+            } catch (DatabaseException e) {
+                throw new IOException(e);
+            }
+        }
+        return new IntSet(conceptNids);
+    }
 }

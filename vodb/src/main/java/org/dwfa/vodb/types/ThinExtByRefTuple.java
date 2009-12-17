@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -209,5 +210,15 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     public int getFixedPartId() {
         return core.getTermComponentId();
+    }
+
+    public I_ThinExtByRefPart makePromotionPart(I_Path promotionPath) {
+        return part.makePromotionPart(promotionPath);
+    }
+
+    public boolean promote(I_Path promotionPath) {
+        I_ThinExtByRefPart promotionPart = part.makePromotionPart(promotionPath);
+        addVersion(promotionPart);
+        return true;
     }
 }

@@ -119,6 +119,26 @@ public class FasterLoad extends AbstractTask {
             return null;
         }
 
+        public void addRoleComposition(int[] lhsIds, int rhsId) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void addRoleRoot(int id, boolean inclusive) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void addRoleNeverGrouped(int id) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void getEquivConcepts(I_EquivalentCallback callback) {
+            // TODO Auto-generated method stub
+
+        }
+
     }
 
     private static class FilterConcept {
@@ -155,8 +175,8 @@ public class FasterLoad extends AbstractTask {
                 // (the corresponding sourceId == the SCTID)
                 for (final I_IdPart idPart : concept.getId().getVersions()) {
                     if (idPart.getSource() == -2147483005) { // FIXME find
-                                                             // source of this
-                                                             // constant
+                        // source of this
+                        // constant
                         ok = true;
                         break;
                     }
@@ -390,7 +410,7 @@ public class FasterLoad extends AbstractTask {
         public void addRelationship(int conceptId1, int roleId, int conceptId2, int group) {
             final AddNewRelationship addNewRelationship = new AddNewRelationship(conceptId1, roleId, conceptId2, group);
             final boolean threadSafe = false; // termFactory.newRelationship no
-                                              // threadsafe :(
+            // threadsafe :(
             if (threadSafe) {
                 executionService.execute(addNewRelationship);
             } else {

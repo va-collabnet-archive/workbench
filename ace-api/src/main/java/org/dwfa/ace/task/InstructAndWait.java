@@ -112,8 +112,6 @@ public class InstructAndWait extends AbstractTask {
         I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        boolean progressPanelVisible = config.isProgressToggleVisible();
-        config.setProgressToggleVisible(false);
         boolean subversionButtonVisible = config.isBuilderToggleVisible();
         config.setSubversionToggleVisible(false);
         try {
@@ -136,11 +134,9 @@ public class InstructAndWait extends AbstractTask {
                     c.gridheight = 1;
                     c.weightx = 1.0;
                     c.weighty = 0;
-                    c.anchor = GridBagConstraints.WEST;
-                    workflowPanel.add(new JPanel(), c); // Filler
-                    c.gridx++;
-                    c.weightx = 0.0;
+                    c.anchor = GridBagConstraints.EAST;
                     workflowPanel.add(new JLabel(instruction), c);
+                    c.weightx = 0.0;
                     c.gridx++;
                     workflowPanel.add(new JLabel("  "), c);
                     c.gridx++;
@@ -150,12 +146,14 @@ public class InstructAndWait extends AbstractTask {
                     stepButton.addActionListener(new StepActionListener());
                     c.gridx++;
                     workflowPanel.add(new JLabel("     "), c);
+                    workflowPanel.setVisible(true);
                     workflowPanel.validate();
                     Container cont = workflowPanel;
                     while (cont != null) {
                         cont.validate();
                         cont = cont.getParent();
                     }
+                    workflowPanel.repaint();
                     stepButton.requestFocusInWindow();
                 }
             });
@@ -175,6 +173,8 @@ public class InstructAndWait extends AbstractTask {
                         cont.validate();
                         cont = cont.getParent();
                     }
+                    workflowPanel.repaint();
+                    workflowPanel.setVisible(false);
                 }
 
             });
@@ -184,7 +184,6 @@ public class InstructAndWait extends AbstractTask {
             throw new TaskFailedException(e);
         }
         config.setBuilderToggleVisible(builderVisible);
-        config.setProgressToggleVisible(progressPanelVisible);
         config.setSubversionToggleVisible(subversionButtonVisible);
         return Condition.CONTINUE;
     }

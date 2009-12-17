@@ -29,8 +29,10 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -43,6 +45,50 @@ public class RefsetQueryFactory {
     private final static int CONCEPT = 3;
 
     public static RefsetSpecQuery createQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
+            I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
+            ParseException {
+
+        // create tree object that corresponds to the database's refset spec
+        List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(
+            refsetSpec.getConceptId(), true);
+        HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
+        HashSet<Integer> fetchedComponents = new HashSet<Integer>();
+        fetchedComponents.add(refsetSpec.getConceptId());
+        addExtensionsToMap(extensions, extensionMap, fetchedComponents);
+
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
+        for (DefaultMutableTreeNode extNode : extensionMap.values()) {
+            I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) extNode.getUserObject();
+            if (ext.getComponentId() == refsetSpec.getConceptId()) {
+                root.add(extNode);
+            } else {
+                extensionMap.get(ext.getComponentId()).add(extNode);
+            }
+        }
+
+        // create refset spec query
+        I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
+
+        RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
+        query = processNode(root, query, CONCEPT, configFrame, termFactory);
+        return query;
+
+    }
+
+    /**
+     * Create a "possible" query that contains all historical clauses to iterate
+     * over, even retired clauses.
+     * 
+     * @param configFrame
+     * @param termFactory
+     * @param refsetSpec
+     * @param refset
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     * @throws ParseException
+     */
+    public static RefsetSpecQuery createPossibleQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
             I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
             ParseException {
 
@@ -163,8 +209,12 @@ public class RefsetQueryFactory {
                         subquery.negateQuery();
                     }
 
+                } else if (thinPart instanceof I_ThinExtByRefPartString) {
+                    // ignore - comments refset
+                } else if (thinPart instanceof I_ThinExtByRefPartConcept) {
+                    // ignore - Not part of spec...
                 } else {
-                    throw new TerminologyException("Unknown extension type");
+                    throw new TerminologyException("Unknown extension type : " + thinPart.getClass());
                 }
             }
         }

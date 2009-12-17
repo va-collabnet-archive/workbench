@@ -127,6 +127,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 
     public long nextCommitTime() throws IOException, ClassNotFoundException {
         lazyInit();
+        ACE.commitSequence++;
         if (nextCommit == null) {
             try {
                 nextCommit = ois.readLong();
@@ -144,6 +145,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             AceLog.getEditLog().info(
                 "Reading from log " + changeSetFile.getName() + " until " + new Date(endTime).toString());
         }
+        boolean firstException = true;
         while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
             try {
                 Object obj = ois.readObject();
@@ -198,10 +200,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         + "\n  +++++---------------\n");
                 nextCommit = Long.MAX_VALUE;
                 getVodb().setProperty(changeSetFile.getName(), Long.toString(changeSetFile.length()));
-            } catch (DatabaseException e) {
-                throw new ToIoException(e);
-            } catch (TerminologyException e) {
-                throw new ToIoException(e);
+            } catch (Exception e) {
+                throw new IOException(e);
             }
         }
         try {
@@ -313,11 +313,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             ConceptBean localBean = ConceptBean.get(bean.getId().getUIDs());
             localBean.flush();
             return localBean;
-        } catch (DatabaseException e) {
-            AceLog.getEditLog().severe(
-                "Error committing bean in change set: " + changeSetFile + "\nUniversalAceBean:  \n" + bean);
-            throw new ToIoException(e);
-        } catch (TerminologyException e) {
+        } catch (Exception e) {
             AceLog.getEditLog().severe(
                 "Error committing bean in change set: " + changeSetFile + "\nUniversalAceBean:  \n" + bean);
             throw new ToIoException(e);
@@ -394,12 +390,20 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             throw new IOException("commit time = Long.MAX_VALUE");
         }
         // Do all the commiting...
+        boolean firstException = true;
         for (UniversalAceIdentification id : list.getUncommittedIds()) {
             try {
                 AceLog.getEditLog().fine("commitUncommittedIds: " + id);
                 ThinIdVersioned tid = null;
+                I_Path path;
                 for (UniversalAceIdentificationPart part : id.getVersions()) {
-                    I_Path path = getVodb().getPath(getVodb().uuidToNative(part.getPathId()));
+                    try {
+                        path = getVodb().getPath(getVodb().uuidToNative(part.getPathId()));
+                    } catch (TerminologyException ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                        path = getVodb().newPath(null, getVodb().getConcept(part.getPathId()));
+                    }
+
                     if (tid == null) {
                         try {
                             int nid = getNid(id.getUIDs());
@@ -420,7 +424,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         }
                     }
                     ThinIdPart newPart = new ThinIdPart();
-                    newPart.setIdStatus(getNid(part.getIdStatus()));
+                    newPart.setStatusId(getNid(part.getIdStatus()));
                     newPart.setPathId(getVodb().uuidToNative(part.getPathId()));
                     newPart.setSource(getNid(part.getSource()));
                     newPart.setSourceId(part.getSourceId());
@@ -443,8 +447,33 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                  */
                 getVodb().writeId(tid);
             } catch (TerminologyException e) {
-                AceLog.getEditLog().alertAndLog(Level.SEVERE,
-                    "TerminologyException. Ignoring component, and continuing import." + id, e);
+                if (firstException) {
+                    AceLog.getEditLog().alertAndLog(
+                        Level.SEVERE,
+                        "Exception. Ignoring component, and continuing import. Examine log for future exceptions. "
+                            + id, e);
+                    firstException = false;
+                } else {
+                    AceLog.getEditLog().log(
+                        Level.SEVERE,
+                        "Exception. Ignoring component, and continuing import. Examine log for future exceptions. "
+                            + id, e);
+                }
+            } catch (Exception e) {
+                if (firstException) {
+                    AceLog.getEditLog()
+                        .alertAndLog(
+                            Level.SEVERE,
+                            "Exception. Ignoring component, and continuing import. Examine log for future exceptions."
+                                + id, e);
+                    firstException = false;
+                } else {
+                    AceLog.getEditLog()
+                        .log(
+                            Level.SEVERE,
+                            "Exception. Ignoring component, and continuing import. Examine log for future exceptions."
+                                + id, e);
+                }
             }
 
         }
@@ -466,7 +495,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     if (part.getTime() == Long.MAX_VALUE) {
                         ThinConPart newPart = new ThinConPart();
                         newPart.setPathId(getNid(part.getPathId()));
-                        newPart.setConceptStatus(getNid(part.getConceptStatus()));
+                        newPart.setStatusId(getNid(part.getConceptStatus()));
                         newPart.setDefined(part.isDefined());
                         newPart.setVersion(ThinVersionHelper.convert(time));
                         if (thinAttributes.getVersions().contains(newPart)) {
@@ -501,7 +530,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             for (UniversalAceConceptAttributesPart part : attributes.getVersions()) {
                 ThinConPart newPart = new ThinConPart();
                 newPart.setPathId(getNid(part.getPathId()));
-                newPart.setConceptStatus(getNid(part.getConceptStatus()));
+                newPart.setStatusId(getNid(part.getConceptStatus()));
                 newPart.setDefined(part.isDefined());
                 if (part.getTime() == Long.MAX_VALUE) {
                     newPart.setVersion(ThinVersionHelper.convert(time));
@@ -614,7 +643,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     newPart.setGroup(part.getGroup());
                     newPart.setPathId(getNid(part.getPathId()));
                     newPart.setRefinabilityId(getNid(part.getRefinabilityId()));
-                    newPart.setRelTypeId(getNid(part.getRelTypeId()));
+                    newPart.setTypeId(getNid(part.getRelTypeId()));
                     newPart.setStatusId(getNid(part.getStatusId()));
                     newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
                     if (part.getTime() == Long.MAX_VALUE) {
@@ -671,7 +700,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         newPart.setGroup(part.getGroup());
                         newPart.setPathId(getNid(part.getPathId()));
                         newPart.setRefinabilityId(getNid(part.getRefinabilityId()));
-                        newPart.setRelTypeId(getNid(part.getRelTypeId()));
+                        newPart.setTypeId(getNid(part.getRelTypeId()));
                         newPart.setStatusId(getNid(part.getStatusId()));
                         if (part.getTime() == Long.MAX_VALUE) {
                             newPart.setVersion(ThinVersionHelper.convert(time));
@@ -699,7 +728,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                             newPart.setGroup(part.getGroup());
                             newPart.setPathId(getNid(part.getPathId()));
                             newPart.setRefinabilityId(getNid(part.getRefinabilityId()));
-                            newPart.setRelTypeId(getNid(part.getRelTypeId()));
+                            newPart.setTypeId(getNid(part.getRelTypeId()));
                             newPart.setStatusId(getNid(part.getStatusId()));
                             newPart.setVersion(ThinVersionHelper.convert(time));
                             if (thinRel.getVersions().contains(newPart)) {
@@ -854,7 +883,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     }
                 }
                 ThinIdPart newPart = new ThinIdPart();
-                newPart.setIdStatus(getNid(part.getIdStatus()));
+                newPart.setStatusId(getNid(part.getIdStatus()));
                 newPart.setPathId(getVodb().uuidToNative(part.getPathId()));
                 newPart.setSource(getNid(part.getSource()));
                 newPart.setSourceId(part.getSourceId());

@@ -16,11 +16,29 @@
  */
 package org.dwfa.vodb;
 
-import com.sleepycat.bind.tuple.TupleBinding;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.JEVersion;
-import com.sleepycat.je.Transaction;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
@@ -29,6 +47,7 @@ import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
 import org.dwfa.ace.api.DatabaseSetupConfig;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceDb;
@@ -55,6 +74,7 @@ import org.dwfa.ace.api.I_ProcessPaths;
 import org.dwfa.ace.api.I_ProcessRelationships;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_SupportClassifier;
 import org.dwfa.ace.api.I_Transact;
@@ -85,10 +105,12 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.AceRunner;
 import org.dwfa.ace.cs.BinaryChangeSetReader;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
+import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -98,7 +120,6 @@ import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.SuppressDataChecks;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.tapi.TerminologyRuntimeException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.bind.ThinExtBinder;
@@ -141,25 +162,11 @@ import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
-import javax.swing.SwingUtilities;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
+import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.je.DatabaseEntry;
+import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.JEVersion;
+import com.sleepycat.je.Transaction;
 
 /**
  * @author kec
@@ -265,7 +272,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             if (isHeadless()) {
                 activityFrame = new UpperInfoOnlyConsoleMonitor();
             } else {
-                activityFrame = new ActivityPanel(true, true, null);
+                activityFrame = new ActivityPanel(true, null, null);
             }
 
             AceLog.getAppLog().info("Setting up db: " + envHome);
@@ -325,6 +332,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         try {
             bdbEnv.close();
             closed = true;
+            ConceptBean.purge();
+            ExtensionByReferenceBean.purge();
+            LocalVersionedTerminology.close(this);
         } catch (DatabaseException e) {
             throw new ToIoException(e);
         }
@@ -419,11 +429,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public boolean hasExtension(int memberId) throws IOException {
-        try {
-            return bdbEnv.hasExtension(memberId);
-        } catch (DatabaseException e) {
-            throw new ToIoException(e);
-        }
+        return bdbEnv.hasExtension(memberId);
     }
 
     public boolean hasConcept(int conceptId) throws IOException {
@@ -467,7 +473,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return bdbEnv.getAllExtensionsForComponent(componentId);
     }
 
-    public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws DatabaseException {
+    public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws IOException {
         return bdbEnv.getExtensionsForRefset(refsetId);
     }
 
@@ -699,6 +705,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public void writeRel(I_RelVersioned rel) throws IOException {
+        ACE.commitSequence++;
         try {
             bdbEnv.writeRel(rel);
         } catch (DatabaseException e) {
@@ -707,11 +714,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public void writeExt(I_ThinExtByRefVersioned ext) throws IOException {
-        try {
-            bdbEnv.writeExt(ext);
-        } catch (DatabaseException e) {
-            throw new ToIoException(e);
-        }
+        bdbEnv.writeExt(ext);
     }
 
     public void writeDescription(I_DescriptionVersioned desc) throws IOException {
@@ -897,6 +900,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             throw new TerminologyException(
                 "<br><br>To create a new relationship, you must<br>select the rel destination in the hierarchy view....");
         }
+        ACE.commitSequence++;
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
         int relId =
                 uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
@@ -932,6 +936,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             I_GetConceptData relStatus, int relGroup, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
             IOException {
         canEdit(aceFrameConfig);
+        ACE.commitSequence++;
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 
         int relId =
@@ -1320,6 +1325,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             try {
                 AceFrame newFrame = new AceFrame(AceRunner.args, AceRunner.lc, frameConfig, false);
                 newFrame.setVisible(true);
+                AceFrameConfig nativeConfig = (AceFrameConfig) frameConfig;
+                nativeConfig.setAceFrame(newFrame);
+
             } catch (Exception e) {
                 ex = e;
             }
@@ -1500,6 +1508,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             int pathNid, int version, int relStatusNid, int relTypeNid, int relCharacteristicNid,
             int relRefinabilityNid, int relGroup) throws TerminologyException, IOException {
 
+        ACE.commitSequence++;
         int relId = nativeGenerationForUuid(relUuid, uuidType, pathNid, version);
         ThinRelVersioned rel = new ThinRelVersioned(relId, conceptNid, relDestinationNid, 1);
         ThinRelPart part = new ThinRelPart();
@@ -1516,6 +1525,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     public I_RelVersioned newRelationshipBypassCommit(int relNid, int conceptNid, int relDestinationNid)
             throws IOException {
+        ACE.commitSequence++;
         return new ThinRelVersioned(relNid, conceptNid, relDestinationNid, 1);
     }
 
@@ -1739,11 +1749,11 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         bdbEnv.commitTransaction();
     }
 
-    public I_ShowActivity newActivityPanel(boolean displayInViewer) {
+    public I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig) {
         if (isHeadless()) {
             return new UpperInfoOnlyConsoleMonitor();
         } else {
-            ActivityPanel ap = new ActivityPanel(true, true, null);
+            ActivityPanel ap = new ActivityPanel(true, null, aceFrameConfig);
             ap.setIndeterminate(true);
             ap.setProgressInfoUpper("New activity");
             ap.setProgressInfoLower("");
@@ -1872,7 +1882,10 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             try {
                 elementClass = Class.forName(e.getClassName());
             } catch (ClassNotFoundException ex) {
-                throw new TerminologyRuntimeException("No class for " + e.getClassName(), ex);
+                // We have encountered a class on the call stack which is not
+                // available to our classloader
+                // so we will stop here and assert we can check no further.
+                return false;
             }
 
             // Skip this class
@@ -1909,6 +1922,45 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return false;
     }
 
+    public void searchConcepts(I_TrackContinuation tracker, org.apache.commons.collections.primitives.IntList matches,
+            CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
+            throws DatabaseException, IOException, ParseException {
+        bdbEnv.searchConcepts(tracker, matches, latch, checkList, config);
+    }
+
+    public List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
+        return ACE.getCommitErrorsAndWarnings();
+    }
+
+    public TransferHandler makeTerminologyTransferHandler(JComponent thisComponent) {
+        return new TerminologyTransferHandler(thisComponent);
+    }
+
+    public I_IntSet getConceptNids() throws IOException {
+        return bdbEnv.getConceptNids();
+    }
+
+    public I_RepresentIdSet getConceptIdSet() throws IOException {
+        return bdbEnv.getConceptIdSet();
+    }
+
+    public I_RepresentIdSet getEmptyIdSet() throws IOException {
+        return bdbEnv.getEmptyIdSet();
+    }
+
+    public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids) throws IOException {
+        return bdbEnv.getIdSetFromIntCollection(ids);
+    }
+
+    public I_RepresentIdSet getIdSetfromTermCollection(Collection<? extends I_AmTermComponent> components)
+            throws IOException {
+        return bdbEnv.getIdSetfromTermCollection(components);
+    }
+
+    public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
+        return bdbEnv.getReadOnlyConceptIdSet();
+    }
+	
 	@Override
 	public I_ProcessQueue newProcessQueue(int threadCount) {
 		return new ProcessQueue(threadCount);

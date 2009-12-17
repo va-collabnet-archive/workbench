@@ -31,7 +31,9 @@ public class ClassifyCurrentEditingBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ClassifyCurrentEditing.class);
-        bd.setDisplayName("<html><font color='green'><center>Classify Current editing");
+        // !!!
+        // bd.setDisplayName("<html><font color='green'><center>Classify Current editing");
+        bd.setDisplayName("<html><font color='purple'><center>ClassifyCurrentEditing");
         return bd;
     }
 

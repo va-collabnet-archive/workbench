@@ -21,18 +21,37 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
+/**
+ * The CreateRefsetMetaDataTaskBeanInfo class describes the visible elements of
+ * the
+ * Workflow task CreateRefsetMetaDataTask so that it can be displayed in the
+ * Process Builder.
+ * The CreateRefsetMetaDataTask task creates meta data required for a new
+ * refset..
+ * 
+ * @author Chrissy Hill
+ * @author Perry Reid
+ * @version 3, October 2009
+ */
 public class CreateRefsetMetaDataTaskBeanInfo extends SimpleBeanInfo {
 
     /**
-     *
+     * Constructor - calls the parent constructor
      */
     public CreateRefsetMetaDataTaskBeanInfo() {
         super();
     }
 
+    /**
+     * Returns a list of property descriptors for this task.
+     * 
+     * @return Returns a PropertyDescriptor array containing the properties of
+     *         this task
+     * @exception Error Thrown when an exception happens during Introspection
+     */
     public PropertyDescriptor[] getPropertyDescriptors() {
 
         try {
@@ -43,10 +62,25 @@ public class CreateRefsetMetaDataTaskBeanInfo extends SimpleBeanInfo {
             newRefsetPropName.setDisplayName("<html><font color='green'>refset Name:");
             newRefsetPropName.setShortDescription("The property to put the refset name into.");
 
+            PropertyDescriptor newRefsetUUIDPropName;
+            newRefsetUUIDPropName = new PropertyDescriptor("newRefsetUUIDPropName", getBeanDescriptor().getBeanClass());
+            newRefsetUUIDPropName.setBound(true);
+            newRefsetUUIDPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            newRefsetUUIDPropName.setDisplayName("<html><font color='green'>refset UUID:");
+            newRefsetUUIDPropName.setShortDescription("The property to put the refset UUID into.");
+
+            PropertyDescriptor newRefsetSpecUUIDPropName;
+            newRefsetSpecUUIDPropName = new PropertyDescriptor("newRefsetSpecUUIDPropName",
+                getBeanDescriptor().getBeanClass());
+            newRefsetSpecUUIDPropName.setBound(true);
+            newRefsetSpecUUIDPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            newRefsetSpecUUIDPropName.setDisplayName("<html><font color='green'>refset spec UUID:");
+            newRefsetSpecUUIDPropName.setShortDescription("The property to put the refset spec UUID into.");
+
             PropertyDescriptor statusTermEntry;
             statusTermEntry = new PropertyDescriptor("statusTermEntry", getBeanDescriptor().getBeanClass());
             statusTermEntry.setBound(true);
-            statusTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
+            statusTermEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
             statusTermEntry.setDisplayName("<html><font color='green'>status concept to use:");
             statusTermEntry.setShortDescription("The status concept to use.");
 
@@ -71,8 +105,8 @@ public class CreateRefsetMetaDataTaskBeanInfo extends SimpleBeanInfo {
             editorUuidPropName.setDisplayName("<html><font color='green'>editor UUID prop name:");
             editorUuidPropName.setShortDescription("The property to put the editor UUID into.");
 
-            PropertyDescriptor rv[] = { newRefsetPropName, statusTermEntry, reviewerUuidPropName, ownerUuidPropName,
-                                       editorUuidPropName };
+            PropertyDescriptor rv[] = { newRefsetPropName, newRefsetUUIDPropName, newRefsetSpecUUIDPropName,
+                                       statusTermEntry, reviewerUuidPropName, ownerUuidPropName, editorUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -80,7 +114,13 @@ public class CreateRefsetMetaDataTaskBeanInfo extends SimpleBeanInfo {
     }
 
     /**
+     * Return the descriptor for this JavaBean which contains a reference to the
+     * JavaBean
+     * that implements this task as well as the display name of the task along
+     * with formating information.
+     * 
      * @see java.beans.BeanInfo#getBeanDescriptor()
+     * @return Returns the BeanDescriptor for this task
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(CreateRefsetMetaDataTask.class);

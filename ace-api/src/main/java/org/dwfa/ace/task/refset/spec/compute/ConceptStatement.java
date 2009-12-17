@@ -17,27 +17,30 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 /**
  * Represents partial information contained in a refset spec.
  * An example of a statement is : "NOT: Concept is : Paracetamol"
  * 
- * @author Chrissy Hill
+ * @author Chrissy Hill, Keith Campbell
  * 
  */
 public class ConceptStatement extends RefsetSpecStatement {
+
+    I_GetConceptData queryConstraintConcept;
 
     /**
      * Constructor for refset spec statement.
@@ -48,149 +51,203 @@ public class ConceptStatement extends RefsetSpecStatement {
      */
     public ConceptStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_GetConceptData queryConstraint) {
         super(useNotQualifier, queryToken, queryConstraint);
+        for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
+            if (queryToken.getConceptId() == token.nid) {
+                tokenEnum = token;
+                break;
+            }
+        }
+        if (tokenEnum == null) {
+            throw new RuntimeException("Unknown query type : " + queryToken);
+        }
+        queryConstraintConcept = (I_GetConceptData) queryConstraint;
+    }
+
+    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
+            throws TerminologyException, IOException {
+        queryConstraint = (I_GetConceptData) queryConstraint;
+        I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
+        if (parentPossibleConcepts == null) {
+            parentPossibleConcepts = termFactory.getConceptIdSet();
+        }
+
+        switch (tokenEnum) {
+        case CONCEPT_IS:
+            if (isNegated()) {
+                // possibleConcepts = termFactory.getConceptIdSet();
+                possibleConcepts.or(parentPossibleConcepts);
+                possibleConcepts.setNotMember(queryConstraintConcept.getConceptId());
+            } else {
+                possibleConcepts.setMember(queryConstraintConcept.getConceptId());
+            }
+            break;
+        case CONCEPT_IS_CHILD_OF:
+        case CONCEPT_IS_DESCENDENT_OF:
+        case CONCEPT_IS_KIND_OF:
+            I_RepresentIdSet results = queryConstraintConcept.getPossibleKindOfConcepts(configFrame);
+            if (isNegated()) {
+                // possibleConcepts = termFactory.getConceptIdSet();
+                possibleConcepts.or(parentPossibleConcepts);
+                // possibleConcepts.removeAll(results);
+            } else {
+                possibleConcepts.or(results);
+            }
+            break;
+        case CONCEPT_IS_MEMBER_OF:
+            List<I_ThinExtByRefVersioned> refsetExtensions = termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
+            Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
+            for (I_ThinExtByRefVersioned ext : refsetExtensions) {
+                refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
+            }
+            I_RepresentIdSet refsetMemberSet = termFactory.getIdSetfromTermCollection(refsetMembers);
+            if (isNegated()) {
+                possibleConcepts.or(parentPossibleConcepts);
+                // possibleConcepts = termFactory.getConceptIdSet();
+                // possibleConcepts.removeAll(refsetMemberSet);
+            } else {
+                possibleConcepts.or(refsetMemberSet);
+            }
+            break;
+        case CONCEPT_STATUS_IS:
+        case CONCEPT_STATUS_IS_CHILD_OF:
+        case CONCEPT_STATUS_IS_DESCENDENT_OF:
+        case CONCEPT_STATUS_IS_KIND_OF:
+            // possibleConcepts = termFactory.getConceptIdSet();
+            possibleConcepts.or(parentPossibleConcepts);
+            break;
+        default:
+            throw new RuntimeException("Can't handle queryToken: " + queryToken);
+        }
+        setPossibleConceptsCount(possibleConcepts.size());
+        return possibleConcepts;
     }
 
     @Override
     public boolean getStatementResult(I_AmTermComponent component) throws TerminologyException, IOException {
         I_GetConceptData concept = (I_GetConceptData) component;
 
-        if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS.getUids()))) {
+        switch (tokenEnum) {
+        case CONCEPT_IS:
             return conceptIs(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF.getUids()))) {
-            return conceptIsMemberOf(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS_KIND_OF.getUids()))) {
-            return conceptIsKindOf(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS.getUids()))) {
-            return conceptStatusIs(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_KIND_OF.getUids()))) {
-            return conceptStatusIsKindOf(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_IS_CHILD_OF.getUids()))) {
+        case CONCEPT_IS_CHILD_OF:
             return conceptIsChildOf(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING.getUids()))) {
-            return conceptContainsRelGrouping(concept);
-        } else if (queryToken.equals(termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.getUids()))) {
-            return conceptContainsDescGrouping(concept);
-        } else {
-            throw new TerminologyException("Unknown query type : " + queryToken.getInitialText());
+        case CONCEPT_IS_DESCENDENT_OF:
+            return conceptIsDescendantOf(concept);
+        case CONCEPT_IS_KIND_OF:
+            return conceptIsKindOf(concept);
+        case CONCEPT_IS_MEMBER_OF:
+            return conceptIsMemberOf(concept);
+        case CONCEPT_STATUS_IS:
+            return conceptStatusIs(concept);
+        case CONCEPT_STATUS_IS_CHILD_OF:
+            return conceptStatusIsChildOf(concept);
+        case CONCEPT_STATUS_IS_DESCENDENT_OF:
+            return conceptStatusIsDescendantOf(concept);
+        case CONCEPT_STATUS_IS_KIND_OF:
+            return conceptStatusIsKindOf(concept);
+        default:
+            throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
     }
 
     /**
-     * Tests of the current concept is a member of the specified refset.
+     * Tests if the concept being tested is an immediate child of the query
+     * constraint.
      * 
-     * @param concept
+     * @param conceptBeingTested
      * @return
-     * @throws IOException
      * @throws TerminologyException
+     * @throws IOException
      */
-    private boolean conceptIsMemberOf(I_GetConceptData concept) throws IOException, TerminologyException {
+    private boolean conceptIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException, IOException {
+        I_IntSet allowedTypes = termFactory.newIntSet();
+        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-        // get all extensions for this concept
-        List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(concept.getConceptId());
+        Set<I_GetConceptData> children = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
 
-        for (I_ThinExtByRefVersioned ext : extensions) {
-            if (ext.getRefsetId() == queryConstraint.getConceptId()) { // check
-                                                                       // they
-                                                                       // are of
-                                                                       // the
-                                                                       // specified
-                                                                       // refset
-
-                List<? extends I_ThinExtByRefPart> parts = ext.getVersions();
-
-                I_ThinExtByRefPart latestPart = null;
-                int latestPartVersion = Integer.MIN_VALUE;
-
-                // get latest part & check that it is current
-                for (I_ThinExtByRefPart part : parts) {
-                    if (part.getVersion() > latestPartVersion) {
-                        latestPartVersion = part.getVersion();
-                        latestPart = part;
-                    }
-                }
-
-                if (latestPart.getStatusId() == termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-                    .getConceptId()) {
-                    return true;
-                }
+        for (I_GetConceptData child : children) {
+            if (conceptBeingTested.equals(child)) {
+                return true;
             }
         }
-
         return false;
     }
 
-    private boolean conceptContainsRelGrouping(I_GetConceptData concept) throws TerminologyException {
-        throw new TerminologyException("Unimplemented query : contains rel grouping"); // unimplemented
-    }
-
-    private boolean conceptContainsDescGrouping(I_GetConceptData concept) throws TerminologyException {
-        throw new TerminologyException("Unimplemented query : contains desc grouping"); // unimplemented
-    }
-
     /**
-     * Tests of the current concept is the same as the destination concept.
-     * 
-     * @param concept
-     * @return
-     */
-    private boolean conceptIs(I_GetConceptData concept) {
-        return concept.equals(queryConstraint);
-    }
-
-    /**
-     * Tests if the current concept is a child of the destination concept. This
-     * does not
-     * return true if they are the same concept.
+     * Tests of the concept being tested is a member of the specified refset.
      * 
      * @param concept
      * @return
      * @throws IOException
      * @throws TerminologyException
      */
-    private boolean conceptIsChildOf(I_GetConceptData concept) throws IOException, TerminologyException {
-        return queryConstraint.isParentOf(concept, true);
+    private boolean conceptIsMemberOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
+        return componentIsMemberOf(conceptBeingTested.getConceptId());
     }
 
     /**
-     * Tests if the current concept is a child of or the same as the destination
-     * concept.
+     * Tests of the current concept is the same as the query constraint.
+     * 
+     * @param concept
+     * @return
+     */
+    private boolean conceptIs(I_GetConceptData conceptBeingTested) {
+        return conceptBeingTested.equals(queryConstraint);
+    }
+
+    /**
+     * Tests if the current concept is a child of the query constraint. This
+     * does not return true if they are the same concept. This will check depth
+     * >= 1 to find children.
      * 
      * @param concept
      * @return
      * @throws IOException
      * @throws TerminologyException
      */
-    private boolean conceptIsKindOf(I_GetConceptData concept) throws IOException, TerminologyException {
-        return queryConstraint.isParentOfOrEqualTo(concept, true);
+    private boolean conceptIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
+        return queryConstraintConcept.isParentOf(conceptBeingTested, true);
     }
 
     /**
-     * Tests if the current concept has a status of the status represented by
-     * the destination concept.
+     * Tests if the current concept is a child of the query constraint. This
+     * will return true if they are the same concept. This will check depth
+     * >= 1 to find children.
      * 
      * @param concept
      * @return
      * @throws IOException
      * @throws TerminologyException
      */
-    private boolean conceptStatusIs(I_GetConceptData concept) throws IOException, TerminologyException {
-        return conceptStatusIs(concept, queryConstraint);
+    private boolean conceptIsKindOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
+        return queryConstraintConcept.isParentOfOrEqualTo(conceptBeingTested, true);
     }
 
     /**
-     * Tests if the current concept has a status of the status represented by
-     * the destination concept.
+     * Tests if the current concept has a status the same as the query
+     * constraint.
      * 
-     * @param statusConcept
      * @param concept
      * @return
      * @throws IOException
      * @throws TerminologyException
      */
-    private boolean conceptStatusIs(I_GetConceptData concept, I_GetConceptData statusConcept) throws IOException,
-            TerminologyException {
-        List<I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(termFactory.getActiveAceFrameConfig()
-            .getAllowedStatus(), null, true, true);
+    private boolean conceptStatusIs(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
+        return conceptStatusIs(conceptBeingTested, queryConstraintConcept);
+    }
+
+    /**
+     * Tests if the current concept has a status matching the inputted status.
+     * 
+     * @param requiredStatusConcept
+     * @param conceptBeingTested
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptStatusIs(I_GetConceptData conceptBeingTested, I_GetConceptData requiredStatusConcept)
+            throws IOException, TerminologyException {
+        List<I_ConceptAttributeTuple> tuples = conceptBeingTested.getConceptAttributeTuples(null, null, true, true);
 
         // get latest tuple
         I_ConceptAttributeTuple latestTuple = null;
@@ -202,7 +259,7 @@ public class ConceptStatement extends RefsetSpecStatement {
             }
         }
 
-        if (latestTuple != null && latestTuple.getConceptStatus() == statusConcept.getConceptId()) {
+        if (latestTuple != null && latestTuple.getConceptStatus() == requiredStatusConcept.getConceptId()) {
             return true;
         }
 
@@ -210,37 +267,93 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     /**
-     * Tests if the current concept has a status of the status represented by
-     * the destination concept,
-     * or any of its children.
+     * Tests if the current concept has a status matching the query constraint,
+     * or any of its children (depth >=1).
      * 
-     * @param concept
+     * @param conceptBeingTested
      * @return
      * @throws IOException
      * @throws TerminologyException
      */
-    private boolean conceptStatusIsKindOf(I_GetConceptData concept) throws IOException, TerminologyException {
+    private boolean conceptStatusIsKindOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
 
-        // check if the concept
-        if (conceptStatusIs(concept)) {
+        // check if the concept's status matches the specified status
+        if (conceptStatusIs(conceptBeingTested)) {
             return true;
         }
+
+        return conceptStatusIsDescendantOf(conceptBeingTested);
+    }
+
+    /**
+     * Tests if the current concept has a status matching the query constraint's
+     * immediate children.
+     * 
+     * @param conceptBeingTested
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptStatusIsChildOf(I_GetConceptData conceptBeingTested) throws IOException,
+            TerminologyException {
 
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
         // get list of all children of input concept
-        Set<I_GetConceptData> childStatuses = concept.getDestRelOrigins(termFactory.getActiveAceFrameConfig()
-            .getAllowedStatus(), allowedTypes, null, true, true);
+        Set<I_GetConceptData> childStatuses = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true,
+            true);
 
         // call conceptStatusIs on each
         for (I_GetConceptData childStatus : childStatuses) {
-            if (conceptStatusIs(concept, childStatus)) {
+            if (conceptStatusIs(conceptBeingTested, childStatus)) {
                 return true;
             }
+
         }
 
         return false;
     }
 
+    /**
+     * Tests if the current concept has a status matching the query constraint's
+     * children to depth >= 1.
+     * 
+     * @param conceptBeingTested
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptStatusIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException,
+            TerminologyException {
+
+        return conceptStatusIsDescendantOf(conceptBeingTested, queryConstraintConcept);
+    }
+
+    /**
+     * Tests if the current concept has a status matching the specified status'
+     * children to depth >= 1.
+     * 
+     * @param conceptBeingTested
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptStatusIsDescendantOf(I_GetConceptData conceptBeingTested, I_GetConceptData status)
+            throws IOException, TerminologyException {
+
+        I_IntSet allowedTypes = termFactory.newIntSet();
+        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+
+        Set<I_GetConceptData> childStatuses = status.getDestRelOrigins(null, allowedTypes, null, true, true);
+
+        for (I_GetConceptData childStatus : childStatuses) {
+            if (conceptStatusIs(conceptBeingTested, childStatus)) {
+                return true;
+            } else if (conceptStatusIsDescendantOf(conceptBeingTested, childStatus)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

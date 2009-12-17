@@ -448,10 +448,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             ImageIconList.add(LIST_LINK_ICON);
         }
 
-        int ordinal = (link.ordinal() >= ImageIconList.size()) ? 0 : link.ordinal();
-
         LinkListModel linkSpinnerModel = new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]),
-            ordinal);
+            link.ordinal());
 
         JSpinner linkSpinner = new JSpinner(linkSpinnerModel);
         linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
@@ -800,8 +798,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                     conceptTabs.setTitleAt(index, shortDesc);
                     conceptTabs.setToolTipTextAt(index, desc);
                 } else {
-                    conceptTabs.setTitleAt(index, "empty");
-                    conceptTabs.setToolTipTextAt(index, "empty");
+                    if (conceptTabs.getTabCount() > index) {
+                        conceptTabs.setTitleAt(index, "empty");
+                        conceptTabs.setToolTipTextAt(index, "empty");
+                    }
                 }
                 conceptTabs.setIconAt(index, tabIcon);
             }

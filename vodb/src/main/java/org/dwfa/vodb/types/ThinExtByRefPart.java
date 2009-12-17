@@ -17,10 +17,15 @@
 package org.dwfa.vodb.types;
 
 import java.io.IOException;
+import java.util.Date;
 
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 
 public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable<I_ThinExtByRefPart> {
     private int pathId;
@@ -131,6 +136,21 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
     }
 
     public String toString() {
+        try {
+            StringBuffer buff = new StringBuffer();
+            buff.append(" path: ");
+            buff.append(LocalVersionedTerminology.get().getConcept(pathId).toString());
+            buff.append(" version: ");
+            buff.append(new Date(LocalVersionedTerminology.get().convertToThickVersion(version)));
+            buff.append(" status: ");
+            buff.append(LocalVersionedTerminology.get().getConcept(status).toString());
+            buff.append(" class: ");
+            buff.append(this.getClass().getSimpleName());
+
+            return buff.toString();
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
         return this.getClass().getSimpleName() + " pathId: " + pathId + " version: " + version + " status: " + status;
     }
 
@@ -138,4 +158,20 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
     public I_ThinExtByRefPart duplicatePart() {
         return duplicate();
     }
+
+    public I_ThinExtByRefPart makePromotionPart(I_Path promotionPath) {
+        I_ThinExtByRefPart promotionPart = duplicate();
+        promotionPart.setVersion(Integer.MAX_VALUE);
+        promotionPart.setPathId(promotionPath.getConceptId());
+        return promotionPart;
+    }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPositionId(int pid) {
+        throw new UnsupportedOperationException();
+    }
+
 }

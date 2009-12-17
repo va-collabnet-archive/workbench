@@ -145,8 +145,6 @@ public class PromptUserForInput extends AbstractTask {
         I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        boolean progressPanelVisible = config.isProgressToggleVisible();
-        config.setProgressToggleVisible(false);
         boolean subversionButtonVisible = config.isBuilderToggleVisible();
         config.setSubversionToggleVisible(false);
         boolean inboxButtonVisible = config.isInboxToggleVisible();
@@ -167,11 +165,9 @@ public class PromptUserForInput extends AbstractTask {
                     c.gridy = 0;
                     c.weightx = 1.0;
                     c.weighty = 0;
-                    c.anchor = GridBagConstraints.WEST;
-                    workflowPanel.add(new JPanel(), c); // Filler
-                    c.gridx++;
-                    c.weightx = 0.0;
+                    c.anchor = GridBagConstraints.EAST;
                     workflowPanel.add(new JLabel(instruction), c);
+                    c.weightx = 0.0;
                     c.fill = GridBagConstraints.HORIZONTAL;
                     c.gridx++;
                     workflowPanel.add(new JLabel("  "), c);
@@ -240,7 +236,6 @@ public class PromptUserForInput extends AbstractTask {
         }
 
         config.setBuilderToggleVisible(builderVisible);
-        config.setProgressToggleVisible(progressPanelVisible);
         config.setSubversionToggleVisible(subversionButtonVisible);
         config.setInboxToggleVisible(inboxButtonVisible);
         return returnCondition;

@@ -431,7 +431,9 @@ public class TaskPanel extends JPanel implements I_DoDragAndDrop, MouseInputList
             c.gridx = 0;
             idLabel = new JLabel("id: " + task.getId());
             this.add(idLabel, c);
-            this.setCurrentTask(task.getId() == this.process.getCurrentTaskId());
+            if (this.process != null) {
+                this.setCurrentTask(task.getId() == this.process.getCurrentTaskId());
+            }
 
             if (taskIsProcess) {
                 c.gridx = 1;

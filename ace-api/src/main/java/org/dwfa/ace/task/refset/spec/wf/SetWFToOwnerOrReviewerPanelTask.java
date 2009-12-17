@@ -17,6 +17,7 @@
 package org.dwfa.ace.task.refset.spec.wf;
 
 import java.awt.Component;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -121,6 +122,11 @@ public class SetWFToOwnerOrReviewerPanelTask extends AbstractTask {
                 wfSheet.remove(components[i]);
             }
 
+            int width = 475;
+            int height = 400;
+
+            wfSheet.setSize(width, height);
+            wfSheet.setLayout(new GridLayout(1, 1));
             wfSheet.add(new SelectOwnerOrReviewerPanel(reviewerUuids, owner));
         } catch (Exception e) {
             ex = e;

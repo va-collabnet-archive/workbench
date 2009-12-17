@@ -212,6 +212,16 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         ConceptBean otherClause = ConceptBean.get(((I_ThinExtByRefPartConceptConceptConcept) otherExt.getPart()).getC3id());
         I_DescriptionTuple thisClauseDesc = thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
         I_DescriptionTuple otherClauseDesc = otherClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
+        if (thisClauseDesc == null || otherClauseDesc == null) {
+            if (thisClauseDesc == otherClauseDesc) {
+                return thisClause.toString().compareTo(otherClause.toString());
+            }
+            if (thisClauseDesc == null) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
         return thisClauseDesc.getText().toLowerCase().compareTo(otherClauseDesc.getText().toLowerCase());
     }
 

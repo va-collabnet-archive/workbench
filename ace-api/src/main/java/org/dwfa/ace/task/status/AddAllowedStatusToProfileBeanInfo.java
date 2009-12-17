@@ -21,7 +21,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class AddAllowedStatusToProfileBeanInfo extends SimpleBeanInfo {
@@ -39,7 +39,7 @@ public class AddAllowedStatusToProfileBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor allowedStatus = new PropertyDescriptor("allowedStatus",
                 getBeanDescriptor().getBeanClass());
             allowedStatus.setBound(true);
-            allowedStatus.setPropertyEditorClass(ConceptLabelEditor.class);
+            allowedStatus.setPropertyEditorClass(ConceptLabelPropEditor.class);
             allowedStatus.setDisplayName("<html><font color='green'>status:");
             allowedStatus.setShortDescription("The concept to add to the profile as an allowed status.");
 

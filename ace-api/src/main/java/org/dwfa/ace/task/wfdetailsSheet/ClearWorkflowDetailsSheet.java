@@ -108,6 +108,7 @@ public class ClearWorkflowDetailsSheet extends AbstractTask {
             for (int i = 0; i < components.length; i++) {
                 workflowDetailsSheet.remove(components[i]);
             }
+            workflowDetailsSheet.setVisible(false);
         } catch (Exception e) {
             ex = e;
         }

@@ -18,6 +18,7 @@ package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.util.HashFunction;
 
 public class ThinIdPartWithCoreDelegate implements I_IdPart {
     private ThinIdPartCore core;
@@ -180,6 +181,14 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
 
     public void setStatusId(int statusId) {
         setIdStatus(statusId);
+    }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPositionId(int pid) {
+        throw new UnsupportedOperationException();
     }
 
 }

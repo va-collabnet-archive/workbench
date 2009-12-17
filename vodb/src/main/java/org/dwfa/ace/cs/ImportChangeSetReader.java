@@ -28,7 +28,6 @@ import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -39,6 +38,7 @@ import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.config.AceConfig;
@@ -79,17 +79,18 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 
     private AceConfig config;
 
-    private JPanel secondaryProgressPanel;
+    private I_ShowActivity secondaryProgressPanel;
 
     private class ProgressUpdator implements I_UpdateProgress {
         Timer updateTimer;
 
         boolean firstUpdate = true;
 
-        ActivityPanel activity = new ActivityPanel(true, true, secondaryProgressPanel);
+        ActivityPanel activity = null;
 
         public ProgressUpdator() {
             super();
+            activity = new ActivityPanel(true, secondaryProgressPanel, config.aceFrames.get(0));
             updateTimer = new Timer(1000, this);
             updateTimer.start();
         }
@@ -117,20 +118,16 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
                 updateTimer.stop();
             }
         }
-
-        public void normalCompletion() {
-            activity.complete();
-            updateTimer.stop();
-        }
-
     }
 
-    public ImportChangeSetReader(final Configuration riverConfig, JPanel secondaryProgressPanel, Frame parentFrame) {
-        this(riverConfig, parentFrame);
+    public ImportChangeSetReader(final Configuration riverConfig, I_ShowActivity secondaryProgressPanel,
+            Frame parentFrame, AceConfig config) {
+        this(riverConfig, parentFrame, config);
         this.secondaryProgressPanel = secondaryProgressPanel;
     }
 
-    public ImportChangeSetReader(final Configuration riverConfig, Frame parentFrame) {
+    public ImportChangeSetReader(final Configuration riverConfig, Frame parentFrame, AceConfig config) {
+        this.config = config;
         try {
             final File csFile = FileDialogUtil.getExistingFile("Select Java Change Set to Import...",
                 new FilenameFilter() {
@@ -139,6 +136,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
                         return name.toLowerCase().endsWith(".jcs");
                     }
                 }, null, parentFrame);
+
             ProgressUpdator updater = new ProgressUpdator();
             updater.activity.addActionListener(this);
             ACE.threadPool.execute(new Runnable() {

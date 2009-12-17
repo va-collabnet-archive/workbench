@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.refset;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,8 +31,9 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LineageHelper;
-import org.dwfa.ace.api.LineageHelper.Condition;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -40,6 +42,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.TerminologyRuntimeException;
 
 @AllowDataCheckSuppression
@@ -392,6 +395,50 @@ public class RefsetHelper extends LineageHelper {
             return hasCurrentRefsetExtension(this.refsetId, concept.getConceptId(), new BeanPropertyMap().with(
                 ThinExtByRefPartProperty.CONCEPT_ONE, this.memberTypeId));
         }
+    }
+
+    public static Set<I_GetConceptData> getCommentsRefsetForRefset(I_GetConceptData refsetIdentityConcept,
+            I_ConfigAceFrame config) throws IOException, TerminologyException {
+        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.COMMENTS_REL.localize()
+            .getNid());
+    }
+
+    public static Set<I_GetConceptData> getMarkedParentRefsetForRefset(I_GetConceptData refsetIdentityConcept,
+            I_ConfigAceFrame config) throws IOException, TerminologyException {
+        return getSourceRelTarget(refsetIdentityConcept, config,
+            RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
+    }
+
+    public static Set<I_GetConceptData> getPromotionRefsetForRefset(I_GetConceptData refsetIdentityConcept,
+            I_ConfigAceFrame config) throws IOException, TerminologyException {
+        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.PROMOTION_REL.localize()
+            .getNid());
+    }
+
+    private static Set<I_GetConceptData> getSourceRelTarget(I_GetConceptData refsetIdentityConcept,
+            I_ConfigAceFrame config, int refsetIdentityNid) throws IOException {
+        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_IntSet allowedTypes = tf.newIntSet();
+        allowedTypes.add(refsetIdentityNid);
+        Set<I_GetConceptData> matchingConcepts = refsetIdentityConcept.getSourceRelTargets(config.getAllowedStatus(),
+            allowedTypes, config.getViewPositionSet(), false);
+        return matchingConcepts;
+    }
+
+    public static Set<I_GetConceptData> getSpecificationRefsetForRefset(I_GetConceptData refsetIdentityConcept,
+            I_ConfigAceFrame config) throws IOException, TerminologyException {
+        return getDestRelOrigins(refsetIdentityConcept, config, RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize()
+            .getNid());
+    }
+
+    private static Set<I_GetConceptData> getDestRelOrigins(I_GetConceptData refsetIdentityConcept,
+            I_ConfigAceFrame config, int refsetIdentityNid) throws IOException {
+        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_IntSet allowedTypes = tf.newIntSet();
+        allowedTypes.add(refsetIdentityNid);
+        Set<I_GetConceptData> matchingConcepts = refsetIdentityConcept.getDestRelOrigins(config.getAllowedStatus(),
+            allowedTypes, config.getViewPositionSet(), false);
+        return matchingConcepts;
     }
 
 }

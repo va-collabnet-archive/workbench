@@ -189,7 +189,9 @@ public class TermTreeHelper implements PropertyChangeListener {
         aceFrameConfig.setStatusMessage(s);
         if (node != null) {
             ConceptBeanForTree treeBean = (ConceptBeanForTree) node.getUserObject();
-            aceFrameConfig.setHierarchySelection(treeBean.getCoreBean());
+            if (treeBean != null) {
+                aceFrameConfig.setHierarchySelection(treeBean.getCoreBean());
+            }
         } else {
             aceFrameConfig.setHierarchySelection(null);
         }

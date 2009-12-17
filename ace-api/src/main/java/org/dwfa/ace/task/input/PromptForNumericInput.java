@@ -112,8 +112,6 @@ public class PromptForNumericInput extends AbstractTask {
         done = false;
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        boolean progressPanelVisible = config.isProgressToggleVisible();
-        config.setProgressToggleVisible(false);
         boolean subversionButtonVisible = config.isBuilderToggleVisible();
         config.setSubversionToggleVisible(false);
         boolean inboxButtonVisible = config.isInboxToggleVisible();
@@ -134,11 +132,9 @@ public class PromptForNumericInput extends AbstractTask {
                     c.gridy = 0;
                     c.weightx = 1.0;
                     c.weighty = 0;
-                    c.anchor = GridBagConstraints.WEST;
-                    workflowPanel.add(new JPanel(), c); // Filler
-                    c.gridx++;
-                    c.weightx = 0.0;
+                    c.anchor = GridBagConstraints.EAST;
                     workflowPanel.add(new JLabel(instruction), c);
+                    c.weightx = 0.0;
                     c.gridx++;
                     workflowPanel.add(new JLabel("  "), c);
                     c.gridx++;
@@ -217,7 +213,6 @@ public class PromptForNumericInput extends AbstractTask {
 
         // reset button visibility as they were before this task executed
         config.setBuilderToggleVisible(builderVisible);
-        config.setProgressToggleVisible(progressPanelVisible);
         config.setSubversionToggleVisible(subversionButtonVisible);
         config.setInboxToggleVisible(inboxButtonVisible);
 

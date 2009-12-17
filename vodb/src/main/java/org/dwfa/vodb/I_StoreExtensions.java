@@ -29,13 +29,13 @@ import com.sleepycat.je.DatabaseException;
 
 public interface I_StoreExtensions extends I_StoreInBdb {
 
-    public void writeExt(I_ThinExtByRefVersioned ext) throws DatabaseException, IOException;
+    public void writeExt(I_ThinExtByRefVersioned ext) throws IOException;
 
     public void iterateExtByRefEntries(I_ProcessExtByRefEntries processor) throws Exception;
 
     public List<I_ThinExtByRefVersioned> getRefsetExtensionMembers(int refsetId) throws IOException;
 
-    public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws DatabaseException;
+    public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws IOException;
 
     public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId) throws IOException;
 
@@ -43,7 +43,7 @@ public interface I_StoreExtensions extends I_StoreInBdb {
 
     public I_ThinExtByRefVersioned getExtension(int memberId) throws IOException;
 
-    public boolean hasExtension(int memberId) throws DatabaseException;
+    public boolean hasExtension(int memberId) throws IOException;
 
     public I_ThinExtByRefVersioned extEntryToObject(DatabaseEntry key, DatabaseEntry value);
 

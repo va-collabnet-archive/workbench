@@ -48,7 +48,7 @@ import org.dwfa.tapi.TerminologyException;
 public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public enum SPECIAL_SVN_ENTRIES {
-        PROFILE_CSU(), PROFILE_DBU(), BERKELEY_DB();
+        PROFILE_CSU();
     };
 
     public enum LANGUAGE_SORT_PREF {
@@ -68,6 +68,10 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public LANGUAGE_SORT_PREF getLanguageSortPref();
 
     public void setLanguageSortPref(LANGUAGE_SORT_PREF langSortPref);
+
+    public boolean searchWithDescTypeFilter();
+
+    public void setSearchWithDescTypeFilter(boolean filter);
 
     public boolean isActive();
 
@@ -133,6 +137,14 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void replaceEditingPath(I_Path oldPath, I_Path newPath);
 
     public Set<I_Path> getEditingPathSet();
+
+    public void addPromotionPath(I_Path p);
+
+    public void removePromotionPath(I_Path p);
+
+    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath);
+
+    public Set<I_Path> getPromotionPathSet();
 
     public void addViewPosition(I_Position p);
 
@@ -324,6 +336,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setShowPreferences(boolean shown);
 
+    public void setSelectedPreferencesTab(String tabName);
+
     public void setShowHistory(boolean shown);
 
     public void setShowAllQueues(boolean show);
@@ -365,10 +379,6 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void setInboxToggleVisible(boolean visible);
 
     public boolean isInboxToggleVisible();
-
-    public void setProgressToggleVisible(boolean visible);
-
-    public boolean isProgressToggleVisible();
 
     public void setComponentToggleVisible(boolean visible);
 
@@ -502,7 +512,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setRefsetInSpecEditor(I_GetConceptData refset);
 
-    public I_GetConceptData getRefsetSpecInSpecEditor();
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException;
 
     public JTree getTreeInSpecEditor();
 
@@ -514,6 +524,10 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_GetConceptData getClassificationRoot();
 
     public void setClassificationRoot(I_GetConceptData classificationRoot);
+
+    public I_GetConceptData getClassificationRoleRoot();
+
+    public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot);
 
     public I_GetConceptData getClassifierIsaType();
 
@@ -529,9 +543,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public I_ManageConflict[] getAllConflictResolutionStrategies();
 
-    public void setTopActivityPanel(I_ShowActivity ap);
-
-    public JPanel getTopActivityPanel();
+    public I_ShowActivity getTopActivityListener();
 
     /**
      * Shows or hides as the activity viewer.

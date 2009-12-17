@@ -19,6 +19,7 @@ package org.dwfa.vodb.types;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.util.HashFunction;
 
 public class ThinImagePart implements I_ImagePart {
     private int pathId;
@@ -151,6 +152,11 @@ public class ThinImagePart implements I_ImagePart {
      * (non-Javadoc)
      * 
      * @see
+     * 
+     * 
+     * 
+     * 
+     * 
      * org.dwfa.vodb.types.I_ImagePart#hasNewData(org.dwfa.vodb.types.ThinImagePart
      * )
      */
@@ -184,6 +190,14 @@ public class ThinImagePart implements I_ImagePart {
 
     public I_ImagePart duplicate() {
         return new ThinImagePart(this);
+    }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPositionId(int pid) {
+        throw new UnsupportedOperationException();
     }
 
 }

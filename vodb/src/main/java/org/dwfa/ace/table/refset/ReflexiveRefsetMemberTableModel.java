@@ -17,9 +17,12 @@
 package org.dwfa.ace.table.refset;
 
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -29,6 +32,7 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
@@ -107,6 +111,9 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
                                 conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart()));
                             }
                             break;
+                        default:
+                            throw new UnsupportedOperationException("Don't know how to handle: "
+                                + col.invokeOnObjectType);
                         }
                     }
 
@@ -180,8 +187,14 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
             getProgress().getProgressBar().setValue(0);
             getProgress().getProgressBar().setIndeterminate(true);
         }
-        if (host.getConfig().getRefsetSpecInSpecEditor() == null) {
-            this.tableComponentId = Integer.MIN_VALUE;
+        try {
+            if (host.getConfig().getRefsetSpecInSpecEditor() == null) {
+                this.tableComponentId = Integer.MIN_VALUE;
+            }
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
         }
         fireTableDataChanged();
     }
@@ -196,5 +209,17 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
         }
         return count;
 
+    }
+
+    @Override
+    public I_GetConceptData getPromotionRefsetIdentityConcept() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected Object getPromotionRefsetValue(I_ThinExtByRefVersioned extension,
+            ReflexiveRefsetFieldData reflexiveRefsetFieldData) throws IOException, IllegalAccessException,
+            InvocationTargetException {
+        throw new UnsupportedOperationException();
     }
 }

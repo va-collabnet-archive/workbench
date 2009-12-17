@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -28,10 +29,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.AceDateFormat;
@@ -228,7 +232,11 @@ public class Position implements I_Position {
     public static void writePosition(ObjectOutputStream out, I_Position p) throws IOException {
         out.writeInt(p.getVersion());
         try {
-            out.writeObject(AceConfig.getVodb().nativeToUuid(p.getPath().getConceptId()));
+            if (AceConfig.getVodb().getId(p.getPath().getConceptId()) != null) {
+                out.writeObject(AceConfig.getVodb().nativeToUuid(p.getPath().getConceptId()));
+            } else {
+                out.writeObject(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            }
         } catch (DatabaseException e) {
             IOException newEx = new IOException();
             newEx.initCause(e);
@@ -245,7 +253,13 @@ public class Position implements I_Position {
         int version = in.readInt();
         int pathConceptId;
         try {
-            pathConceptId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+            List<UUID> pathIdList = (List<UUID>) in.readObject();
+            if (AceConfig.getVodb().hasId(pathIdList)) {
+                pathConceptId = AceConfig.getVodb().uuidToNative(pathIdList);
+            } else {
+                pathConceptId = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid();
+            }
+
         } catch (TerminologyException e) {
             IOException newEx = new IOException(e.getLocalizedMessage());
             newEx.initCause(e);
@@ -265,12 +279,22 @@ public class Position implements I_Position {
         Set<I_Position> positions = Collections.synchronizedSet(new HashSet<I_Position>(size));
         for (int i = 0; i < size; i++) {
             try {
-                positions.add(readPosition(in));
+                I_Position position = readPosition(in);
+                I_GetConceptData pathConcept = LocalVersionedTerminology.get().getConcept(
+                    position.getPath().getConceptId());
+                I_Path path = LocalVersionedTerminology.get().getPath(pathConcept.getUids());
+                positions.add(LocalVersionedTerminology.get().newPosition(path, position.getVersion()));
             } catch (IOException ex) {
                 if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
                     AceLog.getAppLog().alertAndLogException(ex.getCause());
                 } else {
                     throw ex;
+                }
+            } catch (TerminologyException ex) {
+                if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
+                    AceLog.getAppLog().alertAndLogException(ex.getCause());
+                } else {
+                    throw new IOException(ex);
                 }
             }
         }
@@ -307,4 +331,17 @@ public class Position implements I_Position {
         return buff.toString();
 
     }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Collection<I_Position> getAllOrigins() {
+        throw new UnsupportedOperationException();
+    }
+
+    public long getTime() {
+        return ThinVersionHelper.convert(version);
+    }
+
 }

@@ -112,6 +112,9 @@ public class DatePicker extends JPanel {
         fieldBox.setBorder(BorderFactory.createEmptyBorder());
 
         textField = new JTextField(10);
+        textField.setMaximumSize(new Dimension(100, 25));
+        textField.setMinimumSize(new Dimension(100, 25));
+        textField.setPreferredSize(new Dimension(100, 25));
         textField.setEditable(false);
 
         popupButton = new JButton("...");
@@ -160,6 +163,8 @@ public class DatePicker extends JPanel {
      */
     public void setSelectedDate(Calendar selectedDate) {
         calendarPanel.setSelectedDate(selectedDate);
+        // update the text field display with the new date.
+        this.setText();
     }
 
     /**

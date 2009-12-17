@@ -36,6 +36,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -47,20 +48,25 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 
 public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
+
+    private String activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT_UUID.getAttachmentKey();
+
     /**
 	 *
 	 */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
 
     private Boolean clauseIsTrue = true;
     private transient Exception ex = null;
     private transient Condition returnCondition = Condition.CONTINUE;
+    protected I_GetConceptData c3Concept;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeBoolean(clauseIsTrue);
+        out.writeObject(activeConceptPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -70,6 +76,11 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                 clauseIsTrue = true;
             } else {
                 clauseIsTrue = in.readBoolean();
+            }
+            if (objDataVersion >= 3) {
+                activeConceptPropName = (String) in.readObject();
+            } else {
+                activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT_UUID.getAttachmentKey();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -114,6 +125,10 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                 String msg = "Unable to add spec. Editing path set is empty.";
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
                 throw new TaskFailedException(msg);
+            }
+            UUID conceptUuid = (UUID) process.readAttachement(activeConceptPropName);
+            if (conceptUuid != null) {
+                c3Concept = LocalVersionedTerminology.get().getConcept(new UUID[] { conceptUuid });
             }
 
             I_GetConceptData refsetSpec = configFrame.getRefsetSpecInSpecEditor();
@@ -161,7 +176,6 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
             }
             returnCondition = Condition.CONTINUE;
         } catch (Exception e) {
-            e.printStackTrace();
             ex = e;
         }
     }
@@ -188,6 +202,14 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 
     public void setClauseIsTrue(Boolean clauseIsTrue) {
         this.clauseIsTrue = clauseIsTrue;
+    }
+
+    public String getActiveConceptPropName() {
+        return activeConceptPropName;
+    }
+
+    public void setActiveConceptPropName(String activeConceptPropName) {
+        this.activeConceptPropName = activeConceptPropName;
     }
 
 }

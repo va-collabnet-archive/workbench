@@ -80,6 +80,8 @@ public class MoveToDestination extends AbstractTask {
         try {
             ServiceID serviceID = null;
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
+            worker.getLogger().info(
+                "Moving process " + process.getProcessID() + " to destination: " + process.getDestination());
             Entry[] attrSetTemplates = new Entry[] { new ElectronicAddress(process.getDestination()) };
             ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
@@ -90,6 +92,8 @@ public class MoveToDestination extends AbstractTask {
             }
             I_QueueProcesses q = (I_QueueProcesses) service.service;
             q.write(process, worker.getActiveTransaction());
+            worker.getLogger()
+                .info("Moved process " + process.getProcessID() + " to queue: " + q.getNodeInboxAddress());
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }

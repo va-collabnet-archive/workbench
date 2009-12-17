@@ -31,7 +31,9 @@ public class ClassifySelectedBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(Classify.class);
-        bd.setDisplayName("<html><font color='green'><center>Classify Selected");
+        // !!!
+        // bd.setDisplayName("<html><font color='green'><center>Classify Selected");
+        bd.setDisplayName("<html><font color='purple'><center>ClassifySelected");
         return bd;
     }
 

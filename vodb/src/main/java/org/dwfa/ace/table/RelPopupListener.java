@@ -62,7 +62,7 @@ public class RelPopupListener extends MouseAdapter {
                 ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getC1Id());
                 ConceptBean destBean = ConceptBean.get(selectedObject.getTuple().getC2Id());
                 for (I_Path p : config.getEditingPathSet()) {
-                    I_RelPart newPart = selectedObject.getTuple().duplicatePart();
+                    I_RelPart newPart = selectedObject.getTuple().duplicate();
                     newPart.setPathId(p.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);
                     selectedObject.getTuple().getRelVersioned().getVersions().add(newPart);

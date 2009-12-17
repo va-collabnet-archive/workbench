@@ -177,26 +177,6 @@ public class Path implements I_Transact, I_Path {
         }
     }
 
-    // public static void main(String[] args) {
-    // try {
-    // String fileStr;
-    // if (args.length == 0) {
-    // fileStr = "berkeley-db";
-    // } else {
-    // fileStr = args[0];
-    // }
-    // VodbEnv vodb = new VodbEnv();
-    // vodb.setup(new File(fileStr), false, 600000000L);
-    //
-    // writeBasePaths(vodb);
-    // vodb.sync();
-    // vodb.close();
-    // } catch (Exception ex) {
-    // AceLog.getAppLog().alertAndLogException(ex);
-    // }
-    // System.exit(0);
-    // }
-
     public static void writeBasePaths(VodbEnv vodb) throws DatabaseException, ParseException, TerminologyException,
             IOException {
         List<I_Path> basePaths = makeBasePaths(vodb);
@@ -301,7 +281,13 @@ public class Path implements I_Transact, I_Path {
     public static I_Path readPath(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int pathId;
         try {
-            pathId = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+            List<UUID> pathIdList = (List<UUID>) in.readObject();
+            if (AceConfig.getVodb().hasId(pathIdList)) {
+                pathId = AceConfig.getVodb().uuidToNative(pathIdList);
+            } else {
+                pathId = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid();
+            }
+
         } catch (TerminologyException e) {
             IOException newEx = new IOException();
             newEx.initCause(e);

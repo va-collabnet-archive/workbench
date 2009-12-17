@@ -97,7 +97,7 @@ import org.dwfa.ace.table.refset.RefsetPreferences;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.ace.task.search.IsChildOf;
+import org.dwfa.ace.task.search.IsKindOf;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.bpa.data.SortedSetModel;
@@ -129,7 +129,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 42;
+    private static final int dataVersion = 45; // keep current with
+    // objDataVersion logic
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
 
@@ -314,6 +315,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 42
     private boolean showPathInfoInTaxonomy = true;
+
+    // 43
+
+    private boolean searchWithDescTypeFilter = false;
+
+    // 44
+    private Set<I_Path> promotionPathSet = new HashSet<I_Path>();
+
+    // 45
+    private I_GetConceptData classificationRoleRoot;
 
     // transient
     private transient MasterWorker worker;
@@ -524,6 +535,22 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 42
         out.writeObject(showPathInfoInTaxonomy);
+
+        // 43
+        out.writeBoolean(searchWithDescTypeFilter);
+
+        // 44
+        Path.writePathSet(out, promotionPathSet);
+
+        // 45
+        try {
+            writeConceptAsId(classificationRoleRoot, out);
+        } catch (DatabaseException e) {
+            IOException newEx = new IOException();
+            newEx.initCause(e);
+            throw newEx;
+        }
+
     }
 
     private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws DatabaseException,
@@ -649,8 +676,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 termTreeDividerLoc = DEFAULT_TREE_TERM_DIV_LOC;
             }
             if (objDataVersion >= 12) {
+                List<UUID> uuidList = (List<UUID>) in.readObject();
                 try {
-                    List<UUID> uuidList = (List<UUID>) in.readObject();
                     if (uuidList != null) {
                         try {
                             hierarchySelection = ConceptBean.get(AceConfig.getVodb().uuidToNative(uuidList));
@@ -659,9 +686,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                         }
                     }
                 } catch (Exception e) {
-                    IOException newEx = new IOException();
-                    newEx.initCause(e);
-                    throw newEx;
+                    if (uuidList != null) {
+                        AceLog.getAppLog().severe(
+                            "Exception processing hierarchy selection with uuid list: " + uuidList);
+                    }
+                    AceLog.getAppLog().alertAndLogException(e);
+                    hierarchySelection = null;
                 }
             }
             if (objDataVersion >= 13) {
@@ -822,7 +852,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     IntList il = IntList.readIntListIgnoreMapErrors(in);
                     List<I_GetConceptData> tabHistoryList = new LinkedList<I_GetConceptData>();
                     for (int nid : il.getListArray()) {
-                        tabHistoryList.add(ConceptBean.get(nid));
+                        try {
+                            tabHistoryList.add(ConceptBean.get(nid));
+                        } catch (Exception e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
                     }
                     tabHistoryMap.put(mapId, tabHistoryList);
                 }
@@ -934,6 +968,32 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
             if (objDataVersion >= 42) {
                 showPathInfoInTaxonomy = (Boolean) in.readObject();
+            } else {
+                showPathInfoInTaxonomy = true;
+            }
+
+            if (objDataVersion >= 43) {
+                searchWithDescTypeFilter = in.readBoolean();
+            } else {
+                searchWithDescTypeFilter = false;
+            }
+
+            if (objDataVersion >= 44) {
+                promotionPathSet = Path.readPathSet(in);
+            } else {
+                promotionPathSet = new HashSet<I_Path>();
+            }
+
+            if (objDataVersion >= 45) {
+                try {
+                    classificationRoleRoot = readConceptFromSerializedUuids(in);
+                } catch (TerminologyException e) {
+                    IOException newEx = new IOException();
+                    newEx.initCause(e);
+                    throw newEx;
+                }
+            } else {
+                classificationRoleRoot = null;
             }
 
         } else {
@@ -949,7 +1009,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         if (obj == null) {
             return null;
         } else {
-            return LocalVersionedTerminology.get().getConcept((List<UUID>) obj);
+            if (LocalVersionedTerminology.get().hasId((List<UUID>) obj)) {
+                return LocalVersionedTerminology.get().getConcept((List<UUID>) obj);
+            }
+            return null;
         }
     }
 
@@ -1225,6 +1288,49 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     public Set<I_Path> getEditingPathSet() {
         return editingPathSet;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#addEditingPath(org.dwfa.vodb.types
+     * .Path)
+     */
+    public void addPromotionPath(I_Path p) {
+        promotionPathSet.add(p);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#removeEditingPath(org.dwfa.vodb.
+     * types.Path)
+     */
+    public void removePromotionPath(I_Path p) {
+        promotionPathSet.remove(p);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.dwfa.ace.config.I_ConfigAceFrame#replaceEditingPath(org.dwfa.vodb
+     * .types.Path, org.dwfa.vodb.types.Path)
+     */
+    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
+        this.promotionPathSet.remove(oldPath);
+        this.promotionPathSet.add(newPath);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditingPathSet()
+     */
+    public Set<I_Path> getPromotionPathSet() {
+        return promotionPathSet;
     }
 
     /*
@@ -1946,7 +2052,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         try {
             List<I_TestSearchResults> extraCriterion = new ArrayList<I_TestSearchResults>();
             if (root != null) {
-                IsChildOf childTest = new IsChildOf();
+                IsKindOf childTest = new IsKindOf();
                 childTest.setParentTerm(new TermEntry(root.getUids()));
             }
             aceFrame.performLuceneSearch(query, extraCriterion);
@@ -2247,16 +2353,14 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return aceFrame.getCdePanel().isPreferencesToggleVisible();
     }
 
-    public boolean isProgressToggleVisible() {
-        return aceFrame.getCdePanel().isProgressToggleVisible();
-    }
-
     public boolean isSubversionToggleVisible() {
         return aceFrame.getCdePanel().isSubversionToggleVisible();
     }
 
     public void setAddressToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setAddressToggleVisible(visible);
+        if (aceFrame != null) {
+            aceFrame.getCdePanel().setAddressToggleVisible(visible);
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.ADDRESS);
         } else {
@@ -2265,7 +2369,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setBuilderToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setBuilderToggleVisible(visible);
+        if (aceFrame != null) {
+            aceFrame.getCdePanel().setBuilderToggleVisible(visible);
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.BUILDER);
         } else {
@@ -2274,7 +2380,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setComponentToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setComponentToggleVisible(visible);
+        if (aceFrame != null) {
+            aceFrame.getCdePanel().setComponentToggleVisible(visible);
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.COMPONENT);
         } else {
@@ -2283,7 +2391,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setHierarchyToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setHierarchyToggleVisible(visible);
+        if (aceFrame != null) {
+            aceFrame.getCdePanel().setHierarchyToggleVisible(visible);
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.TAXONOMY);
         } else {
@@ -2292,7 +2402,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setHistoryToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setHistoryToggleVisible(visible);
+        if (aceFrame != null) {
+            aceFrame.getCdePanel().setHistoryToggleVisible(visible);
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.HISTORY);
         } else {
@@ -2301,7 +2413,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setInboxToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setInboxToggleVisible(visible);
+        if (aceFrame != null) {
+            aceFrame.getCdePanel().setInboxToggleVisible(visible);
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.INBOX);
         } else {
@@ -2310,7 +2424,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setPreferencesToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setPreferencesToggleVisible(visible);
+        if (aceFrame != null) {
+            aceFrame.getCdePanel().setPreferencesToggleVisible(visible);
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.PREFERENCES);
         } else {
@@ -2318,17 +2434,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         }
     }
 
-    public void setProgressToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setProgressToggleVisible(visible);
-        if (visible) {
-            hiddenTopToggles.remove(TopToggleTypes.TREE_PROGRESS);
-        } else {
-            hiddenTopToggles.add(TopToggleTypes.TREE_PROGRESS);
-        }
-    }
-
     public void setSubversionToggleVisible(boolean visible) {
-        aceFrame.getCdePanel().setSubversionToggleVisible(visible);
+        if (aceFrame != null) {
+            aceFrame.getCdePanel().setSubversionToggleVisible(visible);
+        }
         if (visible) {
             hiddenTopToggles.remove(TopToggleTypes.SUBVERSION);
         } else {
@@ -2579,10 +2688,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public BundleType getBundleType() {
         if (bundleType == null) {
             File profileDirSvn = new File("profiles" + File.separator + ".svn");
-            File databaseSvn = new File(getDbConfig().getDbFolder(), ".svn");
-            if (profileDirSvn.exists() && databaseSvn.exists()) {
-                bundleType = BundleType.DATABASE_UPDATE;
-            } else if (profileDirSvn.exists()) {
+            if (profileDirSvn.exists()) {
                 bundleType = BundleType.CHANGE_SET_UPDATE;
             } else {
                 bundleType = BundleType.STAND_ALONE;
@@ -2683,8 +2789,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return aceFrame.getCdePanel().getTreeInSpecEditor();
     }
 
-    public I_GetConceptData getRefsetSpecInSpecEditor() {
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
+    }
+
+    public I_GetConceptData getClassificationRoleRoot() {
+        return classificationRoleRoot;
     }
 
     public I_GetConceptData getClassificationRoot() {
@@ -2701,6 +2811,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public I_GetConceptData getClassifierOutputPath() {
         return classifierOutputPathConcept;
+    }
+
+    public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot) {
+        Object old = this.classificationRoleRoot;
+        this.classificationRoleRoot = classificationRoleRoot;
+        changeSupport.firePropertyChange("classificationRoleRoot", old, classificationRoleRoot);
     }
 
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
@@ -2725,14 +2841,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Object old = outputPath;
         this.classifierOutputPathConcept = outputPath;
         changeSupport.firePropertyChange("classifierOutputPath", old, outputPath);
-    }
-
-    public JPanel getTopActivityPanel() {
-        return aceFrame.getCdePanel().getTopActivityPanel();
-    }
-
-    public void setTopActivityPanel(I_ShowActivity ap) {
-        aceFrame.getCdePanel().setTopActivityPanel(ap);
     }
 
     public Color getColorForPath(int pathNid) {
@@ -2941,12 +3049,34 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.getCdePanel().setWorkflowDetailSheetDimensions(dim);
     }
 
+    public I_ShowActivity getTopActivityListener() {
+        if (aceFrame == null) {
+            return null;
+        } else {
+            return aceFrame.getCdePanel().getTopActivityListener();
+        }
+    }
+
     public void fireUpdateHierarchyView() {
         changeSupport.firePropertyChange("updateHierarchyView", false, true);
     }
 
     public void setSuppressChangeEvents(boolean suppressChangeEvents) {
         ACE.setSuppressChangeEvents(suppressChangeEvents);
+    }
+
+    public boolean searchWithDescTypeFilter() {
+        return searchWithDescTypeFilter;
+    }
+
+    public void setSearchWithDescTypeFilter(boolean searchWithDescTypeFilter) {
+        boolean old = this.searchWithDescTypeFilter;
+        this.searchWithDescTypeFilter = searchWithDescTypeFilter;
+        this.changeSupport.firePropertyChange("searchWithDescTypeFilter", old, searchWithDescTypeFilter);
+    }
+
+    public void setSelectedPreferencesTab(String tabName) {
+        aceFrame.getCdePanel().setSelectedPreferencesTab(tabName);
     }
 
 }

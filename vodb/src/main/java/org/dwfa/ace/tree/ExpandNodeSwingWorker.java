@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -86,7 +88,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         public ProgressUpdator(boolean addToViewer) {
             super();
             this.addToViewer = addToViewer;
-            activity = new ActivityPanel(addToViewer, addToViewer, config.getTopActivityPanel());
+            activity = new ActivityPanel(addToViewer, null, config);
             updateTimer = new Timer(300, this);
             updateTimer.start();
         }
@@ -349,6 +351,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             logger.info("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + elapsedTime + " ms.");
         }
         tree.workerFinished(this);
+        workers.remove(node.getUserObject());
+
     }
 
     private void updateChildrenInNode() {
@@ -414,9 +418,16 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
 
     private I_ConfigAceFrame config;
 
+    private static Map<Object, ExpandNodeSwingWorker> workers = new TreeMap<Object, ExpandNodeSwingWorker>();
+
     public ExpandNodeSwingWorker(DefaultTreeModel model, JTreeWithDragImage tree, DefaultMutableTreeNode node,
             Comparator<I_GetConceptDataForTree> conceptBeanComparator, TermTreeHelper acePanel, I_ConfigAceFrame config) {
         super();
+        if (workers.containsKey(node.getUserObject())) {
+            ExpandNodeSwingWorker oldWorker = workers.get(node.getUserObject());
+            oldWorker.stopWork("canceled 1");
+            workers.put(node.getUserObject(), this);
+        }
         expansionStart = System.currentTimeMillis();
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("ExpandNodeSwingWorker " + workerId + " starting.");

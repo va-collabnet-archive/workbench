@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface I_Position {
@@ -23,6 +24,8 @@ public interface I_Position {
     public I_Path getPath();
 
     public int getVersion();
+
+    public long getTime();
 
     public boolean isSubsequentOrEqualTo(int version, int pathId);
 
@@ -36,6 +39,6 @@ public interface I_Position {
 
     public boolean equals(int version, int pathId);
 
-    public int getDepth(int pathId);
+    public Collection<I_Position> getAllOrigins();
 
 }

@@ -88,7 +88,13 @@ import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.bpa.util.TableSorter.SortOrder;
 import org.dwfa.vodb.types.ConceptBean;
 
-public class SearchPanel extends JPanel {
+public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
+
+    private class FilterSearchActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            config.setSearchWithDescTypeFilter(searchWithDescTypeFilter.isSelected());
+        }
+    }
 
     public class MaximizeSearchListener implements ActionListener {
 
@@ -106,6 +112,7 @@ public class SearchPanel extends JPanel {
             removeButton.setVisible(!toggle.isSelected());
             linkSpinner.setVisible(!toggle.isSelected());
             showHistory.setVisible(!toggle.isSelected());
+            searchWithDescTypeFilter.setVisible(!toggle.isSelected());
             for (CriterionPanel test : criterionPanels) {
                 test.setVisible(toggle.isSelected());
             }
@@ -142,7 +149,7 @@ public class SearchPanel extends JPanel {
             try {
                 // Create a file dialog box to prompt for a new file to display
                 updateExtraCriterion();
-                QueryBean qb = new QueryBean(searchPhraseField.getText(), getExtraCriterion());
+                QueryBean qb = new QueryBean(searchPhraseField.getText(), extraCriterion);
                 FileDialog f = new FileDialog((Frame) SearchPanel.this.getTopLevelAncestor(), "Save query (.query)",
                     FileDialog.SAVE);
                 File searchFolder = new File("search");
@@ -373,6 +380,8 @@ public class SearchPanel extends JPanel {
 
     private JToggleButton showHistory;
 
+    private JToggleButton searchWithDescTypeFilter;;
+
     private List<I_TestSearchResults> extraCriterion;
 
     private JButton addToList;
@@ -387,7 +396,7 @@ public class SearchPanel extends JPanel {
 
     private int lastSelectedRow = -1;
 
-    public SearchPanel(I_ConfigAceFrame config) {
+    public SearchPanel(I_ConfigAceFrame config, ACE ace) {
         super(new GridBagLayout());
         this.config = config;
         this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
@@ -535,6 +544,15 @@ public class SearchPanel extends JPanel {
         showHistory.setToolTipText("show current and historical descriptions, including retired descriptions and descriptions of retired concepts");
         add(showHistory, gbc);
         gbc.gridx++;
+
+        searchWithDescTypeFilter = new JToggleButton(new ImageIcon(
+            ACE.class.getResource("/24x24/plain/component_preferences.png")));
+        searchWithDescTypeFilter.setToolTipText("filter search using preferences");
+        searchWithDescTypeFilter.setSelected(config.searchWithDescTypeFilter());
+        searchWithDescTypeFilter.addActionListener(new FilterSearchActionListener());
+        add(searchWithDescTypeFilter, gbc);
+        gbc.gridx++;
+
         loadButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/read_from_disk.png")));
         loadButton.setToolTipText("read search specification from disk");
         loadButton.addActionListener(new LoadQuery());
@@ -553,7 +571,7 @@ public class SearchPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 7;
+        gbc.gridwidth = 6;
         gbc.gridheight = 3;
 
         add(criterion, gbc);
@@ -579,7 +597,7 @@ public class SearchPanel extends JPanel {
         descTable.setDefaultRenderer(StringWithDescTuple.class, renderer);
         descTable.setDefaultRenderer(String.class, renderer);
         descTable.setDefaultRenderer(Boolean.class, renderer);
-        descTable.addMouseListener(new DescSearchResultsTablePopupListener(config));
+        descTable.addMouseListener(new DescSearchResultsTablePopupListener(config, ace));
 
         sortingTable.setTableHeader(descTable.getTableHeader());
 
@@ -600,7 +618,7 @@ public class SearchPanel extends JPanel {
         sortingTable.setSortingStatus(0, SortOrder.DESCENDING);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridwidth = 12;
+        gbc.gridwidth = 13;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         JScrollPane scrollPane = new JScrollPane(descTable);
@@ -620,7 +638,6 @@ public class SearchPanel extends JPanel {
     public void setQuery(QueryBean qb) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         searchPhraseField.setText(qb.getQueryString());
         criterionPanels.clear();
-        AceLog.getAppLog().info("Extra criterion: " + qb.getExtraCriterion());
         for (I_TestSearchResults criterion : qb.getExtraCriterion()) {
             criterionPanels.add(new CriterionPanel(this, criterion));
         }
@@ -686,10 +703,10 @@ public class SearchPanel extends JPanel {
                 model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
                 ACE.threadPool.execute(new SearchAllWorker(this, model, config));
             } else {
-                JOptionPane.showMessageDialog(
-                    getRootPane(),
-                    "<html>Unindexed search (a search with an empty query string),<br>requires at least one advanced search criterion. ",
-                    "Search Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(getRootPane(),
+                    "<html>Unindexed search (a search with an empty query string),<br>"
+                        + "requires at least one advanced search criterion. ", "Search Error",
+                    JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(getRootPane(), "The search string must be longer than 1 character: "
@@ -700,7 +717,10 @@ public class SearchPanel extends JPanel {
     private void updateExtraCriterion() {
         extraCriterion = new ArrayList<I_TestSearchResults>();
         for (CriterionPanel criterionPanel : criterionPanels) {
-            extraCriterion.add(criterionPanel.getBean());
+            I_TestSearchResults test = criterionPanel.getBean();
+            if (test != null) {
+                extraCriterion.add(test);
+            }
         }
     }
 
@@ -796,6 +816,10 @@ public class SearchPanel extends JPanel {
             return swdt.getTuple();
         }
         return null;
+    }
+
+    public List<CriterionPanel> getCriterionPanels() {
+        return criterionPanels;
     }
 
 }

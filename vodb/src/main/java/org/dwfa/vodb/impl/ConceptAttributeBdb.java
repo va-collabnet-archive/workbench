@@ -19,15 +19,22 @@ package org.dwfa.vodb.impl;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 
+import org.apache.commons.collections.primitives.IntList;
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.search.I_TrackContinuation;
+import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.vodb.I_StoreConceptAttributes;
 import org.dwfa.vodb.ToIoException;
@@ -47,7 +54,7 @@ import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.StatsConfig;
 
-public class ConceptAttributeBdb implements I_StoreConceptAttributes {
+public abstract class ConceptAttributeBdb implements I_StoreConceptAttributes {
 
     private static ThinConVersionedBinding conBinding = new ThinConVersionedBinding();
 
@@ -155,6 +162,11 @@ public class ConceptAttributeBdb implements I_StoreConceptAttributes {
      * (non-Javadoc)
      * 
      * @see
+     * 
+     * 
+     * 
+     * 
+     * 
      * org.dwfa.vodb.impl.I_StoreConceptAttributes#iterateConceptAttributeEntries
      * (org.dwfa.vodb.types.I_ProcessConceptAttributeEntries)
      */
@@ -296,6 +308,12 @@ public class ConceptAttributeBdb implements I_StoreConceptAttributes {
 
     public int getConceptCount() throws DatabaseException {
         return (int) conceptDb.count();
+    }
+
+    public void searchConcepts(I_TrackContinuation tracker, IntList matches, CountDownLatch latch,
+            List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws DatabaseException, IOException,
+            ParseException {
+        throw new UnsupportedOperationException();
     }
 
 }

@@ -159,12 +159,8 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         this.baseFrame = baseFrame;
     }
 
-    public JPanel getTopActivityPanel() {
-        return baseFrame.getTopActivityPanel();
-    }
-
-    public void setTopActivityPanel(I_ShowActivity ap) {
-        baseFrame.setTopActivityPanel(ap);
+    public I_GetConceptData getClassificationRoleRoot() {
+        return baseFrame.getClassificationRoleRoot();
     }
 
     public I_GetConceptData getClassificationRoot() {
@@ -183,6 +179,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getClassifierOutputPath();
     }
 
+    public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot) {
+        baseFrame.setClassificationRoleRoot(classificationRoleRoot);
+    }
+
     public void setClassificationRoot(I_GetConceptData classificationRoot) {
         baseFrame.setClassificationRoot(classificationRoot);
     }
@@ -199,7 +199,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setClassifierOutputPath(outputPath);
     }
 
-    public I_GetConceptData getRefsetSpecInSpecEditor() {
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         return baseFrame.getRefsetSpecInSpecEditor();
     }
 
@@ -1096,10 +1096,6 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.isPreferencesToggleVisible();
     }
 
-    public boolean isProgressToggleVisible() {
-        return baseFrame.isProgressToggleVisible();
-    }
-
     public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle) {
         return baseFrame.isRefsetInToggleVisible(refsetType, toggle);
     }
@@ -1196,4 +1192,35 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setSuppressChangeEvents(suppressChangeEvents);
     }
 
+    public I_ShowActivity getTopActivityListener() {
+        return baseFrame.getTopActivityListener();
+    }
+
+    public boolean searchWithDescTypeFilter() {
+        return baseFrame.searchWithDescTypeFilter();
+    }
+
+    public void setSearchWithDescTypeFilter(boolean filter) {
+        baseFrame.setSearchWithDescTypeFilter(filter);
+    }
+
+    public void addPromotionPath(I_Path p) {
+        baseFrame.addPromotionPath(p);
+    }
+
+    public Set<I_Path> getPromotionPathSet() {
+        return baseFrame.getPromotionPathSet();
+    }
+
+    public void removePromotionPath(I_Path p) {
+        baseFrame.removePromotionPath(p);
+    }
+
+    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
+        baseFrame.replacePromotionPathSet(oldPath, newPath);
+    }
+
+    public void setSelectedPreferencesTab(String tabName) {
+        baseFrame.setSelectedPreferencesTab(tabName);
+    }
 }

@@ -57,7 +57,7 @@ public class PropertyNameLabelEditor implements PropertyEditor, PropertyChangeLi
      * @see java.beans.PropertyEditor#getValue()
      */
     public String getValue() {
-        return this.propertyName.getText();
+        return this.propertyName.getText().replaceAll("\\<.*?>", "");
     }
 
     /**
@@ -69,7 +69,11 @@ public class PropertyNameLabelEditor implements PropertyEditor, PropertyChangeLi
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("PropertyNameLabelEditor setValue: " + value);
         }
-        this.propertyName.setText(value);
+        if (value != null) {
+            this.propertyName.setText(value.replaceAll("\\<.*?>", ""));
+        } else {
+            this.propertyName.setText(value);
+        }
         this.firePropertyChange();
     }
 

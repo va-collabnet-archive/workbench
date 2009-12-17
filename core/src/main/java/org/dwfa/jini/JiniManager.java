@@ -122,6 +122,14 @@ public class JiniManager implements I_LookupServices {
         return sdm.equals(obj);
     }
 
+    @Override
+    public int hashCode() {
+        if (sdm == null) {
+            return super.hashCode();
+        }
+        return sdm.hashCode();
+    }
+
     /**
      * @return
      */

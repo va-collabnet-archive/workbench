@@ -32,6 +32,10 @@ public interface I_ShowActivity {
 
     public void setProgressInfoLower(String text);
 
+    public String getProgressInfoUpper();
+
+    public String getProgressInfoLower();
+
     public void setIndeterminate(boolean newValue);
 
     public boolean isIndeterminate();
@@ -56,14 +60,20 @@ public interface I_ShowActivity {
 
     public void setStartTime(long time);
 
-    public JPanel getSecondaryPanel();
+    public I_ShowActivity getSecondaryPanel();
 
-    public void setSecondaryPanel(JPanel panel);
+    public void setSecondaryPanel(I_ShowActivity panel);
 
     public void addShowActivityListener(I_ShowActivity listener);
 
     public void removeShowActivityListener(I_ShowActivity listener);
 
+    public boolean isStringPainted();
+
     public void setStringPainted(boolean stringPainted); // displays a string on
+
     // the progress bar
+    public I_ConfigAceFrame getAceFrameConfig();
+
+    public void syncWith(I_ShowActivity another);
 }

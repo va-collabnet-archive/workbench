@@ -34,7 +34,7 @@ import org.dwfa.util.bean.Spec;
  * @author Chrissy Hill
  * 
  */
-@BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/refset/spec/rel", type = BeanType.TASK_BEAN) })
 public class RelationshipLogicalQuantifierIsKindOf extends AddStructuralQueryToRefsetSpec {
     /**
 	 * 

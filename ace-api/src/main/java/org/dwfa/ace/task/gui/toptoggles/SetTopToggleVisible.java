@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -93,7 +94,7 @@ public class SetTopToggleVisible extends AbstractTask {
                 profile.setComponentToggleVisible(visible);
                 break;
             case TREE_PROGRESS:
-                profile.setProgressToggleVisible(visible);
+                AceLog.getAppLog().warning("Setting tree progress visible is no longer supported");
                 break;
             case INBOX:
                 profile.setInboxToggleVisible(visible);

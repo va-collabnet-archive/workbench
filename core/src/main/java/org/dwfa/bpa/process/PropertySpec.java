@@ -118,7 +118,8 @@ public class PropertySpec implements Serializable {
         super();
         this.type = type;
         this.id = id;
-        this.propertyName = propertyName;
+        this.propertyName = propertyName.replaceAll("\\<.*?>", "");
+        ;
         this.externalName = "not set";
         this.externalToolTip = "Not set";
     }
@@ -167,7 +168,8 @@ public class PropertySpec implements Serializable {
      *            The propertyName to set.
      */
     public void setPropertyName(String propertyName) {
-        this.propertyName = propertyName;
+        this.propertyName = propertyName.replaceAll("\\<.*?>", "");
+        ;
     }
 
     /**

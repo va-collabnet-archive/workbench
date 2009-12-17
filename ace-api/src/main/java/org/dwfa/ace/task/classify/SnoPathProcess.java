@@ -34,6 +34,15 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 
+/**
+ * 
+ * SnoPathProcess object is passed to TermFactory.iterateConcepts() to retrieve
+ * all current concepts along the specified path.
+ * 
+ * @author Marc E. Campbell
+ * 
+ */
+
 public class SnoPathProcess implements I_ProcessConcepts {
     private List<I_Position> fromPathPos;
     private Logger logger;
@@ -186,7 +195,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
                         } else if (rPart1.getVersion() < rPart.getVersion()) {
                             rPart1 = rPart; // ... KEEP MORE_RECENT PART
                         } else if (rPart1.getVersion() == rPart.getVersion()) {
-                            countRelDuplVersion++; // !!! MAKE TEMP COUNTER
+                            countRelDuplVersion++;
                             if (rPart.getStatusId() == isCURRENT)
                                 rPart1 = rPart; // KEEP CURRENT PART
                         }
@@ -203,7 +212,9 @@ public class SnoPathProcess implements I_ProcessConcepts {
                     isSnomedConcept = true;
                 }
 
-                // !!! SET UP STATED FORMS LOOP
+                // SET UP STATED FORMS LOOP
+                // NOTE: inferred_only, descriptive and historic relationships
+                // are not included
                 int p1c = rPart1.getCharacteristicId();
                 boolean keep = false;
                 if (p1c == isCh_DEFINING_CHARACTERISTIC) {

@@ -38,6 +38,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.UnknownComponentException;
 import org.dwfa.tapi.spec.ConceptSpec;
@@ -148,6 +149,11 @@ public abstract class RefsetUtilities {
 
     public List<Integer> getChildrenOfConcept(int conceptId) throws IOException, Exception {
 
+        if (!termFactory.hasId(SNOMED.Concept.IS_A.getUids()) && this.altIsA == null) {
+            if (termFactory.hasId(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())) {
+                this.altIsA = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+            }
+        }
         List<Integer> children = new ArrayList<Integer>();
 
         I_GetConceptData concept = getConcept(conceptId);
@@ -192,7 +198,7 @@ public abstract class RefsetUtilities {
         for (I_GetConceptData refsetConcept : refsetChildren) {
             Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
 
-            List<I_RelVersioned> rels = refsetConcept.getSourceRels();
+            List<? extends I_RelVersioned> rels = refsetConcept.getSourceRels();
             for (I_RelVersioned rel : rels) {
                 List<I_RelTuple> tuples = rel.getTuples();
                 for (I_RelTuple tuple : tuples) {

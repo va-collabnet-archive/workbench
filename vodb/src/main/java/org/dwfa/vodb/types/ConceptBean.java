@@ -51,10 +51,12 @@ import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
@@ -128,6 +130,9 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     public static ConceptBean get(int conceptId) {
+        if (conceptId == Integer.MAX_VALUE) {
+            throw new RuntimeException("Invalid identifier: " + conceptId);
+        }
         try {
             return privateGet(conceptId);
         } catch (IOException e) {
@@ -189,6 +194,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     public I_IntSet uncommittedIds = null;
 
+    public List<I_IdVersioned> uncommittedIdVersioned = null;
+
     private List<UUID> uids = null;
 
     private boolean primordial = false;
@@ -198,6 +205,10 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     private ConceptBean(int conceptId) {
         super();
         this.conceptId = conceptId;
+    }
+
+    public int getNid() {
+        return conceptId;
     }
 
     /*
@@ -211,6 +222,11 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         }
         if (conceptAttributes == null) {
             conceptAttributes = AceConfig.getVodb().getConceptAttributes(conceptId);
+        }
+        if (conceptAttributes == null) {
+            if (uncommittedConceptAttributes != null) {
+                return uncommittedConceptAttributes;
+            }
         }
         return conceptAttributes;
     }
@@ -245,27 +261,17 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             boolean addUncommitted) throws IOException {
 
         List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
-        if (getConceptAttributes() != null) {
             getConceptAttributes().addTuples(allowedStatus, positionSet, returnTuples, addUncommitted);
-        }
-        if (addUncommitted && getUncommittedConceptAttributes() != null) {
-            getUncommittedConceptAttributes().addTuples(allowedStatus, positionSet, returnTuples, addUncommitted);
-        }
         return returnTuples;
     }
 
     public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
             boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
         List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
-        if (getConceptAttributes() != null) {
+        I_ConceptAttributeVersioned attr = getConceptAttributes();
+        if (attr != null) {
             getConceptAttributes().addTuples(allowedStatus, positionSet, returnTuples, addUncommitted,
                 returnConflictResolvedLatestState);
-        }
-        if (addUncommitted) {
-            if (getUncommittedConceptAttributes() != null) {
-                getUncommittedConceptAttributes().addTuples(allowedStatus, positionSet, returnTuples, addUncommitted,
-                    returnConflictResolvedLatestState);
-            }
         }
         return returnTuples;
     }
@@ -761,6 +767,25 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                 }
                 uncommittedIds = null;
             }
+            if (uncommittedIdVersioned != null) {
+                boolean delete = true;
+                for (I_IdVersioned idv : uncommittedIdVersioned) {
+                    for (ListIterator<I_IdPart> itr = idv.getVersions().listIterator(); itr.hasNext();) {
+                        I_IdPart p = itr.next();
+                        if (p.getVersion() == Integer.MAX_VALUE) {
+                            itr.remove();
+                        } else {
+                            delete = false;
+                        }
+                    }
+                    if (delete) {
+                        AceConfig.getVodb().deleteId(idv);
+                    } else {
+                        AceConfig.getVodb().writeId(idv);
+                    }
+                }
+                uncommittedIdVersioned = null;
+            }
 
             // remove uncommitted parts...
             if (conceptAttributes != null) {
@@ -784,7 +809,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
             if (sourceRels != null) {
                 for (I_RelVersioned srcRel : sourceRels) {
-                    for (ListIterator<I_RelPart> partItr = srcRel.getVersions().listIterator(); partItr.hasNext();) {
+                    for (ListIterator<? extends I_RelPart> partItr = srcRel.getVersions().listIterator(); partItr.hasNext();) {
                         I_RelPart part = partItr.next();
                         if (part.getVersion() == Integer.MAX_VALUE) {
                             partItr.remove();
@@ -1123,6 +1148,16 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             }
         }
 
+        if (uncommittedIdVersioned != null) {
+            for (I_IdVersioned edv : uncommittedIdVersioned) {
+                for (I_IdPart part : edv.getVersions()) {
+                    if (part.getVersion() == Integer.MAX_VALUE) {
+                        return true;
+                    }
+                }
+            }
+
+        }
         return false;
     }
 
@@ -1394,6 +1429,94 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             }
         }
         return null;
+    }
+
+    public static void purge() {
+        cbeans = new HashMap<Integer, Reference<ConceptBean>>();
+    }
+
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
+        I_RepresentIdSet possibleKindOfConcepts = LocalVersionedTerminology.get().getEmptyIdSet();
+        getPossibleKindOfConcepts(config, possibleKindOfConcepts);
+        return possibleKindOfConcepts;
+    }
+
+    private void getPossibleKindOfConcepts(I_ConfigAceFrame config, I_RepresentIdSet possibleKindOfConcepts)
+            throws IOException {
+        possibleKindOfConcepts.setMember(this.conceptId);
+        I_IntSet relTypes = config.getDestRelTypes();
+        for (I_RelVersioned destRel : getDestRels()) {
+            for (I_RelPart part : destRel.getVersions()) {
+                if (relTypes.contains(part.getTypeId())) {
+                    if (possibleKindOfConcepts.isMember(destRel.getC1Id()) == false) {
+                        possibleKindOfConcepts.setMember(destRel.getC1Id());
+                        ConceptBean child = ConceptBean.get(destRel.getC1Id());
+                        child.getPossibleKindOfConcepts(config, possibleKindOfConcepts);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus)
+            throws IOException, TerminologyException {
+        boolean promotedAnything = false;
+        if (getId().promote(viewPosition, pomotionPaths, allowedStatus)) {
+            promotedAnything = true;
+        }
+
+        I_IntSet idsToPromote = LocalVersionedTerminology.get().newIntSet();
+
+        if (conceptAttributes.promote(viewPosition, pomotionPaths, allowedStatus)) {
+            idsToPromote.add(conceptAttributes.getNid());
+            promotedAnything = true;
+        }
+
+        for (I_DescriptionVersioned dv : getDescriptions()) {
+            idsToPromote.add(dv.getNid());
+            if (dv.promote(viewPosition, pomotionPaths, allowedStatus)) {
+                promotedAnything = true;
+            }
+        }
+
+        for (I_RelVersioned rv : getSourceRels()) {
+            idsToPromote.add(rv.getNid());
+            if (rv.promote(viewPosition, pomotionPaths, allowedStatus)) {
+                promotedAnything = true;
+            }
+        }
+
+        for (I_ImageVersioned img : getImages()) {
+            idsToPromote.add(img.getNid());
+            if (img.promote(viewPosition, pomotionPaths, allowedStatus)) {
+                idsToPromote.add(img.getNid());
+                promotedAnything = true;
+            }
+        }
+
+        for (int id : idsToPromote.getSetValues()) {
+            I_IdVersioned idv = LocalVersionedTerminology.get().getId(id);
+            if (idv.promote(viewPosition, pomotionPaths, allowedStatus)) {
+                promotedAnything = true;
+                if (uncommittedIds == null) {
+                    uncommittedIds = new IntSet();
+                }
+                if (uncommittedIdVersioned == null) {
+                    uncommittedIdVersioned = new ArrayList<I_IdVersioned>();
+                }
+                uncommittedIdVersioned.add(idv);
+                uncommittedIds.add(idv.getNid());
+            }
+        }
+        return promotedAnything;
+    }
+
+    public List<I_IdVersioned> getUncommittedIdVersioned() {
+        if (uncommittedIdVersioned == null) {
+            uncommittedIdVersioned = new ArrayList<I_IdVersioned>();
+        }
+        return uncommittedIdVersioned;
     }
 
 }

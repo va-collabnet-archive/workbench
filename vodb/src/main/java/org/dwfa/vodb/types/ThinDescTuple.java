@@ -21,6 +21,7 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.util.HashFunction;
 
 public class ThinDescTuple implements I_DescriptionTuple {
     I_DescriptionVersioned fixedPart;
@@ -235,4 +236,13 @@ public class ThinDescTuple implements I_DescriptionTuple {
     public int getFixedPartId() {
         return fixedPart.getTermComponentId();
     }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPositionId(int pid) {
+        throw new UnsupportedOperationException();
+    }
+
 }

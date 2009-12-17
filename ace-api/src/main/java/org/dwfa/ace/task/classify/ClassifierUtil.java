@@ -48,9 +48,21 @@ class ClassifierUtil {
     final private I_IntSet activeStatus;
     final private I_IntSet statedForms;
 
+    // :EDIT:MEC:
+    int countAddConcept;
+    int countAddRel;
+    int countStatusNotCurrent;
+
+    // :EDIT:MEC:
+
     ClassifierUtil(final Logger logger, final I_SnorocketFactory rocket) throws TerminologyException, IOException {
         this.logger = logger;
         this.rocket = rocket;
+        // :EDIT:MEC:
+        countAddConcept = 0;
+        countAddRel = 0;
+        countStatusNotCurrent = 0;
+        // :EDIT:MEC:
 
         final I_TermFactory termFactory = LocalVersionedTerminology.get();
 
@@ -90,8 +102,7 @@ class ClassifierUtil {
      * relationships to classifier.
      * 
      * A concept is considered to be a SNOMED concept if it's the root concept
-     * or
-     * it has an active SNOMED ISA relationship.
+     * or it has an active SNOMED ISA relationship.
      * 
      * @param concept
      * @param includeUncommitted
@@ -100,17 +111,30 @@ class ClassifierUtil {
     void processConcept(final I_GetConceptData concept, final boolean includeUncommitted) throws IOException {
         if (concept.getConceptId() == rootNid) {
             rocket.addConcept(concept.getConceptId(), false);
+            // :EDIT:MEC: !!!
+            logger.info("!!! ROOT Concept # " + rootNid);
+            // :EDIT:MEC:
         } else {
             final I_ConceptAttributePart latestAttributePart = getLatestAttribute(concept, includeUncommitted);
 
-            if (latestAttributePart != null && activeStatus.contains(latestAttributePart.getConceptStatus())) {
+            if (latestAttributePart != null && activeStatus.contains(latestAttributePart.getStatusId())) {
                 final List<Relationship> statedRels = collectStatedRelationships(concept, includeUncommitted);
 
                 if (null != statedRels) {
                     rocket.addConcept(concept.getConceptId(), latestAttributePart.isDefined());
+                    // :EDIT:MEC: !!!
+                    if (++countAddConcept % 100000 == 0) {
+                        logger.info("!!! processed concept " + countAddConcept);
+                    }
+                    // :EDIT:MEC:
 
                     for (Relationship rel : statedRels) {
                         rocket.addRelationship(rel.cId1, rel.relId, rel.cId2, rel.group);
+                        // :EDIT:MEC: !!!
+                        if (++countAddRel % 100000 == 0) {
+                            logger.info("!!! processed RELATIONSHIP " + countAddRel);
+                        }
+                        // :EDIT:MEC:
                     }
                 }
             }
@@ -135,12 +159,12 @@ class ClassifierUtil {
             if (null != latestRel && activeStatus.contains(latestRel.getStatusId())) {
                 // check the relationship to see if there is a proper SNOMED
                 // is-a.
-                if (latestRel.getRelTypeId() == isaId) {
+                if (latestRel.getTypeId() == isaId) {
                     isSnomedConcept = true;
                 }
 
                 if (statedForms.contains(latestRel.getCharacteristicId())) {
-                    final Relationship relationship = new Relationship(rel.getC1Id(), latestRel.getRelTypeId(),
+                    final Relationship relationship = new Relationship(rel.getC1Id(), latestRel.getTypeId(),
                         rel.getC2Id(), latestRel.getGroup());
                     statedRels.add(relationship);
                 }

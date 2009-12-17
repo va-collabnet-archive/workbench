@@ -551,4 +551,23 @@ public interface I_GetConceptData extends I_AmTermComponent {
             TerminologyException;
 
     public Object getId(int identifierScheme) throws IOException, TerminologyException;
+
+    /**
+     * This method efficiently determines "possible" concepts that are a
+     * "kind of" a concept,
+     * and bypasses more comprehensive checks (such as version checks). It is
+     * useful
+     * for pre-processing queries to limit number of concepts that the
+     * full query spec must be tested for...
+     * 
+     * @param config
+     * @return A collection of the native identifiers of all possible children
+     *         of this concept
+     *         according to the relationships specified in the config.
+     * @throws IOException
+     */
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException;
+
+    public List<I_IdVersioned> getUncommittedIdVersioned();
+
 }

@@ -16,6 +16,8 @@
  */
 package org.dwfa.vodb.types;
 
+import org.dwfa.util.HashFunction;
+
 public class ThinIdPartCore {
     private int pathId;
     private int version;

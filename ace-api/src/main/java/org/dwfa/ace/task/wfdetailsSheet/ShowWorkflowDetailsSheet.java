@@ -77,11 +77,15 @@ public class ShowWorkflowDetailsSheet extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             final I_ConfigAceFrame configFrame = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    configFrame.setShowWorkflowDetailSheet(show);
-                }
-            });
+            if (SwingUtilities.isEventDispatchThread()) {
+                configFrame.setShowWorkflowDetailSheet(show);
+            } else {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        configFrame.setShowWorkflowDetailSheet(show);
+                    }
+                });
+            }
 
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {

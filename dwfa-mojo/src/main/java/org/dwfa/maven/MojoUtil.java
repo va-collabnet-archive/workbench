@@ -110,7 +110,6 @@ public class MojoUtil {
         for (Artifact a : artifacts) {
             libs.add(a.getFile().toURI().toURL());
         }
-        System.out.println("URLClassLoader(List<Artifact>) libs: " + libs);
         return new URLClassLoader(libs.toArray(new URL[libs.size()]));
     }
 
@@ -134,6 +133,22 @@ public class MojoUtil {
         List<URL> libs = addDependencies(dependencies, localRepository);
         libs.add(new File(classesDir).toURI().toURL());
         return new URLClassLoader(libs.toArray(new URL[libs.size()]));
+    }
+
+    public static URLClassLoader getProjectClassLoaderWithoutProvided(List<Artifact> dependencies) throws IOException {
+        List<Artifact> dependencyWithoutProvided = new ArrayList<Artifact>();
+        for (Artifact d : dependencies) {
+            if (d.getScope().equals("provided")) {
+                // don't add
+            } else if (d.getScope().equals("runtime-directory")) {
+                // don't add
+            } else if (d.getScope().equals("system")) {
+                // don't add
+            } else {
+                dependencyWithoutProvided.add(d);
+            }
+        }
+        return getProjectClassLoader(dependencyWithoutProvided);
     }
 
     public static URLClassLoader getProjectClassLoaderWithoutProvided(List<Dependency> dependencies,

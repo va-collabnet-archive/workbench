@@ -34,7 +34,6 @@ public class ExportRefsetSpecTaskBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         PropertyDescriptor outputFilePropName;
-        PropertyDescriptor reportFilePropName;
         try {
             outputFilePropName = new PropertyDescriptor("outputFilePropName", ExportRefsetSpecTask.class);
             outputFilePropName.setBound(true);
@@ -42,12 +41,7 @@ public class ExportRefsetSpecTaskBeanInfo extends SimpleBeanInfo {
             outputFilePropName.setDisplayName("<html><font color='green'>Output file property:");
             outputFilePropName.setShortDescription("Name of the property containing the filename to export to. ");
 
-            reportFilePropName = new PropertyDescriptor("reportFilePropName", ExportRefsetSpecTask.class);
-            reportFilePropName.setBound(true);
-            reportFilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            reportFilePropName.setDisplayName("<html><font color='green'>Output file property:");
-            reportFilePropName.setShortDescription("Name of the property containing the report filename. ");
-            PropertyDescriptor rv[] = { outputFilePropName, reportFilePropName };
+            PropertyDescriptor rv[] = { outputFilePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

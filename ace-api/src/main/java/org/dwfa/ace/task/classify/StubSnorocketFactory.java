@@ -19,6 +19,7 @@ package org.dwfa.ace.task.classify;
 import java.io.IOException;
 import java.io.InputStream;
 
+/* !!! OBSOLETE */
 public class StubSnorocketFactory implements I_SnorocketFactory {
 
     public void classify() {
@@ -54,6 +55,26 @@ public class StubSnorocketFactory implements I_SnorocketFactory {
     public InputStream getStream() throws IOException {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public void getEquivConcepts(I_EquivalentCallback callback) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void addRoleComposition(int[] lhsIds, int rhsId) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void addRoleRoot(int id, boolean inclusive) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void addRoleNeverGrouped(int id) {
+        // TODO Auto-generated method stub
+
     }
 
 }

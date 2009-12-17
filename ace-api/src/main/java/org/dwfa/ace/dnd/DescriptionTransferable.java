@@ -23,63 +23,85 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 import org.dwfa.tapi.impl.UniversalFixedConcept;
 import org.dwfa.tapi.impl.UniversalFixedDescription;
-import org.dwfa.vodb.ToIoException;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class DescriptionTransferable implements Transferable {
 
+    public static String thinDescTupleType = DataFlavor.javaJVMLocalObjectMimeType + ";class="
+        + I_DescriptionTuple.class.getName();
+
+    public static final String thinDescVersionedType = DataFlavor.javaJVMLocalObjectMimeType + ";class="
+        + I_DescriptionVersioned.class.getName();
+
+    public DataFlavor thinDescVersionedFlavor;
+    public DataFlavor thinDescTupleFlavor;
+    private DataFlavor conceptBeanFlavor;
     private I_DescriptionTuple tuple;
 
     public DescriptionTransferable(I_DescriptionTuple tuple) {
         super();
         this.tuple = tuple;
-
+        try {
+            thinDescVersionedFlavor = new DataFlavor(DescriptionTransferable.thinDescVersionedType);
+            thinDescTupleFlavor = new DataFlavor(DescriptionTransferable.thinDescTupleType);
+            conceptBeanFlavor = new DataFlavor(ConceptTransferable.conceptBeanType);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if (tuple == null) {
             return null;
         }
-        if (flavor.equals(TerminologyTransferHandler.conceptBeanFlavor)) {
-            return ConceptBean.get(tuple.getConceptId());
-        } else if (flavor.equals(TerminologyTransferHandler.thinDescVersionedFlavor)) {
+        I_TermFactory tf = LocalVersionedTerminology.get();
+        if (flavor.equals(conceptBeanFlavor)) {
+            try {
+                return tf.getConcept(tuple.getConceptId());
+            } catch (TerminologyException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+            return null;
+        } else if (flavor.equals(thinDescVersionedFlavor)) {
             return tuple.getDescVersioned();
-        } else if (flavor.equals(TerminologyTransferHandler.thinDescTupleFlavor)) {
+        } else if (flavor.equals(thinDescTupleFlavor)) {
             return tuple;
         } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
             try {
-                return UniversalFixedConcept.get(ConceptBean.get(tuple.getConceptId()).getUids());
-            } catch (IOException e) {
+                return UniversalFixedConcept.get(tf.getConcept(tuple.getConceptId()).getUids());
+            } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
             try {
-                return UniversalFixedConcept.get(ConceptBean.get(tuple.getConceptId()).getUids());
-            } catch (IOException e) {
+                return UniversalFixedConcept.get(tf.getConcept(tuple.getConceptId()).getUids());
+            } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         } else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescFlavor)) {
             try {
                 return new UniversalFixedDescription(tuple.getDescVersioned().getUniversal().getDescId(),
-                    ConceptBean.get(tuple.getStatusId()).getUids(), ConceptBean.get(tuple.getConceptId()).getUids(),
-                    tuple.getInitialCaseSignificant(), ConceptBean.get(tuple.getTypeId()).getUids(), tuple.getText(),
+                    tf.getConcept(tuple.getStatusId()).getUids(), tf.getConcept(tuple.getConceptId()).getUids(),
+                    tuple.getInitialCaseSignificant(), tf.getConcept(tuple.getTypeId()).getUids(), tuple.getText(),
                     tuple.getLang());
             } catch (TerminologyException e) {
-                throw new ToIoException(e);
+                throw new IOException(e);
             }
         } else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescInterfaceFlavor)) {
             try {
                 return new UniversalFixedDescription(tuple.getDescVersioned().getUniversal().getDescId(),
-                    ConceptBean.get(tuple.getStatusId()).getUids(), ConceptBean.get(tuple.getConceptId()).getUids(),
-                    tuple.getInitialCaseSignificant(), ConceptBean.get(tuple.getTypeId()).getUids(), tuple.getText(),
+                    tf.getConcept(tuple.getStatusId()).getUids(), tf.getConcept(tuple.getConceptId()).getUids(),
+                    tuple.getInitialCaseSignificant(), tf.getConcept(tuple.getTypeId()).getUids(), tuple.getText(),
                     tuple.getLang());
             } catch (TerminologyException e) {
-                throw new ToIoException(e);
+                throw new IOException(e);
             }
         } else if (flavor.equals(DataFlavor.stringFlavor)) {
             return tuple.getText();
@@ -88,11 +110,16 @@ public class DescriptionTransferable implements Transferable {
     }
 
     public DataFlavor[] getTransferDataFlavors() {
-        return TerminologyTransferHandler.getSupportedFlavors();
+        return new DataFlavor[] { thinDescVersionedFlavor, thinDescTupleFlavor, conceptBeanFlavor,
+                                 FixedTerminologyTransferable.universalFixedConceptFlavor,
+                                 FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor,
+                                 FixedTerminologyTransferable.universalFixedDescFlavor,
+                                 FixedTerminologyTransferable.universalFixedDescInterfaceFlavor,
+                                 DataFlavor.stringFlavor };
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        for (DataFlavor f : TerminologyTransferHandler.getSupportedFlavors()) {
+        for (DataFlavor f : getTransferDataFlavors()) {
             if (f.equals(flavor)) {
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine("DT flavor supported: " + flavor);

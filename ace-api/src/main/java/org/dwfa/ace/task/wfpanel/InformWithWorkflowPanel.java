@@ -93,41 +93,15 @@ public class InformWithWorkflowPanel extends AbstractTask {
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
             ex = null;
-            SwingUtilities.invokeAndWait(new Runnable() {
-
-                public void run() {
-                    I_ConfigAceFrame config;
-                    try {
-                        config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
-                        JPanel workflowPanel = config.getWorkflowPanel();
-                        Component[] components = workflowPanel.getComponents();
-                        for (int i = 0; i < components.length; i++) {
-                            workflowPanel.remove(components[i]);
-                        }
-                        workflowPanel.setLayout(new GridBagLayout());
-                        GridBagConstraints c = new GridBagConstraints();
-                        c.fill = GridBagConstraints.BOTH;
-                        c.gridx = 0;
-                        c.gridy = 0;
-                        c.weightx = 1.0;
-                        c.weighty = 0;
-                        c.anchor = GridBagConstraints.WEST;
-                        workflowPanel.add(new JPanel(), c); // Filler
-                        c.gridx++;
-                        c.weightx = 0.0;
-                        workflowPanel.add(new JLabel(information, SwingConstants.CENTER), c);
-                        workflowPanel.validate();
-                        Container cont = workflowPanel;
-                        while (cont != null) {
-                            cont.validate();
-                            cont = cont.getParent();
-                        }
-                        workflowPanel.paintImmediately(0, 0, workflowPanel.getWidth(), workflowPanel.getHeight());
-                    } catch (Exception e) {
-                        ex = e;
+            if (SwingUtilities.isEventDispatchThread()) {
+                doRun(process);
+            } else {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        doRun(process);
                     }
-                }
-            });
+                });
+            }
         } catch (InterruptedException e) {
             throw new TaskFailedException(e);
         } catch (InvocationTargetException e) {
@@ -155,6 +129,38 @@ public class InformWithWorkflowPanel extends AbstractTask {
      */
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
+    }
+
+    private void doRun(final I_EncodeBusinessProcess process) {
+        I_ConfigAceFrame config;
+        try {
+            config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+            JPanel workflowPanel = config.getWorkflowPanel();
+            Component[] components = workflowPanel.getComponents();
+            for (int i = 0; i < components.length; i++) {
+                workflowPanel.remove(components[i]);
+            }
+            workflowPanel.setLayout(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            c.gridx = 0;
+            c.gridy = 0;
+            c.weightx = 1.0;
+            c.weighty = 0;
+            c.anchor = GridBagConstraints.EAST;
+            workflowPanel.add(new JLabel(information, SwingConstants.CENTER), c);
+            c.weightx = 0.0;
+            workflowPanel.validate();
+            Container cont = workflowPanel;
+            while (cont != null) {
+                cont.validate();
+                cont = cont.getParent();
+            }
+            workflowPanel.setVisible(true);
+            workflowPanel.paintImmediately(0, 0, workflowPanel.getWidth(), workflowPanel.getHeight());
+        } catch (Exception e) {
+            ex = e;
+        }
     }
 
 }

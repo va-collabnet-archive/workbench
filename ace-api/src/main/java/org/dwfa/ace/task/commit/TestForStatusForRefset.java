@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -73,6 +74,7 @@ public class TestForStatusForRefset extends AbstractConceptTest {
 
             I_IntSet actives = getActiveStatus(termFactory);
 
+            AceLog.getAppLog().info("Testing for status for refset: " + concept);
             for (I_ConceptAttributeTuple rel : concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(),
                 allPositions, true, true)) {
                 if (actives.contains(rel.getConceptStatus()))

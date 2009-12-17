@@ -16,20 +16,14 @@
  */
 package org.dwfa.ace.table.forms;
 
-import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.plaf.basic.BasicHTML;
-import javax.swing.text.View;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.table.AceTableRenderer;
-import org.dwfa.ace.table.DescriptionTableRenderer;
 
 public class FormsTableRenderer extends AceTableRenderer {
 

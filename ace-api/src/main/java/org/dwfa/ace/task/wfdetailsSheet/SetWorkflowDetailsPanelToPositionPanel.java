@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.task.wfdetailsSheet;
 
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -107,6 +108,10 @@ public class SetWorkflowDetailsPanelToPositionPanel extends AbstractTask {
             clear.setProfilePropName(getProfilePropName());
             clear.evaluate(process, worker);
             JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
+            int width = 475;
+            int height = 625;
+            workflowDetailsSheet.setSize(width, height);
+            workflowDetailsSheet.setLayout(new GridLayout(1, 1));
             workflowDetailsSheet.add(new SelectPositionSetPanel(config));
         } catch (Exception e) {
             ex = e;

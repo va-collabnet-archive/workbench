@@ -161,29 +161,22 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
             cont = cont.getParent();
         }
         continueButton.requestFocusInWindow();
+        workflowPanel.repaint();
     }
 
     protected abstract boolean showPrevious();
 
     protected void restore() throws InterruptedException, InvocationTargetException {
-        SwingUtilities.invokeAndWait(new Runnable() {
-
-            public void run() {
-                Component[] components = workflowPanel.getComponents();
-                for (int i = 0; i < components.length; i++) {
-                    workflowPanel.remove(components[i]);
+        if (SwingUtilities.isEventDispatchThread()) {
+            doRun();
+        } else {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    doRun();
                 }
-                workflowPanel.validate();
-                Container cont = workflowPanel;
-                while (cont != null) {
-                    cont.validate();
-                    cont = cont.getParent();
-                }
-            }
-
-        });
+            });
+        }
         config.setBuilderToggleVisible(builderVisible);
-        config.setProgressToggleVisible(progressPanelVisible);
         config.setSubversionToggleVisible(subversionButtonVisible);
         config.setInboxToggleVisible(inboxButtonVisible);
     }
@@ -195,13 +188,12 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
 
         builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        progressPanelVisible = config.isProgressToggleVisible();
-        config.setProgressToggleVisible(false);
         subversionButtonVisible = config.isBuilderToggleVisible();
         config.setSubversionToggleVisible(false);
         inboxButtonVisible = config.isInboxToggleVisible();
         config.setInboxToggleVisible(false);
         workflowPanel = config.getWorkflowPanel();
+        workflowPanel.setVisible(true);
     }
 
     /**
@@ -220,6 +212,21 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
 
     public void setProfilePropName(String profilePropName) {
         this.profilePropName = profilePropName;
+    }
+
+    private void doRun() {
+        Component[] components = workflowPanel.getComponents();
+        for (int i = 0; i < components.length; i++) {
+            workflowPanel.remove(components[i]);
+        }
+        workflowPanel.setVisible(false);
+        workflowPanel.repaint();
+        workflowPanel.validate();
+        Container cont = workflowPanel;
+        while (cont != null) {
+            cont.validate();
+            cont = cont.getParent();
+        }
     }
 
     protected static String getPreviousImage() {

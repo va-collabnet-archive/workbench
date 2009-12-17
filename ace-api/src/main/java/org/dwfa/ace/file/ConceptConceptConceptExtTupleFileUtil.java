@@ -24,12 +24,12 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
-public class ConceptConceptConceptExtTupleFileUtil extends ExtTupleFileUtil {
+public class ConceptConceptConceptExtTupleFileUtil {
 
     public static String exportTuple(I_ThinExtByRefTuple tuple) throws TerminologyException, IOException {
 
@@ -113,7 +113,7 @@ public class ConceptConceptConceptExtTupleFileUtil extends ExtTupleFileUtil {
                 return false;
             }
 
-            RefsetHelper refsetHelper = new RefsetHelper();
+            SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
             TupleFileUtil.pathUuids.add(pathUuid);
@@ -177,10 +177,13 @@ public class ConceptConceptConceptExtTupleFileUtil extends ExtTupleFileUtil {
             }
 
             try {
-                newConceptConceptConceptRefsetExtension(refsetUuid, componentUuid, c1Uuid, c2Uuid, c3Uuid, memberUuid,
+                refsetHelper.newConceptConceptConceptRefsetExtension(termFactory.getId(refsetUuid).getNativeId(),
+                    termFactory.getId(componentUuid).getNativeId(), termFactory.getId(c1Uuid).getNativeId(),
+                    termFactory.getId(c2Uuid).getNativeId(), termFactory.getId(c3Uuid).getNativeId(), memberUuid,
                     pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
-                String errorMessage = "Exception thrown while creating new concept-concept-concept refset extension";
+                String errorMessage = "Exception thrown while creating new concept-concept-concept refset extension : "
+                    + e.getLocalizedMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();

@@ -54,6 +54,11 @@ import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 
+/**
+ * 
+ * @author kec
+ * @deprecated use TermComponentLabel
+ */
 public class ConceptLabel extends JEditorPane {
     private static Logger logger = Logger.getLogger(ConceptLabel.class.getName());
 

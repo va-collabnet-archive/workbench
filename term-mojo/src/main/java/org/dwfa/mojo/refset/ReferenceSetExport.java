@@ -1200,6 +1200,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         I_IntSet statusSet = tf.newIntSet();
         statusSet.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
         statusSet.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+        statusSet.add(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid());
+        statusSet.add(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.localize().getNid());
+        statusSet.add(ArchitectonicAuxiliary.Concept.PROMOTED.localize().getNid());
 
         I_DescriptionTuple descTuple = conceptData.getDescTuple(descTypeList, null, statusSet, positions,
             LANGUAGE_SORT_PREF.TYPE_B4_LANG);

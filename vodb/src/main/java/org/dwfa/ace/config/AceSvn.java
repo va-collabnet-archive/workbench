@@ -69,6 +69,7 @@ class AceSvn {
     private String[] csImportOnStart = null;
     private List<File> changeLocations = new ArrayList<File>();
     private Class jiniClass;
+    private static boolean connectToSubversion = false;
 
     public AceSvn(Class jiniClassToSet, Configuration jiniConfigToSet) throws ConfigurationException {
         jiniClass = jiniClassToSet;
@@ -251,18 +252,26 @@ class AceSvn {
             boolean depthIsSticky = false;
             boolean ignoreExternals = false;
             boolean allowUnverObstructions = false;
+            AceLog.getAppLog().info("Starting svn update for: " + path);
             Svn.getSvnClient().update(path, revision, depth, depthIsSticky, ignoreExternals, allowUnverObstructions);
+            AceLog.getAppLog().info("Finished svn update for: " + path);
             changeLocations.add(new File(path));
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
     }
 
-    private void doStealthChangeSetImport(List<File> changeLocations) {
+    public void doStealthChangeSetImport(List<File> changeLocations) {
         // import any change sets that may be downloaded
         // from svn...
+        boolean transactional = VodbEnv.isTransactional();
+        boolean txnNoSync = VodbEnv.getTxnNoSync();
+        boolean deferredWrite = VodbEnv.isDeferredWrite();
         try {
             AceLog.getAppLog().info("Starting stealth import");
+            VodbEnv.setTransactional(false);
+            VodbEnv.setTxnNoSync(false);
+            VodbEnv.setDeferredWrite(true);
             File dbFolder = (File) jiniConfig.getEntry(jiniClass.getName(), "dbFolder", File.class, new File(
                 "target/berkeley-db"));
 
@@ -298,6 +307,9 @@ class AceSvn {
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
+        VodbEnv.setTransactional(transactional);
+        VodbEnv.setDeferredWrite(deferredWrite);
+        VodbEnv.setTxnNoSync(txnNoSync);
         AceConfig.stealthVodb = null;
         LocalVersionedTerminology.setStealthfactory(null);
     }

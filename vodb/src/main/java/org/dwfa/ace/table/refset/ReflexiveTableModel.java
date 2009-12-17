@@ -23,6 +23,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -49,10 +50,16 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.RefsetSpecTreeCellRenderer;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
@@ -84,8 +91,6 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         }
 
         private JTextField textField;
-        private int row;
-        private int column;
         private ReflexiveRefsetFieldData field;
 
         public StringExtFieldEditor(ReflexiveRefsetFieldData field) {
@@ -115,8 +120,6 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         }
 
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            this.row = row;
-            this.column = column;
             ((JComponent) getComponent()).setBorder(new LineBorder(Color.black));
             return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
@@ -349,6 +352,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
+        I_TermFactory tf = LocalVersionedTerminology.get();
         if (allTuples == null || tableComponentId == Integer.MIN_VALUE) {
             return " ";
         }
@@ -373,7 +377,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 }
                 break;
             case COMPONENT:
-                throw new UnsupportedOperationException();
+                value = tuple.getComponentId();
+                break;
             case CONCEPT:
                 throw new UnsupportedOperationException();
             case IMMUTABLE:
@@ -388,9 +393,21 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     value = columns[columnIndex].getReadMethod().invoke(tuple.getPart(),
                         columns[columnIndex].readParamaters);
                 } else {
-                    value = columns[columnIndex].getReadMethod().invoke(tuple.getPart());
+                    try {
+                        value = columns[columnIndex].getReadMethod().invoke(tuple.getPart());
+                    } catch (Exception e) {
+                        value = tuple.getPart().toString();
+                        AceLog.getAppLog().warning(e.getMessage() + ": " + value);
+                    }
                 }
                 break;
+            case PROMOTION_REFSET_PART:
+                value = getPromotionRefsetValue(tuple.getCore(), columns[columnIndex]);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Don't know how to handle: "
+                    + columns[columnIndex].invokeOnObjectType);
             }
             if (value == null) {
                 return new StringWithExtTuple(null, tuple, id);
@@ -410,9 +427,44 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 }
                 return new StringWithExtTuple(value.toString(), tuple, id);
             case COMPONENT_IDENTIFIER:
-                int componentId = (Integer) value;
-                return new StringWithExtTuple(Integer.toString(componentId), tuple, componentId);
+                if (Integer.class.isAssignableFrom(value.getClass())) {
+                    id = (Integer) value;
+                    if (tf.hasConcept(id)) {
+                        I_GetConceptData concept = tf.getConcept(id);
+                        I_DescriptionTuple obj = concept.getDescTuple(
+                            (I_IntList) columns[columnIndex].readParamaters[0],
+                            (I_ConfigAceFrame) columns[columnIndex].readParamaters[1]);
+                        return new StringWithExtTuple(obj.getText(), tuple, id);
+                    } else if (tf.hasExtension(id)) {
+                        I_ThinExtByRefVersioned ext = tf.getExtension(id);
+                        I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
+                        List<I_ThinExtByRefTuple> tuples = ext.getTuples(config.getAllowedStatus(),
+                            config.getViewPositionSet(), false);
+                        if (tuples.size() > 0) {
+                            I_ThinExtByRefTuple obj = tuples.iterator().next();
+                            ConceptBean componentRefset = ConceptBean.get(obj.getRefsetId());
+                            I_DescriptionTuple refsetDesc = componentRefset.getDescTuple(host.getConfig()
+                                .getTableDescPreferenceList(), host.getConfig());
+                            StringBuffer buff = new StringBuffer();
+                            buff.append("<html>");
+                            buff.append(refsetDesc.getText());
+                            buff.append(" member: ");
+                            // @TODO replace this test with a call to determine
+                            // "refset purpose" once the purpose is available.
+                            if (refsetDesc.getText().toLowerCase().endsWith("refset spec")) {
+                                RefsetSpecTreeCellRenderer renderer = new RefsetSpecTreeCellRenderer(host.getConfig());
+                                buff.append(renderer.getHtmlRendering(obj));
+                            } else {
+                                buff.append(obj.getPart().toString());
+                            }
 
+                            return new StringWithExtTuple(buff.toString(), tuple, id);
+                        }
+                    } else {
+                        throw new UnsupportedOperationException("Can't find component for id: " + id);
+                    }
+                }
+                return value;
             case VERSION:
                 if (tuple.getVersion() == Integer.MAX_VALUE) {
                     return new StringWithExtTuple(ThinVersionHelper.uncommittedHtml(), tuple, id);
@@ -430,6 +482,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         }
         return null;
     }
+
+    protected abstract Object getPromotionRefsetValue(I_ThinExtByRefVersioned extension,
+            ReflexiveRefsetFieldData reflexiveRefsetFieldData) throws IOException, IllegalAccessException,
+            InvocationTargetException;
+
+    public abstract I_GetConceptData getPromotionRefsetIdentityConcept();
 
     private String getPrefText(int id) throws IOException {
         ConceptBean cb = referencedConcepts.get(id);

@@ -21,7 +21,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 
 public class CountExtensionsInRefsetBeanInfo extends SimpleBeanInfo {
 
@@ -30,7 +30,7 @@ public class CountExtensionsInRefsetBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor refsetTermEntry = new PropertyDescriptor("refsetTermEntry",
                 getBeanDescriptor().getBeanClass());
             refsetTermEntry.setBound(true);
-            refsetTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
+            refsetTermEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
             refsetTermEntry.setDisplayName("RefSet:");
             refsetTermEntry.setShortDescription("The identity concept for the refset of interest.");
 

@@ -24,11 +24,13 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class ActiveConceptAndDescTest implements I_TestSearchResults {
@@ -43,7 +45,12 @@ public class ActiveConceptAndDescTest implements I_TestSearchResults {
                 return false;
             }
             List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
-            descV.addTuples(frameConfig.getAllowedStatus(), matchingTuples, true, false);
+            I_IntSet allowedTypes = null;
+            if (frameConfig.searchWithDescTypeFilter()) {
+                allowedTypes = frameConfig.getDescTypes();
+            }
+
+            descV.addTuples(allowedTypes, matchingTuples, true, false);
             if (matchingTuples.size() == 0) {
                 return false;
             }

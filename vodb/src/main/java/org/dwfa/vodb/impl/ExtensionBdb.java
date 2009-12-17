@@ -46,6 +46,7 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.DeadlockException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
@@ -131,12 +132,16 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
      * @seeorg.dwfa.vodb.impl.I_StoreExtensions#writeExt(org.dwfa.ace.api.ebr.
      * I_ThinExtByRefVersioned)
      */
-    public void writeExt(I_ThinExtByRefVersioned ext) throws DatabaseException, IOException {
+    public synchronized void writeExt(I_ThinExtByRefVersioned ext) throws IOException, IOException {
         DatabaseEntry key = new DatabaseEntry();
         DatabaseEntry value = new DatabaseEntry();
         intBinder.objectToEntry(ext.getMemberId(), key);
         extBinder.objectToEntry(ext, value);
-        extensionDb.put(BdbEnv.transaction, key, value);
+        try {
+            extensionDb.put(BdbEnv.transaction, key, value);
+        } catch (DatabaseException e) {
+            throw new IOException(e);
+        }
     }
 
     /*
@@ -150,7 +155,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
         Cursor extCursor = extensionDb.openCursor(null, null);
         DatabaseEntry foundKey = processor.getKeyEntry();
         DatabaseEntry foundData = processor.getDataEntry();
-        while (extCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+        while (extCursor.getNext(foundKey, foundData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
             try {
                 processor.processEbr(foundKey, foundData);
             } catch (Exception e) {
@@ -167,12 +172,13 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
      * @see org.dwfa.vodb.impl.I_StoreExtensions#getRefsetExtensionMembers(int)
      */
     public List<I_ThinExtByRefVersioned> getRefsetExtensionMembers(int refsetId) throws IOException {
+        Cursor extCursor = null;
         try {
             List<I_ThinExtByRefVersioned> returnList = new ArrayList<I_ThinExtByRefVersioned>();
-            Cursor extCursor = extensionDb.openCursor(null, null);
+            extCursor = extensionDb.openCursor(null, null);
             DatabaseEntry foundKey = new DatabaseEntry();
             DatabaseEntry foundData = new DatabaseEntry();
-            while (extCursor.getNext(foundKey, foundData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+            while (extCursor.getNext(foundKey, foundData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
                 try {
                     I_ThinExtByRefVersioned extension = (I_ThinExtByRefVersioned) extBinder.entryToObject(foundData);
                     if (extension.getRefsetId() == refsetId) {
@@ -186,7 +192,14 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
             extCursor.close();
             return returnList;
         } catch (Exception e) {
-            throw new ToIoException(e);
+            if (extCursor != null) {
+                try {
+                    extCursor.close();
+                } catch (DatabaseException e1) {
+                    throw new IOException(e1);
+                }
+            }
+            throw new IOException(e);
         }
     }
 
@@ -195,7 +208,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
      * 
      * @see org.dwfa.vodb.impl.I_StoreExtensions#getExtensionsForRefset(int)
      */
-    public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws DatabaseException {
+    public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws IOException {
         Stopwatch timer = null;
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Getting extensions from refsetId for: " + refsetId);
@@ -208,24 +221,38 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
 
         DatabaseEntry foundData = new DatabaseEntry();
 
-        SecondaryCursor mySecCursor = refsetToExtMap.openSecondaryCursor(null, null);
-        OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
-        List<ExtensionByReferenceBean> matches = new ArrayList<ExtensionByReferenceBean>();
-        while (retVal == OperationStatus.SUCCESS) {
-            I_ThinExtByRefVersioned extFromComponentId = (I_ThinExtByRefVersioned) extBinder.entryToObject(foundData);
-            if (extFromComponentId.getRefsetId() == refsetId) {
-                matches.add(ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId));
-            } else {
-                break;
+        SecondaryCursor mySecCursor = null;
+        try {
+            mySecCursor = refsetToExtMap.openSecondaryCursor(null, null);
+            OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.READ_UNCOMMITTED);
+            List<ExtensionByReferenceBean> matches = new ArrayList<ExtensionByReferenceBean>();
+            while (retVal == OperationStatus.SUCCESS) {
+                I_ThinExtByRefVersioned extFromComponentId = (I_ThinExtByRefVersioned) extBinder.entryToObject(foundData);
+                if (extFromComponentId.getRefsetId() == refsetId) {
+                    matches.add(ExtensionByReferenceBean.make(extFromComponentId.getMemberId(), extFromComponentId));
+                } else {
+                    break;
+                }
+                retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.READ_UNCOMMITTED);
             }
-            retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.DEFAULT);
+            mySecCursor.close();
+            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                AceLog.getAppLog()
+                    .fine(
+                        "Extensions fetched for: " + refsetId + " elapsed time: " + timer.getElapsedTime() / 1000
+                            + " secs");
+            }
+            return matches;
+        } catch (DatabaseException e) {
+            if (mySecCursor != null) {
+                try {
+                    mySecCursor.close();
+                } catch (DatabaseException e1) {
+                    throw new IOException(e1);
+                }
+            }
+            throw new IOException(e);
         }
-        mySecCursor.close();
-        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-            AceLog.getAppLog().fine(
-                "Extensions fetched for: " + refsetId + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
-        }
-        return matches;
     }
 
     /*
@@ -235,53 +262,68 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
      * org.dwfa.vodb.impl.I_StoreExtensions#getAllExtensionsForComponent(int)
      */
     public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId) throws IOException {
+        SecondaryCursor mySecCursor = null;
         try {
-            Stopwatch timer = null;
-            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                AceLog.getAppLog().fine("Getting extensions from componentId for: " + componentId);
-                timer = new Stopwatch();
-                timer.start();
-            }
-            DatabaseEntry secondaryKey = new DatabaseEntry();
-
-            memberAndSecondaryIdBinding.objectToEntry(new MemberAndSecondaryId(componentId, Integer.MIN_VALUE),
-                secondaryKey);
-            DatabaseEntry foundData = new DatabaseEntry();
-
-            SecondaryCursor mySecCursor = componentToExtMap.openSecondaryCursor(null, null);
-            OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
-            List<I_ThinExtByRefVersioned> matches = new ArrayList<I_ThinExtByRefVersioned>();
-            int count = 0;
-            int rejected = 0;
-            while (retVal == OperationStatus.SUCCESS) {
-                I_ThinExtByRefVersioned extFromComponentId = (I_ThinExtByRefVersioned) extBinder.entryToObject(foundData);
-                if (extFromComponentId.getComponentId() == componentId) {
-                    count++;
-                    ExtensionByReferenceBean extBean = ExtensionByReferenceBean.make(extFromComponentId.getMemberId(),
-                        extFromComponentId);
-                    if (extBean == null) {
-                        AceLog.getAppLog().severe("extBean is null for component: " + ConceptBean.get(componentId));
-                        AceLog.getAppLog().severe("extFromComponentId: " + extFromComponentId);
-                        AceLog.getAppLog().severe(
-                            "extFromComponentId.getMemberId(): " + extFromComponentId.getMemberId());
-                    }
-                    I_ThinExtByRefVersioned ext = extBean.getExtension();
-                    matches.add(ext);
-                } else {
-                    rejected++;
-                    break;
+            try {
+                Stopwatch timer = null;
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine("Getting extensions from componentId for: " + componentId);
+                    timer = new Stopwatch();
+                    timer.start();
                 }
-                retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.DEFAULT);
+                DatabaseEntry secondaryKey = new DatabaseEntry();
+
+                memberAndSecondaryIdBinding.objectToEntry(new MemberAndSecondaryId(componentId, Integer.MIN_VALUE),
+                    secondaryKey);
+                DatabaseEntry foundData = new DatabaseEntry();
+
+                mySecCursor = componentToExtMap.openSecondaryCursor(BdbEnv.transaction, null);
+                OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData,
+                    LockMode.READ_UNCOMMITTED);
+                List<I_ThinExtByRefVersioned> matches = new ArrayList<I_ThinExtByRefVersioned>();
+                int count = 0;
+                int rejected = 0;
+                while (retVal == OperationStatus.SUCCESS) {
+                    I_ThinExtByRefVersioned extFromComponentId = (I_ThinExtByRefVersioned) extBinder.entryToObject(foundData);
+                    if (extFromComponentId.getComponentId() == componentId) {
+                        count++;
+                        ExtensionByReferenceBean extBean = ExtensionByReferenceBean.make(
+                            extFromComponentId.getMemberId(), extFromComponentId);
+                        if (extBean == null) {
+                            AceLog.getAppLog().severe("extBean is null for component: " + ConceptBean.get(componentId));
+                            AceLog.getAppLog().severe("extFromComponentId: " + extFromComponentId);
+                            AceLog.getAppLog().severe(
+                                "extFromComponentId.getMemberId(): " + extFromComponentId.getMemberId());
+                        }
+                        I_ThinExtByRefVersioned ext = extBean.getExtension();
+                        matches.add(ext);
+                    } else {
+                        rejected++;
+                        break;
+                    }
+                    retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.READ_UNCOMMITTED);
+                }
+                mySecCursor.close();
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine(
+                        count + " extensions fetched, " + rejected + " extensions rejected " + "for: " + componentId
+                            + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
+                }
+                return matches;
+            } catch (DeadlockException ex) {
+                mySecCursor.close();
+                ex.printStackTrace();
+                return getAllExtensionsForComponent(componentId);
             }
-            mySecCursor.close();
-            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                AceLog.getAppLog().fine(
-                    count + " extensions fetched, " + rejected + " extensions rejected " + "for: " + componentId
-                        + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
-            }
-            return matches;
         } catch (DatabaseException ex) {
-            throw new ToIoException(ex);
+            if (mySecCursor != null) {
+                try {
+                    mySecCursor.close();
+                } catch (DatabaseException e) {
+                    throw new IOException(e);
+                }
+            }
+            throw new IOException(ex);
         }
     }
 
@@ -293,6 +335,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
      * @see org.dwfa.vodb.impl.I_StoreExtensions#getExtensionsForComponent(int)
      */
     public List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException {
+        SecondaryCursor mySecCursor = null;
         try {
             Stopwatch timer = null;
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -306,8 +349,8 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
                 secondaryKey);
             DatabaseEntry foundData = new DatabaseEntry();
 
-            SecondaryCursor mySecCursor = componentToExtMap.openSecondaryCursor(null, null);
-            OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.DEFAULT);
+            mySecCursor = componentToExtMap.openSecondaryCursor(BdbEnv.transaction, null);
+            OperationStatus retVal = mySecCursor.getSearchKeyRange(secondaryKey, foundData, LockMode.READ_UNCOMMITTED);
             List<I_GetExtensionData> matches = new ArrayList<I_GetExtensionData>();
             int count = 0;
             int rejected = 0;
@@ -320,7 +363,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
                     rejected++;
                     break;
                 }
-                retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.DEFAULT);
+                retVal = mySecCursor.getNext(secondaryKey, foundData, LockMode.READ_UNCOMMITTED);
             }
             mySecCursor.close();
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -330,7 +373,14 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
             }
             return matches;
         } catch (DatabaseException ex) {
-            throw new ToIoException(ex);
+            if (mySecCursor != null) {
+                try {
+                    mySecCursor.close();
+                } catch (DatabaseException e) {
+                    throw new IOException(e);
+                }
+            }
+            throw new IOException(ex);
         }
     }
 
@@ -344,7 +394,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
         DatabaseEntry extValue = new DatabaseEntry();
         intBinder.objectToEntry(memberId, extKey);
         try {
-            if (extensionDb.get(BdbEnv.transaction, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+            if (extensionDb.get(BdbEnv.transaction, extKey, extValue, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
                 return (I_ThinExtByRefVersioned) extBinder.entryToObject(extValue);
             }
         } catch (DatabaseException ex) {
@@ -358,12 +408,19 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
      * 
      * @see org.dwfa.vodb.impl.I_StoreExtensions#hasExtension(int)
      */
-    public boolean hasExtension(int memberId) throws DatabaseException {
+    public boolean hasExtension(int memberId) throws IOException {
+        if (ExtensionByReferenceBean.hasNew(memberId)) {
+            return true;
+        }
         DatabaseEntry extKey = new DatabaseEntry();
         DatabaseEntry extValue = new DatabaseEntry();
         intBinder.objectToEntry(memberId, extKey);
-        if (extensionDb.get(BdbEnv.transaction, extKey, extValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-            return true;
+        try {
+            if (extensionDb.get(BdbEnv.transaction, extKey, extValue, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
+                return true;
+            }
+        } catch (DatabaseException e) {
+            throw new IOException(e);
         }
         return false;
     }

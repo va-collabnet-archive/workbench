@@ -45,6 +45,8 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.classifier.DiffTableModel;
+import org.dwfa.ace.classifier.EquivTableModel;
 import org.dwfa.ace.list.TerminologyIntList;
 import org.dwfa.ace.list.TerminologyIntListModel;
 import org.dwfa.ace.list.TerminologyList;
@@ -66,8 +68,6 @@ import org.dwfa.tapi.I_DescribeConceptUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescTuple;
-import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class TerminologyTransferHandler extends TransferHandler {
 
@@ -75,15 +75,6 @@ public class TerminologyTransferHandler extends TransferHandler {
 	 * 
 	 */
     private static final long serialVersionUID = 1L;
-
-    public static String conceptBeanType = DataFlavor.javaJVMLocalObjectMimeType + ";class="
-        + ConceptBean.class.getName();
-
-    public static String thinDescTupleType = DataFlavor.javaJVMLocalObjectMimeType + ";class="
-        + ThinDescTuple.class.getName();
-
-    public static final String thinDescVersionedType = DataFlavor.javaJVMLocalObjectMimeType + ";class="
-        + ThinDescVersioned.class.getName();
 
     public static DataFlavor conceptBeanFlavor;
 
@@ -103,9 +94,9 @@ public class TerminologyTransferHandler extends TransferHandler {
 
         if (conceptBeanFlavor == null) {
             try {
-                conceptBeanFlavor = new DataFlavor(TerminologyTransferHandler.conceptBeanType);
-                thinDescVersionedFlavor = new DataFlavor(TerminologyTransferHandler.thinDescVersionedType);
-                thinDescTupleFlavor = new DataFlavor(TerminologyTransferHandler.thinDescTupleType);
+                conceptBeanFlavor = new DataFlavor(ConceptTransferable.conceptBeanType);
+                thinDescVersionedFlavor = new DataFlavor(DescriptionTransferable.thinDescVersionedType);
+                thinDescTupleFlavor = new DataFlavor(DescriptionTransferable.thinDescTupleType);
                 supportedFlavors = new DataFlavor[] { thinDescVersionedFlavor, thinDescTupleFlavor, conceptBeanFlavor,
                                                      FixedTerminologyTransferable.universalFixedConceptFlavor,
                                                      FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor,
@@ -154,7 +145,7 @@ public class TerminologyTransferHandler extends TransferHandler {
                 case SOURCE_ID:
                     return new ConceptTransferable(ConceptBean.get(rel.getC1Id()));
                 case REL_TYPE:
-                    return new ConceptTransferable(ConceptBean.get(rel.getRelTypeId()));
+                    return new ConceptTransferable(ConceptBean.get(rel.getTypeId()));
                 case DEST_ID:
                     return new ConceptTransferable(ConceptBean.get(rel.getC2Id()));
                 case REFINABILITY:
@@ -203,6 +194,24 @@ public class TerminologyTransferHandler extends TransferHandler {
                         JOptionPane.ERROR_MESSAGE);
                     return null;
                 }
+            } else if (DiffTableModel.class.isAssignableFrom(tableModel.getClass())) {
+
+                AceLog.getAppLog().info("\r\n::: FOUND JTable type: " + tableModel.getClass().toString());
+                DiffTableModel diffTableModel = (DiffTableModel) tableModel;
+                int nid = diffTableModel.getNidAt(termTable.getSelectedRow(), 0);
+                if (nid == Integer.MIN_VALUE)
+                    return null;
+                return new ConceptTransferable(ConceptBean.get(nid));
+
+            } else if (EquivTableModel.class.isAssignableFrom(tableModel.getClass())) {
+
+                AceLog.getAppLog().info("\r\n::: FOUND JTable type: " + tableModel.getClass().toString());
+                EquivTableModel equivTableModel = (EquivTableModel) tableModel;
+                int nid = equivTableModel.getNidAt(termTable.getSelectedRow(), 0);
+                if (nid == Integer.MIN_VALUE)
+                    return null;
+                return new ConceptTransferable(ConceptBean.get(nid));
+
             } else {
                 throw new UnsupportedOperationException("JTable type: " + tableModel.getClass().toString());
             }

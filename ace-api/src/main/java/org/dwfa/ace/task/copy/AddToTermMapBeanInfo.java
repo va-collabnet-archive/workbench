@@ -21,7 +21,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class AddToTermMapBeanInfo extends SimpleBeanInfo {
@@ -31,13 +31,13 @@ public class AddToTermMapBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor valueTermEntry = new PropertyDescriptor("valueTermEntry",
                 getBeanDescriptor().getBeanClass());
             valueTermEntry.setBound(true);
-            valueTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
+            valueTermEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
             valueTermEntry.setDisplayName("concept value:");
             valueTermEntry.setShortDescription("<html><font color='green'>The value for the map.");
 
             PropertyDescriptor keyTermEntry = new PropertyDescriptor("keyTermEntry", getBeanDescriptor().getBeanClass());
             keyTermEntry.setBound(true);
-            keyTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
+            keyTermEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
             keyTermEntry.setDisplayName("concept key:");
             keyTermEntry.setShortDescription("<html><font color='green'>The key for the map.");
 

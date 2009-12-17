@@ -41,17 +41,19 @@ public class ReflexiveRefsetUtil {
             I_HostConceptPlugins host, boolean showRowAdd, boolean spaceForAdd) throws Exception {
         JPanel relPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        JLabel srcRelLabel = new JLabel("     " + labelTxt);
-        if (spaceForAdd == false) {
-            srcRelLabel = new JLabel(labelTxt);
+        if (labelTxt != null) {
+            JLabel srcRelLabel = new JLabel("     " + labelTxt);
+            if (spaceForAdd == false) {
+                srcRelLabel = new JLabel(labelTxt);
+            }
+            srcRelLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 0));
+            c.anchor = GridBagConstraints.WEST;
+            c.gridwidth = 2;
+            c.gridx = 0;
+            c.gridy = 0;
+            c.fill = GridBagConstraints.NONE;
+            relPanel.add(srcRelLabel, c);
         }
-        srcRelLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 0));
-        c.anchor = GridBagConstraints.WEST;
-        c.gridwidth = 2;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.fill = GridBagConstraints.NONE;
-        relPanel.add(srcRelLabel, c);
 
         SmallProgressPanel progress = new SmallProgressPanel();
         progress.setVisible(false);

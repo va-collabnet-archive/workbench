@@ -23,6 +23,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartConcept;
 import org.dwfa.tapi.TerminologyException;
@@ -111,6 +112,18 @@ public class ThinExtByRefPartConcept extends ThinExtByRefPart implements I_ThinE
             return this.conceptId - otherPart.conceptId;
         }
         return 1;
+    }
+
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+        buff.append(super.toString());
+        try {
+            buff.append(LocalVersionedTerminology.get().getConcept(conceptId).toString());
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            buff.append(" cid: " + conceptId);
+        }
+        return buff.toString();
     }
 
 }

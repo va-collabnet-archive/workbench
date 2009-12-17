@@ -379,8 +379,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
     public void cleanupSNOMED(I_IntSet relsToIgnore, I_IntSet releases) throws Exception {
         // Update the history records for the relationships...
         AceLog.getAppLog().info("Starting rel history update.");
-        Transaction txn = null;
-        Cursor relC = relDb.openCursor(txn, null);
+        Cursor relC = relDb.openCursor(null, null);
         DatabaseEntry relKey = new DatabaseEntry();
         DatabaseEntry relValue = new DatabaseEntry();
         int compressedRels = 0;

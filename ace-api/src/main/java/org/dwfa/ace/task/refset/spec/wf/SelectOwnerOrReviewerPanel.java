@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.task.refset.spec.wf;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -24,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 
@@ -33,7 +35,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -61,7 +64,7 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
 
     // components
     private ButtonGroup options;
-    private JTextField commentsTextField;
+    private JTextArea commentsTextField;
 
     public SelectOwnerOrReviewerPanel(UUID[] reviewerUuids, I_GetConceptData owner) throws TerminologyException,
             IOException {
@@ -80,7 +83,14 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
 
         this.setLayout(new GridBagLayout());
         int y = 0;
-        if (reviewerUuids.length == 0) {
+        HashSet<UUID> uniqueReviewerUuids = new HashSet<UUID>();
+        if (reviewerUuids != null) {
+            for (UUID reviewerUuid : reviewerUuids) {
+                uniqueReviewerUuids.add(reviewerUuid);
+            }
+        }
+        uniqueReviewerUuids.remove(owner.getUids().iterator().next());
+        if (uniqueReviewerUuids.size() == 0) {
             setSelectedUser(new TermEntry(owner.getUids()));
         } else {
             options = new ButtonGroup();
@@ -90,13 +100,16 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
             options.add(ownerOption);
             userMap.put(owner.getInitialText(), owner);
 
-            for (UUID reviewerUuid : reviewerUuids) {
+            for (UUID reviewerUuid : uniqueReviewerUuids) {
                 I_GetConceptData reviewer = termFactory.getConcept(new UUID[] { reviewerUuid });
                 JRadioButton option = new JRadioButton("Reviewer: " + reviewer.getInitialText());
                 option.setActionCommand(reviewer.getInitialText());
                 option.addActionListener(this);
                 options.add(option);
                 userMap.put(reviewer.getInitialText(), reviewer);
+
+                option.setSelected(true);
+                setSelectedUser(new TermEntry(reviewerUuid));
             }
 
             Enumeration<AbstractButton> buttons = options.getElements();
@@ -126,9 +139,19 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
                 y++;
             }
         }
+        JLabel commentsLabel;
+        if (uniqueReviewerUuids.size() == 0) {
+            commentsLabel = new JLabel("Comments for the owner (" + owner.getInitialText() + "):");
+        } else {
+            commentsLabel = new JLabel("Comments for workflow recipient:");
+        }
+        commentsTextField = new JTextArea();
+        commentsTextField.setLineWrap(true);
+        commentsTextField.setWrapStyleWord(true);
 
-        JLabel commentsLabel = new JLabel("Comments for workflow recipient:");
-        commentsTextField = new JTextField(30);
+        JScrollPane scrollPane = new JScrollPane(commentsTextField);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setPreferredSize(new Dimension(450, 50));
 
         y++;
 
@@ -146,7 +169,7 @@ public class SelectOwnerOrReviewerPanel extends JPanel implements ActionListener
         gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(commentsTextField, gridBagConstraints);
+        this.add(scrollPane, gridBagConstraints);
 
         // column filler
         gridBagConstraints = new GridBagConstraints();

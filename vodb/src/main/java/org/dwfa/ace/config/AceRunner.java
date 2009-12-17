@@ -29,14 +29,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -58,7 +60,6 @@ import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
-import org.dwfa.ace.url.tiuid.ExtendedUrlStreamHandlerFactory;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.queue.QueueServer;
@@ -113,13 +114,14 @@ public class AceRunner {
     public File aceConfigFile;
     public Properties aceProperties;
     public Boolean initializeFromSubversion = false;
+    public String[] svnUpdateOnStart = null;
 
     public AceRunner(String[] args, LifeCycle lc) {
         try {
+            AceProtocols.setupExtraProtocols();
+
             AceRunner.args = args;
             AceRunner.lc = lc;
-
-            setupCustomProtocolHandler();
 
             AceLog.getAppLog().info(
                 "\n*******************\n" + "\n Starting " + this.getClass().getSimpleName() + "\n with config file: "
@@ -131,7 +133,7 @@ public class AceRunner {
             setupLookAndFeel();
             setupSwingExpansionTimerLogging();
             setupIpChangeListener();
-            setBerkeleyDbAsTransactional();
+            // setBerkeleyDbAsTransactional();
 
             File acePropertiesFile = new File("config", "ace.properties");
             boolean acePropertiesFileExists = acePropertiesFile.exists();
@@ -161,6 +163,8 @@ public class AceRunner {
                     new File("config/config.ace"));
                 initializeFromSubversion = (Boolean) jiniConfig.getEntry(this.getClass().getName(),
                     "initFromSubversion", Boolean.class, Boolean.FALSE);
+                svnUpdateOnStart = (String[]) jiniConfig.getEntry(this.getClass().getName(), "svnUpdateOnStart",
+                    String[].class, null);
             } else {
                 aceConfigFile = new File("config/config.ace");
             }
@@ -332,14 +336,33 @@ public class AceRunner {
             }
 
             // Startup other queues here...
+            List<String> queuesToRemove = new ArrayList<String>();
             for (String queue : AceConfig.config.getQueues()) {
                 File queueFile = new File(queue);
-                AceLog.getAppLog().info("Found queue: " + queueFile.toURI().toURL().toExternalForm());
-                if (QueueServer.started(queueFile)) {
-                    AceLog.getAppLog().info("Queue already started: " + queueFile.toURI().toURL().toExternalForm());
+                if (queueFile.exists()) {
+                    AceLog.getAppLog().info("Found queue: " + queueFile.toURI().toURL().toExternalForm());
+                    if (QueueServer.started(queueFile)) {
+                        AceLog.getAppLog().info("Queue already started: " + queueFile.toURI().toURL().toExternalForm());
+                    } else {
+                        new QueueServer(new String[] { queueFile.getCanonicalPath() }, lc);
+                    }
                 } else {
-                    new QueueServer(new String[] { queueFile.getCanonicalPath() }, lc);
+                    queuesToRemove.add(queue);
                 }
+            }
+            if (queuesToRemove.size() > 0) {
+                AceConfig.config.getQueues().removeAll(queuesToRemove);
+                StringBuffer buff = new StringBuffer();
+                buff.append("<html><body>Removing queues that are not accessible: <br>");
+                for (String queue : queuesToRemove) {
+                    buff.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+                    buff.append(queue);
+                    buff.append("<br>");
+                }
+                buff.append("</body></html>");
+
+                AceLog.getAppLog().alertAndLog(Level.WARNING, buff.toString(),
+                    new Exception("Removing queues that are not accessable: " + queuesToRemove));
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -612,11 +635,6 @@ public class AceRunner {
             argsStr = Arrays.asList(args).toString();
         }
         return argsStr;
-    }
-
-    private void setupCustomProtocolHandler() {
-        AceLog.getAppLog().info("java.protocol.handler.pkgs: " + System.getProperty("java.protocol.handler.pkgs"));
-        URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
     }
 
     private void setupDatabase(AceConfig aceConfig, File configFileFile) throws IOException {

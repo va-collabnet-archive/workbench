@@ -49,7 +49,15 @@ public class CreateUserPathAndQueuesBeanInfo extends SimpleBeanInfo {
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
             profilePropName.setShortDescription("The property that contains the working profile.");
 
-            PropertyDescriptor rv[] = { commitProfilePropName, profilePropName, positionSetPropName };
+            PropertyDescriptor errorsAndWarningsPropName = new PropertyDescriptor("errorsAndWarningsPropName",
+                getBeanDescriptor().getBeanClass());
+            errorsAndWarningsPropName.setBound(true);
+            errorsAndWarningsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            errorsAndWarningsPropName.setDisplayName("<html><font color='green'>error & warn prop:");
+            errorsAndWarningsPropName.setShortDescription("The property that contains errors and warnings found prior to commit.");
+
+            PropertyDescriptor rv[] = { commitProfilePropName, profilePropName, positionSetPropName,
+                                       errorsAndWarningsPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

@@ -35,13 +35,15 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.swing.SwingTask;
 
 public class ActivityPanel extends JPanel implements I_ShowActivity {
 
     private long startTime = System.currentTimeMillis();
-    private static boolean showDeleteButton = false;
+    private I_ConfigAceFrame aceFrameConfig;
+    private boolean eraseWhenFinishedEnabled = false;
 
     public long getStartTime() {
         return startTime;
@@ -61,12 +63,24 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         return spinners[spinnerIndex++];
     }
 
-    private class ShowDeleteButton extends SwingTask {
+    private class ShowStopAndProgress extends SwingTask {
+
+        private ShowStopAndProgress() {
+            super();
+        }
 
         @Override
         public void doRun() {
-            if (showDeleteButton) {
-                deleteButton.setVisible(true);
+            if (isComplete()) {
+                stopButton.setVisible(false);
+                progressBar.setVisible(false);
+                if (eraseWhenFinishedEnabled) {
+                    progressInfoLower.setText("");
+                    progressInfoUpper.setText("");
+                }
+            } else {
+                stopButton.setVisible(true);
+                progressBar.setVisible(true);
             }
         }
 
@@ -116,12 +130,6 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
     }
 
-    private class DeleteActionListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            ActivityViewer.removeActivity(ActivityPanel.this);
-        }
-    }
-
     /**
 	 *
 	 */
@@ -131,16 +139,35 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
     JButton stopButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/stop.png")));
 
-    JButton deleteButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/delete2.png")));
-
     JLabel progressInfoUpper = new JLabel();
 
     JLabel progressInfoLower = new JLabel();
-    private boolean showDelete;
+    private boolean complete = false;
 
-    public ActivityPanel(boolean showBorder, boolean showDelete, JPanel secondaryPanel) {
+    public void syncWith(I_ShowActivity another) {
+        this.complete = another.isComplete();
+        stopButton.setVisible(false);
+        setIndeterminate(another.isIndeterminate());
+        setMaximum(another.getMaximum());
+        setValue(another.getValue());
+        setProgressInfoUpper(another.getProgressInfoUpper());
+        setProgressInfoLower(another.getProgressInfoLower());
+        ActionListener[] stopListeners = getStopButton().getActionListeners();
+        setStartTime(another.getStartTime());
+        for (ActionListener l : stopListeners) {
+            getStopButton().removeActionListener(l);
+        }
+        for (ActionListener l : another.getStopButton().getActionListeners()) {
+            getStopButton().addActionListener(l);
+        }
+        setStringPainted(another.isStringPainted());
+        ACE.timer.schedule(new ShowStopAndProgress(), 1);
+    }
+
+    public ActivityPanel(boolean showBorder, I_ShowActivity secondaryPanel, I_ConfigAceFrame aceFrameConfig) {
         super(new GridBagLayout());
-        this.showDelete = showDelete;
+        this.secondaryPanel = secondaryPanel;
+        this.aceFrameConfig = aceFrameConfig;
         progressInfoUpper.setFont(new Font("Dialog", java.awt.Font.BOLD, 10));
         progressInfoLower.setFont(new Font("Dialog", 0, 10));
 
@@ -163,13 +190,11 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         c.gridx++;
         c.anchor = GridBagConstraints.EAST;
         c.fill = GridBagConstraints.HORIZONTAL;
+        progressBar.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
         add(progressBar, c);
         c.gridx++;
         add(stopButton, c);
         stopButton.addActionListener(new StopActionListener());
-        deleteButton.setVisible(false);
-        deleteButton.addActionListener(new DeleteActionListener());
-        add(deleteButton, c);
         if (showBorder) {
             setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray));
         }
@@ -235,15 +260,8 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     }
 
     public void complete() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                stopButton.setVisible(false);
-                progressBar.setVisible(false);
-                if (showDelete) {
-                    ACE.timer.schedule(new ShowDeleteButton(), 1000);
-                }
-            }
-        });
+        this.complete = true;
+        ACE.timer.schedule(new ShowStopAndProgress(), 1);
         for (I_ShowActivity shower : showActivityListeners) {
             shower.complete();
         }
@@ -290,21 +308,25 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     }
 
     public boolean isComplete() {
-        return stopButton.isVisible() == false;
+        return this.complete;
     }
 
     public boolean isIndeterminate() {
         return progressBar.isIndeterminate();
     }
 
-    JPanel secondaryPanel;
+    I_ShowActivity secondaryPanel;
 
-    public JPanel getSecondaryPanel() {
+    public I_ShowActivity getSecondaryPanel() {
         return secondaryPanel;
     }
 
-    public void setSecondaryPanel(JPanel panel) {
+    public void setSecondaryPanel(I_ShowActivity panel) {
         this.secondaryPanel = panel;
+    }
+
+    public boolean isStringPainted() {
+        return progressBar.isStringPainted();
     }
 
     public void setStringPainted(final boolean stringPainted) {
@@ -324,5 +346,25 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
     public void setStopButton(JButton stopButton) {
         this.stopButton = stopButton;
+    }
+
+    public I_ConfigAceFrame getAceFrameConfig() {
+        return aceFrameConfig;
+    }
+
+    public String getProgressInfoLower() {
+        return progressInfoLower.getText();
+    }
+
+    public String getProgressInfoUpper() {
+        return progressInfoUpper.getText();
+    }
+
+    public boolean isEraseWhenFinishedEnabled() {
+        return eraseWhenFinishedEnabled;
+    }
+
+    public void setEraseWhenFinishedEnabled(boolean eraseWhenFinishedEnabled) {
+        this.eraseWhenFinishedEnabled = eraseWhenFinishedEnabled;
     }
 }

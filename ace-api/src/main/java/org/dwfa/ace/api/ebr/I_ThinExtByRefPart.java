@@ -19,6 +19,7 @@ package org.dwfa.ace.api.ebr;
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 
@@ -45,5 +46,7 @@ public interface I_ThinExtByRefPart extends Comparable<I_ThinExtByRefPart>, I_Am
     public I_ThinExtByRefPart duplicatePart();
 
     public I_ThinExtByRefPart duplicate();
+
+    public I_ThinExtByRefPart makePromotionPart(I_Path promotionPath);
 
 }

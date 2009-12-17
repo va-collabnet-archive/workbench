@@ -200,6 +200,7 @@ public class NewDefaultProfile extends NewProfile {
         addIfNotNull(allowedStatus, Concept.RESOLVED_IN_DUAL_AND_PROCESSED, tf);
         addIfNotNull(allowedStatus, Concept.CONFLICTING, tf);
         addIfNotNull(allowedStatus, Concept.CONSTANT, tf);
+        addIfNotNull(allowedStatus, Concept.READY_TO_PROMOTE, tf);
         activeConfig.setAllowedStatus(allowedStatus);
 
         I_IntSet destRelTypes = tf.newIntSet();
@@ -283,6 +284,8 @@ public class NewDefaultProfile extends NewProfile {
 
         activeConfig.setDefaultStatus(tf.getConcept(Concept.CURRENT.getUids()));
         activeConfig.setDefaultDescriptionType(tf.getConcept(Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
+
+        activeConfig.setSubversionToggleVisible(false);
 
         activeConfig.setDefaultRelationshipType(tf.getConcept(Concept.IS_A_REL.getUids()));
         activeConfig.setDefaultRelationshipCharacteristic(tf.getConcept(Concept.STATED_RELATIONSHIP.getUids()));

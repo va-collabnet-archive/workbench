@@ -38,8 +38,6 @@ public interface I_IdPart extends I_AmPart {
 
     public void setSourceId(Object sourceId);
 
-    public boolean hasNewData(I_IdPart another);
-
     public I_IdPart duplicate();
 
 }

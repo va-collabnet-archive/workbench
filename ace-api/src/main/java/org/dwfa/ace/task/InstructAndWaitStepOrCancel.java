@@ -131,8 +131,6 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
         I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        boolean progressPanelVisible = config.isProgressToggleVisible();
-        config.setProgressToggleVisible(false);
         boolean subversionButtonVisible = config.isSubversionToggleVisible();
         config.setSubversionToggleVisible(false);
         boolean inboxButtonVisible = config.isInboxToggleVisible();
@@ -154,8 +152,6 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
                     c.weightx = 1.0;
                     c.weighty = 0;
                     c.anchor = GridBagConstraints.WEST;
-                    workflowPanel.add(new JPanel(), c); // Filler
-                    c.gridx++;
                     c.weightx = 0.0;
                     workflowPanel.add(new JLabel(instruction), c);
                     c.gridx++;
@@ -173,13 +169,15 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
                     stopButton.addActionListener(new StopActionListener());
                     stopButton.setToolTipText("Cancel");
                     c.gridx++;
-                    workflowPanel.add(new JLabel("     "), c);
+                    workflowPanel.add(new JLabel("  "), c);
                     workflowPanel.validate();
                     Container cont = workflowPanel;
                     while (cont != null) {
                         cont.validate();
                         cont = cont.getParent();
                     }
+                    workflowPanel.setVisible(true);
+                    workflowPanel.repaint();
                     stepButton.requestFocusInWindow();
                 }
             });
@@ -195,10 +193,13 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
                     }
                     workflowPanel.validate();
                     Container cont = workflowPanel;
+
                     while (cont != null) {
                         cont.validate();
                         cont = cont.getParent();
                     }
+                    workflowPanel.repaint();
+                    workflowPanel.setVisible(false);
                 }
 
             });
@@ -208,7 +209,6 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
             throw new TaskFailedException(e);
         }
         config.setBuilderToggleVisible(builderVisible);
-        config.setProgressToggleVisible(progressPanelVisible);
         config.setSubversionToggleVisible(subversionButtonVisible);
         config.setInboxToggleVisible(inboxButtonVisible);
         return returnCondition;

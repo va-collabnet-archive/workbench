@@ -18,6 +18,7 @@ package org.dwfa.vodb.types;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -26,7 +27,9 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -47,6 +50,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPartMeasurement;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartScopedLanguage;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPartString;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.dwfa.tapi.TerminologyRuntimeException;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -152,6 +156,30 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     @Override
     public String toString() {
+        try {
+            StringBuffer buff = new StringBuffer();
+            buff.append(this.getClass().getSimpleName());
+            buff.append(" refset: ");
+            buff.append(LocalVersionedTerminology.get().getConcept(refsetId).toString());
+            buff.append(" memberId: ");
+            buff.append(memberId);
+            if (LocalVersionedTerminology.get().hasConcept(componentId)) {
+                buff.append(" component: ");
+                buff.append(LocalVersionedTerminology.get().getConcept(componentId).toString());
+            } else {
+                buff.append(" componentId: ");
+                buff.append(componentId);
+            }
+            buff.append(" type: ");
+            buff.append(LocalVersionedTerminology.get().getConcept(typeId).toString());
+            buff.append(" versions: ");
+            synchronized (versions) {
+                buff.append(versions);
+            }
+            return buff.toString();
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
         return "ThinExtByRefVersioned refsetId: " + refsetId + " memberId: " + memberId + " componentId: "
             + componentId + " typeId: " + typeId + " versions: " + versions;
     }
@@ -383,6 +411,31 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
         return returnTuples;
     }
 
+    public int getNid() {
+        return memberId;
+    }
+
+    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+        int viewPathId = viewPosition.getPath().getConceptId();
+        Set<I_Position> positions = new HashSet<I_Position>();
+        positions.add(viewPosition);
+        List<I_ThinExtByRefTuple> matchingTuples = new ArrayList<I_ThinExtByRefTuple>();
+        addTuples(allowedStatus, positions, matchingTuples, false);
+        boolean promotedAnything = false;
+        for (I_Path promotionPath : pomotionPaths) {
+            for (I_ThinExtByRefTuple it : matchingTuples) {
+                if (it.getPathId() == viewPathId) {
+                    I_ThinExtByRefPart promotionPart = it.getPart().duplicate();
+                    promotionPart.setVersion(Integer.MAX_VALUE);
+                    promotionPart.setPathId(promotionPath.getConceptId());
+                    it.addVersion(promotionPart);
+                    promotedAnything = true;
+                }
+            }
+        }
+        return promotedAnything;
+    }
+	
     public I_ThinExtByRefPart getLatestVersion() {
         I_ThinExtByRefPart latestVersion = null;
         for (I_ThinExtByRefPart part : getVersions()) {

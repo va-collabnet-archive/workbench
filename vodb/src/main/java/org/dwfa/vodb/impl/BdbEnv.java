@@ -30,9 +30,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.primitives.IntList;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.DatabaseSetupConfig;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -43,6 +45,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -339,10 +343,12 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
     public void sync() throws DatabaseException {
         if (VodbEnv.isDeferredWrite()) {
             if (env.getConfig().getReadOnly()) {
+                AceLog.getAppLog().info("Read only environment requires no sync.");
                 return;
             }
             if (!env.getConfig().getReadOnly()) {
                 for (I_StoreInBdb store : databases) {
+                    AceLog.getAppLog().info("Syncing: " + store.toString());
                     store.sync();
                 }
                 env.sync();
@@ -352,10 +358,11 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
             CheckpointConfig check = new CheckpointConfig();
             check.setForce(true);
             if (env != null) {
+                AceLog.getAppLog().info("Starting checkpoint.");
                 env.checkpoint(check);
+                AceLog.getAppLog().info("Finished checkpoint.");
             }
         }
-
     }
 
     public Map<String, String> getProperties() throws IOException {
@@ -380,6 +387,10 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
 
     public Iterator<I_GetConceptData> getConceptIterator() throws IOException {
         return conAttBdb.getConceptIterator();
+    }
+
+    public I_IntSet getConceptNids() throws IOException {
+        return conAttBdb.getConceptNids();
     }
 
     public boolean hasConcept(int conceptId) throws DatabaseException {
@@ -616,7 +627,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         return extensionBdb.getExtensionsForComponent(componentId);
     }
 
-    public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws DatabaseException {
+    public List<ExtensionByReferenceBean> getExtensionsForRefset(int refsetId) throws IOException {
         return extensionBdb.getExtensionsForRefset(refsetId);
     }
 
@@ -624,7 +635,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         return extensionBdb.getRefsetExtensionMembers(refsetId);
     }
 
-    public boolean hasExtension(int memberId) throws DatabaseException {
+    public boolean hasExtension(int memberId) throws IOException {
         return extensionBdb.hasExtension(memberId);
     }
 
@@ -632,7 +643,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         extensionBdb.iterateExtByRefEntries(processor);
     }
 
-    public void writeExt(I_ThinExtByRefVersioned ext) throws DatabaseException, IOException {
+    public void writeExt(I_ThinExtByRefVersioned ext) throws IOException {
         extensionBdb.writeExt(ext);
     }
 
@@ -856,4 +867,32 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
     public int getConceptCount() throws DatabaseException {
         return conAttBdb.getConceptCount();
     }
+
+    public void searchConcepts(I_TrackContinuation tracker, IntList matches, CountDownLatch latch,
+            List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws DatabaseException, IOException,
+            ParseException {
+        conAttBdb.searchConcepts(tracker, matches, latch, checkList, config);
+    }
+
+    public IdentifierSet getConceptIdSet() throws IOException {
+        return conAttBdb.getConceptIdSet();
+    }
+
+    public IdentifierSet getEmptyIdSet() throws IOException {
+        return conAttBdb.getEmptyIdSet();
+    }
+
+    public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids) throws IOException {
+        return conAttBdb.getIdSetFromIntCollection(ids);
+    }
+
+    public I_RepresentIdSet getIdSetfromTermCollection(Collection<? extends I_AmTermComponent> components)
+            throws IOException {
+        return conAttBdb.getIdSetfromTermCollection(components);
+    }
+
+    public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
+        return conAttBdb.getReadOnlyConceptIdSet();
+    }
+
 }

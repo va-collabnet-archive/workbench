@@ -32,9 +32,12 @@ import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 
 public class ConceptTransferable implements Transferable {
 
+    public static String conceptBeanType = DataFlavor.javaJVMLocalObjectMimeType + ";class="
+        + I_GetConceptData.class.getName();
+
     I_GetConceptData conceptTransferable;
 
-    DataFlavor conceptBeanFlavor;
+    private DataFlavor conceptBeanFlavor;
 
     DataFlavor[] supportedFlavors;
 
@@ -43,7 +46,7 @@ public class ConceptTransferable implements Transferable {
         this.conceptTransferable = concept;
 
         try {
-            conceptBeanFlavor = new DataFlavor(TerminologyTransferHandler.conceptBeanType);
+            conceptBeanFlavor = new DataFlavor(conceptBeanType);
         } catch (ClassNotFoundException e) {
             // should never happen.
             throw new RuntimeException(e);

@@ -28,8 +28,11 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -71,17 +74,16 @@ public class ThinRelVersioned implements I_RelVersioned {
      * (non-Javadoc)
      * 
      * @see
+     * 
+     * 
+     * 
+     * 
+     * 
      * org.dwfa.vodb.types.I_RelVersioned#addVersion(org.dwfa.vodb.types.I_RelPart
      * )
      */
     public boolean addVersion(I_RelPart rel) {
-        int index = versions.size() - 1;
-        if (index == -1) {
-            return versions.add(rel);
-        } else if ((index >= 0) && (versions.get(index).hasNewData(rel))) {
-            return versions.add(rel);
-        }
-        return false;
+        return versions.add(rel);
     }
 
     /*
@@ -290,7 +292,9 @@ public class ThinRelVersioned implements I_RelVersioned {
 
         @Override
         public I_RelTuple makeTuple(I_AmPart part, ThinRelVersioned core) {
-            return new ThinRelTuple(core, (I_RelPart) part);
+            I_RelPart relPart = (I_RelPart) part;
+            assert relPart.getTypeId() != Integer.MAX_VALUE;
+            return new ThinRelTuple(core, relPart);
         }
 
     }
@@ -347,25 +351,6 @@ public class ThinRelVersioned implements I_RelVersioned {
             p.convertIds(jarToDbNativeMap);
         }
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.vodb.types.I_RelVersioned#merge(org.dwfa.vodb.types.ThinRelVersioned
-     * )
-     */
-    public boolean merge(I_RelVersioned jarRel) {
-        HashSet<I_RelPart> versionSet = new HashSet<I_RelPart>(versions);
-        boolean changed = false;
-        for (I_RelPart jarPart : jarRel.getVersions()) {
-            if (!versionSet.contains(jarPart)) {
-                changed = true;
-                versions.add(jarPart);
-            }
-        }
-        return changed;
     }
 
     /*
@@ -432,6 +417,55 @@ public class ThinRelVersioned implements I_RelVersioned {
         } else {
             throw new RuntimeException("Cannot change the relid once set");
         }
+    }
+
+    public int getNid() {
+        return relId;
+    }
+
+    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+        int viewPathId = viewPosition.getPath().getConceptId();
+        Set<I_Position> positions = new HashSet<I_Position>();
+        positions.add(viewPosition);
+        List<I_RelTuple> matchingTuples = new ArrayList<I_RelTuple>();
+        addTuples(allowedStatus, null, positions, matchingTuples, false);
+        boolean promotedAnything = false;
+        for (I_Path promotionPath : pomotionPaths) {
+            for (I_RelTuple rt : matchingTuples) {
+                if (rt.getPathId() == viewPathId) {
+                    I_RelPart promotionPart = rt.getPart().duplicate();
+                    promotionPart.setVersion(Integer.MAX_VALUE);
+                    promotionPart.setPathId(promotionPath.getConceptId());
+                    rt.getRelVersioned().addVersion(promotionPart);
+                    promotedAnything = true;
+                }
+            }
+        }
+        return promotedAnything;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * 
+     * 
+     * 
+     * 
+     * 
+     * org.dwfa.vodb.types.I_RelVersioned#merge(org.dwfa.vodb.types.ThinRelVersioned
+     * )
+     */
+    public boolean merge(I_RelVersioned jarRel) {
+        HashSet<I_RelPart> versionSet = new HashSet<I_RelPart>(versions);
+        boolean changed = false;
+        for (I_RelPart jarPart : jarRel.getVersions()) {
+            if (!versionSet.contains(jarPart)) {
+                changed = true;
+                versions.add(jarPart);
+            }
+        }
+        return changed;
     }
 
 }

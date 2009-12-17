@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
+import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -44,6 +45,7 @@ import javax.swing.WindowConstants;
 import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.WizardPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
@@ -111,15 +113,25 @@ public class AceFrame extends ComponentFrame {
         this.frameConfig = (AceFrameConfig) frameConfig;
         setTitle(getFrameName());
         ((AceFrameConfig) frameConfig).setAceFrame(this);
+
+        JLayeredPane layers = getRootPane().getLayeredPane();
+        WizardPanel wizPanel = new WizardPanel(getCdePanel());
+        layers.add(wizPanel, JLayeredPane.MODAL_LAYER);
+        wizPanel.setLocation(400, 0);
+
+        getCdePanel().setWorkflowDetailsSheet(wizPanel.getWfDetailsPanel());
+        getCdePanel().setWorkflowPanel(wizPanel.getWfPanel());
+        getCdePanel().setWorfklowDetailSheetVisible(false);
         getCdePanel().setup(frameConfig);
-        setContentPane(cdePanel);
+
+        setContentPane(getCdePanel());
         Rectangle defaultBounds = getDefaultFrameSize();
         Rectangle bounds = frameConfig.getBounds();
         bounds.width = Math.min(bounds.width, defaultBounds.width);
         bounds.height = Math.min(bounds.height, defaultBounds.height);
         setBounds(bounds);
         doWindowActivation();
-        getQuitList().add(cdePanel);
+        getQuitList().add(getCdePanel());
         this.addWindowListener(new AceWindowActionListener());
         MasterWorker worker = new MasterWorker(config);
         cdePanel.getAceFrameConfig().setWorker(worker);

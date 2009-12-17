@@ -16,9 +16,26 @@
  */
 package org.dwfa.vodb.process;
 
-import com.sleepycat.je.DatabaseException;
+import java.io.File;
+import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.UUID;
+import java.util.WeakHashMap;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -32,6 +49,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.I_MapIds;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
@@ -42,22 +60,7 @@ import org.dwfa.vodb.types.ThinIdVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StreamTokenizer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.UUID;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.sleepycat.je.DatabaseException;
 
 public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
     /** Used to store the set of path int ids so that the paths can be create in the path store. */
@@ -392,7 +395,12 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 	            if ((vrel.getC1Id() == c1id) && (vrel.getC2Id() == c2id)) {
 	                // rel ok
 	            } else {
-	                 throw new Exception("Duplicate rels with different c1 and c2 for: " + relID);
+                I_GetConceptData c1 = ConceptBean.get(c1id);
+                I_GetConceptData c2 = ConceptBean.get(c2id);
+                I_GetConceptData c3 = ConceptBean.get(vrel.getC2Id());
+
+                throw new Exception("Duplicate rels with different c1 and c2:\n relId: " + relID + "\n c1: " + c1
+                    + "\n c2: " + c2 + "\n c3: " + c3);
 	            }
 	        } else {
 	            vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version), map
@@ -444,7 +452,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
     }
 
     protected void readBooleanMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
 
         st.nextToken();
         boolean booleanValue = st.sval.toLowerCase().startsWith("t");
@@ -460,7 +468,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readConIntMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
         st.nextToken();
         UUID conceptUuid = (UUID) getId(st);
         st.nextToken();
@@ -478,7 +486,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readConceptMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
 
         ProcessMemberTaskConcept.check();
 
@@ -497,7 +505,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readMeasurementMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
         st.nextToken();
         double doubleVal = Double.parseDouble(st.sval);
         st.nextToken();
@@ -516,22 +524,27 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readIntegerMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
         st.nextToken();
-        int intValue = Integer.parseInt(st.sval);
-        int version = ThinVersionHelper.convert(statusDate.getTime());
-        int memberId = map.getIntId((UUID) memberUuid, aceAuxPath, version);
+        try {
+            int intValue = Integer.parseInt(st.sval);
+            int version = ThinVersionHelper.convert(statusDate.getTime());
+            int memberId = map.getIntId((UUID) memberUuid, aceAuxPath, version);
 
-        // Now done with reading file, and getting member id. Could return
-        // control back to caller here.
+            // Now done with reading file, and getting member id. Could return
+            // control back to caller here.
 
-        ProcessMemberTaskInteger.acquire(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId, intValue);
+            ProcessMemberTaskInteger.acquire(refsetUuid, statusUuid, componentUuid, pathUuid, version, memberId,
+                intValue);
+        } catch (NumberFormatException ex) {
+            AceLog.getAppLog().info(ex.toString() + " in file: " + readInfo);
+        }
 
     }
 
     @Override
     protected void readLanguageMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
         st.nextToken();
         UUID acceptabilityUuid = (UUID) getId(st);
 
@@ -553,7 +566,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
 
     @Override
     protected void readStringMember(StreamTokenizer st, UUID refsetUuid, UUID memberUuid, UUID statusUuid,
-        UUID componentUuid, Date statusDate, UUID pathUuid) throws Exception {
+            UUID componentUuid, Date statusDate, UUID pathUuid, String readInfo) throws Exception {
         st.nextToken();
         String strExt = st.sval;
         int version = ThinVersionHelper.convert(statusDate.getTime());

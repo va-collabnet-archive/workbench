@@ -104,7 +104,7 @@ public class JarWriter implements ActionListener {
     private class ProgressUpdator implements I_UpdateProgress {
         Timer updateTimer;
         boolean firstUpdate = true;
-        ActivityPanel activity = new ActivityPanel(true, true, null);
+        ActivityPanel activity = new ActivityPanel(true, null, null);
 
         public ProgressUpdator() {
             super();

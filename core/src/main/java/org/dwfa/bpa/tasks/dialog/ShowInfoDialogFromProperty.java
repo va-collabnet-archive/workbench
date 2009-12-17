@@ -85,6 +85,7 @@ public class ShowInfoDialogFromProperty extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             String msg = (String) process.readProperty(messagePropertyName);
+            msg = process.substituteProperties(msg);
             JFrame parentFrame = null;
             for (JFrame frame : OpenFrames.getFrames()) {
                 if (frame.isActive()) {

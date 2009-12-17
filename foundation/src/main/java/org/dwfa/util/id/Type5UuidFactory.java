@@ -44,31 +44,54 @@ public class Type5UuidFactory {
     public static UUID OPCS_DESC_ID = UUID.fromString("26854023-8bd0-11dc-8314-0800200c9a66");
     public static UUID OPCS_REL_ID = UUID.fromString("26854024-8bd0-11dc-8314-0800200c9a66");
 
-    public static UUID READV3_CONCEPT_ID = UUID.fromString("45419916-8ecd-11dc-8314-0800200c9a66");
-    public static UUID READV3_REL_ID = UUID.fromString("45419917-8ecd-11dc-8314-0800200c9a66");
-    public static UUID READV3_TERM30_DESC_ID = UUID.fromString("45419918-8ecd-11dc-8314-0800200c9a66");
-    public static UUID READV3_TERM60_DESC_ID = UUID.fromString("45419919-8ecd-11dc-8314-0800200c9a66");
-    public static UUID READV3_TERM198_DESC_ID = UUID.fromString("4541991a-8ecd-11dc-8314-0800200c9a66");
-
-    public static UUID READV3_REL_ORDER_REFSET_MEMBER_ID = UUID.fromString("48c30c58-b5ce-11dc-8314-0800200c9a66");
-    public static UUID READV3_LINGUISTIC_ROLE_MEMBER_ID = UUID.fromString("0da484c0-b5d1-11dc-8314-0800200c9a66");
-    public static UUID READV3_SUBJECT_TYPE_ID = UUID.fromString("0da484c1-b5d1-11dc-8314-0800200c9a66");
-
-    public static UUID READV3_KEY_MEMBER_ID = UUID.fromString("2bd4a1b0-b70b-11dc-8314-0800200c9a66");
-
-    public static UUID READV3_TEMPL_VALUE_TYPE_MEMBER_ID = UUID.fromString("5acad348-b735-11dc-8314-0800200c9a66");
-    public static UUID READV3_TEMPL_CARDINALITY_MEMBER_ID = UUID.fromString("5acad349-b735-11dc-8314-0800200c9a66");
-    public static UUID READV3_TEMPL_SEMANTIC_STATUS_MEMBER_ID = UUID.fromString("5acad34a-b735-11dc-8314-0800200c9a66");
-    public static UUID READV3_TEMPL_BROWSE_ATTRIBUTE_ORDER_MEMBER_ID = UUID.fromString("5acad34b-b735-11dc-8314-0800200c9a66");
-    public static UUID READV3_TEMPL_BROWSE_VALUE_ORDER_MEMBER_ID = UUID.fromString("5acad34c-b735-11dc-8314-0800200c9a66");
-    public static UUID READV3_TEMPL_NOTES_SCREEN_ORDER_MEMBER_ID = UUID.fromString("5acad34d-b735-11dc-8314-0800200c9a66");
-    public static UUID READV3_TEMPL_ATTRIBUTE_DISPLAYSTATUS_MEMBER_ID = UUID.fromString("5acad34e-b735-11dc-8314-0800200c9a66");
-    public static UUID READV3_TEMPL_CHARACTERISTIC_STATUS_MEMBER_ID = UUID.fromString("5acad34f-b735-11dc-8314-0800200c9a66");
-
-    public static UUID READV3_TEMPL_FOR_REL = UUID.fromString("bd98b290-bc0d-11dc-95ff-0800200c9a66");
-    public static UUID READV3_TEMPL = UUID.fromString("bd98b291-bc0d-11dc-95ff-0800200c9a66");
-    public static UUID READV3_CROSS_MAP_FOR_REL = UUID.fromString("bd98b292-bc0d-11dc-95ff-0800200c9a66");
-    public static UUID READV3_CROSS_MAP = UUID.fromString("bd98b293-bc0d-11dc-95ff-0800200c9a66");
+    /*
+     * public static UUID READV3_CONCEPT_ID =
+     * UUID.fromString("45419916-8ecd-11dc-8314-0800200c9a66");
+     * public static UUID READV3_REL_ID =
+     * UUID.fromString("45419917-8ecd-11dc-8314-0800200c9a66");
+     * public static UUID READV3_TERM30_DESC_ID =
+     * UUID.fromString("45419918-8ecd-11dc-8314-0800200c9a66");
+     * public static UUID READV3_TERM60_DESC_ID =
+     * UUID.fromString("45419919-8ecd-11dc-8314-0800200c9a66");
+     * public static UUID READV3_TERM198_DESC_ID =
+     * UUID.fromString("4541991a-8ecd-11dc-8314-0800200c9a66");
+     * 
+     * public static UUID READV3_REL_ORDER_REFSET_MEMBER_ID =
+     * UUID.fromString("48c30c58-b5ce-11dc-8314-0800200c9a66");
+     * public static UUID READV3_LINGUISTIC_ROLE_MEMBER_ID =
+     * UUID.fromString("0da484c0-b5d1-11dc-8314-0800200c9a66");
+     * public static UUID READV3_SUBJECT_TYPE_ID =
+     * UUID.fromString("0da484c1-b5d1-11dc-8314-0800200c9a66");
+     * 
+     * public static UUID READV3_KEY_MEMBER_ID =
+     * UUID.fromString("2bd4a1b0-b70b-11dc-8314-0800200c9a66");
+     * 
+     * public static UUID READV3_TEMPL_VALUE_TYPE_MEMBER_ID =
+     * UUID.fromString("5acad348-b735-11dc-8314-0800200c9a66");
+     * public static UUID READV3_TEMPL_CARDINALITY_MEMBER_ID =
+     * UUID.fromString("5acad349-b735-11dc-8314-0800200c9a66");
+     * public static UUID READV3_TEMPL_SEMANTIC_STATUS_MEMBER_ID =
+     * UUID.fromString("5acad34a-b735-11dc-8314-0800200c9a66");
+     * public static UUID READV3_TEMPL_BROWSE_ATTRIBUTE_ORDER_MEMBER_ID =
+     * UUID.fromString("5acad34b-b735-11dc-8314-0800200c9a66");
+     * public static UUID READV3_TEMPL_BROWSE_VALUE_ORDER_MEMBER_ID =
+     * UUID.fromString("5acad34c-b735-11dc-8314-0800200c9a66");
+     * public static UUID READV3_TEMPL_NOTES_SCREEN_ORDER_MEMBER_ID =
+     * UUID.fromString("5acad34d-b735-11dc-8314-0800200c9a66");
+     * public static UUID READV3_TEMPL_ATTRIBUTE_DISPLAYSTATUS_MEMBER_ID =
+     * UUID.fromString("5acad34e-b735-11dc-8314-0800200c9a66");
+     * public static UUID READV3_TEMPL_CHARACTERISTIC_STATUS_MEMBER_ID =
+     * UUID.fromString("5acad34f-b735-11dc-8314-0800200c9a66");
+     * 
+     * public static UUID READV3_TEMPL_FOR_REL =
+     * UUID.fromString("bd98b290-bc0d-11dc-95ff-0800200c9a66");
+     * public static UUID READV3_TEMPL =
+     * UUID.fromString("bd98b291-bc0d-11dc-95ff-0800200c9a66");
+     * public static UUID READV3_CROSS_MAP_FOR_REL =
+     * UUID.fromString("bd98b292-bc0d-11dc-95ff-0800200c9a66");
+     * public static UUID READV3_CROSS_MAP =
+     * UUID.fromString("bd98b293-bc0d-11dc-95ff-0800200c9a66");
+     */
 
     /* ICD 10AM UUIDS Added by NCCH */
     public static UUID ICD10AM_CONCEPT_ID = UUID.fromString("fc5b4274-98a2-11dc-b260-b51f56d89593");

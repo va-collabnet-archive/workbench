@@ -38,6 +38,12 @@ public class LocalVersionedTerminology {
         return factory;
     }
 
+    public static void close(I_TermFactory factory) {
+        if (LocalVersionedTerminology.factory == factory) {
+            LocalVersionedTerminology.factory = null;
+        }
+    }
+
     public static void set(I_TermFactory factory) {
         if (stealthfactory != null && stealthfactory == factory) {
             // stealth factory set

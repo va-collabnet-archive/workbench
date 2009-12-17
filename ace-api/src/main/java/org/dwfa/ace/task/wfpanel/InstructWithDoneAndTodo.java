@@ -153,11 +153,13 @@ public class InstructWithDoneAndTodo extends AbstractTask {
         c.gridx++;
         workflowPanel.add(new JLabel("     "), c);
         workflowPanel.validate();
+        workflowPanel.setVisible(true);
         Container cont = workflowPanel;
         while (cont != null) {
             cont.validate();
             cont = cont.getParent();
         }
+        workflowPanel.repaint();
         saveButton.requestFocusInWindow();
     }
 
@@ -179,7 +181,6 @@ public class InstructWithDoneAndTodo extends AbstractTask {
 
         });
         config.setBuilderToggleVisible(builderVisible);
-        config.setProgressToggleVisible(progressPanelVisible);
         config.setSubversionToggleVisible(subversionButtonVisible);
         config.setInboxToggleVisible(inboxButtonVisible);
     }
@@ -191,8 +192,6 @@ public class InstructWithDoneAndTodo extends AbstractTask {
 
         builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        progressPanelVisible = config.isProgressToggleVisible();
-        config.setProgressToggleVisible(false);
         subversionButtonVisible = config.isBuilderToggleVisible();
         config.setSubversionToggleVisible(false);
         inboxButtonVisible = config.isInboxToggleVisible();
@@ -255,11 +254,9 @@ public class InstructWithDoneAndTodo extends AbstractTask {
             c.gridy = 0;
             c.weightx = 1.0;
             c.weighty = 0;
-            c.anchor = GridBagConstraints.WEST;
-            workflowPanel.add(new JPanel(), c); // Filler
-            c.gridx++;
-            c.weightx = 0.0;
+            c.anchor = GridBagConstraints.EAST;
             workflowPanel.add(new JLabel(instruction), c);
+            c.weightx = 0.0;
             setupDoneAndTodoButtons(workflowPanel, c);
         }
 

@@ -24,12 +24,12 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
-public class ConceptConceptStringExtTupleFileUtil extends ExtTupleFileUtil {
+public class ConceptConceptStringExtTupleFileUtil {
 
     public static String exportTuple(I_ThinExtByRefTuple tuple) throws TerminologyException, IOException {
 
@@ -115,7 +115,7 @@ public class ConceptConceptStringExtTupleFileUtil extends ExtTupleFileUtil {
                 return false;
             }
 
-            RefsetHelper refsetHelper = new RefsetHelper();
+            SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
             TupleFileUtil.pathUuids.add(pathUuid);
@@ -170,9 +170,9 @@ public class ConceptConceptStringExtTupleFileUtil extends ExtTupleFileUtil {
             }
 
             try {
-                newConceptConceptStringRefsetExtension(refsetUuid, componentUuid, c1Uuid, c2Uuid, strValue, memberUuid,
-                    pathUuid, statusUuid, effectiveDate);
-
+                refsetHelper.newConceptConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNativeId(),
+                    termFactory.getId(componentUuid).getNativeId(), termFactory.getId(c1Uuid).getNativeId(),
+                    termFactory.getId(c2Uuid).getNativeId(), strValue, memberUuid, pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Exception thrown while creating new concept-concept-string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
@@ -183,7 +183,8 @@ public class ConceptConceptStringExtTupleFileUtil extends ExtTupleFileUtil {
 
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage = "Exception of unknown cause thrown while importing concept-concept-string ext tuple";
+            String errorMessage = "Exception of unknown cause thrown while importing concept-concept-string ext tuple : "
+                + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

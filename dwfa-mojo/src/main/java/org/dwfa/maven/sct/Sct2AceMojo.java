@@ -19,6 +19,7 @@ package org.dwfa.maven.sct;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -112,7 +113,7 @@ import org.dwfa.util.id.Type5UuidFactory;
 
 public class Sct2AceMojo extends AbstractMojo {
 
-    private static final String FILE_SEPERATOR = File.separator;
+    private static final String FILE_SEPARATOR = File.separator;
 
     /**
      * Line terminator is deliberately set to CR-LF which is DOS style
@@ -121,13 +122,13 @@ public class Sct2AceMojo extends AbstractMojo {
 
     private static final String TAB_CHARACTER = "\t";
 
-    private static final String NHS_UK_DRUG_EXTENSION_FILE_PATH = FILE_SEPERATOR + "net" + FILE_SEPERATOR + "nhs"
-        + FILE_SEPERATOR + "uktc" + FILE_SEPERATOR + "ukde";
+    private static final String NHS_UK_DRUG_EXTENSION_FILE_PATH = FILE_SEPARATOR + "net" + FILE_SEPARATOR + "nhs"
+        + FILE_SEPARATOR + "uktc" + FILE_SEPARATOR + "ukde";
 
-    private static final String NHS_UK_EXTENSION_FILE_PATH = FILE_SEPERATOR + "net" + FILE_SEPERATOR + "nhs"
-        + FILE_SEPERATOR + "uktc" + FILE_SEPERATOR + "uke";
+    private static final String NHS_UK_EXTENSION_FILE_PATH = FILE_SEPARATOR + "net" + FILE_SEPARATOR + "nhs"
+        + FILE_SEPARATOR + "uktc" + FILE_SEPARATOR + "uke";
 
-    private static final String SNOMED_FILE_PATH = FILE_SEPERATOR + "org" + FILE_SEPERATOR + "snomed";
+    private static final String SNOMED_FILE_PATH = FILE_SEPARATOR + "org" + FILE_SEPARATOR + "snomed";
 
     /**
      * Location of the build directory.
@@ -158,6 +159,14 @@ public class Sct2AceMojo extends AbstractMojo {
     private String[] sctInputDirArray;
 
     /**
+     * If this contains anything, only convert paths which match one of the
+     * enclosed regex
+     * 
+     * @parameter
+     */
+    private String[] inputFilters;
+
+    /**
      * 
      * @parameter default-value="false"
      * 
@@ -184,7 +193,7 @@ public class Sct2AceMojo extends AbstractMojo {
      * 
      * @parameter
      */
-    private String outputDirectory = FILE_SEPERATOR + "classes" + FILE_SEPERATOR + "ace";
+    private String outputDirectory = FILE_SEPARATOR + "classes" + FILE_SEPARATOR + "ace";
 
     private static String sourceCtv3Uuid = ArchitectonicAuxiliary.Concept.CTV3_ID.getUids()
         .iterator()
@@ -489,15 +498,16 @@ public class Sct2AceMojo extends AbstractMojo {
 
         // SHOW input sub directory from POM file
         if (!targetSubDir.equals("")) {
-            targetSubDir = FILE_SEPERATOR + targetSubDir;
+            targetSubDir = FILE_SEPARATOR + targetSubDir;
             getLog().info("POM Input Sub Directory: " + targetSubDir);
         }
 
         // SHOW input directories from POM file
         for (int i = 0; i < sctInputDirArray.length; i++) {
+            sctInputDirArray[i] = sctInputDirArray[i].replace('/', File.separatorChar);
             getLog().info("POM Input Directory (" + i + "): " + sctInputDirArray[i]);
-            if (!sctInputDirArray[i].startsWith(FILE_SEPERATOR)) {
-                sctInputDirArray[i] = FILE_SEPERATOR + sctInputDirArray[i];
+            if (!sctInputDirArray[i].startsWith(FILE_SEPARATOR)) {
+                sctInputDirArray[i] = FILE_SEPARATOR + sctInputDirArray[i];
             }
         }
 
@@ -530,80 +540,16 @@ public class Sct2AceMojo extends AbstractMojo {
         }
 
         // SETUP CONCEPTS INPUT SCTFile ArrayList
-        List<List<SCTFile>> listOfCDirs = new ArrayList<List<SCTFile>>();
-        for (int i = 0; i < inDirs.length; i++) {
-            ArrayList<SCTFile> listOfCFiles = new ArrayList<SCTFile>();
-
-            getLog().info("CONCEPTS (" + i + "): " + wDir + subDir + inDirs[i]);
-
-            // PARSE each sub-directory for "sct_descriptions*.txt" files
-            File f1 = new File(wDir + subDir + inDirs[i]);
-            ArrayList<File> fv = new ArrayList<File>();
-            listFilesRecursive(fv, f1, "sct_concepts");
-
-            Iterator<File> it = fv.iterator();
-            while (it.hasNext()) {
-                File f2 = it.next();
-                // ADD SCTFile Entry
-                String tempRevDate = getFileRevDate(f2);
-                String tmpPathID = getFilePathID(f2, wDir, subDir);
-                SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
-                listOfCFiles.add(tmpObj);
-                getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
-            }
-            listOfCDirs.add(listOfCFiles);
-        }
+        List<List<SCTFile>> listOfCDirs = getSnomedFiles(wDir, subDir, inDirs, "concept");
 
         // SETUP DESCRIPTIONS INPUT SCTFile ArrayList
-        List<List<SCTFile>> listOfDDirs = new ArrayList<List<SCTFile>>();
-        for (int i = 0; i < inDirs.length; i++) {
-            ArrayList<SCTFile> listOfDFiles = new ArrayList<SCTFile>();
-            getLog().info("DESCRIPTIONS (" + i + "): " + wDir + subDir + inDirs[i]);
-
-            // PARSE each sub-directory for "sct_descriptions*.txt" files
-            File f1 = new File(wDir + subDir + inDirs[i]);
-            ArrayList<File> fv = new ArrayList<File>();
-            listFilesRecursive(fv, f1, "sct_descriptions");
-
-            Iterator<File> it = fv.iterator();
-            while (it.hasNext()) {
-                File f2 = it.next();
-                // ADD SCTFile Entry
-                String tempRevDate = getFileRevDate(f2);
-                String tmpPathID = getFilePathID(f2, wDir, subDir);
-                SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
-                listOfDFiles.add(tmpObj);
-                getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
-            }
-            listOfDDirs.add(listOfDFiles);
-        }
+        List<List<SCTFile>> listOfDDirs = getSnomedFiles(wDir, subDir, inDirs, "descriptions");
 
         // SETUP RELATIONSHIPS INPUT SCTFile ArrayList
-        List<List<SCTFile>> listOfRDirs = new ArrayList<List<SCTFile>>();
-        for (int i = 0; i < inDirs.length; i++) {
-            ArrayList<SCTFile> listOfRFiles = new ArrayList<SCTFile>();
-            getLog().info("RELATIONSHIPS (" + i + "): " + wDir + subDir + inDirs[i]);
-
-            // PARSE each sub-directory for "sct_relationships*.txt" files
-            File f1 = new File(wDir + subDir + inDirs[i]);
-            ArrayList<File> fv = new ArrayList<File>();
-            listFilesRecursive(fv, f1, "sct_relationships");
-
-            Iterator<File> it = fv.iterator();
-            while (it.hasNext()) {
-                File f2 = it.next();
-                // ADD SCTFile Entry
-                String tempRevDate = getFileRevDate(f2);
-                String tmpPathID = getFilePathID(f2, wDir, subDir);
-                SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
-                listOfRFiles.add(tmpObj);
-                getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
-            }
-            listOfRDirs.add(listOfRFiles);
-        }
+        List<List<SCTFile>> listOfRDirs = getSnomedFiles(wDir, subDir, inDirs, "relationships");
 
         // SETUP "ids.txt" OUTPUT FILE
-        String idsFileName = wDir + outputDirectory + FILE_SEPERATOR + "ids.txt";
+        String idsFileName = wDir + outputDirectory + FILE_SEPARATOR + "ids.txt";
         BufferedWriter idstxtWriter;
         try {
             idstxtWriter = new BufferedWriter(new FileWriter(idsFileName, appendToAceFiles));
@@ -654,6 +600,57 @@ public class Sct2AceMojo extends AbstractMojo {
         getLog().info("CONVERSION TIME: " + ((System.currentTimeMillis() - start) / 1000) + " seconds");
     }
 
+    private List<List<SCTFile>> getSnomedFiles(String wDir, String subDir, String[] inDirs, String pattern)
+            throws MojoFailureException {
+
+        List<List<SCTFile>> listOfDirs = new ArrayList<List<SCTFile>>();
+        for (int ii = 0; ii < inDirs.length; ii++) {
+            ArrayList<SCTFile> listOfFiles = new ArrayList<SCTFile>();
+
+            getLog().info(
+                String.format("%1$s (%2$s): %3$s%4$s%5$s", pattern.toUpperCase(), ii, wDir, subDir, inDirs[ii]));
+
+            File f1 = new File(new File(wDir, subDir), inDirs[ii]);
+            ArrayList<File> fv = new ArrayList<File>();
+            listFilesRecursive(fv, f1, "sct_" + pattern);
+
+            File[] files = new File[0];
+            files = fv.toArray(files);
+            Arrays.sort(files);
+
+            FileFilter filter = new FileFilter() {
+                public boolean accept(File pathname) {
+                    if (inputFilters == null || inputFilters.length == 0) {
+                        return true;
+                    } else {
+                        for (String filter : inputFilters) {
+                            if (pathname.getAbsolutePath().replace(File.separatorChar, '/').matches(filter)) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+            };
+
+            for (File f2 : files) {
+
+                if (filter.accept(f2)) {
+                    // ADD SCTFile Entry
+                    String tempRevDate = getFileRevDate(f2);
+                    String tmpPathID = getFilePathID(f2, wDir, subDir);
+                    SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
+                    listOfFiles.add(tmpObj);
+                    getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
+                }
+
+            }
+
+            listOfDirs.add(listOfFiles);
+        }
+        return listOfDirs;
+    }
+
     /*
      * ORDER: CONCEPTID CONCEPTSTATUS FULLYSPECIFIEDNAME CTV3ID SNOMEDID
      * ISPRIMITIVE
@@ -672,7 +669,7 @@ public class Sct2AceMojo extends AbstractMojo {
         getLog().info("START CONCEPTS PROCESSING...");
 
         // SETUP CONCEPTS OUTPUT FILE
-        String outFileName = wDir + outputDirectory + FILE_SEPERATOR + "concepts.txt";
+        String outFileName = wDir + outputDirectory + FILE_SEPARATOR + "concepts.txt";
         BufferedWriter bw;
         bw = new BufferedWriter(new FileWriter(outFileName, appendToAceFiles));
         getLog().info("ACE CONCEPTS OUTPUT: " + outFileName);
@@ -814,13 +811,13 @@ public class Sct2AceMojo extends AbstractMojo {
 
         getLog().info("START DESCRIPTIONS PROCESSING...");
         // SETUP DESCRIPTIONS EXCEPTION REPORT
-        String erFileName = wDir + outputDirectory + FILE_SEPERATOR + "descriptions_report.txt";
+        String erFileName = wDir + outputDirectory + FILE_SEPARATOR + "descriptions_report.txt";
         BufferedWriter er;
         er = new BufferedWriter(new FileWriter(erFileName));
         getLog().info("exceptions report OUTPUT: " + erFileName);
 
         // SETUP DESCRIPTIONS OUTPUT FILE
-        String outFileName = wDir + outputDirectory + FILE_SEPERATOR + "descriptions.txt";
+        String outFileName = wDir + outputDirectory + FILE_SEPARATOR + "descriptions.txt";
         BufferedWriter bw;
         bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileName, appendToAceFiles), "UTF-8"));
         getLog().info("ACE DESCRIPTIONS OUTPUT: " + outFileName);
@@ -980,13 +977,13 @@ public class Sct2AceMojo extends AbstractMojo {
         getLog().info("START RELATIONSHIPS PROCESSING...");
 
         // Setup exception report
-        String erFileName = wDir + outputDirectory + FILE_SEPERATOR + "relationships_report.txt";
+        String erFileName = wDir + outputDirectory + FILE_SEPARATOR + "relationships_report.txt";
         BufferedWriter er;
         er = new BufferedWriter(new FileWriter(erFileName));
         getLog().info("exceptions report OUTPUT: " + erFileName);
 
         // SETUP CONCEPTS OUTPUT FILE
-        String outFileName = wDir + outputDirectory + FILE_SEPERATOR + "relationships.txt";
+        String outFileName = wDir + outputDirectory + FILE_SEPARATOR + "relationships.txt";
         BufferedWriter bw;
         bw = new BufferedWriter(new FileWriter(outFileName, appendToAceFiles));
         getLog().info("ACE RELATIONSHIPS OUTPUT: " + outFileName);
@@ -1554,7 +1551,7 @@ public class Sct2AceMojo extends AbstractMojo {
             // SNOMED_CORE Path UUID
             puuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator().next().toString();
             getLog().info("  PATH UUID: " + "SNOMED_CORE " + puuid);
-        } else if (s.equals(NHS_UK_EXTENSION_FILE_PATH)) {
+        } else if (s.startsWith(NHS_UK_EXTENSION_FILE_PATH)) {
             // "UK Extensions" Path UUID
             try {
                 u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "NHS UK Extension Path");
@@ -1569,7 +1566,7 @@ public class Sct2AceMojo extends AbstractMojo {
                     + "getFilePathID() UnsupportedEncodingException", e);
             }
             getLog().info("  PATH UUID (uke): " + s + " " + puuid);
-        } else if (s.equals(NHS_UK_DRUG_EXTENSION_FILE_PATH)) {
+        } else if (s.startsWith(NHS_UK_DRUG_EXTENSION_FILE_PATH)) {
             // "UK Drug Extensions" Path UUID
             try {
                 u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "NHS UK Drug Extension Path");

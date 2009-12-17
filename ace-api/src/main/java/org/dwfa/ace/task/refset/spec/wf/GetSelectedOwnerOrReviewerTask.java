@@ -96,27 +96,35 @@ public class GetSelectedOwnerOrReviewerTask extends AbstractTask {
                     String comments = panel.getComments();
                     if (comments != null) {
                         process.setProperty(commentsPropName, comments);
+                    } else {
+                        process.setProperty(commentsPropName, "");
                     }
 
                     RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();
-                    I_GetConceptData userConcept = termFactory.getConcept(selectedUser.getIds());
+                    I_GetConceptData nextUserConcept = termFactory.getConcept(selectedUser.getIds());
+                    I_GetConceptData ownerConcept = termFactory.getConcept((UUID[]) process.readProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey()));
 
-                    String inboxAddress = wizard.getInbox(userConcept);
+                    String inboxAddress = wizard.getInbox(nextUserConcept);
                     if (inboxAddress == null) {
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "Refset wizard cannot be completed. The selected user has no assigned inbox.", "",
                             JOptionPane.ERROR_MESSAGE);
                         return Condition.ITEM_CANCELED;
                     }
-
+                    process.setDestination(inboxAddress);
                     process.setProperty(nextUserTermEntryPropName, inboxAddress);
-                    process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(),
-                        new UUID[] { userConcept.getUids().iterator().next() });
 
-                    return Condition.ITEM_COMPLETE;
+                    process.setProperty(ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey(),
+                        new UUID[] { nextUserConcept.getUids().iterator().next() });
+
+                    if (nextUserConcept.equals(ownerConcept)) {
+                        return Condition.PREVIOUS;
+                    } else {
+                        return Condition.CONTINUE;
+                    }
                 }
             }
-            return Condition.ITEM_COMPLETE;
+            return Condition.CONTINUE;
         } catch (Exception e) {
             e.printStackTrace();
             throw new TaskFailedException(e.getMessage());
@@ -128,7 +136,7 @@ public class GetSelectedOwnerOrReviewerTask extends AbstractTask {
     }
 
     public Collection<Condition> getConditions() {
-        return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
+        return AbstractTask.PREVIOUS_CONTINUE_CANCEL;
     }
 
     public String getNextUserTermEntryPropName() {

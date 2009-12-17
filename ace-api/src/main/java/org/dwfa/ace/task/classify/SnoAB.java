@@ -30,6 +30,17 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
+/**
+ * 
+ * Determines if Concept A subsumes Concept B.
+ * 
+ * SnoAB is a utility to support SnoGrp role value groups subsumption and
+ * differentiation methods.
+ * 
+ * @author Marc E. Campbell
+ * 
+ */
+
 public class SnoAB {
     public static int isCURRENT = Integer.MIN_VALUE;
     public static int isaNid = Integer.MIN_VALUE;
@@ -87,7 +98,7 @@ public class SnoAB {
     private List<SnoRel> findIsaProximal(I_GetConceptData cBean) {
         List<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
         try {
-            List<I_RelVersioned> relList = cBean.getSourceRels();
+            List<? extends I_RelVersioned> relList = cBean.getSourceRels();
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;

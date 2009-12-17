@@ -22,6 +22,7 @@ import java.util.Date;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinDescPartWithCoreDelegate implements I_DescriptionPart {
@@ -248,6 +249,14 @@ public class ThinDescPartWithCoreDelegate implements I_DescriptionPart {
         newPart.setTypeId(core.getTypeId());
         newPart.setLang(core.getLang());
         return newPart;
+    }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPositionId(int pid) {
+        throw new UnsupportedOperationException();
     }
 
 }

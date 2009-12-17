@@ -43,6 +43,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LineageHelper;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -69,6 +70,10 @@ public class ProcessPopupUtil {
                     ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
                         processFile)));
                     I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
+                    if (conceptUuid != null) {
+                        process.writeAttachment(ProcessAttachmentKeys.ACTIVE_CONCEPT_UUID.getAttachmentKey(),
+                            conceptUuid);
+                    }
                     ois.close();
                     if (worker.isExecuting()) {
                         worker = worker.getTransactionIndependentClone();
@@ -87,11 +92,17 @@ public class ProcessPopupUtil {
 
         private File processFile;
         private I_Work worker;
+        private UUID conceptUuid = null;
 
         public ProcessMenuActionListener(File processFile, I_Work worker) {
             super();
             this.processFile = processFile;
             this.worker = worker;
+        }
+
+        public ProcessMenuActionListener(File processFile, I_Work worker, UUID conceptUuid) {
+            this(processFile, worker);
+            this.conceptUuid = conceptUuid;
         }
 
         public void actionPerformed(ActionEvent e) {

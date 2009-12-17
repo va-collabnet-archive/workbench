@@ -32,6 +32,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.URLClassLoader;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,7 +109,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     /**
      * @parameter
      */
-    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta", "au.com.ncch", "org.aao" };
+    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta", "au.com.ncch", "org.aao", "org.kp" };
 
     /**
      * @parameter
@@ -169,18 +170,20 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
             List<Artifact> dependencyWithoutProvided = new ArrayList<Artifact>();
             for (Artifact a : artifacts) {
                 if (a.getScope().equals("provided")) {
-                    // don't add
-                } else if (a.getGroupId().endsWith("jini")) {
-                    // don't add
-                    // getLog().info("Skipping: " + d);
+                    getLog().info("Not adding provided: " + a);
+                } else if (a.getGroupId().endsWith("runtime-directory") || a.getScope().equals("runtime-directory")) {
+                    getLog().info("Not adding runtime-directory: " + a);
                 } else {
                     if (a.getScope().equals("system")) {
                         getLog().info("System dependency: " + a);
                     }
-                    dependencyWithoutProvided.add(a);
+                    if (a.getFile().length() > 10000000) {
+                        getLog().warn("Suppressing addition of: " + a + " \n file size is: " + a.getFile().length());
+                    } else {
+                        dependencyWithoutProvided.add(a);
+                    }
                 }
             }
-
             try {
                 if (targetSubDir != null) {
                     rootDir = new File(this.outputDirectory, targetSubDir);
@@ -188,6 +191,9 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                     rootDir = this.outputDirectory;
 
                 }
+                URLClassLoader libLoader = MojoUtil.getProjectClassLoader(dependencyWithoutProvided);
+                Class beanListClass = libLoader.loadClass(BeanList.class.getName());
+
                 for (Artifact artifact : artifacts) {
                     if (artifact.getScope().equals("provided")) {
                         continue;
@@ -206,6 +212,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                         getLog().info("writing annotated beans for: " + dependencyFile.getAbsolutePath());
                         JarFile jf = new JarFile(dependencyFile);
                         Enumeration<JarEntry> jarEnum = jf.entries();
+                        int notFoundCount = 0;
                         while (jarEnum.hasMoreElements()) {
                             JarEntry je = jarEnum.nextElement();
                             if (je.getName().endsWith(".class")) {
@@ -228,14 +235,14 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                 if (allowed) {
                                     classNameNoDotClass = className.substring(0, className.length() - 6);
                                     try {
-                                        Class c = Class.forName(classNameNoDotClass);
-                                        Annotation annotation = c.getAnnotation(BeanList.class);
-                                        if (c.getAnnotation(BeanList.class) != null) {
+                                        Class c = libLoader.loadClass(classNameNoDotClass);
+                                        Annotation annotation = c.getAnnotation(beanListClass);
+                                        if (c.getAnnotation(beanListClass) != null) {
                                             // getLog().info("Writing annotation
                                             // for: " + c.getCanonicalName());
 
-                                            BeanList bl = (BeanList) Proxy.newProxyInstance(c.getClassLoader(),
-                                                new Class[] { BeanList.class },
+                                            BeanList bl = (BeanList) Proxy.newProxyInstance(
+                                                getClass().getClassLoader(), new Class[] { BeanList.class },
                                                 new GenericInvocationHandler(annotation));
                                             for (Spec s : bl.specs()) {
                                                 if (s.type().equals(BeanType.GENERIC_BEAN)) {
@@ -249,10 +256,13 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                             }
                                         }
 
-                                    } catch (HeadlessException e) {
-                                        getLog().info(e.toString());
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
+                                    } catch (HeadlessException ex) {
+                                        getLog().info(ex.toString());
+                                    } catch (ClassNotFoundException ex) {
+                                        notFoundCount++;
+                                        if (notFoundCount < 10) {
+                                            getLog().info("Can't find class: " + ex.getLocalizedMessage());
+                                        }
                                     }
                                 }
                             }

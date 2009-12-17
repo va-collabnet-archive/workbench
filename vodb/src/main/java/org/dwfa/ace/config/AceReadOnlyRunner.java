@@ -51,21 +51,19 @@ public class AceReadOnlyRunner {
     @SuppressWarnings("unused")
     private String[] args;
 
-    @SuppressWarnings("unused")
-    private LifeCycle lc;
-
     protected Configuration config;
+
+    private LifeCycle lc;
 
     private static boolean firstStartup = true;
 
     public AceReadOnlyRunner(final String[] args, final LifeCycle lc) {
+        AceProtocols.setupExtraProtocols();
         ACE.editMode = false;
         JiniManager.setLocalOnly(true);
         try {
             this.args = args;
             this.lc = lc;
-            AceLog.getAppLog().info("java.protocol.handler.pkgs: " + System.getProperty("java.protocol.handler.pkgs"));
-            URL.setURLStreamHandlerFactory(new ExtendedUrlStreamHandlerFactory());
             String argsStr;
             if (args == null) {
                 argsStr = "null";

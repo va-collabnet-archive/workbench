@@ -16,6 +16,15 @@
  */
 package org.dwfa.ace.task.about;
 
+import java.beans.IntrospectionException;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+
+import javax.swing.JFrame;
+
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -23,21 +32,9 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.bpa.util.AboutBox;
 import org.dwfa.bpa.util.OpenFrames;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
-
-import javax.swing.*;
-import java.util.List;
-import java.util.Collection;
-import java.io.ObjectOutputStream;
-import java.io.IOException;
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Luke

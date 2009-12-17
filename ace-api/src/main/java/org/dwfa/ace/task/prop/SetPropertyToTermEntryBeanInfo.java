@@ -21,8 +21,8 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.CheckboxEditor;
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class SetPropertyToTermEntryBeanInfo extends SimpleBeanInfo {
@@ -38,7 +38,7 @@ public class SetPropertyToTermEntryBeanInfo extends SimpleBeanInfo {
 
             PropertyDescriptor termEntry = new PropertyDescriptor("termEntry", getBeanDescriptor().getBeanClass());
             termEntry.setBound(true);
-            termEntry.setPropertyEditorClass(ConceptLabelEditor.class);
+            termEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
             termEntry.setDisplayName("<html><font color='green'>term:");
             termEntry.setShortDescription("The concept to add to the property.");
 

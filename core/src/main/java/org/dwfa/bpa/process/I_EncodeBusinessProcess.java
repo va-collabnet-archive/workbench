@@ -25,6 +25,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
@@ -399,8 +400,6 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
      * <p>
      * <em>task properties:</em> tp://&lt;task id>/&lt;property name&gt;
      * <p>
-     * <em>data container:</em> dc:&lt;container name&gt;
-     * <p>
      * <p>
      * These extensions allow a uniform means to access objects located within
      * the business process or elsewhere on the network.
@@ -412,7 +411,31 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
      */
     public Object getObjectFromURL(URL locator) throws IOException;
 
+    /**
+     * Read a property specified by the property label.
+     * 
+     * @param propertyLabel The label that specifies the property to read
+     * @return The current value of of the specified property.
+     * @throws IntrospectionException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @deprecated use getProperty
+     */
     public Object readProperty(String propertyLabel) throws IntrospectionException, IllegalArgumentException,
+            IllegalAccessException, InvocationTargetException;
+
+    /**
+     * Get a property specified by the property label.
+     * 
+     * @param propertyLabel The label that specifies the property to read
+     * @return The current value of of the specified property.
+     * @throws IntrospectionException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public Object getProperty(String propertyLabel) throws IntrospectionException, IllegalArgumentException,
             IllegalAccessException, InvocationTargetException;
 
     public void setProperty(String propertyLabel, Object value) throws IntrospectionException, IllegalAccessException,
@@ -429,5 +452,35 @@ public interface I_EncodeBusinessProcess extends I_DefineTask, I_ManagePropertie
     public String getProcessDocumentationSource();
 
     public void setProcessDocumentationSource(String docSource);
+
+    /**
+     * This method processes an input string looking for substitution variables
+     * of the form: <code>${locator}</code> and replaces those values with the
+     * results of the<code>toString()</code> method called on
+     * the object returned by the <code>getObjectFromURL(URL locator)</code> or
+     * an error message
+     * if the object returned is null.
+     * 
+     * <br>
+     * In addition to standard url protocols, a "bpa" protocol is supported that
+     * will retrieve a business process
+     * attachment. The form of the url would be
+     * <code>bpa:<attachment name></code>. In addition, a "tp" protocol is
+     * defined for "task properties", but this definition has no implementation
+     * at the moment... <br>
+     * 
+     * @param input <code>String</code> that may contain substitution variables
+     *            of the form: <code>${locator}</code>.
+     * @return A <code>String</code> with the substitution variables replaced
+     *         with results of the<code>toString()</code> method called on
+     *         the object returned by the
+     *         <code>getObjectFromURL(URL locator)</code> or an error message
+     *         if the object returned is null.
+     *         <p>
+     * 
+     * @throws IOException
+     * @throws MalformedURLException
+     */
+    public String substituteProperties(String input) throws MalformedURLException, IOException;
 
 }

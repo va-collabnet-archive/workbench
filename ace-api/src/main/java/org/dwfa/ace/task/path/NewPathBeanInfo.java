@@ -21,7 +21,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class NewPathBeanInfo extends SimpleBeanInfo {
@@ -38,7 +38,7 @@ public class NewPathBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor parentPathTermEntry = new PropertyDescriptor("parentPathTermEntry",
                 getBeanDescriptor().getBeanClass());
             parentPathTermEntry.setBound(true);
-            parentPathTermEntry.setPropertyEditorClass(ConceptLabelEditor.class);
+            parentPathTermEntry.setPropertyEditorClass(ConceptLabelPropEditor.class);
             parentPathTermEntry.setDisplayName("<html><font color='green'>path parent:");
             parentPathTermEntry.setShortDescription("The parent for the new editing path.");
 

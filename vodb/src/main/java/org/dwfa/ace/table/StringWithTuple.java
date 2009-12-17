@@ -28,9 +28,9 @@ public abstract class StringWithTuple implements I_CellTextWithTuple {
     }
 
     public String toString() {
-        String text = new String(cellText);
+        String text = cellText;
         if (isInConflict()) {
-            if (text.startsWith("<html>")) {
+            if (text != null && text.startsWith("<html>")) {
                 text = text.substring(5);
             }
             text = "<html><em style=\"color:red\">" + text + "</em>";

@@ -23,6 +23,7 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinDescPartCore implements I_AmPart {
@@ -238,6 +239,14 @@ public class ThinDescPartCore implements I_AmPart {
         newPart.typeId = typeId;
         newPart.lang = lang;
         return newPart;
+    }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPositionId(int pid) {
+        throw new UnsupportedOperationException();
     }
 
 }

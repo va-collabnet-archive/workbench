@@ -16,12 +16,20 @@
  */
 package org.dwfa.vodb.impl;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.collections.primitives.IntList;
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.search.I_TrackContinuation;
+import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.vodb.I_StoreInBdb;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinConPart;
@@ -60,29 +68,28 @@ public class ConCoreBdb implements I_StoreInBdb {
         }
     }
 
-    private static class ThinConPartVersionedBinding extends TupleBinding {
+    private static class ThinConPartVersionedBinding extends TupleBinding<I_ConceptAttributePart> {
 
         public ThinConPart entryToObject(TupleInput ti) {
             ThinConPart con = new ThinConPart();
             con.setPathId(ti.readInt());
             con.setVersion(ti.readInt());
-            con.setConceptStatus(ti.readInt());
+            con.setStatusId(ti.readInt());
             con.setDefined(ti.readBoolean());
             return con;
         }
 
-        public void objectToEntry(Object obj, TupleOutput to) {
-            I_ConceptAttributePart con = (I_ConceptAttributePart) obj;
+        public void objectToEntry(I_ConceptAttributePart con, TupleOutput to) {
             to.writeInt(con.getPathId());
             to.writeInt(con.getVersion());
-            to.writeInt(con.getConceptStatus());
+            to.writeInt(con.getStatusId());
             to.writeBoolean(con.isDefined());
         }
 
     }
 
     private ThinConPartVersionedBinding conPartBinding = new ThinConPartVersionedBinding();
-    private TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
+    private TupleBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 
     private Database conPartDb;
     private PartIdGenerator partIdGenerator;
@@ -163,6 +170,12 @@ public class ConCoreBdb implements I_StoreInBdb {
 
     public void setupBean(ConceptBean cb) {
         // nothing to do
+    }
+
+    public void searchConcepts(I_TrackContinuation tracker, IntList matches, CountDownLatch latch,
+            List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws DatabaseException, IOException,
+            ParseException {
+        throw new UnsupportedOperationException();
     }
 
 }

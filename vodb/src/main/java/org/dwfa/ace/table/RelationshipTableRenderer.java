@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 
 public class RelationshipTableRenderer extends AceTableRenderer {
@@ -46,7 +47,11 @@ public class RelationshipTableRenderer extends AceTableRenderer {
 
         if (row > 0) {
             StringWithRelTuple prevSwt = (StringWithRelTuple) table.getValueAt(row - 1, column);
-            same = swt.getTuple().getRelId() == prevSwt.getTuple().getRelId();
+            try {
+                same = swt.getTuple().getRelId() == prevSwt.getTuple().getRelId();
+            } catch (Exception e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
             setBorder(column, this, same, uncommitted);
             if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
                 renderComponent.setText("");

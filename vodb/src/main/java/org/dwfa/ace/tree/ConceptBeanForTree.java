@@ -18,6 +18,7 @@ package org.dwfa.ace.tree;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -35,16 +36,19 @@ import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ConceptBean;
 
-public class ConceptBeanForTree implements I_GetConceptDataForTree {
+public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     ConceptBean bean;
     int relId;
     int parentDepth;
@@ -351,12 +355,26 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree {
         return bean.getId(identifierScheme);
     }
 
-    /*
-     * 
-     * @Override public boolean equals(Object another) { return
-     * bean.equals(another); }
-     * 
-     * @Override public int hashCode() { return bean.hashCode(); }
-     */
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
+        return bean.getPossibleKindOfConcepts(config);
+    }
+
+    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus)
+            throws IOException, TerminologyException {
+        return bean.promote(viewPosition, pomotionPaths, allowedStatus);
+    }
+
+    public int getNid() {
+        return bean.getNid();
+    }
+
+    public List<I_IdVersioned> getUncommittedIdVersioned() {
+        return bean.getUncommittedIdVersioned();
+    }
+
+    @Override
+    public int compareTo(ConceptBeanForTree o) {
+        return bean.getConceptId() - o.bean.getConceptId();
+    }
 
 }

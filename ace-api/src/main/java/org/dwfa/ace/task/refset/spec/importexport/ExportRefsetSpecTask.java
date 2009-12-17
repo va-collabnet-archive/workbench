@@ -55,29 +55,16 @@ public class ExportRefsetSpecTask extends AbstractTask {
     private static final int dataVersion = 2;
 
     private String outputFilePropName = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
-    private String reportFilePropName = ProcessAttachmentKeys.OUTPUT_FILE.getAttachmentKey();
-
-    public String getOutputFilePropName() {
-        return outputFilePropName;
-    }
-
-    public void setOutputFilePropName(String outputFilePropName) {
-        this.outputFilePropName = outputFilePropName;
-    }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(outputFilePropName);
-        out.writeObject(reportFilePropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion <= 1) {
+        if (objDataVersion >= 2) {
             outputFilePropName = (String) in.readObject();
-        } else if (objDataVersion == 2) {
-            outputFilePropName = (String) in.readObject();
-            reportFilePropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -88,12 +75,17 @@ public class ExportRefsetSpecTask extends AbstractTask {
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        I_ShowActivity activityPanel = LocalVersionedTerminology.get().newActivityPanel(true);
+        I_ShowActivity activityPanel = null;
         try {
+            activityPanel = LocalVersionedTerminology.get().newActivityPanel(true,
+                LocalVersionedTerminology.get().getActiveAceFrameConfig());
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             String exportFileName = (String) process.readProperty(outputFilePropName);
-            String reportFileName = (String) process.readProperty(reportFilePropName);
+            String reportFileName = exportFileName.replace(".txt", ".log");
+            if (exportFileName.equals(reportFileName)) {
+                reportFileName = exportFileName + ".log";
+            }
             TupleFileUtil tupleExporter = new TupleFileUtil();
 
             if (configFrame.getRefsetSpecInSpecEditor() == null) {
@@ -125,7 +117,9 @@ public class ExportRefsetSpecTask extends AbstractTask {
 
             return Condition.CONTINUE;
         } catch (Exception ex) {
-            activityPanel.complete();
+            if (activityPanel != null) {
+                activityPanel.complete();
+            }
             throw new TaskFailedException(ex);
         }
     }
@@ -138,11 +132,11 @@ public class ExportRefsetSpecTask extends AbstractTask {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-    public String getReportFilePropName() {
-        return reportFilePropName;
+    public String getOutputFilePropName() {
+        return outputFilePropName;
     }
 
-    public void setReportFilePropName(String reportFilePropName) {
-        this.reportFilePropName = reportFilePropName;
+    public void setOutputFilePropName(String outputFilePropName) {
+        this.outputFilePropName = outputFilePropName;
     }
 }

@@ -91,9 +91,11 @@ public class ImportRefsetSpecTask extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
-        // initialise the progress panel
-        I_ShowActivity activityPanel = LocalVersionedTerminology.get().newActivityPanel(true);
+        // initialize the progress panel
+        I_ShowActivity activityPanel = null;
         try {
+            activityPanel = LocalVersionedTerminology.get().newActivityPanel(true,
+                LocalVersionedTerminology.get().getActiveAceFrameConfig());
             String importFileName = (String) process.readProperty(inputFilePropName);
             String outputFileName = (String) process.readProperty(outputFilePropName);
             Object pathObj = process.readProperty(pathUuidPropName);
@@ -124,10 +126,15 @@ public class ImportRefsetSpecTask extends AbstractTask {
                     LocalVersionedTerminology.get().getUids(memberRefset.getConceptId()).iterator().next());
             }
 
+            LocalVersionedTerminology.get().getActiveAceFrameConfig().setBuilderToggleVisible(true);
+            LocalVersionedTerminology.get().getActiveAceFrameConfig().setInboxToggleVisible(true);
+
             return Condition.CONTINUE;
         } catch (Exception ex) {
             try {
-                activityPanel.complete();
+                if (activityPanel != null) {
+                    activityPanel.complete();
+                }
                 LocalVersionedTerminology.get().cancel();
             } catch (IOException e) {
                 e.printStackTrace();

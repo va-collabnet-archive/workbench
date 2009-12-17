@@ -543,9 +543,9 @@ public class VodbFindDuplicates extends AbstractMojo {
         return attributeTuples;
     }
 
-    private boolean seeIfDupRelExists(Collection<I_RelVersioned> rels, I_GetConceptData destConcept) {
+    private boolean seeIfDupRelExists(List<? extends I_RelVersioned> list, I_GetConceptData destConcept) {
 
-        for (I_RelVersioned rel : rels) {
+        for (I_RelVersioned rel : list) {
             for (I_RelTuple rt : rel.getTuples()) {
                 if ((rt.getC2Id() == destConcept.getConceptId()) || (rt.getC1Id() == destConcept.getConceptId())) {
                     if (dupRelTypeSet.contains(rt.getRelTypeId())) {

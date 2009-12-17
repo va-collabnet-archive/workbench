@@ -110,6 +110,7 @@ import org.dwfa.ace.actions.Commit;
 import org.dwfa.ace.actions.ImportJavaChangeset;
 import org.dwfa.ace.actions.SaveProfile;
 import org.dwfa.ace.actions.SaveProfileAs;
+import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.AceEditor;
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -150,6 +151,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.ace.queue.AddQueueListener;
 import org.dwfa.ace.queue.NewQueueListener;
+import org.dwfa.ace.refset.RefsetSpecEditor;
 import org.dwfa.ace.refset.RefsetSpecPanel;
 import org.dwfa.ace.search.SearchPanel;
 import org.dwfa.ace.table.refset.RefsetDefaults;
@@ -266,79 +268,84 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
 
         private void layoutAlerts() {
-            if (editMode) {
-                if (dataCheckListPanel == null) {
-                    getDataCheckListScroller();
-                }
-                for (Component component : dataCheckListPanel.getComponents()) {
-                    dataCheckListPanel.remove(component);
-                }
+            SwingUtilities.invokeLater(new Runnable() {
 
-                dataCheckListPanel.setLayout(new GridBagLayout());
+                public void run() {
+                    if (editMode) {
+                        if (dataCheckListPanel == null) {
+                            getDataCheckListScroller();
+                        }
+                        for (Component component : dataCheckListPanel.getComponents()) {
+                            dataCheckListPanel.remove(component);
+                        }
 
-                GridBagConstraints c = new GridBagConstraints();
-                c.gridx = 0;
-                c.gridy = 0;
-                c.gridheight = 1;
-                c.gridwidth = 1;
-                c.anchor = GridBagConstraints.NORTHWEST;
-                c.fill = GridBagConstraints.HORIZONTAL;
-                c.weightx = 1;
-                c.weighty = 0;
+                        dataCheckListPanel.setLayout(new GridBagLayout());
 
-                int dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
-                int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
-                if (dataCheckListModel.size() > 0) {
+                        GridBagConstraints c = new GridBagConstraints();
+                        c.gridx = 0;
+                        c.gridy = 0;
+                        c.gridheight = 1;
+                        c.gridwidth = 1;
+                        c.anchor = GridBagConstraints.NORTHWEST;
+                        c.fill = GridBagConstraints.HORIZONTAL;
+                        c.weightx = 1;
+                        c.weighty = 0;
 
-                    for (AlertToDataConstraintFailure alert : dataCheckListModel) {
-                        setupAlert(alert);
-                        dataCheckListPanel.add(alert.getRendererComponent(), c);
-                        c.gridy++;
-                    }
+                        int dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+                        int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
+                        if (dataCheckListModel.size() > 0) {
 
-                    c.weighty = 1;
-                    c.gridy++;
-                    dataCheckListPanel.add(new JPanel(), c);
-                    if (dataCheckIndex == -1) {
-                        leftTabs.addTab(dataCheckTabLabel, getDataCheckListScroller());
-                        dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
-                    }
+                            for (AlertToDataConstraintFailure alert : dataCheckListModel) {
+                                setupAlert(alert);
+                                dataCheckListPanel.add(alert.getRendererComponent(), c);
+                                c.gridy++;
+                            }
 
-                    leftTabs.setSelectedIndex(dataCheckIndex);
-                    if (dataCheckPanel == null) {
-                        try {
-                            dataCheckPanel = new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK, ACE.this,
-                                LINK_TYPE.DATA_CHECK_LINK, conceptTabs, Integer.MAX_VALUE);
-                            conceptPanels.add(dataCheckPanel);
-                        } catch (DatabaseException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (IOException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (ClassNotFoundException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (NoSuchAlgorithmException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
+                            c.weighty = 1;
+                            c.gridy++;
+                            dataCheckListPanel.add(new JPanel(), c);
+                            if (dataCheckIndex == -1) {
+                                leftTabs.addTab(dataCheckTabLabel, getDataCheckListScroller());
+                                dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+                            }
+
+                            leftTabs.setSelectedIndex(dataCheckIndex);
+                            if (dataCheckPanel == null) {
+                                try {
+                                    dataCheckPanel = new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK, ACE.this,
+                                        LINK_TYPE.DATA_CHECK_LINK, conceptTabs, Integer.MAX_VALUE);
+                                    conceptPanels.add(dataCheckPanel);
+                                } catch (DatabaseException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                } catch (IOException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                } catch (ClassNotFoundException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                } catch (NoSuchAlgorithmException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                }
+                            }
+                            conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
+                                "Data Checks Linked");
+
+                        } else {
+                            leftTabs.setSelectedIndex(taxonomyIndex);
+                            if (dataCheckIndex != -1) {
+                                leftTabs.removeTabAt(dataCheckIndex);
+                            }
+                            if (dataCheckPanel != null) {
+                                c.weighty = 1;
+                                c.gridy++;
+                                dataCheckListPanel.add(new JPanel(), c);
+                                if (conceptTabs.indexOfComponent(dataCheckPanel) >= 0) {
+                                    conceptTabs.remove(dataCheckPanel);
+                                    dataCheckPanel.setTermComponent(null);
+                                }
+                            }
                         }
                     }
-                    conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
-                        "Data Checks Linked");
-
-                } else {
-                    leftTabs.setSelectedIndex(taxonomyIndex);
-                    if (dataCheckIndex != -1) {
-                        leftTabs.removeTabAt(dataCheckIndex);
-                    }
-                    if (dataCheckPanel != null) {
-                        c.weighty = 1;
-                        c.gridy++;
-                        dataCheckListPanel.add(new JPanel(), c);
-                        if (conceptTabs.indexOfComponent(dataCheckPanel) >= 0) {
-                            conceptTabs.remove(dataCheckPanel);
-                            dataCheckPanel.setTermComponent(null);
-                        }
-                    }
                 }
-            }
+            });
         }
 
         private void setupAlert(AlertToDataConstraintFailure alert) {
@@ -526,6 +533,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private static List<I_TestDataConstraints> creationTests = new ArrayList<I_TestDataConstraints>();
 
     public static void addUncommittedNoChecks(I_Transact to) {
+        if (to == null) {
+            return;
+        }
         if (commitInProgress) {
             try {
                 to.abort();
@@ -539,6 +549,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public static synchronized void addUncommitted(I_Transact to) {
+        if (to == null) {
+            return;
+        }
         if (commitInProgress) {
             try {
                 to.abort();
@@ -621,36 +634,62 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
-    public static void updateAlerts(I_ConfigAceFrame frameConfig) {
-        if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
-            ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame().getCdePanel();
-            aceInstance.getDataCheckListScroller();
-            aceInstance.getUncommittedListModel().clear();
+    public static void updateAlerts(final I_ConfigAceFrame frameConfig) {
+        SwingUtilities.invokeLater(new Runnable() {
 
-            for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
-                aceInstance.getUncommittedListModel().addAll(alerts);
+            public void run() {
+                doUpdate(frameConfig);
             }
-            if (aceInstance.getUncommittedListModel().size() > 0) {
-                for (int i = 0; i < aceInstance.leftTabs.getTabCount(); i++) {
-                    if (aceInstance.leftTabs.getTitleAt(i).equals(dataCheckTabLabel)) {
-                        aceInstance.leftTabs.setSelectedIndex(i);
-                        break;
+        });
+    }
+
+    private static void doUpdate(I_ConfigAceFrame frameConfig) {
+        try {
+            if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
+                ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame().getCdePanel();
+                aceInstance.getDataCheckListScroller();
+                aceInstance.getUncommittedListModel().clear();
+
+                for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
+                    aceInstance.getUncommittedListModel().addAll(alerts);
+                }
+                if (aceInstance.getUncommittedListModel().size() > 0) {
+                    for (int i = 0; i < aceInstance.leftTabs.getTabCount(); i++) {
+                        if (aceInstance.leftTabs.getTitleAt(i).equals(dataCheckTabLabel)) {
+                            aceInstance.leftTabs.setSelectedIndex(i);
+                            break;
+                        }
                     }
+                    // show data checks tab...
+                } else {
+                    for (TermComponentDataCheckSelectionListener l : aceInstance.dataCheckListeners) {
+                        l.setSelection(null);
+                    }
+                    // hide data checks tab...
                 }
-                // show data checks tab...
-            } else {
-                for (TermComponentDataCheckSelectionListener l : aceInstance.dataCheckListeners) {
-                    l.setSelection(null);
-                }
-                // hide data checks tab...
             }
+        } catch (Exception e) {
+            AceLog.getAppLog().warning(e.toString());
         }
     }
 
-    public static void removeUncommitted(I_Transact to) {
+    public static void removeUncommitted(final I_Transact to) {
         uncommitted.remove(to);
+        if (uncommitted.size() == 0) {
+            dataCheckMap.clear();
+        }
         if (aceConfig != null) {
-            for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    removeUncommittedUpdateFrame(to);
+                }
+            });
+        }
+    }
+
+    private static void removeUncommittedUpdateFrame(I_Transact to) {
+        for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+            try {
                 if (ConceptBean.class.isAssignableFrom(to.getClass())) {
                     frameConfig.removeUncommitted((I_GetConceptData) to);
                     updateAlerts(frameConfig);
@@ -658,6 +697,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 if (uncommitted.size() == 0) {
                     frameConfig.setCommitEnabled(false);
                 }
+            } catch (Exception e) {
+                AceLog.getAppLog().warning(e.toString());
             }
         }
     }
@@ -678,6 +719,22 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public static int commitSequence = 0;
     private static boolean commitInProgress = false;
+
+    public static List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
+        List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+        for (I_Transact to : uncommitted) {
+            for (I_TestDataConstraints test : commitTests) {
+                try {
+                    for (AlertToDataConstraintFailure failure : test.test(to, true)) {
+                        warningsAndErrors.add(failure);
+                    }
+                } catch (Exception e) {
+                    AceLog.getEditLog().alertAndLogException(e);
+                }
+            }
+        }
+        return warningsAndErrors;
+    }
 
     /*
 	 *
@@ -1190,6 +1247,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 }
             }
         }
+        
 
         public void componentHidden(ComponentEvent e) {
         }
@@ -1265,8 +1323,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public static Timer timer = new Timer();
 
     AceFrameConfig aceFrameConfig;
-
-    private JPanel topActivityPanel;
 
     private static AceConfig aceConfig;
 
@@ -1455,7 +1511,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        searchPanel = new SearchPanel(aceFrameConfig);
+        searchPanel = new SearchPanel(aceFrameConfig, this);
         searchPanel.addComponentListener(new ResizePalettesListener());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -1573,7 +1629,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
              * fileMenu.add(menuItem); fileMenu.addSeparator();
              */
             menuItem = new JMenuItem("Import Java Changeset...");
-            menuItem.addActionListener(new ImportJavaChangeset(config, aceFrame));
+            menuItem.addActionListener(new ImportJavaChangeset(config, aceFrame, aceConfig));
             fileMenu.add(menuItem);
             fileMenu.addSeparator();
             /*
@@ -1639,21 +1695,21 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, this, LINK_TYPE.SEARCH_LINK, conceptTabs, 2);
         conceptPanels.add(c2Panel);
         conceptTabs.addComponentListener(new ResizePalettesListener());
-        conceptTabs.addTab("Tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel, "Tree Linked");
-        conceptTabs.addTab("Search", ConceptPanel.SMALL_SEARCH_LINK_ICON, c2Panel, "Search Linked");
+        conceptTabs.addTab("tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel, "tree Linked");
+        conceptTabs.addTab("search", ConceptPanel.SMALL_SEARCH_LINK_ICON, c2Panel, "search Linked");
 
         ConceptPanel c3panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R3, this, LINK_TYPE.UNLINKED, conceptTabs, 3);
         conceptPanels.add(c3panel);
-        conceptTabs.addTab("Empty", null, c3panel, "Unlinked");
+        conceptTabs.addTab("empty", null, c3panel, "Unlinked");
         ConceptPanel c4panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R4, this, LINK_TYPE.UNLINKED, conceptTabs, 4);
         conceptPanels.add(c4panel);
-        conceptTabs.addTab("Empty", null, c4panel, "Unlinked");
-        conceptTabs.addTab("List", new ImageIcon(ACE.class.getResource("/16x16/plain/notebook.png")),
+        conceptTabs.addTab("empty", null, c4panel, "Unlinked");
+        conceptTabs.addTab("   list   ", new ImageIcon(ACE.class.getResource("/16x16/plain/notebook.png")),
             getConceptListEditor());
         refsetTabIndex = conceptTabs.getTabCount();
 
         refsetSpecPanel = new RefsetSpecPanel(this);
-        conceptTabs.addTab("RefSet Spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")),
+        conceptTabs.addTab("refSet spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")),
             refsetSpecPanel);
 
         conceptTabs.setMinimumSize(new Dimension(0, 0));
@@ -1664,7 +1720,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         ConceptPanel c5panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_L1, this, LINK_TYPE.UNLINKED, leftTabs, 3);
         conceptPanels.add(c5panel);
-        leftTabs.addTab("Empty", null, c5panel, "Unlinked");
+        leftTabs.addTab("empty", null, c5panel, "Unlinked");
         leftTabs.setMinimumSize(new Dimension(0, 0));
 
         termTreeConceptSplit.setLeftComponent(leftTabs);
@@ -1733,7 +1789,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JPanel workflowPanel;
 
-    private CdePalette workflowDetailsSheet;
+    private JPanel workflowDetailsSheet;
 
     private JPanel signpostPanel = new JPanel();
 
@@ -2059,6 +2115,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     boolean svnPositionSet = false;
     private JButton showProgressButton;
+    private ActivityPanel topActivityListener;
+    private JTabbedPane preferencesTab;
     private static boolean suppressChangeEvents = false;
 
     private void setInitialSvnPosition() {
@@ -2079,19 +2137,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private void makeConfigPalette() throws Exception {
         JLayeredPane layers = getRootPane().getLayeredPane();
         preferencesPalette = new CdePalette(new BorderLayout(), new RightPalettePoint());
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("View", makeViewConfig());
-        tabs.addTab("Edit", makeEditConfig());
-        tabs.addTab("Path", new SelectPathAndPositionPanelWithCombo(false, "for view", aceFrameConfig,
+        preferencesTab = new JTabbedPane();
+        preferencesTab.addTab("View", makeViewConfig());
+        preferencesTab.addTab("Edit", makeEditConfig());
+        preferencesTab.addTab("Path", new SelectPathAndPositionPanelWithCombo(false, "for view", aceFrameConfig,
             new PropertySetListenerGlue("removeViewPosition", "addViewPosition", "replaceViewPosition",
                 "getViewPositionSet", I_Position.class, aceFrameConfig)));
-        tabs.addTab("New Path", new CreatePathPanel(aceFrameConfig));
-        tabs.addTab("RefSet", makeRefsetConfig());
-        tabs.addTab("Component Panel", makeComponentConfig());
-        tabs.addTab("Classifier", makeClassifierConfig());
+        preferencesTab.addTab("New Path", new CreatePathPanel(aceFrameConfig));
+        preferencesTab.addTab("RefSet", makeRefsetConfig());
+        preferencesTab.addTab("Component Panel", makeComponentConfig());
+        preferencesTab.addTab("Classifier", makeClassifierConfig());
 
         layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
-        preferencesPalette.add(tabs, BorderLayout.CENTER);
+        preferencesPalette.add(preferencesTab, BorderLayout.CENTER);
         preferencesPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 
         int width = 600;
@@ -2228,6 +2286,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         langPrefPanel.add(new JScrollPane(makeTermList("Langauge (Dialect) preference order:",
             aceFrameConfig.getLanguagePreferenceList())), gbc);
+
+        gbc.gridy++;
         TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getShortLabelDescPreferenceList().getListValues()) {
             shortLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
@@ -2702,6 +2762,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         wrapAndAdd(classifierPrefPanel, classifierRootLabel, "Classification root: ");
 
+        TermComponentLabel classifierRoleRootLabel = new TermComponentLabel(aceFrameConfig);
+        classifierRoleRootLabel.setTermComponent(aceFrameConfig.getClassificationRoleRoot());
+        aceFrameConfig.addPropertyChangeListener("classificationRoleRoot", new PropertyListenerGlue("setTermComponent",
+            I_AmTermComponent.class, classifierRoleRootLabel));
+        classifierRoleRootLabel.addTermChangeListener(new PropertyListenerGlue("setClassificationRoleRoot",
+            I_GetConceptData.class, aceFrameConfig));
+        wrapAndAdd(classifierPrefPanel, classifierRoleRootLabel, "Role root: ");
+
         TermComponentLabel classificationIsaLabel = new TermComponentLabel(aceFrameConfig);
         classificationIsaLabel.setTermComponent(aceFrameConfig.getClassifierIsaType());
         aceFrameConfig.addPropertyChangeListener("classifierIsaType", new PropertyListenerGlue("setTermComponent",
@@ -2856,26 +2924,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         historyPalette.setVisible(true);
     }
 
-    private void makeWorkflowDetailsSheet() {
-        JLayeredPane layers = getRootPane().getLayeredPane();
-        workflowDetailsSheet = new CdePalette(new BorderLayout(), new LeftPalettePoint());
-        CenteredPalettePoint locator = new CenteredPalettePoint(workflowDetailsSheet);
-        workflowDetailsSheet.setLocator(locator);
-        workflowDetailsSheet.add(new JPanel(), BorderLayout.CENTER);
-        workflowDetailsSheet.setBorder(BorderFactory.createRaisedBevelBorder());
-        layers.add(workflowDetailsSheet, JLayeredPane.PALETTE_LAYER);
-        int width = 400;
-        int height = 500;
-        Rectangle topBounds = getTopBoundsForPalette();
-        workflowDetailsSheet.setSize(width, height);
-
-        workflowDetailsSheet.setLocation(new Point(locator.getPalettePoint().x, topBounds.y - height));
-        workflowDetailsSheet.setOpaque(true);
-        workflowDetailsSheet.doLayout();
-        addComponentListener(workflowDetailsSheet);
-        workflowDetailsSheet.setVisible(true);
-    }
-
     private void makeAddressPalette() {
         JLayeredPane layers = getRootPane().getLayeredPane();
         addressPalette = new CdePalette(new BorderLayout(), new LeftPalettePoint());
@@ -2959,13 +3007,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(showProgressButton, c);
         c.gridx++;
 
-        topActivityPanel = new JPanel(new GridLayout(1, 1));
-        topPanel.add((JPanel) topActivityPanel, c);
+        JPanel topActivityPanel = new JPanel(new GridLayout(1, 1));
+        topActivityListener = new ActivityPanel(false, null, aceFrameConfig);
+        topActivityListener.setEraseWhenFinishedEnabled(true);
+        topActivityListener.complete();
+        topActivityPanel.add(topActivityListener.getViewPanel());
+        topPanel.add(topActivityPanel, c);
         c.gridx++;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
-        workflowPanel = new JPanel();
-        topPanel.add(workflowPanel, c);
+        JPanel oldWorkflowPanel = new JPanel();
+        topPanel.add(oldWorkflowPanel, c);
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0;
         c.gridx++;
@@ -3216,15 +3268,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         searchPanel.removeLinkedComponent(component);
     }
 
-    public void setTopActivityPanel(I_ShowActivity ap) {
-        for (Component c : topActivityPanel.getComponents()) {
-            topActivityPanel.remove(c);
-        }
-        topActivityPanel.add(ap.getViewPanel());
-    }
-
-    public JPanel getTopActivityPanel() {
-        return topActivityPanel;
+    public I_ShowActivity getTopActivityListener() {
+        return topActivityListener;
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
@@ -3247,23 +3292,34 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 commitHistoryTableModel.removeElement(commitHistoryTableModel.getSize() - 1);
             }
         } else if (evt.getPropertyName().equals("commitEnabled")) {
-            commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
-            if (aceFrameConfig.isCommitEnabled()) {
-                commitButton.setText("<html><b><font color='green'>commit</font></b>");
-            } else {
-                commitButton.setText("commit");
+            if (commitButton != null) {
+                commitButton.setEnabled(aceFrameConfig.isCommitEnabled());
+                if (aceFrameConfig.isCommitEnabled()) {
+                    commitButton.setText("<html><b><font color='green'>commit</font></b>");
+                } else {
+                    commitButton.setText("commit");
+                    if (dataCheckListModel != null) {
+                        dataCheckListModel.clear();
+                    }
+                }
             }
-            cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
+            if (cancelButton != null) {
+                cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
+            }
         } else if (evt.getPropertyName().equals("lastViewed")) {
             viewerHistoryTableModel.addElement(0, (ConceptBean) evt.getNewValue());
             while (viewerHistoryTableModel.getSize() > maxHistoryListSize) {
                 viewerHistoryTableModel.removeElement(viewerHistoryTableModel.getSize() - 1);
             }
         } else if (evt.getPropertyName().equals("uncommitted")) {
-            uncommittedTableModel.clear();
-            for (I_Transact t : uncommitted) {
-                if (ConceptBean.class.isAssignableFrom(t.getClass())) {
-                    uncommittedTableModel.addElement((ConceptBean) t);
+            if (uncommittedTableModel != null) {
+                uncommittedTableModel.clear();
+                for (I_Transact t : uncommitted) {
+                    if (t != null) {
+                        if (ConceptBean.class.isAssignableFrom(t.getClass())) {
+                            uncommittedTableModel.addElement((ConceptBean) t);
+                        }
+                    }
                 }
             }
         } else if (evt.getPropertyName().equals("imported")) {
@@ -3321,6 +3377,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public JPanel getWorkflowPanel() {
         return workflowPanel;
+    }
+
+    public void setWorkflowPanel(JPanel workflowPanel) {
+        this.workflowPanel = workflowPanel;
     }
 
     public JPanel getWorkflowDetailsPanel() {
@@ -3456,7 +3516,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private void executeShutdownProcesses(File shutdownFolder) {
         if (shutdownFolder.exists()) {
-            AceLog.getAppLog().info("Shutdown folder exists");
+            AceLog.getAppLog().info("Shutdown folder exists: " + shutdownFolder.getAbsolutePath());
             File[] startupFiles = shutdownFolder.listFiles(new FilenameFilter() {
 
                 public boolean accept(File dir, String name) {
@@ -3482,7 +3542,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 AceLog.getAppLog().info("No shutdown processes found. Folder exists: " + shutdownFolder.exists());
             }
         } else {
-            AceLog.getAppLog().info("NO shutdown folder exists");
+            AceLog.getAppLog().info("No shutdown folder exists: " + shutdownFolder.getAbsolutePath());
         }
     }
 
@@ -3580,10 +3640,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return showPreferencesButton.isVisible();
     }
 
-    public boolean isProgressToggleVisible() {
-        return topActivityPanel.isVisible();
-    }
-
     public boolean isSubversionToggleVisible() {
         return showSubversionButton.isVisible();
     }
@@ -3644,14 +3700,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         });
     }
 
-    public void setProgressToggleVisible(final boolean visible) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                topActivityPanel.setVisible(visible);
-            }
-        });
-    }
-
     public void setSubversionToggleVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -3700,7 +3748,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return refsetSpecPanel.getTreeInSpecEditor();
     }
 
-    public I_GetConceptData getRefsetSpecInSpecEditor() {
+    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         if (refsetSpecPanel == null) {
             return null;
         }
@@ -3724,7 +3772,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     int refsetTabIndex = -2;
-    private boolean workflowDetailsSheetVisible = false;
 
     public boolean refsetTabIsSelected() {
         return conceptTabs.getSelectedIndex() == refsetTabIndex;
@@ -3748,35 +3795,38 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
+    public void setWorkflowDetailsSheet(JPanel workflowDetailsSheet) {
+        this.workflowDetailsSheet = workflowDetailsSheet;
+    }
+
     public JPanel getWorkflowDetailsSheet() {
-        if (workflowDetailsSheet == null) {
-            makeWorkflowDetailsSheet();
-        }
         return workflowDetailsSheet;
     }
 
-    public void setWorfklowDetailSheetVisible(boolean visible) {
-        if (workflowDetailsSheetVisible == visible) {
-            return;
-        }
-        if (workflowDetailsSheet == null) {
-            try {
-                makeWorkflowDetailsSheet();
-            } catch (Exception ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
-            }
-        }
-        workflowDetailsSheetVisible = !workflowDetailsSheetVisible;
-        if (workflowDetailsSheetVisible) {
-            getRootPane().getLayeredPane().moveToFront(workflowDetailsSheet);
-            deselectOthers(showSignpostPanelToggle);
-        }
-        workflowDetailsSheet.togglePalette(true, TOGGLE_DIRECTION.UP_DOWN);
+    public void setWorfklowDetailSheetVisible(final boolean visible) {
+        SwingUtilities.invokeLater(new Runnable() {
 
+            public void run() {
+                workflowDetailsSheet.setVisible(visible);
+            }
+        });
     }
 
     public void setWorkflowDetailSheetDimensions(Dimension dim) {
         workflowDetailsSheet.setSize(dim);
+    }
+
+    public RefsetSpecEditor getRefsetSpecEditor() {
+        return refsetSpecPanel.getRefsetSpecEditor();
+    }
+
+    public void setSelectedPreferencesTab(String tabName) {
+        for (int i = 0; i < preferencesTab.getTabCount(); i++) {
+            if (preferencesTab.getTitleAt(i).toLowerCase().equals(tabName.toLowerCase())) {
+                preferencesTab.setSelectedIndex(i);
+                break;
+            }
+        }
     }
 
     public static void setSuppressChangeEvents(boolean suppressChangeEvents) {

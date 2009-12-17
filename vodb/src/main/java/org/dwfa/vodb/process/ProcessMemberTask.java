@@ -113,7 +113,7 @@ public abstract class ProcessMemberTask implements Runnable {
                 }
 
                 part.setPathId(pathId);
-                part.setStatus(statusId);
+                part.setStatusId(statusId);
                 part.setVersion(version);
                 ext.addVersion(part);
 

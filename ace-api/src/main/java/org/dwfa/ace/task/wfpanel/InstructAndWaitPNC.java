@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -119,12 +118,12 @@ public class InstructAndWaitPNC extends PreviousNextOrCancel {
             c.gridy = 0;
             c.weightx = 1.0;
             c.weighty = 0;
-            c.anchor = GridBagConstraints.WEST;
-            workflowPanel.add(new JPanel(), c); // Filler
-            c.gridx++;
-            c.weightx = 0.0;
+            c.anchor = GridBagConstraints.EAST;
             workflowPanel.add(new JLabel(instruction), c);
+            c.weightx = 0.0;
             setupPreviousNextOrCancelButtons(workflowPanel, c);
+            workflowPanel.setVisible(true);
+            workflowPanel.repaint();
         }
 
     }

@@ -128,7 +128,9 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         try {
             // ** GUI:START: 1. GET STATED PATH SNORELS **
             continueThisAction = true;
-            gui = tf.newActivityPanel(true); // in activity viewer
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            // activity
+            // viewer
             gui.addActionListener(this);
             String guiStr = "Compare Stated & Inferred 1/3: Get Edit Path";
             gui.setProgressInfoUpper(guiStr);
@@ -156,7 +158,9 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
             }
 
             // ** GUI:START: 2. GET CLASSIFIER PATH DATA **
-            gui = tf.newActivityPanel(true); // in activity viewer
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            // activity
+            // viewer
             gui.addActionListener(this);
             guiStr = "Compare Stated & Inferred 2/3: Get Classifier Path";
             gui.setProgressInfoUpper(guiStr);
@@ -184,7 +188,9 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
             }
 
             // ** GUI: 3. COMPARE RESULTS
-            gui = tf.newActivityPanel(true); // in activity viewer
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            // activity
+            // viewer
             gui.addActionListener(this);
             guiStr = "Compare Stated & Inferred 3/3: Compare Data";
             gui.setProgressInfoUpper(guiStr);
@@ -645,9 +651,9 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
             }
 
             isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()); // 0
-                                                                                           // CURRENT,
-                                                                                           // 1
-                                                                                           // RETIRED
+            // CURRENT,
+            // 1
+            // RETIRED
             isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
             isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
             isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());

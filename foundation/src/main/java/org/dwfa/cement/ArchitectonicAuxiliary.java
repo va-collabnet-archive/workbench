@@ -16,6 +16,20 @@
  */
 package org.dwfa.cement;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.I_DescribeConceptLocally;
@@ -32,20 +46,6 @@ import org.dwfa.tapi.impl.UniversalFixedDescription;
 import org.dwfa.tapi.impl.UniversalFixedRel;
 import org.dwfa.util.id.Type3UuidFactory;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.UUID;
 
 public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     public static final UUID NAME_SPACE = UUID.fromString("d0cb73c0-aaf7-11db-8294-0002a5d5c51b");
@@ -70,7 +70,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     }
 
 
-    public enum Concept implements I_ConceptualizeUniversally {
+    public enum Concept implements I_ConceptEnumeration,I_ConceptualizeUniversally {
 
         ARCHITECTONIC_ROOT_CONCEPT("Terminology Auxiliary concept", getArchitectonicText(),
             new I_ConceptualizeUniversally[] { }),
@@ -309,6 +309,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                   EXTERNAL_REFERENCE(new String[] {"external reference (description type)", "external reference"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
 
+                  READ_XHTML_DESC(new String[] {"read XHMTL desc (description type)", "read XHTML desc"}, null,
+                                new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  READ_SYN_XHTML_DESC(new String[] {"read synonym XHMTL desc (description type)", "read synonym XHMTL desc"}, null,
+                                new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   READ_198_DESC(new String[] {"read 198 desc (description type)", "read 198 desc"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
 
@@ -328,6 +332,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
 
                   READ_KEY_DESC(new String[] {"read key (description type)", "read key"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  READ_OPCS_20_DESC(new String[] {"read opcs code (description type)", "read opcs"}, null,
+                        new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  READ_ICD10_20_DESC(new String[] {"read icd10 (description type)", "read icd10"}, null,
                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
 
                   FULLY_SPECIFIED_DESCRIPTION_TYPE(PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID,
@@ -358,6 +366,18 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             IS_A_REL(PrimordialId.IS_A_REL_ID, new String[] {"is a (relationship type)"}, null,
                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_SAME_AS_REL("is same as (relationship type)",
+                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_ANALOG("is an analog of (relationship type)",
+                             new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_READ_V2_V3_ANALOG("is a Read V2 analog of Read V3(relationship type)",
+                       		new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_READ_4B_V3_ANALOG("is a Read 4Byte analog of Read V3 (relationship type)",
+                           new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_TERM_OF("is a Term of (relationship type)",
+                                   new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_TERM_OF_SYN("is a Synonym Term of (relationship type)",
+                        new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_READ_V3_TEMPLATE("is a Read V3 Template (relationship type)",
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_ALIAS_OF("is alias of (relationship type)",
                      new I_ConceptualizeUniversally[] { RELATIONSHIP }),
@@ -415,7 +435,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     MODIFY_REFSET_METADATA_PERMISSION("Modify existing refset metadata permission",
                           new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP, ADMIN_ROLE, AUTHOR_ROLE, OWNER_ROLE }),
                     EDIT_REFSET("Edit refset permission",
-                          new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP, ADMIN_ROLE, REVIEWER_ROLE, AUTHOR_ROLE }),
+                          new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP, ADMIN_ROLE, AUTHOR_ROLE }),
                     IMPORT_BRANCHED_REFSET_PERMISSION("Import refset from another branch permission",
                           new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP, ADMIN_ROLE }),
                     DEPRECATE_REFSET_PERMISSION("Deprecate refset permission",
@@ -502,6 +522,12 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
                     OPTIONAL("optional (active status type)",
                              new I_ConceptualizeUniversally[] { ACTIVE }),
+                    DEVELOPMENTAL("optional (active status type)",
+                                     new I_ConceptualizeUniversally[] { ACTIVE }),
+                    EXPERIMENTAL("optional (active status type)",
+                                             new I_ConceptualizeUniversally[] { ACTIVE }),
+                    FROM_SNOMED("optional (active status type)",
+                                                     new I_ConceptualizeUniversally[] { ACTIVE }),
 
 
                             REASSIGNED("reassigned (active status type)",
@@ -535,6 +561,18 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     CURRENT_TEMP_INTERNAL_USE("temp, internal use only (active status type)",
                             new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
                     FLAGGED_POTENTIAL_DESC_STYLE_ERROR("desc style flag (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    UNREVIEWED_NEW_ADDITION("unreviewed new addition (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    UNREVIEWED_NEW_DELETION("unreviewed new deletion (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    REVIEWED_APPROVED_ADDITION("reviewed and approved addition (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    REVIEWED_NOT_APPROVED_ADDITION("reviewed and not approved addition (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    REVIEWED_APPROVED_DELETION("reviewed and approved deletion (active status type)",
+                            new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
+                    REVIEWED_NOT_APPROVED_DELETION("reviewed and not approved deletion (active status type)",
                             new I_ConceptualizeUniversally[] { FLAGGED_FOR_REVIEW }),
             INACTIVE("inactive (inactive status type)",
                     new I_ConceptualizeUniversally[] { STATUS }),
@@ -600,7 +638,13 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                         new I_ConceptualizeUniversally[] { ID_SOURCE }),
         CTV3_ID("CTV3_ID",
               new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        CTV2_ID("CTV2_ID",
+              new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        CT4B_ID("CT4Byte_ID",
+              new I_ConceptualizeUniversally[] { ID_SOURCE }),
         UNSPECIFIED_UUID(PrimordialId.ACE_AUX_ENCODING_ID, new String[] {"generated UUID"}, null,
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
+        T5_FROM_DATA_UUID("Data Generated Type 5 UUID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
         OID("OID", null,
               new I_ConceptualizeUniversally[] { ID_SOURCE }),
@@ -614,11 +658,19 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
         RX_NORM("RX Norm ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
+                READ_V3("Read V3 ID", null,
+                        new I_ConceptualizeUniversally[] { ID_SOURCE }),
+                READ_V2("Read V2 ID", null,
+                        new I_ConceptualizeUniversally[] { ID_SOURCE }),
+                READ_4B("Read 4Byte ID", null,
+                        new I_ConceptualizeUniversally[] { ID_SOURCE }),
         CPT("CPT ID", null,
                 new I_ConceptualizeUniversally[] { ID_SOURCE });
        ;
         private Collection<UUID> conceptUids = new ArrayList<UUID>();
 
+        public String[] parents_S;
+        public String[] descriptions_S;
         private Boolean primitive = true;
 
         private UniversalFixedRel[] rels;
@@ -628,6 +680,12 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         private static PrimordialId[] descTypeOrder;
 
         private I_ConceptualizeLocally local;
+		public String[] getParents_S(){
+			return parents_S;
+		}
+		public String[] getDescriptions_S(){
+			return descriptions_S;
+		}
 
       private Concept(String descriptionString, I_ConceptualizeUniversally[] parents) {
          this(new String[] {descriptionString}, null, parents);
@@ -654,6 +712,16 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             			descriptionStrings = newDescriptionStrings;
             		}
             	}
+            if(parents.length > 0){
+            parents_S = new String[parents.length];
+            for(int i=0;i<parents.length ; i++)
+            {
+              parents_S[i] = parents[i].toString();
+            }
+            }
+            if(descriptionStrings.length > 0){
+            	descriptions_S = descriptionStrings;
+            }
 
                 this.rels = makeRels(this, parents);
                 this.descriptions = makeDescriptions(this, descriptionStrings, defString);

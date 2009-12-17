@@ -152,8 +152,6 @@ public interface I_RelVersioned extends I_AmTermComponent {
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
-    public boolean merge(I_RelVersioned jarRel);
-
     public Set<TimePathId> getTimePathSet();
 
     public void setC2Id(int destId);

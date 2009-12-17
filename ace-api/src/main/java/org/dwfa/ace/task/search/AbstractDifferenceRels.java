@@ -61,7 +61,7 @@ public abstract class AbstractDifferenceRels extends AbstractSearchTest {
             if (frameConfig.getViewPositionSet().size() < 2) {
                 // Cannot be a difference if there are not two or more paths to
                 // compare...
-                return false;
+                return applyInversion(false);
             }
             I_GetConceptData conceptToTest;
             if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
@@ -84,15 +84,15 @@ public abstract class AbstractDifferenceRels extends AbstractSearchTest {
                 } else {
                     int firstSetSize = firstSet.size();
                     if (firstSetSize != tuples.size()) {
-                        return true;
+                        return applyInversion(true);
                     }
                     firstSet.addAll(tuples);
                     if (firstSet.size() != firstSetSize) {
-                        return true;
+                        return applyInversion(true);
                     }
                 }
             }
-            return false;
+            return applyInversion(false);
         } catch (IOException ex) {
             throw new TaskFailedException(ex);
         } catch (TerminologyException e) {

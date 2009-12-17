@@ -29,18 +29,18 @@ public class AddCriterion implements ActionListener {
     /**
      * 
      */
-    private final SearchPanel searchPanel;
+    private final I_MakeCriterionPanel searchPanel;
 
     /**
      * @param searchPanel
      */
-    AddCriterion(SearchPanel searchPanel) {
+    AddCriterion(I_MakeCriterionPanel searchPanel) {
         this.searchPanel = searchPanel;
     }
 
     public void actionPerformed(ActionEvent e) {
         try {
-            this.searchPanel.criterionPanels.add(this.searchPanel.makeCriterionPanel());
+            searchPanel.getCriterionPanels().add(searchPanel.makeCriterionPanel());
         } catch (ClassNotFoundException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InstantiationException e1) {
@@ -48,7 +48,7 @@ public class AddCriterion implements ActionListener {
         } catch (IllegalAccessException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
-        this.searchPanel.layoutCriterion();
+        searchPanel.layoutCriterion();
     }
 
 }

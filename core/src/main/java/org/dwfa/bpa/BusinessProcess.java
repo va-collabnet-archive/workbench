@@ -44,6 +44,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1589,8 +1590,12 @@ public class BusinessProcess implements I_EncodeBusinessProcess, VetoableChangeL
                 ioe.initCause(e);
                 throw ioe;
             }
-
+        } else if (protocol.equalsIgnoreCase("bpa")) {
+            return this.readAttachement(locator.getPath());
+        } else if (protocol.equalsIgnoreCase("tp")) {
+            throw new UnsupportedOperationException();
         }
+
         return locator.getContent();
     }
 
@@ -1600,6 +1605,12 @@ public class BusinessProcess implements I_EncodeBusinessProcess, VetoableChangeL
 
     public Object readProperty(String propertyLabel) throws IntrospectionException, IllegalAccessException,
             InvocationTargetException {
+        return getProperty(propertyLabel);
+    }
+
+    public Object getProperty(String propertyLabel) throws IntrospectionException, IllegalAccessException,
+            InvocationTargetException {
+        propertyLabel = propertyLabel.replaceAll("\\<.*?>", "");
         try {
             BeanInfo info = this.getAllPropertiesBeanInfo();
             for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
@@ -1625,6 +1636,7 @@ public class BusinessProcess implements I_EncodeBusinessProcess, VetoableChangeL
 
     public void setProperty(String propertyLabel, Object value) throws IntrospectionException, IllegalAccessException,
             InvocationTargetException {
+        propertyLabel = propertyLabel.replaceAll("\\<.*?>", "");
         try {
             BeanInfo info = this.getAllPropertiesBeanInfo();
             for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
@@ -1697,5 +1709,37 @@ public class BusinessProcess implements I_EncodeBusinessProcess, VetoableChangeL
 
     public void fireDescriptorChanged(PropertyDescriptor pd) {
         this.changeSupport.firePropertyChange("PropertyDescriptor: " + pd.getName(), null, pd);
+    }
+
+    public String substituteProperties(String input) throws MalformedURLException, IOException {
+        Set<String> locaters = getLocators(input);
+        for (String locator : locaters) {
+            Object value = getObjectFromURL(new URL(locator));
+            String substitutionVariable = "${" + locator + "}";
+            if (value == null) {
+                input = input.replace(substitutionVariable, "[" + substitutionVariable + " is null]");
+            } else {
+                input = input.replace("${" + locator + "}", value.toString());
+            }
+
+        }
+        return input;
+    }
+
+    public Set<String> getLocators(String input) {
+        Set<String> locaters = new HashSet<String>();
+        if (input != null) {
+            String[] parts = input.split("\\$\\{");
+            if (parts.length > 1) {
+                for (int i = 1; i < parts.length; i++) {
+                    String part = parts[i];
+                    String locator = part.split("}", 2)[0];
+                    locaters.add(locator);
+                }
+            }
+        } else {
+            logger.log(Level.WARNING, "Input is null in getLocators...");
+        }
+        return locaters;
     }
 }

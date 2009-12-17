@@ -20,9 +20,22 @@ public class SnoCon implements Comparable<Object> {
     public int id;
     public boolean isDefined;
 
+    public SnoCon() {
+        id = Integer.MIN_VALUE;
+        isDefined = false;
+    }
+
     public SnoCon(int id, boolean isDefined) {
         this.id = id;
         this.isDefined = isDefined;
+    }
+
+    public void SetId(int i) {
+        this.id = i;
+    }
+
+    public void SetIsDefined(boolean b) {
+        this.isDefined = b;
     }
 
     public int compareTo(Object o) {

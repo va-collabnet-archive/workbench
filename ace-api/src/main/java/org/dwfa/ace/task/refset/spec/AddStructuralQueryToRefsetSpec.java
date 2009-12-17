@@ -34,9 +34,7 @@ import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
-    /**
-	 * 
-	 */
+
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
@@ -68,7 +66,12 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
             specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid());
         }
         specPart.setC2id(getStructuralQueryTokenId());
-        specPart.setC3id(configFrame.getHierarchySelection().getConceptId());
+        if (c3Concept == null) {
+            specPart.setC3id(configFrame.getHierarchySelection().getConceptId());
+        } else {
+            specPart.setC3id(c3Concept.getConceptId());
+        }
+
         specPart.setPathId(p.getConceptId());
         specPart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
         specPart.setVersion(Integer.MAX_VALUE);

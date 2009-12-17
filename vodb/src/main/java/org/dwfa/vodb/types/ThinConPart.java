@@ -21,6 +21,7 @@ import java.util.Date;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinConPart implements I_ConceptAttributePart {
@@ -164,5 +165,13 @@ public class ThinConPart implements I_ConceptAttributePart {
 
     public void setStatusId(int statusId) {
         setConceptStatus(statusId);
+    }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPositionId(int pid) {
+        throw new UnsupportedOperationException();
     }
 }

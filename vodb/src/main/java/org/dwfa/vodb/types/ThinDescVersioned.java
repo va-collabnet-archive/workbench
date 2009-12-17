@@ -16,6 +16,17 @@
  */
 package org.dwfa.vodb.types;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.dwfa.ace.api.DescriptionHasNoVersionsException;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -24,9 +35,9 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.api.DescriptionHasNoVersionsException;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceDescription;
@@ -37,16 +48,6 @@ import org.dwfa.tapi.impl.LocalFixedDesc;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ThinDescVersioned implements I_DescriptionVersioned {
     private int descId;
@@ -70,16 +71,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
      * .I_DescriptionPart)
      */
     public boolean addVersion(I_DescriptionPart newPart) {
-        int index = versions.size() - 1;
-        if (index == -1) {
-            return versions.add(newPart);
-        } else if (index >= 0) {
-            I_DescriptionPart prevDesc = versions.get(index);
-            if (prevDesc.hasNewData(newPart)) {
-                return versions.add(newPart);
-            }
-        }
-        return false;
+        return versions.add(newPart);
     }
 
     /*
@@ -358,4 +350,28 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
         return universal;
     }
 
+    public int getNid() {
+        return descId;
+    }
+
+    public boolean promote(I_Position viewPosition, Set<I_Path> pomotionPaths, I_IntSet allowedStatus) {
+        int viewPathId = viewPosition.getPath().getConceptId();
+        Set<I_Position> positions = new HashSet<I_Position>();
+        positions.add(viewPosition);
+        List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
+        addTuples(allowedStatus, null, positions, matchingTuples, false);
+        boolean promotedAnything = false;
+        for (I_Path promotionPath : pomotionPaths) {
+            for (I_DescriptionTuple dt : matchingTuples) {
+                if (dt.getPathId() == viewPathId) {
+                    I_DescriptionPart promotionPart = dt.getPart().duplicate();
+                    promotionPart.setVersion(Integer.MAX_VALUE);
+                    promotionPart.setPathId(promotionPath.getConceptId());
+                    dt.getDescVersioned().addVersion(promotionPart);
+                    promotedAnything = true;
+                }
+            }
+        }
+        return promotedAnything;
+    }
 }

@@ -105,7 +105,8 @@ public abstract class AbstractConceptTest extends AbstractDataConstraintTest {
         for (ArchitectonicAuxiliary.Concept con : Arrays.asList(ArchitectonicAuxiliary.Concept.ACTIVE,
             ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED,
             ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED, ArchitectonicAuxiliary.Concept.LIMITED,
-            ArchitectonicAuxiliary.Concept.PENDING_MOVE)) {
+            ArchitectonicAuxiliary.Concept.PENDING_MOVE, ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE,
+            ArchitectonicAuxiliary.Concept.PROMOTED)) {
             I_GetConceptData c = getConceptSafe(termFactory, con.getUids());
             if (c != null) {
                 activeSet.add(c.getConceptId());

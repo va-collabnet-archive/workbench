@@ -215,7 +215,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                 if (latestInheritedViewPosition != null) {
                                     String version = ThinVersionHelper.format(latestInheritedViewPosition.getVersion(),
                                         MAX_VALUE_TYPE.LATEST);
-                                    htmlSuffixes.add("<font color='#967F49'>&nbsp;[Inheritied view:" + version
+                                    htmlSuffixes.add("<font color='#967F49'>&nbsp;[Inherited view:" + version
                                         + "]</font>");
                                 }
                             }

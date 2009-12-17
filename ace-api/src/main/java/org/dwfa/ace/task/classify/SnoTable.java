@@ -72,36 +72,36 @@ public class SnoTable {
     ArrayList<SnoTableRow> snoTableRows = null;
 
     // ** WORKBENCH PARTICULARS **
-    private I_TermFactory tf;
+    static private I_TermFactory tf;
 
     // ** CORE CONSTANTS **
-    private static int isaNid;
+    private static int isaNid = Integer.MIN_VALUE;
     private static int isCURRENT = Integer.MIN_VALUE;
+    private static int rootNid = Integer.MIN_VALUE;
 
     // STATED & INFERRED PATHS
-    List<I_Position> cStatedPath = null; // Classifier Stated Path
-    List<I_Position> cInferredPath = null; // Classifier Inferred Path
+    static List<I_Position> cStatedPath = null; // Classifier Stated Path
+    static List<I_Position> cInferredPath = null; // Classifier Inferred Path
 
     // ** STATISTICS **
-    // !!! :TODO: ??? need reset statistics routine
-    private int countFindIsaProxDuplPart = 0;
+    // :NYI: need reset statistics routine
+    // private int countFindIsaProxDuplPart = 0;
     private int countFindRoleProxDuplPart = 0;
-    private int countFindSelfDuplPart = 0;
+    // private int countFindSelfDuplPart = 0;
     private int countIsCDefinedDuplPart = 0;
-    private int countFindIsaProxDuplPartGE2 = 0;
+    // private int countFindIsaProxDuplPartGE2 = 0;
     private int countFindRoleProxDuplPartGE2 = 0;
-    private int countFindSelfDuplPartGE2 = 0;
+    // private int countFindSelfDuplPartGE2 = 0;
     private int countIsCDefinedDuplPartGE2 = 0;
 
     // Setup Strings
-    String xStr = new String(String.valueOf('\u2022')); // &bull; U+2022 (8226),
-                                                        // small bullet.
+    String xStr = new String(String.valueOf('\u2022')); // &bull; U+2022 (8226)
     String bStr = new String(" ");
     String errStr = new String("*");
     String typeFont = "<font face='Dialog' size='3' color='blue'>";
     String valueFont = "<font face='Dialog' size='3' color='green'>";
 
-    // ** :DEBUG: **
+    // :DEBUG:
     private boolean debug = false;
 
     @SuppressWarnings("serial")
@@ -127,39 +127,8 @@ public class SnoTable {
     }
 
     public SnoTable() {
-        tf = LocalVersionedTerminology.get();
         try {
-            I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-
-            // Setup core constants
-            isaNid = config.getClassifierIsaType().getConceptId();
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-
-            // GET ALL EDIT_PATH ORIGINS
-            I_GetConceptData cEditPathObj = config.getClassifierInputPath();
-            if (cEditPathObj == null) {
-                String errStr = "Classifier Input (Edit) Path -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-                return;
-            }
-
-            I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
-            cStatedPath = new ArrayList<I_Position>();
-            cStatedPath.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
-            addPathOrigins(cStatedPath, cEditIPath);
-
-            // GET ALL CLASSIFER_PATH ORIGINS
-            I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
-            if (cClassPathObj == null) {
-                String errStr = "Classifier Output (Inferred) Path -- not set in Classifier preferences tab!";
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
-                return;
-            }
-            I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
-            cInferredPath = new ArrayList<I_Position>();
-            cInferredPath.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
-            addPathOrigins(cInferredPath, cClassIPath);
-
+            updatePrefs();
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -167,10 +136,59 @@ public class SnoTable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    private static void updatePrefs() throws TerminologyException, IOException {
+        tf = LocalVersionedTerminology.get();
+        I_ConfigAceFrame config;
+        config = tf.getActiveAceFrameConfig();
+        // Setup core constants
+        if (config.getClassifierIsaType() != null)
+            isaNid = config.getClassifierIsaType().getConceptId();
+        else {
+            String errStr = "Classifier ISA -- not set in Classifier preferences tab!";
+            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
+            return;
+        }
+
+        isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+
+        if (config.getClassificationRoot() != null) {
+            rootNid = tf.uuidToNative(config.getClassificationRoot().getUids());
+        } else {
+            String errStr = "Classifier Root not set! Found: " + tf.getActiveAceFrameConfig().getEditingPathSet();
+            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
+            return;
+        }
+
+        // GET ALL EDIT_PATH ORIGINS
+        I_GetConceptData cEditPathObj = config.getClassifierInputPath();
+        if (cEditPathObj == null) {
+            String errStr = "Classifier Input (Edit) Path -- not set in Classifier preferences tab!";
+            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
+            return;
+        }
+
+        I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
+        cStatedPath = new ArrayList<I_Position>();
+        cStatedPath.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
+        addPathOrigins(cStatedPath, cEditIPath);
+
+        // GET ALL CLASSIFER_PATH ORIGINS
+        I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
+        if (cClassPathObj == null) {
+            String errStr = "Classifier Output (Inferred) Path -- not set in Classifier preferences tab!";
+            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
+            return;
+        }
+        I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
+        cInferredPath = new ArrayList<I_Position>();
+        cInferredPath.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
+        addPathOrigins(cInferredPath, cClassIPath);
 
     }
 
-    private void addPathOrigins(List<I_Position> origins, I_Path p) {
+    private static void addPathOrigins(List<I_Position> origins, I_Path p) {
         origins.addAll(p.getOrigins());
         for (I_Position o : p.getOrigins()) {
             addPathOrigins(origins, o.getPath());
@@ -249,11 +267,43 @@ public class SnoTable {
         return sg;
     }
 
+    public SnoGrpList getStatedIsaProx() {
+        return isaStatedSnoGrpList;
+    }
+
+    public SnoGrpList getStatedRole() {
+        return roleStatedSnoGrpList;
+    }
+
+    public SnoGrpList getIsaProx() {
+        return isaProxSnoGrpList;
+    }
+
+    public SnoGrpList getIsaProxPrim() {
+        return isaProxPrimSnoGrpList;
+    }
+
+    public SnoGrpList getRoleDiffFromProx() {
+        return roleDiffFromProxList;
+    }
+
+    public SnoGrpList getRoleDiffFromProxPrim() {
+        return roleDiffFromProxPrimList;
+    }
+
+    public SnoGrpList getRoleDiffFromRootList() {
+        return roleDiffFromRootList;
+    }
+
     public String[][] getStringData(I_GetConceptData cBean) throws TerminologyException, IOException {
-        SnoGrpList diff;
-        int flags;
         // Get the Form data component ArrayLists
         gatherFormData(cBean);
+        return getStringData();
+    }
+
+    public String[][] getStringData() throws TerminologyException, IOException {
+        SnoGrpList diff;
+        int flags;
 
         // Create the Table Rows
         snoTableRows = new ArrayList<SnoTableRow>();
@@ -355,10 +405,10 @@ public class SnoTable {
      * 
      */
 
-    private ArrayList<SnoRel> findIsaProximal(I_GetConceptData cBean, List<I_Position> posList) {
+    private static ArrayList<SnoRel> findIsaProximal(I_GetConceptData cBean, List<I_Position> posList) {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
         try {
-            List<I_RelVersioned> relList = cBean.getSourceRels();
+            List<? extends I_RelVersioned> relList = cBean.getSourceRels();
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;
@@ -394,6 +444,56 @@ public class SnoTable {
         return returnSnoRels;
     }
 
+    public static boolean findIsaCycle(int c1, int type, int c2) throws TerminologyException, IOException {
+
+        if (cStatedPath == null)
+            updatePrefs();
+        if (cStatedPath == null)
+            return false;
+        if (type != isaNid)
+            return false;
+
+        // Does starting at C2 ever end up a C1?
+        // If yes, then C1-Type-C2 will create a cycle.
+        int startNid = c2;
+        int testNid = c1;
+
+        I_GetConceptData cBean = tf.getConcept(startNid);
+        List<I_Position> posList = cStatedPath;
+
+        //
+        List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
+
+        List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList);
+        while (isaSnoRelProx.size() > 0) {
+            // TEST LIST FOR PRIMITIVE OR NOT
+            for (SnoRel isaSnoRel : isaSnoRelProx) {
+                int theNid = isaSnoRel.c2Id;
+                I_GetConceptData isaCB = tf.getConcept(theNid);
+                if (theNid == rootNid) { // i.e. not primitive
+                    // search no more on this branch
+                } else if (theNid == testNid) {
+
+                    return true; // circled back on self
+                } else {
+                    isaCBNext.add(isaCB); // add to next level search
+                }
+            }
+
+            // GET ALL NEXT LEVEL RELS FOR NON_PRIMITIVE CONCEPTS
+            isaSnoRelProx = new ArrayList<SnoRel>();
+            for (I_GetConceptData cbNext : isaCBNext) {
+                List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList);
+                if (nextSnoRelList.size() > 0)
+                    isaSnoRelProx.addAll(nextSnoRelList);
+            }
+
+            // RESET NEXT LEVEL SEARCH LIST
+            isaCBNext = new ArrayList<I_GetConceptData>(); // new "next" list
+        }
+        return false;
+    }
+
     private ArrayList<SnoRel> findIsaProximalPrim(I_GetConceptData cBean, List<I_Position> posList)
             throws TerminologyException, IOException {
 
@@ -423,9 +523,9 @@ public class SnoTable {
             // GET ALL NEXT LEVEL RELS FOR NON_PRIMITIVE CONCEPTS
             isaSnoRelProx = new ArrayList<SnoRel>();
             for (I_GetConceptData cbNext : isaCBNext) {
-                List<SnoRel> nextTuples = findIsaProximal(cbNext, posList);
-                if (nextTuples.size() > 0)
-                    isaSnoRelProx.addAll(nextTuples);
+                List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList);
+                if (nextSnoRelList.size() > 0)
+                    isaSnoRelProx.addAll(nextSnoRelList);
             }
 
             // RESET NEXT LEVEL SEARCH LIST
@@ -451,7 +551,7 @@ public class SnoTable {
                         } else if (cp1.getVersion() < cp.getVersion()) {
                             cp1 = cp; // ... KEEP MORE_RECENT, CURRENT PART
                         } else if (cp1.getVersion() == cp.getVersion()) {
-                            // !!! THIS DUPLICATE SHOULD NEVER HAPPEN
+                            // THIS DUPLICATE SHOULD NEVER HAPPEN
                             tmpCountDupl++;
                         }
                     }
@@ -501,7 +601,7 @@ public class SnoTable {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
 
         try {
-            List<I_RelVersioned> relList = cBean.getSourceRels();
+            List<? extends I_RelVersioned> relList = cBean.getSourceRels();
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;
@@ -693,7 +793,7 @@ public class SnoTable {
         return grpListA;
     }
 
-    private String logTable(String[][] data) {
+    private void logTable(String[][] data) {
         StringBuilder s = new StringBuilder();
         s.append("\r\n::: TABLE -- \"" + cBeanStr + "\" " + ((cBeanDef == true) ? "(( DEFINED ))" : "(( PRIMITIVE ))"));
 
@@ -716,6 +816,110 @@ public class SnoTable {
             s.append("\t " + s1);
         }
         AceLog.getAppLog().log(Level.INFO, s.toString());
-        return null;
     }
+
+    // This routine is a simple version for check role roots.
+    // Expansion would be needed to properly format more complex ancestry.
+    static public String toStringIsaAncestry(int conceptNid, List<I_Position> posList) {
+        String barStr = new String(" || ");
+        String commaStr = new String(", ");
+        String delimStr = commaStr;
+        StringBuilder sb = new StringBuilder(512);
+        sb.insert(0, String.valueOf(conceptNid));
+
+        if (tf == null)
+            try {
+                updatePrefs();
+            } catch (TerminologyException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                return null;
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                return null;
+            }
+
+        try {
+            // tf.getConcept(int) may create an exception
+            I_GetConceptData cBean = tf.getConcept(conceptNid);
+            List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
+
+            List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList);
+            while (isaSnoRelProx.size() > 0) {
+
+                // ADD THIS LEVEL RELS TO STRING
+                if (isaSnoRelProx.size() > 1)
+                    delimStr = barStr;
+                for (SnoRel isaSnoRel : isaSnoRelProx) {
+                    sb.insert(0, String.valueOf(isaSnoRel.c2Id) + delimStr);
+                    delimStr = commaStr;
+
+                    if (isaSnoRel.c2Id != rootNid) { // not root
+                        I_GetConceptData isaCB = tf.getConcept(isaSnoRel.c2Id);
+                        isaCBNext.add(isaCB); // used to get next level
+                    }
+                }
+
+                // GET ALL NEXT LEVEL RELS FOR NON_PRIMITIVE CONCEPTS
+                isaSnoRelProx = new ArrayList<SnoRel>();
+                for (I_GetConceptData cbNext : isaCBNext) {
+                    List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList);
+                    if (nextSnoRelList.size() > 0)
+                        isaSnoRelProx.addAll(nextSnoRelList);
+                }
+
+                // RESET NEXT LEVEL SEARCH LIST
+                isaCBNext = new ArrayList<I_GetConceptData>(); // new "next"
+                // list
+            }
+
+        } catch (TerminologyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return sb.toString();
+    }
+
+    static public String toString(int nid) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            if (tf == null)
+                updatePrefs();
+            I_GetConceptData cb = tf.getConcept(nid);
+            sb.append(String.valueOf(nid) + "\t" + cb.getInitialText() + "\r\n");
+        } catch (TerminologyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+        return sb.toString();
+    }
+
+    static public String toString(SnoRel sr) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            if (tf == null)
+                updatePrefs();
+        } catch (TerminologyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+        // :TODO: fill out format
+        return sb.toString();
+    }
+
 }

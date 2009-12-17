@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.util.HashFunction;
 
 public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
     private ThinIdPartCore core;
@@ -153,7 +154,7 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
      * org.dwfa.vodb.types.I_IdPart#hasNewData(org.dwfa.vodb.types.ThinIdPart)
      */
     public boolean hasNewData(I_IdPart another) {
-        return ((this.getPathId() != another.getPathId()) || (this.getIdStatus() != another.getStatusId())
+        return ((this.getPathId() != another.getPathId()) || (this.getStatusId() != another.getStatusId())
             || (this.getSource() != another.getSource()) || getSourceId().equals(another.getSourceId()) == false);
     }
 
@@ -211,6 +212,14 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
 
     public void setStatusId(int statusId) {
         setIdStatus(statusId);
+    }
+
+    public int getPositionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPositionId(int pid) {
+        throw new UnsupportedOperationException();
     }
 
 }

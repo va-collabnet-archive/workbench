@@ -14,25 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dwfa.ace.actions;
+package org.dwfa.ace;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
-import net.jini.config.Configuration;
+import javax.swing.JLabel;
 
-import org.dwfa.vodb.jar.ImportUpdateJarReader;
+public interface I_ImplementActiveLabel {
 
-public class ImportChangesetJar implements ActionListener {
+    public static final int DOUBLE_CLICK = 1;
+    public static final int POPUP = 2;
 
-    private Configuration riverConfig;
+    public JLabel getLabel();
 
-    public ImportChangesetJar(Configuration riverConfig) {
-        this.riverConfig = riverConfig;
-    }
+    public I_ImplementActiveLabel copy() throws IOException;
 
-    public void actionPerformed(ActionEvent e) {
-        new ImportUpdateJarReader(riverConfig);
-    }
+    public void addActionListener(ActionListener l);
+
+    public void removeActionListener(ActionListener l);
 
 }

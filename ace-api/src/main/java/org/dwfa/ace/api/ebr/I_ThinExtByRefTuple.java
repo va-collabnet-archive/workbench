@@ -19,6 +19,7 @@ package org.dwfa.ace.api.ebr;
 import java.util.List;
 
 import org.dwfa.ace.api.I_AmTuple;
+import org.dwfa.ace.api.I_Path;
 
 public interface I_ThinExtByRefTuple extends I_ThinExtByRefPart, I_AmTuple {
 
@@ -49,5 +50,7 @@ public interface I_ThinExtByRefTuple extends I_ThinExtByRefPart, I_AmTuple {
     public I_ThinExtByRefVersioned getCore();
 
     public I_ThinExtByRefPart getPart();
+
+    public boolean promote(I_Path path);
 
 }

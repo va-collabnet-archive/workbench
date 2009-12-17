@@ -21,7 +21,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class EditSetDefaultBeanInfo extends SimpleBeanInfo {
@@ -31,7 +31,7 @@ public class EditSetDefaultBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor defaultConcept = new PropertyDescriptor("defaultConcept",
                 getBeanDescriptor().getBeanClass());
             defaultConcept.setBound(true);
-            defaultConcept.setPropertyEditorClass(ConceptLabelEditor.class);
+            defaultConcept.setPropertyEditorClass(ConceptLabelPropEditor.class);
             defaultConcept.setDisplayName("<html><font color='green'>default:");
             defaultConcept.setShortDescription("The default value for the selected type");
 

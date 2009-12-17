@@ -21,6 +21,8 @@ import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
+import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.text.View;
 
 import org.dwfa.ace.table.AceTableRenderer;
 
@@ -44,11 +46,13 @@ public class ExtTableRenderer extends AceTableRenderer {
                 boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
 
                 if (row > 0) {
-                    StringWithExtTuple prevSwt = (StringWithExtTuple) table.getValueAt(row - 1, column);
-                    same = swt.getTuple().getMemberId() == prevSwt.getTuple().getMemberId();
-                    setBorder(column, this, same, uncommitted);
-                    if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
-                        renderComponent.setText("");
+                    if (table.getValueAt(row - 1, column).getClass().isAssignableFrom(StringWithExtTuple.class)) {
+                        StringWithExtTuple prevSwt = (StringWithExtTuple) table.getValueAt(row - 1, column);
+                        same = swt.getTuple().getMemberId() == prevSwt.getTuple().getMemberId();
+                        setBorder(column, this, same, uncommitted);
+                        if ((same) && swt.getCellText() != null && (swt.getCellText().equals(prevSwt.getCellText()))) {
+                            renderComponent.setText("");
+                        }
                     }
                 } else {
                     setBorder(column, this, false, uncommitted);
@@ -68,5 +72,4 @@ public class ExtTableRenderer extends AceTableRenderer {
         }
         return renderComponent;
     }
-
 }
