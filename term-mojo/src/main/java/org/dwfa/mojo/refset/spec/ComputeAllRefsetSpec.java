@@ -52,7 +52,7 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
      * @parameter
      * @optional
      */
-    private ConceptDescriptor[] refsetSpecDescriptors;
+    private ConceptDescriptor[] excludedRefsetSpecDescriptors;
 
     /**
      * Location of the build directory.
@@ -64,7 +64,7 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + refsetSpecDescriptors, this
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + excludedRefsetSpecDescriptors, this
                 .getClass(), targetDirectory)) {
                 return;
             }
@@ -76,8 +76,8 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
             Set<Integer> excludedRefsets = new HashSet<Integer>();
-            if (refsetSpecDescriptors != null) {
-                for (ConceptDescriptor refsetSpecDescriptor : refsetSpecDescriptors) {
+            if (excludedRefsetSpecDescriptors != null) {
+                for (ConceptDescriptor refsetSpecDescriptor : excludedRefsetSpecDescriptors) {
                     RefsetSpec spec = new RefsetSpec(refsetSpecDescriptor.getVerifiedConcept());
                     excludedRefsets.add(spec.getMemberRefsetConcept().getConceptId());
                 }
