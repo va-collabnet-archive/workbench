@@ -79,6 +79,10 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
     private boolean cancelComputation = false;
 
+    private Set<Integer> nestedRefsets;
+
+    private Set<Integer> excludedRefsets;
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
@@ -171,8 +175,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         // Step 1: create the query object, based on the refset spec
         RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset);
-        SpecMemberRefsetHelper memberRefsetHelper = new SpecMemberRefsetHelper(refset.getConceptId(),
-            normalMemberConcept.getConceptId());
+        SpecMemberRefsetHelper memberRefsetHelper =
+                new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
         // check validity of query
         if (query.getTotalStatementCount() == 0) {
@@ -189,7 +193,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             if (showActivityPanel) {
                 progressReportHtmlGenerator.setComplete(true);
                 computeRefsetActivityPanel.complete();
-                computeRefsetActivityPanel.setProgressInfoLower("Refset spec has dangling AND/OR. These must have sub-statements.");
+                computeRefsetActivityPanel
+                    .setProgressInfoLower("Refset spec has dangling AND/OR. These must have sub-statements.");
             }
             getLogger().info("Refset spec has dangling AND/OR. These must have sub-statements.");
             throw new TaskFailedException("Refset spec has dangling AND/OR. These must have sub-statements.");
@@ -199,14 +204,18 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         // "Concept is member of : refset2", then the members of
         // "Refset2" will be calculated as part of the computation
         Set<Integer> nestedRefsets = query.getNestedRefsets();
+        this.setNestedRefsets(nestedRefsets);
         for (Integer nestedRefsetId : nestedRefsets) {
-            try {
-                computeRefset(configFrame, termFactory.getConcept(nestedRefsetId), showActivityPanel);
-            } catch (TaskFailedException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Error computing dependant refset: "
-                    + termFactory.getConcept(nestedRefsetId).getInitialText() + ". Re-run separately.", "",
-                    JOptionPane.ERROR_MESSAGE);
+            if (!excludedRefsets.contains(nestedRefsetId)) {
+                try {
+                    computeRefset(configFrame, termFactory.getConcept(nestedRefsetId), showActivityPanel);
+                    getNestedRefsets().addAll(nestedRefsets);
+                } catch (TaskFailedException e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Error computing dependant refset: " + termFactory.getConcept(nestedRefsetId).getInitialText()
+                            + ". Re-run separately.", "", JOptionPane.ERROR_MESSAGE);
+                }
             }
             termFactory.commit();
         }
@@ -222,8 +231,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         // filtering out retired versions)
         List<I_ThinExtByRefVersioned> allRefsetMembers = termFactory.getRefsetExtensionMembers(refset.getConceptId());
 
-        HashSet<Integer> currentRefsetMemberIds = filterNonCurrentRefsetMembers(allRefsetMembers, memberRefsetHelper,
-            refset.getConceptId(), normalMemberConcept.getConceptId());
+        HashSet<Integer> currentRefsetMemberIds =
+                filterNonCurrentRefsetMembers(allRefsetMembers, memberRefsetHelper, refset.getConceptId(),
+                    normalMemberConcept.getConceptId());
         // Compute the possible concepts to iterate over here...
         I_RepresentIdSet possibleConcepts = query.getPossibleConcepts(configFrame, null);
         possibleConcepts.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
@@ -262,7 +272,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                         computeRefsetActivityPanel.setValue(conceptsProcessed);
                     }
 
-                    getLogger().info("Concepts processed: " + conceptsProcessed + " / " + termFactory.getConceptCount());
+                    getLogger()
+                        .info("Concepts processed: " + conceptsProcessed + " / " + termFactory.getConceptCount());
                     getLogger().info("New members: " + newMembers.size());
                     getLogger().info("Retired members: " + retiredMembers.size());
                 }
@@ -312,8 +323,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         // Step 4: retire old member refsets
         getLogger().info("Retiring old member refsets.");
         for (Integer retiredMemberId : retiredMembers) {
-            memberRefsetHelper.retireRefsetExtension(refset.getConceptId(), retiredMemberId,
-                normalMemberConcept.getConceptId());
+            memberRefsetHelper.retireRefsetExtension(refset.getConceptId(), retiredMemberId, normalMemberConcept
+                .getConceptId());
             if (cancelComputation) {
                 break;
             }
@@ -356,8 +367,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         long endTime = new Date().getTime();
         long totalMinutes = (endTime - startTime) / 60000;
         long totalSeconds = ((endTime - startTime) % 60000) / 1000;
-        String executionTimeString = "Total execution time: " + totalMinutes + " minutes, " + totalSeconds
-            + " seconds.";
+        String executionTimeString =
+                "Total execution time: " + totalMinutes + " minutes, " + totalSeconds + " seconds.";
 
         getLogger().info(">>>>>>>>>>><<<<<<<<<<<");
         getLogger().info("Number of new refset members: " + newMembers.size());
@@ -391,9 +402,12 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame configFrame =
+                    (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
             boolean showActivityPanel = true;
+            excludedRefsets = new HashSet<Integer>(); // no excluded refsets when running as part of task
+            nestedRefsets = new HashSet<Integer>();
             computeRefset(configFrame, refset, showActivityPanel);
             return Condition.CONTINUE;
         } catch (Exception ex) {
@@ -440,5 +454,21 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             }
         }
         return newList;
+    }
+
+    public Set<Integer> getNestedRefsets() {
+        return nestedRefsets;
+    }
+
+    public void setNestedRefsets(Set<Integer> nestedRefsets) {
+        this.nestedRefsets = nestedRefsets;
+    }
+
+    public Set<Integer> getExcludedRefsets() {
+        return excludedRefsets;
+    }
+
+    public void setExcludedRefsets(Set<Integer> excludedRefsets) {
+        this.excludedRefsets = excludedRefsets;
     }
 }
