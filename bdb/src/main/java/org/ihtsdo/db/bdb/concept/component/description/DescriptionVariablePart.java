@@ -5,13 +5,13 @@ import java.nio.charset.Charset;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.ihtsdo.db.bdb.concept.component.Part;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class DescriptionPart extends Part<DescriptionPart> 
-	implements I_DescriptionPart<DescriptionPart> {
+public class DescriptionVariablePart extends Version<DescriptionVariablePart> 
+	implements I_DescriptionPart {
 	
 	@SuppressWarnings("unused")
 	private static Charset utf8 = Charset.forName("UTF-8");
@@ -21,11 +21,11 @@ public class DescriptionPart extends Part<DescriptionPart>
 	private int typeNid; 
 	private String lang;
 
-	public DescriptionPart(int statusAtPositionNid) {
+	public DescriptionVariablePart(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 	
-	protected DescriptionPart(DescriptionPart another) {
+	protected DescriptionVariablePart(DescriptionVariablePart another) {
 		super(another.getStatusAtPositionNid());
 		this.text = another.text;
 		this.typeNid = another.typeNid;
@@ -33,7 +33,7 @@ public class DescriptionPart extends Part<DescriptionPart>
 		this.initialCaseSignificant = another.initialCaseSignificant;
 	}
 
-	protected DescriptionPart(DescriptionPart another, int statusNid, int pathNid, long time) {
+	protected DescriptionVariablePart(DescriptionVariablePart another, int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 		this.text = another.text;
 		this.typeNid = another.typeNid;
@@ -41,7 +41,7 @@ public class DescriptionPart extends Part<DescriptionPart>
 		this.initialCaseSignificant = another.initialCaseSignificant;
 	}
 
-	protected DescriptionPart(TupleInput input) {
+	protected DescriptionVariablePart(TupleInput input) {
 		super(input.readInt());
 		text = input.readString();
 		lang = input.readString();
@@ -73,7 +73,7 @@ public class DescriptionPart extends Part<DescriptionPart>
 	}
 
 	@Override
-	public boolean hasNewData(DescriptionPart another) {
+	public boolean hasNewData(I_DescriptionPart another) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -108,18 +108,18 @@ public class DescriptionPart extends Part<DescriptionPart>
 	}
 
 	@Override
-	public DescriptionPart duplicate() {
-		return new DescriptionPart(this);
+	public DescriptionVariablePart duplicate() {
+		return new DescriptionVariablePart(this);
 	}
 
 	@Override
-	public DescriptionPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new DescriptionPart(this, statusNid, pathNid, time);
+	public DescriptionVariablePart makeAnalog(int statusNid, int pathNid, long time) {
+		return new DescriptionVariablePart(this, statusNid, pathNid, time);
 	}
 
 	@Override
-	public ArrayIntList getPartComponentNids() {
-		ArrayIntList list = super.getComponentNids();
+	public ArrayIntList getVariableVersionNids() {
+		ArrayIntList list = new ArrayIntList(3);
 		list.add(typeNid);
 		return list;
 	}

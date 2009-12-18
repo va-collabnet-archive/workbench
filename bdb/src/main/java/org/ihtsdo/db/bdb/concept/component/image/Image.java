@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
@@ -26,13 +27,13 @@ import org.ihtsdo.db.util.TupleComputer;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class Image extends ConceptComponent<ImagePart> implements
-		I_ImageVersioned<ImagePart, Image, ImageTuple> {
+public class Image extends ConceptComponent<ImageVariablePart> implements
+		I_ImageVersioned<ImageVariablePart, ImageTuple> {
 
 	private static class ImageTupleComputer extends
-			TupleComputer<ImageTuple, Image, ImagePart> {
+			TupleComputer<ImageTuple, Image, ImageVariablePart> {
 
-		public ImageTuple makeTuple(ImagePart part, Image core) {
+		public ImageTuple makeTuple(ImageVariablePart part, Image core) {
 			return new ImageTuple(core, part);
 		}
 	}
@@ -64,7 +65,7 @@ public class Image extends ConceptComponent<ImagePart> implements
 
 	@Override
 	public void readPartFromBdb(TupleInput input) {
-		versions.add(new ImagePart(input));
+		versions.add(new ImageVariablePart(input));
 	}
 
 	/*
@@ -119,7 +120,7 @@ public class Image extends ConceptComponent<ImagePart> implements
 	 */
 	public List<ImageTuple> getTuples() {
 		List<ImageTuple> tuples = new ArrayList<ImageTuple>();
-		for (ImagePart p : getVersions()) {
+		for (ImageVariablePart p : getVersions()) {
 			tuples.add(new ImageTuple(this, p));
 		}
 		return tuples;
@@ -138,21 +139,11 @@ public class Image extends ConceptComponent<ImagePart> implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.dwfa.vodb.types.I_ImageVersioned#merge(org.dwfa.vodb.types.
-	 * ThinImageVersioned)
-	 */
-	public boolean merge(Image jarImage) {
-		throw new UnsupportedOperationException();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getTimePathSet()
 	 */
 	public Set<TimePathId> getTimePathSet() {
 		Set<TimePathId> tpSet = new HashSet<TimePathId>();
-		for (ImagePart p : versions) {
+		for (ImageVariablePart p : versions) {
 			tpSet.add(new TimePathId(p.getVersion(), p.getPathId()));
 		}
 		return tpSet;
@@ -174,7 +165,7 @@ public class Image extends ConceptComponent<ImagePart> implements
 		UniversalAceImage universal = new UniversalAceImage(getUids(nid),
 				getImage(), new ArrayList<UniversalAceImagePart>(versions
 						.size()), getFormat(), getUids(conceptId));
-		for (ImagePart part : versions) {
+		for (ImageVariablePart part : versions) {
 			UniversalAceImagePart universalPart = new UniversalAceImagePart();
 			universalPart.setPathId(getUids(part.getPathId()));
 			universalPart.setStatusId(getUids(part.getStatusId()));
@@ -196,7 +187,7 @@ public class Image extends ConceptComponent<ImagePart> implements
 		for (I_Path promotionPath : pomotionPaths) {
 			for (ImageTuple it : matchingTuples) {
 				if (it.getPathId() == viewPathId) {
-					ImagePart promotionPart = it.getPart().makeAnalog(
+					ImageVariablePart promotionPart = it.getPart().makeAnalog(
 							it.getStatusId(), promotionPath.getConceptId(),
 							Long.MAX_VALUE);
 					it.getVersioned().addVersion(promotionPart);
@@ -205,5 +196,15 @@ public class Image extends ConceptComponent<ImagePart> implements
 			}
 		}
 		return promotedAnything;
+	}
+
+	@Override
+	public boolean addVersion(I_ImagePart part) {
+		return versions.add((ImageVariablePart) part);
+	}
+
+	@Override
+	public boolean merge(I_ImageVersioned<ImageVariablePart, ImageTuple> jarImage) {
+		throw new UnsupportedOperationException();
 	}
 }

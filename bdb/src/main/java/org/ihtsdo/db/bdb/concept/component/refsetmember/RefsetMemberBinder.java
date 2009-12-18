@@ -4,18 +4,18 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 
 public class RefsetMemberBinder {
 
-	private static final ThreadLocal<ConceptComponentBinder<RefsetMember, RefsetMemberPart>> binders = 
-		new ThreadLocal<ConceptComponentBinder<RefsetMember, RefsetMemberPart>>() {
+	private static final ThreadLocal<ConceptComponentBinder<RefsetMember, RefsetMemberVariablePart>> binders = 
+		new ThreadLocal<ConceptComponentBinder<RefsetMember, RefsetMemberVariablePart>>() {
 
 		@Override
-		protected ConceptComponentBinder<RefsetMember, RefsetMemberPart> initialValue() {
+		protected ConceptComponentBinder<RefsetMember, RefsetMemberVariablePart> initialValue() {
 			RefsetMemberFactory factory = new RefsetMemberFactory();
-			return new ConceptComponentBinder<RefsetMember, RefsetMemberPart>(
+			return new ConceptComponentBinder<RefsetMember, RefsetMemberVariablePart>(
 					factory);
 		}
 	};
 
-	public static ConceptComponentBinder<RefsetMember, RefsetMemberPart> getBinder() {
+	public static ConceptComponentBinder<RefsetMember, RefsetMemberVariablePart> getBinder() {
 		return binders.get();
 	}
 

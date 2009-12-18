@@ -2,7 +2,7 @@ package org.ihtsdo.db.bdb.concept.component.description;
 
 import org.ihtsdo.db.bdb.concept.component.ComponentFactory;
 
-public class DescriptionFactory extends ComponentFactory<Description, DescriptionPart> {
+public class DescriptionFactory extends ComponentFactory<Description, DescriptionVariablePart> {
 
 	@Override
 	public Description create(int nid, int partCount, boolean editable) {

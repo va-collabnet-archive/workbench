@@ -1,132 +1,56 @@
 package org.ihtsdo.db.bdb.concept.component.image;
 
-import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.ihtsdo.db.bdb.concept.component.Tuple;
 
 public class ImageTuple 
-	extends Tuple<ImagePart, Image> 
-	implements I_ImageTuple<ImagePart, ImageTuple, Image> {
+	extends Tuple<ImageVariablePart, Image> 
+	implements I_ImageTuple {
 
-	private Image fixed;
-	private ImagePart part;
-	
-	protected ImageTuple(Image fixed, ImagePart part) {
-		super();
-		this.fixed = fixed;
-		this.part = part;
+	protected ImageTuple(Image component, ImageVariablePart part) {
+		super(component, part);
 	}
 
-	public ArrayIntList getPartComponentNids() {
-		return part.getPartComponentNids();
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ImageTuple#getImage()
-	 */
-	public byte[] getImage() {
-		return fixed.getImage();
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ImageTuple#getImageId()
-	 */
-	public int getImageId() {
-		return fixed.getImageId();
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ImageTuple#getPathId()
-	 */
-	public int getPathId() {
-		return part.getPathId();
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ImageTuple#getStatusId()
-	 */
-	public int getStatusId() {
-		return part.getStatusId();
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ImageTuple#getVersion()
-	 */
-	public int getVersion() {
-		return part.getVersion();
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ImageTuple#getTextDescription()
-	 */
-	public String getTextDescription() {
-		return part.getTextDescription();
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ImageTuple#getTypeId()
-	 */
-	public int getTypeId() {
-		return part.getTypeId();
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ImageTuple#getFormat()
-	 */
-	public String getFormat() {
-		return fixed.getFormat();
-	}
-	/* (non-Javadoc)
-	 * @see org.dwfa.vodb.types.I_ImageTuple#getConceptId()
-	 */
+	@Override
 	public int getConceptId() {
-		return fixed.getConceptId();
-	}
-	
-	public Image getVersioned() {
-		return fixed;
-	}
-	public ImagePart getPart() {
-		return part;
-	}
-	public void setPathId(int pathId) {
-		throw new UnsupportedOperationException();
-	}
-	public void setStatusId(int idStatus) {
-		throw new UnsupportedOperationException();
-	}
-	public void setVersion(int version) {
-		throw new UnsupportedOperationException();
-	}
-	public Image getFixedPart() {
-		return fixed;
+		return getFixedPart().getConceptId();
 	}
 
-	public ImagePart duplicate() {
-		return duplicate();
+	@Override
+	public String getFormat() {
+		return getFixedPart().getFormat();
 	}
-	
-	public void setTypeId(int type) {
-		part.setTypeId(type);
+
+	@Override
+	public byte[] getImage() {
+		return getFixedPart().getImage();
 	}
-	
-	public int getFixedPartId() {
-		return fixed.getNid();
+
+	@Override
+	public int getImageId() {
+		return getFixedPart().getImageId();
+	}
+
+	@Override
+	public String getTextDescription() {
+		return getPart().getTextDescription();
 	}
 
 	@Override
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
-		// TODO Auto-generated method stub
-		
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public int getStatusAtPositionNid() {
-		return part.statusAtPositionNid;
+	public int getTypeId() {
+		return getPart().getTypeId();
 	}
 
 	@Override
-	public long getTime() {
-		return part.getTime();
+	public void setTypeId(int typeNid) {
+		getPart().setTypeId(typeNid);
 	}
 
-	@Override
-	public ImagePart makeAnalog(int statusNid, int pathNid, long time) {
-		return part.makeAnalog(statusNid, pathNid, time);
-	}
-	
 
 }

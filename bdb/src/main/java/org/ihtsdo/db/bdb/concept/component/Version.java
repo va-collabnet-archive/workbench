@@ -8,31 +8,35 @@ import org.ihtsdo.db.bdb.StatusAtPositionBdb;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 @SuppressWarnings("unchecked")
-public abstract class Part<P extends Part> implements I_AmPart<P> {
+public abstract class Version<P extends Version> implements I_AmPart {
 	
 	private static StatusAtPositionBdb sapBdb = Bdb.getStatusAtPositionDb();
 	
 	public int statusAtPositionNid;
 
-	protected Part(int statusAtPositionNid) {
+	protected Version(int statusAtPositionNid) {
 		super();
 		this.statusAtPositionNid = statusAtPositionNid;
 	}
 
-	public Part(int statusNid, int pathNid, long time) {
+	public Version(int statusNid, int pathNid, long time) {
 		this.statusAtPositionNid = sapBdb.getStatusAtPositionNid(statusNid, pathNid, time);
 	}
 
-	public int getStatusAtPositionNid() {
+	public final int getStatusAtPositionNid() {
 		return statusAtPositionNid;
 	}
 
-	protected ArrayIntList getComponentNids() {
-		ArrayIntList resultList = new ArrayIntList();
+	public final ArrayIntList getPartComponentNids() {
+		ArrayIntList resultList = getVariableVersionNids();
 		resultList.add(getPathId());
 		resultList.add(getStatusId());
 		return resultList;
 	}
+	
+	public abstract ArrayIntList getVariableVersionNids();
+	
+	
 
 	@Override
 	public int getPathId() {

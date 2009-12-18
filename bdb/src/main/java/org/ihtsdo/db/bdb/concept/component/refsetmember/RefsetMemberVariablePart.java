@@ -2,25 +2,25 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.ihtsdo.db.bdb.concept.component.Part;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class RefsetMemberPart extends Part<RefsetMemberPart> 
-	implements I_ThinExtByRefPart<RefsetMemberPart> {
+public abstract class RefsetMemberVariablePart extends Version<RefsetMemberVariablePart> 
+	implements I_ThinExtByRefPart {
 
-	private RefsetMemberPart(int statusNid, int pathNid, long time) {
+	private RefsetMemberVariablePart(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 		// TODO Auto-generated constructor stub
 	}
 
-	private RefsetMemberPart(int statusAtPositionNid) {
+	private RefsetMemberVariablePart(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public RefsetMemberPart makeAnalog(int statusNid, int pathNid, long time) {
+	public RefsetMemberVariablePart makeAnalog(int statusNid, int pathNid, long time) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -32,9 +32,8 @@ public abstract class RefsetMemberPart extends Part<RefsetMemberPart>
 	}
 
 	@Override
-	public ArrayIntList getPartComponentNids() {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayIntList getVariableVersionNids() {
+		throw new UnsupportedOperationException();
 	}
 
 }

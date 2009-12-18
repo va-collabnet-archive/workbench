@@ -12,8 +12,8 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class RefsetMember extends ConceptComponent<RefsetMemberPart> 
-	implements I_ThinExtByRefVersioned<RefsetMemberPart, RefsetMember, RefsetMemberTuple> {
+public class RefsetMember extends ConceptComponent<RefsetMemberVariablePart> 
+	implements I_ThinExtByRefVersioned<RefsetMemberVariablePart, RefsetMemberTuple> {
 
 	private int refsetNid;
 	private int componentNid;

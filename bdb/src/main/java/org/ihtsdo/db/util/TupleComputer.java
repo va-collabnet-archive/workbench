@@ -9,9 +9,6 @@ import java.util.ListIterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_AmTermComponent;
-import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_AmTypedPart;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -19,10 +16,13 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.PositionMapper;
 import org.ihtsdo.db.bdb.PositionMapper.RELATIVE_POSITION;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.Tuple;
 
-public abstract class TupleComputer<T extends I_AmTuple<P, C>, 
-									C extends I_AmTermComponent, 
-									P extends I_AmPart<P>> {
+public abstract class TupleComputer<T extends Tuple<P, C>, 
+									C extends ConceptComponent<P>, 
+									P extends Version<P>> {
 
 	private class SortPartsByTime implements Comparator<P> {
 
@@ -155,7 +155,7 @@ public abstract class TupleComputer<T extends I_AmTuple<P, C>,
 			PositionMapper mapper = Bdb.getStatusAtPositionDb().getMapper(p);
 			for (P part : versions) {
 				if (allowedTypes != null) {
-					if (allowedTypes.contains(((I_AmTypedPart<P>) part)
+					if (allowedTypes.contains(((I_AmTypedPart) part)
 							.getTypeId()) == false) {
 						continue;
 					}
@@ -249,7 +249,7 @@ public abstract class TupleComputer<T extends I_AmTuple<P, C>,
 			}
 			if (allowedTypes != null
 					&& allowedTypes
-							.contains(((I_AmTypedPart<P>) part).getTypeId()) == false) {
+							.contains(((I_AmTypedPart) part).getTypeId()) == false) {
 				rejectedParts.add(part);
 				continue;
 			}
@@ -275,7 +275,7 @@ public abstract class TupleComputer<T extends I_AmTuple<P, C>,
 		for (P part : uncommittedParts) {
 			if (allowedTypes == null
 					|| allowedTypes
-							.contains(((I_AmTypedPart<P>) part).getTypeId()) == true) {
+							.contains(((I_AmTypedPart) part).getTypeId()) == true) {
 				matchingTuples.add(makeTuple(part, core));
 			}
 		}

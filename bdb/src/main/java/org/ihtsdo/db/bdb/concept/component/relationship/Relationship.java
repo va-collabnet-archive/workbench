@@ -12,6 +12,7 @@ import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -29,13 +30,13 @@ import org.ihtsdo.db.util.TupleComputer;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class Relationship extends ConceptComponent<RelationshipPart> 
-	implements I_RelVersioned<RelationshipPart, Relationship, RelationshipTuple> {
+public class Relationship extends ConceptComponent<RelationshipVariablePart> 
+	implements I_RelVersioned<RelationshipVariablePart, RelationshipTuple> {
 
 	private static class RelTupleComputer extends
-			TupleComputer<RelationshipTuple, Relationship, RelationshipPart> {
+			TupleComputer<RelationshipTuple, Relationship, RelationshipVariablePart> {
 
-		public RelationshipTuple makeTuple(RelationshipPart part, Relationship core) {
+		public RelationshipTuple makeTuple(RelationshipVariablePart part, Relationship core) {
 			return new RelationshipTuple(core, part);
 		}
 	}
@@ -60,7 +61,7 @@ public class Relationship extends ConceptComponent<RelationshipPart>
 
 	@Override
 	public void readPartFromBdb(TupleInput input) {
-		versions.add(new RelationshipPart(input));
+		versions.add(new RelationshipVariablePart(input));
 	}
 
 	@Override
@@ -90,7 +91,7 @@ public class Relationship extends ConceptComponent<RelationshipPart>
 		throw new UnsupportedOperationException();
 	}
 
-	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
+	private void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
 			List<RelationshipTuple> matchingTuples) {
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples,
 				versions, this);
@@ -129,22 +130,21 @@ public class Relationship extends ConceptComponent<RelationshipPart>
 		returnRels.addAll(tuples);
 	}
 
-	@Override
-	public void addTuples(I_IntSet allowedTypes, List<RelationshipTuple> returnRels,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
+	public void addTuples(I_IntSet allowedTypes, 
+						  List<RelationshipTuple> returnRels,
+						  boolean addUncommitted, 
+						  boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 		I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 		addTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), 
 				returnRels, addUncommitted, returnConflictResolvedLatestState);
 	}
 
-	@Override
-	public boolean addVersion(RelationshipPart part) {
-		return versions.add(part);
+	public boolean addVersion(I_RelPart part) {
+		return versions.add((RelationshipVariablePart) part);
 	}
 
-	@Override
-	public boolean addVersionNoRedundancyCheck(RelationshipPart part) {
+	public boolean addPart(RelationshipVariablePart part) {
 		return versions.add(part);
 	}
 
@@ -181,7 +181,7 @@ public class Relationship extends ConceptComponent<RelationshipPart>
 	@Override
 	public Set<TimePathId> getTimePathSet() {
 		Set<TimePathId> tpSet = new HashSet<TimePathId>();
-		for (RelationshipPart p : versions) {
+		for (RelationshipVariablePart p : versions) {
 			tpSet.add(new TimePathId(p.getVersion(), p.getPathId()));
 		}
 		return tpSet;
@@ -190,7 +190,7 @@ public class Relationship extends ConceptComponent<RelationshipPart>
 	@Override
 	public List<RelationshipTuple> getTuples() {
 		List<RelationshipTuple> tuples = new ArrayList<RelationshipTuple>();
-		for (RelationshipPart p: versions) {
+		for (RelationshipVariablePart p: versions) {
 			tuples.add(new RelationshipTuple(this, p));
 		}
 		return tuples;
@@ -200,7 +200,7 @@ public class Relationship extends ConceptComponent<RelationshipPart>
 	public List<RelationshipTuple> getTuples(boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 		List<RelationshipTuple> tuples = new ArrayList<RelationshipTuple>();
-		for (RelationshipPart p : getVersions(returnConflictResolvedLatestState)) {
+		for (RelationshipVariablePart p : getVersions(returnConflictResolvedLatestState)) {
 			tuples.add(new RelationshipTuple(this, p));
 		}
 		return tuples;
@@ -214,7 +214,7 @@ public class Relationship extends ConceptComponent<RelationshipPart>
 				Bdb.getConceptDb().getConcept(c1Nid).getUids(), 
 				Bdb.getConceptDb().getConcept(c2Nid).getUids(),
 				versions.size());
-		for (RelationshipPart part : versions) {
+		for (RelationshipVariablePart part : versions) {
 			UniversalAceRelationshipPart universalPart = new UniversalAceRelationshipPart();
 			universalPart.setPathId(Bdb.getConceptDb().getConcept(part.getPathId()).getUids());
 			universalPart.setStatusId(Bdb.getConceptDb().getConcept(part.getStatusId()).getUids());
@@ -230,10 +230,10 @@ public class Relationship extends ConceptComponent<RelationshipPart>
 	
 
 	@Override
-	public List<RelationshipPart> getVersions(
+	public List<RelationshipVariablePart> getVersions(
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<RelationshipPart> returnList = versions; 
+		List<RelationshipVariablePart> returnList = versions; 
 		  
 		if (returnConflictResolvedLatestState) {
 			I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
@@ -264,7 +264,7 @@ public class Relationship extends ConceptComponent<RelationshipPart>
 		for (I_Path promotionPath : pomotionPaths) {
 			for (RelationshipTuple rt : matchingTuples) {
 				if (rt.getPathId() == viewPathId) {
-					RelationshipPart promotionPart = rt.getPart()
+					RelationshipVariablePart promotionPart = rt.getPart()
 							.makeAnalog(rt.getStatusId(),
 									promotionPath.getConceptId(),
 									Long.MAX_VALUE);

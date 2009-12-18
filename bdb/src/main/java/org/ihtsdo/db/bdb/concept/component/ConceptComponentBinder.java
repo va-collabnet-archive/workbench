@@ -11,7 +11,7 @@ import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ConceptComponentBinder<C extends ConceptComponent<P>, P extends Part<P>> extends TupleBinding<ArrayList<C>> 
+public class ConceptComponentBinder<C extends ConceptComponent<P>, P extends Version<P>> extends TupleBinding<ArrayList<C>> 
 							  implements I_BindConceptComponents {
 
 

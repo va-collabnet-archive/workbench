@@ -1,259 +1,84 @@
 package org.ihtsdo.db.bdb.concept.component.relationship;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.utypes.UniversalAceRelationship;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.Tuple;
 
-public class RelationshipTuple extends Tuple<RelationshipPart, Relationship> 
-	implements I_RelTuple<RelationshipPart, RelationshipTuple, Relationship> {
+public class RelationshipTuple extends Tuple<RelationshipVariablePart, Relationship> 
+	implements I_RelTuple {
 
-	private Relationship fixed;
-	
-	private RelationshipPart part;
-	
-	public RelationshipTuple(Relationship fixed, RelationshipPart part) {
-		super();
-		this.fixed = fixed;
-		this.part = part;
+	protected RelationshipTuple(Relationship component, RelationshipVariablePart part) {
+		super(component, part);
 	}
 
-	public boolean addRetiredRec(int[] releases, int retiredStatusId) {
-		return fixed.addRetiredRec(releases, retiredStatusId);
-	}
-
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<RelationshipTuple> returnRels,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		fixed.addTuples(allowedStatus, allowedTypes, positions, returnRels,
-				addUncommitted, returnConflictResolvedLatestState);
-	}
-
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<RelationshipTuple> returnRels,
-			boolean addUncommitted) {
-		fixed.addTuples(allowedStatus, allowedTypes, positions, returnRels,
-				addUncommitted);
-	}
-
-	public void addTuples(I_IntSet allowedTypes, List<RelationshipTuple> returnRels,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		fixed.addTuples(allowedTypes, returnRels, addUncommitted,
-				returnConflictResolvedLatestState);
-	}
-
-	public <T extends RelationshipPart> boolean addVersion(T rel) {
-		return fixed.addVersion(rel);
-	}
-
-	public <T extends RelationshipPart> boolean addVersionNoRedundancyCheck(T rel) {
-		return fixed.addVersionNoRedundancyCheck(rel);
-	}
-
-	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
-		fixed.convertIds(jarToDbNativeMap);
-	}
-
+	@Override
 	public int getC1Id() {
-		return fixed.getC1Id();
+		return getFixedPart().getC1Id();
 	}
 
+	@Override
 	public int getC2Id() {
-		return fixed.getC2Id();
+		return getFixedPart().getC2Id();
 	}
 
-	public RelationshipTuple getFirstTuple() {
-		return fixed.getFirstTuple();
-	}
-
-	public RelationshipTuple getLastTuple() {
-		return fixed.getLastTuple();
-	}
-
-	public int getNid() {
-		return fixed.getNid();
-	}
-
-	public int getRelId() {
-		return fixed.getRelId();
-	}
-
-	public Set<TimePathId> getTimePathSet() {
-		return fixed.getTimePathSet();
-	}
-
-	public List<RelationshipTuple> getTuples() {
-		return fixed.getTuples();
-	}
-
-	public List<RelationshipTuple> getTuples(boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		return fixed.getTuples(returnConflictResolvedLatestState);
-	}
-
-	public UniversalAceRelationship getUniversal() throws IOException,
-			TerminologyException {
-		return fixed.getUniversal();
-	}
-
-	public List<RelationshipPart> getVersions() {
-		return fixed.getVersions();
-	}
-
-	public List<RelationshipPart> getVersions(
-			boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		return fixed.getVersions(returnConflictResolvedLatestState);
-	}
-
-	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
-			throws IOException, TerminologyException {
-		return fixed.promote(viewPosition, pomotionPaths, allowedStatus);
-	}
-
-	public boolean removeRedundantRecs() {
-		return fixed.removeRedundantRecs();
-	}
-
-	public void setC2Id(int destId) {
-		fixed.setC2Id(destId);
-	}
-
-	public int versionCount() {
-		return fixed.versionCount();
-	}
-
-	public RelationshipPart duplicate() {
-		return part.duplicate();
-	}
-
+	@Override
 	public int getCharacteristicId() {
-		return part.getCharacteristicId();
+		return getPart().getCharacteristicId();
 	}
 
+	@Override
 	public int getGroup() {
-		return part.getGroup();
+		return getPart().getGroup();
 	}
 
-	public ArrayIntList getPartComponentNids() {
-		return part.getPartComponentNids();
-	}
-
-	public int getPathId() {
-		return part.getPathId();
-	}
-
+	@Override
 	public int getRefinabilityId() {
-		return part.getRefinabilityId();
-	}
-
-	public int getStatusAtPositionNid() {
-		return part.getStatusAtPositionNid();
-	}
-
-	public int getStatusId() {
-		return part.getStatusId();
-	}
-
-	public long getTime() {
-		return part.getTime();
-	}
-
-	public int getTypeId() {
-		return part.getTypeId();
-	}
-
-	public int getVersion() {
-		return part.getVersion();
-	}
-
-	public boolean hasNewData(RelationshipPart another) {
-		return part.hasNewData(another);
-	}
-
-	public RelationshipPart makeAnalog(int statusNid, int pathNid, long time) {
-		return part.makeAnalog(statusNid, pathNid, time);
-	}
-
-	public void setCharacteristicId(int characteristicId) {
-		part.setCharacteristicId(characteristicId);
-	}
-
-	public void setGroup(int group) {
-		part.setGroup(group);
-	}
-
-	@Deprecated
-	public void setPathId(int pathId) {
-		part.setPathId(pathId);
-	}
-
-	public void setRefinabilityId(int refinabilityId) {
-		part.setRefinabilityId(refinabilityId);
-	}
-
-	@Deprecated
-	public void setStatusId(int statusId) {
-		part.setStatusId(statusId);
-	}
-
-	public void setTypeId(int type) {
-		part.setTypeId(type);
-	}
-
-	@Deprecated
-	public void setVersion(int version) {
-		part.setVersion(version);
+		return getPart().getRefinabilityId();
 	}
 
 	@Override
-	public Relationship getFixedPart() {
-		return fixed;
+	public int getRelId() {
+		return getFixedPartId();
 	}
 
 	@Override
-	public RelationshipPart getPart() {
-		return part;
-	}
-
 	public Relationship getRelVersioned() {
-		return fixed;
+		return getFixedPart();
 	}
 
+	@Override
 	public void setCharacteristicId(Integer characteristicId) {
-		part.setCharacteristicId(characteristicId);
+		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void setGroup(Integer group) {
-		part.setGroup(group);
+		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void setRefinabilityId(Integer refinabilityId) {
-		part.setRefinabilityId(refinabilityId);
+		throw new UnsupportedOperationException();
 	}
-	
-	@Deprecated
+
+	@Override
 	public void setStatusId(Integer statusId) {
-		part.setStatusId(statusId);
+		throw new UnsupportedOperationException();
 	}
 
-	public int getFixedPartId() {
-		return fixed.getNid();
+	@Override
+	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
+		throw new UnsupportedOperationException();
 	}
 
-	
+	@Override
+	public int getTypeId() {
+		return getPart().getTypeId();
+	}
+
+	@Override
+	public void setTypeId(int type) {
+		throw new UnsupportedOperationException();
+	}
+
 }

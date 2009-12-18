@@ -6,9 +6,9 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMemberPart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMemberVariablePart;
 
-public class MembershipPart extends RefsetMemberPart {
+public class MembershipVersion extends RefsetMemberVariablePart {
 
 	@Override
 	public UniversalAceExtByRefPart getUniversalPart()
@@ -18,13 +18,13 @@ public class MembershipPart extends RefsetMemberPart {
 	}
 
 	@Override
-	public RefsetMemberPart makePromotionPart(I_Path promotionPath) {
+	public RefsetMemberVariablePart makePromotionPart(I_Path promotionPath) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public int compareTo(I_ThinExtByRefPart<RefsetMemberPart> o) {
+	public int compareTo(I_ThinExtByRefPart<RefsetMemberVariablePart> o) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

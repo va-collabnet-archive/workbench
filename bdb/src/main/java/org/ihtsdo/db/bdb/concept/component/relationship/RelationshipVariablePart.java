@@ -3,24 +3,24 @@ package org.ihtsdo.db.bdb.concept.component.relationship;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
-import org.ihtsdo.db.bdb.concept.component.Part;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class RelationshipPart extends Part<RelationshipPart> 
-	implements I_RelPart<RelationshipPart> {
+public class RelationshipVariablePart extends Version<RelationshipVariablePart> 
+	implements I_RelPart {
 	
 	private int characteristicNid;
 	private int group;
 	private int refinabilityNid;
 	private int typeNid;
 
-	public RelationshipPart(int statusAtPositionNid) {
+	public RelationshipVariablePart(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public RelationshipPart(RelationshipPart another) {
+	public RelationshipVariablePart(RelationshipVariablePart another) {
 		super(another.statusAtPositionNid);
 		this.characteristicNid = another.characteristicNid;
 		this.group = another.group;
@@ -28,7 +28,7 @@ public class RelationshipPart extends Part<RelationshipPart>
 		this.typeNid = another.typeNid;
 	}
 
-	public RelationshipPart(RelationshipPart another, int statusNid,
+	public RelationshipVariablePart(RelationshipVariablePart another, int statusNid,
 			int pathNid, long time) {
 		super(statusNid, pathNid, time);
 		this.characteristicNid = another.characteristicNid;
@@ -37,7 +37,7 @@ public class RelationshipPart extends Part<RelationshipPart>
 		this.typeNid = another.typeNid;
 	}
 
-	public RelationshipPart(TupleInput input) {
+	public RelationshipVariablePart(TupleInput input) {
 		super(input.readInt());
 		this.characteristicNid = input.readInt();
 		this.group = input.readInt();
@@ -90,27 +90,26 @@ public class RelationshipPart extends Part<RelationshipPart>
 	}
 
 	@Override
-	public RelationshipPart duplicate() {
-		return new RelationshipPart(this);
+	public RelationshipVariablePart duplicate() {
+		return new RelationshipVariablePart(this);
 	}
 	
 	@Override
-	public RelationshipPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new RelationshipPart(this, statusNid, pathNid, time);
-	}
-
-
-	@Override
-	public boolean hasNewData(RelationshipPart another) {
-		throw new UnsupportedOperationException();
+	public RelationshipVariablePart makeAnalog(int statusNid, int pathNid, long time) {
+		return new RelationshipVariablePart(this, statusNid, pathNid, time);
 	}
 
 	@Override
-	public ArrayIntList getPartComponentNids() {
-		ArrayIntList nids = super.getComponentNids();
+	public ArrayIntList getVariableVersionNids() {
+		ArrayIntList nids = new ArrayIntList(5);
 		nids.add(characteristicNid);
 		nids.add(refinabilityNid);
 		nids.add(typeNid);
 		return nids;
+	}
+
+	@Override
+	public boolean hasNewData(I_RelPart another) {
+		throw new UnsupportedOperationException();
 	}
 }

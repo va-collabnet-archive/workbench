@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
@@ -34,8 +36,8 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ConceptAttributes 
-	extends ConceptComponent<ConceptAttributesPart> 
-	implements I_ConceptAttributeVersioned<ConceptAttributesPart, ConceptAttributes, ConceptAttributesTuple> {
+	extends ConceptComponent<ConceptAttributesVariablePart> 
+	implements I_ConceptAttributeVersioned<ConceptAttributesVariablePart, ConceptAttributesTuple> {
 
 	protected ConceptAttributes(int nid, int parts,
 			boolean editable) {
@@ -49,7 +51,7 @@ public class ConceptAttributes
 
 	@Override
 	public void readPartFromBdb(TupleInput input) {
-		versions.add(new ConceptAttributesPart(input));
+		versions.add(new ConceptAttributesVariablePart(input));
 	}
 
 	@Override
@@ -62,7 +64,7 @@ public class ConceptAttributes
 	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#addVersion(org.dwfa.vodb.types.ThinConPart)
 	 */
-	public boolean addVersion(ConceptAttributesPart part) {
+	public boolean addVersion(ConceptAttributesVariablePart part) {
 		return versions.add(part);
 	}
 
@@ -82,7 +84,7 @@ public class ConceptAttributes
 	 */
 	public List<ConceptAttributesTuple> getTuples() {
 		List<ConceptAttributesTuple> tuples = new ArrayList<ConceptAttributesTuple>();
-		for (ConceptAttributesPart p : versions) {
+		for (ConceptAttributesVariablePart p : versions) {
 			tuples.add(new ConceptAttributesTuple(this, p));
 		}
 		return tuples;
@@ -103,13 +105,13 @@ public class ConceptAttributes
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#merge(org.dwfa.vodb.types.ThinConVersioned)
 	 */
 	public boolean merge(ConceptAttributes jarCon) {
-		HashSet<ConceptAttributesPart> versionSet = new HashSet<ConceptAttributesPart>(
+		HashSet<ConceptAttributesVariablePart> versionSet = new HashSet<ConceptAttributesVariablePart>(
 				versions);
 		boolean changed = false;
-		for (ConceptAttributesPart jarPart : jarCon.getVersions()) {
+		for (ConceptAttributesVariablePart jarPart : jarCon.getVersions()) {
 			if (!versionSet.contains(jarPart)) {
 				changed = true;
-				versions.add((ConceptAttributesPart) jarPart);
+				versions.add((ConceptAttributesVariablePart) jarPart);
 			}
 		}
 		return changed;
@@ -122,7 +124,7 @@ public class ConceptAttributes
 	 */
 	public Set<TimePathId> getTimePathSet() {
 		Set<TimePathId> tpSet = new HashSet<TimePathId>();
-		for (ConceptAttributesPart p : versions) {
+		for (ConceptAttributesVariablePart p : versions) {
 			tpSet.add(new TimePathId(p.getVersion(), p.getPathId()));
 		}
 		return tpSet;
@@ -135,10 +137,10 @@ public class ConceptAttributes
 
 	
 	private static class AttributeTupleComputer extends
-			TupleComputer<ConceptAttributesTuple, ConceptAttributes, ConceptAttributesPart> {
+			TupleComputer<ConceptAttributesTuple, ConceptAttributes, ConceptAttributesVariablePart> {
 
 		@Override
-		public ConceptAttributesTuple makeTuple(ConceptAttributesPart part,
+		public ConceptAttributesTuple makeTuple(ConceptAttributesVariablePart part,
 				ConceptAttributes core) {
 			return new ConceptAttributesTuple(core, part);
 		}
@@ -206,7 +208,7 @@ public class ConceptAttributes
 			TerminologyException {
 		UniversalAceConceptAttributes conceptAttributes = new UniversalAceConceptAttributes(
 				getUids(nid), this.versionCount());
-		for (ConceptAttributesPart part : versions) {
+		for (ConceptAttributesVariablePart part : versions) {
 			UniversalAceConceptAttributesPart universalPart = new UniversalAceConceptAttributesPart();
 			universalPart.setStatusId(getUids(part.getStatusId()));
 			universalPart.setDefined(part.isDefined());
@@ -225,7 +227,7 @@ public class ConceptAttributes
 		buf.append(" parts: ");
 		buf.append(versions.size());
 		buf.append("\n  ");
-		for (ConceptAttributesPart p : versions) {
+		for (ConceptAttributesVariablePart p : versions) {
 			buf.append(p);
 			buf.append("\n  ");
 		}
@@ -270,7 +272,7 @@ public class ConceptAttributes
 		for (I_Path promotionPath: promotionPaths) {
 			for (ConceptAttributesTuple tuple: getTuples(allowedStatus, viewPosition)) {
 				if (tuple.getPart().getPathId() == viewPathId) {
-					ConceptAttributesPart promotionPart = 
+					ConceptAttributesVariablePart promotionPart = 
 						tuple.getPart().makeAnalog(tuple.getStatusId(), promotionPath.getConceptId(), Long.MAX_VALUE);
 					addVersion(promotionPart);
 					promotedAnything = true;
@@ -278,5 +280,16 @@ public class ConceptAttributes
 			}
 		}
 		return promotedAnything;
+	}
+
+	@Override
+	public boolean addVersion(I_ConceptAttributePart part) {
+		return versions.add((ConceptAttributesVariablePart) part);
+	}
+
+	@Override
+	public boolean merge(
+			I_ConceptAttributeVersioned<ConceptAttributesVariablePart, ConceptAttributesTuple> jarCon) {
+		throw new UnsupportedOperationException();
 	}
 }

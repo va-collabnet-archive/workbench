@@ -2,42 +2,42 @@ package org.ihtsdo.db.bdb.concept.component.attributes;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.ihtsdo.db.bdb.concept.component.Part;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ConceptAttributesPart extends Part<ConceptAttributesPart> 
-	implements I_ConceptAttributePart<ConceptAttributesPart> {
+public class ConceptAttributesVariablePart extends Version<ConceptAttributesVariablePart> 
+	implements I_ConceptAttributePart {
 
 	private boolean defined = false;
 	
-	public ConceptAttributesPart(int statusAtPositionNid) {
+	public ConceptAttributesVariablePart(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public ConceptAttributesPart(ConceptAttributesPart another,
+	public ConceptAttributesVariablePart(ConceptAttributesVariablePart another,
 			int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 		this.defined = another.defined;
 	}
-	public ConceptAttributesPart(ConceptAttributesPart another) {
+	public ConceptAttributesVariablePart(ConceptAttributesVariablePart another) {
 		super(another.statusAtPositionNid, another.getPathId(), another.getTime());
 		this.defined = another.defined;
 	}
 
-	public ConceptAttributesPart(TupleInput input) {
+	public ConceptAttributesVariablePart(TupleInput input) {
 		super(input.readInt());
 		defined = input.readBoolean();
 	}
 
 	@Override
-	public ConceptAttributesPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new ConceptAttributesPart(this, statusNid, pathNid, time);
+	public ConceptAttributesVariablePart makeAnalog(int statusNid, int pathNid, long time) {
+		return new ConceptAttributesVariablePart(this, statusNid, pathNid, time);
 	}
 
 	@Override
-	public boolean hasNewData(ConceptAttributesPart another) {
+	public boolean hasNewData(I_ConceptAttributePart another) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -52,13 +52,13 @@ public class ConceptAttributesPart extends Part<ConceptAttributesPart>
 	}
 
 	@Override
-	public ArrayIntList getPartComponentNids() {
-		return super.getComponentNids();
+	public ArrayIntList getVariableVersionNids() {
+		return new ArrayIntList(2);
 	}
 
 	@Override
-	public ConceptAttributesPart duplicate() {
-		return new ConceptAttributesPart(this);
+	public ConceptAttributesVariablePart duplicate() {
+		return new ConceptAttributesVariablePart(this);
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class ConceptComponent<P extends Part<P>> implements I_AmTermComponent {
+public abstract class ConceptComponent<P extends Version<P>> implements I_AmTermComponent {
 	public int nid;
 	public boolean editable;
 	public List<P> versions;
@@ -34,6 +34,11 @@ public abstract class ConceptComponent<P extends Part<P>> implements I_AmTermCom
 		}
 		throw new RuntimeException("versions is not editable");
 	}
+	
+	public boolean addVersionNoRedundancyCheck(P newPart) {
+		return versions.add(newPart);
+	}
+
 
 	public final int versionCount() {
 		return versions.size();
