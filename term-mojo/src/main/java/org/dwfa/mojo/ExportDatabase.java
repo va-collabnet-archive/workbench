@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,9 +43,9 @@ import org.dwfa.mojo.refset.ExportSpecification;
  * </p>
  * <p>
  * </p>
- * 
- * 
- * 
+ *
+ *
+ *
  * @see <code>org.apache.maven.plugin.AbstractMojo</code>
  * @author PeterVawser
  * @goal exportdata
@@ -56,14 +56,14 @@ public class ExportDatabase extends AbstractMojo {
      * Date format to use in output files
      * If not specified the Path Version Reference Set will be used to determine
      * the release version.
-     * 
+     *
      * @parameter
      */
     private String releaseDate;
 
     /**
      * Location of the directory to output data files to.
-     * 
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -71,42 +71,42 @@ public class ExportDatabase extends AbstractMojo {
 
     /**
      * File name for concept table data output file
-     * 
+     *
      * @parameter expression="ids.txt"
      */
     private String idsDataFileName;
 
     /**
      * File name for concept table data output file
-     * 
+     *
      * @parameter expression="concepts.txt"
      */
     private String conceptDataFileName;
 
     /**
      * File name for relationship table data output file
-     * 
+     *
      * @parameter expression="relationships.txt"
      */
     private String relationshipsDataFileName;
 
     /**
      * File name for description table data output file
-     * 
+     *
      * @parameter expression="descriptions.txt"
      */
     private String descriptionsDataFileName;
 
     /**
      * File name for description table data output file
-     * 
+     *
      * @parameter expression="errorLog.txt"
      */
     private String errorLogFileName;
 
     /**
      * Whether to validate the positions
-     * 
+     *
      * @parameter expression=true
      */
     private boolean validatePositions;
@@ -114,7 +114,7 @@ public class ExportDatabase extends AbstractMojo {
     /**
      * The set of specifications used to determine if a concept should be
      * exported.
-     * 
+     *
      * @parameter
      * @required
      */
@@ -122,7 +122,7 @@ public class ExportDatabase extends AbstractMojo {
 
     /**
      * Positions to export data.
-     * 
+     *
      * @parameter
      * @required
      */
@@ -130,7 +130,7 @@ public class ExportDatabase extends AbstractMojo {
 
     /**
      * Status values to include in export
-     * 
+     *
      * @parameter
      * @required
      */
@@ -145,7 +145,7 @@ public class ExportDatabase extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     * 
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -157,14 +157,14 @@ public class ExportDatabase extends AbstractMojo {
      * self supporting set (true), or if the resulting export may contain
      * references to entities
      * not represented in the export (false).
-     * 
+     *
      * @parameter expression=true
      */
     private boolean exportCohesiveSet;
 
     /**
      * output file for the exported id map
-     * 
+     *
      * @parameter expression="${project.build.directory}/generated-resources/sct-uuid-maps/exported-ids-sct-map.txt"
      */
     private File exportedIdMapFile;
@@ -172,7 +172,7 @@ public class ExportDatabase extends AbstractMojo {
     /**
      * Indicates if SCTIDs should be generated for entities exported that have
      * no SCTIDs already
-     * 
+     *
      * @parameter
      */
     private boolean generateSctIds = false;
@@ -180,7 +180,7 @@ public class ExportDatabase extends AbstractMojo {
     /**
      * Concept to use as a path for the SCTIDs generated if generateSctIds is
      * set to true.
-     * 
+     *
      * @parameter
      */
     private ConceptDescriptor pathForIds;
@@ -188,14 +188,14 @@ public class ExportDatabase extends AbstractMojo {
     /**
      * Directory containing the SCTID map to be used if generateSctIds is set to
      * true.
-     * 
+     *
      * @parameter
      */
     private File sctIdMapDirectory;
 
     /**
      * Namespace for the SCTIDs if generateSctIds is set to true.
-     * 
+     *
      * @parameter
      */
     private String namespace;
@@ -204,7 +204,7 @@ public class ExportDatabase extends AbstractMojo {
      * Specifies the description types that are exportable - note that this is
      * above and beyond any description
      * type concepts that are exportable according to the export specification
-     * 
+     *
      * @parameter
      */
     private ConceptDescriptor[] descriptionTypesForExport;
@@ -215,10 +215,17 @@ public class ExportDatabase extends AbstractMojo {
      * database.
      * Note this configuration will be ignored and overridden by the releaseDate
      * parameter
-     * 
+     *
      * @parameter
      */
     private PathReleaseDateConfig[] pathReleaseDateConfig;
+
+    /**
+     * Export the full history
+     *
+     * @parameter
+     */
+    private boolean fullExport = false;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
@@ -271,6 +278,7 @@ public class ExportDatabase extends AbstractMojo {
             expItr.setExportCohesiveSet(exportCohesiveSet);
             expItr.setDescriptionTypes(descriptionTypesForExport);
             expItr.setPathReleaseDateConfig(pathReleaseDateConfig);
+            expItr.setFullExport(fullExport);
             if (generateSctIds) {
                 expItr.enableSctIdGeneration(NAMESPACE.fromString(namespace), pathForIds.getVerifiedConcept(),
                     sctIdMapDirectory);

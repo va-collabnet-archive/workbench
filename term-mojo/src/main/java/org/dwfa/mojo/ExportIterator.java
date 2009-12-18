@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -187,6 +187,11 @@ public class ExportIterator implements I_ProcessConcepts {
      */
     private PathReleaseDateConfig[] pathReleaseDateConfig;
 
+    /**
+     * Set to true of a full export and not a snapshot
+     */
+    private boolean fullExport;
+
     public PathReleaseDateConfig[] getPathReleaseDateConfig() {
         return pathReleaseDateConfig;
     }
@@ -311,10 +316,18 @@ public class ExportIterator implements I_ProcessConcepts {
                 /*
                  * Get concept details
                  */
-                if (writeUuidBasedConceptDetails(concept, allowedStatus)) {
-                    writeUuidBasedRelDetails(concept, allowedStatus, null);
-                    writeUuidBasedDescriptionDetails(concept, allowedStatus, null);
-                    writeUuidBasedIdDetails(concept.getId(), concept, allowedStatus, null);
+                if (fullExport) {
+                    if(writeAllUuidBasedConceptDetails(concept, allowedStatus)){
+                        writeAllUuidBasedRelDetails(concept, allowedStatus, null);
+                        writeAllUuidBasedDescriptionDetails(concept, allowedStatus, null);
+                        writeAllUuidBasedIdDetails(concept.getId(), concept, allowedStatus, null);
+                    }
+                } else {
+                    if (writeUuidBasedConceptDetails(concept, allowedStatus)) {
+                        writeUuidBasedRelDetails(concept, allowedStatus, null);
+                        writeUuidBasedDescriptionDetails(concept, allowedStatus, null);
+                        writeUuidBasedIdDetails(concept.getId(), concept, allowedStatus, null);
+                    }
                 }
             } else {
                 conceptsSuppressed++;
@@ -326,6 +339,48 @@ public class ExportIterator implements I_ProcessConcepts {
         }
 
     }// End method processConcept
+
+    private void writeAllUuidBasedIdDetails(I_IdVersioned idVersioned, I_AmTermComponent component,
+            I_IntSet allowedStatus, Object object) throws TerminologyException, Exception {
+        String uuidString = "";
+        boolean firstRun = true;
+
+        for (UUID uuid : idVersioned.getUIDs()) {
+            if (!firstRun) {
+                uuidString += "\t" + uuid;
+            } else {
+                firstRun = false;
+                uuidString += uuid;
+            }
+        }
+        for (I_IdTuple tuple : idVersioned.getTuples()) {
+            if (snomedSource(tuple.getPart()) && !isMemberType(component)) {
+                String snomedId = tuple.getPart().getSourceId().toString();
+                writeIdToMap(uuidString, snomedId);
+                writeIdPartToFile(tuple.getPart(), tuple.getIdVersioned());
+            } else if (generateSctIds) {
+                // seems that there is no other method to create an IdPart than
+                // duplicate one
+                // so that is what is done here - couldn't find a factory method
+                // to create one
+                I_IdPart newIdPart = idVersioned.getVersions().get(0).duplicate();
+                newIdPart.setStatusId(currentStatusNid);
+                newIdPart.setPathId(pathForIds.getConceptId());
+                newIdPart.setSource(termFactory.getConcept(snomedIdUuids).getConceptId());
+                String generatedSctId = generateSctId(component, idVersioned);
+                newIdPart.setSourceId(generatedSctId);
+
+                idVersioned.addVersion(newIdPart);
+                termFactory.commit();
+
+                writeIdPartToFile(newIdPart, idVersioned);
+                writeIdToMap(uuidString, generatedSctId);
+
+                log.info("Generated new SCTID '" + generatedSctId + "' for component '" + component + "' uuids "
+                    + uuidString);
+            }
+        }
+    }
 
     private void writeUuidBasedIdDetails(I_IdVersioned idVersioned, I_AmTermComponent component,
             I_IntSet allowedStatus, Object object) throws TerminologyException, Exception {
@@ -393,7 +448,7 @@ public class ExportIterator implements I_ProcessConcepts {
     /**
      * Is the component a Member Type Marked Parent or Normal Member Concept,
      * description of or a relationship where the source is.
-     * 
+     *
      * @param component I_AmTermComponent
      * @return boolean
      * @throws IOException DB error
@@ -483,11 +538,89 @@ public class ExportIterator implements I_ProcessConcepts {
         return "prepareConceptData";
     }
 
+    /**
+     * Write out all the version of the concept.
+     *
+     * @param concept I_GetConceptData
+     * @param allowedStatus I_IntSet
+     * @return true if one or more version where written out.
+     *
+     * @throws Exception
+     */
+    private boolean writeAllUuidBasedConceptDetails(I_GetConceptData concept, I_IntSet allowedStatus) throws Exception {
+
+        I_IntSet fsn = termFactory.newIntSet();
+        fsn.add(fsnNid);
+
+        List<I_ConceptAttributeTuple> attributeTuples = concept.getConceptAttributeTuples(allowedStatus, positions, false, true);
+        for (I_ConceptAttributeTuple attributeTuple : attributeTuples) {
+
+            StringBuilder stringBuilder = new StringBuilder("");
+            // ConceptId
+            createRecord(stringBuilder, concept.getUids().get(0));
+
+            // Concept status
+            createRecord(stringBuilder,
+                ArchitectonicAuxiliary.getSnomedConceptStatusId(termFactory.getUids(attributeTuple.getConceptStatus())));
+
+
+            // Fully specified name
+            // Get the latest description of this version of the concept.
+            // IE get the description version that is equal to the concept description but not more.
+            I_DescriptionTuple descForConceptFile = null;
+            List<I_DescriptionTuple> descTuples = concept.getDescriptionTuples(null, null, positions, true);
+            if (!descTuples.isEmpty()) {
+                descForConceptFile = descTuples.get(0);
+            } else {
+                log.warn("\n\nnull desc for: " + concept.getUids() + " " + concept.getDescriptions() + " attributeTuple version " + attributeTuple.getVersion());
+                continue;
+            }
+            createRecord(stringBuilder, descForConceptFile.getText());
+
+            // CTV3ID
+            I_IdPart ctv3IdPart = getLatestVersion(concept.getId().getVersions(),
+                ArchitectonicAuxiliary.Concept.CTV3_ID,attributeTuple);
+            createRecord(stringBuilder, (ctv3IdPart != null) ? ctv3IdPart.getSourceId().toString() : "null");
+
+            // SNOMED 3 ID
+            I_IdPart snomedIdPart = getLatestVersion(concept.getId().getVersions(),
+                ArchitectonicAuxiliary.Concept.SNOMED_RT_ID, attributeTuple);
+            createRecord(stringBuilder, (snomedIdPart != null) ? snomedIdPart.getSourceId().toString() : "null");
+
+            // IsPrimative value
+            createRecord(stringBuilder, attributeTuple.isDefined() ? 0 : 1);
+
+            // AMT added
+            // Concept UUID
+            createRecord(stringBuilder, concept.getUids().get(0));
+
+            // ConceptStatusId
+            createRecord(stringBuilder, getFirstUuid(attributeTuple.getConceptStatus()));
+
+            // Effective time
+            createVersion(stringBuilder, attributeTuple.getPart().getVersion(), attributeTuple.getPart().getPathId());
+
+            // Path Id
+            createRecord(stringBuilder, getFirstUuid(attributeTuple.getPart().getPathId()));
+
+            // Status active/inactive value
+            createRecord(stringBuilder, getBinaryStatusValue(attributeTuple.getPart().getStatusId()), true);
+
+            // End record
+            createRecord(stringBuilder, System.getProperty("line.separator"));
+
+            conceptsWriter.write(stringBuilder.toString());
+        }
+
+        return !attributeTuples.isEmpty();
+    }
+
+
     private boolean writeUuidBasedConceptDetails(I_GetConceptData concept, I_IntSet allowedStatus) throws Exception {
 
         I_IntSet fsn = termFactory.newIntSet();
         fsn.add(fsnNid);
-        List<I_DescriptionTuple> descTuples = concept.getDescriptionTuples(null, fsn, positions);
+        List<I_DescriptionTuple> descTuples = concept.getDescriptionTuples(null, fsn, positions, true);
         List<I_DescriptionTuple> latestDescTuples = getLatestTuples(descTuples);
 
         I_DescriptionTuple descForConceptFile = null;
@@ -599,7 +732,7 @@ public class ExportIterator implements I_ProcessConcepts {
     /**
      * Get the latest version for the list of parts with the source
      * <code>sourceConcept</code>
-     * 
+     *
      * @param sourceConcept Concept eg CTV3_ID, SNOMED_RT_ID etc
      * @return I_IdPart latest Id version for the sourceConcept.
      * @throws IOException DB errors
@@ -611,6 +744,29 @@ public class ExportIterator implements I_ProcessConcepts {
         for (I_IdPart iIdPart : idParts) {
             if (iIdPart.getSource() == termFactory.uuidToNative(sourceConcept.getUids())
                 && (latestVersion == null || iIdPart.getVersion() > latestVersion.getVersion())) {
+                latestVersion = iIdPart;
+            }
+        }
+
+        return latestVersion;
+    }
+
+    /**
+     * Get the latest version for the list of parts with the source
+     * <code>sourceConcept</code>
+     *
+     * @param sourceConcept Concept eg CTV3_ID, SNOMED_RT_ID etc
+     * @return I_IdPart latest Id version for the sourceConcept.
+     * @throws IOException DB errors
+     */
+    private I_IdPart getLatestVersion(List<I_IdPart> idParts, Concept sourceConcept,
+            I_ConceptAttributeTuple attributeTuple) throws TerminologyException, IOException, NoMappingException {
+        I_IdPart latestVersion = null;
+
+        for (I_IdPart iIdPart : idParts) {
+            if (iIdPart.getSource() == termFactory.uuidToNative(sourceConcept.getUids())
+                && ((latestVersion == null && iIdPart.getVersion() <= attributeTuple.getVersion())
+                        || (latestVersion != null && iIdPart.getVersion() > latestVersion.getVersion() && latestVersion.getVersion() <= attributeTuple.getVersion()))) {
                 latestVersion = iIdPart;
             }
         }
@@ -653,6 +809,88 @@ public class ExportIterator implements I_ProcessConcepts {
             }
         }
         return false;
+    }
+
+    private void writeAllUuidBasedRelDetails(I_GetConceptData concept, I_IntSet allowedStatus, I_IntSet allowedTypes)
+            throws Exception {
+
+        List<I_RelTuple> tuples = concept.getSourceRelTuples(allowedStatus, null, positions, false, true);
+
+        for (I_RelTuple tuple : tuples) {
+            I_RelPart part = tuple.getPart();
+            I_RelVersioned rel = tuple.getRelVersioned();
+            if (isExportable(ConceptBean.get(rel.getC2Id()))) {
+
+                writeAllUuidBasedIdDetails(termFactory.getId(tuple.getRelId()), rel, allowedStatus, null);
+
+                StringBuilder stringBuilder = new StringBuilder();
+                // Relationship ID
+                createRecord(stringBuilder, getFirstUuid(rel.getRelId()));
+
+                // Concept status
+                createRecord(stringBuilder,
+                    ArchitectonicAuxiliary.getSnomedConceptStatusId(termFactory.getUids(part.getStatusId())));
+
+                // Concept Id 1 UUID
+                createRecord(stringBuilder, getFirstUuid((rel.getC1Id())));
+
+                // Relationship type UUID
+                createRecord(stringBuilder, getFirstUuid((part.getTypeId())));
+
+                // Concept Id 2 UUID
+                createRecord(stringBuilder, getFirstUuid(rel.getC2Id()));
+
+                // (Characteristict Type integer)
+                int snomedCharacter = ArchitectonicAuxiliary.getSnomedCharacteristicTypeId(termFactory.getUids(part.getCharacteristicId()));
+                if (snomedCharacter == -1) {
+                    errorWriter.append("\nNo characteristic mapping for: "
+                        + termFactory.getConcept(part.getCharacteristicId()));
+                }
+                createRecord(stringBuilder, snomedCharacter);
+
+                // Refinability integer
+                createRecord(stringBuilder,
+                    ArchitectonicAuxiliary.getSnomedRefinabilityTypeId(termFactory.getUids(part.getRefinabilityId())));
+
+                // Relationship Group
+                createRecord(stringBuilder, part.getGroup());
+
+                // Amt added
+                // Relationship UUID
+                createRecord(stringBuilder, getFirstUuid((rel.getRelId())));
+
+                // Concept1 UUID
+                createRecord(stringBuilder, getFirstUuid(rel.getC1Id()));
+
+                // Relationship type UUID
+                createRecord(stringBuilder, getFirstUuid(part.getTypeId()));
+
+                // Concept2 UUID
+                createRecord(stringBuilder, getFirstUuid(rel.getC2Id()));
+
+                // Characteristic Type UUID
+                createRecord(stringBuilder, getFirstUuid(part.getCharacteristicId()));
+
+                // Refinability UUID
+                createRecord(stringBuilder, getFirstUuid(part.getRefinabilityId()));
+
+                // Relationship status UUID
+                createRecord(stringBuilder, getFirstUuid(part.getStatusId()));
+
+                // Effective Time
+                createVersion(stringBuilder, part.getVersion(), part.getPathId());
+
+                // Path Id
+                createRecord(stringBuilder, getFirstUuid(part.getPathId()));
+
+                // Status active/inactive value
+                createRecord(stringBuilder, getBinaryStatusValue(part.getStatusId()), true);
+
+                createRecord(stringBuilder, System.getProperty("line.separator"));
+
+                relationshipsWriter.write(stringBuilder.toString());
+            }
+        }
     }
 
     private void writeUuidBasedRelDetails(I_GetConceptData concept, I_IntSet allowedStatus, I_IntSet allowedTypes)
@@ -850,6 +1088,76 @@ public class ExportIterator implements I_ProcessConcepts {
         }
     }
 
+    private void writeAllUuidBasedDescriptionDetails(I_GetConceptData concept, I_IntSet allowedStatus,
+            I_IntSet allowedTypes) throws Exception {
+
+        List<I_DescriptionTuple> tuples = concept.getDescriptionTuples(allowedStatus, null, positions, true);
+
+        for (I_DescriptionTuple desc : tuples) {
+
+            I_DescriptionPart part = desc.getPart();
+
+            writeAllUuidBasedIdDetails(termFactory.getId(desc.getDescId()), desc.getDescVersioned(), allowedStatus, null);
+
+            StringBuilder stringBuilder = new StringBuilder("");
+            createRecord(stringBuilder, termFactory.getConcept(desc.getDescVersioned().getDescId()).getUids().get(0));
+
+            // Description Status
+            createRecord(stringBuilder,
+                ArchitectonicAuxiliary.getSnomedDescriptionStatusId(termFactory.getUids(part.getStatusId())));
+
+            // ConceptId
+            createRecord(stringBuilder, concept.getUids().get(0));
+
+            // Term
+            createRecord(stringBuilder, part.getText());
+
+            // Case sensitivity
+            createRecord(stringBuilder, part.getInitialCaseSignificant() ? 1 : 0);
+
+            // Initial Capital Status
+            createRecord(stringBuilder, part.getInitialCaseSignificant() ? 1 : 0);
+
+            // Description Type
+            createRecord(stringBuilder,
+                ArchitectonicAuxiliary.getSnomedDescriptionTypeId(termFactory.getUids(part.getTypeId())));
+
+            // Language code
+            createRecord(stringBuilder, part.getLang());
+
+            // Language code for UUID
+            createRecord(stringBuilder, part.getLang());
+
+            // AMT added
+            // Description UUID
+            createRecord(stringBuilder, getFirstUuid(desc.getDescVersioned().getDescId()));
+
+            // Description status UUID
+            createRecord(stringBuilder, getFirstUuid(part.getStatusId()));
+
+            // Description type UUID
+            createRecord(stringBuilder, getFirstUuid(part.getTypeId()));
+
+            // ConceptId
+            createRecord(stringBuilder, concept.getUids().get(0));
+
+            // Effective time
+            createVersion(stringBuilder, part.getVersion(), part.getPathId());
+
+            // Path Id
+            createRecord(stringBuilder, getFirstUuid(part.getPathId()));
+
+            // Status active/inactive value
+            createRecord(stringBuilder, getBinaryStatusValue(part.getStatusId()), true);
+
+            // End record
+            createRecord(stringBuilder, System.getProperty("line.separator"));
+
+            descriptionsWriter.write(stringBuilder.toString());
+        }
+    }
+
+
     private void writeUuidBasedDescriptionDetails(I_GetConceptData concept, I_IntSet allowedStatus,
             I_IntSet allowedTypes) throws Exception {
 
@@ -1016,5 +1324,9 @@ public class ExportIterator implements I_ProcessConcepts {
 
     public void setDescriptionTypes(ConceptDescriptor[] descriptionTypesForExport) {
         this.descriptionTypesForExport = descriptionTypesForExport;
+    }
+
+    public final void setFullExport(boolean fullExport) {
+        this.fullExport = fullExport;
     }
 }

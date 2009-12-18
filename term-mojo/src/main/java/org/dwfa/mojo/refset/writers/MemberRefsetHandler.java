@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -147,13 +147,13 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
      */
     public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctId, boolean useRf2)
             throws SQLException, ClassNotFoundException, Exception {
-        return formatRefsetLine(tf, tuple, tuple.getMemberId(), tuple.getRefsetId(), tuple.getComponentId(), sctId,
-            useRf2);
+        return formatRefsetLine(tf, tuple, getMemberUuid(tuple.getMemberId(), tuple.getComponentId(),
+            tuple.getRefsetId()), tuple.getRefsetId(), tuple.getComponentId(), sctId, useRf2);
     }
 
     /**
      * String representation of the tuple in Release Format 2.
-     * 
+     *
      * @param tf
      * @param tuple
      *            extension part to format
@@ -165,11 +165,9 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
      * @throws ClassNotFoundException
      * @throws SQLException
      */
-    public String formatRefsetLineRF2(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetNid,
+    public String formatRefsetLineRF2(I_TermFactory tf, I_ThinExtByRefPart part, UUID memberUuid, int refsetNid,
             int componentId, boolean sctId, boolean useRf2, TYPE type) throws SQLException, ClassNotFoundException,
             Exception {
-        UUID memberUuid = getMemberUuid(memberId, componentId, refsetNid);
-
         String formattedLine = getRefsetAndReferencePart(tf, part, memberUuid, refsetNid, componentId, sctId, useRf2,
             type);
 
@@ -178,14 +176,14 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     /**
      * Returns the first 6 columns for a refset file.
-     * 
+     *
      * @param tf I_TermFactory DB access
      * @param part I_ThinExtByRefPart the concept extension
      * @param memberId Integer member id, may be null or not exists in the DB.
      * @param refsetNid int refset id
      * @param componentId int referenced component id
      * @param useSctId boolean use a new sct ids
-     * 
+     *
      * @return RF2 formatted refset line except the annotation/concept
      * @throws Exception
      * @throws ClassNotFoundException
@@ -258,7 +256,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     /**
      * String representation of the refset tuple as a subset.
-     * 
+     *
      * @param tf
      * @param tuple
      *            extension part to format
@@ -319,9 +317,9 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
             + "LINKEDID";
     }
 
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart tuple, Integer memberId, int refsetId,
+    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart tuple, UUID memberUuid, int refsetId,
             int componentId, boolean sctId, boolean useRf2) throws SQLException, ClassNotFoundException, Exception {
-        return getMemberUuid(memberId, componentId, refsetId) + COLUMN_DELIMITER
+        return memberUuid + COLUMN_DELIMITER
             + toIdWithCache(tf, tuple.getPathId(), sctId, TYPE.CONCEPT) + COLUMN_DELIMITER
             + getDate(tf, tuple.getVersion()) + COLUMN_DELIMITER
             + toIdWithCache(tf, tuple.getStatusId(), sctId, TYPE.CONCEPT) + COLUMN_DELIMITER
@@ -331,7 +329,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     /**
      * HACK
-     * 
+     *
      * @param forConcept
      * @return
      * @throws IOException
@@ -350,9 +348,9 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     /**
      * THIS IS A HACK REMOVE.
-     * 
+     *
      * Get the namespace for the I_Path.
-     * 
+     *
      * @param forPath I_path
      * @return NAMESPACE
      */
@@ -368,27 +366,22 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     private String getMemberId(UUID memberUuid, int componentNid, int refsetNid, boolean useRf2) throws SQLException,
             ClassNotFoundException, Exception {
-        I_Path refsetPath = getLatestPath(tf.getConcept(refsetNid));
+        I_Path refsetPath = getLatestPath(getTermFactory().getConcept(refsetNid));
 
         return Long.toString(getSctGenerator().getWithGeneration(memberUuid, getNamespace(refsetPath),
             getSctIdTypeForExtention(componentNid, useRf2)));
     }
 
-    private UUID getMemberUuid(Integer memberNid, int componentNid, int refsetNid) throws UnsupportedEncodingException,
+    protected UUID getMemberUuid(Integer memberNid, int componentNid, int refsetNid) throws UnsupportedEncodingException,
             TerminologyException, IOException {
         UUID uuid;
         if (memberNid == null) {
             // generate new id
-            uuid = UUID.nameUUIDFromBytes(("org.dwfa." + getTermFactory().getUids(componentNid) + getTermFactory().getUids(
-                refsetNid)).getBytes("8859_1"));
+            uuid = UUID.nameUUIDFromBytes(("org.dwfa." + getTermFactory().getUids(componentNid) + getTermFactory().getUids(refsetNid)).getBytes("8859_1"));
         } else {
             if (getTermFactory().getUids(memberNid) == null) {
-                System.out.println("Member id " + memberNid + " has no UUIDs!!! for refset "
-                    + getTermFactory().getConcept(refsetNid) + " for component "
-                    + getTermFactory().getConcept(componentNid));
-
-                uuid = UUID.nameUUIDFromBytes(("org.dwfa." + getTermFactory().getUids(componentNid) + getTermFactory().getUids(
-                    refsetNid)).getBytes("8859_1"));
+                logger.warning("No UUID for member, component and refset ids.");
+                uuid = UUID.nameUUIDFromBytes(("org.dwfa." + getTermFactory().getUids(componentNid) + getTermFactory().getUids(refsetNid)).getBytes("8859_1"));
             } else {
                 uuid = getTermFactory().getUids(memberNid).iterator().next();
             }
@@ -547,7 +540,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
     /**
      * This method determines if the string passed is a UUID or SCTID and then
      * finds the NID of the matching concept using the passed identifier.
-     * 
+     *
      * @param id String representation of a UUID or SCTID
      * @return NID of the matching concept if found
      * @throws TerminologyException if not found
@@ -657,7 +650,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     /**
      * Opens the id file for writing.
-     * 
+     *
      * @param aceIdentifierWriter the aceIdentifierWriter to set
      * @throws IOException cannot open file for writing.
      */

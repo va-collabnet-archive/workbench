@@ -17,6 +17,7 @@
 package org.dwfa.mojo.refset.writers;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -32,15 +33,16 @@ public class ConceptConceptRefsetHandler extends ConceptRefsetHandler {
     @Override
     public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple part, boolean sctid, boolean useRf2)
             throws SQLException, ClassNotFoundException, Exception {
-        return formatRefsetLine(tf, part, part.getMemberId(), part.getRefsetId(), part.getComponentId(), sctid, useRf2);
+        return formatRefsetLine(tf, part, getMemberUuid(part.getMemberId(), part.getComponentId(), part.getRefsetId()),
+            part.getRefsetId(), part.getComponentId(), sctid, useRf2);
     }
 
     @Override
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId,
+    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, UUID memberUuid, int refsetId,
             int componentId, boolean sctId, boolean useRf2) throws SQLException, ClassNotFoundException, Exception {
         I_ThinExtByRefPartConceptConcept conceptPart = (I_ThinExtByRefPartConceptConcept) part;
 
-        return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId, useRf2)
+        return super.formatRefsetLine(tf, part, memberUuid, refsetId, componentId, sctId, useRf2)
             + MemberRefsetHandler.COLUMN_DELIMITER + toId(tf, conceptPart.getC2id(), sctId, TYPE.CONCEPT);
     }
 
@@ -53,12 +55,12 @@ public class ConceptConceptRefsetHandler extends ConceptRefsetHandler {
      *      int, boolean, boolean)
      */
     @Override
-    public String formatRefsetLineRF2(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetNid,
+    public String formatRefsetLineRF2(I_TermFactory tf, I_ThinExtByRefPart part, UUID memberUuid, int refsetNid,
             int componentId, boolean sctId, boolean useRf2, TYPE type) throws SQLException, ClassNotFoundException,
             Exception {
         I_ThinExtByRefPartConceptConcept conceptPart = (I_ThinExtByRefPartConceptConcept) part;
 
-        return super.formatRefsetLineRF2(tf, part, memberId, refsetNid, componentId, sctId, useRf2, type)
+        return super.formatRefsetLineRF2(tf, part, memberUuid, refsetNid, componentId, sctId, useRf2, type)
             + MemberRefsetHandler.COLUMN_DELIMITER + toId(tf, conceptPart.getC2id(), sctId, type);
     }
 

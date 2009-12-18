@@ -20,6 +20,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
@@ -36,7 +38,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -44,6 +45,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelPart;
@@ -53,13 +55,13 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.api.process.I_ProcessQueue;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
+import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.mojo.ConceptDescriptor;
@@ -69,7 +71,6 @@ import org.dwfa.mojo.file.AceIdentifierWriter;
 import org.dwfa.mojo.refset.writers.MemberRefsetHandler;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
-import org.dwfa.vodb.types.ThinExtByRefPartConceptConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartString;
 
 /**
@@ -496,10 +497,6 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             // therefore export its extensions
             int descId = versionedDesc.getDescId();
             exportRefsets(descId, TYPE.DESCRIPTION);
-
-            // TODO commented out because it costs too many SCTIDs and we need
-            // to release pathology - to be included later
-            // extractStatus(latest, descId);
         }
     }
 
@@ -546,8 +543,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                     && testSpecificationWithCache(versionPart.getPathId())) {
 
                     if (allExtensions.isEmpty()) {
+                        UUID uuid = UUID.nameUUIDFromBytes(("org.dwfa." + tf.getUids(versionedRel.getC2Id()) + tf.getUids(
+                            historyStatusRefsetMap.get(versionPart.getTypeId()))).getBytes("8859_1"));
+
                         I_ThinExtByRefPartConcept part = createConceptExtension(versionedRel, versionPart);
-                        export(part, null, historyStatusRefsetMap.get(versionPart.getTypeId()), versionedRel.getC1Id(),
+                        export(part, uuid, historyStatusRefsetMap.get(versionPart.getTypeId()), versionedRel.getC1Id(),
                             TYPE.CONCEPT);
                     } else {
                         for (I_ThinExtByRefVersioned ext : allExtensions) {
@@ -557,12 +557,10 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
                                 if (part == null) {
                                     part = createConceptExtension(versionedRel, versionPart);
-                                    export(part, null, historyStatusRefsetMap.get(versionPart.getTypeId()),
-                                        versionedRel.getC1Id(), TYPE.CONCEPT);
-                                } else if (versionPart.getVersion() == part.getVersion()) {
-                                    export(part, null, historyStatusRefsetMap.get(versionPart.getTypeId()),
-                                        versionedRel.getC1Id(), TYPE.CONCEPT);
                                 }
+                                export(part, getMemberUuid(ext.getMemberId(), ext.getComponentId(),
+                                    ext.getRefsetId()), historyStatusRefsetMap.get(versionPart.getTypeId()),
+                                    versionedRel.getC1Id(), TYPE.CONCEPT);
                             }
                         }
                     }
@@ -892,7 +890,10 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     void export(I_ThinExtByRefTuple thinExtByRefTuple, TYPE type) throws Exception {
-        export(thinExtByRefTuple.getPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
+        UUID memberUuid = getMemberUuid(thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getComponentId(),
+            thinExtByRefTuple.getRefsetId());
+
+        export(thinExtByRefTuple.getPart(), memberUuid, thinExtByRefTuple.getRefsetId(),
             thinExtByRefTuple.getComponentId(), type);
     }
 
@@ -900,12 +901,12 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * Exports the refset to file.
      *
      * @param thinExtByRefPart The concept extension to write to file.
-     * @param memberId the id for this refset member record.
+     * @param memberUuid the id for this refset member record.
      * @param refsetId the refset id
      * @param componentId the referenced component
      * @throws Exception on DB errors or file write errors.
      */
-    void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId, TYPE type)
+    void export(I_ThinExtByRefPart thinExtByRefPart, UUID memberUuid, int refsetId, int componentId, TYPE type)
             throws Exception {
 
         RefsetType refsetType;
@@ -929,10 +930,13 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         }
         BufferedWriter sctIdRefsetWriter = getSctIdWriter(refsetId);
 
-        writeToSctIdFile(sctIdRefsetWriter, thinExtByRefPart, memberId, refsetId, componentId, type);
+        if(memberUuid == null){
+            memberUuid = UUID.nameUUIDFromBytes(("org.dwfa." + tf.getUids(componentId) + tf.getUids(refsetId)).getBytes("8859_1"));
+        }
+        writeToSctIdFile(sctIdRefsetWriter, thinExtByRefPart, memberUuid, refsetId, componentId, type);
 
         if (!useRF2) {
-            writeToUuidFile(uuidRefsetWriter, thinExtByRefPart, memberId, refsetId, componentId);
+            writeToUuidFile(uuidRefsetWriter, thinExtByRefPart, memberUuid, refsetId, componentId);
         }
         first = false;
     }
@@ -984,24 +988,24 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     synchronized private void writeToSctIdFile(BufferedWriter sctIdRefsetWriter, I_ThinExtByRefPart thinExtByRefPart,
-            Integer memberId, int refsetId, int componentId, TYPE type) throws IOException, TerminologyException,
+            UUID memberUuid, int refsetId, int componentId, TYPE type) throws IOException, TerminologyException,
             InstantiationException, IllegalAccessException, Exception {
         if (useRF2) {
             refsetTypeMap.get(refsetId).getRefsetHandler().setAceIdentifierFile(getAceIdentifierFile(refsetId));
             sctIdRefsetWriter.write(refsetTypeMap.get(refsetId).getRefsetHandler().formatRefsetLineRF2(tf,
-                thinExtByRefPart, memberId, refsetId, componentId, true, useRF2, type));
+                thinExtByRefPart, memberUuid, refsetId, componentId, true, useRF2, type));
         } else {
             sctIdRefsetWriter.write(refsetTypeMap.get(refsetId).getRefsetHandler().formatRefsetLine(tf,
-                thinExtByRefPart, memberId, refsetId, componentId, true, useRF2));
+                thinExtByRefPart, memberUuid, refsetId, componentId, true, useRF2));
         }
         sctIdRefsetWriter.write(newLineChars);
     }
 
     synchronized private void writeToUuidFile(BufferedWriter uuidRefsetWriter, I_ThinExtByRefPart thinExtByRefPart,
-            Integer memberId, int refsetId, int componentId) throws IOException, TerminologyException,
+            UUID memberUuid, int refsetId, int componentId) throws IOException, TerminologyException,
             InstantiationException, IllegalAccessException, Exception {
         uuidRefsetWriter.write(refsetTypeMap.get(refsetId).getRefsetHandler().formatRefsetLine(tf, thinExtByRefPart,
-            memberId, refsetId, componentId, false, useRF2));
+            memberUuid, refsetId, componentId, false, useRF2));
         uuidRefsetWriter.write(newLineChars);
     }
 
@@ -1183,6 +1187,43 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      */
     boolean checkPath(int pathId) {
         return positionIds.contains(pathId);
+    }
+
+    /**
+     * THIS IS A HACK REMOVE.
+     *
+     * Get the namespace for the I_Path.
+     *
+     * @param forPath I_path
+     * @return NAMESPACE
+     */
+    private NAMESPACE getNamespace(I_Path forPath) {
+        NAMESPACE namespace = NAMESPACE.NEHTA;
+
+        if (forPath != null && forPath.toString().equals("SNOMED Core")) {
+            namespace = NAMESPACE.SNOMED_META_DATA;
+        }
+
+        return namespace;
+    }
+
+    private UUID getMemberUuid(Integer memberNid, int componentNid, int refsetNid) throws UnsupportedEncodingException,
+            TerminologyException, IOException {
+        UUID uuid;
+        if (memberNid == null) {
+            // generate new id
+            uuid = UUID.nameUUIDFromBytes(("org.dwfa." + tf.getUids(componentNid) + tf.getUids(
+                refsetNid)).getBytes("8859_1"));
+        } else {
+            if (tf.getUids(memberNid) == null) {
+                logger.warning("No UUID for member, component and refset ids.");
+                uuid = UUID.nameUUIDFromBytes(("org.dwfa." + tf.getUids(componentNid) + tf.getUids(
+                    refsetNid)).getBytes("8859_1"));
+            } else {
+                uuid = tf.getUids(memberNid).iterator().next();
+            }
+        }
+        return uuid;
     }
 
     /**

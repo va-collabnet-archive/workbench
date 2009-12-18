@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -33,15 +32,16 @@ public class ConceptConceptConceptRefsetHandler extends ConceptConceptRefsetHand
     @Override
     public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple part, boolean sctid, boolean useRf2)
             throws SQLException, ClassNotFoundException, Exception {
-        return formatRefsetLine(tf, part, part.getMemberId(), part.getRefsetId(), part.getComponentId(), sctid, useRf2);
+        return formatRefsetLine(tf, part, getMemberUuid(part.getMemberId(), part.getComponentId(), part.getRefsetId()),
+            part.getRefsetId(), part.getComponentId(), sctid, useRf2);
     }
 
     @Override
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId,
+    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, UUID memberUuid, int refsetId,
             int componentId, boolean sctId, boolean useRf2) throws SQLException, ClassNotFoundException, Exception {
         I_ThinExtByRefPartConceptConceptConcept conceptPart = (I_ThinExtByRefPartConceptConceptConcept) part;
 
-        return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId, useRf2)
+        return super.formatRefsetLine(tf, part, memberUuid, refsetId, componentId, sctId, useRf2)
             + MemberRefsetHandler.COLUMN_DELIMITER + toId(tf, conceptPart.getC3id(), sctId, TYPE.CONCEPT);
     }
 
@@ -54,12 +54,12 @@ public class ConceptConceptConceptRefsetHandler extends ConceptConceptRefsetHand
      *      int, boolean, boolean)
      */
     @Override
-    public String formatRefsetLineRF2(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetNid,
+    public String formatRefsetLineRF2(I_TermFactory tf, I_ThinExtByRefPart part, UUID memberUuid, int refsetNid,
             int componentId, boolean sctId, boolean useRf2, TYPE type) throws SQLException, ClassNotFoundException,
             Exception {
         I_ThinExtByRefPartConceptConceptConcept conceptPart = (I_ThinExtByRefPartConceptConceptConcept) part;
 
-        return super.formatRefsetLineRF2(tf, part, memberId, refsetNid, componentId, sctId, useRf2, type)
+        return super.formatRefsetLineRF2(tf, part, memberUuid, refsetNid, componentId, sctId, useRf2, type)
             + MemberRefsetHandler.COLUMN_DELIMITER + toId(tf, conceptPart.getC3id(), sctId, TYPE.CONCEPT);
     }
 
