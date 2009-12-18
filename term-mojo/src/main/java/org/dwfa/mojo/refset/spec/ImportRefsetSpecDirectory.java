@@ -17,6 +17,7 @@
 package org.dwfa.mojo.refset.spec;
 
 import java.io.File;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -24,6 +25,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.file.TupleFileUtil;
 import org.dwfa.maven.MojoUtil;
+import org.dwfa.mojo.ConceptDescriptor;
 
 /**
  * Imports all the refset specs in a specified directory.
@@ -37,12 +39,20 @@ import org.dwfa.maven.MojoUtil;
 public class ImportRefsetSpecDirectory extends AbstractMojo {
 
     /**
-     * The refset spec directory.
+     * The input refset spec directory.
      * 
      * @parameter default-value=
      *            "${project.build.directory}/generated-resources/refsetspec/"
      */
-    File dir;
+    File inputDir;
+
+    /**
+     * The output refset report directory.
+     * 
+     * @parameter default-value=
+     *            "${project.build.directory}/generated-resources/refsetspec/reports"
+     */
+    File outputDir;
 
     /**
      * Location of the build directory.
@@ -52,10 +62,17 @@ public class ImportRefsetSpecDirectory extends AbstractMojo {
      */
     private File targetDirectory;
 
+    /**
+     * Optional edit path (this will override refset spec file path data).
+     * 
+     * @parameter
+     */
+    private ConceptDescriptor editPathDescriptor = null;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + dir.getCanonicalPath(),
-                this.getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + inputDir.getCanonicalPath(), this
+                .getClass(), targetDirectory)) {
                 return;
             }
         } catch (Exception e) {
@@ -64,18 +81,31 @@ public class ImportRefsetSpecDirectory extends AbstractMojo {
 
         try {
             TupleFileUtil tupleImporter = new TupleFileUtil();
-            if (!dir.isDirectory()) {
-                throw new Exception("Directory has not been configured : " + dir.getPath());
-            } else {
-                getLog().info("Importing refset specs from " + dir.getPath());
-                for (File f : dir.listFiles()) {
-                    getLog().info("Beginning import of refset spec :" + f.getPath());
-                    // tupleImporter.importFile(f);
-                    getLog().info("Finished importing refset spec from " + f.getPath());
-                }
-
-                LocalVersionedTerminology.get().commit();
+            if (!inputDir.isDirectory()) {
+                throw new Exception("Directory has not been configured : " + inputDir.getPath());
             }
+            outputDir.mkdirs();
+            getLog().info("Importing refset specs from " + inputDir.getPath());
+            for (File inputFile : inputDir.listFiles()) {
+                if (inputFile.getName().endsWith(".txt")) {
+                    String reportFileName = inputFile.getName().replace(".txt", ".log");
+                    if (inputFile.getName().equals(reportFileName)) {
+                        reportFileName = inputFile.getName() + ".log";
+                    }
+                    File outputFile = new File(outputDir, reportFileName);
+
+                    UUID uuid = null;
+                    if (editPathDescriptor != null) {
+                        uuid = editPathDescriptor.getVerifiedConcept().getUids().iterator().next();
+                    }
+
+                    getLog().info("Beginning import of refset spec :" + inputFile.getPath());
+                    tupleImporter.importFile(inputFile, outputFile, uuid);
+                    getLog().info("Finished importing refset spec from " + inputFile.getPath());
+                }
+            }
+
+            LocalVersionedTerminology.get().commit();
 
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
