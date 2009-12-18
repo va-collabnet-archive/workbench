@@ -16,12 +16,17 @@
  */
 package org.dwfa.mojo.epicexport.kp;
 
+import java.util.List;
+
 import org.dwfa.mojo.epicexport.AbstractEpicExportBuilder;
 import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
+import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 import org.dwfa.mojo.epicexport.I_ExportFactory;
 
-public class EpicExportBuilderWritesAll extends AbstractEpicExportBuilder {
+public class EpicExportBuilderWritesAll extends AbstractEpicExportBuilder implements I_EpicLoadFileBuilder {
+	
+	//public String masterfile;
 	
 	public EpicExportBuilderWritesAll(I_ExportFactory exportManager, EpicExportManager em) {
 		super(exportManager, em);
@@ -32,11 +37,15 @@ public class EpicExportBuilderWritesAll extends AbstractEpicExportBuilder {
 		return new Integer(refsetNumber).toString();
 	}
 	
-	public void writeRecord(String version) throws Exception {
+	public void writeRecord(String version, List<String> regions) throws Exception {
 		
-		I_EpicExportRecordWriter writer = getExportManager().getWriter(masterfile);
+		I_EpicExportRecordWriter writer = getExportManager().getWriter(this.getMasterfile());
 		this.setWriter(writer);
+		if (this.anyItemsHaveChanges())
+			this.writeLiteralItem("rel_ver", version);
+		
 		this.writeAll();
+		this.writeLiteralItem("300000", stringArrayToList(regions, ","));
 		writer.saveRecord();
 	}
 }

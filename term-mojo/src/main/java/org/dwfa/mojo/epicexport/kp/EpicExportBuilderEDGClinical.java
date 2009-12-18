@@ -17,6 +17,8 @@
 
 package org.dwfa.mojo.epicexport.kp;
 
+import java.util.List;
+
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.AbstractEpicExportBuilder;
 import org.dwfa.mojo.epicexport.EpicExportManager;
@@ -43,10 +45,9 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 		return new Integer(refsetNumber).toString();
 	}
 	
-	public void writeRecord(String version) throws Exception {
+	public void writeRecord(String version, List<String> regions) throws Exception {
 		
 		if (this.isChangedRecord()) {
-// AceLog.getAppLog().info("Item 11 = " + getFirstItem("11"));
 			if (getFirstItem("11") == null) {
 				//"NRNC" Its a new record
 				if (! this.allItemsArePopulated(MANDATORY_ITEMS))

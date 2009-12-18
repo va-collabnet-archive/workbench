@@ -20,6 +20,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.EpicExportWriter;
@@ -27,15 +29,18 @@ import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 import org.dwfa.mojo.epicexport.I_ExportFactory;
 
+import com.mysql.jdbc.Connection;
+
 public class EpicLoadFileFactory implements I_ExportFactory {
 
     public EpicExportManager getExportManager(String baseDir) {
         return new EpicExportManager(baseDir, this);
     }
-
-    public EpicExportManager getExportManager() {
-    	return new EpicExportManager(null, this);
+    
+    public EpicExportManager getExportManager(String dburl, String user, String pw) throws SQLException {
+    	throw new UnsupportedOperationException();
     }
+
 
     public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile, EpicExportManager em) throws Exception {
         I_EpicLoadFileBuilder ret;
@@ -48,14 +53,21 @@ public class EpicLoadFileFactory implements I_ExportFactory {
         return ret;
     }
 
-    public I_EpicExportRecordWriter getWriter(File fw) throws IOException {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(fw));
+    public I_EpicExportRecordWriter getWriter(String writerName, String baseDir, Connection conn) throws Exception {
+        StringBuffer filename = new StringBuffer(baseDir);
+        filename.append(writerName);
+        filename.append(".txt");
+        System.out.println("Creating " + filename.toString());
+        File fw = new File(filename.toString());
+        fw.mkdirs();
+        if (fw.exists())
+            fw.delete();
+
+    	BufferedWriter bw = new BufferedWriter(new FileWriter(fw));
+        
         EpicExportWriter ret = new EpicExportWriter(bw, fw.getName());
         return ret;
     }
     
-    public I_EpicExportRecordWriter getWriter(String name) {
-    	throw new UnsupportedOperationException();
-    }
 
 }

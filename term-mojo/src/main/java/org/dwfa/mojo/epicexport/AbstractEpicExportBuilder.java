@@ -107,7 +107,7 @@ public abstract class AbstractEpicExportBuilder {
 	 * @param version - Passed to determine which load file to write to
 	 * @throws Exception
 	 */
-	public abstract void writeRecord(String version) throws Exception;
+	public abstract void writeRecord(String version, List<String> regions) throws Exception;
 	
 	/**
 	 * Writes an item to the Epic load file
@@ -281,6 +281,14 @@ public abstract class AbstractEpicExportBuilder {
 		return ret;
 	}
 	
+	public boolean anyItemsHaveChanges() {
+		boolean ret = false;
+		for (EpicItem e: this.epicItems) {
+			ret = ret || e.hasChanges();
+		}
+		return ret;
+	}
+	
 	public boolean isChangedRecord() {
 		return this.anyItemsHaveChanges(this.exportIfTheseItemsChanged);
 	}
@@ -301,6 +309,21 @@ public abstract class AbstractEpicExportBuilder {
 		return ret;
 	}
 
+	public String stringArrayToList(List <String> a) {
+		return stringArrayToList(a, ",");
+	}
+	
+	public String stringArrayToList(List <String> a, String seperator) {
+    	StringBuffer ret = new StringBuffer();
+    	int i = 0;
+    	for (String s: a) {
+    		if (++i > 1)
+    			ret.append(seperator);
+    		ret.append(s);
+    	}
+    	return ret.toString();
+	}
+	
 	public String toString() {
 		StringBuffer ret = new StringBuffer();
 		EpicItem dot11 = getFirstItem("11");

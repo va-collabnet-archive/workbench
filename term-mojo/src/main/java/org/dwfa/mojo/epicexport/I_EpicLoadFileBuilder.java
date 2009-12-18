@@ -16,6 +16,8 @@
  */
 package org.dwfa.mojo.epicexport;
 
+import java.util.List;
+
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.mojo.epicexport.AbstractEpicExportBuilder.EpicItem;
 
@@ -52,7 +54,7 @@ public interface I_EpicLoadFileBuilder {
 	 * @param version - Passed to determine which load file to write to
 	 * @throws Exception
 	 */
-	public abstract void writeRecord(String version) throws Exception;
+	public abstract void writeRecord(String version, List<String> regions) throws Exception;
 	
 	/**
 	 * Writes an item to the Epic load file
