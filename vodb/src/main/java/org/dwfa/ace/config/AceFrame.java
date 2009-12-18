@@ -118,6 +118,7 @@ public class AceFrame extends ComponentFrame {
         WizardPanel wizPanel = new WizardPanel(getCdePanel());
         layers.add(wizPanel, JLayeredPane.MODAL_LAYER);
         wizPanel.setLocation(400, 0);
+        wizPanel.setVisible(false);
 
         getCdePanel().setWorkflowDetailsSheet(wizPanel.getWfDetailsPanel());
         getCdePanel().setWorkflowPanel(wizPanel.getWfPanel());
