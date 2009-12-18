@@ -88,6 +88,7 @@ import org.dwfa.bpa.tasks.editor.I_NeedPropertyDisplayName;
 import org.dwfa.bpa.tasks.editor.I_OnlyWantOneLine;
 import org.dwfa.bpa.util.FrameWithOpenFramesListener;
 import org.dwfa.bpa.util.PlatformWebBrowser;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.Spec;
 
@@ -497,19 +498,15 @@ public class TaskPanel extends JPanel implements I_DoDragAndDrop, MouseInputList
         }
     }
 
+
     /**
      * @param task
+     * @param taskInfo
      * @param process
      * @param c
-     * @throws ClassNotFoundException
-     * @throws IntrospectionException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
      */
-    private void addProperties(I_DefineTask task, BeanInfo taskInfo, I_EncodeBusinessProcess process,
-            GridBagConstraints c) throws ClassNotFoundException, IntrospectionException, InvocationTargetException,
-            IllegalAccessException, InvocationTargetException {
+    private void addProperties(I_DefineTask task, BeanInfo taskInfo, I_EncodeBusinessProcess process, GridBagConstraints c) {
+        
         PropertyDescriptor[] properties = taskInfo.getPropertyDescriptors();
         for (int i = 0; i < properties.length; i++) {
             try {
@@ -569,8 +566,11 @@ public class TaskPanel extends JPanel implements I_DoDragAndDrop, MouseInputList
                         logger.fine("Null editor for property " + prop.getDisplayName());
                     }
                 }
-            } catch (Exception ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
+            } catch (Throwable t) {
+                // Need to also catch errors which can occur through the use of reflection (eg NoSuchMethodError)                
+                String errMsg = "Error processing task '" + taskInfo.getBeanDescriptor().getName() + "' in process '" + process.getName() + "'.";
+                new LogWithAlerts(this.getClass().getName()).alertAndLog(Level.SEVERE, errMsg, t);
+                throw new RuntimeException(t);
             }
         }
     }
