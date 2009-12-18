@@ -21,11 +21,13 @@ import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -39,7 +41,6 @@ import javax.swing.JOptionPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LineageHelper;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
@@ -203,6 +204,7 @@ public class ProcessPopupUtil {
                     }
                 }
 
+                ArrayList<JMenuItem> menuItems = new ArrayList<JMenuItem>();
                 ITERATE_FILES: for (File f : getSortedFiles(menuDir)) {
                     if (f.isDirectory()) {
                         JMenu newSubMenu = new JMenu(f.getName());
@@ -228,8 +230,7 @@ public class ProcessPopupUtil {
                                         }
                                     }
                                 } catch (TerminologyException e) {
-                                    // A context is defined put we can't
-                                    // validate it as the specified
+                                    // A context is defined put we can't validate it as the specified
                                     // uuid is invalid or does not exist
                                     continue ITERATE_FILES;
                                 }
@@ -242,9 +243,13 @@ public class ProcessPopupUtil {
                             ois.close();
                             JMenuItem processMenuItem = new JMenuItem(process.getName());
                             processMenuItem.addActionListener(processMenuListener);
-                            subMenu.add(processMenuItem);
+                            menuItems.add(processMenuItem);
                         }
                     }
+                }
+                Collections.sort(menuItems, new MenuTextComparitor());
+                for (JMenuItem menuItem : menuItems) {
+                    subMenu.add(menuItem);
                 }
             }
         } catch (Exception e) {
@@ -252,4 +257,11 @@ public class ProcessPopupUtil {
         }
     }
 
+    static class MenuTextComparitor implements Comparator<JMenuItem> {
+        @Override
+        public int compare(JMenuItem o1, JMenuItem o2) {
+            return o1.getText().compareTo(o2.getText());
+        }
+    }
+    
 }
