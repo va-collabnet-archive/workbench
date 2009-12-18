@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -125,6 +126,10 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
         try {
             allowedStatuses = null;
             positions = null;
+            Set<I_Position> refsetPositions = new HashSet<I_Position>();
+            refsetPositions.addAll(LocalVersionedTerminology.get().getActiveAceFrameConfig()
+                .getViewPositionSetReadOnly());
+            referenceSetExport.setPositions(refsetPositions);
 
             sctidRefsetOutputDirectory.mkdirs();
             uuidRefsetOutputDirectory.mkdirs();
@@ -262,7 +267,8 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
             try {
                 refsetType = RefsetType.findByExtension(thinExtByRefPart);
             } catch (EnumConstantNotPresentException e) {
-                getLog().warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
+                getLog()
+                    .warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
                 return;
             }
             refsetTypeMap.put(refsetId, refsetType);
@@ -298,13 +304,15 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
                 uuidFilePrefix = "";
             }
             if (fileName == null) {
-                fileName = refsetName + refsetType.getFileExtension() + "_" + rf2Descriptor.getContentSubType() + "_"
-                    + rf2Descriptor.getCountryCode() + rf2Descriptor.getNamespace() + "_" + releaseVersion + ".txt";
+                fileName =
+                        refsetName + refsetType.getFileExtension() + "_" + rf2Descriptor.getContentSubType() + "_"
+                            + rf2Descriptor.getCountryCode() + rf2Descriptor.getNamespace() + "_" + releaseVersion
+                            + ".txt";
             }
-            uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, uuidFilePrefix
-                + fileName)));
-            sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, sctIdFilePrefix
-                + fileName)));
+            uuidRefsetWriter =
+                    new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, uuidFilePrefix + fileName)));
+            sctIdRefsetWriter =
+                    new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, sctIdFilePrefix + fileName)));
 
             writerMap.put(refsetId + "UUID", uuidRefsetWriter);
             writerMap.put(refsetId + "SCTID", sctIdRefsetWriter);
