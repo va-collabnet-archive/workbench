@@ -48,6 +48,7 @@ import org.dwfa.maven.MojoUtil;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
+import org.dwfa.mojo.epicexport.kp.EpicTermWarehouseFactory;
 import org.dwfa.tapi.TerminologyException;
 
 
@@ -140,6 +141,28 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
      private String dropName;
      
      
+     /**
+      * The URL of the database
+      * 
+      * @parameter
+      * @optional
+      */
+     private String database;
+     /**
+      * The username of the database
+      * 
+      * @parameter
+      * @optional
+      */
+     private String username;
+     /**
+      * The password of the database
+      * 
+      * @parameter
+      * @optional
+      */
+     private String password;
+     
      private File targetDirectory;
 
 	private HashSet<I_Position> positions;
@@ -192,12 +215,12 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			 * 
 			*/
 			
-			// I_GetConceptData concept = termFactory.getConcept(UUID.fromString("e9bba573-b160-4fcc-b4a1-7ec9ab019046"));
+			//I_GetConceptData concept = termFactory.getConcept(UUID.fromString("3073adf3-0c10-3cbb-975f-7bfc0c9cbd17"));
 			// expItr.processConcept(concept);
 			
 			
 			// Iterate through all concepts
-            LocalVersionedTerminology.get().iterateConcepts(expItr);
+			LocalVersionedTerminology.get().iterateConcepts(expItr);
 			expItr.close();
 
 		} catch (Exception e) {
@@ -207,7 +230,8 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 
 	}// End method execute
      
-    private class ExportIterator implements I_ProcessConcepts {
+    @SuppressWarnings("unused")
+	private class ExportIterator implements I_ProcessConcepts {
 
 		private String currentItem;
 		
@@ -220,6 +244,8 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		private int counter = 0;
 		private Date startingDate;
 		private List<String> masterFilesImpacted;
+		private I_ThinExtByRefTuple idTuple;
+		private List<DisplayName> displayNames;
 		
 		public ExportIterator(ExportToEpicLoadFilesMojo parent) throws Exception
 		{
@@ -230,7 +256,8 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 				exportManager = exportFactory.getExportManager(parent.outputDirectory);
 			}
 			else if (parent.writerName.equals("kp term warehouse build")){
-				
+				exportFactory = new EpicTermWarehouseFactory();
+				exportManager = exportFactory.getExportManager(parent.database, parent.username, parent.password);
 			}
 			else
 				throw new Exception("Unknown writer name: " + parent.writerName);
@@ -252,6 +279,9 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		
 		public void processConcept(I_GetConceptData concept) throws Exception {
 			masterFilesImpacted = new ArrayList<String>();
+			displayNames = new ArrayList<DisplayName>();
+			
+			this.idTuple = null;
 			List<? extends I_DescriptionVersioned> descs = concept.getDescriptions();
 
 			if (++counter % 10000 == 0)
@@ -266,15 +296,18 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			// Finally, process this concept directly if it is a description concept, or process the root concept
 			// for extensions attached to the root concept
 			processDescriptionConcept(concept, null);
+			if (this.idTuple != null)
+				this.writeRecordIds(this.idTuple);
 			// Write all of the records
 	        for (String masterfile: masterFilesImpacted) {
-		        I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(masterfile);
-		        if (exportWriter != null) { 
-			        exportWriter.writeRecord(this.dropName);
-			        exportWriter.clearRecordContents();
+		        I_EpicLoadFileBuilder exportBuilder = exportManager.getLoadFileBuilder(masterfile);
+		        if (exportBuilder != null) { 
+			        exportBuilder.writeRecord(this.dropName, this.getRegions(masterfile));
+			        exportBuilder.clearRecordContents();
 		        }
 		        this.currentMasterFile = null;
 	        }
+	        
 	        // Need to clear any "orphaned" items, so they do not get put into the next concept.
 	        // This may happen if a refset for a description is not associated with the master file
 	        // of the other refsets.
@@ -345,6 +378,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	String refsetName = refsetConcept.getInitialText();
 	    	String stringValue = null;
 	    	String previousStringValue = null;
+	    	String region = null;
 	    	List<EpicItemIdentifier> refsetAppliesTo = new ArrayList<EpicItemIdentifier>();
 	    	
 	    	I_ThinExtByRefPart extensionTuplePart = extensionTuple.getPart();
@@ -384,9 +418,10 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	 *  EDG Clinical refsets
 	    	 */
 	    	else if(refsetName.equals("EDG Clinical Item 2 National")) {
+	    		
 	    		refsetAppliesTo.add(new EpicItemIdentifier(
 	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2"));
-
+	    		region = "National";
 	    		if (description != null) {
 	    			stringValue = description.getLastTuple().getPart().getText();
 	    			previousStringValue = getPreviousDisplayName(description);
@@ -396,7 +431,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	else if (refsetName.startsWith("EDG Clinical Item 2 "))
 	    	{
 	    		
-	    		// String region = refsetName.substring(20);
+	    		region = refsetName.substring(20);
 	    		refsetAppliesTo.add(new EpicItemIdentifier(
 	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2"));
 	    		if (description != null) {
@@ -446,22 +481,25 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    		getLog().warn("Unhandled refset name: " + refsetName);
 	    	
 	    	for (EpicItemIdentifier e: refsetAppliesTo) {
-	    		if (e.getItemNumber().equals("2")) {
-	    			masterFilesImpacted.add(e.getMasterfile());
-	    			this.writeRecordIds(extensionTuple);
-	    		}
-	    			
-	    		if (stringValue == null)
-	    			stringValue = getValueAsString(extensionTuplePart);
 	    		I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(e.getMasterfile());
-	    		if (previousStringValue == null)
-	    			previousStringValue = getValueAsString(previousPart);
-	    		//getLog().info("Exporting item " + this.currentItem + " with a value of " + stringValue +
-	    		//		" and a previous value of " + previousStringValue);
+	    		if (e.getItemNumber().equals("2")) {
+	    			if (isNewDisplayNameApplication(e.getMasterfile(), region)) {
+	    				this.idTuple = extensionTuple;
+	    				exportWriter.addItemForExport(e.getItemNumber(), stringValue, previousStringValue);
+	    			}
+	    		}
+	    		else {
+		    		if (stringValue == null)
+		    			stringValue = getValueAsString(extensionTuplePart);
+		    		
+		    		if (previousStringValue == null)
+		    			previousStringValue = getValueAsString(previousPart);
+		    		//getLog().info("Exporting item " + this.currentItem + " with a value of " + stringValue +
+		    		//		" and a previous value of " + previousStringValue);
 	    		
-	    		exportWriter.addItemForExport(e.getItemNumber(), stringValue, previousStringValue);
+		    		exportWriter.addItemForExport(e.getItemNumber(), stringValue, previousStringValue);
+	    		}
 	    	}
-	    	
 	    }
 	    
 	    public void addSynonyms(I_GetConceptData conceptForDescription, String[] displayTypes, 
@@ -517,7 +555,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    }
 	    
 	    
-	    public String convertToIntString(String str) {
+		public String convertToIntString(String str) {
 	    	String ret = null;
 	    	try {
 	    		ret = new Integer(str).toString();
@@ -623,6 +661,39 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			return ret;
 	    }
 	    
+	    public boolean isNewDisplayNameApplication(String masterFile, String region) {
+	    	boolean found = false;
+	    	boolean ret = false;
+	    	for (String m : this.masterFilesImpacted) {
+	    		if ( m.equals(masterFile)) {
+	    			found = true;
+	    			break;
+	    		}
+	    	}
+	    	if (!found)
+	    		this.masterFilesImpacted.add(masterFile);
+	    	ret = !found;
+	    	found = false;
+	    	for (DisplayName d : this.displayNames) {
+	    		if (d.getMasterFile().equals(masterFile) && d.getRegion().equals(region)) {
+	    			found = true;
+	    			break;
+	    		}
+	    	}
+	    	if (!found)
+	    		this.displayNames.add(new DisplayName(masterFile, region));
+	    	return ret;
+	    }
+	    
+	    public List<String> getRegions(String masterFile) {
+	    	ArrayList<String> ret = new ArrayList<String>();
+	    	for (DisplayName d:  this.displayNames) {
+	    		if (d.getMasterFile().equals(masterFile))
+	    			ret.add(d.getRegion());
+	    	}
+	    	return ret;
+	    }
+	    
 	    private class EpicItemIdentifier {
 	    	String masterfile;
 	    	String itemNumber;
@@ -644,9 +715,32 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			public void setItemNumber(String itemNumber) {
 				this.itemNumber = itemNumber;
 			}
+	    }
+	    
+	    private class DisplayName {
+	    	public String masterFile;
+	    	public String region;
 	    	
-	    	
-	    	
+	    	public DisplayName(String masterFile, String region) {
+	    		this.setMasterFile(masterFile);
+	    		this.setRegion(region);
+	    	}
+
+			public String getMasterFile() {
+				return masterFile;
+			}
+
+			public void setMasterFile(String masterFile) {
+				this.masterFile = masterFile;
+			}
+
+			public String getRegion() {
+				return region;
+			}
+
+			public void setRegion(String region) {
+				this.region = region;
+			}
 	    }
     }
 

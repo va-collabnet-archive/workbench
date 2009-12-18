@@ -18,9 +18,12 @@ package org.dwfa.mojo.epicexport;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import org.dwfa.ace.log.AceLog;
+
+import com.mysql.jdbc.Connection;
 
 /**
  * Class used to manage a list of export writers, and export builders. Used to
@@ -36,12 +39,12 @@ public class EpicExportManager {
     // private List<EpicExportWriter> writers;
     // private List<AbstractEpicLoadFileBuilder> builders;
     private String baseDir;
+    private Connection connection;
     private I_ExportFactory exportFactory;
     private HashMap<String, I_EpicExportRecordWriter> writers = new HashMap<String, I_EpicExportRecordWriter>();
     private HashMap<String, I_EpicLoadFileBuilder> builders = new HashMap<String, I_EpicLoadFileBuilder>();
     public static final String EPIC_MASTERFILE_NAME_EDG_CLINICAL = "edgclinical";
     public static final String EPIC_MASTERFILE_NAME_EDG_BILLING = "edgbilling";
-    private Connection connection;
 
     public EpicExportManager(String baseDir, I_ExportFactory exportFactory) {
         this.baseDir = baseDir;
@@ -49,9 +52,15 @@ public class EpicExportManager {
             this.baseDir = this.baseDir.concat("/");
         }
         this.exportFactory = exportFactory;
+    }
+
+    public EpicExportManager(Connection conn, I_ExportFactory exportFactory) {
+        this.connection = conn;
+        this.exportFactory = exportFactory;
 
     }
 
+    
     /**
      * Looks for an existing load file writer that handles the named record
      * type,
@@ -61,19 +70,11 @@ public class EpicExportManager {
      * @return The writer that handles the requested record type
      * @throws IOException
      */
-    public I_EpicExportRecordWriter getWriter(String writerName) throws IOException {
+    public I_EpicExportRecordWriter getWriter(String writerName) throws Exception {
         I_EpicExportRecordWriter ret = null;
         ret = writers.get(writerName);
         if (ret == null) {
-            StringBuffer filename = new StringBuffer(this.baseDir);
-            filename.append(writerName);
-            filename.append(".txt");
-            System.out.println("Creating " + filename.toString());
-            File fw = new File(filename.toString());
-            fw.mkdirs();
-            if (fw.exists())
-                fw.delete();
-            ret = exportFactory.getWriter(fw);
+            ret = exportFactory.getWriter(writerName, this.baseDir, this.connection);
             writers.put(writerName, ret);
         }
         return ret;
@@ -82,6 +83,7 @@ public class EpicExportManager {
     public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile) throws Exception {
         I_EpicLoadFileBuilder ret = builders.get(masterfile);
         if (ret == null) {
+AceLog.getAppLog().info("Getting builder for masterfuile: " + masterfile);        	
             ret = this.exportFactory.getLoadFileBuilder(masterfile, this);
             if (ret != null)
                 builders.put(masterfile, ret);

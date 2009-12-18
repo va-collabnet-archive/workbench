@@ -16,17 +16,17 @@
  */
 package org.dwfa.mojo.epicexport;
 
-import java.io.File;
-import java.io.IOException;
+import java.sql.SQLException;
+
+import com.mysql.jdbc.Connection;
 
 public interface I_ExportFactory {
 	public EpicExportManager getExportManager(String baseDir);
 	
-	public EpicExportManager getExportManager();
+	public EpicExportManager getExportManager(String dburl, String user, String pw)  throws Exception ;
 	
 	public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile, EpicExportManager em) throws Exception;
 	
-	public I_EpicExportRecordWriter getWriter(File fw) throws IOException;
-	
-	public I_EpicExportRecordWriter getWriter(String masterfile);
+	public I_EpicExportRecordWriter getWriter(String writerName, String baseDir, Connection conn) throws Exception;
+
 }

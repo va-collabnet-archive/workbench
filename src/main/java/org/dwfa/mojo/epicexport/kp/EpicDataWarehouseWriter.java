@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo.epicexport.kp;
 
 
@@ -11,7 +27,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
+import org.dwfa.mojo.epicexport.AbstractEpicExportBuilder.EpicItem;
 
 
 /** 
@@ -40,28 +58,18 @@ public class EpicDataWarehouseWriter implements I_EpicExportRecordWriter {
 	private int recordsWrittenCount = 0;
 	private int masterId = 0;
 	private Connection connection;
-	private List<EpicItem> values;
-	private List<EpicItem> multiValues;
+	private List<EpicItem> values = new ArrayList<EpicItem>();
+	//private List<EpicItem> multiValues;
 	
 	private List<DatabaseColumn> singleValueItems;
 	private List<DatabaseColumn> multiValueItems;
 	
-	private DatabaseColumn xsingleValueItems[] = {
-		new DatabaseColumn("1", "varchar(12)"),
-		new DatabaseColumn("2", "varchar(80)"),	
-		new DatabaseColumn("11", "varchar(12)"),
-		new DatabaseColumn("40", "varchar(12)"),
-		new DatabaseColumn("100", "varchar(12)"),
-		new DatabaseColumn("2000", "varchar(12)")
-		};
-	private DatabaseColumn xmultiValueItems[] = {
-			new DatabaseColumn("7010", "varchar(7010)")
-	};
-	private String recordKey = "item_value_11";
 	
-	public EpicDataWarehouseWriter(String masterfile) {
+	public EpicDataWarehouseWriter(String masterfile, Connection conn) {
 		try {
+AceLog.getAppLog().info("Initializing writer with masterfile name: " + masterfile);
 			this.setMasterfile(masterfile);
+			this.connection = conn;
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -109,7 +117,7 @@ public class EpicDataWarehouseWriter implements I_EpicExportRecordWriter {
 				for (EpicItem e: this.values) {
 					if (e.itemNumber.equals(singleItem.getName())) {
 						if (j++ > 1)
-							throw new Exception("Multiple values for single value item: " + e.itemNumber);
+							AceLog.getAppLog().warning("Multiple values for single value item: " + e.itemNumber);
 						v = e.value;
 					}
 				}
@@ -132,7 +140,7 @@ public class EpicDataWarehouseWriter implements I_EpicExportRecordWriter {
 			sql.append(") values (");
 			sql.append(vals);
 			sql.append(");");
-System.out.println(sql.toString());			
+// System.out.println(sql.toString());			
 			st.execute(sql.toString());
 
 			/**
@@ -166,7 +174,7 @@ System.out.println(sql.toString());
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+		values = new ArrayList<EpicItem>();
 		recordsWrittenCount++;
 	}
 	
@@ -194,7 +202,7 @@ System.out.println(sql.toString());
 		sql.append("KEY `item_11` (`item_value_11`), ");
 		sql.append("KEY `item_2` (`item_value_2`) ");
 		sql.append(") ENGINE=MyISAM DEFAULT CHARSET=latin1");
-		System.out.println(sql.toString());
+		AceLog.getAppLog().info("Creating table: " + sql.toString());
 		st.execute(sql.toString());
 		
 		/**
@@ -218,7 +226,7 @@ System.out.println(sql.toString());
 		sql.append("KEY `item_order` (`item_order`) ");
 		sql.append(") ENGINE=MyISAM DEFAULT CHARSET=latin1");
 
-		System.out.println(sql.toString());
+		AceLog.getAppLog().info("Creating table: " + sql.toString());
 		st.execute(sql.toString());
 
 		/* CREATE TABLE  `contextset_qa`.`edc_cs_wsd_detail` (
@@ -233,8 +241,7 @@ System.out.println(sql.toString());
 	}
 	
 	public void writeLine(String str) throws IOException {
-		this.writer.write(str);
-		this.writer.write("\r\n");
+		throw new UnsupportedOperationException();
 	}
 	
 	public void addItemValue(String itemNumber, Object value, int pos) {
@@ -249,7 +256,7 @@ System.out.println(sql.toString());
 	}
 
 	public void close() throws IOException {
-		writer.close();
+		// Nothing to do
 	}
 	
 	public void setWriter(BufferedWriter writer) {
@@ -355,7 +362,11 @@ System.out.println(sql.toString());
 		return this.connection;
 	}
 
-	public List<EpicItem> seperateMultiValueItems() {
+	public void clearRecordContents() {
+		values = new ArrayList<EpicItem>();
+	}
+
+	/*public List<EpicItem> seperateMultiValueItems() {
 		int i = 0;
 		List<EpicItem> singles = new ArrayList<EpicItem>();
 		this.multiValues = new ArrayList<EpicItem>();
@@ -383,6 +394,7 @@ System.out.println(sql.toString());
 		return singles;
 		
 	}
+	*/
 	private class EpicItem {
 		private String itemNumber;
 		private Object value;
