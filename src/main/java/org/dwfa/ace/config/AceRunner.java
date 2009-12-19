@@ -293,6 +293,7 @@ public class AceRunner {
             // Startup other queues here...
             List<String> queuesToRemove = new ArrayList<String>();
             for (String queue : AceConfig.config.getQueues()) {
+            	queue = queue.replace('\\', '/');
                 File queueFile = new File(queue);
                 if (queueFile.exists()) {
                     AceLog.getAppLog().info("Found queue: " + queueFile.toURI().toURL().toExternalForm());
