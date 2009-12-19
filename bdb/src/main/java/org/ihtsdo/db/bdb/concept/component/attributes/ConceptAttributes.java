@@ -32,34 +32,44 @@ import org.ihtsdo.db.util.TupleComputer;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ConceptAttributes 
-	extends ConceptComponent<ConceptAttributesVariablePart> 
-	implements I_ConceptAttributeVersioned<ConceptAttributesVariablePart, ConceptAttributesVersion> {
+public class ConceptAttributes extends
+		ConceptComponent<ConceptAttributesVariablePart>
+		implements
+		I_ConceptAttributeVersioned<ConceptAttributesVariablePart, ConceptAttributesVersion> {
 
-	protected ConceptAttributes(int nid, int parts,
-			boolean editable) {
+	protected ConceptAttributes(int nid, int parts, boolean editable) {
 		super(nid, parts, editable);
 	}
 
 	@Override
 	public void readComponentFromBdb(TupleInput input, int conceptNid) {
-		// nothing to do...
+		int partsToRead = input.readShort();
+		for (int i = 0; i < partsToRead; i++) {
+			variableParts.add(new ConceptAttributesVariablePart(input));
+		}
 	}
 
 	@Override
-	public void readPartFromBdb(TupleInput input) {
-		variableParts.add(new ConceptAttributesVariablePart(input));
+	public void writeComponentToBdb(TupleOutput output,
+			int maxReadOnlyStatusAtPositionNid) {
+		List<ConceptAttributesVariablePart> partsToWrite = new ArrayList<ConceptAttributesVariablePart>();
+		for (ConceptAttributesVariablePart p : variableParts) {
+			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
+				partsToWrite.add(p);
+			}
+		}
+		output.writeShort(partsToWrite.size());
+		for (ConceptAttributesVariablePart p : partsToWrite) {
+			p.writePartToBdb(output);
+		}
 	}
 
-	@Override
-	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-		// Nothing to do...
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#addVersion(org.dwfa.vodb.types.ThinConPart)
+	 * @see
+	 * org.dwfa.vodb.types.I_ConceptAttributeVersioned#addVersion(org.dwfa.vodb
+	 * .types.ThinConPart)
 	 */
 	public boolean addVersion(ConceptAttributesVariablePart part) {
 		return variableParts.add(part);
@@ -73,7 +83,7 @@ public class ConceptAttributes
 	public int getConId() {
 		return nid;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -90,7 +100,9 @@ public class ConceptAttributes
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)
+	 * @see
+	 * org.dwfa.vodb.types.I_ConceptAttributeVersioned#convertIds(org.dwfa.vodb
+	 * .jar.I_MapNativeToNative)
 	 */
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		throw new UnsupportedOperationException();
@@ -99,7 +111,9 @@ public class ConceptAttributes
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#merge(org.dwfa.vodb.types.ThinConVersioned)
+	 * @see
+	 * org.dwfa.vodb.types.I_ConceptAttributeVersioned#merge(org.dwfa.vodb.types
+	 * .ThinConVersioned)
 	 */
 	public boolean merge(ConceptAttributes jarCon) {
 		HashSet<ConceptAttributesVariablePart> versionSet = new HashSet<ConceptAttributesVariablePart>(
@@ -114,60 +128,69 @@ public class ConceptAttributes
 		return changed;
 	}
 
-	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
+	public void addTuples(I_IntSet allowedStatus,
+			PositionSetReadOnly positions,
 			List<ConceptAttributesVersion> returnTuples) {
 		addTuples(allowedStatus, positions, returnTuples, true);
 	}
 
-	
-	private static class AttributeTupleComputer extends
+	private static class AttributeTupleComputer
+			extends
 			TupleComputer<ConceptAttributesVersion, ConceptAttributes, ConceptAttributesVariablePart> {
 
 		@Override
-		public ConceptAttributesVersion makeTuple(ConceptAttributesVariablePart part,
-				ConceptAttributes core) {
+		public ConceptAttributesVersion makeTuple(
+				ConceptAttributesVariablePart part, ConceptAttributes core) {
 			return new ConceptAttributesVersion(core, part);
 		}
 	}
 
 	private static AttributeTupleComputer computer = new AttributeTupleComputer();
 
-	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-			List<ConceptAttributesVersion> matchingTuples, boolean addUncommitted) {
+	public void addTuples(I_IntSet allowedStatus,
+			PositionSetReadOnly positions,
+			List<ConceptAttributesVersion> matchingTuples,
+			boolean addUncommitted) {
 		computer.addTuples(allowedStatus, positions, matchingTuples,
 				addUncommitted, variableParts, this);
 	}
-	
-	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
-			List<ConceptAttributesVersion> returnTuples, boolean addUncommitted,
-			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
-	    
+
+	public void addTuples(I_IntSet allowedStatus,
+			PositionSetReadOnly positionSet,
+			List<ConceptAttributesVersion> returnTuples,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+
 		List<ConceptAttributesVersion> tuples = new ArrayList<ConceptAttributesVersion>();
-		   
-	    addTuples(allowedStatus, positionSet, tuples, addUncommitted);
-		
+
+		addTuples(allowedStatus, positionSet, tuples, addUncommitted);
+
 		if (returnConflictResolvedLatestState) {
-		    I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+			I_ConfigAceFrame config = AceConfig.getVodb()
+					.getActiveAceFrameConfig();
 			I_ManageConflict conflictResolutionStrategy;
 			if (config == null) {
 				conflictResolutionStrategy = new IdentifyAllConflictStrategy();
 			} else {
-				conflictResolutionStrategy = config.getConflictResolutionStrategy();
+				conflictResolutionStrategy = config
+						.getConflictResolutionStrategy();
 			}
-			
+
 			tuples = conflictResolutionStrategy.resolveTuples(tuples);
 		}
-		
+
 		returnTuples.addAll(tuples);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getLocalFixedConcept()
+	 * @see
+	 * org.dwfa.vodb.types.I_ConceptAttributeVersioned#getLocalFixedConcept()
 	 */
 	public I_ConceptualizeLocally getLocalFixedConcept() {
-		boolean isDefined = variableParts.get(variableParts.size() - 1).isDefined();
+		boolean isDefined = variableParts.get(variableParts.size() - 1)
+				.isDefined();
 		boolean isPrimitive = !isDefined;
 		return LocalFixedConcept.get(nid, isPrimitive);
 	}
@@ -229,35 +252,39 @@ public class ConceptAttributes
 	public List<ConceptAttributesVersion> getTuples(I_IntSet allowedStatus,
 			PositionSetReadOnly viewPositionSet) {
 		List<ConceptAttributesVersion> returnList = new ArrayList<ConceptAttributesVersion>();
-		
+
 		addTuples(allowedStatus, viewPositionSet, returnList);
-		
+
 		return returnList;
 	}
-	
+
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
 			List<ConceptAttributesVersion> returnTuples) {
-		computer.addTuples(allowedStatus, viewPosition, returnTuples, variableParts, this);
+		computer.addTuples(allowedStatus, viewPosition, returnTuples,
+				variableParts, this);
 	}
 
 	public List<ConceptAttributesVersion> getTuples(I_IntSet allowedStatus,
 			I_Position viewPosition) {
 		List<ConceptAttributesVersion> returnList = new ArrayList<ConceptAttributesVersion>();
-		
+
 		addTuples(allowedStatus, viewPosition, returnList);
-		
+
 		return returnList;
 	}
 
-	public boolean promote(I_Position viewPosition, PathSetReadOnly promotionPaths,
-			I_IntSet allowedStatus) {
+	public boolean promote(I_Position viewPosition,
+			PathSetReadOnly promotionPaths, I_IntSet allowedStatus) {
 		int viewPathId = viewPosition.getPath().getConceptId();
 		boolean promotedAnything = false;
-		for (I_Path promotionPath: promotionPaths) {
-			for (ConceptAttributesVersion tuple: getTuples(allowedStatus, viewPosition)) {
+		for (I_Path promotionPath : promotionPaths) {
+			for (ConceptAttributesVersion tuple : getTuples(allowedStatus,
+					viewPosition)) {
 				if (tuple.getPart().getPathId() == viewPathId) {
-					ConceptAttributesVariablePart promotionPart = 
-						tuple.getPart().makeAnalog(tuple.getStatusId(), promotionPath.getConceptId(), Long.MAX_VALUE);
+					ConceptAttributesVariablePart promotionPart = tuple
+							.getPart().makeAnalog(tuple.getStatusId(),
+									promotionPath.getConceptId(),
+									Long.MAX_VALUE);
 					addVersion(promotionPart);
 					promotedAnything = true;
 				}

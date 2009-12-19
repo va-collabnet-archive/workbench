@@ -54,17 +54,26 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 		this.c1Nid = conceptNid;
 		this.c2Nid = input.readInt();
 		this.editable = input.readBoolean();
-	}
-
-	@Override
-	public void readPartFromBdb(TupleInput input) {
-		variableParts.add(new RelationshipVariablePart(input));
+		int partsToRead = input.readShort();
+		for (int i = 0; i < partsToRead; i++) {
+			variableParts.add(new RelationshipVariablePart(input));
+		}
 	}
 
 	@Override
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		output.writeInt(c2Nid);
 		output.writeBoolean(editable);
+		List<RelationshipVariablePart> partsToWrite = new ArrayList<RelationshipVariablePart>();
+		for (RelationshipVariablePart p : variableParts) {
+			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
+				partsToWrite.add(p);
+			}
+		}
+		output.writeShort(partsToWrite.size());
+		for (RelationshipVariablePart p : partsToWrite) {
+			p.writePartToBdb(output);
+		}
 	}
 
 

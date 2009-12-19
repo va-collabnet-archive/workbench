@@ -68,7 +68,6 @@ public class Identifier extends ConceptComponent<IdentifierVariablePart>
 					throw new UnsupportedOperationException();
 			}
 		}
-
 	}
 
 	@Override

@@ -51,6 +51,10 @@ public class Image extends ConceptComponent<ImageVariablePart> implements
 		int imageBytes = input.readInt();
 		image = new byte[imageBytes];
 		input.read(image, 0, imageBytes);
+		int partsToRead = input.readShort();
+		for (int i = 0; i < partsToRead; i++) {
+			variableParts.add(new ImageVariablePart(input));
+		}
 	}
 
 	@Override
@@ -58,12 +62,18 @@ public class Image extends ConceptComponent<ImageVariablePart> implements
 		output.writeString(format);
 		output.writeInt(image.length);
 		output.write(image);
+		List<ImageVariablePart> partsToWrite = new ArrayList<ImageVariablePart>();
+		for (ImageVariablePart p: variableParts) {
+			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
+				partsToWrite.add(p);
+			}
+		}
+		output.writeShort(partsToWrite.size());
+		for (ImageVariablePart p: partsToWrite) {
+			p.writePartToBdb(output);
+		}
 	}
 
-	@Override
-	public void readPartFromBdb(TupleInput input) {
-		variableParts.add(new ImageVariablePart(input));
-	}
 
 	/*
 	 * (non-Javadoc)
