@@ -9,7 +9,7 @@ import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
 
-public class Version<V extends VariablePart<V>, C extends ConceptComponent<V>> 
+public class Version<V extends MutablePart<V>, C extends ConceptComponent<V>> 
 	implements I_AmTuple {
 
 	protected C component;
@@ -94,7 +94,7 @@ public class Version<V extends VariablePart<V>, C extends ConceptComponent<V>>
 		return component.getTimePathSet();
 	}
 	public List<V> getVersions() {
-		return component.variableParts;
+		return component.mutableParts;
 	}
 
 

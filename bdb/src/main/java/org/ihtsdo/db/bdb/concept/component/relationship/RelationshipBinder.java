@@ -4,18 +4,18 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 
 public class RelationshipBinder {
 
-	private static final ThreadLocal<ConceptComponentBinder<Relationship, RelationshipVariablePart>> binders = 
-			new ThreadLocal<ConceptComponentBinder<Relationship, RelationshipVariablePart>>() {
+	private static final ThreadLocal<ConceptComponentBinder<Relationship, RelationshipMutablePart>> binders = 
+			new ThreadLocal<ConceptComponentBinder<Relationship, RelationshipMutablePart>>() {
 		
 		@Override
-		protected ConceptComponentBinder<Relationship, RelationshipVariablePart> initialValue() {
+		protected ConceptComponentBinder<Relationship, RelationshipMutablePart> initialValue() {
 			RelationshipFactory factory = new RelationshipFactory();
-			return new ConceptComponentBinder<Relationship, RelationshipVariablePart>(
+			return new ConceptComponentBinder<Relationship, RelationshipMutablePart>(
 					factory);
 		}
 	};
 
-	public static ConceptComponentBinder<Relationship, RelationshipVariablePart> getBinder() {
+	public static ConceptComponentBinder<Relationship, RelationshipMutablePart> getBinder() {
 		return binders.get();
 	}
 

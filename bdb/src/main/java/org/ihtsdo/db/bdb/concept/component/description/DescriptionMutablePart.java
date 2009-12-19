@@ -5,12 +5,12 @@ import java.nio.charset.Charset;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.ihtsdo.db.bdb.concept.component.VariablePart;
+import org.ihtsdo.db.bdb.concept.component.MutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class DescriptionVariablePart extends VariablePart<DescriptionVariablePart> 
+public class DescriptionMutablePart extends MutablePart<DescriptionMutablePart> 
 	implements I_DescriptionPart {
 	
 	@SuppressWarnings("unused")
@@ -21,11 +21,11 @@ public class DescriptionVariablePart extends VariablePart<DescriptionVariablePar
 	private int typeNid; 
 	private String lang;
 
-	public DescriptionVariablePart(int statusAtPositionNid) {
+	public DescriptionMutablePart(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 	
-	protected DescriptionVariablePart(DescriptionVariablePart another) {
+	protected DescriptionMutablePart(DescriptionMutablePart another) {
 		super(another.getStatusAtPositionNid());
 		this.text = another.text;
 		this.typeNid = another.typeNid;
@@ -33,7 +33,7 @@ public class DescriptionVariablePart extends VariablePart<DescriptionVariablePar
 		this.initialCaseSignificant = another.initialCaseSignificant;
 	}
 
-	protected DescriptionVariablePart(DescriptionVariablePart another, int statusNid, int pathNid, long time) {
+	protected DescriptionMutablePart(DescriptionMutablePart another, int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 		this.text = another.text;
 		this.typeNid = another.typeNid;
@@ -41,7 +41,7 @@ public class DescriptionVariablePart extends VariablePart<DescriptionVariablePar
 		this.initialCaseSignificant = another.initialCaseSignificant;
 	}
 
-	protected DescriptionVariablePart(TupleInput input) {
+	protected DescriptionMutablePart(TupleInput input) {
 		super(input.readInt());
 		text = input.readString();
 		lang = input.readString();
@@ -108,13 +108,13 @@ public class DescriptionVariablePart extends VariablePart<DescriptionVariablePar
 	}
 
 	@Override
-	public DescriptionVariablePart duplicate() {
-		return new DescriptionVariablePart(this);
+	public DescriptionMutablePart duplicate() {
+		return new DescriptionMutablePart(this);
 	}
 
 	@Override
-	public DescriptionVariablePart makeAnalog(int statusNid, int pathNid, long time) {
-		return new DescriptionVariablePart(this, statusNid, pathNid, time);
+	public DescriptionMutablePart makeAnalog(int statusNid, int pathNid, long time) {
+		return new DescriptionMutablePart(this, statusNid, pathNid, time);
 	}
 
 	@Override

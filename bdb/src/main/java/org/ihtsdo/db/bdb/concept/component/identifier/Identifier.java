@@ -17,8 +17,8 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class Identifier extends ConceptComponent<IdentifierVariablePart>
-		implements I_IdVersioned<IdentifierVariablePart, IdentifierVersion> {
+public class Identifier extends ConceptComponent<IdentifierMutablePart>
+		implements I_IdVersioned<IdentifierMutablePart, IdentifierVersion> {
 
 	protected enum VARIABLE_PART_TYPES {
 		LONG(1), STRING(2), UUID(3);
@@ -51,18 +51,18 @@ public class Identifier extends ConceptComponent<IdentifierVariablePart>
 	}
 
 	@Override
-	public void readComponentFromBdb(TupleInput input, int conceptNid) {
-		int partsToRead = input.readShort();
-		for (int i = 0; i < partsToRead; i++) {
+	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize) {
+		// nid, list size, and conceptNid are read already by the binder...
+		for (int i = 0; i < listSize; i++) {
 			switch (VARIABLE_PART_TYPES.readType(input)) {
 			case LONG:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new IdentifierMutablePartLong(input));
 				break;
 			case STRING:
-				variableParts.add(new IdentifierVariablePartString(input));
+				mutableParts.add(new IdentifierMutablePartString(input));
 				break;
 			case UUID:
-				variableParts.add(new IdentifierVariablePartUuid(input));
+				mutableParts.add(new IdentifierMutablePartUuid(input));
 				break;
 				default:
 					throw new UnsupportedOperationException();
@@ -73,14 +73,16 @@ public class Identifier extends ConceptComponent<IdentifierVariablePart>
 	@Override
 	public void writeComponentToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
-		List<IdentifierVariablePart> partsToWrite = new ArrayList<IdentifierVariablePart>();
-		for (IdentifierVariablePart p: variableParts) {
+		List<IdentifierMutablePart> partsToWrite = new ArrayList<IdentifierMutablePart>();
+		for (IdentifierMutablePart p: mutableParts) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
 		}
+		// Start writing
+		output.writeInt(nid);
 		output.writeShort(partsToWrite.size());
-		for (IdentifierVariablePart p: partsToWrite) {
+		for (IdentifierMutablePart p: partsToWrite) {
 			p.getType().writeType(output);
 			p.writePartToBdb(output);
 		}
@@ -88,13 +90,13 @@ public class Identifier extends ConceptComponent<IdentifierVariablePart>
 
 	@Override
 	public boolean addVersion(I_IdPart srcId) {
-		return variableParts.add((IdentifierVariablePart) srcId);
+		return mutableParts.add((IdentifierMutablePart) srcId);
 	}
 
 	@Override
 	public List<IdentifierVersion> getTuples() {
 		List<IdentifierVersion> returnValues = new ArrayList<IdentifierVersion>();
-		for (IdentifierVariablePart idv : variableParts) {
+		for (IdentifierMutablePart idv : mutableParts) {
 			returnValues.add(new IdentifierVersion(this, idv));
 		}
 		return returnValues;
@@ -103,10 +105,10 @@ public class Identifier extends ConceptComponent<IdentifierVariablePart>
 	@Override
 	public List<UUID> getUIDs() {
 		List<UUID> returnValues = new ArrayList<UUID>();
-		for (IdentifierVariablePart idv : variableParts) {
-			if (IdentifierVariablePartUuid.class.isAssignableFrom(idv
+		for (IdentifierMutablePart idv : mutableParts) {
+			if (IdentifierMutablePartUuid.class.isAssignableFrom(idv
 					.getClass())) {
-				IdentifierVariablePartUuid uuidPart = (IdentifierVariablePartUuid) idv;
+				IdentifierMutablePartUuid uuidPart = (IdentifierMutablePartUuid) idv;
 				returnValues.add(uuidPart.getUuid());
 			}
 		}
@@ -136,7 +138,7 @@ public class Identifier extends ConceptComponent<IdentifierVariablePart>
 
 	@Override
 	public boolean hasVersion(I_IdPart newPart) {
-		return super.hasVersion((IdentifierVariablePart) newPart);
+		return super.hasVersion((IdentifierMutablePart) newPart);
 	}
 
 }

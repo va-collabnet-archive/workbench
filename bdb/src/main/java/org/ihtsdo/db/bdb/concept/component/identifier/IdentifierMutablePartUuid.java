@@ -7,11 +7,11 @@ import org.ihtsdo.db.bdb.concept.component.identifier.Identifier.VARIABLE_PART_T
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class IdentifierVariablePartUuid extends IdentifierVariablePart {
+public class IdentifierMutablePartUuid extends IdentifierMutablePart {
 	private long mostSigBits;
 	private long leastSigBits;
 	
-	public IdentifierVariablePartUuid(TupleInput input) {
+	public IdentifierMutablePartUuid(TupleInput input) {
 		super(input.readInt());
 		mostSigBits = input.readLong();
 		leastSigBits = input.readLong();

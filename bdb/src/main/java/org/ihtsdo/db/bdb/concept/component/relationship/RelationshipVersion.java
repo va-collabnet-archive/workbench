@@ -4,10 +4,10 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelTuple;
 import org.ihtsdo.db.bdb.concept.component.Version;
 
-public class RelationshipVersion extends Version<RelationshipVariablePart, Relationship> 
+public class RelationshipVersion extends Version<RelationshipMutablePart, Relationship> 
 	implements I_RelTuple {
 
-	protected RelationshipVersion(Relationship component, RelationshipVariablePart part) {
+	protected RelationshipVersion(Relationship component, RelationshipMutablePart part) {
 		super(component, part);
 	}
 

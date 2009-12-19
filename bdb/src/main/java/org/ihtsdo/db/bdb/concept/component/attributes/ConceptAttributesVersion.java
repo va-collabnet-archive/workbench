@@ -4,11 +4,11 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.ihtsdo.db.bdb.concept.component.Version;
 
 public class ConceptAttributesVersion 
-	extends Version<ConceptAttributesVariablePart, ConceptAttributes>
+	extends Version<ConceptAttributesMutablePart, ConceptAttributes>
 	implements I_ConceptAttributeTuple {
 
 	protected ConceptAttributesVersion(ConceptAttributes component,
-			ConceptAttributesVariablePart part) {
+			ConceptAttributesMutablePart part) {
 		super(component, part);
 	}
 

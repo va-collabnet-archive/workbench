@@ -18,14 +18,14 @@ import org.ihtsdo.db.bdb.concept.component.DataVersionBinder;
 import org.ihtsdo.db.bdb.concept.component.RelNidTypeNidBinder;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesBinder;
-import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesVariablePart;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesMutablePart;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionBinder;
-import org.ihtsdo.db.bdb.concept.component.description.DescriptionVariablePart;
+import org.ihtsdo.db.bdb.concept.component.description.DescriptionMutablePart;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
-import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipVariablePart;
+import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipMutablePart;
 
 import cern.colt.map.OpenIntIntHashMap;
 
@@ -102,7 +102,7 @@ public class ConceptData  {
 	}
 
 	public ArrayList<Relationship> getSourceRels() throws IOException {
-		ConceptComponentBinder<Relationship, RelationshipVariablePart> binder = RelationshipBinder.getBinder();
+		ConceptComponentBinder<Relationship, RelationshipMutablePart> binder = RelationshipBinder.getBinder();
 		binder.setupBinder(nid, editable);
 		try {
 			TupleInput readOnlyInput = data.getReadOnlyTupleInput();
@@ -121,7 +121,7 @@ public class ConceptData  {
 	}
 	
 	public List<Description> getDescriptions() throws IOException {
-		ConceptComponentBinder<Description, DescriptionVariablePart> binder = DescriptionBinder.getBinder();
+		ConceptComponentBinder<Description, DescriptionMutablePart> binder = DescriptionBinder.getBinder();
 		binder.setupBinder(nid, editable);
 		try {
 			TupleInput readOnlyInput = data.getReadOnlyTupleInput();
@@ -142,7 +142,7 @@ public class ConceptData  {
 
 	public ConceptAttributes getConceptAttributes()
 			throws IOException {
-		ConceptComponentBinder<ConceptAttributes, ConceptAttributesVariablePart> binder = 
+		ConceptComponentBinder<ConceptAttributes, ConceptAttributesMutablePart> binder = 
 				ConceptAttributesBinder.getBinder();
 		binder.setupBinder(nid, editable);
 		try {

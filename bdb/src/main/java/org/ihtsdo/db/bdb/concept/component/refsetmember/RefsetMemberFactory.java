@@ -2,7 +2,7 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember;
 
 import org.ihtsdo.db.bdb.concept.component.ComponentFactory;
 
-public class RefsetMemberFactory extends ComponentFactory<RefsetMember, RefsetMemberVariablePart> {
+public class RefsetMemberFactory extends ComponentFactory<RefsetMember, RefsetMemberMutablePart> {
 
 	@Override
 	public RefsetMember create(int nid, int partCount, boolean editable) {

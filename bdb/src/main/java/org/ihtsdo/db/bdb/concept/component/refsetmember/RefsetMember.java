@@ -1,8 +1,10 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -14,91 +16,78 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVariablePartLong;
-import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVariablePartString;
-import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVariablePartUuid;
-import org.ihtsdo.db.bdb.concept.component.identifier.Identifier.VARIABLE_PART_TYPES;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.ConceptConceptConceptMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.ConceptConceptMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.ConceptConceptStringMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.ConceptIntegerMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.ConceptMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.ConceptStringMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.CrossMapForRelMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.CrossMapMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.IntegerMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.LanguageMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.MeasurementMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.MemberMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.MembershipMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.ScopedLanguageMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.StringMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.TemplateForRelMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membertype.TemplateMutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class RefsetMember extends ConceptComponent<RefsetMemberVariablePart> 
-	implements I_ThinExtByRefVersioned<RefsetMemberVariablePart, RefsetMemberVersion> {
+public class RefsetMember extends ConceptComponent<RefsetMemberMutablePart> 
+	implements I_ThinExtByRefVersioned<RefsetMemberMutablePart, RefsetMemberVersion> {
 	/**
 	 * 
 	 * @author kec
 	 *
 	 */
 	protected enum REFSET_MEMBER_TYPE {
-	    MEMBER(0, RefsetAuxiliary.Concept.MEMBERSHIP_EXTENSION.getUids()), 
-	    BOOLEAN(1, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids()), 
-	    CONCEPT(2, RefsetAuxiliary.Concept.STRING_EXTENSION.getUids()), 
-	    CON_INT(3, RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids()),
-	    STRING(4, RefsetAuxiliary.Concept.INT_EXTENSION.getUids()), 
-	    INTEGER(5, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids()), 
-	    MEASUREMENT(6, RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids()), 
-	    LANGUAGE(7, RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids()), 
-	    SCOPED_LANGUAGE(8, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids()), 
-	    TEMPLATE_FOR_REL(9, RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids()),
-	    TEMPLATE(10, RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids()),
-	    CROSS_MAP_FOR_REL(11, RefsetAuxiliary.Concept.TEMPLATE_EXTENSION.getUids()),
-	    CROSS_MAP(12, RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids()),
-	    CONCEPT_CONCEPT(13, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids()),
-	    CONCEPT_CONCEPT_CONCEPT(14, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids()),
-	    CONCEPT_CONCEPT_STRING(15, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids()),
-	    CONCEPT_STRING(16, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids()),
+	    MEMBER(RefsetAuxiliary.Concept.MEMBERSHIP_EXTENSION.getUids()), 
+	    BOOLEAN(RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids()), 
+	    CONCEPT(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids()), 
+	    CON_INT(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids()),
+	    STRING(RefsetAuxiliary.Concept.INT_EXTENSION.getUids()), 
+	    INTEGER(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids()), 
+	    MEASUREMENT(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids()), 
+	    LANGUAGE(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids()), 
+	    SCOPED_LANGUAGE(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids()), 
+	    TEMPLATE_FOR_REL(RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids()),
+	    TEMPLATE(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids()),
+	    CROSS_MAP_FOR_REL(RefsetAuxiliary.Concept.TEMPLATE_EXTENSION.getUids()),
+	    CROSS_MAP(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids()),
+	    CONCEPT_CONCEPT(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids()),
+	    CONCEPT_CONCEPT_CONCEPT(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids()),
+	    CONCEPT_CONCEPT_STRING(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids()),
+	    CONCEPT_STRING(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids()),
 	    	;
 	    
 	    private int typeNid;
-	    private byte typeByte;
 	    
 	    
-	    private REFSET_MEMBER_TYPE(int typeByte, Collection<UUID> uids) throws TerminologyException, IOException {
-	    	this.typeByte = (byte) typeByte;
-	        this.typeNid = AceConfig.getVodb().uuidToNative(uids);
+	    private REFSET_MEMBER_TYPE(Collection<UUID> uids) {
+	        try {
+				this.typeNid = AceConfig.getVodb().uuidToNative(uids);
+			} catch (TerminologyException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 	    }
 
-	    private static Map<Integer, REFSET_MEMBER_TYPE> typeNidToRefsetMemberTypeMap = 
-	    	new HashMap<Integer, REFSET_MEMBER_TYPE>();
+	    private static Map<Integer, REFSET_MEMBER_TYPE> typeNidToRefsetMemberTypeMap;
 
 			public static REFSET_MEMBER_TYPE readType(TupleInput input) {
-				switch (input.readByte()) {
-				case 0:
-					return MEMBER;
-				case 1:
-					return BOOLEAN; 
-				case 2:
-					return CONCEPT; 
-				case 3:
-					return CON_INT;
-				case 4:
-					return STRING; 
-				case 5:
-					return INTEGER; 
-				case 6:
-					return MEASUREMENT; 
-				case 7:
-					return LANGUAGE; 
-				case 8:
-					return SCOPED_LANGUAGE; 
-				case 9:
-					return TEMPLATE_FOR_REL;
-				case 10:
-					return TEMPLATE;
-				case 11:
-					return CROSS_MAP_FOR_REL;
-				case 12:
-					return CROSS_MAP;
-				case 13:
-					return CONCEPT_CONCEPT;
-				case 14:
-					return CONCEPT_CONCEPT_CONCEPT;
-				case 15:
-					return CONCEPT_CONCEPT_STRING;
-				case 16:
-					return CONCEPT_STRING;
+				if (typeNidToRefsetMemberTypeMap == null) {
+					typeNidToRefsetMemberTypeMap = 
+				    	new HashMap<Integer, REFSET_MEMBER_TYPE>();
+				    	for (REFSET_MEMBER_TYPE type: REFSET_MEMBER_TYPE.values()) {
+				    		typeNidToRefsetMemberTypeMap.put(type.typeNid, type);
+				    	}
 				}
-				throw new UnsupportedOperationException();
+				return typeNidToRefsetMemberTypeMap.get(input.readInt());
 			}
 	}
 
@@ -111,72 +100,93 @@ public class RefsetMember extends ConceptComponent<RefsetMemberVariablePart>
 		super(nid, partCount, editable);
 	}
 
-	
+
 	@Override
-	public void readComponentFromBdb(TupleInput input, int conceptNid) {
+	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+		List<RefsetMemberMutablePart> partsToWrite = new ArrayList<RefsetMemberMutablePart>();
+		for (RefsetMemberMutablePart p: mutableParts) {
+			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
+				partsToWrite.add(p);
+			}
+		}
+		// Start writing
+		output.writeInt(nid);
+		output.writeShort(partsToWrite.size());
+		// refsetNid is the enclosing concept, does not need to be written. 
+		output.writeInt(componentNid);
+		output.writeInt(memberTypeNid);
+
+		for (RefsetMemberMutablePart p: partsToWrite) {
+			p.writePartToBdb(output);
+		}
+		
+	}
+
+	@Override
+	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize) {
 		refsetNid = conceptNid;
+		
+		// nid, list size, and conceptNid are read already by the binder...
 		componentNid = input.readInt();
-		memberTypeNid = input.readInt();
-		int partsToRead = input.readShort();
-		for (int i = 0; i < partsToRead; i++) {
-			switch (REFSET_MEMBER_TYPE.readType(input)) {
+		REFSET_MEMBER_TYPE memberType = REFSET_MEMBER_TYPE.readType(input);
+		memberTypeNid = memberType.typeNid;
+		for (int i = 0; i < listSize; i++) {
+			switch (memberType) {
 			case BOOLEAN:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new MembershipMutablePart(input));
 				break;
 			case CON_INT:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new ConceptIntegerMutablePart(input));
 				break;
 			case CONCEPT:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new ConceptMutablePart(input));
+				break;
+			case CONCEPT_CONCEPT:
+				mutableParts.add(new ConceptConceptMutablePart(input));
 				break;
 			case CONCEPT_CONCEPT_CONCEPT:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new ConceptConceptConceptMutablePart(input));
 				break;
 			case CONCEPT_CONCEPT_STRING:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new ConceptConceptStringMutablePart(input));
 				break;
 			case CONCEPT_STRING:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new ConceptStringMutablePart(input));
 				break;
 			case CROSS_MAP:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new CrossMapMutablePart(input));
 				break;
 			case CROSS_MAP_FOR_REL:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new CrossMapForRelMutablePart(input));
 				break;
 			case INTEGER:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new IntegerMutablePart(input));
 				break;
 			case LANGUAGE:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new LanguageMutablePart(input));
 				break;
 			case MEASUREMENT:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new MeasurementMutablePart(input));
 				break;
 			case MEMBER:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new MemberMutablePart(input));
 				break;
 			case SCOPED_LANGUAGE:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new ScopedLanguageMutablePart(input));
 				break;
 			case STRING:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new StringMutablePart(input));
 				break;
 			case TEMPLATE:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new TemplateMutablePart(input));
 				break;
 			case TEMPLATE_FOR_REL:
-				variableParts.add(new IdentifierVariablePartLong(input));
+				mutableParts.add(new TemplateForRelMutablePart(input));
 				break;
 				default:
 					throw new UnsupportedOperationException();
 			}
-	}
-
-	@Override
-	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-		output.writeInt(componentNid);
-		
+		}
 	}
 
 	@Override

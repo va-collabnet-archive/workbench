@@ -5,10 +5,10 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.ihtsdo.db.bdb.concept.component.Version;
 
 public class DescriptionVersion 
-	extends Version<DescriptionVariablePart, Description> 
+	extends Version<DescriptionMutablePart, Description> 
 	implements I_DescriptionTuple {
 
-	protected DescriptionVersion(Description component, DescriptionVariablePart part) {
+	protected DescriptionVersion(Description component, DescriptionMutablePart part) {
 		super(component, part);
 	}
 

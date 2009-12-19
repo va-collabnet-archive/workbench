@@ -5,10 +5,10 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.ihtsdo.db.bdb.concept.component.Version;
 
 public class ImageVersion 
-	extends Version<ImageVariablePart, Image> 
+	extends Version<ImageMutablePart, Image> 
 	implements I_ImageTuple {
 
-	protected ImageVersion(Image component, ImageVariablePart part) {
+	protected ImageVersion(Image component, ImageMutablePart part) {
 		super(component, part);
 	}
 

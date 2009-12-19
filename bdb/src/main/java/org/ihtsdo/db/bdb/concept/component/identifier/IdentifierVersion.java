@@ -11,16 +11,16 @@ import org.ihtsdo.db.bdb.concept.component.Version;
 import org.ihtsdo.db.bdb.concept.component.identifier.Identifier.VARIABLE_PART_TYPES;
 
 public class IdentifierVersion 
-	extends Version<IdentifierVariablePart, Identifier> 
+	extends Version<IdentifierMutablePart, Identifier> 
 	implements I_IdTuple {
 
 	protected IdentifierVersion(Identifier component,
-			IdentifierVariablePart version) {
+			IdentifierMutablePart version) {
 		super(component, version);
 	}
 
 	@Override
-	public I_IdVersioned<IdentifierVariablePart, IdentifierVersion> getIdVersioned() {
+	public I_IdVersioned<IdentifierMutablePart, IdentifierVersion> getIdVersioned() {
 		return component;
 	}
 
@@ -42,7 +42,7 @@ public class IdentifierVersion
 	@Override
 	public List<UUID> getUIDs() {
 		List<UUID> returnValues = new ArrayList<UUID>();
-		for (IdentifierVariablePart p: component.variableParts) {
+		for (IdentifierMutablePart p: component.mutableParts) {
 			if (p.getType() == VARIABLE_PART_TYPES.UUID) {
 				returnValues.add((UUID) p.getSourceId());
 			}

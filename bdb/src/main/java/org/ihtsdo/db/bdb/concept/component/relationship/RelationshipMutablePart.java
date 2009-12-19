@@ -3,12 +3,12 @@ package org.ihtsdo.db.bdb.concept.component.relationship;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
-import org.ihtsdo.db.bdb.concept.component.VariablePart;
+import org.ihtsdo.db.bdb.concept.component.MutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class RelationshipVariablePart extends VariablePart<RelationshipVariablePart> 
+public class RelationshipMutablePart extends MutablePart<RelationshipMutablePart> 
 	implements I_RelPart {
 	
 	private int characteristicNid;
@@ -16,11 +16,11 @@ public class RelationshipVariablePart extends VariablePart<RelationshipVariableP
 	private int refinabilityNid;
 	private int typeNid;
 
-	public RelationshipVariablePart(int statusAtPositionNid) {
+	public RelationshipMutablePart(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public RelationshipVariablePart(RelationshipVariablePart another) {
+	public RelationshipMutablePart(RelationshipMutablePart another) {
 		super(another.statusAtPositionNid);
 		this.characteristicNid = another.characteristicNid;
 		this.group = another.group;
@@ -28,7 +28,7 @@ public class RelationshipVariablePart extends VariablePart<RelationshipVariableP
 		this.typeNid = another.typeNid;
 	}
 
-	public RelationshipVariablePart(RelationshipVariablePart another, int statusNid,
+	public RelationshipMutablePart(RelationshipMutablePart another, int statusNid,
 			int pathNid, long time) {
 		super(statusNid, pathNid, time);
 		this.characteristicNid = another.characteristicNid;
@@ -37,7 +37,7 @@ public class RelationshipVariablePart extends VariablePart<RelationshipVariableP
 		this.typeNid = another.typeNid;
 	}
 
-	public RelationshipVariablePart(TupleInput input) {
+	public RelationshipMutablePart(TupleInput input) {
 		super(input.readInt());
 		this.characteristicNid = input.readInt();
 		this.group = input.readInt();
@@ -90,13 +90,13 @@ public class RelationshipVariablePart extends VariablePart<RelationshipVariableP
 	}
 
 	@Override
-	public RelationshipVariablePart duplicate() {
-		return new RelationshipVariablePart(this);
+	public RelationshipMutablePart duplicate() {
+		return new RelationshipMutablePart(this);
 	}
 	
 	@Override
-	public RelationshipVariablePart makeAnalog(int statusNid, int pathNid, long time) {
-		return new RelationshipVariablePart(this, statusNid, pathNid, time);
+	public RelationshipMutablePart makeAnalog(int statusNid, int pathNid, long time) {
+		return new RelationshipMutablePart(this, statusNid, pathNid, time);
 	}
 
 	@Override

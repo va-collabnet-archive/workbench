@@ -4,12 +4,12 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.util.HashFunction;
-import org.ihtsdo.db.bdb.concept.component.VariablePart;
+import org.ihtsdo.db.bdb.concept.component.MutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ImageVariablePart extends VariablePart<ImageVariablePart> 
+public class ImageMutablePart extends MutablePart<ImageMutablePart> 
 		implements I_ImagePart {
 
 	private String textDescription;
@@ -21,27 +21,27 @@ public class ImageVariablePart extends VariablePart<ImageVariablePart>
 		return partComponentNids;
 	}
 
-	protected ImageVariablePart(TupleInput input) {
+	protected ImageMutablePart(TupleInput input) {
 		super(input.readInt());
 		this.textDescription = input.readString();
 		this.typeNid = input.readInt();
 	}
 
-	private ImageVariablePart(ImageVariablePart another) {
+	private ImageMutablePart(ImageMutablePart another) {
 		super(another.statusAtPositionNid);
 		this.textDescription = another.textDescription;
 		this.typeNid = another.typeNid;
 	}
 
-	private ImageVariablePart(ImageVariablePart another, int statusNid, int pathNid, long time) {
+	private ImageMutablePart(ImageMutablePart another, int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 		this.textDescription = another.textDescription;
 		this.typeNid = another.typeNid;
 	}
 
 	@Override
-	public ImageVariablePart makeAnalog(int statusNid, int pathNid, long time) {
-		return new ImageVariablePart(this, statusNid, pathNid, time);
+	public ImageMutablePart makeAnalog(int statusNid, int pathNid, long time) {
+		return new ImageMutablePart(this, statusNid, pathNid, time);
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class ImageVariablePart extends VariablePart<ImageVariablePart>
 		output.writeInt(typeNid);
 	}
 
-	private ImageVariablePart(int statusAtPositionNid) {
+	private ImageMutablePart(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 		// TODO Auto-generated constructor stub
 	}
@@ -83,7 +83,7 @@ public class ImageVariablePart extends VariablePart<ImageVariablePart>
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#hasNewData(org.dwfa.vodb.types.ThinImagePart)
 	 */
-	public boolean hasNewData(ImageVariablePart another) {
+	public boolean hasNewData(ImageMutablePart another) {
 		return ((this.getPathId() != another.getPathId()) ||
 				(this.getStatusId() != another.getStatusId()) ||
 				((this.textDescription.equals(another.getTextDescription()) == false) ||
@@ -97,7 +97,7 @@ public class ImageVariablePart extends VariablePart<ImageVariablePart>
 	}
 	@Override
 	public boolean equals(Object obj) {
-		ImageVariablePart another = (ImageVariablePart) obj;
+		ImageMutablePart another = (ImageMutablePart) obj;
 		return ((getPathId() == another.getPathId()) &&
 				(getStatusId() == another.getStatusId()) && 
 				(textDescription.equals(another.textDescription)) &&
@@ -110,8 +110,8 @@ public class ImageVariablePart extends VariablePart<ImageVariablePart>
 				textDescription.hashCode(), typeNid});
 	}
 	
-	public ImageVariablePart duplicate() {
-		return new ImageVariablePart(this);
+	public ImageMutablePart duplicate() {
+		return new ImageMutablePart(this);
 	}
 	
 }

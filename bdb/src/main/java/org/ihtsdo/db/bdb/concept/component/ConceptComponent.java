@@ -12,42 +12,42 @@ import org.dwfa.ace.api.TimePathId;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class ConceptComponent<P extends VariablePart<P>> implements I_AmTermComponent {
+public abstract class ConceptComponent<P extends MutablePart<P>> implements I_AmTermComponent {
 	public int nid;
 	public boolean editable;
-	public List<P> variableParts;
+	public ArrayList<P> mutableParts;
 	
 	protected ConceptComponent(int nid, int listSize, boolean editable) {
 		super();
 		this.nid = nid;
 		this.editable = editable;
-		this.variableParts = new ArrayList<P>(listSize);
+		this.mutableParts = new ArrayList<P>(listSize);
 	}
 	
 	public final List<P> getVersions() {
 		if (editable) {
-			return variableParts;
+			return mutableParts;
 		}
-		return Collections.unmodifiableList(variableParts);
+		return Collections.unmodifiableList(mutableParts);
 	}
 
 	public boolean addVersion(P newPart) {
 		if (editable) {
-			return variableParts.add(newPart);
+			return mutableParts.add(newPart);
 		}
 		throw new RuntimeException("versions is not editable");
 	}
 	
 	public boolean addVersionNoRedundancyCheck(P newPart) {
-		return variableParts.add(newPart);
+		return mutableParts.add(newPart);
 	}
 	
 	public boolean hasVersion(P p) {
-		return variableParts.contains(p);
+		return mutableParts.contains(p);
 	}
 
 	public final int versionCount() {
-		return variableParts.size();
+		return mutableParts.size();
 	}
 
 	public final int getNid() {
@@ -61,14 +61,14 @@ public abstract class ConceptComponent<P extends VariablePart<P>> implements I_A
 
 	public final Set<TimePathId> getTimePathSet() {
 		Set<TimePathId> set = new TreeSet<TimePathId>();
-		for (P p : variableParts) {
+		for (P p : mutableParts) {
 			set.add(new TimePathId(p.getVersion(), p.getPathId()));
 		}
 		return set;
 	}
 
 
-	public abstract void readComponentFromBdb(TupleInput input, int conceptNid);
+	public abstract void readComponentFromBdb(TupleInput input, int conceptNid, int listSize);
 	
 	public abstract void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid);
 

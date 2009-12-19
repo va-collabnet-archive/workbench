@@ -2,7 +2,7 @@ package org.ihtsdo.db.bdb.concept.component.image;
 
 import org.ihtsdo.db.bdb.concept.component.ComponentFactory;
 
-public class ImageFactory extends ComponentFactory<Image, ImageVariablePart> {
+public class ImageFactory extends ComponentFactory<Image, ImageMutablePart> {
 
 	@Override
 	public Image create(int nid, int partCount, boolean editable) {

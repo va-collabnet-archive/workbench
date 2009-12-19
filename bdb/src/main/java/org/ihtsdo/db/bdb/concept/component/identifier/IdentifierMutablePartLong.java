@@ -5,24 +5,23 @@ import org.ihtsdo.db.bdb.concept.component.identifier.Identifier.VARIABLE_PART_T
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class IdentifierVariablePartString extends IdentifierVariablePart {
+public class IdentifierMutablePartLong extends IdentifierMutablePart {
+	private long longId;
 
-	private String stringId;
-
-	public IdentifierVariablePartString(TupleInput input) {
+	public IdentifierMutablePartLong(TupleInput input) {
 		super(input.readInt());
-		stringId = input.readString();
+		longId = input.readLong();
 	}
 
 	@Override
 	protected VARIABLE_PART_TYPES getType() {
-		return VARIABLE_PART_TYPES.STRING;
+		return VARIABLE_PART_TYPES.LONG;
 	}
 
 	@Override
 	protected void writeSourceIdToBdb(TupleOutput output) {
 		output.writeInt(statusAtPositionNid);
-		output.writeString(stringId);
+		output.writeLong(longId);
 	}
 
 }

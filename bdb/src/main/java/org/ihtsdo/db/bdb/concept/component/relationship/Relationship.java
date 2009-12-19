@@ -22,18 +22,18 @@ import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.util.TupleComputer;
+import org.ihtsdo.db.util.VersionComputer;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class Relationship extends ConceptComponent<RelationshipVariablePart> 
-	implements I_RelVersioned<RelationshipVariablePart, RelationshipVersion> {
+public class Relationship extends ConceptComponent<RelationshipMutablePart> 
+	implements I_RelVersioned<RelationshipMutablePart, RelationshipVersion> {
 
 	private static class RelTupleComputer extends
-			TupleComputer<RelationshipVersion, Relationship, RelationshipVariablePart> {
+			VersionComputer<RelationshipVersion, Relationship, RelationshipMutablePart> {
 
-		public RelationshipVersion makeTuple(RelationshipVariablePart part, Relationship core) {
+		public RelationshipVersion makeTuple(RelationshipMutablePart part, Relationship core) {
 			return new RelationshipVersion(core, part);
 		}
 	}
@@ -50,28 +50,30 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	
 
 	@Override
-	public void readComponentFromBdb(TupleInput input, int conceptNid) {
+	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize) {
+		// nid, list size, and conceptNid are read already by the binder...
 		this.c1Nid = conceptNid;
 		this.c2Nid = input.readInt();
-		this.editable = input.readBoolean();
-		int partsToRead = input.readShort();
-		for (int i = 0; i < partsToRead; i++) {
-			variableParts.add(new RelationshipVariablePart(input));
+		for (int i = 0; i < listSize; i++) {
+			mutableParts.add(new RelationshipMutablePart(input));
 		}
 	}
 
 	@Override
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-		output.writeInt(c2Nid);
-		output.writeBoolean(editable);
-		List<RelationshipVariablePart> partsToWrite = new ArrayList<RelationshipVariablePart>();
-		for (RelationshipVariablePart p : variableParts) {
+		//
+		List<RelationshipMutablePart> partsToWrite = new ArrayList<RelationshipMutablePart>();
+		for (RelationshipMutablePart p : mutableParts) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
 		}
+		// Start writing
+		output.writeInt(nid);
 		output.writeShort(partsToWrite.size());
-		for (RelationshipVariablePart p : partsToWrite) {
+		// c1Nid is the enclosing concept, does not need to be written. 
+		output.writeInt(c2Nid);
+		for (RelationshipMutablePart p : partsToWrite) {
 			p.writePartToBdb(output);
 		}
 	}
@@ -100,7 +102,7 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	private void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
 			List<RelationshipVersion> matchingTuples) {
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples,
-				variableParts, this);
+				mutableParts, this);
 	}
 
 	@Override
@@ -109,7 +111,7 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 			boolean addUncommitted) {
 		computer.addTuples(allowedStatus, allowedTypes, 
 				positions, returnRels, 
-				addUncommitted, variableParts, this);
+				addUncommitted, mutableParts, this);
 	}
 
 	@Override
@@ -147,11 +149,11 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	}
 
 	public boolean addVersion(I_RelPart part) {
-		return variableParts.add((RelationshipVariablePart) part);
+		return mutableParts.add((RelationshipMutablePart) part);
 	}
 
-	public boolean addPart(RelationshipVariablePart part) {
-		return variableParts.add(part);
+	public boolean addPart(RelationshipMutablePart part) {
+		return mutableParts.add(part);
 	}
 
 	@Override
@@ -171,12 +173,12 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 
 	@Override
 	public RelationshipVersion getFirstTuple() {
-		return new RelationshipVersion(this, variableParts.get(0));
+		return new RelationshipVersion(this, mutableParts.get(0));
 	}
 
 	@Override
 	public RelationshipVersion getLastTuple() {
-		return new RelationshipVersion(this, variableParts.get(variableParts.size() - 1));
+		return new RelationshipVersion(this, mutableParts.get(mutableParts.size() - 1));
 	}
 
 	@Override
@@ -187,7 +189,7 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	@Override
 	public List<RelationshipVersion> getTuples() {
 		List<RelationshipVersion> tuples = new ArrayList<RelationshipVersion>();
-		for (RelationshipVariablePart p: variableParts) {
+		for (RelationshipMutablePart p: mutableParts) {
 			tuples.add(new RelationshipVersion(this, p));
 		}
 		return tuples;
@@ -197,7 +199,7 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	public List<RelationshipVersion> getTuples(boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 		List<RelationshipVersion> tuples = new ArrayList<RelationshipVersion>();
-		for (RelationshipVariablePart p : getVersions(returnConflictResolvedLatestState)) {
+		for (RelationshipMutablePart p : getVersions(returnConflictResolvedLatestState)) {
 			tuples.add(new RelationshipVersion(this, p));
 		}
 		return tuples;
@@ -210,8 +212,8 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 				Bdb.getConceptDb().getConcept(c1Nid).getUidsForComponent(nid), 
 				Bdb.getConceptDb().getConcept(c1Nid).getUids(), 
 				Bdb.getConceptDb().getConcept(c2Nid).getUids(),
-				variableParts.size());
-		for (RelationshipVariablePart part : variableParts) {
+				mutableParts.size());
+		for (RelationshipMutablePart part : mutableParts) {
 			UniversalAceRelationshipPart universalPart = new UniversalAceRelationshipPart();
 			universalPart.setPathId(Bdb.getConceptDb().getConcept(part.getPathId()).getUids());
 			universalPart.setStatusId(Bdb.getConceptDb().getConcept(part.getStatusId()).getUids());
@@ -227,10 +229,10 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	
 
 	@Override
-	public List<RelationshipVariablePart> getVersions(
+	public List<RelationshipMutablePart> getVersions(
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<RelationshipVariablePart> returnList = variableParts; 
+		List<RelationshipMutablePart> returnList = mutableParts; 
 		  
 		if (returnConflictResolvedLatestState) {
 			I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
@@ -261,7 +263,7 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 		for (I_Path promotionPath : pomotionPaths) {
 			for (RelationshipVersion rt : matchingTuples) {
 				if (rt.getPathId() == viewPathId) {
-					RelationshipVariablePart promotionPart = rt.getPart()
+					RelationshipMutablePart promotionPart = rt.getPart()
 							.makeAnalog(rt.getStatusId(),
 									promotionPath.getConceptId(),
 									Long.MAX_VALUE);

@@ -28,19 +28,19 @@ import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.util.TupleComputer;
+import org.ihtsdo.db.util.VersionComputer;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Description 
-	extends ConceptComponent<DescriptionVariablePart> 
-	implements I_DescriptionVersioned<DescriptionVariablePart, DescriptionVersion> {
+	extends ConceptComponent<DescriptionMutablePart> 
+	implements I_DescriptionVersioned<DescriptionMutablePart, DescriptionVersion> {
 
 	private static class DescTupleComputer extends
-			TupleComputer<DescriptionVersion, Description, DescriptionVariablePart> {
+			VersionComputer<DescriptionVersion, Description, DescriptionMutablePart> {
 
-		public DescriptionVersion makeTuple(DescriptionVariablePart part, Description core) {
+		public DescriptionVersion makeTuple(DescriptionMutablePart part, Description core) {
 			return new DescriptionVersion(core, part);
 		}
 	}
@@ -54,24 +54,27 @@ public class Description
 	}
 
 	@Override
-	public void readComponentFromBdb(TupleInput input, int conceptNid) {
+	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize) {
+		// nid, list size, and conceptNid are read already by the binder...
 		this.conceptNid = conceptNid;
-		short partSize = input.readShort();
-		for (int i = 0; i < partSize; i++) {
-			variableParts.add(new DescriptionVariablePart(input));
+		for (int i = 0; i < listSize; i++) {
+			mutableParts.add(new DescriptionMutablePart(input));
 		}
 	}
 
 	@Override
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-		List<DescriptionVariablePart> partsToWrite = new ArrayList<DescriptionVariablePart>();
-		for (DescriptionVariablePart p: variableParts) {
+		List<DescriptionMutablePart> partsToWrite = new ArrayList<DescriptionMutablePart>();
+		for (DescriptionMutablePart p: mutableParts) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
 		}
+		// Start writing
+		output.writeInt(nid);
 		output.writeShort(partsToWrite.size());
-		for (DescriptionVariablePart p: partsToWrite) {
+		// conceptNid is the enclosing concept, does not need to be written. 
+		for (DescriptionMutablePart p: partsToWrite) {
 			p.writePartToBdb(output);
 		}
 
@@ -79,7 +82,7 @@ public class Description
 
 	public final List<DescriptionVersion> getTuples() {
 		List<DescriptionVersion> tuples = new ArrayList<DescriptionVersion>();
-		for (DescriptionVariablePart p : variableParts) {
+		for (DescriptionMutablePart p : mutableParts) {
 			tuples.add(new DescriptionVersion(this, p));
 		}
 		return tuples;
@@ -88,14 +91,14 @@ public class Description
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
 			List<DescriptionVersion> matchingTuples) {
 		computer.addTuples(allowedStatus, viewPosition,
-				matchingTuples, variableParts, this);
+				matchingTuples, mutableParts, this);
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, List<DescriptionVersion> matchingTuples,
 			boolean addUncommitted) {
 		computer.addTuples(allowedStatus, allowedTypes, positions,
-				matchingTuples, addUncommitted, variableParts, this);
+				matchingTuples, addUncommitted, mutableParts, this);
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
@@ -105,7 +108,7 @@ public class Description
 		List<DescriptionVersion> tuples = new ArrayList<DescriptionVersion>();
 
 		computer.addTuples(allowedStatus, allowedTypes, positions,
-				tuples, addUncommitted, variableParts, this);
+				tuples, addUncommitted, mutableParts, this);
 
 		if (returnConflictResolvedLatestState) {
 			I_ConfigAceFrame config = AceConfig.getVodb()
@@ -140,12 +143,12 @@ public class Description
 
 	@Override
 	public DescriptionVersion getFirstTuple() {
-		return new DescriptionVersion(this, variableParts.get(0));
+		return new DescriptionVersion(this, mutableParts.get(0));
 	}
 
 	@Override
 	public DescriptionVersion getLastTuple() {
-		return new DescriptionVersion(this, variableParts.get(variableParts.size() - 1));
+		return new DescriptionVersion(this, mutableParts.get(mutableParts.size() - 1));
 	}
 
 
@@ -154,7 +157,7 @@ public class Description
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 		List<DescriptionVersion> tuples = new ArrayList<DescriptionVersion>();
-		for (DescriptionVariablePart p : getVersions(returnConflictResolvedLatestState)) {
+		for (DescriptionMutablePart p : getVersions(returnConflictResolvedLatestState)) {
 			tuples.add(new DescriptionVersion(this, p));
 		}
 		return tuples;
@@ -165,7 +168,7 @@ public class Description
 			TerminologyException {
 		UniversalAceDescription universal = new UniversalAceDescription(
 				getUids(nid), getUids(conceptNid), this.versionCount());
-		for (DescriptionVariablePart part : variableParts) {
+		for (DescriptionMutablePart part : mutableParts) {
 			UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
 			universalPart.setInitialCaseSignificant(part
 					.getInitialCaseSignificant());
@@ -181,16 +184,16 @@ public class Description
 	}
 
 	@Override
-	public List<DescriptionVariablePart> getVersions(
+	public List<DescriptionMutablePart> getVersions(
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		return variableParts;
+		return mutableParts;
 	}
 
 	@Override
 	public boolean matches(Pattern p) {
 		String lastText = null;
-		for (DescriptionVariablePart desc : variableParts) {
+		for (DescriptionMutablePart desc : mutableParts) {
 			if (desc.getText() != lastText) {
 				lastText = desc.getText();
 				Matcher m = p.matcher(lastText);
@@ -203,13 +206,13 @@ public class Description
 	}
 
 	public boolean merge(Description jarDesc) {
-		HashSet<DescriptionVariablePart> versionSet = 
-			new HashSet<DescriptionVariablePart>(variableParts);
+		HashSet<DescriptionMutablePart> versionSet = 
+			new HashSet<DescriptionMutablePart>(mutableParts);
 		boolean changed = false;
-		for (DescriptionVariablePart part : jarDesc.getVersions()) {
+		for (DescriptionMutablePart part : jarDesc.getVersions()) {
 			if (!versionSet.contains(part)) {
 				changed = true;
-				variableParts.add(part);
+				mutableParts.add(part);
 			}
 		}
 		return changed;
@@ -230,7 +233,7 @@ public class Description
 		   for (I_Path promotionPath: pomotionPaths) {
 			   for (DescriptionVersion dt: matchingTuples) {
 				   if (dt.getPathId() == viewPathId) {
-					   DescriptionVariablePart promotionPart = 
+					   DescriptionMutablePart promotionPart = 
 						   dt.getPart().makeAnalog(dt.getStatusId(), 
 								   promotionPath.getConceptId(), 
 								   Long.MAX_VALUE);
@@ -250,12 +253,12 @@ public class Description
 
 	@Override
 	public boolean addVersion(I_DescriptionPart newPart) {
-		return variableParts.add((DescriptionVariablePart) newPart);
+		return mutableParts.add((DescriptionMutablePart) newPart);
 	}
 
 	@Override
 	public boolean merge(
-			I_DescriptionVersioned<DescriptionVariablePart, DescriptionVersion> jarDesc) {
+			I_DescriptionVersioned<DescriptionMutablePart, DescriptionVersion> jarDesc) {
 		throw new UnsupportedOperationException();
 	}
 
