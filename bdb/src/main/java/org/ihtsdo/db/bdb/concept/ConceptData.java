@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import org.dwfa.ace.api.I_IdVersioned;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.NidData;
@@ -22,7 +20,9 @@ import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesMutablePa
 import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionBinder;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionMutablePart;
+import org.ihtsdo.db.bdb.concept.component.identifier.Identifier;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipMutablePart;
@@ -202,13 +202,13 @@ public class ConceptData  {
 		}
 	}
 
-	public List<I_ThinExtByRefVersioned> getExtensions() throws IOException,
+	public List<RefsetMember> getExtensions() throws IOException,
 			TerminologyException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public I_IdVersioned getId() throws IOException {
+	public Identifier getId() throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}

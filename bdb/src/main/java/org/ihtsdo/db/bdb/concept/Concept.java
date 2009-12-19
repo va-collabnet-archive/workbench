@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -25,6 +24,7 @@ import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesVersion;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
+import org.ihtsdo.db.bdb.concept.component.identifier.Identifier;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
 import org.ihtsdo.db.bdb.concept.component.image.ImageVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMember;
@@ -265,7 +265,7 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		return data.getExtensions();
 	}
 
-	public I_IdVersioned getId() throws IOException {
+	public Identifier getId() throws IOException {
 		return data.getId();
 	}
 
@@ -369,7 +369,7 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		return null;
 	}
 
-	public List<I_IdVersioned> getUncommittedIdVersioned() {
+	public List<Identifier> getUncommittedIdVersioned() {
 		// TODO Auto-generated method stub
 		return null;
 	}

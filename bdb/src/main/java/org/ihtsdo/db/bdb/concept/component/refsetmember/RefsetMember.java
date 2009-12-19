@@ -11,6 +11,8 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -92,7 +94,7 @@ public class RefsetMember extends ConceptComponent<RefsetMemberMutablePart>
 	}
 
 	private int refsetNid;
-	private int componentNid;
+	private int referencedComponentNid;
 	private int memberTypeNid; 
 
 
@@ -113,7 +115,7 @@ public class RefsetMember extends ConceptComponent<RefsetMemberMutablePart>
 		output.writeInt(nid);
 		output.writeShort(partsToWrite.size());
 		// refsetNid is the enclosing concept, does not need to be written. 
-		output.writeInt(componentNid);
+		output.writeInt(referencedComponentNid);
 		output.writeInt(memberTypeNid);
 
 		for (RefsetMemberMutablePart p: partsToWrite) {
@@ -127,7 +129,7 @@ public class RefsetMember extends ConceptComponent<RefsetMemberMutablePart>
 		refsetNid = conceptNid;
 		
 		// nid, list size, and conceptNid are read already by the binder...
-		componentNid = input.readInt();
+		referencedComponentNid = input.readInt();
 		REFSET_MEMBER_TYPE memberType = REFSET_MEMBER_TYPE.readType(input);
 		memberTypeNid = memberType.typeNid;
 		for (int i = 0; i < listSize; i++) {
@@ -195,6 +197,104 @@ public class RefsetMember extends ConceptComponent<RefsetMemberMutablePart>
 			throws IOException, TerminologyException {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus,
+			PositionSetReadOnly positions,
+			List<RefsetMemberVersion> returnTuples, boolean addUncommitted) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus,
+			PositionSetReadOnly positions,
+			List<RefsetMemberVersion> returnTuples, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void addTuples(List<RefsetMemberVersion> returnTuples,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void addVersion(I_ThinExtByRefPart part) {
+		mutableParts.add((RefsetMemberMutablePart) part);
+	}
+
+
+	@Override
+	public int getComponentId() {
+		return referencedComponentNid;
+	}
+
+
+	@Override
+	public int getMemberId() {
+		return nid;
+	}
+
+
+	@Override
+	public int getRefsetId() {
+		return refsetNid;
+	}
+
+
+	@Override
+	public List<RefsetMemberVersion> getTuples(I_IntSet allowedStatus,
+			PositionSetReadOnly positions, boolean addUncommitted) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public List<RefsetMemberVersion> getTuples(I_IntSet allowedStatus,
+			PositionSetReadOnly positions, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public List<RefsetMemberVersion> getTuples(boolean addUncommitted,
+			boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public int getTypeId() {
+		return memberTypeNid;
+	}
+
+
+	@Override
+	public void setRefsetId(int refsetId) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public void setTypeId(int typeId) {
+		throw new UnsupportedOperationException();
 	}
 
 }
