@@ -3,9 +3,7 @@ package org.ihtsdo.db.bdb.concept.component.image;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ImagePart;
@@ -16,7 +14,6 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.ace.utypes.UniversalAceImagePart;
 import org.dwfa.tapi.TerminologyException;
@@ -28,13 +25,13 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Image extends ConceptComponent<ImageVariablePart> implements
-		I_ImageVersioned<ImageVariablePart, ImageTuple> {
+		I_ImageVersioned<ImageVariablePart, ImageVersion> {
 
 	private static class ImageTupleComputer extends
-			TupleComputer<ImageTuple, Image, ImageVariablePart> {
+			TupleComputer<ImageVersion, Image, ImageVariablePart> {
 
-		public ImageTuple makeTuple(ImageVariablePart part, Image core) {
-			return new ImageTuple(core, part);
+		public ImageVersion makeTuple(ImageVariablePart part, Image core) {
+			return new ImageVersion(core, part);
 		}
 	}
 
@@ -57,7 +54,7 @@ public class Image extends ConceptComponent<ImageVariablePart> implements
 	}
 
 	@Override
-	public void writeComponentToBdb(TupleOutput output) {
+	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		output.writeString(format);
 		output.writeInt(image.length);
 		output.write(image);
@@ -65,7 +62,7 @@ public class Image extends ConceptComponent<ImageVariablePart> implements
 
 	@Override
 	public void readPartFromBdb(TupleInput input) {
-		versions.add(new ImageVariablePart(input));
+		variableParts.add(new ImageVariablePart(input));
 	}
 
 	/*
@@ -109,8 +106,8 @@ public class Image extends ConceptComponent<ImageVariablePart> implements
 	 * 
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getLastTuple()
 	 */
-	public ImageTuple getLastTuple() {
-		return new ImageTuple(this, versions.get(versions.size() - 1));
+	public ImageVersion getLastTuple() {
+		return new ImageVersion(this, variableParts.get(variableParts.size() - 1));
 	}
 
 	/*
@@ -118,10 +115,10 @@ public class Image extends ConceptComponent<ImageVariablePart> implements
 	 * 
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getTuples()
 	 */
-	public List<ImageTuple> getTuples() {
-		List<ImageTuple> tuples = new ArrayList<ImageTuple>();
+	public List<ImageVersion> getTuples() {
+		List<ImageVersion> tuples = new ArrayList<ImageVersion>();
 		for (ImageVariablePart p : getVersions()) {
-			tuples.add(new ImageTuple(this, p));
+			tuples.add(new ImageVersion(this, p));
 		}
 		return tuples;
 	}
@@ -136,23 +133,10 @@ public class Image extends ConceptComponent<ImageVariablePart> implements
 		throw new UnsupportedOperationException();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_ImageVersioned#getTimePathSet()
-	 */
-	public Set<TimePathId> getTimePathSet() {
-		Set<TimePathId> tpSet = new HashSet<TimePathId>();
-		for (ImageVariablePart p : versions) {
-			tpSet.add(new TimePathId(p.getVersion(), p.getPathId()));
-		}
-		return tpSet;
-	}
-
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<ImageTuple> matchingTuples) {
+			PositionSetReadOnly positions, List<ImageVersion> matchingTuples) {
 		computer.addTuples(allowedStatus, allowedTypes, positions, 
-				matchingTuples, true, versions, this);
+				matchingTuples, true, variableParts, this);
 	}
 
 	private static Collection<UUID> getUids(int id) throws IOException,
@@ -163,9 +147,9 @@ public class Image extends ConceptComponent<ImageVariablePart> implements
 	public UniversalAceImage getUniversal() throws IOException,
 			TerminologyException {
 		UniversalAceImage universal = new UniversalAceImage(getUids(nid),
-				getImage(), new ArrayList<UniversalAceImagePart>(versions
+				getImage(), new ArrayList<UniversalAceImagePart>(variableParts
 						.size()), getFormat(), getUids(conceptId));
-		for (ImageVariablePart part : versions) {
+		for (ImageVariablePart part : variableParts) {
 			UniversalAceImagePart universalPart = new UniversalAceImagePart();
 			universalPart.setPathId(getUids(part.getPathId()));
 			universalPart.setStatusId(getUids(part.getStatusId()));
@@ -180,12 +164,12 @@ public class Image extends ConceptComponent<ImageVariablePart> implements
 	public boolean promote(I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus) {
 		int viewPathId = viewPosition.getPath().getConceptId();
-		List<ImageTuple> matchingTuples = new ArrayList<ImageTuple>();
+		List<ImageVersion> matchingTuples = new ArrayList<ImageVersion>();
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples, 
-				versions, this);
+				variableParts, this);
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {
-			for (ImageTuple it : matchingTuples) {
+			for (ImageVersion it : matchingTuples) {
 				if (it.getPathId() == viewPathId) {
 					ImageVariablePart promotionPart = it.getPart().makeAnalog(
 							it.getStatusId(), promotionPath.getConceptId(),
@@ -200,11 +184,11 @@ public class Image extends ConceptComponent<ImageVariablePart> implements
 
 	@Override
 	public boolean addVersion(I_ImagePart part) {
-		return versions.add((ImageVariablePart) part);
+		return variableParts.add((ImageVariablePart) part);
 	}
 
 	@Override
-	public boolean merge(I_ImageVersioned<ImageVariablePart, ImageTuple> jarImage) {
+	public boolean merge(I_ImageVersioned<ImageVariablePart, ImageVersion> jarImage) {
 		throw new UnsupportedOperationException();
 	}
 }

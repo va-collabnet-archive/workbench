@@ -4,18 +4,18 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.util.HashFunction;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.VariablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ImageVariablePart extends Version<ImageVariablePart> 
+public class ImageVariablePart extends VariablePart<ImageVariablePart> 
 		implements I_ImagePart {
 
 	private String textDescription;
 	private int typeNid;
 	
-	public ArrayIntList getVariableVersionNids() {
+	protected ArrayIntList getVariableVersionNids() {
 		ArrayIntList partComponentNids = new ArrayIntList(3);
 		partComponentNids.add(typeNid);
 		return partComponentNids;

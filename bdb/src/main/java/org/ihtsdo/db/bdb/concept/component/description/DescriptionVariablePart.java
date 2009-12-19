@@ -5,12 +5,12 @@ import java.nio.charset.Charset;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.VariablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class DescriptionVariablePart extends Version<DescriptionVariablePart> 
+public class DescriptionVariablePart extends VariablePart<DescriptionVariablePart> 
 	implements I_DescriptionPart {
 	
 	@SuppressWarnings("unused")
@@ -118,7 +118,7 @@ public class DescriptionVariablePart extends Version<DescriptionVariablePart>
 	}
 
 	@Override
-	public ArrayIntList getVariableVersionNids() {
+	protected ArrayIntList getVariableVersionNids() {
 		ArrayIntList list = new ArrayIntList(3);
 		list.add(typeNid);
 		return list;

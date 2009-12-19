@@ -3,12 +3,12 @@ package org.ihtsdo.db.bdb.concept.component.relationship;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.VariablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class RelationshipVariablePart extends Version<RelationshipVariablePart> 
+public class RelationshipVariablePart extends VariablePart<RelationshipVariablePart> 
 	implements I_RelPart {
 	
 	private int characteristicNid;
@@ -100,7 +100,7 @@ public class RelationshipVariablePart extends Version<RelationshipVariablePart>
 	}
 
 	@Override
-	public ArrayIntList getVariableVersionNids() {
+	protected ArrayIntList getVariableVersionNids() {
 		ArrayIntList nids = new ArrayIntList(5);
 		nids.add(characteristicNid);
 		nids.add(refinabilityNid);

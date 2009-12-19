@@ -2,13 +2,13 @@ package org.ihtsdo.db.bdb.concept.component.description;
 
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.ihtsdo.db.bdb.concept.component.Tuple;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
-public class DescriptionTuple 
-	extends Tuple<DescriptionVariablePart, Description> 
+public class DescriptionVersion 
+	extends Version<DescriptionVariablePart, Description> 
 	implements I_DescriptionTuple {
 
-	protected DescriptionTuple(Description component, DescriptionVariablePart part) {
+	protected DescriptionVersion(Description component, DescriptionVariablePart part) {
 		super(component, part);
 	}
 

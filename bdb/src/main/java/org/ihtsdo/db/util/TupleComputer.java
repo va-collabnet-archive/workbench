@@ -17,12 +17,12 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.PositionMapper;
 import org.ihtsdo.db.bdb.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.VariablePart;
 import org.ihtsdo.db.bdb.concept.component.Version;
-import org.ihtsdo.db.bdb.concept.component.Tuple;
 
-public abstract class TupleComputer<T extends Tuple<P, C>, 
+public abstract class TupleComputer<T extends Version<P, C>, 
 									C extends ConceptComponent<P>, 
-									P extends Version<P>> {
+									P extends VariablePart<P>> {
 
 	private class SortPartsByTime implements Comparator<P> {
 

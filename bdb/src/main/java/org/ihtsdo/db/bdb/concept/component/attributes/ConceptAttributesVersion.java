@@ -1,13 +1,13 @@
 package org.ihtsdo.db.bdb.concept.component.attributes;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.ihtsdo.db.bdb.concept.component.Tuple;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
-public class ConceptAttributesTuple 
-	extends Tuple<ConceptAttributesVariablePart, ConceptAttributes>
+public class ConceptAttributesVersion 
+	extends Version<ConceptAttributesVariablePart, ConceptAttributes>
 	implements I_ConceptAttributeTuple {
 
-	protected ConceptAttributesTuple(ConceptAttributes component,
+	protected ConceptAttributesVersion(ConceptAttributes component,
 			ConceptAttributesVariablePart part) {
 		super(component, part);
 	}

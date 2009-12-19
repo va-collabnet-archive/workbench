@@ -22,14 +22,14 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesTuple;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesVersion;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
-import org.ihtsdo.db.bdb.concept.component.description.DescriptionTuple;
+import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
-import org.ihtsdo.db.bdb.concept.component.image.ImageTuple;
+import org.ihtsdo.db.bdb.concept.component.image.ImageVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
-import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipTuple;
+import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipVersion;
 
 public abstract class Concept implements I_Transact, I_GetConceptData {
 
@@ -139,14 +139,14 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ConceptAttributesTuple> getConceptAttributeTuples(
+	public List<ConceptAttributesVersion> getConceptAttributeTuples(
 			I_IntSet allowedStatus, Set<I_Position> positions)
 			throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ConceptAttributesTuple> getConceptAttributeTuples(
+	public List<ConceptAttributesVersion> getConceptAttributeTuples(
 			I_IntSet allowedStatus, Set<I_Position> positions,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
@@ -154,14 +154,14 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ConceptAttributesTuple> getConceptAttributeTuples(
+	public List<ConceptAttributesVersion> getConceptAttributeTuples(
 			I_IntSet allowedStatus, Set<I_Position> positions,
 			boolean addUncommitted) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ConceptAttributesTuple> getConceptAttributeTuples(
+	public List<ConceptAttributesVersion> getConceptAttributeTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
 		//TODO
@@ -176,7 +176,7 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		return nid;
 	}
 
-	public DescriptionTuple getDescTuple(I_IntList typePrefOrder,
+	public DescriptionVersion getDescTuple(I_IntList typePrefOrder,
 			I_IntList langPrefOrder, I_IntSet allowedStatus,
 			Set<I_Position> positionSet, LANGUAGE_SORT_PREF sortPref)
 			throws IOException {
@@ -185,27 +185,27 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	@Override
-	public DescriptionTuple getDescTuple(I_IntList descTypePreferenceList,
+	public DescriptionVersion getDescTuple(I_IntList descTypePreferenceList,
 			I_ConfigAceFrame config) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus,
+	public List<DescriptionVersion> getDescriptionTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions)
 			throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus,
+	public List<DescriptionVersion> getDescriptionTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean returnConflictResolvedLatestState) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<DescriptionTuple> getDescriptionTuples(
+	public List<DescriptionVersion> getDescriptionTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
 		//TODO
@@ -234,14 +234,14 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipTuple> getDestRelTuples(I_IntSet allowedStatus,
+	public List<RelationshipVersion> getDestRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipTuple> getDestRelTuples(I_IntSet allowedStatus,
+	public List<RelationshipVersion> getDestRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
@@ -249,7 +249,7 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipTuple> getDestRelTuples(I_IntSet allowedTypes,
+	public List<RelationshipVersion> getDestRelTuples(I_IntSet allowedTypes,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
 		//TODO
@@ -274,14 +274,14 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		return data.getId(identifierScheme);
 	}
 
-	public List<ImageTuple> getImageTuples(I_IntSet allowedStatus,
+	public List<ImageVersion> getImageTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions)
 			throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ImageTuple> getImageTuples(I_IntSet allowedStatus,
+	public List<ImageVersion> getImageTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
@@ -289,7 +289,7 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ImageTuple> getImageTuples(
+	public List<ImageVersion> getImageTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
 		//TODO
@@ -333,14 +333,14 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipTuple> getSourceRelTuples(I_IntSet allowedStatus,
+	public List<RelationshipVersion> getSourceRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipTuple> getSourceRelTuples(I_IntSet allowedStatus,
+	public List<RelationshipVersion> getSourceRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
@@ -348,10 +348,10 @@ public abstract class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipTuple> getSourceRelTuples(I_IntSet allowedTypes,
+	public List<RelationshipVersion> getSourceRelTuples(I_IntSet allowedTypes,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
-		List<RelationshipTuple> returnTuples = new ArrayList<RelationshipTuple>();
+		List<RelationshipVersion> returnTuples = new ArrayList<RelationshipVersion>();
 		for (Relationship r: getNativeSourceRels()) {
 			r.addTuples(allowedTypes, returnTuples, addUncommitted, 
 					returnConflictResolvedLatestState);

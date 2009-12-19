@@ -2,12 +2,12 @@ package org.ihtsdo.db.bdb.concept.component.attributes;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.VariablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ConceptAttributesVariablePart extends Version<ConceptAttributesVariablePart> 
+public class ConceptAttributesVariablePart extends VariablePart<ConceptAttributesVariablePart> 
 	implements I_ConceptAttributePart {
 
 	private boolean defined = false;
@@ -52,7 +52,7 @@ public class ConceptAttributesVariablePart extends Version<ConceptAttributesVari
 	}
 
 	@Override
-	public ArrayIntList getVariableVersionNids() {
+	protected ArrayIntList getVariableVersionNids() {
 		return new ArrayIntList(2);
 	}
 

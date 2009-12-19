@@ -2,9 +2,7 @@ package org.ihtsdo.db.bdb.concept.component.relationship;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
@@ -16,7 +14,6 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
@@ -31,13 +28,13 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Relationship extends ConceptComponent<RelationshipVariablePart> 
-	implements I_RelVersioned<RelationshipVariablePart, RelationshipTuple> {
+	implements I_RelVersioned<RelationshipVariablePart, RelationshipVersion> {
 
 	private static class RelTupleComputer extends
-			TupleComputer<RelationshipTuple, Relationship, RelationshipVariablePart> {
+			TupleComputer<RelationshipVersion, Relationship, RelationshipVariablePart> {
 
-		public RelationshipTuple makeTuple(RelationshipVariablePart part, Relationship core) {
-			return new RelationshipTuple(core, part);
+		public RelationshipVersion makeTuple(RelationshipVariablePart part, Relationship core) {
+			return new RelationshipVersion(core, part);
 		}
 	}
 
@@ -61,11 +58,11 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 
 	@Override
 	public void readPartFromBdb(TupleInput input) {
-		versions.add(new RelationshipVariablePart(input));
+		variableParts.add(new RelationshipVariablePart(input));
 	}
 
 	@Override
-	public void writeComponentToBdb(TupleOutput output) {
+	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		output.writeInt(c2Nid);
 		output.writeBoolean(editable);
 	}
@@ -92,26 +89,26 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	}
 
 	private void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<RelationshipTuple> matchingTuples) {
+			List<RelationshipVersion> matchingTuples) {
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples,
-				versions, this);
+				variableParts, this);
 	}
 
 	@Override
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<RelationshipTuple> returnRels,
+			PositionSetReadOnly positions, List<RelationshipVersion> returnRels,
 			boolean addUncommitted) {
 		computer.addTuples(allowedStatus, allowedTypes, 
 				positions, returnRels, 
-				addUncommitted, versions, this);
+				addUncommitted, variableParts, this);
 	}
 
 	@Override
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<RelationshipTuple> returnRels,
+			PositionSetReadOnly positions, List<RelationshipVersion> returnRels,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-	    List<RelationshipTuple> tuples = new ArrayList<RelationshipTuple>();
+	    List<RelationshipVersion> tuples = new ArrayList<RelationshipVersion>();
 	    
 	    addTuples(allowedStatus, allowedTypes, positions, tuples, addUncommitted);
 		
@@ -131,7 +128,7 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	}
 
 	public void addTuples(I_IntSet allowedTypes, 
-						  List<RelationshipTuple> returnRels,
+						  List<RelationshipVersion> returnRels,
 						  boolean addUncommitted, 
 						  boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
@@ -141,11 +138,11 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	}
 
 	public boolean addVersion(I_RelPart part) {
-		return versions.add((RelationshipVariablePart) part);
+		return variableParts.add((RelationshipVariablePart) part);
 	}
 
 	public boolean addPart(RelationshipVariablePart part) {
-		return versions.add(part);
+		return variableParts.add(part);
 	}
 
 	@Override
@@ -164,13 +161,13 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	}
 
 	@Override
-	public RelationshipTuple getFirstTuple() {
-		return new RelationshipTuple(this, versions.get(0));
+	public RelationshipVersion getFirstTuple() {
+		return new RelationshipVersion(this, variableParts.get(0));
 	}
 
 	@Override
-	public RelationshipTuple getLastTuple() {
-		return new RelationshipTuple(this, versions.get(versions.size() - 1));
+	public RelationshipVersion getLastTuple() {
+		return new RelationshipVersion(this, variableParts.get(variableParts.size() - 1));
 	}
 
 	@Override
@@ -179,29 +176,20 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	}
 
 	@Override
-	public Set<TimePathId> getTimePathSet() {
-		Set<TimePathId> tpSet = new HashSet<TimePathId>();
-		for (RelationshipVariablePart p : versions) {
-			tpSet.add(new TimePathId(p.getVersion(), p.getPathId()));
-		}
-		return tpSet;
-	}
-
-	@Override
-	public List<RelationshipTuple> getTuples() {
-		List<RelationshipTuple> tuples = new ArrayList<RelationshipTuple>();
-		for (RelationshipVariablePart p: versions) {
-			tuples.add(new RelationshipTuple(this, p));
+	public List<RelationshipVersion> getTuples() {
+		List<RelationshipVersion> tuples = new ArrayList<RelationshipVersion>();
+		for (RelationshipVariablePart p: variableParts) {
+			tuples.add(new RelationshipVersion(this, p));
 		}
 		return tuples;
 	}
 
 	@Override
-	public List<RelationshipTuple> getTuples(boolean returnConflictResolvedLatestState)
+	public List<RelationshipVersion> getTuples(boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<RelationshipTuple> tuples = new ArrayList<RelationshipTuple>();
+		List<RelationshipVersion> tuples = new ArrayList<RelationshipVersion>();
 		for (RelationshipVariablePart p : getVersions(returnConflictResolvedLatestState)) {
-			tuples.add(new RelationshipTuple(this, p));
+			tuples.add(new RelationshipVersion(this, p));
 		}
 		return tuples;
 	}
@@ -213,8 +201,8 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 				Bdb.getConceptDb().getConcept(c1Nid).getUidsForComponent(nid), 
 				Bdb.getConceptDb().getConcept(c1Nid).getUids(), 
 				Bdb.getConceptDb().getConcept(c2Nid).getUids(),
-				versions.size());
-		for (RelationshipVariablePart part : versions) {
+				variableParts.size());
+		for (RelationshipVariablePart part : variableParts) {
 			UniversalAceRelationshipPart universalPart = new UniversalAceRelationshipPart();
 			universalPart.setPathId(Bdb.getConceptDb().getConcept(part.getPathId()).getUids());
 			universalPart.setStatusId(Bdb.getConceptDb().getConcept(part.getStatusId()).getUids());
@@ -233,7 +221,7 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 	public List<RelationshipVariablePart> getVersions(
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<RelationshipVariablePart> returnList = versions; 
+		List<RelationshipVariablePart> returnList = variableParts; 
 		  
 		if (returnConflictResolvedLatestState) {
 			I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
@@ -258,11 +246,11 @@ public class Relationship extends ConceptComponent<RelationshipVariablePart>
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
 			throws IOException, TerminologyException {
 		int viewPathId = viewPosition.getPath().getConceptId();
-		List<RelationshipTuple> matchingTuples = new ArrayList<RelationshipTuple>();
+		List<RelationshipVersion> matchingTuples = new ArrayList<RelationshipVersion>();
 		addTuples(allowedStatus, viewPosition, matchingTuples);
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {
-			for (RelationshipTuple rt : matchingTuples) {
+			for (RelationshipVersion rt : matchingTuples) {
 				if (rt.getPathId() == viewPathId) {
 					RelationshipVariablePart promotionPart = rt.getPart()
 							.makeAnalog(rt.getStatusId(),

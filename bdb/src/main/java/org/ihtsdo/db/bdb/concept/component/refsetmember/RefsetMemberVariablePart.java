@@ -2,11 +2,11 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.VariablePart;
 
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class RefsetMemberVariablePart extends Version<RefsetMemberVariablePart> 
+public abstract class RefsetMemberVariablePart extends VariablePart<RefsetMemberVariablePart> 
 	implements I_ThinExtByRefPart {
 
 	private RefsetMemberVariablePart(int statusNid, int pathNid, long time) {
@@ -32,7 +32,7 @@ public abstract class RefsetMemberVariablePart extends Version<RefsetMemberVaria
 	}
 
 	@Override
-	public ArrayIntList getVariableVersionNids() {
+	protected ArrayIntList getVariableVersionNids() {
 		throw new UnsupportedOperationException();
 	}
 

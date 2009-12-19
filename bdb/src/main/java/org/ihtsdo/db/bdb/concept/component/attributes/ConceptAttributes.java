@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
@@ -19,7 +17,6 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
@@ -37,7 +34,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ConceptAttributes 
 	extends ConceptComponent<ConceptAttributesVariablePart> 
-	implements I_ConceptAttributeVersioned<ConceptAttributesVariablePart, ConceptAttributesTuple> {
+	implements I_ConceptAttributeVersioned<ConceptAttributesVariablePart, ConceptAttributesVersion> {
 
 	protected ConceptAttributes(int nid, int parts,
 			boolean editable) {
@@ -51,11 +48,11 @@ public class ConceptAttributes
 
 	@Override
 	public void readPartFromBdb(TupleInput input) {
-		versions.add(new ConceptAttributesVariablePart(input));
+		variableParts.add(new ConceptAttributesVariablePart(input));
 	}
 
 	@Override
-	public void writeComponentToBdb(TupleOutput output) {
+	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		// Nothing to do...
 	}
 	
@@ -65,7 +62,7 @@ public class ConceptAttributes
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#addVersion(org.dwfa.vodb.types.ThinConPart)
 	 */
 	public boolean addVersion(ConceptAttributesVariablePart part) {
-		return versions.add(part);
+		return variableParts.add(part);
 	}
 
 	/*
@@ -82,10 +79,10 @@ public class ConceptAttributes
 	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getTuples()
 	 */
-	public List<ConceptAttributesTuple> getTuples() {
-		List<ConceptAttributesTuple> tuples = new ArrayList<ConceptAttributesTuple>();
-		for (ConceptAttributesVariablePart p : versions) {
-			tuples.add(new ConceptAttributesTuple(this, p));
+	public List<ConceptAttributesVersion> getTuples() {
+		List<ConceptAttributesVersion> tuples = new ArrayList<ConceptAttributesVersion>();
+		for (ConceptAttributesVariablePart p : variableParts) {
+			tuples.add(new ConceptAttributesVersion(this, p));
 		}
 		return tuples;
 	}
@@ -106,59 +103,46 @@ public class ConceptAttributes
 	 */
 	public boolean merge(ConceptAttributes jarCon) {
 		HashSet<ConceptAttributesVariablePart> versionSet = new HashSet<ConceptAttributesVariablePart>(
-				versions);
+				variableParts);
 		boolean changed = false;
 		for (ConceptAttributesVariablePart jarPart : jarCon.getVersions()) {
 			if (!versionSet.contains(jarPart)) {
 				changed = true;
-				versions.add((ConceptAttributesVariablePart) jarPart);
+				variableParts.add((ConceptAttributesVariablePart) jarPart);
 			}
 		}
 		return changed;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getTimePathSet()
-	 */
-	public Set<TimePathId> getTimePathSet() {
-		Set<TimePathId> tpSet = new HashSet<TimePathId>();
-		for (ConceptAttributesVariablePart p : versions) {
-			tpSet.add(new TimePathId(p.getVersion(), p.getPathId()));
-		}
-		return tpSet;
-	}
-
 	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-			List<ConceptAttributesTuple> returnTuples) {
+			List<ConceptAttributesVersion> returnTuples) {
 		addTuples(allowedStatus, positions, returnTuples, true);
 	}
 
 	
 	private static class AttributeTupleComputer extends
-			TupleComputer<ConceptAttributesTuple, ConceptAttributes, ConceptAttributesVariablePart> {
+			TupleComputer<ConceptAttributesVersion, ConceptAttributes, ConceptAttributesVariablePart> {
 
 		@Override
-		public ConceptAttributesTuple makeTuple(ConceptAttributesVariablePart part,
+		public ConceptAttributesVersion makeTuple(ConceptAttributesVariablePart part,
 				ConceptAttributes core) {
-			return new ConceptAttributesTuple(core, part);
+			return new ConceptAttributesVersion(core, part);
 		}
 	}
 
 	private static AttributeTupleComputer computer = new AttributeTupleComputer();
 
 	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-			List<ConceptAttributesTuple> matchingTuples, boolean addUncommitted) {
+			List<ConceptAttributesVersion> matchingTuples, boolean addUncommitted) {
 		computer.addTuples(allowedStatus, positions, matchingTuples,
-				addUncommitted, versions, this);
+				addUncommitted, variableParts, this);
 	}
 	
 	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
-			List<ConceptAttributesTuple> returnTuples, boolean addUncommitted,
+			List<ConceptAttributesVersion> returnTuples, boolean addUncommitted,
 			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
 	    
-		List<ConceptAttributesTuple> tuples = new ArrayList<ConceptAttributesTuple>();
+		List<ConceptAttributesVersion> tuples = new ArrayList<ConceptAttributesVersion>();
 		   
 	    addTuples(allowedStatus, positionSet, tuples, addUncommitted);
 		
@@ -183,7 +167,7 @@ public class ConceptAttributes
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getLocalFixedConcept()
 	 */
 	public I_ConceptualizeLocally getLocalFixedConcept() {
-		boolean isDefined = versions.get(versions.size() - 1).isDefined();
+		boolean isDefined = variableParts.get(variableParts.size() - 1).isDefined();
 		boolean isPrimitive = !isDefined;
 		return LocalFixedConcept.get(nid, isPrimitive);
 	}
@@ -208,7 +192,7 @@ public class ConceptAttributes
 			TerminologyException {
 		UniversalAceConceptAttributes conceptAttributes = new UniversalAceConceptAttributes(
 				getUids(nid), this.versionCount());
-		for (ConceptAttributesVariablePart part : versions) {
+		for (ConceptAttributesVariablePart part : variableParts) {
 			UniversalAceConceptAttributesPart universalPart = new UniversalAceConceptAttributesPart();
 			universalPart.setStatusId(getUids(part.getStatusId()));
 			universalPart.setDefined(part.isDefined());
@@ -225,9 +209,9 @@ public class ConceptAttributes
 		buf.append("NativeId: ");
 		buf.append(nid);
 		buf.append(" parts: ");
-		buf.append(versions.size());
+		buf.append(variableParts.size());
 		buf.append("\n  ");
-		for (ConceptAttributesVariablePart p : versions) {
+		for (ConceptAttributesVariablePart p : variableParts) {
 			buf.append(p);
 			buf.append("\n  ");
 		}
@@ -242,9 +226,9 @@ public class ConceptAttributes
 		}
 	}
 
-	public List<ConceptAttributesTuple> getTuples(I_IntSet allowedStatus,
+	public List<ConceptAttributesVersion> getTuples(I_IntSet allowedStatus,
 			PositionSetReadOnly viewPositionSet) {
-		List<ConceptAttributesTuple> returnList = new ArrayList<ConceptAttributesTuple>();
+		List<ConceptAttributesVersion> returnList = new ArrayList<ConceptAttributesVersion>();
 		
 		addTuples(allowedStatus, viewPositionSet, returnList);
 		
@@ -252,13 +236,13 @@ public class ConceptAttributes
 	}
 	
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<ConceptAttributesTuple> returnTuples) {
-		computer.addTuples(allowedStatus, viewPosition, returnTuples, versions, this);
+			List<ConceptAttributesVersion> returnTuples) {
+		computer.addTuples(allowedStatus, viewPosition, returnTuples, variableParts, this);
 	}
 
-	public List<ConceptAttributesTuple> getTuples(I_IntSet allowedStatus,
+	public List<ConceptAttributesVersion> getTuples(I_IntSet allowedStatus,
 			I_Position viewPosition) {
-		List<ConceptAttributesTuple> returnList = new ArrayList<ConceptAttributesTuple>();
+		List<ConceptAttributesVersion> returnList = new ArrayList<ConceptAttributesVersion>();
 		
 		addTuples(allowedStatus, viewPosition, returnList);
 		
@@ -270,7 +254,7 @@ public class ConceptAttributes
 		int viewPathId = viewPosition.getPath().getConceptId();
 		boolean promotedAnything = false;
 		for (I_Path promotionPath: promotionPaths) {
-			for (ConceptAttributesTuple tuple: getTuples(allowedStatus, viewPosition)) {
+			for (ConceptAttributesVersion tuple: getTuples(allowedStatus, viewPosition)) {
 				if (tuple.getPart().getPathId() == viewPathId) {
 					ConceptAttributesVariablePart promotionPart = 
 						tuple.getPart().makeAnalog(tuple.getStatusId(), promotionPath.getConceptId(), Long.MAX_VALUE);
@@ -284,12 +268,12 @@ public class ConceptAttributes
 
 	@Override
 	public boolean addVersion(I_ConceptAttributePart part) {
-		return versions.add((ConceptAttributesVariablePart) part);
+		return variableParts.add((ConceptAttributesVariablePart) part);
 	}
 
 	@Override
 	public boolean merge(
-			I_ConceptAttributeVersioned<ConceptAttributesVariablePart, ConceptAttributesTuple> jarCon) {
+			I_ConceptAttributeVersioned<ConceptAttributesVariablePart, ConceptAttributesVersion> jarCon) {
 		throw new UnsupportedOperationException();
 	}
 }

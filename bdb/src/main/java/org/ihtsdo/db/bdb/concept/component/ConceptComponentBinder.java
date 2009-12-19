@@ -11,7 +11,7 @@ import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ConceptComponentBinder<C extends ConceptComponent<P>, P extends Version<P>> extends TupleBinding<ArrayList<C>> 
+public class ConceptComponentBinder<C extends ConceptComponent<P>, P extends VariablePart<P>> extends TupleBinding<ArrayList<C>> 
 							  implements I_BindConceptComponents {
 
 
@@ -54,9 +54,6 @@ public class ConceptComponentBinder<C extends ConceptComponent<P>, P extends Ver
 				newConceptComponentList.add(conceptComponent);
 			}
 			conceptComponent.readComponentFromBdb(input, conceptNid);
-			for (int partIndex = 0; partIndex < partCount; partIndex++) {
-				conceptComponent.readPartFromBdb(input);
-			}
 		}
 		newConceptComponentList.trimToSize();
 		return newConceptComponentList;
@@ -66,30 +63,16 @@ public class ConceptComponentBinder<C extends ConceptComponent<P>, P extends Ver
 	public void objectToEntry(ArrayList<C> conceptComponentList, TupleOutput output) {
 		List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
 		for (C conceptComponent: conceptComponentList) {
-			for (P part: conceptComponent.versions) {
+			for (P part: conceptComponent.variableParts) {
 				if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
 					componentListToWrite.add(conceptComponent);
 					break;
 				}
 			}
 		}
-		
 		output.writeInt(componentListToWrite.size()); // List size
 		for (C conceptComponent: componentListToWrite) {
-			conceptComponent.writeComponentToBdb(output);
-			int partCount = 0;
-			for (P part: conceptComponent.versions) {
-				if (part.statusAtPositionNid > maxReadOnlyStatusAtPositionId) {
-					partCount++;
-				}
-			} 
-			
-			output.writeShort(partCount);
-			for (P part: conceptComponent.versions) {
-				if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
-					part.writePartToBdb(output);
-				}
-			}
+			conceptComponent.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
 		}
 	}
 

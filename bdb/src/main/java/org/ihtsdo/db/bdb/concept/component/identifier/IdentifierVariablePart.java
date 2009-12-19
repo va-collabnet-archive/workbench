@@ -2,11 +2,14 @@ package org.ihtsdo.db.bdb.concept.component.identifier;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IdPart;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.VariablePart;
+import org.ihtsdo.db.bdb.concept.component.identifier.Identifier.VARIABLE_PART_TYPES;
 
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class IdentifierVariablePart extends Version<IdentifierVersion> implements I_IdPart {
+public abstract class IdentifierVariablePart 
+	extends VariablePart<IdentifierVariablePart> 
+		implements I_IdPart {
 
 	private int sourceSystemNid;
 	private Object sourceId;
@@ -18,18 +21,21 @@ public class IdentifierVariablePart extends Version<IdentifierVersion> implement
 	protected IdentifierVariablePart(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
+	
+	protected abstract VARIABLE_PART_TYPES getType();
 
 	@Override
-	public IdentifierVersion makeAnalog(int statusNid, int pathNid, long time) {
+	public IdentifierVariablePart makeAnalog(int statusNid, int pathNid, long time) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	protected void writeFieldsToBdb(TupleOutput output) {
-		// TODO Auto-generated method stub
-		
+		output.writeInt(sourceSystemNid);
+		writeSourceIdToBdb(output);
 	}
+	protected abstract void writeSourceIdToBdb(TupleOutput output);
 
 	@Override
 	public int getSource() {
@@ -52,9 +58,10 @@ public class IdentifierVariablePart extends Version<IdentifierVersion> implement
 	}
 
 	@Override
-	public ArrayIntList getPartComponentNids() {
-		ArrayIntList nids = super.get
-		return null;
+	protected ArrayIntList getVariableVersionNids() {
+		ArrayIntList nids = new ArrayIntList(3);
+		nids.add(sourceSystemNid);
+		return nids;
 	}
 
 }

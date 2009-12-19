@@ -2,13 +2,13 @@ package org.ihtsdo.db.bdb.concept.component.image;
 
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.ihtsdo.db.bdb.concept.component.Tuple;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
-public class ImageTuple 
-	extends Tuple<ImageVariablePart, Image> 
+public class ImageVersion 
+	extends Version<ImageVariablePart, Image> 
 	implements I_ImageTuple {
 
-	protected ImageTuple(Image component, ImageVariablePart part) {
+	protected ImageVersion(Image component, ImageVariablePart part) {
 		super(component, part);
 	}
 

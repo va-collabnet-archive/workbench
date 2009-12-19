@@ -2,12 +2,12 @@ package org.ihtsdo.db.bdb.concept.component.relationship;
 
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelTuple;
-import org.ihtsdo.db.bdb.concept.component.Tuple;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
-public class RelationshipTuple extends Tuple<RelationshipVariablePart, Relationship> 
+public class RelationshipVersion extends Version<RelationshipVariablePart, Relationship> 
 	implements I_RelTuple {
 
-	protected RelationshipTuple(Relationship component, RelationshipVariablePart part) {
+	protected RelationshipVersion(Relationship component, RelationshipVariablePart part) {
 		super(component, part);
 	}
 
