@@ -338,7 +338,7 @@ public class PanelRefsetAndParameters extends JPanel {
 		attachmentScroller.setBorder(BorderFactory.createTitledBorder("Attachments (optional):"));
 		add(attachmentScroller, gbc);
 
-		// Using validate(), Tell the panel to o lay out its subcomponents again. It should be invoked 
+		// Using validate(), Tell the panel to lay out its subcomponents again. It should be invoked 
 		// when this container's subcomponents are modified after the container has been displayed.
 		this.validate();
 
