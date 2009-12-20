@@ -247,15 +247,6 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
 
         getLogger().info("************* Search space: " + possibleDescriptions.size() + " descriptions *******");
 
-        I_GetConceptData test = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
-        getLogger().info("Has concept on concept ID? " + termFactory.hasConcept(test.getConceptId()));
-        List<? extends I_DescriptionVersioned> descs = test.getDescriptions();
-        for (I_DescriptionVersioned desc : descs) {
-            getLogger().info("Has concept on desc ID? " + termFactory.hasConcept(desc.getDescId()));
-            UUID uuid = termFactory.getId(desc.getDescId()).getUIDs().iterator().next();
-            getLogger().info("get description on desc ID? " + termFactory.getDescription(uuid.toString()));
-        }
-
         if (showActivityPanel) {
             computeRefsetActivityPanel.setMaximum(termFactory.getConceptCount());
             computeRefsetActivityPanel.setIndeterminate(false);
@@ -265,10 +256,8 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
         while (nidIterator.next()) {
             int nid = nidIterator.nid();
             if (possibleDescriptions.isMember(nid)) {
-                System.out.println("NID : " + nid);
-                System.out.println(termFactory.hasConcept(nid));
                 UUID uuid = termFactory.getId(nid).getUIDs().iterator().next();
-                currentDescription = termFactory.getDescription(uuid.toString()); // TODO ?? why does this take a string
+                currentDescription = termFactory.getDescription(uuid.toString());
                 descriptionsProcessed++;
 
                 boolean containsCurrentMember = currentRefsetMemberIds.contains(currentDescription.getConceptId());

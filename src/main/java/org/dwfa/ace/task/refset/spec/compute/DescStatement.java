@@ -52,7 +52,7 @@ public class DescStatement extends RefsetSpecStatement {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_GetConceptData queryConstraint) {
+    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint) {
         super(useNotQualifier, queryToken, queryConstraint);
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptId() == token.nid) {
@@ -390,8 +390,8 @@ public class DescStatement extends RefsetSpecStatement {
     // //////////////////////////////////////////////////////////////////////////////////
 
     private boolean descriptionIs(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
-        I_DescriptionTuple queryConstraintDesc = (I_DescriptionTuple) queryConstraint;
-        return descriptionBeingChecked.equals(queryConstraintDesc);
+        I_DescriptionVersioned queryConstraintDesc = (I_DescriptionVersioned) queryConstraint;
+        return descriptionBeingChecked.getDescId() == queryConstraintDesc.getDescId();
     }
 
     private boolean descriptionRegexMatch(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {

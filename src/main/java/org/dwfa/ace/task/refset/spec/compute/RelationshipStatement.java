@@ -47,7 +47,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_GetConceptData queryConstraint) {
+    public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint) {
         super(useNotQualifier, queryToken, queryConstraint);
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptId() == token.nid) {
@@ -55,6 +55,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
                 break;
             }
         }
+
         if (tokenEnum == null) {
             throw new RuntimeException("Unknown query type : " + queryToken);
         }

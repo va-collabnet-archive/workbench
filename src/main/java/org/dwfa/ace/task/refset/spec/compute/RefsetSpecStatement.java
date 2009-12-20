@@ -136,7 +136,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, I_GetConceptData constraint) {
+    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, I_AmTermComponent constraint) {
 
         this.useNotQualifier = useNotQualifier;
         this.queryToken = groupingToken;
