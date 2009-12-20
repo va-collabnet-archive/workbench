@@ -24,6 +24,7 @@ import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.lucene.queryParser.ParseException;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -40,10 +41,6 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class RefsetQueryFactory {
-
-    private final static int REL = 1;
-    private final static int DESC = 2;
-    private final static int CONCEPT = 3;
 
     public static RefsetSpecQuery createQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
             I_GetConceptData refsetSpec, I_GetConceptData refset, RefsetComputeType refsetType) throws IOException,
@@ -134,9 +131,9 @@ public class RefsetQueryFactory {
      * @throws TerminologyException
      * @throws ParseException
      */
-    private static RefsetSpecQuery processNode(DefaultMutableTreeNode node, RefsetSpecQuery query, RefsetComputeType type,
-            I_ConfigAceFrame configFrame, I_TermFactory termFactory) throws IOException, TerminologyException,
-            ParseException {
+    private static RefsetSpecQuery processNode(DefaultMutableTreeNode node, RefsetSpecQuery query,
+            RefsetComputeType type, I_ConfigAceFrame configFrame, I_TermFactory termFactory) throws IOException,
+            TerminologyException, ParseException {
 
         if (query == null) {
             throw new TerminologyException("Invalid refset spec : null query item used.");
@@ -166,7 +163,14 @@ public class RefsetQueryFactory {
 
                     I_GetConceptData truthToken = termFactory.getConcept(part.getC1id());
                     I_GetConceptData groupingToken = termFactory.getConcept(part.getC2id());
-                    I_GetConceptData constraint = termFactory.getConcept(part.getC3id());
+                    I_AmTermComponent constraint;
+                    if (termFactory.hasConcept(part.getC3id())) {
+                        constraint = termFactory.getConcept(part.getC3id());
+                    } else {
+                        constraint =
+                                termFactory.getDescription((termFactory.getId(part.getC3id()).getUIDs().iterator()
+                                    .next()).toString());
+                    } // TODO add rel
 
                     RefsetComputeType statementType = RefsetComputeType.getTypeFromGroupingToken(groupingToken);
                     switch (statementType) {
@@ -210,13 +214,6 @@ public class RefsetQueryFactory {
 
                     // add subquery
                     RefsetSpecQuery subquery = query.addSubquery(groupingToken);
-
-                    /*
-                     * int subtype = getType(groupingToken, termFactory);
-                     * if (subtype == -1) {
-                     * subtype = type;
-                     * }
-                     */
 
                     // process each grandchild
                     if (!childNode.isLeaf()) {

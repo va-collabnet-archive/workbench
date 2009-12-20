@@ -132,7 +132,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addRelStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            I_GetConceptData constraint) {
+            I_AmTermComponent constraint) {
         RefsetSpecStatement statement = new RelationshipStatement(useNotQualifier, groupingToken, constraint);
         statements.add(statement);
         allComponents.add(statement);
@@ -140,7 +140,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addConceptStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            I_GetConceptData constraint) {
+            I_AmTermComponent constraint) {
         RefsetSpecStatement statement = new ConceptStatement(useNotQualifier, groupingToken, constraint);
         statements.add(statement);
         allComponents.add(statement);
@@ -148,7 +148,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            I_GetConceptData constraint) {
+            I_AmTermComponent constraint) {
         RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint);
         statements.add(statement);
         allComponents.add(statement);
