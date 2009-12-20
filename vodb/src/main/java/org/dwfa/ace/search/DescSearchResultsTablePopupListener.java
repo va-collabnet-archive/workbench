@@ -39,6 +39,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
@@ -114,6 +115,7 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
             selectedRow = descTable.getSelectedRow();
             StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
             descTuple = swdt.getTuple();
+            UUID descUuid = AceConfig.getVodb().getId(descTuple.getDescId()).getUIDs().iterator().next();
             descConcept = ConceptBean.get(descTuple.getConceptId());
 
             JPopupMenu popup = new JPopupMenu();
@@ -131,7 +133,7 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
                         case CONCEPT_CONCEPT:
                             popup.addSeparator();
                             addRefsetItems(popup, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart,
-                                descConcept.getId().getUIDs().iterator().next());
+                                descUuid);
                             break;
                         default:
                         }
@@ -171,9 +173,9 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
         }
     }
 
-    private void addRefsetItems(JPopupMenu popup, File directory, I_ThinExtByRefVersioned specPart, UUID conceptUuid)
+    private void addRefsetItems(JPopupMenu popup, File directory, I_ThinExtByRefVersioned specPart, UUID descriptionUuid)
             throws FileNotFoundException, IOException, ClassNotFoundException {
-        ProcessPopupUtil.addSubmenMenuItems(popup, directory, ace.getAceFrameConfig().getWorker(), conceptUuid);
+        ProcessPopupUtil.addSubmenMenuItems(popup, directory, ace.getAceFrameConfig().getWorker(), descriptionUuid);
     }
 
     public void actionPerformed(ActionEvent e) {
