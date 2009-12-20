@@ -60,12 +60,12 @@ public class ProcessPopupUtil {
 
             public void run() {
                 try {
-                    ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
-                        processFile)));
+                    ObjectInputStream ois =
+                            new ObjectInputStream(new BufferedInputStream(new FileInputStream(processFile)));
                     I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
-                    if (conceptUuid != null) {
-                        process.writeAttachment(ProcessAttachmentKeys.ACTIVE_CONCEPT_UUID.getAttachmentKey(),
-                            conceptUuid);
+                    if (descriptionUuid != null) {
+                        process.writeAttachment(ProcessAttachmentKeys.ACTIVE_DESCRIPTION_UUID.getAttachmentKey(),
+                            descriptionUuid);
                     }
                     ois.close();
                     if (worker.isExecuting()) {
@@ -85,7 +85,7 @@ public class ProcessPopupUtil {
 
         private File processFile;
         private I_Work worker;
-        private UUID conceptUuid = null;
+        private UUID descriptionUuid = null;
 
         public ProcessMenuActionListener(File processFile, I_Work worker) {
             super();
@@ -93,9 +93,9 @@ public class ProcessPopupUtil {
             this.worker = worker;
         }
 
-        public ProcessMenuActionListener(File processFile, I_Work worker, UUID conceptUuid) {
+        public ProcessMenuActionListener(File processFile, I_Work worker, UUID descriptionUuid) {
             this(processFile, worker);
-            this.conceptUuid = conceptUuid;
+            this.descriptionUuid = descriptionUuid;
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -153,10 +153,10 @@ public class ProcessPopupUtil {
                             addSubmenMenuItems(submenu, processFile, menuWorker);
                         } else if (processFile.getName().toLowerCase().endsWith(".bp")) {
                             try {
-                                ActionListener processMenuListener = new ProcessMenuActionListener(processFile,
-                                    menuWorker);
-                                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
-                                    new FileInputStream(processFile)));
+                                ActionListener processMenuListener =
+                                        new ProcessMenuActionListener(processFile, menuWorker);
+                                ObjectInputStream ois =
+                                        new ObjectInputStream(new BufferedInputStream(new FileInputStream(processFile)));
                                 I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
                                 ois.close();
                                 JMenuItem processMenuItem = new JMenuItem(process.getName());
@@ -176,17 +176,18 @@ public class ProcessPopupUtil {
         }
     }
 
-    public static void addSubmenMenuItems(JComponent subMenu, File menuDir, MasterWorker menuWorker, UUID conceptUuid)
-            throws IOException, FileNotFoundException, ClassNotFoundException {
+    public static void addSubmenMenuItems(JComponent subMenu, File menuDir, MasterWorker menuWorker,
+            UUID descriptionUuid) throws IOException, FileNotFoundException, ClassNotFoundException {
         if ((menuDir != null) && menuDir.exists() && (menuDir.listFiles() != null)) {
             for (File f : getSortedFiles(menuDir)) {
                 if (f.isDirectory()) {
                     JMenu newSubMenu = new JMenu(f.getName());
                     subMenu.add(newSubMenu);
-                    addSubmenMenuItems(newSubMenu, f, menuWorker, conceptUuid);
+                    addSubmenMenuItems(newSubMenu, f, menuWorker, descriptionUuid);
                 } else {
                     if (f.getName().toLowerCase().endsWith(".bp")) {
-                        ActionListener processMenuListener = new ProcessMenuActionListener(f, menuWorker, conceptUuid);
+                        ActionListener processMenuListener =
+                                new ProcessMenuActionListener(f, menuWorker, descriptionUuid);
                         ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
                         I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
                         ois.close();
