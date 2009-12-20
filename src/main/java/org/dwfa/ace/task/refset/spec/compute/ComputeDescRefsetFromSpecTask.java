@@ -34,6 +34,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RepresentIdSet;
@@ -57,7 +58,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Computes the members of a refset given a refset spec. This refset spec is the
+ * Computes the members of a description refset. This refset spec is the
  * one currently displayed in the refset spec editing panel. The refset spec's
  * "specifies refset" relationship indicates which member refset will be
  * created.
@@ -66,7 +67,7 @@ import org.dwfa.util.bean.Spec;
  * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
-public class ComputeRefsetFromSpecTask extends AbstractTask {
+public class ComputeDescRefsetFromSpecTask extends AbstractTask {
 
     /**
 	 *
@@ -82,6 +83,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
     private Set<Integer> nestedRefsets;
 
     private Set<Integer> excludedRefsets;
+
+    private Set<Integer> membersFromPreviousComputeToRemove;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -105,11 +108,12 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         long startTime = new Date().getTime();
         termFactory = LocalVersionedTerminology.get();
+        membersFromPreviousComputeToRemove = new HashSet<Integer>();
         I_GetConceptData normalMemberConcept = termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
-        int conceptsToProcess = termFactory.getConceptCount();
+        int descriptionsToProcess = termFactory.getConceptCount(); // TODO
 
-        int conceptsProcessed = 0;
-        I_GetConceptData currentConcept;
+        int descriptionsProcessed = 0;
+        I_DescriptionVersioned currentDescription;
         List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
         Set<Integer> newMembers = new HashSet<Integer>();
         Set<Integer> retiredMembers = new HashSet<Integer>();
@@ -123,7 +127,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             computeRefsetActivityPanel.setValue(0);
             computeRefsetActivityPanel.setIndeterminate(true);
             progressReportHtmlGenerator = new ProgressReport();
-            progressReportHtmlGenerator.setDatabaseCount(conceptsToProcess);
+            progressReportHtmlGenerator.setDatabaseCount(descriptionsToProcess);
             progressReportHtmlGenerator.setStartTime(startTime);
         }
 
@@ -175,7 +179,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         // Step 1: create the query object, based on the refset spec
         RefsetSpecQuery query =
-                RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset, RefsetComputeType.CONCEPT);
+                RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset,
+                    RefsetComputeType.DESCRIPTION);
         SpecMemberRefsetHelper memberRefsetHelper =
                 new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
@@ -235,46 +240,59 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         HashSet<Integer> currentRefsetMemberIds =
                 filterNonCurrentRefsetMembers(allRefsetMembers, memberRefsetHelper, refset.getConceptId(),
                     normalMemberConcept.getConceptId());
-        // Compute the possible concepts to iterate over here...
-        I_RepresentIdSet possibleConcepts = query.getPossibleConcepts(configFrame, null);
-        possibleConcepts.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
 
-        getLogger().info("************* Search space: " + possibleConcepts.size() + " concepts *******");
+        // Compute the possible concepts to iterate over here...
+        I_RepresentIdSet possibleDescriptions = query.getPossibleDescriptions(configFrame, null);
+        possibleDescriptions.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
+
+        getLogger().info("************* Search space: " + possibleDescriptions.size() + " descriptions *******");
+
+        I_GetConceptData test = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
+        getLogger().info("Has concept on concept ID? " + termFactory.hasConcept(test.getConceptId()));
+        List<? extends I_DescriptionVersioned> descs = test.getDescriptions();
+        for (I_DescriptionVersioned desc : descs) {
+            getLogger().info("Has concept on desc ID? " + termFactory.hasConcept(desc.getDescId()));
+            UUID uuid = termFactory.getId(desc.getDescId()).getUIDs().iterator().next();
+            getLogger().info("get description on desc ID? " + termFactory.getDescription(uuid.toString()));
+        }
 
         if (showActivityPanel) {
             computeRefsetActivityPanel.setMaximum(termFactory.getConceptCount());
             computeRefsetActivityPanel.setIndeterminate(false);
         }
 
-        I_IterateIds nidIterator = possibleConcepts.iterator();
+        I_IterateIds nidIterator = possibleDescriptions.iterator();
         while (nidIterator.next()) {
             int nid = nidIterator.nid();
-            if (possibleConcepts.isMember(nid)) {
-                currentConcept = termFactory.getConcept(nid);
-                conceptsProcessed++;
+            if (possibleDescriptions.isMember(nid)) {
+                System.out.println("NID : " + nid);
+                System.out.println(termFactory.hasConcept(nid));
+                UUID uuid = termFactory.getId(nid).getUIDs().iterator().next();
+                currentDescription = termFactory.getDescription(uuid.toString()); // TODO ?? why does this take a string
+                descriptionsProcessed++;
 
-                boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());
+                boolean containsCurrentMember = currentRefsetMemberIds.contains(currentDescription.getConceptId());
 
-                if (query.execute(currentConcept)) {
+                if (query.execute(currentDescription)) {
                     if (!containsCurrentMember) {
-                        newMembers.add(currentConcept.getConceptId());
+                        newMembers.add(currentDescription.getDescId());
                     }
                 } else {
                     if (containsCurrentMember) {
-                        retiredMembers.add(currentConcept.getConceptId());
+                        retiredMembers.add(currentDescription.getDescId());
                     }
                 }
 
-                if (conceptsProcessed % 10000 == 0) {
+                if (descriptionsProcessed % 10000 == 0) {
                     if (showActivityPanel) {
                         progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
                         progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
                         computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
-                        computeRefsetActivityPanel.setValue(conceptsProcessed);
+                        computeRefsetActivityPanel.setValue(descriptionsProcessed);
                     }
 
-                    getLogger()
-                        .info("Concepts processed: " + conceptsProcessed + " / " + termFactory.getConceptCount());
+                    getLogger().info(
+                        "Concepts processed: " + descriptionsProcessed + " / " + termFactory.getConceptCount());
                     getLogger().info("New members: " + newMembers.size());
                     getLogger().info("Retired members: " + retiredMembers.size());
                 }
@@ -305,9 +323,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             throw new TaskFailedException("User cancelled refset computation.");
         }
 
+        // Step 3 : create new member refsets
         long createComponentsStartTime = System.currentTimeMillis();
         getLogger().info("Creating new member refsets.");
-        // Step 3 : create new member refsets
         for (Integer memberId : newMembers) {
             memberRefsetHelper.newRefsetExtension(refset.getConceptId(), memberId, normalMemberConcept.getConceptId(),
                 false);
@@ -323,6 +341,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         // Step 4: retire old member refsets
         getLogger().info("Retiring old member refsets.");
+        retiredMembers.addAll(membersFromPreviousComputeToRemove);
         for (Integer retiredMemberId : retiredMembers) {
             memberRefsetHelper.retireRefsetExtension(refset.getConceptId(), retiredMemberId, normalMemberConcept
                 .getConceptId());
@@ -373,7 +392,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         getLogger().info(">>>>>>>>>>><<<<<<<<<<<");
         getLogger().info("Number of new refset members: " + newMembers.size());
-        getLogger().info("Total number of concepts processed: " + conceptsProcessed);
+        getLogger().info("Total number of concepts processed: " + descriptionsProcessed);
         getLogger().info("End execution of refset spec: " + refsetSpec.getInitialText());
         getLogger().info("Total execution time: " + executionTimeString);
         getLogger().info(">>>>>> COMPLETE <<<<<<");
@@ -434,9 +453,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
     }
 
     private class ButtonListener implements ActionListener {
-        ComputeRefsetFromSpecTask task;
+        ComputeDescRefsetFromSpecTask task;
 
-        public ButtonListener(ComputeRefsetFromSpecTask task) {
+        public ButtonListener(ComputeDescRefsetFromSpecTask task) {
             this.task = task;
         }
 
@@ -451,7 +470,11 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         HashSet<Integer> newList = new HashSet<Integer>();
         for (I_ThinExtByRefVersioned v : list) {
             if (refsetHelper.hasCurrentRefsetExtension(refsetId, v.getComponentId(), memberTypeId)) {
-                newList.add(v.getComponentId());
+                if (!termFactory.hasConcept(v.getComponentId())) { // TODO this needs to include rel check
+                    newList.add(v.getComponentId());
+                } else {
+                    membersFromPreviousComputeToRemove.add(v.getComponentId());
+                }
             }
         }
         return newList;

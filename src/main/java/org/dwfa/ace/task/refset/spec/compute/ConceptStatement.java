@@ -62,6 +62,19 @@ public class ConceptStatement extends RefsetSpecStatement {
         queryConstraintConcept = (I_GetConceptData) queryConstraint;
     }
 
+    @Override
+    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
+            throws TerminologyException, IOException {
+        throw new TerminologyException("Get possible descriptions in concept statement unsupported operation.");
+    }
+
+    @Override
+    public I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame configFrame,
+            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException {
+        throw new TerminologyException("Get possible relationships in concept statement unsupported operation.");
+    }
+
+    @Override
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
         queryConstraint = (I_GetConceptData) queryConstraint;
@@ -93,7 +106,8 @@ public class ConceptStatement extends RefsetSpecStatement {
             }
             break;
         case CONCEPT_IS_MEMBER_OF:
-            List<I_ThinExtByRefVersioned> refsetExtensions = termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
+            List<I_ThinExtByRefVersioned> refsetExtensions =
+                    termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ThinExtByRefVersioned ext : refsetExtensions) {
                 refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
@@ -161,7 +175,8 @@ public class ConceptStatement extends RefsetSpecStatement {
     private boolean conceptIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException, IOException {
         I_IntSet allowedTypes = getIsAIds();
 
-        Set<? extends I_GetConceptData> children = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<? extends I_GetConceptData> children =
+                queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
 
         for (I_GetConceptData child : children) {
             if (conceptBeingTested.equals(child)) {
@@ -245,7 +260,8 @@ public class ConceptStatement extends RefsetSpecStatement {
      */
     private boolean conceptStatusIs(I_GetConceptData conceptBeingTested, I_GetConceptData requiredStatusConcept)
             throws IOException, TerminologyException {
-        List<? extends I_ConceptAttributeTuple> tuples = conceptBeingTested.getConceptAttributeTuples(null, null, true, true);
+        List<? extends I_ConceptAttributeTuple> tuples =
+                conceptBeingTested.getConceptAttributeTuples(null, null, true, true);
 
         // get latest tuple
         I_ConceptAttributeTuple latestTuple = null;
@@ -292,14 +308,14 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws IOException
      * @throws TerminologyException
      */
-    private boolean conceptStatusIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException, 
-        IOException {
+    private boolean conceptStatusIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException,
+            IOException {
 
         I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
-        Set<? extends I_GetConceptData> childStatuses = queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true,
-            true);
+        Set<? extends I_GetConceptData> childStatuses =
+                queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
 
         // call conceptStatusIs on each
         for (I_GetConceptData childStatus : childStatuses) {
@@ -337,7 +353,7 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptStatusIsDescendantOf(I_GetConceptData conceptBeingTested, I_GetConceptData status)
-        throws TerminologyException, IOException {
+            throws TerminologyException, IOException {
 
         I_IntSet allowedTypes = getIsAIds();
 
@@ -352,4 +368,5 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
         return false;
     }
+
 }

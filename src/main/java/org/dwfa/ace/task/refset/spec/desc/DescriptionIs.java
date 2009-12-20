@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.dwfa.ace.task.refset.spec.AddTextQueryToRefsetSpec;
+import org.dwfa.ace.task.refset.spec.AddStructuralQueryToRefsetSpec;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
@@ -28,14 +28,13 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Task for adding a "description lucene match" structural query to a refset
- * spec.
+ * Task for adding a "description is" structural query to a refset spec.
  * 
  * @author Chrissy Hill
  * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/desc", type = BeanType.TASK_BEAN) })
-public class DescriptionLuceneMatch extends AddTextQueryToRefsetSpec {
+public class DescriptionIs extends AddStructuralQueryToRefsetSpec {
     /**
 	 * 
 	 */
@@ -57,7 +56,7 @@ public class DescriptionLuceneMatch extends AddTextQueryToRefsetSpec {
     }
 
     protected int getStructuralQueryTokenId() throws IOException, TerminologyException {
-        return RefsetAuxiliary.Concept.DESC_LUCENE_MATCH.localize().getNid();
+        return RefsetAuxiliary.Concept.DESC_IS.localize().getNid();
     }
 
 }

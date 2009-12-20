@@ -215,8 +215,7 @@ public interface I_TermFactory {
      * Useful for checking for errors prior to commit performed by a workflow
      * process.
      * 
-     * @return Data Constraint failures that would be encountered if
-     *         <code>commit()</code> is called.
+     * @return Data Constraint failures that would be encountered if <code>commit()</code> is called.
      */
 
     List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings();
@@ -305,6 +304,20 @@ public interface I_TermFactory {
      * @throws IOException
      */
     public I_RepresentIdSet getConceptIdSet() throws IOException;
+
+    /**
+     * 
+     * @return a mutable bit set, with all description identifiers set to true.
+     * @throws IOException
+     */
+    public I_RepresentIdSet getDescriptionIdSet() throws IOException;
+
+    /**
+     * 
+     * @return a mutable bit set, with all relationship identifiers set to true.
+     * @throws IOException
+     */
+    public I_RepresentIdSet getRelationshipIdSet() throws IOException;
 
     /**
      * 
@@ -415,8 +428,7 @@ public interface I_TermFactory {
             Class<? extends I_ThinExtByRefPart> partType);
 
     /**
-     * @deprecated Use {@link #newExtension(int, int, int, int)} using
-     *             {@link AllowDataCheckSuppression} and
+     * @deprecated Use {@link #newExtension(int, int, int, int)} using {@link AllowDataCheckSuppression} and
      *             {@link SuppressDataChecks} annotations.
      */
     @Deprecated
@@ -457,7 +469,7 @@ public interface I_TermFactory {
      * 
      * 
      * 
-     *             
+     * 
      *             newExtensionPart(I_ThinExtByRefPartConceptConceptConcept.class
      *             )
      */
