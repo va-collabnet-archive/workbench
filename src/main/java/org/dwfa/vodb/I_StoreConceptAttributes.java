@@ -71,4 +71,8 @@ public interface I_StoreConceptAttributes extends I_StoreInBdb {
 
     public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException;
 
+    public IdentifierSet getRelationshipIdSet() throws IOException;
+
+    public IdentifierSet getDescriptionIdSet() throws IOException;
+
 }
