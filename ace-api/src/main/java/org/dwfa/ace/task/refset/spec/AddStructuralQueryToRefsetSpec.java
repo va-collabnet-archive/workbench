@@ -59,17 +59,26 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
 
     protected I_ThinExtByRefPart createAndPopulatePart(I_TermFactory tf, I_Path p, I_ConfigAceFrame configFrame)
             throws IOException, TerminologyException {
-        I_ThinExtByRefPartConceptConceptConcept specPart = tf.newConceptConceptConceptExtensionPart();
+        I_ThinExtByRefPartConceptConceptConcept specPart =
+                tf.newExtensionPart(I_ThinExtByRefPartConceptConceptConcept.class);
         if (getClauseIsTrue()) {
             specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid());
         } else {
             specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid());
         }
         specPart.setC2id(getStructuralQueryTokenId());
-        if (c3Concept == null) {
-            specPart.setC3id(configFrame.getHierarchySelection().getConceptId());
+        if (specPart.getC2id() == RefsetAuxiliary.Concept.DESC_IS.localize().getNid()) {
+            if (c3Description == null) {
+                specPart.setC3id(configFrame.getHierarchySelection().getDescriptions().get(0).getDescId());
+            } else {
+                specPart.setC3id(c3Description.getDescId());
+            }
         } else {
-            specPart.setC3id(c3Concept.getConceptId());
+            if (c3Description == null) {
+                specPart.setC3id(configFrame.getHierarchySelection().getConceptId());
+            } else {
+                specPart.setC3id(c3Description.getConceptId());
+            }
         }
 
         specPart.setPathId(p.getConceptId());
