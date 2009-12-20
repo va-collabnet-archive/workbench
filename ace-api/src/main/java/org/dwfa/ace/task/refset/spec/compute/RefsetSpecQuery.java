@@ -56,7 +56,12 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private ArrayList<RefsetSpecComponent> allComponents;
 
     public enum GROUPING_TYPE {
-        OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true), AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true), CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true), NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false), CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true), NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false);
+        OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true),
+        AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true),
+        CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true),
+        NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false),
+        CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true),
+        NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false);
 
         private int nid;
         private boolean truth;
@@ -144,6 +149,14 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
             I_GetConceptData constraint) {
+        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint);
+        statements.add(statement);
+        allComponents.add(statement);
+        return statement;
+    }
+
+    public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
+            String constraint) {
         RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint);
         statements.add(statement);
         allComponents.add(statement);
@@ -300,8 +313,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         }
 
         I_GetConceptData descriptionConcept = (I_GetConceptData) component;
-        List<? extends I_DescriptionTuple> descriptionTuples = descriptionConcept.getDescriptionTuples(null, null,
-            termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
+        List<? extends I_DescriptionTuple> descriptionTuples =
+                descriptionConcept.getDescriptionTuples(null, null, termFactory.getActiveAceFrameConfig()
+                    .getViewPositionSetReadOnly(), true);
 
         for (I_DescriptionTuple tuple : descriptionTuples) {
             I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
@@ -443,7 +457,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             case CONCEPT_IS_MEMBER_OF:
             case DESC_IS_MEMBER_OF:
             case REL_IS_MEMBER_OF:
-                results.add(statement.queryConstraint.getNid()); // TODO check
+                results.add(((I_AmTermComponent) statement.queryConstraint).getNid());
                 break;
             default:
                 break;
@@ -465,5 +479,73 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public void setGroupingType(GROUPING_TYPE groupingType) {
         this.groupingType = groupingType;
+    }
+
+    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleDescriptions)
+            throws TerminologyException, IOException {
+
+        Collections.sort(allComponents, calculationOrderComparator);
+
+        long startTime = System.currentTimeMillis();
+        AceLog.getAppLog().info(">> Start of " + this.toString());
+        I_RepresentIdSet possibleDescriptions = null;
+        // process all statements and subqueries
+        switch (groupingType) {
+        case AND:
+            if (statements.size() == 0 && subqueries.size() == 0) {
+                throw new TerminologyException("Spec is invalid - dangling AND.");
+            }
+
+            for (RefsetSpecComponent component : allComponents) {
+                if (possibleDescriptions == null) {
+                    possibleDescriptions = component.getPossibleDescriptions(config, parentPossibleDescriptions);
+                } else {
+                    possibleDescriptions.and(component.getPossibleDescriptions(config, possibleDescriptions));
+                }
+            }
+
+            break;
+
+        case OR:
+            if (statements.size() == 0 && subqueries.size() == 0) {
+                throw new TerminologyException("Spec is invalid - dangling OR.");
+            }
+
+            for (RefsetSpecComponent component : allComponents) {
+                if (possibleDescriptions == null) {
+                    possibleDescriptions = component.getPossibleDescriptions(config, parentPossibleDescriptions);
+                } else {
+                    possibleDescriptions.or(component.getPossibleDescriptions(config, parentPossibleDescriptions));
+                }
+            }
+
+            break;
+        case CONCEPT_CONTAINS_DESC:
+            throw new TerminologyException(
+                "Concept-contains-desc is not supported within a description refset calculation.");
+        case NOT_CONCEPT_CONTAINS_DESC:
+            throw new TerminologyException(
+                "NOT Concept-contains-desc is not supported within a description refset calculation.");
+        case CONCEPT_CONTAINS_REL:
+            throw new TerminologyException(
+                "Concept-contains-rel is not supported within a description refset calculation.");
+        case NOT_CONCEPT_CONTAINS_REL:
+            throw new TerminologyException(
+                "NOT Concept-contains-rel is not supported within a description refset calculation.");
+        default:
+            throw new TerminologyException("Unknown grouping type.");
+        }
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        long minutes = elapsedTime / 60000;
+        long seconds = (elapsedTime % 60000) / 1000;
+        AceLog.getAppLog().info(this + " possibleConceptTime: " + minutes + " minutes, " + seconds + " seconds.");
+        setPossibleConceptsCount(possibleDescriptions.size());
+        return possibleDescriptions;
+    }
+
+    @Override
+    public I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
+            throws TerminologyException, IOException {
+        throw new TerminologyException("Get possible relationships unimplemented.");
     }
 }

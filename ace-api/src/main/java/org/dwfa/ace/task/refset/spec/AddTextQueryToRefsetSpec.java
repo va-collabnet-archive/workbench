@@ -33,7 +33,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
-public class AddTextQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
+public abstract class AddTextQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
     /**
 	 * 
 	 */
@@ -59,16 +59,19 @@ public class AddTextQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
         return typeId;
     }
 
+    protected abstract int getStructuralQueryTokenId() throws IOException, TerminologyException;
+
     protected I_ThinExtByRefPart createAndPopulatePart(I_TermFactory tf, I_Path p, I_ConfigAceFrame configFrame)
             throws IOException, TerminologyException {
-        I_ThinExtByRefPartConceptConceptString specPart = tf.newConceptConceptStringExtensionPart();
+        I_ThinExtByRefPartConceptConceptString specPart =
+                tf.newExtensionPart(I_ThinExtByRefPartConceptConceptString.class);
         if (getClauseIsTrue()) {
             specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid());
         } else {
             specPart.setC1id(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid());
         }
-        specPart.setC2id(RefsetAuxiliary.Concept.DESC_LUCENE_MATCH.localize().getNid());
-        specPart.setStr("+corneal +abrasion (NOT IMPLEMENTED YET!!)");
+        specPart.setC2id(getStructuralQueryTokenId());
+        specPart.setStringValue("queue"); // TODO
         specPart.setPathId(p.getConceptId());
         specPart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
         specPart.setVersion(Integer.MAX_VALUE);
