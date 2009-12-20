@@ -536,7 +536,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                 baos.write('\0');
             }
             ByteArrayOutputStream compressedOut = new ByteArrayOutputStream();
-            DeflaterOutputStream dout = new DeflaterOutputStream(compressedOut, new Deflater(Deflater.BEST_COMPRESSION));
+            DeflaterOutputStream dout =
+                    new DeflaterOutputStream(compressedOut, new Deflater(Deflater.BEST_COMPRESSION));
             dout.write(baos.toByteArray());
             dout.close();
             return compressedOut.toByteArray();
@@ -1000,7 +1001,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.dwfa.vodb.impl.I_StoreConceptAttributes#writeConceptAttributes(org
      * .dwfa.ace.api.I_ConceptAttributeVersioned)
@@ -1041,7 +1041,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.impl.I_StoreConceptAttributes#hasConcept(int)
      */
     public boolean hasConcept(int conceptId) throws DatabaseException {
@@ -1056,7 +1055,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.dwfa.vodb.impl.I_StoreConceptAttributes#getConceptAttributes(int)
      */
@@ -1067,7 +1065,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.impl.I_StoreConceptAttributes#getConceptIterator()
      */
     public Iterator<I_GetConceptData> getConceptIterator() throws IOException {
@@ -1081,14 +1078,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     /*
      * (non-Javadoc)
-     * 
      * @see
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
      * org.dwfa.vodb.impl.I_StoreConceptAttributes#iterateConceptAttributeEntries
      * (org.dwfa.vodb.types.I_ProcessConceptAttributeEntries)
      */
@@ -1151,6 +1141,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
     }
 
     private static int[] conceptNids;
+    private static ArrayList<Integer> descriptionNids;
+    private static ArrayList<Integer> relationshipNids;
     private static IdentifierSetReadOnly idSet;
 
     private void refreshConceptNids() throws IOException {
@@ -1171,6 +1163,72 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                 }
                 idSet = new IdentifierSetReadOnly(tempIdSet);
             }
+        } catch (DatabaseException ex) {
+            throw new IOException(ex);
+        } finally {
+            if (concCursor != null) {
+                try {
+                    concCursor.close();
+                } catch (DatabaseException e) {
+                    throw new IOException(e);
+                }
+            }
+        }
+    }
+
+    private void refreshDescriptionNids() throws IOException {
+        Cursor concCursor = null;
+        try {
+            refreshConceptNids();
+            descriptionNids = new ArrayList<Integer>();
+            concCursor = conDescRelDb.openCursor(null, null);
+            DatabaseEntry foundKey = new DatabaseEntry();
+            DatabaseEntry foundData = new DatabaseEntry();
+            for (int i = 0; i < conceptNids.length; i++) {
+                if (concCursor.getNext(foundKey, foundData, LockMode.DEFAULT) != OperationStatus.SUCCESS) {
+                    AceLog.getAppLog().alertAndLogException(new Exception("premature end of description cursor: " + i));
+                }
+                int conceptId = (Integer) intBinder.entryToObject(foundKey);
+                List<I_DescriptionVersioned> allDescriptions = getDescriptions(conceptId);
+
+                for (I_DescriptionVersioned description : allDescriptions) {
+                    descriptionNids.add(description.getDescId());
+                }
+            }
+        } catch (DatabaseException ex) {
+            throw new IOException(ex);
+        } finally {
+            if (concCursor != null) {
+                try {
+                    concCursor.close();
+                } catch (DatabaseException e) {
+                    throw new IOException(e);
+                }
+            }
+        }
+    }
+
+    private void refreshRelationshipNids() throws IOException {
+        Cursor concCursor = null;
+        try {
+            refreshConceptNids();
+            relationshipNids = new ArrayList<Integer>();
+            concCursor = conDescRelDb.openCursor(null, null);
+            DatabaseEntry foundKey = new DatabaseEntry();
+            DatabaseEntry foundData = new DatabaseEntry();
+            for (int i = 0; i < conceptNids.length; i++) {
+                if (concCursor.getNext(foundKey, foundData, LockMode.DEFAULT) != OperationStatus.SUCCESS) {
+                    AceLog.getAppLog()
+                        .alertAndLogException(new Exception("premature end of relationship cursor: " + i));
+                }
+                int conceptId = (Integer) intBinder.entryToObject(foundKey);
+                List<I_RelVersioned> allRelationships = getSrcRels(conceptId);
+
+                for (I_RelVersioned relationship : allRelationships) {
+                    relationshipNids.add(relationship.getRelId());
+                }
+            }
+
         } catch (DatabaseException ex) {
             throw new IOException(ex);
         } finally {
@@ -1354,19 +1412,21 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
         if (bean.uncommittedIdVersioned != null) {
             for (I_IdVersioned idv : bean.uncommittedIdVersioned) {
-            	List<I_IdPart> partsToRemove = new ArrayList<I_IdPart>();
-            	List<I_IdPart> partsToAdd = new ArrayList<I_IdPart>();
+                List<I_IdPart> partsToRemove = new ArrayList<I_IdPart>();
+                List<I_IdPart> partsToAdd = new ArrayList<I_IdPart>();
                 for (I_IdPart p : idv.getVersions()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         try {
-							p.setVersion(version);
-						} catch (UnsupportedOperationException e) {
-							e.printStackTrace();
-							AceLog.getAppLog().warning(e.getLocalizedMessage());
-							AceLog.getAppLog().warning("Creating duplicate...");
-							I_IdPart newPart = (I_IdPart) p.makeAnalog(p.getStatusId(), p.getPathId(), ThinVersionHelper.convert(version));
-							partsToAdd.add(newPart);
-						}
+                            p.setVersion(version);
+                        } catch (UnsupportedOperationException e) {
+                            e.printStackTrace();
+                            AceLog.getAppLog().warning(e.getLocalizedMessage());
+                            AceLog.getAppLog().warning("Creating duplicate...");
+                            I_IdPart newPart =
+                                    (I_IdPart) p.makeAnalog(p.getStatusId(), p.getPathId(), ThinVersionHelper
+                                        .convert(version));
+                            partsToAdd.add(newPart);
+                        }
                         values.add(new TimePathId(version, p.getPathId()));
                         for (I_DescriptionVersioned desc : bean.getDescriptions()) {
                             if (desc.getDescId() == idv.getNativeId()) {
@@ -1518,7 +1578,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             IndexWriter writer = new IndexWriter(luceneDir, new StandardAnalyzer(), false);
             Document doc = new Document();
             doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
-            doc.add(new Field("cnid", Integer.toString(desc.getConceptId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc
+                .add(new Field("cnid", Integer.toString(desc.getConceptId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
             addIdsToIndex(doc, identifierDb.getId(desc.getDescId()));
             addIdsToIndex(doc, identifierDb.getId(desc.getConceptId()));
 
@@ -1799,7 +1860,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             I_DescriptionVersioned descV = descItr.next();
             Document doc = new Document();
             doc.add(new Field("dnid", Integer.toString(descV.getDescId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
-            doc.add(new Field("cnid", Integer.toString(descV.getConceptId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc
+                .add(new Field("cnid", Integer.toString(descV.getConceptId()), Field.Store.YES,
+                    Field.Index.UN_TOKENIZED));
             try {
                 addIdsToIndex(doc, identifierDb.getId(descV.getDescId()));
                 addIdsToIndex(doc, identifierDb.getId(descV.getConceptId()));
@@ -1884,7 +1947,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
     }
 
     public boolean hasSrcRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet sourceRelTypes,
-    		PositionSetReadOnly positions) throws DatabaseException, IOException {
+            PositionSetReadOnly positions) throws DatabaseException, IOException {
         ConceptBean concept = ConceptBean.get(conceptId);
         return concept.getSourceRelTuples(allowedStatus, sourceRelTypes, positions, false).size() > 0;
     }
@@ -2083,5 +2146,31 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             }
         }
         return new IntSet(conceptNids);
+    }
+
+    public IdentifierSet getDescriptionIdSet() throws IOException {
+        try {
+            IdentifierSet cidSet = new IdentifierSet(identifierDb.getMaxId() - Integer.MIN_VALUE);
+            refreshDescriptionNids();
+            for (int nid : descriptionNids) {
+                cidSet.setMember(nid);
+            }
+            return cidSet;
+        } catch (DatabaseException e) {
+            throw new IOException(e);
+        }
+    }
+
+    public IdentifierSet getRelationshipIdSet() throws IOException {
+        try {
+            IdentifierSet cidSet = new IdentifierSet(identifierDb.getMaxId() - Integer.MIN_VALUE);
+            refreshRelationshipNids();
+            for (int nid : relationshipNids) {
+                cidSet.setMember(nid);
+            }
+            return cidSet;
+        } catch (DatabaseException e) {
+            throw new IOException(e);
+        }
     }
 }

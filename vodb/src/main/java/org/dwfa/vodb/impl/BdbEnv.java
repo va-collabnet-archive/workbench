@@ -240,8 +240,9 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         case CON_DESC_REL:
         case CON_DESCMAP_REL:
         case CON_COMPDESC_REL:
-            ConDescRelBdb conDescRelBdb = new ConDescRelBdb(env, makeConfig(readOnly, VodbEnv.isTransactional()),
-                luceneDir, identifierDb, dbSetupConfig.getCoreDbType());
+            ConDescRelBdb conDescRelBdb =
+                    new ConDescRelBdb(env, makeConfig(readOnly, VodbEnv.isTransactional()), luceneDir, identifierDb,
+                        dbSetupConfig.getCoreDbType());
             conAttBdb = conDescRelBdb;
             relBdb = conDescRelBdb;
             descBdb = conDescRelBdb;
@@ -689,8 +690,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
             sb.append("nFullINFlush=").append(f.format(s.getNFullINFlush())).append("<br>");
             sb.append("nFullBINFlush=").append(f.format(s.getNFullBINFlush())).append("<br>");
             sb.append("nDeltaINFlush=").append(f.format(s.getNDeltaINFlush())).append("<br>");
-            sb.append("lastCheckpointStart=")
-                .append(DbLsn.getNoFormatString(s.getLastCheckpointStart()))
+            sb.append("lastCheckpointStart=").append(DbLsn.getNoFormatString(s.getLastCheckpointStart()))
                 .append("<br>");
             sb.append("lastCheckpointEnd=").append(DbLsn.getNoFormatString(s.getLastCheckpointEnd())).append("<br>");
             sb.append("endOfLog=").append(DbLsn.getNoFormatString(s.getEndOfLog())).append("<br>");
@@ -873,6 +873,14 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
 
     public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
         return conAttBdb.getReadOnlyConceptIdSet();
+    }
+
+    public IdentifierSet getRelationshipIdSet() throws IOException {
+        return conAttBdb.getRelationshipIdSet();
+    }
+
+    public IdentifierSet getDescriptionIdSet() throws IOException {
+        return conAttBdb.getDescriptionIdSet();
     }
 
 }

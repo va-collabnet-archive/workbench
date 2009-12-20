@@ -447,7 +447,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public boolean hasDestRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet destRelTypes,
-    		PositionSetReadOnly positions) throws DatabaseException, IOException {
+            PositionSetReadOnly positions) throws DatabaseException, IOException {
         return bdbEnv.hasDestRelTuple(conceptId, allowedStatus, destRelTypes, positions);
     }
 
@@ -492,7 +492,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     public boolean hasSrcRelTuple(int conceptId, I_IntSet allowedStatus, I_IntSet sourceRelTypes,
-    		PositionSetReadOnly positions) throws DatabaseException, IOException {
+            PositionSetReadOnly positions) throws DatabaseException, IOException {
         return bdbEnv.hasSrcRelTuple(conceptId, allowedStatus, sourceRelTypes, positions);
     }
 
@@ -522,12 +522,6 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     /*
      * For issues upgrading to lucene 2.x, see this link:
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
      * http://www.nabble.com/Lucene-in-Action-examples-complie-problem-tf2418478.
      * html#a6743189
      */
@@ -785,8 +779,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             throws TerminologyException, IOException {
         canEdit(aceFrameConfig);
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        int nid = uuidToNativeWithGeneration(newConceptId, idSource, aceFrameConfig.getEditingPathSet(),
-            Integer.MAX_VALUE);
+        int nid =
+                uuidToNativeWithGeneration(newConceptId, idSource, aceFrameConfig.getEditingPathSet(),
+                    Integer.MAX_VALUE);
         AceLog.getEditLog().info("Creating new concept: " + newConceptId + " (" + nid + ") defined: " + defined);
         ConceptBean newBean = ConceptBean.get(nid);
         newBean.setPrimordial(true);
@@ -816,13 +811,14 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         canEdit(aceFrameConfig);
         addUncommitted((I_Transact) concept);
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        int descId = uuidToNativeWithGeneration(newDescriptionId, idSource, aceFrameConfig.getEditingPathSet(),
-            Integer.MAX_VALUE);
+        int descId =
+                uuidToNativeWithGeneration(newDescriptionId, idSource, aceFrameConfig.getEditingPathSet(),
+                    Integer.MAX_VALUE);
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
             AceLog.getEditLog().fine("Creating new description: " + newDescriptionId + " (" + descId + "): " + text);
         }
-        ThinDescVersioned desc = new ThinDescVersioned(descId, concept.getConceptId(),
-            aceFrameConfig.getEditingPathSet().size());
+        ThinDescVersioned desc =
+                new ThinDescVersioned(descId, concept.getConceptId(), aceFrameConfig.getEditingPathSet().size());
         boolean capStatus = false;
         int status = aceFrameConfig.getDefaultStatus().getConceptId();
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
@@ -863,15 +859,16 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
         ACE.commitSequence++;
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        int relId = uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig.getEditingPathSet(),
-            Integer.MAX_VALUE);
+        int relId =
+                uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
             AceLog.getEditLog().fine(
                 "Creating new relationship 1: " + newRelUid + " (" + relId + ") from " + concept.getUids() + " to "
                     + aceFrameConfig.getHierarchySelection().getUids());
         }
-        ThinRelVersioned rel = new ThinRelVersioned(relId, concept.getConceptId(),
-            aceFrameConfig.getHierarchySelection().getConceptId(), 1);
+        ThinRelVersioned rel =
+                new ThinRelVersioned(relId, concept.getConceptId(), aceFrameConfig.getHierarchySelection()
+                    .getConceptId(), 1);
         int status = aceFrameConfig.getDefaultStatus().getConceptId();
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
             ThinRelPart relPart = new ThinRelPart();
@@ -899,15 +896,16 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         ACE.commitSequence++;
         int idSource = uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 
-        int relId = uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig.getEditingPathSet(),
-            Integer.MAX_VALUE);
+        int relId =
+                uuidToNativeWithGeneration(newRelUid, idSource, aceFrameConfig.getEditingPathSet(), Integer.MAX_VALUE);
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
             AceLog.getEditLog().fine(
                 "Creating new relationship 2: " + newRelUid + " (" + relId + ") from " + concept.getUids() + " to "
                     + relDestination.getUids());
         }
-        ThinRelVersioned rel = new ThinRelVersioned(relId, concept.getConceptId(), relDestination.getConceptId(),
-            aceFrameConfig.getEditingPathSet().size());
+        ThinRelVersioned rel =
+                new ThinRelVersioned(relId, concept.getConceptId(), relDestination.getConceptId(), aceFrameConfig
+                    .getEditingPathSet().size());
 
         ThinRelPart relPart = new ThinRelPart();
 
@@ -1796,8 +1794,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     }
 
     /**
-     * If a class that is calling a method in this class defines the
-     * {@link AllowDataCheckSuppression} annotation then
+     * If a class that is calling a method in this class defines the {@link AllowDataCheckSuppression} annotation then
      * we will traverse back up the the call stack for a method that declares
      * the {@link SuppressDataChecks} annotation.
      * If found returns true.
@@ -1889,6 +1886,14 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
     public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
         return bdbEnv.getReadOnlyConceptIdSet();
+    }
+
+    public I_RepresentIdSet getDescriptionIdSet() throws IOException {
+        return bdbEnv.getDescriptionIdSet();
+    }
+
+    public I_RepresentIdSet getRelationshipIdSet() throws IOException {
+        return bdbEnv.getRelationshipIdSet();
     }
 
 }
