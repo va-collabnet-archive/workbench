@@ -146,9 +146,7 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
         roleAllowedTypes.add(smeRole.getConceptId());
         roleAllowedTypes.add(reviewerRole.getConceptId());
 
-        I_IntSet isAAllowedTypes = termFactory.newIntSet();
-        I_GetConceptData isARel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-        isAAllowedTypes.add(isARel.getConceptId());
+        I_IntSet isAAllowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
 
         List<? extends I_RelTuple> roleRels =
                 concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true, true);
