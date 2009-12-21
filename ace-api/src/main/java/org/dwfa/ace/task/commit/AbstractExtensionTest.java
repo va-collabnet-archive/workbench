@@ -21,7 +21,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -29,7 +28,6 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
@@ -83,16 +81,19 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
     }
 
     public PositionSetReadOnly getPositions(I_TermFactory termFactory) throws Exception {
-        I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
-        Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
-        Set<I_Position> allPositions = new HashSet<I_Position>();
-        for (I_Path path : editingPaths) {
-            allPositions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
-            for (I_Position position : path.getOrigins()) {
-                addOriginPositions(termFactory, position, allPositions);
-            }
-        }
-        return new PositionSetReadOnly(allPositions);
+        return termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly();
+        /*
+         * I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
+         * Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
+         * Set<I_Position> allPositions = new HashSet<I_Position>();
+         * for (I_Path path : editingPaths) {
+         * allPositions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+         * for (I_Position position : path.getOrigins()) {
+         * addOriginPositions(termFactory, position, allPositions);
+         * }
+         * }
+         * return new PositionSetReadOnly(allPositions);
+         */
     }
 
     private void addOriginPositions(I_TermFactory termFactory, I_Position position, Set<I_Position> allPositions) {
@@ -112,7 +113,8 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
         for (ArchitectonicAuxiliary.Concept con : Arrays.asList(ArchitectonicAuxiliary.Concept.ACTIVE,
             ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED,
             ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED, ArchitectonicAuxiliary.Concept.LIMITED,
-            ArchitectonicAuxiliary.Concept.PENDING_MOVE)) {
+            ArchitectonicAuxiliary.Concept.PENDING_MOVE, ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE,
+            ArchitectonicAuxiliary.Concept.PROMOTED)) {
             I_GetConceptData c = getConceptSafe(termFactory, con.getUids());
             if (c != null) {
                 activeSet.add(c.getConceptId());
