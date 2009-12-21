@@ -16,14 +16,12 @@
  */
 package org.dwfa.mojo.epicexport.kp;
 
-import java.io.IOException;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-
 import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 import org.dwfa.mojo.epicexport.I_ExportFactory;
+import org.dwfa.mojo.epicexport.I_RefsetInterpreter;
 
 import com.mysql.jdbc.Connection;
 
@@ -54,5 +52,8 @@ public class EpicTermWarehouseFactory implements I_ExportFactory {
     	return ret;
     }
 
+    public I_RefsetInterpreter getInterpreter() {
+    	return new RefsetApplicationInterpreter();
+    }
 }
 

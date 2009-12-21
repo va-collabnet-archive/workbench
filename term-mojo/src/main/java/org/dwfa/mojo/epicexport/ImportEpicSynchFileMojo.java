@@ -23,6 +23,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -30,8 +33,13 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.mojo.ConceptDescriptor;
+import org.dwfa.mojo.PositionDescriptor;
+import org.dwfa.mojo.epicexport.kp.RegionalHibernationBuilder;
 import org.dwfa.tapi.TerminologyException;
 
 /**
@@ -58,6 +66,30 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
      * @required
      */
     private File kpDir;
+	/**
+	 * Positions to export data.
+	 *
+	 * @parameter
+	 * @required
+	 */
+	private PositionDescriptor[] positionsForExport;
+
+	/**
+	 * Status values to include in export
+	 *
+	 * @parameter
+	 * @required
+	 */
+	private ConceptDescriptor[] statusValuesForExport;
+	/**
+	 * Location of the directory to output regional hibernation files to.
+	 *
+	 * @parameter expression="${project.build.directory}"
+	 * @required
+	 */
+	private String outputDirectory;
+	
+    
     private int synchRecordsProcessed = 0;
     private int conceptsMatched = 0;
     private int cidValuesMatched = 0;
@@ -66,9 +98,35 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
     private int dot1ValuesMisMatched = 0;
     private int cidValuesSynched = 0;
     private int dot1ValuesSynched = 0;
+	private HashSet<I_Position> positions;
+
+	private I_IntSet statusValues;
+	private I_TermFactory termFactory;
+	private RegionalHibernationBuilder hibernationBuilder;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
+        	termFactory = LocalVersionedTerminology.get();
+        	/**
+        	 * Set the status values and positions for export.  This is used for building the regional
+        	 * hibernation.
+        	 */
+			positions = new HashSet<I_Position>(
+					positionsForExport.length);
+			for (PositionDescriptor pd : positionsForExport) {
+				positions.add(pd.getPosition());
+			}
+			
+			statusValues = termFactory.newIntSet();
+			List<I_GetConceptData> statusValueList = new ArrayList<I_GetConceptData>();
+			for (ConceptDescriptor status : statusValuesForExport) {
+				I_GetConceptData statusConcept = status.getVerifiedConcept();
+				statusValues.add(statusConcept.getConceptId());
+				statusValueList.add(statusConcept);
+			}
+			hibernationBuilder = 
+				new RegionalHibernationBuilder(outputDirectory, positions, statusValues);
+
             getLog().info("KP dir: " + kpDir);
 
             BufferedReader r = new BufferedReader(new FileReader(new File(kpDir, "epic_synch.txt")));
@@ -84,6 +142,7 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
             }
 
             r.close();
+            hibernationBuilder.close();
 
             getLog().info("synchRecordsProcessed: " + synchRecordsProcessed);
             getLog().info("conceptsMatched:       " + conceptsMatched);
@@ -99,6 +158,8 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         } catch (NoSuchAlgorithmException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }
@@ -120,6 +181,7 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
         try {
             I_GetConceptData concept = tf.getConcept(new UUID[] { UUID.fromString(concept_id) });
             conceptsMatched++;
+            hibernationBuilder.buildAnyHibernationForConcept(concept, cid);
 
             /*
              * I_GetConceptData cidSourceConcept = tf.getConcept(new UUID[] {
@@ -208,6 +270,8 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
                 tf.addUncommitted(concept);
                 cidValuesSynched++;
             }
+            
+            
 
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block

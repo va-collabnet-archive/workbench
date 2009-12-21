@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
-import org.dwfa.mojo.epicexport.AbstractEpicExportBuilder.EpicItem;
 
 
 /** 
@@ -414,10 +413,12 @@ AceLog.getAppLog().info("Initializing writer with masterfile name: " + masterfil
 			return position;
 		}
 
+		@SuppressWarnings("unused")
 		public String toExportLine() {
 			return itemNumber.concat(",\"").concat(value.toString()).concat("\"");
 		}
 		
+		@SuppressWarnings("unused")
 		public int compareTo(EpicItem x) {
 			int ret = this.itemNumber.compareTo(x.getItemNumber());
 			if (ret == 0)

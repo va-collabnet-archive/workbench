@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -80,14 +79,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	private String outputDirectory;
 	
 	/**
-	 * If true, do not create thesaurus entries for preferred terms with no synonyms.
-	 *
-	 * 
-	 * 
-	 */
-	// private ExportSpecification[] specs;
-
-	/**
 	 * Positions to export data.
 	 *
 	 * @parameter
@@ -108,7 +99,8 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
      * @required
      * @readonly
      */
-     private File buildDirectory;
+     @SuppressWarnings("unused")
+	private File buildDirectory;
 
      /**
       * Location of the build directory.
@@ -246,6 +238,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		private List<String> masterFilesImpacted;
 		private I_ThinExtByRefTuple idTuple;
 		private List<DisplayName> displayNames;
+		private I_RefsetInterpreter interpreter;
 		
 		public ExportIterator(ExportToEpicLoadFilesMojo parent) throws Exception
 		{
@@ -271,6 +264,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	
 	    	this.startingVersion = termFactory.convertToThinVersion(parsedDate.getTime());
 	    	this.startingDate = new Date(parsedDate.getTime());
+	    	this.interpreter = exportFactory.getInterpreter();
 		}
 
 		public void close() throws Exception {
@@ -383,102 +377,44 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	
 	    	I_ThinExtByRefPart extensionTuplePart = extensionTuple.getPart();
 	    	// getLog().info("Processing refset: " + refsetName);	    	
-	    	//TODO: Re-factor into separate class, allow pattern matching, store and read from pom.xml
-	    	/* if(refsetName.equals("EDG Billing Item 207")) {
-	    		refsetAppliesTo.add(new EpicItemIdentifier(
-	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "207"));
-	    		refsetAppliesTo.add(new EpicItemIdentifier(
-	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "207"));
-	    	}
-	    	else if(refsetName.equals("EDG Billing Item 91")) {
-	    		refsetAppliesTo.add(new EpicItemIdentifier(
-	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "91"));
-	    		refsetAppliesTo.add(new EpicItemIdentifier(
-	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "91"));
-// getLog().info("Found billing 91");
-	    	}
-	    	else */
-	    	if(refsetName.equals("EDG Billing Item 2")) {
-	    		refsetAppliesTo.add(new EpicItemIdentifier(
-	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "2"));
-	    		stringValue = getDisplayName(conceptForDescription); 
-	    		previousStringValue = getPreviousDisplayName(conceptForDescription); 
-	    	}
-	    	else if(refsetName.startsWith("EDG Billing Item ")) {
-	    		String item = refsetName.substring(17);
-	    		refsetAppliesTo.add(new EpicItemIdentifier(
-	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, item));
-	    	}
-	    	else if(refsetName.equals("EDG Billing Contact Date")) {
-	    		this.setCurrentItem(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, "20");
-	    	}
 
+	    	List<I_RefsetInterpreter.I_RefsetApplication> applications = 
+	    		this.interpreter.getApplications(refsetName);
 	    	
-	    	/**
-	    	 *  EDG Clinical refsets
-	    	 */
-	    	else if(refsetName.equals("EDG Clinical Item 2 National")) {
-	    		
-	    		refsetAppliesTo.add(new EpicItemIdentifier(
-	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2"));
-	    		region = "National";
-	    		if (description != null) {
-	    			stringValue = description.getLastTuple().getPart().getText();
-	    			previousStringValue = getPreviousDisplayName(description);
-	    		}
-	    		// getLog().info("Found display name: " + stringValue + " / " + previousStringValue);	
-	    	}
-	    	else if (refsetName.startsWith("EDG Clinical Item 2 "))
-	    	{
-	    		
-	    		region = refsetName.substring(20);
-	    		refsetAppliesTo.add(new EpicItemIdentifier(
-	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2"));
-	    		if (description != null) {
-	    			stringValue = description.getLastTuple().getPart().getText();
-	    			previousStringValue = stringValue;
-	    		}
-	    		
-	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 2")) {
-	    		refsetAppliesTo.add(new EpicItemIdentifier(
-	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2"));
-	    		stringValue = getDisplayName(conceptForDescription); 
-	    		previousStringValue = getPreviousDisplayName(conceptForDescription); 
-	    	}
-	    	else if(refsetName.equals("EDG Clinical Item 50")) {
-	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
-	    		if (doAdd.getValue() && description != null) {
-	    			stringValue = description.getLastTuple().getPart().getText();
-	    			previousStringValue = getPreviousDisplayName(description);
+	    	for (I_RefsetInterpreter.I_RefsetApplication app: applications) {
+	    		if (app.getMasterfile().equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
+	    			if (app.getItemNumber().equals("2")) {
+	    	    		stringValue = getDisplayName(conceptForDescription); 
+	    	    		previousStringValue = getPreviousDisplayName(conceptForDescription); 
+	    			}
+	    			else {
+	    				stringValue = getValueAsString(extensionTuplePart);
+	    				previousStringValue = getValueAsString(previousPart);
+	    			}
 		    		refsetAppliesTo.add(new EpicItemIdentifier(
-		    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "50"));
-	    			/* String[] types = {ExportToEpicLoadFilesMojo.DESCRIPTION_SYNONYM, 
-			    			ExportToEpicLoadFilesMojo.DESCRIPTION_PREFERED_TERM};
-	    			addSynonyms(conceptForDescription, types, 
-		    			EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "50");
-		    			*/
+		    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, app.getItemNumber()));
+	    		}
+	    		else if (app.getMasterfile().equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
+	    			if (app.getItemNumber().equals("2")) {
+		    			stringValue = description.getLastTuple().getPart().getText();
+		    			previousStringValue = getPreviousDisplayName(description);
+		    			region = app.getRegion();
+	    			}
+	    			else if (app.getItemNumber().equals("50")){
+	    	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
+	    	    		if (doAdd.getValue() && description != null) {
+	    	    			stringValue = description.getLastTuple().getPart().getText();
+	    	    			previousStringValue = getPreviousDisplayName(description);
+	    	    		}
+	    			}
+	    			else {
+	    				stringValue = getValueAsString(extensionTuplePart);
+	    				previousStringValue = getValueAsString(previousPart);
+	    			}
+		    		refsetAppliesTo.add(new EpicItemIdentifier(
+		    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, app.getItemNumber()));
 	    		}
 	    	}
-	    	else if(refsetName.startsWith("EDG Clinical Item ")) {
-	    		String item = refsetName.substring(18);
-	    		refsetAppliesTo.add(new EpicItemIdentifier(
-	    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, item));
-	    	}
-
-	    	else if(refsetName.equals("Reason for Soft Delete")) {
-	    		this.currentItem = "5";
-	    		stringValue = "*SD";
-	    		previousStringValue = "*SD";
-	    	}
-	    	else if (refsetName.equals("ICD10-CM Code Mapping Status") ||
-	    			refsetName.equals("Path reference set") || 
-	    			refsetName.equals("Path origin reference set")) {
-	    		// Ignore
-	    	}
-	    		
-	    	else 
-	    		getLog().warn("Unhandled refset name: " + refsetName);
 	    	
 	    	for (EpicItemIdentifier e: refsetAppliesTo) {
 	    		I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(e.getMasterfile());
@@ -489,11 +425,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    			}
 	    		}
 	    		else {
-		    		if (stringValue == null)
-		    			stringValue = getValueAsString(extensionTuplePart);
-		    		
-		    		if (previousStringValue == null)
-		    			previousStringValue = getValueAsString(previousPart);
 		    		//getLog().info("Exporting item " + this.currentItem + " with a value of " + stringValue +
 		    		//		" and a previous value of " + previousStringValue);
 	    		
