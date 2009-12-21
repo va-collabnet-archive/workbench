@@ -349,9 +349,6 @@ public abstract class ProcessSources {
         st.eolIsSignificant(true);
         int rels = 0;
 
-        ProcessQueue processQueue = new ProcessQueue("AceRelationshipQueue", THREAD_COUNT);
-        WriteRelationshipJob job = new WriteRelationshipJob(this);
-
         skipLineOne(st, relationshipLatch);
         int tokenType = st.nextToken();
         while (tokenType != StreamTokenizer.TT_EOF) {
@@ -389,11 +386,9 @@ public abstract class ProcessSources {
             if (rels > 0 && rels % batchSize == 0) {
                 getLog().info(
                     "Added " + batchSize + " relationships, time to execute job - " + rels + " relationships parsed");
-                processQueue.execute(job);
-                job = new WriteRelationshipJob(this);
             }
 
-            job.addTask(relationshipLatch, statusDate, relID, statusId, conceptOneID, relationshipTypeConceptID,
+            writeRelationship(relationshipLatch, statusDate, relID, statusId, conceptOneID, relationshipTypeConceptID,
                 conceptTwoID, characteristic, refinability, group, pathId);
 
             rels++;
@@ -408,13 +403,6 @@ public abstract class ProcessSources {
             // Beginning of loop
             tokenType = st.nextToken();
         }
-        getLog().info(
-            "Added final relationships processing job with " + job.batch.size() + " items to process - " + rels
-                + " relationships parsed");
-        processQueue.execute(job);
-
-        getLog().info("Awaiting completion of queued relationships processing tasks");
-        processQueue.awaitCompletion();
         getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed relationsips: " + rels);
     }
 
