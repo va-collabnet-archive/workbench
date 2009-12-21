@@ -22,7 +22,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,12 +33,11 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.TestForCreateNewRefsetPermission;
-import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
 import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -47,43 +45,41 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
  * This task prepares the Workflow Details Sheet to display the CreateRefsetPanel
- * panel where the user will be asked to enter a number of fields required to start the 
- * Create Refset process.   
+ * panel where the user will be asked to enter a number of fields required to start the
+ * Create Refset process.
  * 
  * @author Perry Reid
- * @version 1.0, December 2009 
+ * @version 1.0, December 2009
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/wf", type = BeanType.TASK_BEAN) })
 public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
 
-    /* -----------------------
-     * Properties 
+    /*
+     * -----------------------
+     * Properties
      * -----------------------
      */
-	// Serialization Properties 
+    // Serialization Properties
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
-	// Task Attribute Properties     
-	private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();  
+    // Task Attribute Properties
+    private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
 
-           
-	// Other Properties 
+    // Other Properties
     private transient Exception ex = null;
     private I_TermFactory termFactory;
     private I_ConfigAceFrame config;
-    private I_GetConceptData owner; 
+    private I_GetConceptData owner;
 
-    
-    /* -----------------------
+    /*
+     * -----------------------
      * Serialization Methods
      * -----------------------
      */
@@ -91,51 +87,49 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
         out.writeInt(dataVersion);
         out.writeObject(profilePropName);
     }
+
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        
+
         if (objDataVersion <= dataVersion) {
-        	if (objDataVersion >= 1) {
+            if (objDataVersion >= 1) {
                 // Read version 1 data fields...
-            	profilePropName = (String) in.readObject();
-        	} 
+                profilePropName = (String) in.readObject();
+            }
             // Initialize transient properties...
             ex = null;
-           
+
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
-    
 
-	/**
-	 * Handles actions required by the task after normal task completion (such as moving a 
-	 * process to another user's input queue).   
-	 * @return  	void
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#complete(
-	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
-	 */
+    /**
+     * Handles actions required by the task after normal task completion (such as moving a
+     * process to another user's input queue).
+     * 
+     * @return void
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-
-    
-	/**
-	 * Performs the primary action of the task, which in this case is to gather and 
-	 * validate data that has been entered by the user on the Workflow Details Sheet.
-	 * @return  	The exit condition of the task
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#evaluate(
-	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
-	 */
+    /**
+     * Performs the primary action of the task, which in this case is to gather and
+     * validate data that has been entered by the user on the Workflow Details Sheet.
+     * 
+     * @return The exit condition of the task
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
 
         try {
@@ -162,36 +156,31 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
         return Condition.CONTINUE;
     }
 
-
     private void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
 
-    	try {
- 
-    		// Initialize class variables
-    		this.config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-    		this.owner = this.config.getDbConfig().getUserConcept();
+        try {
+
+            // Initialize class variables
+            this.config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+            this.owner = this.config.getDbConfig().getUserConcept();
             this.termFactory = LocalVersionedTerminology.get();
-            
-            
+
             // create list of all users
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet allowedStatuses = helper.getCurrentStatusIntSet();
             I_GetConceptData userParent = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
-            I_IntSet allowedTypes = termFactory.newIntSet();
-            allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
-            final Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(allowedTypes, true, true);
-            
-            I_GetConceptData fsnConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-            I_IntSet fsnAllowedTypes = termFactory.newIntSet();
-            fsnAllowedTypes.add(fsnConcept.getConceptId());
-            
+            I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
+            final Set<? extends I_GetConceptData> allUsers =
+                    userParent.getDestRelOrigins(allowedStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
+                        .getViewPositionSetReadOnly(), true, true);
+
             Set<I_GetConceptData> allValidUsers = new HashSet<I_GetConceptData>();
             for (I_GetConceptData user : allUsers) {
-
                 if (getInbox(user) != null) {
-                	allValidUsers.add(user);
+                    allValidUsers.add(user);
                 }
             }
 
-            
             // check permissions for the current user - they require
             // "create new refset" permission either as a user role or
             // individual permission
@@ -199,61 +188,47 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
             Set<I_GetConceptData> permissibleRefsetParents = new HashSet<I_GetConceptData>();
             permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(owner));
             permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(owner));
-            
-            
-            
-			// Clear the Workflow Details Sheet 
-			ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
-			clear.setProfilePropName(getProfilePropName());
-			clear.evaluate(process, worker);
 
-			// Create a new panel to add to the Workflow Details Sheet
+            // Clear the Workflow Details Sheet
+            ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
+            clear.setProfilePropName(getProfilePropName());
+            clear.evaluate(process, worker);
+
+            // Create a new panel to add to the Workflow Details Sheet
             JPanel workflowDetailsSheet = this.config.getWorkflowDetailsSheet();
-	        int width = 475;
-	        int height = 590;
-	        workflowDetailsSheet.setSize(width, height);
-	        workflowDetailsSheet.setLayout(new GridLayout(1, 1));
-	        CreateRefsetPanel newPanel = new CreateRefsetPanel(allValidUsers, permissibleRefsetParents); 
-			
-	        /*----------------------------------------------------------------------------------
-	         *  Add the initialized panel to the Workflow Details Sheet
-	         * ----------------------------------------------------------------------------------
-	         */
-	        workflowDetailsSheet.add(newPanel);
-	        
+            int width = 475;
+            int height = 590;
+            workflowDetailsSheet.setSize(width, height);
+            workflowDetailsSheet.setLayout(new GridLayout(1, 1));
+            CreateRefsetPanel newPanel = new CreateRefsetPanel(allValidUsers, permissibleRefsetParents);
+
+            /*----------------------------------------------------------------------------------
+             *  Add the initialized panel to the Workflow Details Sheet
+             * ----------------------------------------------------------------------------------
+             */
+            workflowDetailsSheet.add(newPanel);
+
         } catch (Exception e) {
             ex = e;
         }
     }
 
-    
-    public String getInbox(I_GetConceptData concept) throws TerminologyException, IOException {
+    public String getInbox(I_GetConceptData concept) throws Exception {
         // find the inbox string using the concept's "user inbox" description
 
-        I_GetConceptData descriptionType = LocalVersionedTerminology.get().getConcept(
-            ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
+        I_GetConceptData descriptionType =
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
         I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
         allowedTypes.add(descriptionType.getConceptId());
         String latestDescription = null;
         int latestVersion = Integer.MIN_VALUE;
 
-        I_IntSet activeStatuses = LocalVersionedTerminology.get().newIntSet();
-        activeStatuses.add(LocalVersionedTerminology.get()
-            .getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.getUids()))
-            .getConceptId());
-        activeStatuses.add(LocalVersionedTerminology.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.CURRENT.getUids())).getConceptId());
-        activeStatuses.add(LocalVersionedTerminology.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids())).getConceptId());
-        activeStatuses.add(LocalVersionedTerminology.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids())).getConceptId());
-        activeStatuses.add(LocalVersionedTerminology.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.LIMITED.getUids())).getConceptId());
-        activeStatuses.add(LocalVersionedTerminology.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())).getConceptId());
+        SpecRefsetHelper helper = new SpecRefsetHelper();
+        I_IntSet activeStatuses = helper.getCurrentStatusIntSet();
 
-        List<? extends I_DescriptionTuple> descriptionResults = concept.getDescriptionTuples(activeStatuses, allowedTypes, null,
-            true);
+        List<? extends I_DescriptionTuple> descriptionResults =
+                concept.getDescriptionTuples(activeStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
+                    .getViewPositionSetReadOnly(), true);
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
             if (descriptionTuple.getVersion() > latestVersion) {
                 latestVersion = descriptionTuple.getVersion();
@@ -263,7 +238,6 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
         return latestDescription;
     }
 
-    
     public int[] getDataContainerIds() {
         return new int[] {};
     }
@@ -272,18 +246,18 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-    
+    /*
+     * ====================================================================
+     * Getters and Setters
+     * ====================================================================
+     */
 
-	/* ====================================================================
-	 * Getters and Setters
-	 * ====================================================================
-	 */
-	
-	public String getProfilePropName() {
-		return profilePropName;
-	}
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
-	}
+    public String getProfilePropName() {
+        return profilePropName;
+    }
+
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
+    }
 
 }

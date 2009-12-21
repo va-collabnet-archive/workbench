@@ -176,24 +176,20 @@ public class CreateRefsetPanel extends JPanel {
             reviewers = getPermissibleReviewers(refsetParent);
         }
 
-        int editorIndex = -1;
         if (editorComboBox != null) {
-            editorIndex = editorComboBox.getSelectedIndex();
+            I_GetConceptData previousEditor = (I_GetConceptData) editorComboBox.getSelectedItem();
+            editorComboBox = new JComboBox(editors.toArray());
+            if (previousEditor != null || editors.size() == 0) {
+                editorComboBox.setSelectedItem(previousEditor);
+            }
         }
 
-        int reviewerIndex = -1;
         if (reviewerComboBox != null) {
-            reviewerIndex = reviewerComboBox.getSelectedIndex();
-        }
-
-        editorComboBox = new JComboBox(editors.toArray());
-        reviewerComboBox = new JComboBox(reviewers.toArray());
-
-        if (reviewerIndex != -1) {
-            reviewerComboBox.setSelectedIndex(reviewerIndex);
-        }
-        if (editorIndex != -1) {
-            editorComboBox.setSelectedIndex(editorIndex);
+            I_GetConceptData previousReviewer = (I_GetConceptData) reviewerComboBox.getSelectedItem();
+            reviewerComboBox = new JComboBox(reviewers.toArray());
+            if (previousReviewer != null || reviewers.size() == 0) {
+                reviewerComboBox.setSelectedItem(previousReviewer);
+            }
         }
     }
 
