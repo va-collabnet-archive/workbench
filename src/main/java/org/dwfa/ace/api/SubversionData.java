@@ -32,8 +32,15 @@ public class SubversionData implements Serializable {
     private String password;
     private Set<String> readOnlyUrlMirrors = null;
     private String preferredReadRepository = null;
+    
+    private void fixDataErrors() {
+    	if (workingCopyStr.contains("\\")) {
+    		workingCopyStr = workingCopyStr.replace('\\', '/');
+    	}
+    }
 
     public String getPreferredReadRepository() {
+    	fixDataErrors();
         if (preferredReadRepository == null) {
             if (readOnlyUrlMirrors == null || readOnlyUrlMirrors.size() == 0) {
                 return repositoryUrlStr;
@@ -57,6 +64,7 @@ public class SubversionData implements Serializable {
         this.repositoryUrlStr = repositoryUrlStr;
         this.workingCopyStr = workingCopyStr;
         this.preferredReadRepository = repositoryUrlStr;
+        fixDataErrors();
         getReadOnlyUrlMirrors().add(repositoryUrlStr);
     }
 
@@ -79,11 +87,13 @@ public class SubversionData implements Serializable {
     }
 
     public String getWorkingCopyStr() {
-        return workingCopyStr;
+    	fixDataErrors();
+    	return workingCopyStr;
     }
 
     public void setWorkingCopyStr(String workingCopyStr) {
         this.workingCopyStr = workingCopyStr;
+        fixDataErrors();
     }
 
     public String getUsername() {
