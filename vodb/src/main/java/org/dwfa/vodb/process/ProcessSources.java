@@ -388,8 +388,8 @@ public abstract class ProcessSources {
                     "Added " + batchSize + " relationships, time to execute job - " + rels + " relationships parsed");
             }
 
-            writeRelationship(relationshipLatch, statusDate, relID, statusId, conceptOneID, relationshipTypeConceptID,
-                conceptTwoID, characteristic, refinability, group, pathId);
+            writeRelationship(relationshipLatch, statusDate, relID, Arrays.asList(new Object[] { statusId }), conceptOneID, relationshipTypeConceptID,
+                conceptTwoID, characteristic, refinability, group, Arrays.asList(new Object[] { pathId }));
 
             rels++;
 
