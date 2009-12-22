@@ -37,8 +37,8 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * Represents partial information contained in a refset spec.
- * An example of a statement is : "NOT: Concept is : Paracetamol"
+ * Represents partial information contained in a refset spec. An example of a
+ * statement is : "NOT: Concept is : Paracetamol"
  * 
  * @author Chrissy Hill
  * 
@@ -48,9 +48,12 @@ public class DescStatement extends RefsetSpecStatement {
     /**
      * Constructor for refset spec statement.
      * 
-     * @param useNotQualifier Whether to use the NOT qualifier.
-     * @param queryToken The query type to use (e.g. "concept is")
-     * @param queryConstraint The destination concept (e.g. "paracetamol")
+     * @param useNotQualifier
+     *            Whether to use the NOT qualifier.
+     * @param queryToken
+     *            The query type to use (e.g. "concept is")
+     * @param queryConstraint
+     *            The destination concept (e.g. "paracetamol")
      */
     public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint) {
         super(useNotQualifier, queryToken, queryConstraint);
@@ -68,9 +71,12 @@ public class DescStatement extends RefsetSpecStatement {
     /**
      * Constructor for refset spec statement.
      * 
-     * @param useNotQualifier Whether to use the NOT qualifier.
-     * @param queryToken The query type to use (e.g. "concept is")
-     * @param queryConstraint String value for regex or lucene search
+     * @param useNotQualifier
+     *            Whether to use the NOT qualifier.
+     * @param queryToken
+     *            The query type to use (e.g. "concept is")
+     * @param queryConstraint
+     *            String value for regex or lucene search
      */
     public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, String queryConstraint) {
         super(useNotQualifier, queryToken, queryConstraint);
@@ -86,37 +92,40 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     public boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException {
+        if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
+            I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
+            I_DescriptionTuple descriptionTuple = descriptionVersioned.getLastTuple();
 
-        I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
-        I_DescriptionTuple descriptionTuple = descriptionVersioned.getLastTuple();
-
-        switch (tokenEnum) {
-        case DESC_IS:
-            return descriptionIs(descriptionTuple);
-        case DESC_IS_MEMBER_OF:
-            return descriptionIsMemberOf(descriptionTuple);
-        case DESC_STATUS_IS:
-            return descriptionStatusIs(descriptionTuple);
-        case DESC_STATUS_IS_CHILD_OF:
-            return descriptionStatusIsChildOf(descriptionTuple);
-        case DESC_STATUS_IS_KIND_OF:
-            return descriptionStatusIsKindOf(descriptionTuple);
-        case DESC_STATUS_IS_DESCENDENT_OF:
-            return descriptionStatusIsDescendentOf(descriptionTuple);
-        case DESC_TYPE_IS:
-            return descriptionTypeIs(descriptionTuple);
-        case DESC_TYPE_IS_CHILD_OF:
-            return descriptionTypeIsChildOf(descriptionTuple);
-        case DESC_TYPE_IS_KIND_OF:
-            return descriptionTypeIsKindOf(descriptionTuple);
-        case DESC_TYPE_IS_DESCENDENT_OF:
-            return descriptionTypeIsDescendentOf(descriptionTuple);
-        case DESC_REGEX_MATCH:
-            return descriptionRegexMatch(descriptionTuple);
-        case DESC_LUCENE_MATCH:
-            return descriptionLuceneMatch(descriptionTuple);
-        default:
-            throw new RuntimeException("Can't handle queryToken: " + queryToken);
+            switch (tokenEnum) {
+            case DESC_IS:
+                return descriptionIs(descriptionTuple);
+            case DESC_IS_MEMBER_OF:
+                return descriptionIsMemberOf(descriptionTuple);
+            case DESC_STATUS_IS:
+                return descriptionStatusIs(descriptionTuple);
+            case DESC_STATUS_IS_CHILD_OF:
+                return descriptionStatusIsChildOf(descriptionTuple);
+            case DESC_STATUS_IS_KIND_OF:
+                return descriptionStatusIsKindOf(descriptionTuple);
+            case DESC_STATUS_IS_DESCENDENT_OF:
+                return descriptionStatusIsDescendentOf(descriptionTuple);
+            case DESC_TYPE_IS:
+                return descriptionTypeIs(descriptionTuple);
+            case DESC_TYPE_IS_CHILD_OF:
+                return descriptionTypeIsChildOf(descriptionTuple);
+            case DESC_TYPE_IS_KIND_OF:
+                return descriptionTypeIsKindOf(descriptionTuple);
+            case DESC_TYPE_IS_DESCENDENT_OF:
+                return descriptionTypeIsDescendentOf(descriptionTuple);
+            case DESC_REGEX_MATCH:
+                return descriptionRegexMatch(descriptionTuple);
+            case DESC_LUCENE_MATCH:
+                return descriptionLuceneMatch(descriptionTuple);
+            default:
+                throw new RuntimeException("Can't handle queryToken: " + queryToken);
+            }
+        } else {
+            return false;
         }
     }
 
@@ -133,8 +142,8 @@ public class DescStatement extends RefsetSpecStatement {
             possibleConcepts.or(parentPossibleConcepts);
             break;
         case DESC_IS_MEMBER_OF:
-            List<I_ThinExtByRefVersioned> refsetExtensions =
-                    termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
+            List<I_ThinExtByRefVersioned> refsetExtensions = termFactory
+                    .getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ThinExtByRefVersioned ext : refsetExtensions) {
                 refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
@@ -170,7 +179,7 @@ public class DescStatement extends RefsetSpecStatement {
 
     @SuppressWarnings( { "deprecation", "unchecked" })
     public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame configFrame,
-            I_RepresentIdSet parentPossibleDescriptions) throws TerminologyException, IOException {
+        I_RepresentIdSet parentPossibleDescriptions) throws TerminologyException, IOException {
 
         I_RepresentIdSet possibleDescriptions = termFactory.getEmptyIdSet();
         if (parentPossibleDescriptions == null) {
@@ -182,8 +191,8 @@ public class DescStatement extends RefsetSpecStatement {
             possibleDescriptions.setMember(((I_DescriptionVersioned) queryConstraint).getDescId());
             break;
         case DESC_IS_MEMBER_OF:
-            List<I_ThinExtByRefVersioned> refsetExtensions =
-                    termFactory.getRefsetExtensionMembers(((I_AmTermComponent) queryConstraint).getNid());
+            List<I_ThinExtByRefVersioned> refsetExtensions = termFactory
+                    .getRefsetExtensionMembers(((I_AmTermComponent) queryConstraint).getNid());
             Set<Integer> refsetMembers = new HashSet<Integer>();
             for (I_ThinExtByRefVersioned ext : refsetExtensions) {
                 refsetMembers.add(ext.getComponentId());
@@ -243,7 +252,7 @@ public class DescStatement extends RefsetSpecStatement {
 
     @Override
     public I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame configFrame,
-            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException {
+        I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException {
         throw new TerminologyException("Get possible relationships in desc statement unsupported operation.");
     }
 
@@ -257,14 +266,14 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     private boolean descriptionTypeIs(I_GetConceptData requiredDescriptionType,
-            I_DescriptionTuple descriptionBeingTested) {
+        I_DescriptionTuple descriptionBeingTested) {
         return descriptionBeingTested.getTypeId() == requiredDescriptionType.getConceptId();
     }
 
     /**
      * Checks if the description being tested has a description type matching
-     * the query constraint.
-     * This also checks for the description type's children (depth >= 1);
+     * the query constraint. This also checks for the description type's
+     * children (depth >= 1);
      */
     private boolean descriptionTypeIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws IOException,
             TerminologyException {
@@ -286,13 +295,13 @@ public class DescStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean descriptionTypeIsDescendentOf(I_GetConceptData requiredType,
-            I_DescriptionTuple descriptionBeingChecked) throws IOException, TerminologyException {
+        I_DescriptionTuple descriptionBeingChecked) throws IOException, TerminologyException {
 
         I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
-        Set<? extends I_GetConceptData> childDescTypes =
-                requiredType.getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<? extends I_GetConceptData> childDescTypes = requiredType.getDestRelOrigins(null, allowedTypes, null, true,
+                                                                                        true);
 
         // call descriptionTypeIs on each
         for (I_GetConceptData childDescType : childDescTypes) {
@@ -317,8 +326,8 @@ public class DescStatement extends RefsetSpecStatement {
         I_IntSet allowedTypes = getIsAIds();
 
         // get list of all children of input concept
-        Set<? extends I_GetConceptData> childDescTypes =
-                ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<? extends I_GetConceptData> childDescTypes = ((I_GetConceptData) queryConstraint)
+                .getDestRelOrigins(null, allowedTypes, null, true, true);
 
         // call descriptionTypeIs on each
         for (I_GetConceptData childDescType : childDescTypes) {
@@ -343,8 +352,8 @@ public class DescStatement extends RefsetSpecStatement {
             IOException {
         I_IntSet allowedTypes = getIsAIds();
 
-        Set<? extends I_GetConceptData> childStatuses =
-                ((I_GetConceptData) queryConstraint).getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<? extends I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint)
+                .getDestRelOrigins(null, allowedTypes, null, true, true);
 
         for (I_GetConceptData childStatus : childStatuses) {
             if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {
@@ -361,11 +370,11 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     private boolean descriptionStatusIsDescendentOf(I_GetConceptData requiredStatus,
-            I_DescriptionTuple descriptionBeingChecked) throws TerminologyException, IOException {
+        I_DescriptionTuple descriptionBeingChecked) throws TerminologyException, IOException {
         I_IntSet allowedTypes = getIsAIds();
 
-        Set<? extends I_GetConceptData> childStatuses =
-                requiredStatus.getDestRelOrigins(null, allowedTypes, null, true, true);
+        Set<? extends I_GetConceptData> childStatuses = requiredStatus.getDestRelOrigins(null, allowedTypes, null,
+                                                                                         true, true);
 
         for (I_GetConceptData childStatus : childStatuses) {
             if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {
