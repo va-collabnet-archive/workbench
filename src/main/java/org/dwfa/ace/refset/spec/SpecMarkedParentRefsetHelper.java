@@ -71,8 +71,10 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         Set<I_GetConceptData> ancestors = new HashSet<I_GetConceptData>();
         for (Integer descriptionId : descriptionIds) {
             UUID descriptionUuid = termFactory.getId(descriptionId).getUIDs().iterator().next();
-            ancestors.addAll(getAllAncestors(termFactory.getConcept(termFactory.getDescription(
-                descriptionUuid.toString()).getConceptId()), traversingConditions));
+            I_GetConceptData concept =
+                    termFactory.getConcept(termFactory.getDescription(descriptionUuid.toString()).getConceptId());
+            ancestors.addAll(getAllAncestors(concept, traversingConditions));
+            // ancestors.add(concept);
         }
 
         for (I_GetConceptData concept : ancestors) {
@@ -129,7 +131,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         }
     }
 
-    public void removeDescriptionParentMembers(Integer... descriptionIds) throws Exception { // TODO
+    public void removeDescriptionParentMembers(Integer... descriptionIds) throws Exception {
         Condition[] traversingConditions =
                 new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
 
@@ -137,12 +139,14 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         Set<Integer> toBeRetired = new HashSet<Integer>();
         for (Integer descriptionId : descriptionIds) {
             UUID descriptionUuid = termFactory.getId(descriptionId).getUIDs().iterator().next();
-            Integer conceptId = termFactory.getDescription(descriptionUuid.toString()).getConceptId();
-            if (isMarkedParent(conceptId)) {
-                toBeRetired.add(conceptId);
-            }
-            for (I_GetConceptData concept : getAllAncestors(termFactory.getConcept(conceptId), traversingConditions)) {
+            I_GetConceptData concept =
+                    termFactory.getConcept(termFactory.getDescription(descriptionUuid.toString()).getConceptId());
+            if (isMarkedParent(concept.getConceptId())) {
                 toBeRetired.add(concept.getConceptId());
+            }
+            for (I_GetConceptData ancestor : getAllAncestors(termFactory.getConcept(concept.getConceptId()),
+                traversingConditions)) {
+                toBeRetired.add(ancestor.getConceptId());
             }
         }
 
