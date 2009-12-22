@@ -39,6 +39,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
@@ -68,11 +69,11 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
     private static ImageIcon multiParentClosed = new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_green.png"));
 
-    private static ImageIcon multiParentOpen = new ImageIcon(
-        ACE.class.getResource("/16x16/plain/nav_up_right_green.png"));
+    private static ImageIcon multiParentOpen =
+            new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_right_green.png"));
 
-    private static ImageIcon focusMultiParentOpen = new ImageIcon(
-        ACE.class.getResource("/16x16/plain/nav_up_right_blue.png"));
+    private static ImageIcon focusMultiParentOpen =
+            new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_right_blue.png"));
 
     private static ImageIcon multiParentRoot = new ImageIcon(ACE.class.getResource("/16x16/plain/pin_green.png"));
 
@@ -149,8 +150,9 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                 if (I_GetConceptDataForTree.class.isAssignableFrom(node.getUserObject().getClass())) {
                     I_GetConceptDataForTree cb = (I_GetConceptDataForTree) node.getUserObject();
                     List<Color> pathColors = new ArrayList<Color>();
-                    List<? extends I_ConceptAttributeTuple> attributes = cb.getConceptAttributeTuples(
-                        aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(), true);
+                    List<? extends I_ConceptAttributeTuple> attributes =
+                            cb.getConceptAttributeTuples(aceConfig.getAllowedStatus(), aceConfig
+                                .getViewPositionSetReadOnly(), true);
                     for (I_ConceptAttributeTuple t : attributes) {
                         Color pathColor = aceConfig.getColorForPath(t.getPathId());
                         if (pathColor != null) {
@@ -158,10 +160,10 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                         }
                     }
                     for (Color pathColor : pathColors) {
-                        this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
-                            BorderFactory.createMatteBorder(0, 2, 0, 0, pathColor)));
-                        this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
-                            BorderFactory.createEmptyBorder(0, 2, 0, 0)));
+                        this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(), BorderFactory
+                            .createMatteBorder(0, 2, 0, 0, pathColor)));
+                        this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(), BorderFactory
+                            .createEmptyBorder(0, 2, 0, 0)));
                     }
 
                     Rectangle iconRect = getIconRect(cb.getParentDepth());
@@ -198,9 +200,11 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
                                 for (I_Position viewPosition : aceConfig.getViewPositionSet()) {
                                     if (viewPosition.getPath().getConceptId() == cb.getConceptId()) {
-                                        String version = ThinVersionHelper.format(viewPosition.getVersion(),
-                                            MAX_VALUE_TYPE.LATEST);
-                                        htmlSuffixes.add("<font color='#007FAE'>&nbsp;[Viewing:" + version + "]</font>");
+                                        String version =
+                                                ThinVersionHelper.format(viewPosition.getVersion(),
+                                                    MAX_VALUE_TYPE.LATEST);
+                                        htmlSuffixes
+                                            .add("<font color='#007FAE'>&nbsp;[Viewing:" + version + "]</font>");
                                     }
                                     for (I_Position origin : viewPosition.getPath().getNormalisedOrigins()) {
                                         if (origin.getPath().getConceptId() == cb.getConceptId()) {
@@ -213,17 +217,31 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                 }
 
                                 if (latestInheritedViewPosition != null) {
-                                    String version = ThinVersionHelper.format(latestInheritedViewPosition.getVersion(),
-                                        MAX_VALUE_TYPE.LATEST);
+                                    String version =
+                                            ThinVersionHelper.format(latestInheritedViewPosition.getVersion(),
+                                                MAX_VALUE_TYPE.LATEST);
                                     htmlSuffixes.add("<font color='#967F49'>&nbsp;[Inherited view:" + version
                                         + "]</font>");
                                 }
                             }
                         }
-
+                        List<I_DescriptionVersioned> descriptionsWithExtensions =
+                                new ArrayList<I_DescriptionVersioned>();
                         if (showRefsetInfoInTaxonomy) {
-                            List<I_GetExtensionData> extensions = AceConfig.getVodb().getExtensionsForComponent(
-                                cb.getConceptId());
+                            List<I_GetExtensionData> extensions =
+                                    AceConfig.getVodb().getExtensionsForComponent(cb.getConceptId());
+                            List<? extends I_DescriptionVersioned> descriptions = cb.getDescriptions();
+                            List<I_GetExtensionData> descriptionExtensions = new ArrayList<I_GetExtensionData>();
+                            for (I_DescriptionVersioned desc : descriptions) {
+                                List<I_GetExtensionData> descExts =
+                                        AceConfig.getVodb().getExtensionsForComponent(desc.getDescId());
+                                descriptionExtensions.addAll(descExts);
+                                if (descExts.size() > 0) {
+                                    descriptionsWithExtensions.add(desc);
+                                }
+                            }
+                            extensions.addAll(descriptionExtensions);
+
                             for (int i : refsetsToShow.getListArray()) {
                                 for (I_GetExtensionData ext : extensions) {
                                     if (ext != null && ext.getExtension() != null
@@ -238,13 +256,19 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                                 boolean extValue = ((I_ThinExtByRefPartBoolean) t.getPart()).getValue();
 
                                                 try {
-                                                    ConceptBean booleanImageBean = ConceptBean.get(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.getUids());
+                                                    ConceptBean booleanImageBean =
+                                                            ConceptBean
+                                                                .get(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE
+                                                                    .getUids());
                                                     if (extValue) {
-                                                        booleanImageBean = ConceptBean.get(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.getUids());
+                                                        booleanImageBean =
+                                                                ConceptBean
+                                                                    .get(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE
+                                                                        .getUids());
                                                     }
                                                     for (I_ImageTuple imageTuple : booleanImageBean.getImageTuples(
-                                                        aceConfig.getAllowedStatus(), viewerImageTypes,
-                                                        aceConfig.getViewPositionSetReadOnly())) {
+                                                        aceConfig.getAllowedStatus(), viewerImageTypes, aceConfig
+                                                            .getViewPositionSetReadOnly())) {
                                                         htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId()
                                                             + "$" + imageTuple.getConceptId() + "' align=center>");
                                                     }
@@ -257,10 +281,12 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(),
                                                 returnTuples, false);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
-                                                ConceptBean ebrCb = ConceptBean.get(((I_ThinExtByRefPartConcept) t.getPart()).getConceptId());
-                                                for (I_ImageTuple imageTuple : ebrCb.getImageTuples(
-                                                    aceConfig.getAllowedStatus(), viewerImageTypes,
-                                                    aceConfig.getViewPositionSetReadOnly())) {
+                                                ConceptBean ebrCb =
+                                                        ConceptBean.get(((I_ThinExtByRefPartConcept) t.getPart())
+                                                            .getConceptId());
+                                                for (I_ImageTuple imageTuple : ebrCb.getImageTuples(aceConfig
+                                                    .getAllowedStatus(), viewerImageTypes, aceConfig
+                                                    .getViewPositionSetReadOnly())) {
                                                     htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "$"
                                                         + imageTuple.getConceptId() + "' align=center>");
                                                 }
@@ -271,7 +297,8 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                                 returnTuples, false);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
                                                 int extValue = ((I_ThinExtByRefPartInteger) t.getPart()).getValue();
-                                                htmlPrefixes.add("<font color=blue>&nbsp;" + extValue + "&nbsp;</font>");
+                                                htmlPrefixes
+                                                    .add("<font color=blue>&nbsp;" + extValue + "&nbsp;</font>");
                                             }
                                             break;
                                         case LANGUAGE:
@@ -284,7 +311,8 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(),
                                                 returnTuples, false);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
-                                                String strExt = ((I_ThinExtByRefPartString) t.getPart()).getStringValue();
+                                                String strExt =
+                                                        ((I_ThinExtByRefPartString) t.getPart()).getStringValue();
                                                 htmlSuffixes.add("<code><strong>" + strExt + "'</strong></code>");
                                             }
                                             break;
@@ -302,7 +330,12 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                             for (String prefix : htmlPrefixes) {
                                 buff.append(prefix);
                             }
-                            String text = cb.getDescTuple(aceConfig).getText();
+                            String text;
+                            if (descriptionsWithExtensions.size() > 0) {
+                                text = descriptionsWithExtensions.get(0).getLastTuple().getText();
+                            } else {
+                                text = cb.getDescTuple(aceConfig).getText();
+                            }
                             if (text.toLowerCase().startsWith("<html>")) {
                                 buff.append(text.substring(5));
                             } else {
@@ -325,21 +358,22 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                         setText("null desc: " + cb.getInitialText());
                     }
                     ;
-                    int sourceRelTupleSize = cb.getSourceRelTuples(aceConfig.getAllowedStatus(),
-                        aceConfig.getDestRelTypes(), aceConfig.getViewPositionSetReadOnly(), false).size();
+                    int sourceRelTupleSize =
+                            cb.getSourceRelTuples(aceConfig.getAllowedStatus(), aceConfig.getDestRelTypes(),
+                                aceConfig.getViewPositionSetReadOnly(), false).size();
                     if (sourceRelTupleSize > 1) {
                         if (cb.isParentOpened()) {
                             this.setIcon(multiParentOpen);
                         } else {
                             this.setIcon(multiParentClosed);
                         }
-                        this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
-                            BorderFactory.createMatteBorder(0, iconRect.x, 0, 0, getBackgroundNonSelectionColor())));
+                        this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(), BorderFactory
+                            .createMatteBorder(0, iconRect.x, 0, 0, getBackgroundNonSelectionColor())));
 
                     } else {
                         if (cb.isSecondaryParentNode()) {
-                            this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
-                                BorderFactory.createMatteBorder(0, iconRect.x, 0, 0, getBackgroundNonSelectionColor())));
+                            this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(), BorderFactory
+                                .createMatteBorder(0, iconRect.x, 0, 0, getBackgroundNonSelectionColor())));
                             if (sourceRelTupleSize == 0) {
                                 this.setIcon(multiParentRoot);
                             } else {
