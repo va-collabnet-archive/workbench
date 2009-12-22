@@ -47,7 +47,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.maven.transform.AceAuxillaryConstantToUuid;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -329,32 +328,36 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
             Method m = beanClass.getMethod("valueOf", new Class[] { String.class });
             obj = m.invoke(null, (Object[]) s.constructArgs());
         } else {
-            if (s.constructArgs().length == 0) {
-                Constructor beanConstructor = beanClass.getConstructor(new Class[] {});
-                obj = beanConstructor.newInstance(new Object[] {});
-            } else {
-                Constructor beanConstructor = beanClass.getConstructor(new Class[] { String.class });
-                obj = beanConstructor.newInstance((Object[]) s.constructArgs());
+            try {
+                if (s.constructArgs().length == 0) {
+                    Constructor beanConstructor = beanClass.getConstructor(new Class[] {});
+                    obj = beanConstructor.newInstance(new Object[] {});
+                } else {
+                    Constructor beanConstructor = beanClass.getConstructor(new Class[] { String.class });
+                    obj = beanConstructor.newInstance((Object[]) s.constructArgs());
+                }
+                File beanDir = rootDir;
+                if (s.directory().length() > 1) {
+                    beanDir = new File(rootDir, s.directory());
+                }
+                beanDir.mkdirs();
+                File beanFile;
+                if (s.beanName().length() == 0) {
+                    beanFile = new File(beanDir, beanClass.getName() + suffix);
+                } else {
+                    beanFile = new File(beanDir, s.beanName() + suffix);
+                }
+                // getLog().info(" Writing: " + beanFile.getName());
+                FileOutputStream fos = new FileOutputStream(beanFile);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                ObjectOutputStream oos = new ObjectOutputStream(bos);
+                oos.writeObject(obj);
+                oos.close();
+            } catch (InstantiationException e) {
+                System.err.println("Processing: " + beanClass + " Spec: " + s + " resulted in: " + e.getLocalizedMessage());
             }
         }
 
-        File beanDir = rootDir;
-        if (s.directory().length() > 1) {
-            beanDir = new File(rootDir, s.directory());
-        }
-        beanDir.mkdirs();
-        File beanFile;
-        if (s.beanName().length() == 0) {
-            beanFile = new File(beanDir, beanClass.getName() + suffix);
-        } else {
-            beanFile = new File(beanDir, s.beanName() + suffix);
-        }
-        // getLog().info(" Writing: " + beanFile.getName());
-        FileOutputStream fos = new FileOutputStream(beanFile);
-        BufferedOutputStream bos = new BufferedOutputStream(fos);
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(obj);
-        oos.close();
     }
 
     @SuppressWarnings("unused")
