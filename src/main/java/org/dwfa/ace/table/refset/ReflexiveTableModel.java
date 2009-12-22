@@ -50,6 +50,7 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
@@ -370,8 +371,16 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             case CONCEPT_COMPONENT:
                 id = tuple.getComponentId();
                 if (columns[columnIndex].readParamaters != null) {
-                    value = columns[columnIndex].getReadMethod().invoke(ConceptBean.get(tuple.getComponentId()),
-                        columns[columnIndex].readParamaters);
+                    if (tf.hasConcept(id)) {
+                        value = columns[columnIndex].getReadMethod().invoke(ConceptBean.get(tuple.getComponentId()),
+                                                                            columns[columnIndex].readParamaters);
+                    } else {
+                        I_DescriptionVersioned desc = tf.getDescription(tf.getId(id).getUIDs().iterator().next().toString());
+                        if (desc != null) {
+                            value = desc.getLastTuple().getText();
+                        }
+                    }
+                    
                 } else {
                     value = columns[columnIndex].getReadMethod().invoke(ConceptBean.get(tuple.getComponentId()));
                 }
