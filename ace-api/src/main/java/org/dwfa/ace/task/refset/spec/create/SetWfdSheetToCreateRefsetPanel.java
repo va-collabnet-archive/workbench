@@ -75,6 +75,7 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
     // Other Properties
     private transient Exception ex = null;
     private I_TermFactory termFactory;
+
     private I_ConfigAceFrame config;
     private I_GetConceptData owner;
 
@@ -258,6 +259,14 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
 
     public void setProfilePropName(String profilePropName) {
         this.profilePropName = profilePropName;
+    }
+
+    public I_TermFactory getTermFactory() {
+        return termFactory;
+    }
+
+    public void setTermFactory(I_TermFactory termFactory) {
+        this.termFactory = termFactory;
     }
 
 }
