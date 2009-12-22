@@ -28,10 +28,14 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImageTuple;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
@@ -203,7 +207,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         }
     }
 
-    private void renderTextQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException {
+    private void renderTextQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
         I_ThinExtByRefPartConceptConceptString ccsPart = (I_ThinExtByRefPartConceptConceptString) firstTuple.getPart();
 
@@ -224,7 +228,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setTextToHtml(htmlParts);
     }
 
-    private void renderStructuralQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException {
+    private void renderStructuralQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
         I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) firstTuple.getPart();
         if (indent) {
@@ -239,7 +243,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setTextToHtml(htmlParts);
     }
 
-    private void renderBranchingClause(I_ThinExtByRefTuple firstTuple) throws IOException {
+    private void renderBranchingClause(I_ThinExtByRefTuple firstTuple) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
         I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) firstTuple.getPart();
         htmlParts.add("&nbsp;&nbsp;&nbsp;");
@@ -250,24 +254,38 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setTextToHtml(htmlParts);
     }
 
-    private void addConceptDescription(List<String> htmlParts, int cid, String color) throws IOException {
+    private void addConceptDescription(List<String> htmlParts, int cid, String color) throws IOException, TerminologyException, ParseException {
         htmlParts.add("<font color='" + color + "'>");
         addConceptDescription(htmlParts, cid);
         htmlParts.add("</font>");
     }
 
-    private void addConceptDescription(List<String> htmlParts, int cid) throws IOException {
-        ConceptBean cb = ConceptBean.get(cid);
-        I_DescriptionTuple desc = cb.getDescTuple(configAceFrame.getTreeDescPreferenceList(), configAceFrame);
-        if (desc != null) {
-            String text = desc.getText();
-            if (text.toLowerCase().startsWith("<html>")) {
-                htmlParts.add(text.substring(5));
+    private void addConceptDescription(List<String> htmlParts, int cid) throws IOException, TerminologyException, ParseException {
+        I_TermFactory tf = LocalVersionedTerminology.get();
+        if (tf.hasConcept(cid)) {
+            I_GetConceptData cb = tf.getConcept(cid);
+            I_DescriptionTuple desc = cb.getDescTuple(configAceFrame.getTreeDescPreferenceList(), configAceFrame);
+            if (desc != null) {
+                String text = desc.getText();
+                if (text.toLowerCase().startsWith("<html>")) {
+                    htmlParts.add(text.substring(5));
+                } else {
+                    htmlParts.add(text);
+                }
             } else {
-                htmlParts.add(text);
+                htmlParts.add(cb.toString());
             }
         } else {
-            htmlParts.add(cb.toString());
+            I_DescriptionVersioned desc = tf.getDescription(tf.getId(cid).getUIDs().iterator().next().toString());
+            if (desc != null) {
+                String text = desc.getLastTuple().getText();
+                if (text.toLowerCase().startsWith("<html>")) {
+                    htmlParts.add(text.substring(5));
+                } else {
+                    htmlParts.add(text);
+                }
+            }
+            
         }
     }
 
