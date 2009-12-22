@@ -39,6 +39,7 @@ import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_FilterTaxonomyRels;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
@@ -62,6 +63,7 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
@@ -399,8 +401,9 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
             try {
                 allowedTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
                 boolean addUncommitted = true;
-                List<? extends I_RelTuple> markedParentRefset = refset.getSourceRelTuples(frameConfig.getAllowedStatus(),
-                    allowedTypes, frameConfig.getViewPositionSetReadOnly(), addUncommitted);
+                List<? extends I_RelTuple> markedParentRefset =
+                        refset.getSourceRelTuples(frameConfig.getAllowedStatus(), allowedTypes, frameConfig
+                            .getViewPositionSetReadOnly(), addUncommitted);
                 for (I_RelTuple rel : markedParentRefset) {
                     refsetsToShow.add(rel.getC2Id());
                 }
@@ -426,8 +429,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                 ConceptBean rootBean = ConceptBean.get(rootNid);
                 for (I_ThinExtByRefVersioned ext : rootBean.getExtensions()) {
                     if (refsets.contains(ext.getRefsetId())) {
-                        List<I_ThinExtByRefTuple> tuples = ext.getTuples(frameConfig.getAllowedStatus(),
-                            frameConfig.getViewPositionSet(), true);
+                        List<I_ThinExtByRefTuple> tuples =
+                                ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSet(), true);
                         if (tuples != null && tuples.size() > 0) {
                             refsetRoots.add(rootNid);
                         }
@@ -492,8 +495,9 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     private class RefsetParentOnlyFilter implements I_FilterTaxonomyRels {
 
-        public void filter(I_GetConceptData node, List<? extends I_RelTuple> srcRels, List<? extends I_RelTuple> destRels,
-                I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
+        public void filter(I_GetConceptData node, List<? extends I_RelTuple> srcRels,
+                List<? extends I_RelTuple> destRels, I_ConfigAceFrame frameConfig) throws TerminologyException,
+                IOException {
 
             List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
             for (I_RelTuple rt : srcRels) {
@@ -516,7 +520,16 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         }
 
         private boolean notMarkedParent(ConceptBean child) throws IOException, TerminologyException {
-            for (I_ThinExtByRefVersioned ext : child.getExtensions()) {
+            List<? extends I_DescriptionVersioned> descriptions = child.getDescriptions();
+            List<I_ThinExtByRefVersioned> extensions = new ArrayList<I_ThinExtByRefVersioned>();
+            for (I_DescriptionVersioned desc : descriptions) {
+                // extensions on the description(s)
+                extensions.addAll(AceConfig.getVodb().getAllExtensionsForComponent(desc.getDescId()));
+            }
+
+            extensions.addAll(child.getExtensions()); // extensions on the concept
+
+            for (I_ThinExtByRefVersioned ext : extensions) {
                 if (getRefsetsToShowInTaxonomy().contains(ext.getRefsetId())) {
                     if (ThinExtBinder.getExtensionType(ext) == EXT_TYPE.CONCEPT) {
                         List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
@@ -1178,15 +1191,15 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setSelectedPreferencesTab(tabName);
     }
 
-	public PositionSetReadOnly getViewPositionSetReadOnly() {
-		return frameConfig.getViewPositionSetReadOnly();
-	}
+    public PositionSetReadOnly getViewPositionSetReadOnly() {
+        return frameConfig.getViewPositionSetReadOnly();
+    }
 
-	public PathSetReadOnly getEditingPathSetReadOnly() {
-		return frameConfig.getEditingPathSetReadOnly();
-	}
+    public PathSetReadOnly getEditingPathSetReadOnly() {
+        return frameConfig.getEditingPathSetReadOnly();
+    }
 
-	public PathSetReadOnly getPromotionPathSetReadOnly() {
-		return frameConfig.getPromotionPathSetReadOnly();
-	}
+    public PathSetReadOnly getPromotionPathSetReadOnly() {
+        return frameConfig.getPromotionPathSetReadOnly();
+    }
 }
