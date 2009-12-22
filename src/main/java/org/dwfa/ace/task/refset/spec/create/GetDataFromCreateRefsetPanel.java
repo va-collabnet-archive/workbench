@@ -28,12 +28,12 @@ import java.util.UUID;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.refset.spec.RefsetSpecWizardTask;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -263,7 +263,7 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
                     			"You must select an editor. ", "", JOptionPane.ERROR_MESSAGE);
                     	return Condition.ITEM_CANCELED;                         
                     } else {
-
+                        setCreateTask.setTermFactory(termFactory);
                     	String editorInbox = setCreateTask.getInbox(editor);
                     	if (editorInbox == null) {
                     		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
