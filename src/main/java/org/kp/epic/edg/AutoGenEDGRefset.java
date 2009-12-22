@@ -61,14 +61,6 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-/*
- * Q: ICD9 fictitious -> real edits.
- * Q: Which input edit path? Only one edit path? @@@
- * Q: Which write back path? @@@
- * Q: How to get moon's updates? @@@
- * Q: How to determine associated refset members? @@@
- */
-
 @BeanList(specs = { @Spec(directory = "tasks/kp/edg", type = BeanType.TASK_BEAN) })
 public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     private static final long serialVersionUID = 1L;
@@ -174,6 +166,9 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     private boolean continueThisAction = true;
     private boolean queryConceptViaRefset;
 
+    // :DEBUG:
+    private boolean debug;
+
     @Override
     public void actionPerformed(ActionEvent e) {
         continueThisAction = false;
@@ -235,7 +230,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                 // WOULD BE LAST ELEMENT IN ARRAY
                 currentStr = computePostfixIncr(s);
                 item2000List.add(currentStr);
-                
+
             } else {
                 if (s.equals(computeBase(item2000List.get(idx))) == false) {
                     // ICD9 Code not yet on list.
@@ -471,9 +466,9 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             for (Icd9CmGroupRange gr : groupRanges) {
                 boolean testMin = false;
                 boolean testMax = false;
-                if (gr.min.compareToIgnoreCase(icd9Code) >= 0)
+                if (gr.min.compareToIgnoreCase(icd9Code) <= 0)
                     testMin = true;
-                if (gr.max.compareToIgnoreCase(icd9Code) <= 0)
+                if (gr.max.compareToIgnoreCase(icd9Code) >= 0)
                     testMax = true;
 
                 if (testMin && testMax) {
@@ -656,6 +651,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
+        debug = true;
         tf = LocalVersionedTerminology.get();
         logger = worker.getLogger();
         logger.info("\r\n::: [AutoGenEDGRefset] evaluate() -- begin");
@@ -706,8 +702,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         // 3. DETERMINE ITEM40 Codes in use.
         item40Generator = new Item40CodeGen();
         doEDGClinicalItem_40_Setup(editSnoCons);
-        logger.info("\r\n::: [AutoGenEDGRefset] INITIAL ITEM 40 \r\n"
-            + item40Generator.toString());
+        logger.info("\r\n::: [AutoGenEDGRefset] INITIAL ITEM 40 \r\n" + item40Generator.toString());
 
         // 4. PERFORM DATA CHECKS ON CONCEPTS !!!
         checkData(editSnoCons);
@@ -892,10 +887,20 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                 StringBuilder sb = new StringBuilder(icd9Codes.get(0));
                 for (int i = 1; i < totalCodes; i++)
                     sb.append("/" + icd9Codes.get(i));
+                icd9CodeStr = sb.toString();
             } else if (totalCodes == 1) {
                 icd9CodeStr = icd9Codes.get(0);
             } else if (totalCodes == 0)
                 icd9CodeStr = "";
+
+            if (debug) {
+                if (ext200part != null)
+                    logger.info("\r\n::: Clinical Item 200 : IDC9=\t" + icd9CodeStr + "\t"
+                        + tf.getConcept(nidConcept).getInitialText());
+                if (ext2000part != null)
+                    logger.info("\r\n::: Clinical Item 2000: IDC9=\t" + icd9CodeStr + "\t"
+                        + tf.getConcept(nidConcept).getInitialText());
+            }
 
             boolean item200 = true;
             boolean item2000 = false;
@@ -1142,7 +1147,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                 memberCreate_String(nidEDGClinicalItem_7010, desc.getNid(), name);
             else if (name != null && oldMember != null)
                 memberUpdate_String(oldMember.getExt(), oldMember.getExtPart(), name);
-            else 
+            else
                 memberRetire_String(oldMember.getExt(), oldMember.getExtPart());
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -1439,7 +1444,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                     result = part.getText();
                 else
                     logger.info("\r\n::: ERROR Multiple Patient Friendly Names: "
-                        + concept.getInitialText() + " .AND. " +result);
+                        + concept.getInitialText() + " .AND. " + result);
         }
         return result;
     }
@@ -1523,9 +1528,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                         I_IdVersioned icd9CodeId = icd9CodeCB.getId();
                         for (I_IdPart idPart : icd9CodeId.getVersions()) {
                             if (idPart.getSource() == nidIDC9Id) {
-                                // :NOTE: could also type cast .getSourceId
-                                // object to String
-                                result.add(idPart.toString());
+                                result.add((String) idPart.getSourceId());
                             }
                         }
                     }
