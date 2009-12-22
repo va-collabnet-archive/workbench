@@ -28,11 +28,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.bean.BeanList;
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public abstract class AddTextQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
     /**
 	 * 
