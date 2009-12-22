@@ -2011,7 +2011,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     boolean svnPositionSet = false;
     private JButton showProgressButton;
-    private ActivityPanel topActivityListener;
+    private ActivityPanel activityListener;
     private JTabbedPane preferencesTab;
 
     private void setInitialSvnPosition() {
@@ -2902,13 +2902,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(showProgressButton, c);
         c.gridx++;
 
-        JPanel topActivityPanel = new JPanel(new GridLayout(1, 1));
-        topActivityListener = new ActivityPanel(false, null, aceFrameConfig);
-        topActivityListener.setEraseWhenFinishedEnabled(true);
-        topActivityListener.complete();
-        topActivityPanel.add(topActivityListener.getViewPanel());
-        topPanel.add(topActivityPanel, c);
-        c.gridx++;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
         JPanel oldWorkflowPanel = new JPanel();
@@ -3111,6 +3104,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0;
         c.gridx++;
+        
+        JPanel activityPanel = new JPanel(new GridLayout(1, 1));
+        activityListener = new ActivityPanel(false, null, aceFrameConfig);
+        activityListener.setEraseWhenFinishedEnabled(true);
+        activityListener.complete();
+        activityPanel.add(activityListener.getViewPanel());
+        bottomPanel.add(activityPanel, c);
+        c.gridx++;
+
         cancelButton = new JButton("cancel");
         cancelButton.setEnabled(false);
         cancelButton.addActionListener(new Abort());
@@ -3164,7 +3166,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public I_ShowActivity getTopActivityListener() {
-        return topActivityListener;
+        return activityListener;
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
