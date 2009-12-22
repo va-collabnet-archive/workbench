@@ -918,10 +918,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 return Condition.STOP;
             }
 
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()); // 0
-            // CURRENT,
-            // 1
-            // RETIRED
+            // 0 CURRENT, 1 RETIRED
+            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
             isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
             isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
@@ -1043,7 +1041,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
     private String toStringNids() {
         StringBuilder s = new StringBuilder();
-        s.append("\r\n::: [SnoTaskComparePaths]");
+        s.append("\r\n::: [SnorocketTask]");
         s.append("\r\n:::\t" + isaNid + "\t : isaNid");
         s.append("\r\n:::\t" + rootNid + "\t : rootNid");
         s.append("\r\n:::\t" + isCURRENT + "\t : isCURRENT");
