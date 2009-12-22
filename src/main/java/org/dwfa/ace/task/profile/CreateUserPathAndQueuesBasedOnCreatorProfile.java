@@ -167,6 +167,41 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             for (Integer pathNid : creatorConfig.getPathColorMap().keySet()) {
                 newConfig.setColorForPath(pathNid, creatorConfig.getColorForPath(pathNid));
             }
+            
+            // Set desc types
+            for (Integer descTypeNid : creatorConfig.getDescTypes().getSetValues()) {
+                newConfig.getDescTypes().add(descTypeNid);
+            }
+            
+
+            newConfig.getShortLabelDescPreferenceList().clear();
+            newConfig.getShortLabelDescPreferenceList().addAll(creatorConfig.getShortLabelDescPreferenceList().getListValues());
+
+            newConfig.getLongLabelDescPreferenceList().clear();
+            newConfig.getLongLabelDescPreferenceList().addAll(creatorConfig.getLongLabelDescPreferenceList().getListValues());
+
+            newConfig.getTreeDescPreferenceList().clear();
+            newConfig.getTreeDescPreferenceList().addAll(creatorConfig.getTreeDescPreferenceList().getListValues());
+
+            newConfig.getTableDescPreferenceList().clear();
+            newConfig.getTableDescPreferenceList().addAll(creatorConfig.getTableDescPreferenceList().getListValues());
+
+            newConfig.getLanguagePreferenceList().clear();
+            newConfig.getLanguagePreferenceList().addAll(creatorConfig.getLanguagePreferenceList().getListValues());
+            
+            newConfig.setShowViewerImagesInTaxonomy(creatorConfig.getShowViewerImagesInTaxonomy());
+
+            newConfig.getRefsetsToShowInTaxonomy().clear();
+            newConfig.getRefsetsToShowInTaxonomy().addAll(creatorConfig.getRefsetsToShowInTaxonomy().getListValues());
+            
+            newConfig.setShowPathInfoInTaxonomy(creatorConfig.getShowPathInfoInTaxonomy());
+            newConfig.setShowRefsetInfoInTaxonomy(creatorConfig.getShowRefsetInfoInTaxonomy());
+            newConfig.getDescTypes().addAll(creatorConfig.getDescTypes().getSetValues());
+            newConfig.getPrefFilterTypesForRel().addAll(creatorConfig.getPrefFilterTypesForRel().getSetValues());
+            newConfig.setHighlightConflictsInComponentPanel(creatorConfig.getHighlightConflictsInComponentPanel());
+            newConfig.setHighlightConflictsInTaxonomyView(creatorConfig.getHighlightConflictsInTaxonomyView());
+            newConfig.setConflictResolutionStrategy(creatorConfig.getConflictResolutionStrategy());
+            
 
             // clear the user's path color
             if (creatorConfig.getDbConfig().getUserPath() != null) {
