@@ -18,6 +18,7 @@ package org.dwfa.ace.refset.spec;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -44,8 +45,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         this.refsetId = refsetId;
         this.memberTypeId = memberTypeId;
         this.refsetHelper = new RefsetHelper(termFactory);
-        this.parentMemberTypeId = termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids())
-            .getConceptId();
+        this.parentMemberTypeId =
+                termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids()).getConceptId();
         this.parentRefsetId = getParentRefset();
     }
 
@@ -63,9 +64,25 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         }
     }
 
+    public void addDescriptionParentMembers(Integer... descriptionIds) throws Exception {
+
+        Condition[] traversingConditions = new Condition[] { new NotAlreadyVisited() };
+
+        Set<I_GetConceptData> ancestors = new HashSet<I_GetConceptData>();
+        for (Integer descriptionId : descriptionIds) {
+            UUID descriptionUuid = termFactory.getId(descriptionId).getUIDs().iterator().next();
+            ancestors.addAll(getAllAncestors(termFactory.getConcept(termFactory.getDescription(
+                descriptionUuid.toString()).getConceptId()), traversingConditions));
+        }
+
+        for (I_GetConceptData concept : ancestors) {
+            newRefsetExtension(parentRefsetId, concept.getConceptId(), parentMemberTypeId);
+        }
+    }
+
     public void removeParentMembers(Integer... conceptIds) throws Exception {
-        Condition[] traversingConditions = new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId),
-                                                            new NotAlreadyVisited() };
+        Condition[] traversingConditions =
+                new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
 
         // Get all ancestors
         Set<Integer> toBeRetired = new HashSet<Integer>();
@@ -92,8 +109,59 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         }
 
         // Reset memory of visited concepts
-        traversingConditions = new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId),
-                                                new NotAlreadyVisited() };
+        traversingConditions =
+                new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
+
+        // Find all ancestors of the lineages not to be modified
+        Set<Integer> ancestorIdsToExclude = new HashSet<Integer>();
+        for (Integer conceptId : lineageToExclude) {
+            for (I_GetConceptData concept : getAllAncestors(termFactory.getConcept(conceptId), traversingConditions)) {
+                ancestorIdsToExclude.add(concept.getConceptId());
+            }
+        }
+
+        // Exclude these lineages
+        toBeRetired.removeAll(ancestorIdsToExclude);
+
+        // Retire the rest
+        for (Integer markedParentId : toBeRetired) {
+            retireRefsetExtension(parentRefsetId, markedParentId, parentMemberTypeId);
+        }
+    }
+
+    public void removeDescriptionParentMembers(Integer... descriptionIds) throws Exception { // TODO
+        Condition[] traversingConditions =
+                new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
+
+        // Get all ancestors
+        Set<Integer> toBeRetired = new HashSet<Integer>();
+        for (Integer descriptionId : descriptionIds) {
+            UUID descriptionUuid = termFactory.getId(descriptionId).getUIDs().iterator().next();
+            Integer conceptId = termFactory.getDescription(descriptionUuid.toString()).getConceptId();
+            if (isMarkedParent(conceptId)) {
+                toBeRetired.add(conceptId);
+            }
+            for (I_GetConceptData concept : getAllAncestors(termFactory.getConcept(conceptId), traversingConditions)) {
+                toBeRetired.add(concept.getConceptId());
+            }
+        }
+
+        // For each ancestor, check immediate children for a member of either
+        // refset (member or marked parent)
+        // that is not in the existing ancestor set. This means we've found a
+        // lineage that should not be modified.
+        Set<Integer> lineageToExclude = new HashSet<Integer>();
+        for (Integer parentId : toBeRetired) {
+            for (Integer childId : refsetHelper.getChildrenOfConcept(parentId)) {
+                if (!toBeRetired.contains(childId) && (isMarkedParent(childId) || isMember(childId))) {
+                    lineageToExclude.add(childId);
+                }
+            }
+        }
+
+        // Reset memory of visited concepts
+        traversingConditions =
+                new Condition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
 
         // Find all ancestors of the lineages not to be modified
         Set<Integer> ancestorIdsToExclude = new HashSet<Integer>();
@@ -127,8 +195,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         I_IntSet allowedType = termFactory.newIntSet();
         allowedType.add(termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptId());
 
-        Set<? extends I_GetConceptData> targetParentRefsets = memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType,
-            null, false, true);
+        Set<? extends I_GetConceptData> targetParentRefsets =
+                memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType, null, false, true);
 
         if (targetParentRefsets == null || targetParentRefsets.size() == 0) {
             throw new TerminologyException("Unable to locate parent member refset for '"
@@ -155,8 +223,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
                 isATypes.add(termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids())
                     .getConceptId());
                 I_GetConceptData memberRefset = termFactory.getConcept(this.refsetId);
-                Set<? extends I_GetConceptData> requiredIsAType = memberRefset.getSourceRelTargets(getAllowedStatuses(),
-                    isATypes, null, false, true);
+                Set<? extends I_GetConceptData> requiredIsAType =
+                        memberRefset.getSourceRelTargets(getAllowedStatuses(), isATypes, null, false, true);
 
                 if (requiredIsAType != null && requiredIsAType.size() > 0) {
                     // relationship exists so use the is-a specified by the

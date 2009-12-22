@@ -122,8 +122,16 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
         new SpecMarkedParentRefsetHelper(memberRefsetId, memberTypeId).addParentMembers(conceptIds);
     }
 
+    public void addDescriptionMarkedParents(Integer... conceptIds) throws Exception {
+        new SpecMarkedParentRefsetHelper(memberRefsetId, memberTypeId).addDescriptionParentMembers(conceptIds);
+    }
+
     public void removeMarkedParents(Integer... conceptIds) throws Exception {
         new SpecMarkedParentRefsetHelper(memberRefsetId, memberTypeId).removeParentMembers(conceptIds);
+    }
+
+    public void removeDescriptionMarkedParents(Integer... conceptIds) throws Exception {
+        new SpecMarkedParentRefsetHelper(memberRefsetId, memberTypeId).removeDescriptionParentMembers(conceptIds);
     }
 
     /**

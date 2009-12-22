@@ -260,7 +260,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 currentDescription = termFactory.getDescription(uuid.toString());
                 descriptionsProcessed++;
 
-                boolean containsCurrentMember = currentRefsetMemberIds.contains(currentDescription.getConceptId());
+                boolean containsCurrentMember = currentRefsetMemberIds.contains(currentDescription.getDescId());
 
                 if (query.execute(currentDescription)) {
                     if (!containsCurrentMember) {
@@ -348,7 +348,11 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
         if (termFactory.hasId(markedParentsUuid)) {
             getLogger().info("Adding marked parents.");
             for (Integer newMember : newMembers) {
-                memberRefsetHelper.addMarkedParents(new Integer[] { newMember });
+                if (termFactory.hasConcept(newMember)) {
+                    memberRefsetHelper.addMarkedParents(new Integer[] { newMember });
+                } else {
+                    memberRefsetHelper.addDescriptionMarkedParents(new Integer[] { newMember });
+                }
                 if (cancelComputation) {
                     break;
                 }
@@ -356,7 +360,11 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
 
             getLogger().info("Retiring marked parents.");
             for (Integer retiredMember : retiredMembers) {
-                memberRefsetHelper.removeMarkedParents(new Integer[] { retiredMember });
+                if (termFactory.hasConcept(retiredMember)) {
+                    memberRefsetHelper.removeMarkedParents(new Integer[] { retiredMember });
+                } else {
+                    memberRefsetHelper.removeDescriptionMarkedParents(new Integer[] { retiredMember });
+                }
                 if (cancelComputation) {
                     break;
                 }
