@@ -262,7 +262,7 @@ public class RefsetSpecPanel extends JPanel {
             throws NoSuchMethodException, Exception {
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
-        column1.setColumnName("referenced concept");
+        column1.setColumnName("referenced component");
         column1.setCreationEditable(true);
         column1.setUpdateEditable(true);
         column1.setFieldClass(Number.class);
