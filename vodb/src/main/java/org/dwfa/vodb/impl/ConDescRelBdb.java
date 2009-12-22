@@ -1625,7 +1625,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         Query q = new QueryParser("desc", new StandardAnalyzer()).parse(query);
         Hits saHits = luceneSearcher.search(q);
         if (saHits.length() > 0) {
-            AceLog.getAppLog().info("StandardAnalyzer query returned " + saHits.length() + " hits");
             return saHits;
         }
         AceLog.getAppLog().info("StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
