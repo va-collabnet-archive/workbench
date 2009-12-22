@@ -33,77 +33,45 @@ public class ProgressReport {
     boolean step5Complete = false;
 
     public String toString() {
-
         // step 1
-        String result = "<html>" + "1) Creating / validating refset spec query :";
+        StringBuffer  result = new StringBuffer();
+        result.append("<html>");
         if (!step1Complete) {
-            result = result + "<font color='green'> Executing.";
-        } else {
-            result = result + "<font color='red'> COMPLETE.";
+            result.append("1) Creating / validating refset spec query :");
+            result.append("<font color='green'> Executing.");
         }
-        result = result + "<br><font color='black'>";
 
         // step 2
-        result = result + "2) Calculating required updates :";
-
-        if (step1Complete) {
-            if (!step2Complete) {
-                result = result + "<font color='green'> Executing.";
-            } else {
-                result = result + "<font color='red'> COMPLETE.";
-            }
-        }
-        result = result + "<br><font color='black'>";
-
-        result = result + "Number of new members : " + newMembersCount + " / " + databaseCount + "<br>"
-            + "Number of to-be-retired members : " + toBeRetiredMembersCount + " / " + databaseCount + "<br>";
+        if (step1Complete && !step2Complete) {
+            result.append("2) Calculating required updates :");
+            result.append("<font color='green'> Executing.");
+        } 
 
         // step 3
-        result = result + "3) Creating new member refsets :";
         // + getMembersCount() + " / " + newMembersCount;
-        if (step2Complete) {
-            if (!step3Complete) {
-                result = result + "<font color='green'> Executing.";
-            } else {
-                result = result + "<font color='red'> COMPLETE.";
-            }
-        }
-        result = result + "<br><font color='black'>";
-
+        if (step2Complete && !step3Complete) {
+            result.append("3) Creating new member refsets :");
+            result.append("<font color='green'> Executing.");
+        } 
         // step 4
-        result = result + "4) Retiring old member refsets :";
         // + getNonMembersCleanedCount() + " / " + toBeRetiredMembersCount;
-        if (step3Complete) {
-            if (!step4Complete) {
-                result = result + "<font color='green'> Executing.";
-            } else {
-                result = result + "<font color='red'> COMPLETE.";
-            }
-        }
-        result = result + "<br><font color='black'>";
-
+        if (step3Complete && !step4Complete) {
+            result.append("4) Retiring old member refsets :");
+            result.append("<font color='green'> Executing.");
+        } 
         // step 5
-        result = result + "5) Adding / removing marked parent refsets :";
-        if (step4Complete) {
-            if (!step5Complete) {
-                result = result + "<font color='green'> Executing.";
-            } else {
-                result = result + "<font color='red'> COMPLETE.";
-            }
-        }
-        result = result + "<br><font color='black'>";
 
+        if (step4Complete && !step5Complete) {
+            result.append("5) Adding / removing marked parent refsets :");
+            result.append("<font color='green'> Executing.");
+        } 
         if (complete) {
             long minutes = (endTime - startTime) / 60000;
             long seconds = ((endTime - startTime) % 60000) / 1000;
-            result = result + "Total execution time: " + minutes + " minutes, " + seconds + " seconds.";
-        } /*
-           * else { long minutes = (new Date().getTime() - startTime) / 60000;
-           * long seconds = ((new Date().getTime() - startTime) % 60000) / 1000;
-           * result = result + "Current execution time: " + minutes +
-           * " minutes, " + seconds + " seconds."; }
-           */
-        return result;
+            result.append("New: " + newMembersCount + " / " + databaseCount + " Retired: " + toBeRetiredMembersCount + " / " + databaseCount);
+            result.append("Time: " + minutes + " m " + seconds + " s");
+        } 
+        return result.toString();
     }
 
     public int getNonMembersCleanedCount() {
