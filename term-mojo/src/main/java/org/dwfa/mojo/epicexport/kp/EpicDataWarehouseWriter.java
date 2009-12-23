@@ -32,9 +32,9 @@ import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 
 
 /** 
- * Class used to store values to be written to a load file, and write to that load file.
- * From an export builder,(see AbstractEpicLoadFileBuilder), the method addItemValue 
- * is called to store the values.
+ * Class used to build a data warehouse of terms used as master files in the Epic system.
+ * Also, associated values that are used to populate master file items from a refset are 
+ * passed to this class.
  * When the saveRecord() method is called, the stored values are written to the load
  * file in the format 'n,"value"'.
  * 
@@ -66,7 +66,7 @@ public class EpicDataWarehouseWriter implements I_EpicExportRecordWriter {
 	
 	public EpicDataWarehouseWriter(String masterfile, Connection conn) {
 		try {
-AceLog.getAppLog().info("Initializing writer with masterfile name: " + masterfile);
+			AceLog.getAppLog().info("Initializing writer with masterfile name: " + masterfile);
 			this.setMasterfile(masterfile);
 			this.connection = conn;
 		}
@@ -139,7 +139,7 @@ AceLog.getAppLog().info("Initializing writer with masterfile name: " + masterfil
 			sql.append(") values (");
 			sql.append(vals);
 			sql.append(");");
-// System.out.println(sql.toString());			
+			// System.out.println(sql.toString());			
 			st.execute(sql.toString());
 
 			/**
@@ -162,7 +162,7 @@ AceLog.getAppLog().info("Initializing writer with masterfile name: " + masterfil
 						sql.append(", '");
 						sql.append(e.value.toString());
 						sql.append("');");
-						System.out.println(sql.toString());
+						// System.out.println(sql.toString());
 						st = (Statement) conn.createStatement();
 						st.execute(sql.toString());
 					}

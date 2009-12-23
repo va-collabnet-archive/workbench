@@ -70,6 +70,7 @@ import org.dwfa.tapi.TerminologyException;
 public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	public final static String DESCRIPTION_PREFERED_TERM = "prefered term";
 	public final static String DESCRIPTION_SYNONYM = "synonym";
+	public static final String EPIC_MASTERFILE_NAME_WILDCARD = "*";
 	/**
 	 * Location of the directory to output data files to.
 	 *
@@ -239,6 +240,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		private I_ThinExtByRefTuple idTuple;
 		private List<DisplayName> displayNames;
 		private I_RefsetInterpreter interpreter;
+		private List<ValuePair> wildcardItems;
 		
 		public ExportIterator(ExportToEpicLoadFilesMojo parent) throws Exception
 		{
@@ -274,6 +276,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		public void processConcept(I_GetConceptData concept) throws Exception {
 			masterFilesImpacted = new ArrayList<String>();
 			displayNames = new ArrayList<DisplayName>();
+			wildcardItems = new ArrayList<ValuePair>();
 			
 			this.idTuple = null;
 			List<? extends I_DescriptionVersioned> descs = concept.getDescriptions();
@@ -296,6 +299,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	        for (String masterfile: masterFilesImpacted) {
 		        I_EpicLoadFileBuilder exportBuilder = exportManager.getLoadFileBuilder(masterfile);
 		        if (exportBuilder != null) { 
+		        	writeWildcardValues(exportBuilder);
 			        exportBuilder.writeRecord(this.dropName, this.getRegions(masterfile));
 			        exportBuilder.clearRecordContents();
 		        }
@@ -414,21 +418,32 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		    		refsetAppliesTo.add(new EpicItemIdentifier(
 		    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, app.getItemNumber()));
 	    		}
+	    		else if (app.getMasterfile().equals(ExportToEpicLoadFilesMojo.EPIC_MASTERFILE_NAME_WILDCARD)) {
+		    		refsetAppliesTo.add(new EpicItemIdentifier(
+		    				ExportToEpicLoadFilesMojo.EPIC_MASTERFILE_NAME_WILDCARD, app.getItemNumber()));
+	    			stringValue = getValueAsString(extensionTuplePart);
+	    			previousStringValue = getValueAsString(previousPart);
+	    		}
 	    	}
 	    	
 	    	for (EpicItemIdentifier e: refsetAppliesTo) {
-	    		I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(e.getMasterfile());
-	    		if (e.getItemNumber().equals("2")) {
-	    			if (isNewDisplayNameApplication(e.getMasterfile(), region)) {
-	    				this.idTuple = extensionTuple;
-	    				exportWriter.addItemForExport(e.getItemNumber(), stringValue, previousStringValue);
-	    			}
+	    		if (e.getMasterfile().equals(ExportToEpicLoadFilesMojo.EPIC_MASTERFILE_NAME_WILDCARD)) {
+	    			this.wildcardItems.add(new ValuePair(e.getItemNumber(), stringValue, previousStringValue));
 	    		}
 	    		else {
-		    		//getLog().info("Exporting item " + this.currentItem + " with a value of " + stringValue +
-		    		//		" and a previous value of " + previousStringValue);
-	    		
-		    		exportWriter.addItemForExport(e.getItemNumber(), stringValue, previousStringValue);
+		    		I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(e.getMasterfile());
+		    		if (e.getItemNumber().equals("2")) {
+		    			if (isNewDisplayNameApplication(e.getMasterfile(), region)) {
+		    				this.idTuple = extensionTuple;
+		    				exportWriter.addItemForExport(e.getItemNumber(), stringValue, previousStringValue);
+		    			}
+		    		}
+		    		else {
+			    		//getLog().info("Exporting item " + this.currentItem + " with a value of " + stringValue +
+			    		//		" and a previous value of " + previousStringValue);
+		    		
+			    		exportWriter.addItemForExport(e.getItemNumber(), stringValue, previousStringValue);
+		    		}
 	    		}
 	    	}
 	    }
@@ -515,6 +530,11 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	}
 	    	return value;
 
+	    }
+	    
+	    public void writeWildcardValues(I_EpicLoadFileBuilder builder) {
+	    	for (ValuePair p: this.wildcardItems)
+	    		builder.addItemForExport(p.getItemNumber(), p.getValue(), p.getPreviousValue());
 	    }
 	    public void setCurrentItem(String masterFile, String item) {
 	    	this.currentMasterFile = masterFile;
@@ -671,6 +691,37 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 
 			public void setRegion(String region) {
 				this.region = region;
+			}
+	    }
+	    
+	    private class ValuePair {
+	    	String itemNumber;
+	    	String value;
+	    	String previousValue;
+	    	
+	    	public ValuePair(String item, String val, String previousVal) {
+	    		setItemNumber(item);
+	    		setValue(val);
+	    		setPreviousValue(previousVal);
+	    	}
+	    	
+			public String getItemNumber() {
+				return itemNumber;
+			}
+			public void setItemNumber(String itemNumber) {
+				this.itemNumber = itemNumber;
+			}
+			public String getValue() {
+				return value;
+			}
+			public void setValue(String value) {
+				this.value = value;
+			}
+			public String getPreviousValue() {
+				return previousValue;
+			}
+			public void setPreviousValue(String previousValue) {
+				this.previousValue = previousValue;
 			}
 	    }
     }
