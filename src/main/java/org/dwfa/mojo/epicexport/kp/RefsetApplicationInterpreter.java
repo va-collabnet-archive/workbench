@@ -19,6 +19,7 @@ package org.dwfa.mojo.epicexport.kp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.I_RefsetInterpreter;
 
 public class RefsetApplicationInterpreter implements I_RefsetInterpreter{
@@ -28,8 +29,24 @@ public class RefsetApplicationInterpreter implements I_RefsetInterpreter{
 
 	public List<I_RefsetApplication> getApplications(String refsetName) {
 		List<I_RefsetApplication> applications = new ArrayList<I_RefsetApplication>();
+		List<String> nameComponents;
 
+		if ((nameComponents = parseStringForWildcardContents(refsetName, "* Item 2 *")) != null) {
+			RefsetApplication app = new RefsetApplication(
+					formatMasterfileName(nameComponents.get(0)), "2");
+			app.setRegion(nameComponents.get(1));
+			applications.add(app);	
+		}
+		else if ((nameComponents = parseStringForWildcardContents(refsetName, "* Item *")) != null) {
+			RefsetApplication app = new RefsetApplication(
+					formatMasterfileName(nameComponents.get(0)), nameComponents.get(1));
+			applications.add(app);	
+		}
+    	else if(refsetName.equals("EDG Billing Contact Date")) {
+    		applications.add(new RefsetApplication(RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING, "20"));
+    	}
 
+		/*
 		if(refsetName.equals("EDG Billing Item 2")) {
     		applications.add(new RefsetApplication(
     				RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING, "2"));
@@ -44,9 +61,9 @@ public class RefsetApplicationInterpreter implements I_RefsetInterpreter{
     	}
 
     	
-    	/**
-    	 *  EDG Clinical refsets
-    	 */
+    	//
+    	 //  EDG Clinical refsets
+    	 //
     	else if (refsetName.startsWith("EDG Clinical Item 2 "))
     	{
     		String region = refsetName.substring(20);
@@ -59,20 +76,75 @@ public class RefsetApplicationInterpreter implements I_RefsetInterpreter{
     		applications.add(new RefsetApplication(
     				RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL, item));
     	}
+		*/
     	else if(refsetName.equals("Reason for Soft Delete")) {
     		applications.add(new RefsetApplication(
-    				RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_WILDCARD, "5"));
+    				RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_WILDCARD, "300002"));
     	}
     	else if (refsetName.equals("ICD10-CM Code Mapping Status") ||
+    			refsetName.equals("ICD9-CM Code Mapping") ||
     			refsetName.equals("Path reference set") || 
+    			refsetName.equals("Refset Auxiliary Concept") ||
     			refsetName.equals("Path origin reference set")) {
     		// Ignore
     	}
     		
     	else 
-    		System.out.println("Unhandled refset name: " + refsetName);
+    		AceLog.getAppLog().warning("Unhandled refset name: " + refsetName);
 
 		return applications;
+	}
+	
+	public String formatMasterfileName(String name) {
+		return name.replaceAll(" ", "").toLowerCase();
+	}
+
+	public List<String> parseStringForWildcardContents(String lookin, String pattern) {
+		List<String> arguments = new ArrayList<String>();
+		int lookforPointer = 0;
+		int jumpto = 0;
+		int found = 0;
+		int wildcards = 0;
+		String next;
+		int lastPatternPointer = 0;
+		int lastf = 0;
+		
+		for (int i = 0; i < pattern.length(); i++) {
+			if (pattern.charAt(i) == '*') {
+				wildcards++;
+				jumpto = -1;
+				int locationOfNextWildcard = pattern.indexOf("*", i + 1);
+				//System.out.format("locationOfNextWildcard=%d i=%d found=%d\n", locationOfNextWildcard, i + 1, found);
+				if (locationOfNextWildcard == -1) {
+					if (wildcards > found + 1)
+						break;
+					next = pattern.substring(i + 1);
+				}
+				else
+					next = pattern.substring(i + 1, locationOfNextWildcard);
+				//System.out.println("\"" + next + "\"");
+				if (next.length() > 0) {
+					jumpto = lookin.indexOf(next, lookforPointer);
+				}
+				else
+					jumpto = lookin.length();
+				if (jumpto != -1) {
+					String arg = lookin.substring(lookforPointer, jumpto);
+					
+					if (pattern.substring(lastPatternPointer, i).equals(lookin.substring(lastf, lookforPointer))) {
+						arguments.add(arg);
+						lookforPointer = jumpto - 1;
+						found++;
+						lastPatternPointer = i + 1;
+						lastf = lookforPointer + 1;
+					}
+				}
+			}
+			lookforPointer++;
+			//if (lookforPointer >= lookin.length())
+			//	break;
+		}
+		return (wildcards == found) ? arguments : null;
 	}
 
 	public class RefsetApplication implements I_RefsetInterpreter.I_RefsetApplication {
