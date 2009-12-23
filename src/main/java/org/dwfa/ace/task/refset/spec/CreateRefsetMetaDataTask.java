@@ -299,9 +299,11 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
             newRelationship(memberRefset, refsetOwnerRel, owner, aceConfig);
             newRelationship(memberRefset, refsetEditorRel, editor, aceConfig);
-            for (UUID reviewerUuid : reviewerUuids) {
-                I_GetConceptData reviewer = termFactory.getConcept(new UUID[] { reviewerUuid });
-                newRelationship(memberRefset, refsetReviewerRel, reviewer, aceConfig);
+            if (reviewerUuids != null) {
+                for (UUID reviewerUuid : reviewerUuids) {
+                    I_GetConceptData reviewer = termFactory.getConcept(new UUID[] { reviewerUuid });
+                    newRelationship(memberRefset, refsetReviewerRel, reviewer, aceConfig);
+                }
             }
 
             newRelationship(memberRefset, promotionRel, promotionRefset, aceConfig);
