@@ -16,7 +16,6 @@
  */
 package org.dwfa.ace.task.refset.rfc;
 
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -45,9 +44,9 @@ import javax.swing.JTextArea;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
-import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -80,8 +79,8 @@ public class RequestForChangePanel extends JPanel {
     private JLabel priorityLabel;
     private JLabel fileAttachmentLabel;
     private JButton openFileChooserButton;
-    private DynamicWidthComboBox refsetNameComboBox;
-    private DynamicWidthComboBox editorComboBox;
+    private JComboBox refsetNameComboBox;
+    private JComboBox editorComboBox;
     private JComboBox priorityComboBox;
     private JTextArea originalRequestTextField;
     private JTextArea commentsTextField;
@@ -119,14 +118,7 @@ public class RequestForChangePanel extends JPanel {
 
         // buttons and boxes
         openFileChooserButton = new JButton("Attach a file");
-        refsetNameComboBox = new DynamicWidthComboBox(refsets.toArray());
-        refsetNameComboBox.setMaximumSize(new Dimension(200, 25));
-        refsetNameComboBox.setMinimumSize(new Dimension(200, 25));
-        refsetNameComboBox.setPreferredSize(new Dimension(200, 25));
-        editorComboBox = new DynamicWidthComboBox();
-        editorComboBox.setMaximumSize(new Dimension(200, 25));
-        editorComboBox.setMinimumSize(new Dimension(200, 25));
-        editorComboBox.setPreferredSize(new Dimension(200, 25));
+        refsetNameComboBox = new JComboBox(refsets.toArray());
         priorityComboBox = new JComboBox(new String[] { "Highest", "High", "Normal", "Low", "Lowest" });
 
         // date picker
@@ -139,17 +131,11 @@ public class RequestForChangePanel extends JPanel {
         originalRequestTextField.setWrapStyleWord(true);
         originalRequestScrollPane = new JScrollPane(originalRequestTextField);
         originalRequestScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        originalRequestScrollPane.setMaximumSize(new Dimension(200, 50));
-        originalRequestScrollPane.setMinimumSize(new Dimension(200, 50));
-        originalRequestScrollPane.setPreferredSize(new Dimension(200, 50));
         commentsTextField = new JTextArea();
         commentsTextField.setLineWrap(true);
         commentsTextField.setWrapStyleWord(true);
         commentsScrollPane = new JScrollPane(commentsTextField);
         commentsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        commentsScrollPane.setMaximumSize(new Dimension(200, 50));
-        commentsScrollPane.setMinimumSize(new Dimension(200, 50));
-        commentsScrollPane.setPreferredSize(new Dimension(200, 50));
     }
 
     private void addListeners() {
@@ -163,137 +149,149 @@ public class RequestForChangePanel extends JPanel {
         this.removeAll();
 
         // refset name label & box
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.add(refsetNameLabel, gridBagConstraints);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(refsetNameLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.weighty = 0.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        gbc.weightx = 1;
         if (refsets.size() == 0) {
-            this.add(new JLabel("No available refsets."), gridBagConstraints);
+            this.add(new JLabel("No available refsets."), gbc);
         } else {
-            this.add(refsetNameComboBox, gridBagConstraints);
+            this.add(refsetNameComboBox, gbc);
         }
 
         // editor
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.add(editorLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(editorLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        try {
-            editorComboBox = new DynamicWidthComboBox(getValidEditors().toArray());
-        } catch (Exception e) {
-            editorComboBox = new DynamicWidthComboBox();
-            e.printStackTrace();
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        if (editorComboBox == null) {
+            try {           
+                editorComboBox = new JComboBox(getValidEditors().toArray());
+            } catch (Exception e) {
+                editorComboBox = new JComboBox();
+                AceLog.getAppLog().alertAndLogException(e);
+            }
         }
-        editorComboBox.setMaximumSize(new Dimension(200, 25));
-        editorComboBox.setMinimumSize(new Dimension(200, 25));
-        editorComboBox.setPreferredSize(new Dimension(200, 25));
-        this.add(editorComboBox, gridBagConstraints);
+        this.add(editorComboBox, gbc);
 
         // original request
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.add(originalRequestLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 40, 5);
+        this.add(originalRequestLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(originalRequestScrollPane, gridBagConstraints);
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(originalRequestScrollPane, gbc);
 
         // comments
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(commentsLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 40, 5);
+        this.add(commentsLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(commentsScrollPane, gridBagConstraints);
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(commentsScrollPane, gbc);
 
         // deadline
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(deadlineLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(deadlineLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(deadlinePicker, gridBagConstraints);
+        gbc.gridx = 2;
+        gbc.gridy = 4;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(deadlinePicker, gbc);
 
         // priority
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(priorityLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(priorityLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(priorityComboBox, gridBagConstraints);
+        gbc.gridx = 2;
+        gbc.gridy = 5;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(priorityComboBox, gbc);
 
         // file attachments
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(fileAttachmentLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(fileAttachmentLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(openFileChooserButton, gridBagConstraints);
+        gbc.gridx = 2;
+        gbc.gridy = 6;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(openFileChooserButton, gbc);
 
         int fileCount = 0;
         for (File attachment : attachments) {
@@ -301,54 +299,37 @@ public class RequestForChangePanel extends JPanel {
             JCheckBox checkBox = new JCheckBox();
             checkBox.setSelected(true);
             checkBox.addItemListener(new CheckBoxListener(attachment));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 7 + fileCount;
-            gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.weightx = 0.0;
-            gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-            this.add(checkBox, gridBagConstraints);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 1;
+            gbc.gridy = 7 + fileCount;
+            gbc.weighty = 0.0;
+            gbc.weightx = 0.0;
+            gbc.anchor = GridBagConstraints.LINE_END;
+            gbc.insets = new Insets(5, 5, 0, 5);
+            this.add(checkBox, gbc);
 
             JLabel attachmentLabel = new JLabel(attachment.getName());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 7 + fileCount;
-            gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.weightx = 0.0;
-            gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-            this.add(attachmentLabel, gridBagConstraints);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 2;
+            gbc.gridy = 7 + fileCount;
+            gbc.weighty = 0.0;
+            gbc.weightx = 0.0;
+            gbc.anchor = GridBagConstraints.LINE_START;
+            this.add(attachmentLabel, gbc);
 
             fileCount++;
         }
 
         // column filler
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 8 + fileCount;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        this.add(Box.createGlue(), gridBagConstraints);
+        gbc.gridx = 5;
+        gbc.gridy = 8 + fileCount;
+        gbc.weighty = 1.0;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.LINE_END;
+        this.add(Box.createGlue(), gbc);
 
-        this.setPreferredSize(new Dimension(0, 0));
-        this.setMaximumSize(new Dimension(0, 0));
-        this.setMinimumSize(new Dimension(0, 0));
         this.revalidate();
-
-        this.setPreferredSize(null);
-        this.setMaximumSize(null);
-        this.setMinimumSize(null);
         this.repaint();
-
-        wfPanel.setPreferredSize(new Dimension(0, 0));
-        wfPanel.setMaximumSize(new Dimension(0, 0));
-        wfPanel.setMinimumSize(new Dimension(0, 0));
-
-        wfPanel.setPreferredSize(null);
-        wfPanel.setMaximumSize(null);
-        wfPanel.setMinimumSize(null);
         wfPanel.repaint();
 
     }
