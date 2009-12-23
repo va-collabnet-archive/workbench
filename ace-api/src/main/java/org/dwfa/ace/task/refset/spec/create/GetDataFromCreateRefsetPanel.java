@@ -79,8 +79,6 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
     private String reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
     private String fileAttachmentsPropName = ProcessAttachmentKeys.FILE_ATTACHMENTS.getAttachmentKey();
 	
-    
-    		
 	// Other Properties 
     private I_TermFactory termFactory;
     private I_GetConceptData status;

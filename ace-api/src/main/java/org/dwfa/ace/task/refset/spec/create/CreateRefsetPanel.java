@@ -43,6 +43,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
@@ -50,6 +51,70 @@ import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
 import org.dwfa.ace.task.commit.TestForReviewRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
 import org.dwfa.bpa.data.ArrayListModel;
+
+/**
+ * Table to support selection of more than one reviewer. 
+ * @author kec
+ *
+ */
+class ReviewerTableModel extends AbstractTableModel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    
+    String[] columnNames = {"name", "reviewer"};
+    Object[][] data = {
+            {"reviewer 1", new Boolean(false) },
+            {"reviewer 2", new Boolean(true) },
+            {"reviewer 3", new Boolean(false) }
+    };
+            
+
+
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    public int getRowCount() {
+        return data.length;
+    }
+
+    public String getColumnName(int col) {
+        return columnNames[col];
+    }
+
+    public Object getValueAt(int row, int col) {
+        return data[row][col];
+    }
+
+    public Class getColumnClass(int c) {
+        return getValueAt(0, c).getClass();
+    }
+
+    /*
+     * Don't need to implement this method unless your table's
+     * editable.
+     */
+    public boolean isCellEditable(int row, int col) {
+        //Note that the data/cell address is constant,
+        //no matter where the cell appears onscreen.
+        if (col < 1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /*
+     * Don't need to implement this method unless your table's
+     * data can change.
+     */
+    public void setValueAt(Object value, int row, int col) {
+        data[row][col] = value;
+        fireTableCellUpdated(row, col);
+    }
+}
 
 /**
  * The Create Refset panel is used to start the Create Refset process. It allows the user to input:
@@ -105,8 +170,12 @@ public class CreateRefsetPanel extends JPanel {
 
     private Set<I_GetConceptData> refsetParents;
     private Set<I_GetConceptData> editors;
-    private Set<I_GetConceptData> reviewers;
+    private Set<Object> reviewers;
     private Set<I_GetConceptData> validUsers;
+    
+    private String noReviewText = "no reviewer assigned";
+
+    
 
     public CreateRefsetPanel(Set<I_GetConceptData> allValidUsers, Set<I_GetConceptData> permissibleRefsetParents) {
         super(new GridBagLayout());
@@ -170,7 +239,7 @@ public class CreateRefsetPanel extends JPanel {
 
         if (refsetParent == null) {
             editors = validUsers;
-            reviewers = validUsers;
+            reviewers = new HashSet<Object>(validUsers);
         } else {
             editors = getPermissibleEditors(refsetParent);
             reviewers = getPermissibleReviewers(refsetParent);
@@ -185,10 +254,12 @@ public class CreateRefsetPanel extends JPanel {
         }
 
         if (reviewerComboBox != null) {
-            I_GetConceptData previousReviewer = (I_GetConceptData) reviewerComboBox.getSelectedItem();
+            Object previousReviewer = reviewerComboBox.getSelectedItem();
             reviewerComboBox = new JComboBox(reviewers.toArray());
             if (previousReviewer != null || reviewers.size() == 0) {
                 reviewerComboBox.setSelectedItem(previousReviewer);
+            } else {
+                reviewerComboBox.setSelectedItem(noReviewText);
             }
         }
     }
@@ -203,18 +274,16 @@ public class CreateRefsetPanel extends JPanel {
         this.setLayout(new GridBagLayout());
         this.removeAll();
         GridBagConstraints gbc = new GridBagConstraints();
-        int row = 0;
 
         // Refset Name (Label & TextField)
         gbc.gridx = 0;
-        gbc.gridy = row;
+        gbc.gridy = 0;
         gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.weighty = 0;
         this.add(refsetNameLabel, gbc);
 
-        gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = row;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
@@ -222,17 +291,13 @@ public class CreateRefsetPanel extends JPanel {
         this.add(refsetNameTextField, gbc);
 
         // Refset Parent (Label & ComboBox)
-        row++;
-        gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = row;
+        gbc.gridy++;
         gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(refsetParentLabel, gbc);
 
-        gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = row;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(5, 5, 0, 5); // padding
         gbc.anchor = GridBagConstraints.LINE_START;
@@ -244,17 +309,13 @@ public class CreateRefsetPanel extends JPanel {
         }
 
         // Comments (Label and Scroll Area)
-        row++;
-        gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = row;
+        gbc.gridy++;
         gbc.insets = new Insets(5, 10, 0, 5); // padding
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         this.add(commentsLabel, gbc);
 
-        gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = row;
         gbc.gridwidth = 2;
         gbc.weighty = 1.0;
         gbc.insets = new Insets(5, 5, 0, 5); // padding
@@ -263,36 +324,28 @@ public class CreateRefsetPanel extends JPanel {
         this.add(commentsScrollPane, gbc);
 
         // Requestor (Label & TextField)
-        row++;
-        gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = row;
+        gbc.gridy++;
+        gbc.weighty = 0.0;
         gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(requestorLabel, gbc);
 
-        gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = row;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(requestorTextField, gbc);
 
-        // Editor (Label and ComboBox)
-        row++;
-        gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = row;
+        gbc.gridy++;
         gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.NONE;
         this.add(editorLabel, gbc);
 
-        gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = row;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
@@ -304,17 +357,13 @@ public class CreateRefsetPanel extends JPanel {
         }
 
         // Reviewer (Label and ComboBox)
-        row++;
-        gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = row;
+        gbc.gridy++;
         gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(reviewerLabel, gbc);
-
-        gbc = new GridBagConstraints();
+        
         gbc.gridx = 1;
-        gbc.gridy = row;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
@@ -325,35 +374,39 @@ public class CreateRefsetPanel extends JPanel {
             this.add(reviewerComboBox, gbc);
         }
 
+        /*
+         * Table for selecting multiple reviewers. Not needed now, may use in the future. 
+        gbc.gridy++;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        JTable table = new JTable(new ReviewerTableModel());
+        this.add(new JScrollPane(table), gbc);
+        table.setFillsViewportHeight(true);
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        */
+
         // deadline
-        row++;
-        gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = row;
+        gbc.gridy++;
         gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(deadlineLabel, gbc);
 
-        gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = row;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(deadlinePicker, gbc);
 
         // priority
-        row++;
-        gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = row;
+        gbc.gridy++;
         gbc.insets = new Insets(5, 10, 5, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(priorityLabel, gbc);
 
-        gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = row;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(5, 5, 5, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
@@ -361,19 +414,16 @@ public class CreateRefsetPanel extends JPanel {
         this.add(priorityComboBox, gbc);
 
         // file attachments
-        row++;
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = row;
+        gbc.gridx = 0;
+        gbc.gridy++;
         gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(openFileChooserButton, gbc);
 
-        row++;
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        gbc.gridwidth = 3;
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1;
@@ -422,18 +472,20 @@ public class CreateRefsetPanel extends JPanel {
         }
     }
 
-    private Set<I_GetConceptData> getPermissibleReviewers(I_GetConceptData refsetParent) {
+    private Set<Object> getPermissibleReviewers(I_GetConceptData refsetParent) {
         /*
          * -------------------------------------------------
          * Get a list of valid reviewers
          * -------------------------------------------------
          */
+        Set<Object> permissibleReviewers = new HashSet<Object>();
+        permissibleReviewers.add(noReviewText);
         try {
             if (refsetParent == null) {
-                return this.validUsers;
+                permissibleReviewers.addAll(validUsers);
+                return permissibleReviewers;
             }
 
-            Set<I_GetConceptData> permissibleReviewers = new HashSet<I_GetConceptData>();
             for (I_GetConceptData user : this.validUsers) {
                 if (hasReviewerPermission(user, refsetParent)) {
                     permissibleReviewers.add(user);
@@ -442,8 +494,9 @@ public class CreateRefsetPanel extends JPanel {
 
             return permissibleReviewers;
         } catch (Exception e) {
-            e.printStackTrace();
-            return validUsers;
+            AceLog.getAppLog().alertAndLogException(e);
+            permissibleReviewers.addAll(validUsers);
+            return permissibleReviewers;
         }
     }
 
@@ -577,7 +630,12 @@ public class CreateRefsetPanel extends JPanel {
     // Reviewer
     // -----------------------
     public I_GetConceptData getReviewer() {
-        return (I_GetConceptData) reviewerComboBox.getSelectedItem();
+        Object selectedObject = reviewerComboBox.getSelectedItem();
+        if (selectedObject == null || I_GetConceptData.class.isAssignableFrom(selectedObject.getClass())) {
+            return (I_GetConceptData) selectedObject;
+        } else {
+            return null;
+        }
     }
 
     public void setReviewer(I_GetConceptData newReviewer) {
