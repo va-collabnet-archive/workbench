@@ -131,13 +131,15 @@ public class FileIO {
 
     /** Copy a file from an opened InputStream to an opened OutputStream */
     public static void copyFile(InputStream is, OutputStream os, boolean close) throws IOException {
-        int b; // the byte read from the file
-        while ((b = is.read()) != -1) {
-            os.write(b);
+        byte[] buffer = new byte[4096];
+        int length;
+        while ((length = is.read(buffer)) > 0) {
+            os.write(buffer, 0, length);
         }
         is.close();
-        if (close)
+        if (close) {
             os.close();
+        }
     }
 
     /** Copy a file from an opened Reader to an opened Writer */
