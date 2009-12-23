@@ -16,10 +16,14 @@
  */
 package org.dwfa.bpa.tasks.util;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
+
+import org.dwfa.util.io.FileIO;
 
 /**
  * Class to store file name and content, to be stored as an attachment.
@@ -37,29 +41,17 @@ public class FileContent implements Serializable {
      * Create a new FileContent object.
      * 
      * @param file The file to read in.
+     * @throws IOException 
      */
-    public FileContent(File file) {
-        try {
+    public FileContent(File file) throws IOException {
             filename = file.getName();
-
-            FileInputStream fis = new FileInputStream(file);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
+            FileIO.copyFile(is, baos, true);
 
-            int nextByte = fis.read();
-            while (nextByte != -1) {
-                baos.write(nextByte);
-                nextByte = fis.read();
-            }
             // set content
             contents = baos.toByteArray();
-
             baos.close();
-            fis.close();
-
-        } catch (Exception e) {
-            // if an error occurs, empty the file contents
-            contents = new byte[0];
-        }
     }
 
     /**
