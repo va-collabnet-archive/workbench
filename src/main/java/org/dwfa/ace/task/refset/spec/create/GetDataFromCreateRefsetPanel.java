@@ -40,6 +40,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.Priority;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.tasks.util.FileContent;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.util.LogWithAlerts;
@@ -335,6 +336,12 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
                     // File attachments (OPTIONAL)
                     // -----------------------------------------
                     process.setProperty(fileAttachmentsPropName, fileAttachments);
+                    
+                    for (File f: fileAttachments) {
+                        FileContent fileContent = new FileContent(f);
+                        process.writeAttachment(fileContent.getFilename(), fileContent);
+                    }
+                    
                    
                     // Under normal conditions this is where we should return from 
                     return Condition.ITEM_COMPLETE;
