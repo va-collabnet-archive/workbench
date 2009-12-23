@@ -16,8 +16,10 @@
  */
 package org.dwfa.ace.task.file;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,6 +36,7 @@ import org.dwfa.bpa.tasks.util.FileContent;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.dwfa.util.io.FileIO;
 
 /**
  * Prompts the user to save all of the BP's file attachments.
@@ -84,12 +87,11 @@ public class SaveFileAttachmentsTask extends AbstractTask {
                     if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
                         File newFile = fileChooser.getSelectedFile();
 
-                        FileWriter fw = new FileWriter(newFile);
-                        for (byte b : fileContent.getContents()) {
-                            fw.write((int) b);
-                        }
-                        fw.flush();
-                        fw.close();
+                        ByteArrayInputStream bais = new ByteArrayInputStream(fileContent.getContents());
+                        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile));
+                        FileIO.copyFile(bais, bos, false);
+                        bos.flush();
+                        bos.close();
                     }
                 }
             }
