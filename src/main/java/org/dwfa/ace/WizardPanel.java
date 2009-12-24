@@ -73,6 +73,8 @@ public class WizardPanel extends JPanel {
     private JPanel wfDetailsPanel = new JPanel();
     private JLabel dragLabel = new JLabel();
     private ACE acePanel;
+    private static int dragLabelHeight = 49;
+
 
     private class WfDetailsChangedListener extends ComponentAdapter {
 
@@ -104,14 +106,14 @@ public class WizardPanel extends JPanel {
         WizardMouseAdaptor adaptor = new WizardMouseAdaptor();
         dragLabel.addMouseListener(adaptor);
         dragLabel.addMouseMotionListener(adaptor);
-        dragLabel.setSize(10, 48);
+        dragLabel.setSize(10, dragLabelHeight);
         add(dragLabel);
         dragLabel.setLocation(0, 0);
         setLocation(300, 20);
 
         wfPanel.setOpaque(true);
         add(wfPanel);
-        wfPanel.setSize(500 - dragLabel.getWidth(), 48);
+        wfPanel.setSize(500 - dragLabel.getWidth(), dragLabelHeight);
         wfPanel.setLocation(dragLabel.getLocation().x + dragLabel.getWidth() + 1, 0);
         wfPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 

@@ -117,7 +117,7 @@ public class AceFrame extends ComponentFrame {
         JLayeredPane layers = getRootPane().getLayeredPane();
         WizardPanel wizPanel = new WizardPanel(getCdePanel());
         layers.add(wizPanel, JLayeredPane.MODAL_LAYER);
-        wizPanel.setLocation(400, 0);
+        wizPanel.setLocation(350, 0);
 
         getCdePanel().setWorkflowDetailsSheet(wizPanel.getWfDetailsPanel());
         getCdePanel().setWorkflowPanel(wizPanel.getWfPanel());
@@ -222,7 +222,7 @@ public class AceFrame extends ComponentFrame {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                MarshalledObject marshalledFrame = new MarshalledObject(cdePanel.getAceFrameConfig());
+                MarshalledObject<I_ConfigAceFrame> marshalledFrame = new MarshalledObject<I_ConfigAceFrame>(cdePanel.getAceFrameConfig());
                 AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
                 newFrameConfig.setMasterConfig((AceConfig) cdePanel.getAceFrameConfig().getDbConfig());
                 newFrameConfig.getMasterConfig().aceFrames.add(newFrameConfig);
@@ -262,7 +262,7 @@ public class AceFrame extends ComponentFrame {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                MarshalledObject marshalledFrame = new MarshalledObject(cdePanel.getAceFrameConfig());
+                MarshalledObject<I_ConfigAceFrame> marshalledFrame = new MarshalledObject<I_ConfigAceFrame>(cdePanel.getAceFrameConfig());
                 AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
                 newFrameConfig.setMasterConfig((AceConfig) cdePanel.getAceFrameConfig().getDbConfig());
                 newFrameConfig.getMasterConfig().aceFrames.add(newFrameConfig);
