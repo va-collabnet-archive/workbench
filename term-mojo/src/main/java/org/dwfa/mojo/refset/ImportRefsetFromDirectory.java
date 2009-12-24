@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,23 +16,20 @@
  */
 package org.dwfa.mojo.refset;
 
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.file.IterableFileReader;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.process.I_ProcessQueue;
-import org.dwfa.ace.file.IterableFileReader;
 
 /**
  * Imports the contents of refset files from a directory
- * 
+ *
  * @see https
  *      ://mgr.cubit.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/dataimport
  *      .html
@@ -44,7 +41,7 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
 
     /**
      * Directory the files are to read from
-     * 
+     *
      * @parameter
      * @required
      */
@@ -53,7 +50,7 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
     /**
      * Indicates if the transactional ACE interface should be used - defaults to
      * false
-     * 
+     *
      * @parameter
      */
     boolean transactional;
@@ -62,14 +59,14 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
      * Indicates if the files contain a header row or not. If true the first
      * line of the file
      * will be skipped. Default value is true.
-     * 
+     *
      * @parameter
      */
     boolean hasHeader = true;
 
     /**
      * List of filename expressions to exclude
-     * 
+     *
      * @parameter
      */
     List<String> exclusions = new ArrayList<String>();
@@ -78,7 +75,7 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
 
     /*
      * Mojo execution method.
-     * 
+     *
      * @see org.apache.maven.plugin.AbstractMojo#execute()
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -86,7 +83,8 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
         try {
             List<File> files = recursivelyGetFiles(refsetDirectory);
             if (files.isEmpty()) {
-                throw new MojoExecutionException("No files found to import at specified directory " + refsetDirectory);
+                getLog().warn("No files found to import at specified directory " + refsetDirectory);
+                return;
             }
 
             for (File file : files) {
