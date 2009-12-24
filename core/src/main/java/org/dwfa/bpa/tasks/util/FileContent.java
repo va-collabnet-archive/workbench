@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 
 import org.dwfa.util.io.FileIO;
@@ -46,9 +47,8 @@ public class FileContent implements Serializable {
     public FileContent(File file) throws IOException {
             filename = file.getName();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
+            InputStream is = new BufferedInputStream(new FileInputStream(file));
             FileIO.copyFile(is, baos, true);
-
             // set content
             contents = baos.toByteArray();
             baos.close();
