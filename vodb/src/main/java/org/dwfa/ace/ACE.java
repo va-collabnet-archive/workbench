@@ -1404,10 +1404,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private int getMenuSpacer() {
         if (offset == null) {
             if (System.getProperty("os.name").toLowerCase().startsWith("mac")) {
-                System.out.println("Setting offset to 49");
                 offset = 49;
             } else {
-                System.out.println("Setting offset to 69");
                 offset = 69;
             }
         }       
