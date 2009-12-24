@@ -88,6 +88,7 @@ public class SaveFileAttachmentsTask extends AbstractTask {
                         File newFile = fileChooser.getSelectedFile();
 
                         ByteArrayInputStream bais = new ByteArrayInputStream(fileContent.getContents());
+                        System.out.println(" Writing: " + newFile.getName() + " bytes: " + fileContent.getContents().length);
                         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile));
                         FileIO.copyFile(bais, bos, false);
                         bos.flush();
