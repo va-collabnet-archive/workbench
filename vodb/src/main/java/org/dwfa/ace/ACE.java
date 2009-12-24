@@ -86,6 +86,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -1394,39 +1395,53 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private class RightPalettePoint implements I_GetPalettePoint {
 
         public Point getPalettePoint() {
-            return new Point(topPanel.getLocation().x + topPanel.getWidth(), topPanel.getLocation().y
-                + topPanel.getHeight() + 1 + getMenuSpacer());
+            return new Point(topPanel.getLocation().x + topPanel.getWidth(), getMenuSpacer());
         }
 
     }
 
+    private Integer offset;
     private int getMenuSpacer() {
-        if (System.getProperty("apple.laf.useScreenMenuBar") != null
-            && System.getProperty("apple.laf.useScreenMenuBar").equals("true")) {
-            return 0;
-        }
-        return 24;
+        if (offset == null) {
+            if (System.getProperty("os.name").toLowerCase().startsWith("mac")) {
+                System.out.println("Setting offset to 49");
+                offset = 49;
+            } else {
+                System.out.println("Setting offset to 69");
+                offset = 69;
+            }
+        }       
+        return offset;
     }
 
     private class LeftPalettePoint implements I_GetPalettePoint {
 
+        Integer offset;
+        
         public Point getPalettePoint() {
-            return new Point(topPanel.getLocation().x, topPanel.getLocation().y + topPanel.getHeight()
-                + getMenuSpacer() + 1);
-        }
-    }
-
-    private class CenteredPalettePoint implements I_GetPalettePoint {
-        JPanel palette;
-
-        private CenteredPalettePoint(JPanel palette) {
-            super();
-            this.palette = palette;
-        }
-
-        public Point getPalettePoint() {
-            int x = (topPanel.getLocation().x + (getWidth() / 2) - (palette.getWidth() / 2));
-            return new Point(x, topPanel.getLocation().y + topPanel.getHeight() + getMenuSpacer() + 1);
+            if (frame != null) {
+               JRootPane root = frame.getRootPane();
+               Point p = new Point(topPanel.getLocation().x, getMenuSpacer());
+               if (offset == null) {
+                   if (System.getProperty("exe4j.isInstall4j") != null &&
+                           System.getProperty("exe4j.isInstall4j").equals("true") &&
+                           System.getProperty("os.name") != null && 
+                           System.getProperty("os.name").toLowerCase().startsWith("window"))
+                           {
+                       System.out.println("Setting offset to 20");
+                       offset = 20;
+                   } else {
+                       System.out.println("Setting offset to 0");
+                       offset = 0;
+                   }
+               }
+               p.y = p.y + offset;
+               
+               return SwingUtilities.convertPoint(ACE.this, p, root);
+               
+            }
+            Point p = new Point(topPanel.getLocation().x, getMenuSpacer());
+            return SwingUtilities.convertPoint(ACE.this, p, workflowPanel);
         }
     }
 
@@ -1435,6 +1450,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JPanel dataCheckListPanel;
     private RefsetSpecPanel refsetSpecPanel;
     private TermTreeHelper treeHelper;
+    private JFrame frame;
 
     public String getPluginRoot() {
         return pluginRoot;
@@ -1570,6 +1586,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public JMenuBar createMenuBar(JFrame frame) throws LoginException, SecurityException, ConfigurationException,
             IOException, PrivilegedActionException, IntrospectionException, InvocationTargetException,
             IllegalAccessException, PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
+        this.frame = frame;
         JMenuBar menuBar = new JMenuBar();
         JMenu editMenu = new JMenu("Edit");
         menuBar.add(editMenu);
@@ -1581,6 +1598,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             SecurityException, ConfigurationException, IOException, PrivilegedActionException, IntrospectionException,
             InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException,
             NoSuchMethodException {
+        this.frame = frame;
         addFileMenu(menuBar, aceFrame);
         addEditMenu(menuBar, editMenu, aceFrame);
         ProcessPopupUtil.addProcessMenus(menuBar, pluginRoot, menuWorker);
@@ -1602,6 +1620,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     private void addEditMenu(JMenuBar menuBar, JMenu editMenu, JFrame aceFrame) {
+        this.frame = frame;
         editMenu.removeAll();
         JMenuItem menuItem;
         editMenu.setMnemonic(KeyEvent.VK_E);
@@ -1653,6 +1672,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             IOException, PrivilegedActionException, SecurityException, IntrospectionException,
             InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException,
             NoSuchMethodException {
+        this.frame = frame;
         if (editMode) {
             JMenuItem menuItem = null;
             /*
@@ -2101,7 +2121,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         conflictComboBox.setSelectedItem(aceFrameConfig.getConflictResolutionStrategy());
         descriptionPanel.setText(aceFrameConfig.getConflictResolutionStrategy().getDescription());
         conflictComboBox.addActionListener(new ActionListener() {
-            @SuppressWarnings("unchecked")
             public void actionPerformed(ActionEvent actionevent) {
                 JComboBox cb = (JComboBox) actionevent.getSource();
                 I_ManageConflict conflictResolutionStrategy = (I_ManageConflict) cb.getSelectedItem();
@@ -2840,6 +2859,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JPanel getTopPanel() throws IOException, ClassNotFoundException {
         JPanel topPanel = new JPanel(new GridBagLayout());
+        topPanel.setMaximumSize(new Dimension(3000, 48));
+        topPanel.setPreferredSize(new Dimension(3000, 48));
+        topPanel.setMinimumSize(new Dimension(800, 48));
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
         c.gridx = 0;
