@@ -133,8 +133,12 @@ public class FileIO {
     public static void copyFile(InputStream is, OutputStream os, boolean close) throws IOException {
         byte[] buffer = new byte[4096];
         int length;
-        while ((length = is.read(buffer)) > 0) {
-            os.write(buffer, 0, length);
+        int bytesWritten = 0;
+        while (is.available() > 0) {
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+                bytesWritten = bytesWritten + length;
+            }
         }
         is.close();
         if (close) {
