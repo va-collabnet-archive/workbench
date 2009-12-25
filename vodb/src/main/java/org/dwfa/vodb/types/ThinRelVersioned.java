@@ -194,7 +194,7 @@ public class ThinRelVersioned implements I_RelVersioned {
         if (versions.size() == compact.getVersions().size()) {
             return false;
         }
-        versions = compact.getVersions();
+        versions = (List<I_RelPart>) compact.getVersions();
         return true;
     }
 

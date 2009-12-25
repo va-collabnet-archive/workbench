@@ -1519,7 +1519,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         }
         if (bean.sourceRels != null) {
             for (I_RelVersioned srcRel : bean.sourceRels) {
-                for (ListIterator<I_RelPart> partItr = srcRel.getVersions().listIterator(); partItr.hasNext();) {
+                for (ListIterator<? extends I_RelPart> partItr = srcRel.getVersions().listIterator(); partItr.hasNext();) {
                     I_RelPart part = partItr.next();
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         changed = true;
