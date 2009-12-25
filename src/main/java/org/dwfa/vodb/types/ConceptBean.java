@@ -811,7 +811,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
             if (images != null) {
                 for (I_ImageVersioned img : images) {
-                    for (ListIterator<I_ImagePart> partItr = img.getVersions().listIterator(); partItr.hasNext();) {
+                    for (ListIterator<? extends I_ImagePart> partItr = img.getVersions().listIterator(); partItr.hasNext();) {
                         I_ImagePart part = partItr.next();
                         if (part.getVersion() == Integer.MAX_VALUE) {
                             partItr.remove();

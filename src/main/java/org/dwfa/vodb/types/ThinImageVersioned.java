@@ -33,6 +33,7 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceImage;
@@ -203,7 +204,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     ImageTupleAdder adder = new ImageTupleAdder();
 
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             List<I_ImageTuple> matchingTuples) {
         adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples, true, versions, this);
     }
@@ -233,7 +234,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
 
     public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus) {
         int viewPathId = viewPosition.getPath().getConceptId();
-        Set<I_Position> positions = new HashSet<I_Position>();
+        PositionSetReadOnly positions = new PositionSetReadOnly(viewPosition);
         positions.add(viewPosition);
         List<I_ImageTuple> matchingTuples = new ArrayList<I_ImageTuple>();
         addTuples(allowedStatus, null, positions, matchingTuples);
