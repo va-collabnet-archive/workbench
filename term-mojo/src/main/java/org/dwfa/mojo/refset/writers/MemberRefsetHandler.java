@@ -333,7 +333,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         int snomedIntegerId = tf.getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())
             .getNativeId();
 
-        List<I_IdPart> parts = idVersioned.getVersions();
+        List<? extends I_IdPart> parts = idVersioned.getVersions();
         I_IdPart latestPart = null;
         for (I_IdPart part : parts) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
