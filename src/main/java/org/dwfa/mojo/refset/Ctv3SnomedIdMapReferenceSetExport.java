@@ -141,7 +141,7 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
      * @throws IOException DB errors
      * @throws TerminologyException DB errors
      */
-    private I_IdPart getLatestVersion(List<I_IdPart> idParts, Concept sourceConcept) throws TerminologyException,
+    private I_IdPart getLatestVersion(List<? extends I_IdPart> idParts, Concept sourceConcept) throws TerminologyException,
             IOException {
         I_IdPart latestVersion = null;
 

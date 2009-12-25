@@ -414,7 +414,7 @@ public class ExportIterator implements I_ProcessConcepts {
      * @return I_IdPart latest Id version for the sourceConcept.
      * @throws IOException DB errors
      */
-    private I_IdPart getLatestVersion(List<I_IdPart> idParts, Concept sourceConcept) throws TerminologyException,
+    private I_IdPart getLatestVersion(List<? extends I_IdPart> idParts, Concept sourceConcept) throws TerminologyException,
             IOException, NoMappingException {
         I_IdPart latestVersion = null;
 
