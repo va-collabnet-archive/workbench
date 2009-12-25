@@ -244,7 +244,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
         int fsnId = LocalVersionedTerminology.get().uuidToNative(
             ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next());
         for (I_DescriptionVersioned description : descriptions) {
-            List<I_DescriptionPart> parts = description.getVersions();
+            List<? extends I_DescriptionPart> parts = description.getVersions();
             for (I_DescriptionPart part : parts) {
                 if (fsnId == part.getTypeId()) {
                     return part.getText();
