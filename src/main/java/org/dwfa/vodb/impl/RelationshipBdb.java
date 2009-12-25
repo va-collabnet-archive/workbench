@@ -654,7 +654,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
         if (bean.sourceRels != null) {
             for (I_RelVersioned srcRel : bean.sourceRels) {
                 boolean changed = false;
-                for (ListIterator<I_RelPart> partItr = srcRel.getVersions().listIterator(); partItr.hasNext();) {
+                for (ListIterator<? extends I_RelPart> partItr = srcRel.getVersions().listIterator(); partItr.hasNext();) {
                     I_RelPart part = partItr.next();
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         changed = true;

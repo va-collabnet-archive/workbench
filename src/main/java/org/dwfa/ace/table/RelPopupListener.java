@@ -65,7 +65,7 @@ public class RelPopupListener extends MouseAdapter {
                     I_RelPart newPart = selectedObject.getTuple().duplicate();
                     newPart.setPathId(p.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);
-                    selectedObject.getTuple().getRelVersioned().getVersions().add(newPart);
+                    selectedObject.getTuple().getRelVersioned().addVersion(newPart);
 
                     I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
                     I_RelVersioned destRel = destBean.getDestRel(selectedObject.getTuple().getRelId());
@@ -157,7 +157,7 @@ public class RelPopupListener extends MouseAdapter {
 
                     I_RelVersioned destRel = destBean.getDestRel(selectedObject.getTuple().getRelId());
 
-                    selectedObject.getTuple().getRelVersioned().getVersions().add(newPart);
+                    selectedObject.getTuple().getRelVersioned().addVersion(newPart);
                     if (destRel != null && srcRel != destRel) {
                         destRel.addVersion(newPart);
                     }
