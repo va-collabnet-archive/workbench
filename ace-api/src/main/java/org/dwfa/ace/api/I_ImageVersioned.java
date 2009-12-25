@@ -29,7 +29,7 @@ public interface I_ImageVersioned extends I_AmTermComponent {
 
     public int getImageId();
 
-    public List<I_ImagePart> getVersions();
+    public List<? extends I_ImagePart> getVersions();
 
     public boolean addVersion(I_ImagePart part);
 
@@ -47,7 +47,7 @@ public interface I_ImageVersioned extends I_AmTermComponent {
 
     public Set<TimePathId> getTimePathSet();
 
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             List<I_ImageTuple> returnImages);
 
     public UniversalAceImage getUniversal() throws IOException, TerminologyException;

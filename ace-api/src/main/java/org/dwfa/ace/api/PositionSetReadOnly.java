@@ -29,6 +29,10 @@ public class PositionSetReadOnly  implements Set<I_Position> {
 		this.positions = positionSet.toArray(this.positions);
 	}
 
+	public PositionSetReadOnly(I_Position viewPosition) {
+		positions = new I_Position[] { viewPosition};
+	}
+
 	@Override
 	public boolean add(I_Position e) {
 		throw new UnsupportedOperationException();
