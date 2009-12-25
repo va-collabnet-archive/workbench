@@ -780,7 +780,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
             // remove uncommitted parts...
             if (conceptAttributes != null) {
-                for (ListIterator<I_ConceptAttributePart> partItr = conceptAttributes.getVersions().listIterator(); partItr.hasNext();) {
+                for (ListIterator<? extends I_ConceptAttributePart> partItr = conceptAttributes.getVersions().listIterator(); partItr.hasNext();) {
                     I_ConceptAttributePart part = partItr.next();
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         partItr.remove();

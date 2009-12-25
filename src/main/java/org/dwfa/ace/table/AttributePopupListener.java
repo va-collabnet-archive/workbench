@@ -65,7 +65,7 @@ public class AttributePopupListener extends MouseAdapter {
                     I_ConceptAttributePart newPart = selectedObject.getTuple().duplicate();
                     newPart.setPathId(p.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);
-                    sourceBean.getConceptAttributes().getVersions().add(newPart);
+                    sourceBean.getConceptAttributes().addVersion(newPart);
                 }
                 ACE.addUncommitted(sourceBean);
             } catch (IOException ex) {
@@ -113,7 +113,7 @@ public class AttributePopupListener extends MouseAdapter {
                     I_ConceptAttributePart newPart = selectedObject.getTuple().getPart();
                     if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
                         newPart = selectedObject.getTuple().duplicate();
-                        selectedObject.getTuple().getConVersioned().getVersions().add(newPart);
+                        selectedObject.getTuple().getConVersioned().addVersion(newPart);
                     }
                     newPart.setPathId(p.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);

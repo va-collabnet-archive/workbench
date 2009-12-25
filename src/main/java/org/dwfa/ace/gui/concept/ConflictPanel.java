@@ -672,7 +672,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
                             AceLog.getEditLog().fine("   uncommitted updated part already exists...");
                         }
                     } else {
-                        attributes.getVersions().add(possiblePart);
+                        attributes.addVersion(possiblePart);
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                             AceLog.getEditLog().fine("   adding uncommitted part...");
                         }
