@@ -460,7 +460,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                     I_IdPart newPart = selectedObject.getTuple().duplicate();
                     newPart.setPathId(p.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);
-                    selectedObject.getTuple().getIdVersioned().getVersions().add(newPart);
+                    selectedObject.getTuple().getIdVersioned().addVersion(newPart);
                 }
                 ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNativeId()));
                 allTuples = null;
@@ -483,7 +483,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                         newPart.setStatusId(AceConfig.getVodb().uuidToNative(
                             ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
                         referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
-                        selectedObject.getTuple().getIdVersioned().getVersions().add(newPart);
+                        selectedObject.getTuple().getIdVersioned().addVersion(newPart);
                     }
                     ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNativeId()));
                     allTuples = null;

@@ -742,7 +742,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                 boolean delete = true;
                 for (int id : uncommittedIds.getSetValues()) {
                     I_IdVersioned idv = AceConfig.getVodb().getId(id);
-                    for (ListIterator<I_IdPart> itr = idv.getVersions().listIterator(); itr.hasNext();) {
+                    for (ListIterator<? extends I_IdPart> itr = idv.getVersions().listIterator(); itr.hasNext();) {
                         I_IdPart p = itr.next();
                         if (p.getVersion() == Integer.MAX_VALUE) {
                             itr.remove();
@@ -761,7 +761,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             if (uncommittedIdVersioned != null) {
                 boolean delete = true;
                 for (I_IdVersioned idv : uncommittedIdVersioned) {
-                    for (ListIterator<I_IdPart> itr = idv.getVersions().listIterator(); itr.hasNext();) {
+                    for (ListIterator<? extends I_IdPart> itr = idv.getVersions().listIterator(); itr.hasNext();) {
                         I_IdPart p = itr.next();
                         if (p.getVersion() == Integer.MAX_VALUE) {
                             itr.remove();
