@@ -491,7 +491,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             String ret = null;
             int lastVersion = Integer.MIN_VALUE;
 
-            List<I_IdPart> idList = concept.getId().getVersions();
+            List<? extends I_IdPart> idList = concept.getId().getVersions();
             for (I_IdPart part : idList) {
                 if (part.getSource() == nidEDGClinicalDot1) {
                     if (part.getVersion() >= lastVersion) {

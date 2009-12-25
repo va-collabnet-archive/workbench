@@ -32,7 +32,7 @@ public class IDTupleFileUtil {
 
     public static String exportTuple(I_IdVersioned iIdVersioned) throws TerminologyException, IOException {
 
-        List<I_IdPart> parts = iIdVersioned.getVersions();
+        List<? extends I_IdPart> parts = iIdVersioned.getVersions();
         I_IdPart latestPart = null;
         for (I_IdPart part : parts) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {

@@ -30,7 +30,7 @@ public interface I_IdVersioned extends I_AmTermComponent {
 
     public void setNativeId(int nativeId);
 
-    public List<I_IdPart> getVersions();
+    public List<? extends I_IdPart> getVersions();
 
     public List<UUID> getUIDs();
 
