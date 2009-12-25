@@ -5,17 +5,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -27,6 +28,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
 
@@ -35,7 +37,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Description 
 	extends ConceptComponent<DescriptionMutablePart> 
-	implements I_DescriptionVersioned<DescriptionMutablePart, DescriptionVersion> {
+	implements I_DescriptionVersioned {
 
 	private static class DescTupleComputer extends
 			VersionComputer<DescriptionVersion, Description, DescriptionMutablePart> {
@@ -48,9 +50,17 @@ public class Description
 	private static DescTupleComputer computer = new DescTupleComputer();
 	private int conceptNid;
 	
-	protected Description(int nid,
+	public Description(int nid,
 			int versionCount, boolean editable) {
 		super(nid, versionCount, editable);
+	}
+	
+	public Description(UniversalAceDescription uDesc, boolean editable) {
+		super(Bdb.uuidsToNid(uDesc.getDescId()), uDesc.getVersions().size(), editable);
+		setConceptNid(Bdb.uuidsToNid(uDesc.getConceptId()));
+		for (UniversalAceDescriptionPart umPart: uDesc.getMutableParts()) {
+			mutableParts.add(new DescriptionMutablePart(umPart));
+		}
 	}
 
 	@Override
@@ -80,52 +90,6 @@ public class Description
 
 	}
 
-	public final List<DescriptionVersion> getTuples() {
-		List<DescriptionVersion> tuples = new ArrayList<DescriptionVersion>();
-		for (DescriptionMutablePart p : mutableParts) {
-			tuples.add(new DescriptionVersion(this, p));
-		}
-		return tuples;
-	}
-
-	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<DescriptionVersion> matchingTuples) {
-		computer.addTuples(allowedStatus, viewPosition,
-				matchingTuples, mutableParts, this);
-	}
-
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<DescriptionVersion> matchingTuples,
-			boolean addUncommitted) {
-		computer.addTuples(allowedStatus, allowedTypes, positions,
-				matchingTuples, addUncommitted, mutableParts, this);
-	}
-
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<DescriptionVersion> matchingTuples,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		List<DescriptionVersion> tuples = new ArrayList<DescriptionVersion>();
-
-		computer.addTuples(allowedStatus, allowedTypes, positions,
-				tuples, addUncommitted, mutableParts, this);
-
-		if (returnConflictResolvedLatestState) {
-			I_ConfigAceFrame config = AceConfig.getVodb()
-					.getActiveAceFrameConfig();
-			I_ManageConflict conflictResolutionStrategy;
-			if (config == null) {
-				conflictResolutionStrategy = new IdentifyAllConflictStrategy();
-			} else {
-				conflictResolutionStrategy = config
-						.getConflictResolutionStrategy();
-			}
-
-			tuples = conflictResolutionStrategy.resolveTuples(tuples);
-		}
-		matchingTuples.addAll(tuples);
-	}
-
 	@Override
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		throw new UnsupportedOperationException();
@@ -153,11 +117,11 @@ public class Description
 
 
 	@Override
-	public List<DescriptionVersion> getTuples(
+	public List<I_DescriptionTuple> getTuples(
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<DescriptionVersion> tuples = new ArrayList<DescriptionVersion>();
-		for (DescriptionMutablePart p : getVersions(returnConflictResolvedLatestState)) {
+		List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
+		for (DescriptionMutablePart p : getMutableParts(returnConflictResolvedLatestState)) {
 			tuples.add(new DescriptionVersion(this, p));
 		}
 		return tuples;
@@ -181,13 +145,6 @@ public class Description
 			universal.addVersion(universalPart);
 		}
 		return universal;
-	}
-
-	@Override
-	public List<DescriptionMutablePart> getVersions(
-			boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		return mutableParts;
 	}
 
 	@Override
@@ -226,6 +183,8 @@ public class Description
 	@Override
 	public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths,
 			I_IntSet allowedStatus) throws IOException, TerminologyException {
+		throw new UnsupportedOperationException();
+		/*
 		   int viewPathId = viewPosition.getPath().getConceptId();
 		   List<DescriptionVersion> matchingTuples = new ArrayList<DescriptionVersion>();
 		   addTuples(allowedStatus, viewPosition, matchingTuples);
@@ -244,6 +203,7 @@ public class Description
 			   }
 		   }
 		   return promotedAnything;
+		 */
 	}
 
 	private static Collection<UUID> getUids(int id) throws IOException,
@@ -257,10 +217,90 @@ public class Description
 	}
 
 	@Override
-	public boolean merge(
-			I_DescriptionVersioned<DescriptionMutablePart, DescriptionVersion> jarDesc) {
+	public boolean merge(I_DescriptionVersioned jarDesc) {
 		throw new UnsupportedOperationException();
 	}
 
+	public int getConceptNid() {
+		return conceptNid;
+	}
+
+	public void setConceptNid(int conceptNid) {
+		this.conceptNid = conceptNid;
+	}
+
+	/*
+	 * Consider depreciating the below methods...
+	 */
+	
+	
+
+	public final List<I_DescriptionTuple> getTuples() {
+		List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
+		for (DescriptionMutablePart p : mutableParts) {
+			tuples.add(new DescriptionVersion(this, p));
+		}
+		return tuples;
+	}
+
+	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
+			List<I_DescriptionTuple> matchingTuples) {
+		throw new UnsupportedOperationException();
+		/*
+		computer.addTuples(allowedStatus, viewPosition,
+				matchingTuples, mutableParts, this);
+		*/
+	}
+
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples,
+			boolean addUncommitted) {
+		throw new UnsupportedOperationException();
+		/*
+		computer.addTuples(allowedStatus, allowedTypes, positions,
+				matchingTuples, addUncommitted, mutableParts, this);
+		*/
+	}
+
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		List<DescriptionVersion> tuples = new ArrayList<DescriptionVersion>();
+
+		computer.addTuples(allowedStatus, allowedTypes, positions,
+				tuples, addUncommitted, mutableParts, this);
+
+		if (returnConflictResolvedLatestState) {
+			I_ConfigAceFrame config = AceConfig.getVodb()
+					.getActiveAceFrameConfig();
+			I_ManageConflict conflictResolutionStrategy;
+			if (config == null) {
+				conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+			} else {
+				conflictResolutionStrategy = config
+						.getConflictResolutionStrategy();
+			}
+
+			tuples = conflictResolutionStrategy.resolveTuples(tuples);
+		}
+		matchingTuples.addAll(tuples);
+	}
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positionSet,
+			List<I_DescriptionTuple> matchingTuples, boolean addUncommitted) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positionSet,
+			List<I_DescriptionTuple> matchingTuples, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		throw new UnsupportedOperationException();
+	}
 
 }

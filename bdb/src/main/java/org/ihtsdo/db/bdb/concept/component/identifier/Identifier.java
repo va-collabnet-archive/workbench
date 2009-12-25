@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -18,7 +19,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Identifier extends ConceptComponent<IdentifierMutablePart>
-		implements I_IdVersioned<IdentifierMutablePart, IdentifierVersion> {
+		implements I_IdVersioned {
 
 	protected enum VARIABLE_PART_TYPES {
 		LONG(1), STRING(2), UUID(3);
@@ -94,8 +95,8 @@ public class Identifier extends ConceptComponent<IdentifierMutablePart>
 	}
 
 	@Override
-	public List<IdentifierVersion> getTuples() {
-		List<IdentifierVersion> returnValues = new ArrayList<IdentifierVersion>();
+	public List<I_IdTuple> getTuples() {
+		List<I_IdTuple> returnValues = new ArrayList<I_IdTuple>();
 		for (IdentifierMutablePart idv : mutableParts) {
 			returnValues.add(new IdentifierVersion(this, idv));
 		}

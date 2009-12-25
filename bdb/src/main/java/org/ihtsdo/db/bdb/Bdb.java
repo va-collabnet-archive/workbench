@@ -2,6 +2,8 @@ package org.ihtsdo.db.bdb;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,20 +24,34 @@ public class Bdb {
 	private static Bdb readWrite;
 	private static StatusAtPositionBdb statusAtPositionDb;
 	private static ConceptBdb conceptDb;
+	private static UuidsToNidMap uuidsToNidMap;
 	
 	private static ExecutorService executorPool;
+	
+	static {
+		Bdb.setup();
+	}
 	
 	public static void commit() throws IOException {
 		long commitTime = System.currentTimeMillis();
 		statusAtPositionDb.commit(commitTime);
 	}
 	
-	public static void setup() throws IOException {
-		readOnly = new Bdb(true, "berkeley-db/read-only");
-		readWrite = new Bdb(false, "berkeley-db/read-write");
-		statusAtPositionDb = new StatusAtPositionBdb(readOnly, readWrite);
-		conceptDb = new ConceptBdb(readOnly, readWrite);
-		executorPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+	public static void setup() {
+		try {
+			File buildDirectory = new File("target");
+			File bdbDirectory = new File(buildDirectory, "berkeley-db");
+			bdbDirectory.mkdirs();
+			readWrite = new Bdb(false, new File(bdbDirectory, "read-write"));
+			File readOnlyDir = new File(bdbDirectory, "read-only");
+			boolean readOnlyExists = readOnlyDir.exists();
+			readOnly = new Bdb(readOnlyExists, readOnlyDir);
+			statusAtPositionDb = new StatusAtPositionBdb(readOnly, readWrite);
+			conceptDb = new ConceptBdb(readOnly, readWrite);
+			executorPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public static Database setupDatabase(boolean readOnly, String dbName, Bdb bdb) throws IOException {
@@ -51,15 +67,16 @@ public class Bdb {
 		}
 	}
 
-	private Environment bdbEnv;
+	protected Environment bdbEnv;
 
-	private Bdb(boolean readOnly, String directory) throws IOException {
+	private Bdb(boolean readOnly, File directory) throws IOException {
 		try {
+			directory.mkdirs();
 			EnvironmentConfig envConfig = new EnvironmentConfig();
 			envConfig.setSharedCache(true);
 			envConfig.setReadOnly(readOnly);
 			envConfig.setAllowCreate(!readOnly);
-			bdbEnv = new Environment(new File(directory), envConfig);
+			bdbEnv = new Environment(directory, envConfig);
 		} catch (EnvironmentLockedException e) {
 			throw new IOException(e);
 		} catch (DatabaseException e) {
@@ -95,5 +112,28 @@ public class Bdb {
 	}
 	public static Concept getConceptForComponent(int componentNid) {
 		throw new UnsupportedOperationException();
+	}
+	
+	public static int uuidToNid(UUID uuid) {
+		return uuidsToNidMap.uuidToNid(uuid);
+	}
+	
+	public static int uuidsToNid(Collection<UUID> uuids) {
+		return uuidsToNidMap.uuidsToNid(uuids);
+	}
+
+	public static UuidsToNidMap getUuidsToNidMap() {
+		return uuidsToNidMap;
+	}
+
+	public static void setUuidsToNidMap(UuidsToNidMap uuidsToNidMap) {
+		Bdb.uuidsToNidMap = uuidsToNidMap;
+	}
+
+	public static void sync() {
+		readWrite.bdbEnv.sync();
+		if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
+			readOnly.bdbEnv.sync();
+		}
 	}
 }

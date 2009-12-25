@@ -6,13 +6,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -40,7 +41,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class RefsetMember extends ConceptComponent<RefsetMemberMutablePart> 
-	implements I_ThinExtByRefVersioned<RefsetMemberMutablePart, RefsetMemberVersion> {
+	implements I_ThinExtByRefVersioned {
 	/**
 	 * 
 	 * @author kec
@@ -200,34 +201,6 @@ public class RefsetMember extends ConceptComponent<RefsetMemberMutablePart>
 	}
 
 
-	@Override
-	public void addTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions,
-			List<RefsetMemberVersion> returnTuples, boolean addUncommitted) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void addTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions,
-			List<RefsetMemberVersion> returnTuples, boolean addUncommitted,
-			boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void addTuples(List<RefsetMemberVersion> returnTuples,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 	@Override
 	public void addVersion(I_ThinExtByRefPart part) {
@@ -254,25 +227,7 @@ public class RefsetMember extends ConceptComponent<RefsetMemberMutablePart>
 
 
 	@Override
-	public List<RefsetMemberVersion> getTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions, boolean addUncommitted) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<RefsetMemberVersion> getTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions, boolean addUncommitted,
-			boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<RefsetMemberVersion> getTuples(boolean addUncommitted,
+	public List<I_ThinExtByRefTuple> getTuples(boolean addUncommitted,
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 		// TODO Auto-generated method stub
@@ -294,6 +249,46 @@ public class RefsetMember extends ConceptComponent<RefsetMemberMutablePart>
 
 	@Override
 	public void setTypeId(int typeId) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
+			List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions,
+			List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public void addTuples(List<I_ThinExtByRefTuple> returnTuples,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus,
+			Set<I_Position> positions, boolean addUncommitted) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public List<I_ThinExtByRefTuple> getTuples(I_IntSet allowedStatus,
+			Set<I_Position> positions, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
 		throw new UnsupportedOperationException();
 	}
 

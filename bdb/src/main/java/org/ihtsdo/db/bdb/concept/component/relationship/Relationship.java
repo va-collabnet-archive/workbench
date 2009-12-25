@@ -3,23 +3,22 @@ package org.ihtsdo.db.bdb.concept.component.relationship;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
@@ -28,7 +27,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Relationship extends ConceptComponent<RelationshipMutablePart> 
-	implements I_RelVersioned<RelationshipMutablePart, RelationshipVersion> {
+	implements I_RelVersioned {
 
 	private static class RelTupleComputer extends
 			VersionComputer<RelationshipVersion, Relationship, RelationshipMutablePart> {
@@ -105,41 +104,8 @@ public class Relationship extends ConceptComponent<RelationshipMutablePart>
 				mutableParts, this);
 	}
 
-	@Override
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<RelationshipVersion> returnRels,
-			boolean addUncommitted) {
-		computer.addTuples(allowedStatus, allowedTypes, 
-				positions, returnRels, 
-				addUncommitted, mutableParts, this);
-	}
-
-	@Override
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<RelationshipVersion> returnRels,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-	    List<RelationshipVersion> tuples = new ArrayList<RelationshipVersion>();
-	    
-	    addTuples(allowedStatus, allowedTypes, positions, tuples, addUncommitted);
-		
-		if (returnConflictResolvedLatestState) {
-		    I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
-			I_ManageConflict conflictResolutionStrategy;
-			if (config == null) {
-				conflictResolutionStrategy = new IdentifyAllConflictStrategy();
-			} else {
-				conflictResolutionStrategy = config.getConflictResolutionStrategy();
-			}
-			
-			tuples = conflictResolutionStrategy.resolveTuples(tuples);
-		}
-		
-		returnRels.addAll(tuples);
-	}
-
 	public void addTuples(I_IntSet allowedTypes, 
-						  List<RelationshipVersion> returnRels,
+						  List<I_RelTuple> returnRels,
 						  boolean addUncommitted, 
 						  boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
@@ -187,8 +153,8 @@ public class Relationship extends ConceptComponent<RelationshipMutablePart>
 	}
 
 	@Override
-	public List<RelationshipVersion> getTuples() {
-		List<RelationshipVersion> tuples = new ArrayList<RelationshipVersion>();
+	public List<I_RelTuple> getTuples() {
+		List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
 		for (RelationshipMutablePart p: mutableParts) {
 			tuples.add(new RelationshipVersion(this, p));
 		}
@@ -196,9 +162,9 @@ public class Relationship extends ConceptComponent<RelationshipMutablePart>
 	}
 
 	@Override
-	public List<RelationshipVersion> getTuples(boolean returnConflictResolvedLatestState)
+	public List<I_RelTuple> getTuples(boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<RelationshipVersion> tuples = new ArrayList<RelationshipVersion>();
+		List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
 		for (RelationshipMutablePart p : getVersions(returnConflictResolvedLatestState)) {
 			tuples.add(new RelationshipVersion(this, p));
 		}
@@ -227,21 +193,6 @@ public class Relationship extends ConceptComponent<RelationshipMutablePart>
 		return universal;
 	}
 	
-
-	@Override
-	public List<RelationshipMutablePart> getVersions(
-			boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		List<RelationshipMutablePart> returnList = mutableParts; 
-		  
-		if (returnConflictResolvedLatestState) {
-			I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
-			returnList = config.getConflictResolutionStrategy().resolveParts(returnList);
-		}
-   
-		return returnList;
-	}
-
 	@Override
 	public boolean removeRedundantRecs() {
 		throw new UnsupportedOperationException();
@@ -273,5 +224,28 @@ public class Relationship extends ConceptComponent<RelationshipMutablePart>
 			}
 		}
 		return promotedAnything;
+	}
+
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions, List<I_RelTuple> returnRels,
+			boolean addUncommitted) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			Set<I_Position> positions, List<I_RelTuple> returnRels,
+			boolean addUncommitted, boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public boolean addVersionNoRedundancyCheck(I_RelPart rel) {
+		throw new UnsupportedOperationException();
 	}
 }

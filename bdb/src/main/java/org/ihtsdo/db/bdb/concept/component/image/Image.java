@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_MapNativeToNative;
@@ -25,7 +26,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Image extends ConceptComponent<ImageMutablePart> implements
-		I_ImageVersioned<ImageMutablePart, ImageVersion> {
+		I_ImageVersioned {
 
 	private static class ImageTupleComputer extends
 			VersionComputer<ImageVersion, Image, ImageMutablePart> {
@@ -129,8 +130,8 @@ public class Image extends ConceptComponent<ImageMutablePart> implements
 	 * 
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getTuples()
 	 */
-	public List<ImageVersion> getTuples() {
-		List<ImageVersion> tuples = new ArrayList<ImageVersion>();
+	public List<I_ImageTuple> getTuples() {
+		List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
 		for (ImageMutablePart p : getVersions()) {
 			tuples.add(new ImageVersion(this, p));
 		}
@@ -148,9 +149,12 @@ public class Image extends ConceptComponent<ImageMutablePart> implements
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<ImageVersion> matchingTuples) {
+			PositionSetReadOnly positions, List<I_ImageTuple> matchingTuples) {
+		throw new UnsupportedOperationException();
+		/*
 		computer.addTuples(allowedStatus, allowedTypes, positions, 
 				matchingTuples, true, mutableParts, this);
+				*/
 	}
 
 	private static Collection<UUID> getUids(int id) throws IOException,
@@ -202,7 +206,7 @@ public class Image extends ConceptComponent<ImageMutablePart> implements
 	}
 
 	@Override
-	public boolean merge(I_ImageVersioned<ImageMutablePart, ImageVersion> jarImage) {
+	public boolean merge(I_ImageVersioned jarImage) {
 		throw new UnsupportedOperationException();
 	}
 }

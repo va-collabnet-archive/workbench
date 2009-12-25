@@ -21,15 +21,21 @@ public class ConceptAttributesMutablePart extends MutablePart<ConceptAttributesM
 		super(statusNid, pathNid, time);
 		this.defined = another.defined;
 	}
-	public ConceptAttributesMutablePart(ConceptAttributesMutablePart another) {
-		super(another.statusAtPositionNid, another.getPathId(), another.getTime());
-		this.defined = another.defined;
+
+	public ConceptAttributesMutablePart(I_ConceptAttributePart another) {
+		super(another.getStatusId(), another.getPathId(), another.getTime());
+		this.defined = another.isDefined();
+	}
+
+	public ConceptAttributesMutablePart(int statusNid, int pathNid, long time) {
+		super(statusNid, pathNid, time);
 	}
 
 	public ConceptAttributesMutablePart(TupleInput input) {
 		super(input.readInt());
 		defined = input.readBoolean();
 	}
+
 
 	@Override
 	public ConceptAttributesMutablePart makeAnalog(int statusNid, int pathNid, long time) {
@@ -66,5 +72,4 @@ public class ConceptAttributesMutablePart extends MutablePart<ConceptAttributesM
 		output.writeBoolean(defined);
 	}
 
-	
 }

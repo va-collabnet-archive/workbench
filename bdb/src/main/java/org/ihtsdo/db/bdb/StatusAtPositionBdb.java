@@ -36,7 +36,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	private static HashMap<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries = 
 		new HashMap<UncommittedStatusForPath, Integer>();
 	
-	private AtomicInteger sequence = new AtomicInteger(Integer.MIN_VALUE + 1);
+	private AtomicInteger sequence;
 
 	/**
 	 * TODO future optimization is to use a map that uses an index to the <code>PositionArrays</code>
@@ -134,12 +134,15 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
 
 	protected void init() throws IOException {
+		sequence = new AtomicInteger(Integer.MIN_VALUE + 1);
 		DatabaseEntry theKey = new DatabaseEntry();
 		IntegerBinding.intToEntry(0, theKey);
 		DatabaseEntry theData = new DatabaseEntry();
 		try {
 			if (readOnly.get(null, theKey, theData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				readOnlyArray = positionArrayBinder.entryToObject(theData);
+			} else {
+				readOnlyArray = new PositionArrays();
 			}
 			if (readWrite.get(null, theKey, theData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				readWriteArray = positionArrayBinder.entryToObject(theData);

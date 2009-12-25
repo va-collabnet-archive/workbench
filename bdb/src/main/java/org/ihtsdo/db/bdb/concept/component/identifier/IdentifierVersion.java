@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
-import org.dwfa.ace.api.I_IdVersioned;
 import org.ihtsdo.db.bdb.concept.component.Version;
 import org.ihtsdo.db.bdb.concept.component.identifier.Identifier.VARIABLE_PART_TYPES;
 
@@ -20,7 +19,7 @@ public class IdentifierVersion
 	}
 
 	@Override
-	public I_IdVersioned<IdentifierMutablePart, IdentifierVersion> getIdVersioned() {
+	public Identifier getIdVersioned() {
 		return component;
 	}
 

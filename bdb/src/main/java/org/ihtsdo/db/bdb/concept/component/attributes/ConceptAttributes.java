@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
@@ -32,12 +34,11 @@ import org.ihtsdo.db.util.VersionComputer;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ConceptAttributes extends
-		ConceptComponent<ConceptAttributesMutablePart>
-		implements
-		I_ConceptAttributeVersioned<ConceptAttributesMutablePart, ConceptAttributesVersion> {
+public class ConceptAttributes 
+		extends ConceptComponent<ConceptAttributesMutablePart>
+		implements I_ConceptAttributeVersioned {
 
-	protected ConceptAttributes(int nid, int parts, boolean editable) {
+	public ConceptAttributes(int nid, int parts, boolean editable) {
 		super(nid, parts, editable);
 	}
 
@@ -69,17 +70,6 @@ public class ConceptAttributes extends
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.dwfa.vodb.types.I_ConceptAttributeVersioned#addVersion(org.dwfa.vodb
-	 * .types.ThinConPart)
-	 */
-	public boolean addVersion(ConceptAttributesMutablePart part) {
-		return mutableParts.add(part);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getConId()
 	 */
 	public int getConId() {
@@ -91,8 +81,8 @@ public class ConceptAttributes extends
 	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getTuples()
 	 */
-	public List<ConceptAttributesVersion> getTuples() {
-		List<ConceptAttributesVersion> tuples = new ArrayList<ConceptAttributesVersion>();
+	public List<I_ConceptAttributeTuple> getTuples() {
+		List<I_ConceptAttributeTuple> tuples = new ArrayList<I_ConceptAttributeTuple>();
 		for (ConceptAttributesMutablePart p : mutableParts) {
 			tuples.add(new ConceptAttributesVersion(this, p));
 		}
@@ -295,14 +285,47 @@ public class ConceptAttributes extends
 		return promotedAnything;
 	}
 
+	/*
+	 * Below methods should be considered for deprecation...
+	 */
+
 	@Override
 	public boolean addVersion(I_ConceptAttributePart part) {
-		return mutableParts.add((ConceptAttributesMutablePart) part);
+		return mutableParts.add(new ConceptAttributesMutablePart(part));
 	}
 
 	@Override
-	public boolean merge(
-			I_ConceptAttributeVersioned<ConceptAttributesMutablePart, ConceptAttributesVersion> jarCon) {
+	public boolean merge(I_ConceptAttributeVersioned jarCon) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
+			List<I_ConceptAttributeTuple> returnTuples) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
+			List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
+			List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted,
+			boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<I_ConceptAttributeTuple> getTuples(I_IntSet allowedStatus,
+			Set<I_Position> viewPositionSet) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

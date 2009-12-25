@@ -5,6 +5,8 @@ import java.nio.charset.Charset;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.MutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -47,6 +49,16 @@ public class DescriptionMutablePart extends MutablePart<DescriptionMutablePart>
 		lang = input.readString();
 		initialCaseSignificant = input.readBoolean();
 		typeNid = input.readInt();
+	}
+
+	public DescriptionMutablePart(UniversalAceDescriptionPart umPart) {
+		super(Bdb.uuidsToNid(umPart.getStatusId()),
+				Bdb.uuidsToNid(umPart.getPathId()),
+				umPart.getTime());
+		text = umPart.getText();
+		lang = umPart.getLang();
+		initialCaseSignificant = umPart.getInitialCaseSignificant();
+		typeNid = Bdb.uuidsToNid(umPart.getTypeId());
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.dwfa.cement.PrimordialId;
 import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
 import org.ihtsdo.db.uuidmap.UuidUtil;
 
@@ -12,7 +13,22 @@ public class UuidsToNidMap {
 	UuidToIntHashMap readOnlyUuidsToNidMap = new UuidToIntHashMap();
 	UuidToIntHashMap mutableUuidsToNidMap = new UuidToIntHashMap();
 
-	public int uuidToNidWithGeneration(UUID uuid) throws InterruptedException {
+	protected UuidsToNidMap(int readOnlySize, int mutableSize) {
+		super();
+		readOnlyUuidsToNidMap = new UuidToIntHashMap(readOnlySize);
+		mutableUuidsToNidMap = new UuidToIntHashMap(mutableSize);
+		int max = Integer.MIN_VALUE;
+        for (PrimordialId pid : PrimordialId.values()) {
+            for (UUID uid : pid.getUids()) {
+            	readOnlyUuidsToNidMap.put(UuidUtil.convert(uid), 
+            			pid.getNativeId(Integer.MIN_VALUE));
+             	max = Math.max(max, pid.getNativeId(Integer.MIN_VALUE));
+            }
+        }
+        sequence = new AtomicInteger(max + 1);
+	}
+
+	public int uuidToNidWithGeneration(UUID uuid)  {
 		if (readOnlyUuidsToNidMap.unlockedContainsKey(uuid)) {
 			return readOnlyUuidsToNidMap.unlockedGet(uuid);
 		}
@@ -25,8 +41,7 @@ public class UuidsToNidMap {
 		return newNid;
 	}
 
-	public int uuidsToNidWithGeneration(Collection<UUID> uuids)
-			throws InterruptedException {
+	public int uuidsToNidWithGeneration(Collection<UUID> uuids) {
 		for (UUID uuid : uuids) {
 			if (readOnlyUuidsToNidMap.unlockedContainsKey(uuid)) {
 				return readOnlyUuidsToNidMap.unlockedGet(uuid);
@@ -45,7 +60,7 @@ public class UuidsToNidMap {
 		return newNid;
 	}
 
-	public int uuidToNid(UUID uuid) throws InterruptedException {
+	public int uuidToNid(UUID uuid) {
 		if (readOnlyUuidsToNidMap.unlockedContainsKey(uuid)) {
 			return readOnlyUuidsToNidMap.unlockedGet(uuid);
 		}
@@ -55,8 +70,7 @@ public class UuidsToNidMap {
 		return Integer.MAX_VALUE;
 	}
 
-	public int uuidsToNid(Collection<UUID> uuids)
-			throws InterruptedException {
+	public int uuidsToNid(Collection<UUID> uuids)  {
 		for (UUID uuid : uuids) {
 			if (readOnlyUuidsToNidMap.unlockedContainsKey(uuid)) {
 				return readOnlyUuidsToNidMap.unlockedGet(uuid);

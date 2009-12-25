@@ -15,7 +15,8 @@ public abstract class ComponentBdb {
 
 	public ComponentBdb(Bdb readOnlyBdbEnv, Bdb readWriteBdbEnv)
 			throws IOException {
-		readOnly = Bdb.setupDatabase(true, getDbName(), readOnlyBdbEnv);
+		readOnly = Bdb.setupDatabase(readOnlyBdbEnv.bdbEnv.getConfig().getReadOnly(), 
+				getDbName(), readOnlyBdbEnv);
 		readWrite = Bdb.setupDatabase(false, getDbName(), readWriteBdbEnv);
 		init();
 	}
