@@ -29,7 +29,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
 
     public boolean addVersion(I_DescriptionPart newPart);
 
-    public List<I_DescriptionPart> getVersions();
+    public List<? extends I_DescriptionPart> getVersions();
 
     /**
      * @param returnConflictResolvedLatestState
@@ -38,7 +38,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
      * @throws TerminologyException
      * @throws IOException
      */
-    public List<I_DescriptionPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException,
+    public List<? extends I_DescriptionPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException,
             IOException;
 
     public int versionCount();
