@@ -32,13 +32,13 @@ public class UniversalAceDescription implements Serializable {
 
     private Collection<UUID> conceptId;
 
-    private List<UniversalAceDescriptionPart> versions;
+    private List<UniversalAceDescriptionPart> mutableParts;
 
     public UniversalAceDescription(Collection<UUID> descId, Collection<UUID> conceptId, int count) {
         super();
         this.descId = descId;
         this.conceptId = conceptId;
-        this.versions = new ArrayList<UniversalAceDescriptionPart>(count);
+        this.mutableParts = new ArrayList<UniversalAceDescriptionPart>(count);
     }
 
     // START: ADDED TO IMPLEMENT JAVABEANS SPEC
@@ -99,7 +99,7 @@ public class UniversalAceDescription implements Serializable {
      * @deprecated
      */
     public void setVersions(List<UniversalAceDescriptionPart> versions) {
-        this.versions = versions;
+        this.mutableParts = versions;
     }
 
     // END: ADDED TO IMPLEMENT JAVABEANS SPEC
@@ -112,11 +112,11 @@ public class UniversalAceDescription implements Serializable {
      * .I_DescriptionPart)
      */
     public boolean addVersion(UniversalAceDescriptionPart newPart) {
-        int index = versions.size() - 1;
+        int index = mutableParts.size() - 1;
         if (index == -1) {
-            return versions.add(newPart);
+            return mutableParts.add(newPart);
         } else if (index >= 0) {
-            return versions.add(newPart);
+            return mutableParts.add(newPart);
         }
         return false;
     }
@@ -127,7 +127,7 @@ public class UniversalAceDescription implements Serializable {
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#getVersions()
      */
     public List<UniversalAceDescriptionPart> getVersions() {
-        return versions;
+        return mutableParts;
     }
 
     /*
@@ -136,7 +136,7 @@ public class UniversalAceDescription implements Serializable {
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#versionCount()
      */
     public int versionCount() {
-        return versions.size();
+        return mutableParts.size();
     }
 
     /*
@@ -166,7 +166,7 @@ public class UniversalAceDescription implements Serializable {
         buff.append(" conId:");
         buff.append(conceptId);
         buff.append("\n");
-        for (UniversalAceDescriptionPart part : versions) {
+        for (UniversalAceDescriptionPart part : mutableParts) {
             buff.append("     ");
             buff.append(part.toString());
             buff.append("\n");
@@ -174,5 +174,9 @@ public class UniversalAceDescription implements Serializable {
 
         return buff.toString();
     }
+
+	public List<UniversalAceDescriptionPart> getMutableParts() {
+		return mutableParts;
+	}
 
 }

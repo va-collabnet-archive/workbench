@@ -533,7 +533,7 @@ public class SnoTable {
 
         try {
             I_ConceptAttributeVersioned cv = cBean.getConceptAttributes();
-            List<I_ConceptAttributePart> cvList = cv.getVersions();
+            List<? extends I_ConceptAttributePart> cvList = cv.getVersions();
             I_ConceptAttributePart cp1 = null;
             for (I_Position pos : posList) {
                 int tmpCountDupl = 0;

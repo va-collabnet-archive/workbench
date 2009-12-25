@@ -28,7 +28,7 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
 
     public boolean addVersion(I_ConceptAttributePart part);
 
-    public List<I_ConceptAttributePart> getVersions();
+    public List<? extends I_ConceptAttributePart> getVersions();
 
     public int versionCount();
 
