@@ -145,7 +145,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
 
         List<I_ImageTuple> matchingTuples = new ArrayList<I_ImageTuple>();
 
-        image.addTuples(config.getAllowedStatus(), null, config.getViewPositionSet(), matchingTuples);
+        image.addTuples(config.getAllowedStatus(), null, config.getViewPositionSetReadOnly(), matchingTuples);
 
         return doesConflictExist(matchingTuples);
     }

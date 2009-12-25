@@ -125,7 +125,7 @@ public class ImagePopupListener extends MouseAdapter {
 
                     model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
                     model.referencedConcepts.put(newPart.getTypeId(), ConceptBean.get(newPart.getTypeId()));
-                    selectedObject.getTuple().getVersioned().getVersions().add(newPart);
+                    selectedObject.getTuple().getVersioned().addVersion(newPart);
                 }
                 ACE.addUncommitted(sourceBean);
                 model.allImageTuples = null;
