@@ -67,7 +67,7 @@ public class DescPopupListener extends MouseAdapter {
                 I_DescriptionPart newPart = selectedObject.getTuple().duplicate();
                 newPart.setPathId(p.getConceptId());
                 newPart.setVersion(Integer.MAX_VALUE);
-                selectedObject.getTuple().getDescVersioned().getVersions().add(newPart);
+                selectedObject.getTuple().getDescVersioned().addVersion(newPart);
             }
             ACE.addUncommitted(sourceBean);
             model.allTuples = null;
@@ -110,7 +110,7 @@ public class DescPopupListener extends MouseAdapter {
                     I_DescriptionPart newPart = selectedObject.getTuple().getPart();
                     if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
                         newPart = selectedObject.getTuple().duplicate();
-                        selectedObject.getTuple().getDescVersioned().getVersions().add(newPart);
+                        selectedObject.getTuple().getDescVersioned().addVersion(newPart);
                     }
                     newPart.setPathId(p.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);
