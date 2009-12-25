@@ -1579,7 +1579,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         // FIND MOST RECENT VERSION OF THIS ICD9 MAPPING
         int lastVersion = Integer.MIN_VALUE;
         I_DescriptionPart lastPart = null;
-        List<I_DescriptionPart> partsList = desc.getVersions();
+        List<? extends I_DescriptionPart> partsList = desc.getVersions();
         for (I_DescriptionPart part : partsList) {
             if (isOnAPath(part.getPathId(), part.getVersion())) {
                 if (part.getVersion() > lastVersion) {
