@@ -111,7 +111,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         }
 
         // GET LATEST CONCEPT PART
-        List<I_ConceptAttributePart> cParts;
+        List<? extends I_ConceptAttributePart> cParts;
         cParts = concept.getConceptAttributes().getVersions();
         I_ConceptAttributePart cPart1 = null;
         for (I_Position pos : fromPathPos) { // FOR PATHS_IN_PRIORITY_ORDER

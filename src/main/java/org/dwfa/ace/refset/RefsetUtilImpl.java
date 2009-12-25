@@ -35,7 +35,7 @@ import org.dwfa.tapi.TerminologyException;
 public final class RefsetUtilImpl implements RefsetUtil {
 
     public I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData refsetConcept) throws IOException {
-        List<I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getVersions();
+        List<? extends I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getVersions();
         I_ConceptAttributePart latestAttributePart = null;
         for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
             if (latestAttributePart == null || attributePart.getVersion() >= latestAttributePart.getVersion()) {
