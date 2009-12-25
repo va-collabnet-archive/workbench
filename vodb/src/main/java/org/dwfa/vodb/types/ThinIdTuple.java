@@ -74,7 +74,7 @@ public class ThinIdTuple implements I_IdTuple {
      * 
      * @see org.dwfa.vodb.types.I_IdTuple#getVersions()
      */
-    public List<I_IdPart> getVersions() {
+    public List<? extends I_IdPart> getVersions() {
         return core.getVersions();
     }
 

@@ -1445,7 +1445,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                     }
                 }
                 idv.getVersions().removeAll(partsToRemove);
-                idv.getVersions().addAll(partsToAdd);
+                for (I_IdPart part: partsToAdd) {
+                    idv.addVersion(part);
+                }
                 identifierDb.writeId(idv);
                 if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                     AceLog.getEditLog().fine("Committing: " + idv);

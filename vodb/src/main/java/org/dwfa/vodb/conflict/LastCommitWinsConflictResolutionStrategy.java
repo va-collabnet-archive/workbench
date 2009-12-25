@@ -175,7 +175,6 @@ public class LastCommitWinsConflictResolutionStrategy extends ConflictManagement
         return getLatestTuples(tuples);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends I_AmPart> List<T> resolveParts(List<T> parts) {
         if (parts == null || parts.size() == 0) {
             return parts;

@@ -767,7 +767,9 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                     }
                 }
                 idv.getVersions().removeAll(partsToRemove);
-                idv.getVersions().addAll(partsToAdd);
+                for (I_IdPart part: partsToAdd) {
+                	idv.addVersion(part);
+                }
                 this.writeId(idv);
                 if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                     AceLog.getEditLog().fine("Committing: " + idv);
