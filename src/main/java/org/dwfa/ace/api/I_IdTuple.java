@@ -22,26 +22,26 @@ import java.util.UUID;
 
 public interface I_IdTuple extends I_AmTuple {
 
-    public abstract int getNativeId();
+    public int getNativeId();
 
-    public abstract Set<TimePathId> getTimePathSet();
+    public Set<TimePathId> getTimePathSet();
 
-    public abstract List<UUID> getUIDs();
+    public List<UUID> getUIDs();
 
-    public abstract List<I_IdPart> getVersions();
+    public List<? extends I_IdPart> getVersions();
 
-    public abstract boolean hasVersion(I_IdPart newPart);
+    public boolean hasVersion(I_IdPart newPart);
 
-    public abstract void setNativeId(int nativeId);
+    public void setNativeId(int nativeId);
 
-    public abstract int getSource();
+    public int getSource();
 
-    public abstract Object getSourceId();
+    public Object getSourceId();
 
-    public abstract I_IdVersioned getIdVersioned();
+    public I_IdVersioned getIdVersioned();
 
     public I_IdPart duplicate();
 
-    public abstract I_IdPart getPart();
+    public I_IdPart getPart();
 
 }
