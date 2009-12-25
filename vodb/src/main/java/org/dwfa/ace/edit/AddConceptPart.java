@@ -41,7 +41,7 @@ public class AddConceptPart extends AddComponent {
             part.setPathId(p.getConceptId());
             part.setDefined(false);
             part.setConceptStatus(config.getDefaultStatus().getConceptId());
-            cb.getConceptAttributes().getVersions().add(part);
+            cb.getConceptAttributes().addVersion(part);
         }
         ACE.addUncommitted(cb);
         termContainer.setTermComponent(cb);
