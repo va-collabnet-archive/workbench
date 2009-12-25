@@ -563,7 +563,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             }
         }
         I_DescriptionVersioned tdv = localDesc.get(0);
-        List<I_DescriptionPart> versions = tdv.getVersions();
+        List<? extends I_DescriptionPart> versions = tdv.getVersions();
         I_DescriptionPart first = versions.get(0);
         return first.getText();
     }
@@ -789,7 +789,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             }
             if (descriptions != null) {
                 for (I_DescriptionVersioned desc : descriptions) {
-                    for (ListIterator<I_DescriptionPart> partItr = desc.getVersions().listIterator(); partItr.hasNext();) {
+                    for (ListIterator<? extends I_DescriptionPart> partItr = desc.getVersions().listIterator(); partItr.hasNext();) {
                         I_DescriptionPart part = partItr.next();
                         if (part.getVersion() == Integer.MAX_VALUE) {
                             partItr.remove();
