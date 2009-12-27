@@ -182,9 +182,9 @@ public class RelTupleFileUtil {
             }
 
             I_IntSet allowedStatus = termFactory.newIntSet();
-            allowedStatus.add(termFactory.getId(statusUuid).getNativeId());
+            allowedStatus.add(termFactory.getId(statusUuid).getNid());
             I_IntSet allowedTypes = termFactory.newIntSet();
-            allowedTypes.add(termFactory.getId(relTypeUuid).getNativeId());
+            allowedTypes.add(termFactory.getId(relTypeUuid).getNid());
 
             I_GetConceptData concept = termFactory.getConcept(new UUID[] { c1Uuid });
             // Set<I_Position> positions =
@@ -215,12 +215,12 @@ public class RelTupleFileUtil {
                     termFactory.getConcept(new UUID[] { statusUuid }), group, termFactory.getActiveAceFrameConfig());
 
                 I_RelPart newPart = v.getLastTuple().getPart();
-                newPart.setCharacteristicId(termFactory.getId(charUuid).getNativeId());
+                newPart.setCharacteristicId(termFactory.getId(charUuid).getNid());
                 newPart.setGroup(group);
-                newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
-                newPart.setRefinabilityId(termFactory.getId(refUuid).getNativeId());
-                newPart.setTypeId(termFactory.getId(relTypeUuid).getNativeId());
-                newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
+                newPart.setPathId(termFactory.getId(pathUuid).getNid());
+                newPart.setRefinabilityId(termFactory.getId(refUuid).getNid());
+                newPart.setTypeId(termFactory.getId(relTypeUuid).getNid());
+                newPart.setStatusId(termFactory.getId(statusUuid).getNid());
                 newPart.setVersion(effectiveDate);
 
                 v.addVersion(newPart);
@@ -228,12 +228,12 @@ public class RelTupleFileUtil {
             } else {
 
                 I_RelPart newPart = latestTuple.getPart().duplicate();
-                newPart.setCharacteristicId(termFactory.getId(charUuid).getNativeId());
+                newPart.setCharacteristicId(termFactory.getId(charUuid).getNid());
                 newPart.setGroup(group);
-                newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
-                newPart.setRefinabilityId(termFactory.getId(refUuid).getNativeId());
-                newPart.setTypeId(termFactory.getId(relTypeUuid).getNativeId());
-                newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
+                newPart.setPathId(termFactory.getId(pathUuid).getNid());
+                newPart.setRefinabilityId(termFactory.getId(refUuid).getNid());
+                newPart.setTypeId(termFactory.getId(relTypeUuid).getNid());
+                newPart.setStatusId(termFactory.getId(statusUuid).getNid());
                 newPart.setVersion(effectiveDate);
 
                 latestTuple.getRelVersioned().addVersion(newPart);

@@ -248,7 +248,7 @@ public class RefsetHelper extends LineageHelper {
 
         int newMemberId;
         if (memberUuid != null && termFactory.hasId(memberUuid)) {
-            newMemberId = termFactory.getId(memberUuid).getNativeId();
+            newMemberId = termFactory.getId(memberUuid).getNid();
         } else {
             newMemberId = termFactory.uuidToNativeWithGeneration((memberUuid == null) ? UUID.randomUUID() : memberUuid,
                 unspecifiedUuid, Arrays.asList(path), effectiveTime);

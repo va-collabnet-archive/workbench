@@ -142,8 +142,8 @@ public class IntExtTupleFileUtil {
             }
 
             try {
-                refsetHelper.newIntRefsetExtension(termFactory.getId(refsetUuid).getNativeId(), termFactory.getId(
-                    componentUuid).getNativeId(), value, memberUuid, pathUuid, statusUuid, effectiveDate);
+                refsetHelper.newIntRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory.getId(
+                    componentUuid).getNid(), value, memberUuid, pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Exception thrown while creating new int refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");

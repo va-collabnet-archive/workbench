@@ -238,7 +238,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         I_IdVersioned idVersioned = termFactory.getId(componentId);
         int snomedIntegerId = termFactory.getId(
-            ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNativeId();
+            ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNid();
 
         List<? extends I_IdPart> parts = idVersioned.getVersions();
         I_IdPart latestPart = null;

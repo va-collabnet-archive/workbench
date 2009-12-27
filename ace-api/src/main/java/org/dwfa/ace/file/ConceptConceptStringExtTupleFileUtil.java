@@ -170,9 +170,9 @@ public class ConceptConceptStringExtTupleFileUtil {
             }
 
             try {
-                refsetHelper.newConceptConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNativeId(),
-                    termFactory.getId(componentUuid).getNativeId(), termFactory.getId(c1Uuid).getNativeId(),
-                    termFactory.getId(c2Uuid).getNativeId(), strValue, memberUuid, pathUuid, statusUuid, effectiveDate);
+                refsetHelper.newConceptConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNid(),
+                    termFactory.getId(componentUuid).getNid(), termFactory.getId(c1Uuid).getNid(),
+                    termFactory.getId(c2Uuid).getNid(), strValue, memberUuid, pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Exception thrown while creating new concept-concept-string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
