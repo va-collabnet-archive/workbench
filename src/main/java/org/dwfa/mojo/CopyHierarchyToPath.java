@@ -31,8 +31,8 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdTuple;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_IdVersion;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
@@ -345,15 +345,15 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
         getLog().info("concept refset part copied " + t);
     }
 
-    public void processId(I_IdVersioned idVersioned) throws Exception {
+    public void processId(I_Identify idVersioned) throws Exception {
 
         if (++idCount % 1000 == 0) {
             getLog().info("processed id " + idCount);
         }
 
         boolean datachanged = false;
-        I_IdTuple latestPart = null;
-        for (I_IdTuple t : idVersioned.getTuples()) {
+        I_IdVersion latestPart = null;
+        for (I_IdVersion t : idVersioned.getIdVersions()) {
             if (latestStateOnly) {
                 if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
                     latestPart = t;
@@ -374,10 +374,10 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
         }
     }
 
-    private void duplicateIdTuple(I_IdTuple t) {
+    private void duplicateIdTuple(I_IdVersion t) {
         I_IdPart newPart = t.duplicate();
         newPart.setPathId(toPathId);
-        t.getIdVersioned().addVersion(newPart);
+        t.getIdentifier().addMutableIdPart(newPart);
 
         getLog().info("concept id part copied " + t);
     }

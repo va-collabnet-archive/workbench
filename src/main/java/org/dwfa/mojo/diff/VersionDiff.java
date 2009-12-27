@@ -802,7 +802,7 @@ public class VersionDiff extends AbstractMojo {
         I_TermFactory tf = LocalVersionedTerminology.get();
         I_ConceptAttributePart a1 = null;
         I_ConceptAttributePart a2 = null;
-        for (I_ConceptAttributePart a : c.getConceptAttributes().getVersions()) {
+        for (I_ConceptAttributePart a : c.getConceptAttributes().getMutableIdParts()) {
             // Must be on the path
             if (a.getPathId() != path.getConceptId())
                 continue;
@@ -847,7 +847,7 @@ public class VersionDiff extends AbstractMojo {
             descriptions++;
             I_DescriptionPart d1 = null;
             I_DescriptionPart d2 = null;
-            for (I_DescriptionPart dd : d.getVersions()) {
+            for (I_DescriptionPart dd : d.getMutableIdParts()) {
                 if (dd.getPathId() != path.getConceptId())
                     continue;
                 // Find the greatest version <= the one of interest
@@ -947,7 +947,7 @@ public class VersionDiff extends AbstractMojo {
             relationships++;
             I_RelPart r1 = null;
             I_RelPart r2 = null;
-            for (I_RelPart dd : d.getVersions()) {
+            for (I_RelPart dd : d.getMutableIdParts()) {
                 if (dd.getPathId() != path.getConceptId())
                     continue;
                 // Find the greatest version <= the one of interest
@@ -1218,7 +1218,7 @@ public class VersionDiff extends AbstractMojo {
 
             I_ConceptAttributePart a1 = null;
             I_ConceptAttributePart a2 = null;
-            for (I_ConceptAttributePart a : c.getConceptAttributes().getVersions()) {
+            for (I_ConceptAttributePart a : c.getConceptAttributes().getMutableIdParts()) {
                 // Must be on the path
                 if (a.getPathId() != path.getConceptId())
                     continue;
@@ -1274,7 +1274,7 @@ public class VersionDiff extends AbstractMojo {
             if (diffs % 1000 == 0)
                 getLog().info("diffs " + diffs);
             I_GetConceptData mem_con = tf.getConcept(mem.getComponentId());
-            I_ThinExtByRefPart p = mem.getVersions().get(0);
+            I_ThinExtByRefPart p = mem.getMutableIdParts().get(0);
             if (p instanceof I_ThinExtByRefPartConceptConceptString) {
                 I_ThinExtByRefPartConceptConceptString pccs = (I_ThinExtByRefPartConceptConceptString) p;
                 if (description_changes.contains(pccs.getC2id())) {
@@ -1299,7 +1299,7 @@ public class VersionDiff extends AbstractMojo {
                 if (diffs % 1000 == 0)
                     getLog().info(rs.getInitialText() + " diffs " + diffs);
                 I_GetConceptData mem_con = tf.getConcept(mem.getComponentId());
-                I_ThinExtByRefPart p = mem.getVersions().get(0);
+                I_ThinExtByRefPart p = mem.getMutableIdParts().get(0);
                 if (p instanceof I_ThinExtByRefPartConcept) {
                     I_ThinExtByRefPartConcept pccs = (I_ThinExtByRefPartConcept) p;
                     out.println(rs.getInitialText() + "\t" + "MEMBER" + "\t"
@@ -1403,12 +1403,12 @@ public class VersionDiff extends AbstractMojo {
         I_GetConceptData c = tf.getConcept(SNOMED.Concept.ROOT.getUids());
         getLog().info(c.getInitialText());
         I_ConceptAttributeVersioned cv = c.getConceptAttributes();
-        for (I_ConceptAttributePart cvp : cv.getVersions()) {
+        for (I_ConceptAttributePart cvp : cv.getMutableIdParts()) {
             getLog().info("Attr: " + cvp.getVersion());
         }
         I_GetConceptData syn_type = tf.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
         for (I_DescriptionVersioned cd : c.getDescriptions()) {
-            for (I_DescriptionPart cvp : cd.getVersions()) {
+            for (I_DescriptionPart cvp : cd.getMutableIdParts()) {
                 if (cvp.getTypeId() == syn_type.getConceptId() && cvp.getText().contains("version")) {
                     getLog().info("Version: " + cvp.getText());
                     getLog().info("         " + cvp.getVersion());
@@ -1443,7 +1443,7 @@ public class VersionDiff extends AbstractMojo {
         I_GetConceptData c = tf.getConcept(concept_id);
         for (I_RelVersioned d : c.getDestRels()) {
             I_RelPart dm = null;
-            for (I_RelPart dd : d.getVersions()) {
+            for (I_RelPart dd : d.getMutableIdParts()) {
                 if (dd.getPathId() != path.getConceptId())
                     continue;
                 if (dd.getTypeId() != tf.getConcept(SNOMED.Concept.IS_A.getUids()).getConceptId())
@@ -1465,7 +1465,7 @@ public class VersionDiff extends AbstractMojo {
         for (I_RelVersioned d : c.getDestRels()) {
             I_RelPart d1 = null;
             I_RelPart d2 = null;
-            for (I_RelPart dd : d.getVersions()) {
+            for (I_RelPart dd : d.getMutableIdParts()) {
                 if (dd.getPathId() != path.getConceptId())
                     continue;
                 if (dd.getTypeId() != tf.getConcept(SNOMED.Concept.IS_A.getUids()).getConceptId())

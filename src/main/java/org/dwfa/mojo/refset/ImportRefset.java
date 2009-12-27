@@ -85,10 +85,10 @@ public class ImportRefset extends ImportFromFile {
                     // we have already encountered
 
                     I_ThinExtByRefVersioned existingExt = extensions.get(memberId);
-                    I_ThinExtByRefPart extPart = existingExt.getVersions().get(0);
-                    I_ThinExtByRefPart newPart = extension.getVersions().get(0);
+                    I_ThinExtByRefPart extPart = existingExt.getMutableIdParts().get(0);
+                    I_ThinExtByRefPart newPart = extension.getMutableIdParts().get(0);
                     if (extPart.getVersion() <= newPart.getVersion()) {
-                        existingExt.getVersions().clear();
+                        existingExt.getMutableIdParts().clear();
                         existingExt.addVersion(newPart);
                     }
 
@@ -108,8 +108,8 @@ public class ImportRefset extends ImportFromFile {
                 // Modify the version part (there should be only one) and set it
                 // back anew
 
-                I_ThinExtByRefPart extPart = extension.getVersions().get(0);
-                extension.getVersions().remove(0);
+                I_ThinExtByRefPart extPart = extension.getMutableIdParts().get(0);
+                extension.getMutableIdParts().remove(0);
                 extPart.setVersion(Integer.MAX_VALUE); // uncommitted
 
                 if (destination != null) {

@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessIds;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -48,10 +48,10 @@ public class IdIterator implements I_ProcessIds {
         snomedIdUuids = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids();
     }
 
-    public void processId(I_IdVersioned idv) throws Exception {
+    public void processId(I_Identify idv) throws Exception {
 
-        for (UUID uuid : idv.getUIDs()) {
-            for (I_IdPart idvPart : idv.getVersions()) {
+        for (UUID uuid : idv.getUUIDs()) {
+            for (I_IdPart idvPart : idv.getMutableIdParts()) {
 
                 Date date = new Date(ThinVersionHelper.convert(idvPart.getVersion()));
 
@@ -71,10 +71,10 @@ public class IdIterator implements I_ProcessIds {
 
                     output.newLine();
                 } else {
-                    System.out.println("WARNING: id " + idv.getUIDs() + " has source id " + idvPart.getSourceId()
+                    System.out.println("WARNING: id " + idv.getUUIDs() + " has source id " + idvPart.getSourceId()
                         + " but the source " + idvPart.getSource() + " does not map to a source concept - skipping");
                     try {
-                        System.out.println("the uuids do map to a concept - " + termFactory.getConcept(idv.getUIDs()));
+                        System.out.println("the uuids do map to a concept - " + termFactory.getConcept(idv.getUUIDs()));
                     } catch (Exception e) {
                         System.out.println("the uuids do not map to a concept");
                         e.printStackTrace();

@@ -68,7 +68,7 @@ public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
     private void processExtension(final I_ThinExtByRefVersioned member) throws Exception {
         // sort by version, smallest to largest.
         SortedSet<I_ThinExtByRefPart> sortedVersions = new TreeSet<I_ThinExtByRefPart>(new LatestVersionComparator());
-        sortedVersions.addAll(member.getVersions());
+        sortedVersions.addAll(member.getMutableIdParts());
 
         // Get the latest version.
         I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) sortedVersions.last().duplicate();
