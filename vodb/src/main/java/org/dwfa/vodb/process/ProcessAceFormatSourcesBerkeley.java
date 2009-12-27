@@ -189,7 +189,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
                 return nid;
             }
             if (vodb.hasId(uids)) {
-                nid = vodb.getId(uids).getNativeId();
+                nid = vodb.getId(uids).getNid();
                 idsFromCollection.put(uids, nid);
                 return nid;
             }
@@ -217,7 +217,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
                 return nid;
             }
             if (vodb.hasId(uid)) {
-                nid = vodb.getId(uid).getNativeId();
+                nid = vodb.getId(uid).getNid();
                 ids.put(uid, nid);
                 return nid;
             }

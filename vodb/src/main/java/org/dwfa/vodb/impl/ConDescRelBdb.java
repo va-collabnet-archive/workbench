@@ -1429,7 +1429,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                         }
                         values.add(new TimePathId(version, p.getPathId()));
                         for (I_DescriptionVersioned desc : bean.getDescriptions()) {
-                            if (desc.getDescId() == idv.getNativeId()) {
+                            if (desc.getDescId() == idv.getNid()) {
                                 Document doc = new Document();
                                 doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES,
                                     Field.Index.UN_TOKENIZED));
