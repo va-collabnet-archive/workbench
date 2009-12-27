@@ -62,7 +62,7 @@ public abstract class RefsetUtilities {
         System.out.println("getInclusionTypeForRefset " + part);
         int typeId = ID_NOT_FOUND;
         I_ThinExtByRefPart latest = null;
-        List<? extends I_ThinExtByRefPart> versions = part.getVersions();
+        List<? extends I_ThinExtByRefPart> versions = part.getMutableIdParts();
         for (I_ThinExtByRefPart version : versions) {
 
             if (latest == null) {
@@ -328,7 +328,7 @@ public abstract class RefsetUtilities {
 
     public I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned ext) {
         I_ThinExtByRefPart latest = null;
-        List<? extends I_ThinExtByRefPart> versions = ext.getVersions();
+        List<? extends I_ThinExtByRefPart> versions = ext.getMutableIdParts();
         for (I_ThinExtByRefPart version : versions) {
 
             if (latest == null) {
@@ -451,12 +451,12 @@ public abstract class RefsetUtilities {
 
         if (membershipTypes.size() == 0) {
             throw new TerminologyException("A source relationship of type '" + relType.getDescription()
-                + "' was not found for concept " + concept.getId().getUIDs().iterator().next());
+                + "' was not found for concept " + concept.getId().getUUIDs().iterator().next());
         }
 
         if (membershipTypes.size() > 1) {
             throw new TerminologyException("More than one source relationship of type '" + relType.getDescription()
-                + "' was found for concept " + concept.getId().getUIDs().iterator().next());
+                + "' was found for concept " + concept.getId().getUUIDs().iterator().next());
         }
 
         return membershipTypes.iterator().next().getConceptId();

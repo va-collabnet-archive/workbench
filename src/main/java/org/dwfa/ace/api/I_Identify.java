@@ -16,30 +16,30 @@
  */
 package org.dwfa.ace.api;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public interface I_IdTuple extends I_AmTuple {
+import org.dwfa.ace.utypes.UniversalAceIdentification;
+import org.dwfa.tapi.TerminologyException;
+
+public interface I_Identify extends I_AmTermComponent {
 
     public int getNid();
 
+    public List<? extends I_IdPart> getMutableIdParts();
+
+    public List<UUID> getUUIDs();
+
+    public boolean addMutableIdPart(I_IdPart srcId);
+
+    public boolean hasMutableIdPart(I_IdPart newPart);
+
     public Set<TimePathId> getTimePathSet();
 
-    public List<UUID> getUIDs();
+    public List<? extends I_IdVersion> getIdVersions();
 
-    public List<? extends I_IdPart> getVersions();
-
-    public boolean hasVersion(I_IdPart newPart);
-
-    public int getSource();
-
-    public Object getSourceId();
-
-    public I_IdVersioned getIdVersioned();
-
-    public I_IdPart duplicate();
-
-    public I_IdPart getPart();
+    public UniversalAceIdentification getUniversalId() throws IOException, TerminologyException;
 
 }

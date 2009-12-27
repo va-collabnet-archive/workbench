@@ -409,7 +409,7 @@ public class SnoTable {
                 for (I_Position pos : posList) { // FOR EACH PATH POSITION
                     // FIND MOST CURRENT
                     int tmpCountDupl = 0;
-                    for (I_RelPart rp : rel.getVersions()) {
+                    for (I_RelPart rp : rel.getMutableIdParts()) {
                         if (rp.getPathId() == pos.getPath().getConceptId()) {
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART
@@ -533,7 +533,7 @@ public class SnoTable {
 
         try {
             I_ConceptAttributeVersioned cv = cBean.getConceptAttributes();
-            List<? extends I_ConceptAttributePart> cvList = cv.getVersions();
+            List<? extends I_ConceptAttributePart> cvList = cv.getMutableIdParts();
             I_ConceptAttributePart cp1 = null;
             for (I_Position pos : posList) {
                 int tmpCountDupl = 0;
@@ -602,7 +602,7 @@ public class SnoTable {
                 for (I_Position pos : posList) { // FOR EACH PATH POSITION
                     // FIND MOST CURRENT
                     int tmpCountDupl = 0;
-                    for (I_RelPart rp : rel.getVersions()) {
+                    for (I_RelPart rp : rel.getMutableIdParts()) {
                         if (rp.getPathId() == pos.getPath().getConceptId()) {
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART

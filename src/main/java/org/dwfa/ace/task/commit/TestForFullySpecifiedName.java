@@ -108,7 +108,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
         I_IntSet actives = getActiveStatus(termFactory);
         HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
         for (I_DescriptionVersioned desc : descriptions) {
-            for (I_DescriptionPart part : desc.getVersions()) {
+            for (I_DescriptionPart part : desc.getMutableIdParts()) {
                 if (!actives.contains(part.getStatusId()))
                     continue;
                 if (part.getTypeId() == fsn_type.getConceptId()) {
@@ -147,7 +147,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                         if (cnid == concept.getConceptId())
                             continue;
                         I_DescriptionVersioned potential_fsn = termFactory.getDescription(dnid, cnid);
-                        for (I_DescriptionPart part_search : potential_fsn.getVersions()) {
+                        for (I_DescriptionPart part_search : potential_fsn.getMutableIdParts()) {
                             // System.out.println("Hit: "
                             // + part_search.getVersion() + "\t"
                             // + part_search.getText());

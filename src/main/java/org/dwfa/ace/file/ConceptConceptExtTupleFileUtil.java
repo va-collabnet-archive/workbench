@@ -47,7 +47,7 @@ public class ConceptConceptExtTupleFileUtil {
                 throw new TerminologyException("Non concept-concept ext tuple passed to concept-concept file util.");
             }
 
-            I_ThinExtByRefPartConceptConcept part = (I_ThinExtByRefPartConceptConcept) tuple.getPart();
+            I_ThinExtByRefPartConceptConcept part = (I_ThinExtByRefPartConceptConcept) tuple.getMutableIdPart();
             UUID c1Uuid = termFactory.getUids(part.getC1id()).iterator().next();
             UUID c2Uuid = termFactory.getUids(part.getC2id()).iterator().next();
 

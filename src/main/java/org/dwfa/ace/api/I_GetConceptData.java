@@ -527,7 +527,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
     public List<I_ImageVersioned> getUncommittedImages();
 
-    public I_IdVersioned getId() throws IOException;
+    public I_Identify getId() throws IOException;
 
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus,
             PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException;
@@ -568,6 +568,6 @@ public interface I_GetConceptData extends I_AmTermComponent {
      */
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException;
 
-    public List<I_IdVersioned> getUncommittedIdVersioned();
+    public List<I_Identify> getUncommittedIdVersioned();
 
 }

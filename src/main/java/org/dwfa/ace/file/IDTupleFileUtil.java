@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -30,9 +30,9 @@ import org.dwfa.tapi.TerminologyException;
 
 public class IDTupleFileUtil {
 
-    public static String exportTuple(I_IdVersioned iIdVersioned) throws TerminologyException, IOException {
+    public static String exportTuple(I_Identify iIdVersioned) throws TerminologyException, IOException {
 
-        List<? extends I_IdPart> parts = iIdVersioned.getVersions();
+        List<? extends I_IdPart> parts = iIdVersioned.getMutableIdParts();
         I_IdPart latestPart = null;
         for (I_IdPart part : parts) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
@@ -101,8 +101,8 @@ public class IDTupleFileUtil {
                     ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNid(),
                     termFactory.getPath(new UUID[] { pathUuid }), effectiveDate);
 
-                I_IdVersioned versioned = termFactory.getId(primaryUuid);
-                I_IdPart part = versioned.getVersions().get(0).duplicate();
+                I_Identify versioned = termFactory.getId(primaryUuid);
+                I_IdPart part = versioned.getMutableIdParts().get(0).duplicate();
                 part.setStatusId(termFactory.uuidToNative(statusUuid));
                 part.setPathId(termFactory.uuidToNative(pathUuid));
                 part.setSource(termFactory.uuidToNative(sourceSystemUuid));
@@ -117,8 +117,8 @@ public class IDTupleFileUtil {
                     part.setSourceId(sourceId); // use string
                 }
 
-                if (!versioned.hasVersion(part)) {
-                    versioned.addVersion(part);
+                if (!versioned.hasMutableIdPart(part)) {
+                    versioned.addMutableIdPart(part);
                     termFactory.writeId(versioned);
                 }
             }

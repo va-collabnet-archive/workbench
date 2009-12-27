@@ -154,7 +154,7 @@ public class RefsetQueryFactory {
                     currExt.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSet(), addUncommitted,
                         returnConflictResolvedLatestState);
             if (extensions.size() > 0) {
-                I_ThinExtByRefPart thinPart = extensions.get(0).getPart();
+                I_ThinExtByRefPart thinPart = extensions.get(0).getMutableIdPart();
 
                 if (thinPart instanceof I_ThinExtByRefPartConceptConceptConcept) {
 
@@ -168,7 +168,7 @@ public class RefsetQueryFactory {
                         constraint = termFactory.getConcept(part.getC3id());
                     } else {
                         constraint =
-                                termFactory.getDescription((termFactory.getId(part.getC3id()).getUIDs().iterator()
+                                termFactory.getDescription((termFactory.getId(part.getC3id()).getUUIDs().iterator()
                                     .next()).toString());
                     } // TODO add rel
 

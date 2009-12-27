@@ -25,7 +25,7 @@ public interface I_ConceptAttributeTuple extends I_AmTuple {
 
     public I_ConceptAttributePart duplicate();
 
-    public I_ConceptAttributePart getPart();
+    public I_ConceptAttributePart getMutableIdPart();
     
     /**
      * 

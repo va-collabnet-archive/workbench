@@ -190,7 +190,7 @@ public class DescTupleFileUtil {
                 I_DescriptionVersioned v = termFactory.newDescription(descUuid, concept, lang, text,
                     termFactory.getConcept(new UUID[] { typeUuid }), termFactory.getActiveAceFrameConfig());
 
-                I_DescriptionPart newLastPart = v.getLastTuple().getPart();
+                I_DescriptionPart newLastPart = v.getLastTuple().getMutableIdPart();
                 newLastPart.setLang(lang);
                 newLastPart.setText(text);
                 newLastPart.setInitialCaseSignificant(initialCapSignificant);
@@ -202,7 +202,7 @@ public class DescTupleFileUtil {
                 v.addVersion(newLastPart);
                 termFactory.addUncommittedNoChecks(concept);
             } else {
-                I_DescriptionPart newLastPart = latestTuple.getDescVersioned().getLastTuple().getPart().duplicate();
+                I_DescriptionPart newLastPart = latestTuple.getDescVersioned().getLastTuple().getMutableIdPart().duplicate();
                 newLastPart.setLang(lang);
                 newLastPart.setText(text);
                 newLastPart.setInitialCaseSignificant(initialCapSignificant);

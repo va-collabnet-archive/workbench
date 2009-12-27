@@ -32,6 +32,6 @@ public interface I_ImageTuple extends I_AmTypedTuple {
 
     public I_ImagePart duplicate();
 
-    public I_ImagePart getPart();
+    public I_ImagePart getMutableIdPart();
 
 }

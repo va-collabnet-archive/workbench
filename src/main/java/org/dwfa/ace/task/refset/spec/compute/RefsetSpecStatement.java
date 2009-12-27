@@ -258,7 +258,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         for (I_ThinExtByRefVersioned ext : extensions) {
             if (ext.getRefsetId() == ((I_GetConceptData) queryConstraint).getConceptId()) { // check
 
-                List<? extends I_ThinExtByRefPart> parts = ext.getVersions();
+                List<? extends I_ThinExtByRefPart> parts = ext.getMutableIdParts();
 
                 I_ThinExtByRefPart latestPart = null;
                 int latestPartVersion = Integer.MIN_VALUE;

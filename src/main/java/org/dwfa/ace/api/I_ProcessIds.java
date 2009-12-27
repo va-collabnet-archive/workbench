@@ -17,5 +17,5 @@
 package org.dwfa.ace.api;
 
 public interface I_ProcessIds {
-    public void processId(I_IdVersioned versionedId) throws Exception;
+    public void processId(I_Identify versionedId) throws Exception;
 }

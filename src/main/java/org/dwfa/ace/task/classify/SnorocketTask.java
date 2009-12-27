@@ -1079,7 +1079,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     Integer iR = rv.getRelId();
                     Integer iA = rv.getC1Id();
                     Integer iB = rv.getC2Id();
-                    List<? extends I_RelPart> parts = rv.getVersions();
+                    List<? extends I_RelPart> parts = rv.getMutableIdParts();
                     for (I_RelPart p : parts) {
                         x++;
                         Integer i1 = p.getTypeId();

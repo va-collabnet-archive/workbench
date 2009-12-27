@@ -142,7 +142,7 @@ public class RelationshipValidator extends SimpleValidator {
                     failureReport.append(" c2id: ");
                     failureReport.append(beanC2Id);
                     failureReport.append("\n newPart: " + newPart);
-                    for (I_RelPart repPart : databaseRelationship.getVersions()) {
+                    for (I_RelPart repPart : databaseRelationship.getMutableIdParts()) {
                         failureReport.append("\nexisting: " + repPart);
                     }
                     failureReport.append("\n\n");
@@ -160,10 +160,10 @@ public class RelationshipValidator extends SimpleValidator {
 
     private boolean containsPart(I_RelVersioned databaseRelationship, I_RelPart newPart) {
         if (!timeLenient) {
-            return databaseRelationship.getVersions().contains(newPart);
+            return databaseRelationship.getMutableIdParts().contains(newPart);
         } else {
             boolean match = false;
-            for (I_RelPart relPart : databaseRelationship.getVersions()) {
+            for (I_RelPart relPart : databaseRelationship.getMutableIdParts()) {
                 if (relPart.getPathId() == newPart.getPathId()
                     && relPart.getCharacteristicId() == newPart.getCharacteristicId()
                     && relPart.getGroup() == newPart.getGroup()

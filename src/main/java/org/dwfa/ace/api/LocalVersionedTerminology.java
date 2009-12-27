@@ -25,7 +25,7 @@ import org.dwfa.tapi.TerminologyException;
 public class LocalVersionedTerminology {
     private static I_TermFactory factory;
 
-    private static I_IdVersioned authorityId;
+    private static I_Identify authorityId;
 
     private static I_TermFactory stealthfactory;
 

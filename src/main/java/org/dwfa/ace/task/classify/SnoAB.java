@@ -105,7 +105,7 @@ public class SnoAB {
                 for (I_Position pos : posList) { // FOR EACH PATH POSITION
                     // FIND MOST CURRENT
                     int tmpCountDupl = 0;
-                    for (I_RelPart rp : rel.getVersions()) {
+                    for (I_RelPart rp : rel.getMutableIdParts()) {
                         if (rp.getPathId() == pos.getPath().getConceptId()) {
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART

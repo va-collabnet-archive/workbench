@@ -186,8 +186,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
                 if (excludeMembersRefsetId != ID_NOT_FOUND) {
                     I_GetConceptData exclusionSet = getConcept(excludeMembersRefsetId);
                     System.out.println("Applying additional exclusion members from "
-                        + exclusionSet.getId().getUIDs().iterator().next() + " to member refset "
-                        + memberSet.getId().getUIDs().iterator().next());
+                        + exclusionSet.getId().getUUIDs().iterator().next() + " to member refset "
+                        + memberSet.getId().getUUIDs().iterator().next());
 
                     for (I_ThinExtByRefVersioned additionalExclusionMember : termFactory.getRefsetExtensionMembers(excludeMembersRefsetId)) {
                         conceptsWithExcludeIndividual.add(additionalExclusionMember.getComponentId());
@@ -661,7 +661,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
     private boolean newestPartRetired(I_ThinExtByRefVersioned ext) {
         I_ThinExtByRefPart newestPart = null;
-        for (I_ThinExtByRefPart part : ext.getVersions()) {
+        for (I_ThinExtByRefPart part : ext.getMutableIdParts()) {
             if (newestPart == null || part.getVersion() > newestPart.getVersion()) {
                 newestPart = part;
             }

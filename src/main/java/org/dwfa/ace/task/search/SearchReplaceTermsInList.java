@@ -223,7 +223,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                     description.getLang(), finalDesc, termFactory.getConcept(description.getTypeId()),
                                     config);
 
-                                I_DescriptionPart newLastPart = newDesc.getLastTuple().getPart();
+                                I_DescriptionPart newLastPart = newDesc.getLastTuple().getMutableIdPart();
                                 for (I_Path path : paths) {
                                     // retire the existing description
                                     I_DescriptionPart newRetiredPart = description.duplicate();
@@ -238,7 +238,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                     // Set the status to that of the original,
                                     // and path to the current
                                     if (newLastPart == null) {
-                                        newLastPart = newDesc.getLastTuple().getPart().duplicate();
+                                        newLastPart = newDesc.getLastTuple().getMutableIdPart().duplicate();
                                     }
                                     newLastPart.setStatusId(description.getStatusId());
                                     newLastPart.setInitialCaseSignificant(description.isInitialCaseSignificant());

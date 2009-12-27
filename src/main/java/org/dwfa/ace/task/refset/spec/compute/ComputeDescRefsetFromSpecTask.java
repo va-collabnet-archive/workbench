@@ -256,7 +256,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
         while (nidIterator.next()) {
             int nid = nidIterator.nid();
             if (possibleDescriptions.isMember(nid)) {
-                UUID uuid = termFactory.getId(nid).getUIDs().iterator().next();
+                UUID uuid = termFactory.getId(nid).getUUIDs().iterator().next();
                 currentDescription = termFactory.getDescription(uuid.toString());
                 descriptionsProcessed++;
 

@@ -70,7 +70,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
 
         Set<I_GetConceptData> ancestors = new HashSet<I_GetConceptData>();
         for (Integer descriptionId : descriptionIds) {
-            UUID descriptionUuid = termFactory.getId(descriptionId).getUIDs().iterator().next();
+            UUID descriptionUuid = termFactory.getId(descriptionId).getUUIDs().iterator().next();
             I_GetConceptData concept =
                     termFactory.getConcept(termFactory.getDescription(descriptionUuid.toString()).getConceptId());
             ancestors.addAll(getAllAncestors(concept, traversingConditions));
@@ -138,7 +138,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
         // Get all ancestors
         Set<Integer> toBeRetired = new HashSet<Integer>();
         for (Integer descriptionId : descriptionIds) {
-            UUID descriptionUuid = termFactory.getId(descriptionId).getUIDs().iterator().next();
+            UUID descriptionUuid = termFactory.getId(descriptionId).getUUIDs().iterator().next();
             I_GetConceptData concept =
                     termFactory.getConcept(termFactory.getDescription(descriptionUuid.toString()).getConceptId());
             if (isMarkedParent(concept.getConceptId())) {
