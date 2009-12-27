@@ -18,18 +18,36 @@ package org.dwfa.ace.api;
 
 public interface I_ConceptAttributeTuple extends I_AmTuple {
 
-    public abstract int getConId();
 
-    public abstract int getConceptStatus();
+    public boolean isDefined();
 
-    public abstract boolean isDefined();
-
-    public abstract void setDefined(boolean defined);
-
-    public abstract I_ConceptAttributeVersioned getConVersioned();
+    public void setDefined(boolean defined);
 
     public I_ConceptAttributePart duplicate();
 
-    public abstract I_ConceptAttributePart getPart();
+    public I_ConceptAttributePart getPart();
+    
+    /**
+     * 
+     * @return
+     * @deprecated use getStatusId();
+     */
+    public int getConceptStatus();
+
+    /**
+     * 
+     * @return
+     * @deprecated use getFixedPartId();
+     */
+    public int getConId();
+
+    /**
+     * 
+     * @return
+     * @deprecated use getFixedPart();
+     */
+    public I_ConceptAttributeVersioned getConVersioned();
+
+
 
 }
