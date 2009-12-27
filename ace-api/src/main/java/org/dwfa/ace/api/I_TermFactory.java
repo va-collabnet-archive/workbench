@@ -379,15 +379,15 @@ public interface I_TermFactory {
 
     I_IntList newIntList();
 
-    I_IdVersioned getId(int nid) throws TerminologyException, IOException;
+    I_Identify getId(int nid) throws TerminologyException, IOException;
 
-    I_IdVersioned getId(UUID uid) throws TerminologyException, IOException;
+    I_Identify getId(UUID uid) throws TerminologyException, IOException;
 
-    I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException;
+    I_Identify getId(Collection<UUID> uids) throws TerminologyException, IOException;
 
-    I_IdVersioned getAuthorityId() throws TerminologyException, IOException;
+    I_Identify getAuthorityId() throws TerminologyException, IOException;
 
-    I_IdVersioned getPreviousAuthorityId() throws TerminologyException, IOException;
+    I_Identify getPreviousAuthorityId() throws TerminologyException, IOException;
 
     /**
      * Delete any uncommitted changes.
@@ -624,7 +624,7 @@ public interface I_TermFactory {
      */
     int getConceptCount() throws IOException;
 
-    void writeId(I_IdVersioned versioned) throws IOException;
+    void writeId(I_Identify versioned) throws IOException;
 
     public List<TimePathId> getTimePathList() throws Exception;
 

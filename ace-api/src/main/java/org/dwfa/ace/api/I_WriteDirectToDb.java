@@ -150,7 +150,7 @@ public interface I_WriteDirectToDb {
      * @param id
      * @throws IOException
      */
-    public void writeId(I_IdVersioned id) throws IOException;
+    public void writeId(I_Identify id) throws IOException;
 
     /**
      * Generates a new id part that can be set with appropriate values, added to

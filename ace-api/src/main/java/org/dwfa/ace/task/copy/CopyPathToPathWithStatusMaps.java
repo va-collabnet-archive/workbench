@@ -32,8 +32,8 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdTuple;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_IdVersion;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntSet;
@@ -205,8 +205,8 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
         }
     }
 
-    public static void copyId(I_Path toPath, I_IdVersioned id, Map<Integer, Integer> statusMap) {
-        for (I_IdTuple t : id.getTuples()) {
+    public static void copyId(I_Path toPath, I_Identify id, Map<Integer, Integer> statusMap) {
+        for (I_IdVersion t : id.getIdVersions()) {
             I_IdPart newPart = t.duplicate();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
@@ -215,7 +215,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
                     newPart.setStatusId(statusMap.get(newPart.getStatusId()));
                 }
             }
-            t.getIdVersioned().addVersion(newPart);
+            t.getIdentifier().addMutableIdPart(newPart);
         }
     }
 

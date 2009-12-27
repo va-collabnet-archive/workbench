@@ -24,7 +24,7 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -35,7 +35,7 @@ import org.dwfa.tapi.TerminologyException;
 public final class RefsetUtilImpl implements RefsetUtil {
 
     public I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData refsetConcept) throws IOException {
-        List<? extends I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getVersions();
+        List<? extends I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getMutableIdParts();
         I_ConceptAttributePart latestAttributePart = null;
         for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
             if (latestAttributePart == null || attributePart.getVersion() >= latestAttributePart.getVersion()) {
@@ -55,7 +55,7 @@ public final class RefsetUtilImpl implements RefsetUtil {
     public I_ThinExtByRefPart getLatestVersionIfCurrent(final I_ThinExtByRefVersioned ext,
             final I_TermFactory termFactory) throws TerminologyException, IOException {
         I_ThinExtByRefPart latest = null;
-        List<? extends I_ThinExtByRefPart> versions = ext.getVersions();
+        List<? extends I_ThinExtByRefPart> versions = ext.getMutableIdParts();
         for (I_ThinExtByRefPart version : versions) {
 
             if (latest == null) {
@@ -76,8 +76,8 @@ public final class RefsetUtilImpl implements RefsetUtil {
             return "no identifier";
         }
 
-        I_IdVersioned idVersioned = termFactory.getId(nid);
-        for (I_IdPart idPart : idVersioned.getVersions()) {
+        I_Identify idVersioned = termFactory.getId(nid);
+        for (I_IdPart idPart : idVersioned.getMutableIdParts()) {
             if (idPart.getSource() == termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids())) {
                 return idPart.getSourceId().toString();
             }

@@ -50,7 +50,7 @@ public class ConceptConceptStringExtTupleFileUtil {
                     "Non concept-concept-string ext tuple passed to concept-concept-string file util.");
             }
 
-            I_ThinExtByRefPartConceptConceptString part = (I_ThinExtByRefPartConceptConceptString) tuple.getPart();
+            I_ThinExtByRefPartConceptConceptString part = (I_ThinExtByRefPartConceptConceptString) tuple.getMutableIdPart();
             UUID c1Uuid = termFactory.getUids(part.getC1id()).iterator().next();
             UUID c2Uuid = termFactory.getUids(part.getC2id()).iterator().next();
             String strValue = part.getStr();

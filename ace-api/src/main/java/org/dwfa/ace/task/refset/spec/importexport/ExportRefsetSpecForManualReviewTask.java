@@ -30,7 +30,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
@@ -184,9 +184,9 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                 returnConflictResolvedLatestState);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : tuples) {
-                if (thinExtByRefTuple.getPart() instanceof I_ThinExtByRefPartConcept) {
+                if (thinExtByRefTuple.getMutableIdPart() instanceof I_ThinExtByRefPartConcept) {
                     if (thinExtByRefTuple.getRefsetId() == memberRefset.getConceptId()) {
-                        I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
+                        I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutableIdPart();
                         if (part.getC1id() == termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids())
                             .getConceptId()) {
                             lineCount++;
@@ -236,11 +236,11 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
 
     private String getSctId(int componentId) throws TerminologyException, IOException {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        I_IdVersioned idVersioned = termFactory.getId(componentId);
+        I_Identify idVersioned = termFactory.getId(componentId);
         int snomedIntegerId = termFactory.getId(
             ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNid();
 
-        List<? extends I_IdPart> parts = idVersioned.getVersions();
+        List<? extends I_IdPart> parts = idVersioned.getMutableIdParts();
         I_IdPart latestPart = null;
         for (I_IdPart part : parts) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {

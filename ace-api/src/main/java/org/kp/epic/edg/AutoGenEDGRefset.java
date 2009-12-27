@@ -36,7 +36,7 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -491,7 +491,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             String ret = null;
             int lastVersion = Integer.MIN_VALUE;
 
-            List<? extends I_IdPart> idList = concept.getId().getVersions();
+            List<? extends I_IdPart> idList = concept.getId().getMutableIdParts();
             for (I_IdPart part : idList) {
                 if (part.getSource() == nidEDGClinicalDot1) {
                     if (part.getVersion() >= lastVersion) {
@@ -508,7 +508,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             int lastVersion = Integer.MIN_VALUE;
 
             // Get all version parts of each extension
-            List<? extends I_ThinExtByRefPart> vList = ext.getVersions();
+            List<? extends I_ThinExtByRefPart> vList = ext.getMutableIdParts();
             for (I_ThinExtByRefPart v : vList) {
                 if (v.getVersion() > lastVersion) {
                     lastPart = v;
@@ -853,7 +853,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                 if (ext.getRefsetId() == nidEDGClinicalItem_200) {
                     if (ext200 == null) {
                         ext200 = ext;
-                        List<? extends I_ThinExtByRefPart> partList = ext.getVersions();
+                        List<? extends I_ThinExtByRefPart> partList = ext.getMutableIdParts();
                         int lastVersion = Integer.MIN_VALUE;
                         for (I_ThinExtByRefPart part : partList) {
                             if (part.getVersion() > lastVersion) {
@@ -866,7 +866,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                 } else if (ext.getRefsetId() == nidEDGClinicalItem_2000) {
                     if (ext2000 == null) {
                         ext2000 = ext;
-                        List<? extends I_ThinExtByRefPart> partList = ext.getVersions();
+                        List<? extends I_ThinExtByRefPart> partList = ext.getMutableIdParts();
                         int lastVersion = Integer.MIN_VALUE;
                         for (I_ThinExtByRefPart part : partList) {
                             if (part.getVersion() > lastVersion) {
@@ -1074,7 +1074,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                 if (ext.getRefsetId() == nidEDGClinicalItem_200) {
                     if (ext200 == null) {
                         ext200 = ext;
-                        List<? extends I_ThinExtByRefPart> partList = ext.getVersions();
+                        List<? extends I_ThinExtByRefPart> partList = ext.getMutableIdParts();
                         int lastVersion = Integer.MIN_VALUE;
                         for (I_ThinExtByRefPart part : partList) {
                             if (part.getVersion() > lastVersion) {
@@ -1087,7 +1087,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                 } else if (ext.getRefsetId() == nidEDGClinicalItem_2000) {
                     if (ext2000 == null) {
                         ext2000 = ext;
-                        List<? extends I_ThinExtByRefPart> partList = ext.getVersions();
+                        List<? extends I_ThinExtByRefPart> partList = ext.getMutableIdParts();
                         int lastVersion = Integer.MIN_VALUE;
                         for (I_ThinExtByRefPart part : partList) {
                             if (part.getVersion() > lastVersion) {
@@ -1325,7 +1325,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             if (ext.getRefsetId() == nidClinicalItem_Num) {
                 if (extResult == null) {
                     extResult = ext;
-                    List<? extends I_ThinExtByRefPart> partList = ext.getVersions();
+                    List<? extends I_ThinExtByRefPart> partList = ext.getMutableIdParts();
                     int lastVersion = Integer.MIN_VALUE;
                     for (I_ThinExtByRefPart part : partList) {
                         if (part.getVersion() > lastVersion) {
@@ -1510,7 +1510,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                     // FIND MOST RECENT VERSION OF THIS ICD9 MAPPING
                     int lastVersion = Integer.MIN_VALUE;
                     I_ThinExtByRefPart lastPart = null;
-                    List<? extends I_ThinExtByRefPart> partsList = ext.getVersions();
+                    List<? extends I_ThinExtByRefPart> partsList = ext.getMutableIdParts();
                     for (I_ThinExtByRefPart part : partsList) {
                         if (isOnAPath(part.getPathId(), part.getVersion())) {
                             if (part.getVersion() > lastVersion) {
@@ -1525,8 +1525,8 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                         // Get Identifiers for the ICD9 Code Concept
                         I_GetConceptData icd9CodeCB = tf.getConcept(icd9CodeNid);
 
-                        I_IdVersioned icd9CodeId = icd9CodeCB.getId();
-                        for (I_IdPart idPart : icd9CodeId.getVersions()) {
+                        I_Identify icd9CodeId = icd9CodeCB.getId();
+                        for (I_IdPart idPart : icd9CodeId.getMutableIdParts()) {
                             if (idPart.getSource() == nidIDC9Id) {
                                 result.add((String) idPart.getSourceId());
                             }
@@ -1579,7 +1579,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         // FIND MOST RECENT VERSION OF THIS ICD9 MAPPING
         int lastVersion = Integer.MIN_VALUE;
         I_DescriptionPart lastPart = null;
-        List<? extends I_DescriptionPart> partsList = desc.getVersions();
+        List<? extends I_DescriptionPart> partsList = desc.getMutableIdParts();
         for (I_DescriptionPart part : partsList) {
             if (isOnAPath(part.getPathId(), part.getVersion())) {
                 if (part.getVersion() > lastVersion) {

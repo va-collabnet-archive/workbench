@@ -46,7 +46,7 @@ public class IntExtTupleFileUtil {
                 throw new TerminologyException("Non int ext tuple passed to int file util.");
             }
 
-            I_ThinExtByRefPartInteger part = (I_ThinExtByRefPartInteger) tuple.getPart();
+            I_ThinExtByRefPartInteger part = (I_ThinExtByRefPartInteger) tuple.getMutableIdPart();
             int value = part.getValue();
             UUID pathUuid = termFactory.getUids(tuple.getPathId()).iterator().next();
             UUID statusUuid = termFactory.getUids(tuple.getStatusId()).iterator().next();

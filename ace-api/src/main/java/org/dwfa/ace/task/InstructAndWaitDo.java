@@ -176,10 +176,10 @@ public class InstructAndWaitDo extends AbstractTask {
                 Set<I_Path> paths = config.getEditingPathSet();
                 I_DescriptionVersioned newDescr = termFactory.newDescription(UUID.randomUUID(), con, language,
                     newDescrString, synonym_description_type, config);
-                I_DescriptionPart newLastPart = newDescr.getLastTuple().getPart();
+                I_DescriptionPart newLastPart = newDescr.getLastTuple().getMutableIdPart();
                 for (I_Path path : paths) {
                     if (newLastPart == null) {
-                        newLastPart = newDescr.getLastTuple().getPart().duplicate();
+                        newLastPart = newDescr.getLastTuple().getMutableIdPart().duplicate();
                     }
                     // printDescriptionPart(newLastPart);
                     // System.out.println(">>> language: " + language);

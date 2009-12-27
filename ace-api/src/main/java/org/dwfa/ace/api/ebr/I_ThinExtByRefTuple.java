@@ -49,7 +49,7 @@ public interface I_ThinExtByRefTuple extends I_ThinExtByRefPart, I_AmTuple {
 
     public I_ThinExtByRefVersioned getCore();
 
-    public I_ThinExtByRefPart getPart();
+    public I_ThinExtByRefPart getMutableIdPart();
 
     public boolean promote(I_Path path);
 

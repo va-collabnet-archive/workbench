@@ -482,7 +482,7 @@ public class TupleFileUtil {
 
             if (extensions.size() > 0) {
                 I_ThinExtByRefTuple thinTuple = tuples.get(0);
-                I_ThinExtByRefPart thinPart = thinTuple.getPart();
+                I_ThinExtByRefPart thinPart = thinTuple.getMutableIdPart();
 
                 if (thinPart instanceof I_ThinExtByRefPartConceptConceptConcept) {
                     outputFileWriter.append(ConceptConceptConceptExtTupleFileUtil.exportTuple(thinTuple));
@@ -536,7 +536,7 @@ public class TupleFileUtil {
                 configFrame.getViewPositionSet(), addUncommitted, returnConflictResolvedLatestState);
             if (extensions.size() > 0) {
                 I_ThinExtByRefTuple thinTuple = extensions.get(0);
-                I_ThinExtByRefPart thinPart = thinTuple.getPart();
+                I_ThinExtByRefPart thinPart = thinTuple.getMutableIdPart();
 
                 if (thinPart instanceof I_ThinExtByRefPartConceptConceptConcept) {
                     outputFileWriter.append(ConceptConceptConceptExtTupleFileUtil.exportTuple(thinTuple));

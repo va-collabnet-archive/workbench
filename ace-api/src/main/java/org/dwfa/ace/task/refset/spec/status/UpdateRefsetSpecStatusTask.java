@@ -218,7 +218,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
         for (I_ThinExtByRefVersioned extension : extensions) {
             // get the latest version
             I_ThinExtByRefPart latestPart = null;
-            for (I_ThinExtByRefPart part : extension.getVersions()) {
+            for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
                 if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                     latestPart = part;
                 }
@@ -245,7 +245,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             List<? extends I_DescriptionVersioned> descs = currentConcept.getDescriptions();
             for (I_DescriptionVersioned descVersioned : descs) {
                 for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                    I_DescriptionPart newPart = descVersioned.getLastTuple().getPart().duplicate();
+                    I_DescriptionPart newPart = descVersioned.getLastTuple().getMutableIdPart().duplicate();
                     if (newPart.getStatusId() != retiredStatusId) {
                         newPart.setStatusId(statusConcept.getConceptId());
                         newPart.setVersion(Integer.MAX_VALUE);
@@ -264,7 +264,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             List<? extends I_RelVersioned> rels = currentConcept.getSourceRels();
             for (I_RelVersioned relVersioned : rels) {
                 for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                    I_RelPart newPart = relVersioned.getLastTuple().getPart().duplicate();
+                    I_RelPart newPart = relVersioned.getLastTuple().getMutableIdPart().duplicate();
                     if (newPart.getStatusId() != retiredStatusId) {
                         newPart.setStatusId(statusConcept.getConceptId());
                         newPart.setVersion(Integer.MAX_VALUE);
@@ -282,11 +282,11 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
         for (I_GetConceptData currentConcept : concepts) {
             I_ConceptAttributeVersioned v = currentConcept.getConceptAttributes();
 
-            int index = v.getVersions().size() - 1;
+            int index = v.getMutableIdParts().size() - 1;
             for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
                 I_ConceptAttributePart part;
                 if (index >= 0) {
-                    part = (I_ConceptAttributePart) v.getVersions().get(index).duplicate();
+                    part = (I_ConceptAttributePart) v.getMutableIdParts().get(index).duplicate();
                 } else {
                     part = termFactory.newConceptAttributePart();
                 }

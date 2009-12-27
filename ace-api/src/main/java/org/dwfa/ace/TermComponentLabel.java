@@ -58,7 +58,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdTuple;
+import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.dnd.ConceptTransferable;
@@ -124,7 +124,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                     I_TermFactory tf = LocalVersionedTerminology.get();
                     I_GetConceptData concept = (I_GetConceptData) getTermComponent();
                     buff.append("  <concept-ids>\n");
-                    for (I_IdTuple idt : concept.getId().getTuples()) {
+                    for (I_IdVersion idt : concept.getId().getIdVersions()) {
                         writeIdentifiersToBuff("    ", buff, idt);
                     }
                     buff.append("  </concept-ids>\n");
@@ -141,7 +141,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                         buff.append("'\n                 text='");
                         buff.append(dt.getText());
                         buff.append("'>\n");
-                        for (I_IdTuple idt : tf.getId(dt.getDescId()).getTuples()) {
+                        for (I_IdVersion idt : tf.getId(dt.getDescId()).getIdVersions()) {
                             writeIdentifiersToBuff("      ", buff, idt);
                         }
                         buff.append("    </description>\n");
@@ -157,12 +157,12 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             }
         }
 
-        private void writeIdentifiersToBuff(String indent, StringBuffer buff, I_IdTuple idt) throws IOException {
+        private void writeIdentifiersToBuff(String indent, StringBuffer buff, I_IdVersion idt) throws IOException {
             buff.append(indent);
             buff.append("<id source='");
             I_GetConceptData source;
             try {
-                source = LocalVersionedTerminology.get().getConcept(idt.getSource());
+                source = LocalVersionedTerminology.get().getConcept(idt.getIdSource());
             } catch (TerminologyException e) {
                 throw new IOException(e);
             }
@@ -193,7 +193,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                     I_GetConceptData concept = (I_GetConceptData) getTermComponent();
                     buff.append("cid source\tcid\tdesc\n");
                     I_DescriptionTuple dt = concept.getDescTuple(config.getLongLabelDescPreferenceList(), config);
-                    for (I_IdTuple idt : concept.getId().getTuples()) {
+                    for (I_IdVersion idt : concept.getId().getIdVersions()) {
                         writeIdentifiersToBuff(buff, idt, dt.getText());
                     }
                 }
@@ -205,10 +205,10 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             }
         }
 
-        private void writeIdentifiersToBuff(StringBuffer buff, I_IdTuple idt, String text) throws IOException {
+        private void writeIdentifiersToBuff(StringBuffer buff, I_IdVersion idt, String text) throws IOException {
             I_GetConceptData source;
             try {
-                source = LocalVersionedTerminology.get().getConcept(idt.getSource());
+                source = LocalVersionedTerminology.get().getConcept(idt.getIdSource());
             } catch (TerminologyException e) {
                 throw new IOException(e);
             }

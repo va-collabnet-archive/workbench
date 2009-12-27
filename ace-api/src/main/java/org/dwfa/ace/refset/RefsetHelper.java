@@ -83,7 +83,7 @@ public class RefsetHelper extends LineageHelper {
             I_ThinExtByRefPartConcept latestPart = null;
             if (extension.getRefsetId() == refsetId) {
                 // get the latest version
-                for (I_ThinExtByRefPart part : extension.getVersions()) {
+                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
                     if (part instanceof I_ThinExtByRefPartConcept && (latestPart == null)
                         || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = (I_ThinExtByRefPartConcept) part;
@@ -126,7 +126,7 @@ public class RefsetHelper extends LineageHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getVersions()) {
+                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -158,7 +158,7 @@ public class RefsetHelper extends LineageHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getVersions()) {
+                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -288,7 +288,7 @@ public class RefsetHelper extends LineageHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getVersions()) {
+                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }

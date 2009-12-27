@@ -122,15 +122,15 @@ public class CmrscsReader implements I_ReadChangeSet {
                     int memberNid = getVodb().uuidToNativeWithGeneration(memberUid, unspecifiedUuidNid, path, version);
                     if (getVodb().hasExtension(memberNid)) {
                         ebr = getVodb().getExtension(memberNid);
-                        I_ThinExtByRefPartConcept lastPart = (I_ThinExtByRefPartConcept) ebr.getVersions().get(
-                            ebr.getVersions().size() - 1);
-                        ebr.getVersions().clear();
+                        I_ThinExtByRefPartConcept lastPart = (I_ThinExtByRefPartConcept) ebr.getMutableIdParts().get(
+                            ebr.getMutableIdParts().size() - 1);
+                        ebr.getMutableIdParts().clear();
                         ebr.addVersion(lastPart);
                         ebr.addVersion(newPart);
                     } else {
                         ebr = getVodb().getDirectInterface().newExtensionBypassCommit(refsetNid, memberNid,
                             getVodb().uuidToNative(componentUid), conceptExt);
-                        ((List<I_ThinExtByRefPartConcept>) ebr.getVersions()).add(newPart);
+                        ((List<I_ThinExtByRefPartConcept>) ebr.getMutableIdParts()).add(newPart);
 
                     }
                     try {

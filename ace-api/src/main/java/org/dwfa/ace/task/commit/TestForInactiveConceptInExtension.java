@@ -59,7 +59,7 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
         List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
         try {
             I_ConfigAceFrame activeProfile = LocalVersionedTerminology.get().getActiveAceFrameConfig();
-            for (I_ThinExtByRefPart part : extension.getVersions()) {
+            for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
                 testPart(part, activeProfile, alerts, forCommit);
             }
             if (LocalVersionedTerminology.get().hasConcept(extension.getComponentId())) {

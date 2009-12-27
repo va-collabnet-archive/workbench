@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
@@ -160,8 +160,8 @@ public class SnoTrace {
     // Several UUIDs related to the immediate concept.
     private String toStringNidUAI(int nid) {
         try {
-            I_IdVersioned idv = tf.getId(nid);
-            UniversalAceIdentification uai = idv.getUniversal();
+            I_Identify idv = tf.getId(nid);
+            UniversalAceIdentification uai = idv.getUniversalId();
             return uai.toString();
         } catch (TerminologyException e) {
             e.printStackTrace();

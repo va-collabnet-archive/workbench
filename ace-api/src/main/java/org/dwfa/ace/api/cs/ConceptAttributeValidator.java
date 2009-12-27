@@ -61,7 +61,7 @@ public class ConceptAttributeValidator extends SimpleValidator {
             if (part.getTime() != Long.MAX_VALUE) {
                 startParts++;
                 boolean match = false;
-                for (I_ConceptAttributePart conceptAttributePart : thinConAttr.getVersions()) {
+                for (I_ConceptAttributePart conceptAttributePart : thinConAttr.getMutableIdParts()) {
                     if (conceptAttributePart.getStatusId() == getNativeId(part.getConceptStatus())
                         && conceptAttributePart.getPathId() == getNativeId(part.getPathId())
                         && (timeLenient || conceptAttributePart.getVersion() == tf.convertToThinVersion(part.getTime()))) {
@@ -80,7 +80,7 @@ public class ConceptAttributeValidator extends SimpleValidator {
                     failureReport.append("\n   newPart is " + part);
                     failureReport.append("\n   new native part: " + newConceptAttributePart);
 
-                    for (I_ConceptAttributePart conceptAttributePart : thinConAttr.getVersions()) {
+                    for (I_ConceptAttributePart conceptAttributePart : thinConAttr.getMutableIdParts()) {
                         failureReport.append("\n     existing part: " + conceptAttributePart);
                     }
                     failureReport.append("\n\n");
@@ -89,9 +89,9 @@ public class ConceptAttributeValidator extends SimpleValidator {
             }
 
         }
-        if (startParts != thinConAttr.getVersions().size()) {
+        if (startParts != thinConAttr.getMutableIdParts().size()) {
             failureReport.append("number of concept attribute parts is different for " + bean + " and "
-                + thinConAttr.getVersions());
+                + thinConAttr.getMutableIdParts());
             return false; // test 3
         }
 

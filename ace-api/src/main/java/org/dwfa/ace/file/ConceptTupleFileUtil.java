@@ -165,7 +165,7 @@ public class ConceptTupleFileUtil {
                 if (latestTuple == null) {
                     throw new Exception("Concept UUID exists but has no tuples.");
                 } else {
-                    I_ConceptAttributePart newPart = latestTuple.getPart().duplicate();
+                    I_ConceptAttributePart newPart = latestTuple.getMutableIdPart().duplicate();
                     newPart.setStatusId(termFactory.getId(statusUuid).getNid());
                     newPart.setDefined(isDefined);
                     newPart.setPathId(termFactory.getId(pathUuid).getNid());
@@ -183,10 +183,10 @@ public class ConceptTupleFileUtil {
                 lastConcept = newConcept;
 
                 // edit the existing part's effectiveDate/version
-                int index = v.getVersions().size() - 1;
+                int index = v.getMutableIdParts().size() - 1;
                 I_ConceptAttributePart part;
                 if (index >= 0) {
-                    part = (I_ConceptAttributePart) v.getVersions().get(index);
+                    part = (I_ConceptAttributePart) v.getMutableIdParts().get(index);
                     part.setVersion(effectiveDate);
                 } else {
                     part = termFactory.newConceptAttributePart();

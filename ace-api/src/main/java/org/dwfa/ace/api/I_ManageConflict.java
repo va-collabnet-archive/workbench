@@ -132,7 +132,7 @@ public interface I_ManageConflict extends Serializable {
      * @throws IOException
      * @throws TerminologyException
      */
-    boolean isInConflict(I_IdVersioned id) throws IOException, TerminologyException;
+    boolean isInConflict(I_Identify id) throws IOException, TerminologyException;
 
     /**
      * @param image image to test

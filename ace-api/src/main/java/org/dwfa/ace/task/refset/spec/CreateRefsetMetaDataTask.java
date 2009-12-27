@@ -352,10 +352,10 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             // edit the existing part's status
             I_ConceptAttributeVersioned v = newConcept.getConceptAttributes();
 
-            int index = v.getVersions().size() - 1;
+            int index = v.getMutableIdParts().size() - 1;
             I_ConceptAttributePart part;
             if (index >= 0) {
-                part = (I_ConceptAttributePart) v.getVersions().get(index);
+                part = (I_ConceptAttributePart) v.getMutableIdParts().get(index);
             } else {
                 part = termFactory.newConceptAttributePart();
             }
@@ -381,7 +381,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             I_DescriptionVersioned descVersioned = termFactory.newDescription(descUuid, concept, "en", description,
                 descriptionType, termFactory.getActiveAceFrameConfig());
 
-            I_DescriptionPart part = descVersioned.getLastTuple().getPart();
+            I_DescriptionPart part = descVersioned.getLastTuple().getMutableIdPart();
             part.setStatusId(status.getConceptId());
 
             descVersioned.addVersion(part);
@@ -409,7 +409,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             I_RelVersioned relVersioned = termFactory.newRelationship(relUuid, concept, relationshipType, destination,
                 charConcept, refConcept, termFactory.getConcept(statusId), group, termFactory.getActiveAceFrameConfig());
 
-            I_RelPart newPart = relVersioned.getLastTuple().getPart();
+            I_RelPart newPart = relVersioned.getLastTuple().getMutableIdPart();
             newPart.setStatusId(status.getConceptId());
 
             relVersioned.addVersion(newPart);
