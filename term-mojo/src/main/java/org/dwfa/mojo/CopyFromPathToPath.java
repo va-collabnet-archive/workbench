@@ -505,7 +505,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             getLog().info("processed id " + idCount);
         }
 
-        Collection<I_IdTuple> ids;
+        Collection<? extends I_IdTuple> ids;
         if (readLatestPartOnly) {
             ids = getLatest(idVersioned.getTuples());
         } else {
@@ -537,7 +537,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    private Collection<I_IdTuple> getLatest(List<I_IdTuple> tuples) {
+    private Collection<I_IdTuple> getLatest(List<? extends I_IdTuple> tuples) {
         Map<Integer, I_IdTuple> map = new HashMap<Integer, I_IdTuple>();
         for (I_IdTuple ids : tuples) {
             if (map.containsKey(ids.getNid())) {
