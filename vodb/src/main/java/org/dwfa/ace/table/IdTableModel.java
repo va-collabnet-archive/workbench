@@ -379,7 +379,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
             switch (columns[columnIndex]) {
             case LOCAL_ID:
-                return new StringWithIdTuple(Integer.toString(idTuple.getNativeId()), idTuple, inConflict);
+                return new StringWithIdTuple(Integer.toString(idTuple.getNid()), idTuple, inConflict);
             case STATUS:
                 if (referencedConcepts.containsKey(idTuple.getStatusId())) {
                     return new StringWithIdTuple(getPrefText(idTuple.getStatusId()), idTuple, inConflict);
@@ -462,7 +462,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                     newPart.setVersion(Integer.MAX_VALUE);
                     selectedObject.getTuple().getIdVersioned().addVersion(newPart);
                 }
-                ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNativeId()));
+                ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNid()));
                 allTuples = null;
                 IdTableModel.this.fireTableDataChanged();
             }
@@ -485,7 +485,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                         referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
                         selectedObject.getTuple().getIdVersioned().addVersion(newPart);
                     }
-                    ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNativeId()));
+                    ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNid()));
                     allTuples = null;
                     IdTableModel.this.fireTableDataChanged();
                 } catch (Exception ex) {

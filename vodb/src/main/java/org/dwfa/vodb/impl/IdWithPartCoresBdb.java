@@ -304,7 +304,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                     AceLog.getAppLog().finer(
                         "Got id record for: " + nativeId + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
                 }
-                I_IdVersioned theId = (I_IdVersioned) idBinding.entryToObject(idValue);
+                ThinIdVersioned theId = (ThinIdVersioned) idBinding.entryToObject(idValue);
                 theId.setNid(nativeId);
                 return theId;
             }

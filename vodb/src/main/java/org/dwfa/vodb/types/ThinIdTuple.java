@@ -47,7 +47,7 @@ public class ThinIdTuple implements I_IdTuple {
      * 
      * @see org.dwfa.vodb.types.I_IdTuple#getNativeId()
      */
-    public int getNativeId() {
+    public int getNid() {
         return core.getNid();
     }
 
@@ -86,15 +86,6 @@ public class ThinIdTuple implements I_IdTuple {
      */
     public boolean hasVersion(I_IdPart newPart) {
         return core.hasVersion(newPart);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.dwfa.vodb.types.I_IdTuple#setNativeId(int)
-     */
-    public void setNativeId(int nativeId) {
-        core.setNid(nativeId);
     }
 
     /*
