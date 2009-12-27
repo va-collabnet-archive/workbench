@@ -138,7 +138,7 @@ public class ThinRelTuple implements I_RelTuple {
      * @see org.dwfa.vodb.types.I_RelTuple#setTypeId(java.lang.Integer)
      */
     @Deprecated
-    public void setTypeId(Integer typeId) {
+    public void setTypeId(int typeId) {
         part.setTypeId(typeId);
 
     }
@@ -148,7 +148,7 @@ public class ThinRelTuple implements I_RelTuple {
      * 
      * @see org.dwfa.vodb.types.I_RelTuple#setStatusId(java.lang.Integer)
      */
-    public void setStatusId(Integer statusId) {
+    public void setStatusId(int statusId) {
         part.setStatusId(statusId);
 
     }
@@ -159,7 +159,7 @@ public class ThinRelTuple implements I_RelTuple {
      * @see
      * org.dwfa.vodb.types.I_RelTuple#setCharacteristicId(java.lang.Integer)
      */
-    public void setCharacteristicId(Integer characteristicId) {
+    public void setCharacteristicId(int characteristicId) {
         part.setCharacteristicId(characteristicId);
 
     }
@@ -169,7 +169,7 @@ public class ThinRelTuple implements I_RelTuple {
      * 
      * @see org.dwfa.vodb.types.I_RelTuple#setRefinabilityId(java.lang.Integer)
      */
-    public void setRefinabilityId(Integer refinabilityId) {
+    public void setRefinabilityId(int refinabilityId) {
         part.setRefinabilityId(refinabilityId);
 
     }
@@ -179,7 +179,7 @@ public class ThinRelTuple implements I_RelTuple {
      * 
      * @see org.dwfa.vodb.types.I_RelTuple#setGroup(java.lang.Integer)
      */
-    public void setGroup(Integer group) {
+    public void setGroup(int group) {
         part.setGroup(group);
 
     }
@@ -248,16 +248,8 @@ public class ThinRelTuple implements I_RelTuple {
         part.setPathId(pathId);
     }
 
-    public void setStatusId(int idStatus) {
-        part.setStatusId(idStatus);
-    }
-
     public void setVersion(int version) {
         part.setVersion(version);
-    }
-
-    public void setTypeId(int type) {
-        part.setTypeId(type);
     }
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
