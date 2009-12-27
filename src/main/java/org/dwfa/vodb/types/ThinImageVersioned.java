@@ -93,7 +93,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
      * 
      * @see org.dwfa.vodb.types.I_ImageVersioned#getVersions()
      */
-    public List<I_ImagePart> getVersions() {
+    public List<I_ImagePart> getMutableIdParts() {
         return versions;
     }
 
@@ -141,7 +141,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
      */
     public List<I_ImageTuple> getTuples() {
         List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
-        for (I_ImagePart p : getVersions()) {
+        for (I_ImagePart p : getMutableIdParts()) {
             tuples.add(new ThinImageTuple(this, p));
         }
         return tuples;
@@ -171,7 +171,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
     public boolean merge(I_ImageVersioned jarImage) {
         HashSet<I_ImagePart> versionSet = new HashSet<I_ImagePart>(versions);
         boolean changed = false;
-        for (I_ImagePart jarPart : jarImage.getVersions()) {
+        for (I_ImagePart jarPart : jarImage.getMutableIdParts()) {
             if (!versionSet.contains(jarPart)) {
                 changed = true;
                 versions.add(jarPart);
@@ -242,7 +242,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
         for (I_Path promotionPath : pomotionPaths) {
             for (I_ImageTuple it : matchingTuples) {
                 if (it.getPathId() == viewPathId) {
-                    I_ImagePart promotionPart = it.getPart().duplicate();
+                    I_ImagePart promotionPart = it.getMutableIdPart().duplicate();
                     promotionPart.setVersion(Integer.MAX_VALUE);
                     promotionPart.setPathId(promotionPath.getConceptId());
                     it.getVersioned().addVersion(promotionPart);

@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.I_ProcessIdEntries;
@@ -36,17 +36,17 @@ public interface I_StoreIdentifiers extends I_StoreInBdb {
 
     public int getMaxId() throws DatabaseException;
 
-    public I_IdVersioned getIdNullOk(int nativeId) throws IOException;
+    public I_Identify getIdNullOk(int nativeId) throws IOException;
 
     public List<UUID> nativeToUuid(int nativeId) throws DatabaseException;
 
-    public I_IdVersioned getId(int nativeId) throws IOException;
+    public I_Identify getId(int nativeId) throws IOException;
 
     public Collection<UUID> getUids(int nativeId) throws TerminologyException, IOException;
 
-    public void writeId(I_IdVersioned id) throws DatabaseException;
+    public void writeId(I_Identify id) throws DatabaseException;
 
-    public void deleteId(I_IdVersioned id) throws DatabaseException;
+    public void deleteId(I_Identify id) throws DatabaseException;
 
     public int nativeGenerationForUuid(UUID uid, int source, int pathId, int version) throws TerminologyException,
             IOException;
@@ -59,7 +59,7 @@ public interface I_StoreIdentifiers extends I_StoreInBdb {
 
     public void iterateIdEntries(I_ProcessIdEntries processor) throws Exception;
 
-    public I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException;
+    public I_Identify getId(Collection<UUID> uids) throws TerminologyException, IOException;
 
     public boolean hasId(Collection<UUID> uids) throws DatabaseException;
 
@@ -80,6 +80,6 @@ public interface I_StoreIdentifiers extends I_StoreInBdb {
 
     public int getAceAuxillaryNid();
 
-    public I_IdVersioned idEntryToObject(DatabaseEntry key, DatabaseEntry value);
+    public I_Identify idEntryToObject(DatabaseEntry key, DatabaseEntry value);
 
 }

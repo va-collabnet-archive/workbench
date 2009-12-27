@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -142,7 +142,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             getLog().info("ID Count: " + ids.size());
             int count = 0;
             for (Entry<UUID, Integer> entry : ids.entrySet()) {
-                I_IdVersioned idv = vodb.getIdNullOk(entry.getValue());
+                I_Identify idv = vodb.getIdNullOk(entry.getValue());
                 if (idv == null) {
                     idv = new ThinIdVersioned(entry.getValue(), 1);
                     addUuidPart(entry.getKey(), idv);
@@ -159,14 +159,14 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             getLog().info("Converted to Berkeley-based id mapper");
         }
 
-        private void addUuidPart(UUID uuid, I_IdVersioned idv) throws TerminologyException, IOException {
+        private void addUuidPart(UUID uuid, I_Identify idv) throws TerminologyException, IOException {
             ThinIdPart idPart = new ThinIdPart();
             idPart.setStatusId(currentStatusId);
             idPart.setPathId(encodingPathId);
             idPart.setSource(encodingSource);
             idPart.setSourceId(uuid);
             idPart.setVersion(Integer.MIN_VALUE);
-            idv.addVersion(idPart);
+            idv.addMutableIdPart(idPart);
         }
 
     }
@@ -200,7 +200,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             int newId = vodb.uuidToNativeWithGeneration(firstId, encodingSource, idPath, version);
             idsFromCollection.put(uids, newId);
 
-            I_IdVersioned idv = new ThinIdVersioned(newId, 1);
+            I_Identify idv = new ThinIdVersioned(newId, 1);
             addUuidPart(idPath, version, firstId, idv);
             while (idsItr.hasNext()) {
                 addUuidPart(idPath, version, idsItr.next(), idv);
@@ -225,7 +225,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             int newId = vodb.uuidToNativeWithGeneration(uid, encodingSource, idPath, version);
             ids.put(uid, newId);
 
-            I_IdVersioned idv = new ThinIdVersioned(newId, 1);
+            I_Identify idv = new ThinIdVersioned(newId, 1);
 
             addUuidPart(idPath, version, uid, idv);
             vodb.writeId(idv);
@@ -233,7 +233,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             return newId;
         }
 
-        private void addUuidPart(I_Path idPath, int version, UUID firstId, I_IdVersioned idv)
+        private void addUuidPart(I_Path idPath, int version, UUID firstId, I_Identify idv)
                 throws TerminologyException, IOException {
             ThinIdPart idPart = new ThinIdPart();
             idPart.setStatusId(vodb.uuidToNativeWithGeneration(ArchitectonicAuxiliary.Concept.CURRENT.getUids(),
@@ -243,7 +243,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             idPart.setSource(encodingSource);
             idPart.setSourceId(firstId);
             idPart.setVersion(version);
-            idv.addVersion(idPart);
+            idv.addMutableIdPart(idPart);
         }
 
         public void flushIdBuffer() throws Exception {
@@ -266,14 +266,14 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         if (nativeIdClass.equals(Integer.class)) {
             for (PrimordialId primId : PrimordialId.values()) {
                 for (UUID uid : primId.getUids()) {
-                    I_IdVersioned thinId = new ThinIdVersioned(primId.getNativeId(Integer.MIN_VALUE), 1);
+                    I_Identify thinId = new ThinIdVersioned(primId.getNativeId(Integer.MIN_VALUE), 1);
                     ThinIdPart idPart = new ThinIdPart();
                     idPart.setStatusId(PrimordialId.CURRENT_ID.getNativeId(Integer.MIN_VALUE));
                     idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE));
                     idPart.setSource(PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE));
                     idPart.setSourceId(uid);
                     idPart.setVersion(Integer.MIN_VALUE);
-                    thinId.addVersion(idPart);
+                    thinId.addMutableIdPart(idPart);
                     vodb.writeId(thinId);
                 }
             }
@@ -408,8 +408,8 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         idPart.setSource(vodb.uuidToNative(sourceSystemUuid));
         idPart.setSourceId(sourceId);
         idPart.setVersion(ThinVersionHelper.convert(statusDate.getTime()));
-        if (idv.getVersions().contains(idPart) == false) {
-            idv.addVersion(idPart);
+        if (idv.getMutableIdParts().contains(idPart) == false) {
+            idv.addMutableIdPart(idPart);
             vodb.writeId(idv);
         }
 

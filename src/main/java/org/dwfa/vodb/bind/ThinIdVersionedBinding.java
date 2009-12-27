@@ -19,7 +19,7 @@ package org.dwfa.vodb.bind;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.vodb.types.ThinIdPart;
 import org.dwfa.vodb.types.ThinIdVersioned;
 
@@ -34,10 +34,10 @@ public class ThinIdVersionedBinding extends TupleBinding {
     private static final byte UUID_ID = 3;
     private static final byte STRING_ID = 4;
 
-    public I_IdVersioned entryToObject(TupleInput ti) {
+    public I_Identify entryToObject(TupleInput ti) {
         int nativeId = ti.readInt();
         int size = ti.readInt();
-        I_IdVersioned versioned = new ThinIdVersioned(nativeId, size);
+        I_Identify versioned = new ThinIdVersioned(nativeId, size);
         for (int x = 0; x < size; x++) {
             ThinIdPart id = new ThinIdPart();
             id.setPathId(ti.readInt());
@@ -59,16 +59,16 @@ public class ThinIdVersionedBinding extends TupleBinding {
                 id.setSourceId(ti.readString());
                 break;
             }
-            versioned.addVersion(id);
+            versioned.addMutableIdPart(id);
         }
         return versioned;
     }
 
     public void objectToEntry(Object obj, TupleOutput to) {
-        I_IdVersioned versioned = (I_IdVersioned) obj;
+        I_Identify versioned = (I_Identify) obj;
         to.writeInt(versioned.getNid());
-        to.writeInt(versioned.getVersions().size());
-        for (I_IdPart id : versioned.getVersions()) {
+        to.writeInt(versioned.getMutableIdParts().size());
+        for (I_IdPart id : versioned.getMutableIdParts()) {
             to.writeInt(id.getPathId());
             to.writeInt(id.getVersion());
             to.writeInt(id.getStatusId());

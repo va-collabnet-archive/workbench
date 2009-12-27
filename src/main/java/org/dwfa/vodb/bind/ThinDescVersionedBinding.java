@@ -100,7 +100,7 @@ public class ThinDescVersionedBinding extends TupleBinding {
         to.writeInt(versioned.versionCount());
         String lastLang = null;
         byte[] lastText = new byte[0];
-        for (I_DescriptionPart desc : versioned.getVersions()) {
+        for (I_DescriptionPart desc : versioned.getMutableIdParts()) {
             to.writeInt(desc.getPathId());
             to.writeInt(desc.getVersion());
             to.writeInt(desc.getStatusId());

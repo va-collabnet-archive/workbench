@@ -176,7 +176,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
             switch (field) {
             case STRING_VALUE:
-                return ((I_ThinExtByRefPartString) swet.getTuple().getPart()).getStringValue();
+                return ((I_ThinExtByRefPartString) swet.getTuple().getMutableIdPart()).getStringValue();
             default:
                 throw new UnsupportedOperationException("Can't do string combobox on " + field);
 
@@ -253,23 +253,23 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             case BOOLEAN_VALUE:
                 throw new UnsupportedOperationException("Can't do concept combobox on " + field);
             case CONCEPT_ID:
-                return ConceptBean.get(((I_ThinExtByRefPartConcept) swet.getTuple().getPart()).getConceptId());
+                return ConceptBean.get(((I_ThinExtByRefPartConcept) swet.getTuple().getMutableIdPart()).getConceptId());
             case INTEGER_VALUE:
                 throw new UnsupportedOperationException("Can't do concept combobox on " + field);
             case ACCEPTABILITY:
-                return ConceptBean.get(((I_ThinExtByRefPartLanguage) swet.getTuple().getPart()).getAcceptabilityId());
+                return ConceptBean.get(((I_ThinExtByRefPartLanguage) swet.getTuple().getMutableIdPart()).getAcceptabilityId());
             case CORRECTNESS:
-                return ConceptBean.get(((I_ThinExtByRefPartLanguage) swet.getTuple().getPart()).getCorrectnessId());
+                return ConceptBean.get(((I_ThinExtByRefPartLanguage) swet.getTuple().getMutableIdPart()).getCorrectnessId());
             case DEGREE_OF_SYNONYMY:
-                return ConceptBean.get(((I_ThinExtByRefPartLanguage) swet.getTuple().getPart()).getDegreeOfSynonymyId());
+                return ConceptBean.get(((I_ThinExtByRefPartLanguage) swet.getTuple().getMutableIdPart()).getDegreeOfSynonymyId());
             case TAG:
-                return ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swet.getTuple().getPart()).getTagId());
+                return ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swet.getTuple().getMutableIdPart()).getTagId());
             case SCOPE:
-                return ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swet.getTuple().getPart()).getScopeId());
+                return ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swet.getTuple().getMutableIdPart()).getScopeId());
             case PRIORITY:
                 throw new UnsupportedOperationException("Can't do concept combobox on " + field);
             case MEASUREMENT_UNITS_ID:
-                return ConceptBean.get(((I_ThinExtByRefPartMeasurement) swet.getTuple().getPart()).getUnitsOfMeasureId());
+                return ConceptBean.get(((I_ThinExtByRefPartMeasurement) swet.getTuple().getMutableIdPart()).getUnitsOfMeasureId());
             case MEASUREMENT_VALUE:
             default:
                 throw new UnsupportedOperationException("Can't do concept combobox on " + field);
@@ -837,10 +837,10 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 List<I_ThinExtByRefPart> parts = new ArrayList<I_ThinExtByRefPart>();
                 if (!host.getShowHistory()) {
                     for (I_ThinExtByRefTuple tuple : ebrBean.getExtension().getTuples(allowedStatus, null, true, true)) {
-                        parts.add(tuple.getPart());
+                        parts.add(tuple.getMutableIdPart());
                     }
                 } else {
-                    parts.addAll(ebrBean.getExtension().getVersions());
+                    parts.addAll(ebrBean.getExtension().getMutableIdParts());
                 }
                 for (I_ThinExtByRefPart part : parts) {
                     if (getExtPartClass().equals(part.getClass()) == false) {
@@ -1098,25 +1098,25 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
             case BOOLEAN_VALUE:
                 return new StringWithExtTuple(
-                    Boolean.toString(((I_ThinExtByRefPartBoolean) tuple.getPart()).getValue()), tuple,
+                    Boolean.toString(((I_ThinExtByRefPartBoolean) tuple.getMutableIdPart()).getValue()), tuple,
                     tuple.getMemberId(), inConflict);
 
             case STRING_VALUE:
-                return new StringWithExtTuple(((I_ThinExtByRefPartString) tuple.getPart()).getStringValue(), tuple,
+                return new StringWithExtTuple(((I_ThinExtByRefPartString) tuple.getMutableIdPart()).getStringValue(), tuple,
                     tuple.getMemberId(), inConflict);
 
             case CONCEPT_ID:
-                if (referencedConcepts.containsKey(((I_ThinExtByRefPartConcept) tuple.getPart()).getC1id())) {
-                    return new StringWithExtTuple(getPrefText(((I_ThinExtByRefPartConcept) tuple.getPart()).getC1id()),
-                        tuple, ((I_ThinExtByRefPartConcept) tuple.getPart()).getC1id(), inConflict);
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartConcept) tuple.getMutableIdPart()).getC1id())) {
+                    return new StringWithExtTuple(getPrefText(((I_ThinExtByRefPartConcept) tuple.getMutableIdPart()).getC1id()),
+                        tuple, ((I_ThinExtByRefPartConcept) tuple.getMutableIdPart()).getC1id(), inConflict);
                 }
                 return new StringWithExtTuple(
-                    Integer.toString(((I_ThinExtByRefPartConcept) tuple.getPart()).getC1id()), tuple,
-                    ((I_ThinExtByRefPartConcept) tuple.getPart()).getC1id(), inConflict);
+                    Integer.toString(((I_ThinExtByRefPartConcept) tuple.getMutableIdPart()).getC1id()), tuple,
+                    ((I_ThinExtByRefPartConcept) tuple.getMutableIdPart()).getC1id(), inConflict);
 
             case INTEGER_VALUE:
-                if (ThinExtByRefPartConceptInt.class.isAssignableFrom(tuple.getPart().getClass())) {
-                    int value = ((ThinExtByRefPartConceptInt) tuple.getPart()).getIntValue();
+                if (ThinExtByRefPartConceptInt.class.isAssignableFrom(tuple.getMutableIdPart().getClass())) {
+                    int value = ((ThinExtByRefPartConceptInt) tuple.getMutableIdPart()).getIntValue();
                     if (refsetHelper.hasPurpose(tuple.getRefsetId(), RefsetAuxiliary.Concept.REFSET_PURPOSE_POSITION)) {
                         return new StringWithExtTuple((value == Integer.MAX_VALUE) ? "latest"
                                                                                   : ThinVersionHelper.format(value),
@@ -1125,89 +1125,89 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                         return new StringWithExtTuple(Integer.toString(value), tuple, tuple.getMemberId(), inConflict);
                     }
                 } else {
-                    int value = ((I_ThinExtByRefPartInteger) tuple.getPart()).getIntValue();
+                    int value = ((I_ThinExtByRefPartInteger) tuple.getMutableIdPart()).getIntValue();
                     return new StringWithExtTuple(Integer.toString(value), tuple, tuple.getMemberId(), inConflict);
                 }
 
             case ACCEPTABILITY:
-                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId())) {
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getAcceptabilityId())) {
                     return new StringWithExtTuple(
-                        getPrefText(((I_ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId()), tuple,
-                        ((I_ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId(), inConflict);
+                        getPrefText(((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getAcceptabilityId()), tuple,
+                        ((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getAcceptabilityId(), inConflict);
                 }
                 return new StringWithExtTuple(
-                    Integer.toString(((I_ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId()), tuple,
-                    ((I_ThinExtByRefPartLanguage) tuple.getPart()).getAcceptabilityId(), inConflict);
+                    Integer.toString(((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getAcceptabilityId()), tuple,
+                    ((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getAcceptabilityId(), inConflict);
 
             case CORRECTNESS:
-                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId())) {
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getCorrectnessId())) {
                     return new StringWithExtTuple(
-                        getPrefText(((I_ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId()), tuple,
-                        ((I_ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId(), inConflict);
+                        getPrefText(((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getCorrectnessId()), tuple,
+                        ((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getCorrectnessId(), inConflict);
                 }
                 return new StringWithExtTuple(
-                    Integer.toString(((I_ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId()), tuple,
-                    ((I_ThinExtByRefPartLanguage) tuple.getPart()).getCorrectnessId(), inConflict);
+                    Integer.toString(((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getCorrectnessId()), tuple,
+                    ((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getCorrectnessId(), inConflict);
 
             case DEGREE_OF_SYNONYMY:
-                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId())) {
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getDegreeOfSynonymyId())) {
                     return new StringWithExtTuple(
-                        getPrefText(((I_ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId()), tuple,
-                        ((I_ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId(), inConflict);
+                        getPrefText(((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getDegreeOfSynonymyId()), tuple,
+                        ((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getDegreeOfSynonymyId(), inConflict);
                 }
                 return new StringWithExtTuple(
-                    Integer.toString(((I_ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId()), tuple,
-                    ((I_ThinExtByRefPartLanguage) tuple.getPart()).getDegreeOfSynonymyId(), inConflict);
+                    Integer.toString(((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getDegreeOfSynonymyId()), tuple,
+                    ((I_ThinExtByRefPartLanguage) tuple.getMutableIdPart()).getDegreeOfSynonymyId(), inConflict);
 
             case TAG:
-                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId())) {
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getTagId())) {
                     return new StringWithExtTuple(
-                        getPrefText(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId()), tuple,
-                        ((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId(), inConflict);
+                        getPrefText(((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getTagId()), tuple,
+                        ((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getTagId(), inConflict);
                 }
                 return new StringWithExtTuple(
-                    Integer.toString(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId()), tuple,
-                    ((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getTagId(), inConflict);
+                    Integer.toString(((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getTagId()), tuple,
+                    ((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getTagId(), inConflict);
 
             case SCOPE:
-                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId())) {
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getScopeId())) {
                     return new StringWithExtTuple(
-                        getPrefText(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId()), tuple,
-                        ((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId(), inConflict);
+                        getPrefText(((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getScopeId()), tuple,
+                        ((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getScopeId(), inConflict);
                 }
                 return new StringWithExtTuple(
-                    Integer.toString(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId()), tuple,
-                    ((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getScopeId(), inConflict);
+                    Integer.toString(((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getScopeId()), tuple,
+                    ((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getScopeId(), inConflict);
 
             case PRIORITY:
                 return new StringWithExtTuple(
-                    Integer.toString(((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getPriority()), tuple,
-                    ((I_ThinExtByRefPartLanguageScoped) tuple.getPart()).getPriority(), inConflict);
+                    Integer.toString(((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getPriority()), tuple,
+                    ((I_ThinExtByRefPartLanguageScoped) tuple.getMutableIdPart()).getPriority(), inConflict);
 
             case MEASUREMENT_UNITS_ID:
-                if (referencedConcepts.containsKey(((I_ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId())) {
+                if (referencedConcepts.containsKey(((I_ThinExtByRefPartMeasurement) tuple.getMutableIdPart()).getUnitsOfMeasureId())) {
                     return new StringWithExtTuple(
-                        getPrefText(((I_ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId()), tuple,
-                        ((I_ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId(), inConflict);
+                        getPrefText(((I_ThinExtByRefPartMeasurement) tuple.getMutableIdPart()).getUnitsOfMeasureId()), tuple,
+                        ((I_ThinExtByRefPartMeasurement) tuple.getMutableIdPart()).getUnitsOfMeasureId(), inConflict);
                 }
                 return new StringWithExtTuple(
-                    Integer.toString(((I_ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId()), tuple,
-                    ((I_ThinExtByRefPartMeasurement) tuple.getPart()).getUnitsOfMeasureId(), inConflict);
+                    Integer.toString(((I_ThinExtByRefPartMeasurement) tuple.getMutableIdPart()).getUnitsOfMeasureId()), tuple,
+                    ((I_ThinExtByRefPartMeasurement) tuple.getMutableIdPart()).getUnitsOfMeasureId(), inConflict);
 
             case MEASUREMENT_VALUE:
                 return new StringWithExtTuple(
-                    Double.toString(((I_ThinExtByRefPartMeasurement) tuple.getPart()).getMeasurementValue()), tuple,
+                    Double.toString(((I_ThinExtByRefPartMeasurement) tuple.getMutableIdPart()).getMeasurementValue()), tuple,
                     tuple.getMemberId(), inConflict);
 
             case MAP_REFINABILITY:
                 return new StringWithExtTuple(
-                    Double.toString(((I_ThinExtByRefPartCrossmap) tuple.getPart()).getRefineFlagId()), tuple,
-                    ((I_ThinExtByRefPartCrossmap) tuple.getPart()).getRefineFlagId(), inConflict);
+                    Double.toString(((I_ThinExtByRefPartCrossmap) tuple.getMutableIdPart()).getRefineFlagId()), tuple,
+                    ((I_ThinExtByRefPartCrossmap) tuple.getMutableIdPart()).getRefineFlagId(), inConflict);
 
             case MAP_STATUS:
                 return new StringWithExtTuple(
-                    Double.toString(((I_ThinExtByRefPartCrossmap) tuple.getPart()).getMapStatusId()), tuple,
-                    ((I_ThinExtByRefPartCrossmap) tuple.getPart()).getMapStatusId(), inConflict);
+                    Double.toString(((I_ThinExtByRefPartCrossmap) tuple.getMutableIdPart()).getMapStatusId()), tuple,
+                    ((I_ThinExtByRefPartCrossmap) tuple.getMutableIdPart()).getMapStatusId(), inConflict);
             }
 
             AceLog.getAppLog().alertAndLogException(new Exception("Can't handle column type: " + columns[columnIndex]));
@@ -1561,78 +1561,78 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 break;
             case BOOLEAN_VALUE:
                 Boolean booleanValue = (Boolean) value;
-                if (booleanValue != ((I_ThinExtByRefPartBoolean) extTuple.getPart()).getValue()) {
-                    ((I_ThinExtByRefPartBoolean) extTuple.getPart()).setValue(booleanValue);
+                if (booleanValue != ((I_ThinExtByRefPartBoolean) extTuple.getMutableIdPart()).getValue()) {
+                    ((I_ThinExtByRefPartBoolean) extTuple.getMutableIdPart()).setValue(booleanValue);
                     changed = true;
                 }
                 break;
             case STRING_VALUE:
                 String stringValue = (String) value;
-                if (stringValue.equals(((I_ThinExtByRefPartString) extTuple.getPart()).getStringValue()) == false) {
-                    ((I_ThinExtByRefPartString) extTuple.getPart()).setStringValue(stringValue);
+                if (stringValue.equals(((I_ThinExtByRefPartString) extTuple.getMutableIdPart()).getStringValue()) == false) {
+                    ((I_ThinExtByRefPartString) extTuple.getMutableIdPart()).setStringValue(stringValue);
                     changed = true;
                 }
                 break;
             case CONCEPT_ID:
                 Integer conceptId = (Integer) value;
-                ((I_ThinExtByRefPartConcept) extTuple.getPart()).setConceptId(conceptId);
+                ((I_ThinExtByRefPartConcept) extTuple.getMutableIdPart()).setConceptId(conceptId);
                 referencedConcepts.put(conceptId, ConceptBean.get(conceptId));
                 changed = true;
                 break;
             case INTEGER_VALUE:
                 Integer intValue = (Integer) value;
-                if (I_ThinExtByRefPartConceptInt.class.isAssignableFrom(extTuple.getPart().getClass())) {
-                    ((I_ThinExtByRefPartConceptInt) extTuple.getPart()).setIntValue(intValue);
+                if (I_ThinExtByRefPartConceptInt.class.isAssignableFrom(extTuple.getMutableIdPart().getClass())) {
+                    ((I_ThinExtByRefPartConceptInt) extTuple.getMutableIdPart()).setIntValue(intValue);
                 } else {
-                    ((I_ThinExtByRefPartInteger) extTuple.getPart()).setValue(intValue);
+                    ((I_ThinExtByRefPartInteger) extTuple.getMutableIdPart()).setValue(intValue);
                 }
                 changed = true;
                 break;
             case ACCEPTABILITY:
                 Integer acceptabilityId = (Integer) value;
                 // TODO finish the conditional tests...
-                ((I_ThinExtByRefPartLanguage) extTuple.getPart()).setAcceptabilityId(acceptabilityId);
+                ((I_ThinExtByRefPartLanguage) extTuple.getMutableIdPart()).setAcceptabilityId(acceptabilityId);
                 referencedConcepts.put(acceptabilityId, ConceptBean.get(acceptabilityId));
                 changed = true;
                 break;
             case CORRECTNESS:
                 Integer correctnessId = (Integer) value;
-                ((I_ThinExtByRefPartLanguage) extTuple.getPart()).setCorrectnessId(correctnessId);
+                ((I_ThinExtByRefPartLanguage) extTuple.getMutableIdPart()).setCorrectnessId(correctnessId);
                 referencedConcepts.put(correctnessId, ConceptBean.get(correctnessId));
                 changed = true;
                 break;
             case DEGREE_OF_SYNONYMY:
                 Integer dosId = (Integer) value;
-                ((I_ThinExtByRefPartLanguage) extTuple.getPart()).setDegreeOfSynonymyId(dosId);
+                ((I_ThinExtByRefPartLanguage) extTuple.getMutableIdPart()).setDegreeOfSynonymyId(dosId);
                 referencedConcepts.put(dosId, ConceptBean.get(dosId));
                 changed = true;
                 break;
             case TAG:
                 Integer tagId = (Integer) value;
-                ((I_ThinExtByRefPartLanguageScoped) extTuple.getPart()).setTagId(tagId);
+                ((I_ThinExtByRefPartLanguageScoped) extTuple.getMutableIdPart()).setTagId(tagId);
                 referencedConcepts.put(tagId, ConceptBean.get(tagId));
                 changed = true;
                 break;
             case SCOPE:
                 Integer scopeId = (Integer) value;
-                ((I_ThinExtByRefPartLanguageScoped) extTuple.getPart()).setScopeId(scopeId);
+                ((I_ThinExtByRefPartLanguageScoped) extTuple.getMutableIdPart()).setScopeId(scopeId);
                 referencedConcepts.put(scopeId, ConceptBean.get(scopeId));
                 changed = true;
                 break;
             case PRIORITY:
                 Integer priority = (Integer) value;
-                ((I_ThinExtByRefPartLanguageScoped) extTuple.getPart()).setPriority(priority);
+                ((I_ThinExtByRefPartLanguageScoped) extTuple.getMutableIdPart()).setPriority(priority);
                 changed = true;
                 break;
             case MEASUREMENT_UNITS_ID:
                 Integer unitsId = (Integer) value;
-                ((I_ThinExtByRefPartMeasurement) extTuple.getPart()).setUnitsOfMeasureId(unitsId);
+                ((I_ThinExtByRefPartMeasurement) extTuple.getMutableIdPart()).setUnitsOfMeasureId(unitsId);
                 referencedConcepts.put(unitsId, ConceptBean.get(unitsId));
                 changed = true;
                 break;
             case MEASUREMENT_VALUE:
                 Double measurementValue = (Double) value;
-                ((I_ThinExtByRefPartMeasurement) extTuple.getPart()).setMeasurementValue(measurementValue);
+                ((I_ThinExtByRefPartMeasurement) extTuple.getMutableIdPart()).setMeasurementValue(measurementValue);
                 changed = true;
                 break;
             }

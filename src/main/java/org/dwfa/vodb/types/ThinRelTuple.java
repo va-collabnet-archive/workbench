@@ -226,7 +226,7 @@ public class ThinRelTuple implements I_RelTuple {
         return fixedPart;
     }
 
-    public I_RelPart getPart() {
+    public I_RelPart getMutableIdPart() {
         return part;
     }
 
@@ -256,7 +256,7 @@ public class ThinRelTuple implements I_RelTuple {
         // TODO
     }
 
-    public int getFixedPartId() {
+    public int getNid() {
         return fixedPart.getNid();
     }
 

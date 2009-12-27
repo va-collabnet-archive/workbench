@@ -119,7 +119,7 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
@@ -599,7 +599,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     if (uncommittedBean.isUncommitted() && uncommittedBean.isExtensionUncommitted()) {
                         removeUncommitted(uncommittedBean);
                     }
-                    if (eb.getExtension().getVersions().size() == 0) {
+                    if (eb.getExtension().getMutableIdParts().size() == 0) {
                         eb.abort();
                     }
                     List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
@@ -607,7 +607,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     addUncommitted(uncommittedBean);
                     for (I_ThinExtByRefVersioned ext : LocalVersionedTerminology.get().getAllExtensionsForComponent(
                         uncommittedBean.getConceptId(), true)) {
-                        for (I_ThinExtByRefPart part : ext.getVersions()) {
+                        for (I_ThinExtByRefPart part : ext.getMutableIdParts()) {
                             if (part.getVersion() == Integer.MAX_VALUE) {
                                 addUncommitted(ExtensionByReferenceBean.get(ext.getMemberId()));
                                 break;
@@ -913,9 +913,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         if (I_GetConceptData.class.isAssignableFrom(cb.getClass())) {
             I_GetConceptData igcd = (I_GetConceptData) cb;
             for (int nid : igcd.getUncommittedIds().getSetValues()) {
-                I_IdVersioned idv = AceConfig.getVodb().getId(nid);
+                I_Identify idv = AceConfig.getVodb().getId(nid);
                 try {
-                    uncommittedIds.getUncommittedIds().add(idv.getUniversal());
+                    uncommittedIds.getUncommittedIds().add(idv.getUniversalId());
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }
@@ -923,9 +923,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         } else if (ExtensionByReferenceBean.class.isAssignableFrom(cb.getClass())) {
             ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) cb;
             if (ebrBean.isFirstCommit()) {
-                I_IdVersioned idv = AceConfig.getVodb().getId(ebrBean.getMemberId());
+                I_Identify idv = AceConfig.getVodb().getId(ebrBean.getMemberId());
                 try {
-                    uncommittedIds.getUncommittedIds().add(idv.getUniversal());
+                    uncommittedIds.getUncommittedIds().add(idv.getUniversalId());
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }

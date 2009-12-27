@@ -375,7 +375,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         value = columns[columnIndex].getReadMethod().invoke(ConceptBean.get(tuple.getComponentId()),
                                                                             columns[columnIndex].readParamaters);
                     } else {
-                        I_DescriptionVersioned desc = tf.getDescription(tf.getId(id).getUIDs().iterator().next().toString());
+                        I_DescriptionVersioned desc = tf.getDescription(tf.getId(id).getUUIDs().iterator().next().toString());
                         if (desc != null) {
                             value = desc.getLastTuple().getText();
                         }
@@ -399,13 +399,13 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 break;
             case PART:
                 if (columns[columnIndex].readParamaters != null) {
-                    value = columns[columnIndex].getReadMethod().invoke(tuple.getPart(),
+                    value = columns[columnIndex].getReadMethod().invoke(tuple.getMutableIdPart(),
                         columns[columnIndex].readParamaters);
                 } else {
                     try {
-                        value = columns[columnIndex].getReadMethod().invoke(tuple.getPart());
+                        value = columns[columnIndex].getReadMethod().invoke(tuple.getMutableIdPart());
                     } catch (Exception e) {
-                        value = tuple.getPart().toString();
+                        value = tuple.getMutableIdPart().toString();
                         AceLog.getAppLog().warning(e.getMessage() + ": " + value);
                     }
                 }
@@ -464,7 +464,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 RefsetSpecTreeCellRenderer renderer = new RefsetSpecTreeCellRenderer(host.getConfig());
                                 buff.append(renderer.getHtmlRendering(obj));
                             } else {
-                                buff.append(obj.getPart().toString());
+                                buff.append(obj.getMutableIdPart().toString());
                             }
 
                             return new StringWithExtTuple(buff.toString(), tuple, id);
@@ -486,7 +486,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                     RefsetSpecTreeCellRenderer renderer = new RefsetSpecTreeCellRenderer(host.getConfig());
                                     buff.append(renderer.getHtmlRendering(obj));
                                 } else {
-                                    buff.append(obj.getPart().toString());
+                                    buff.append(obj.getMutableIdPart().toString());
                                 }
 
                                 return new StringWithExtTuple(buff.toString(), tuple, id);
@@ -585,7 +585,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                             changed = true;
                             break;
                         case PART:
-                            columns[col].getWriteMethod().invoke(extTuple.getPart(), value);
+                            columns[col].getWriteMethod().invoke(extTuple.getMutableIdPart(), value);
                             changed = true;
                             break;
                         default:

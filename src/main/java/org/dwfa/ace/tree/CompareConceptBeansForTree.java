@@ -87,7 +87,7 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
                         } else if (c2ExtTuple == null) {
                             return -1;
                         }
-                        int comparison = c1ExtTuple.getPart().compareTo(c2ExtTuple.getPart());
+                        int comparison = c1ExtTuple.getMutableIdPart().compareTo(c2ExtTuple.getMutableIdPart());
                         if (comparison != 0) {
                             return comparison;
                         } else {
@@ -153,7 +153,7 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
                     return returnTuples.get(0);
                 }
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().fine("No tuple for match: " + ext.getExtension().getVersions());
+                    AceLog.getAppLog().fine("No tuple for match: " + ext.getExtension().getMutableIdParts());
                 }
                 return null;
             }

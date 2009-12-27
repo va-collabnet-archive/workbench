@@ -129,7 +129,7 @@ public class ThinImageTuple implements I_ImageTuple {
         return core;
     }
 
-    public I_ImagePart getPart() {
+    public I_ImagePart getMutableIdPart() {
         return part;
     }
 
@@ -157,7 +157,7 @@ public class ThinImageTuple implements I_ImageTuple {
         part.setTypeId(type);
     }
 
-    public int getFixedPartId() {
+    public int getNid() {
         return core.getNid();
     }
 

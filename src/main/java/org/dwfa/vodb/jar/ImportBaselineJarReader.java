@@ -45,7 +45,7 @@ import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -293,7 +293,7 @@ public class ImportBaselineJarReader implements ActionListener {
                     read = dis.read(buffer, read, size);
                 }
                 TupleInput input = new TupleInput(buffer);
-                I_IdVersioned jarId = binding.entryToObject(input);
+                I_Identify jarId = binding.entryToObject(input);
                 AceConfig.getVodb().writeId(jarId);
                 processed++;
             } catch (Throwable e) {

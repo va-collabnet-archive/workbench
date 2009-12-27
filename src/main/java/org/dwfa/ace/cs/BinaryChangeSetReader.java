@@ -33,7 +33,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -331,7 +331,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             }
             // Do all the committing...
             Collection<UUID> memberUid = bean.getMemberUid();
-            I_IdVersioned id = getVodb().getId(memberUid);
+            I_Identify id = getVodb().getId(memberUid);
             int memberId = Integer.MIN_VALUE;
             if (id == null) {
                 I_Path path = getVodb().getPath(
@@ -347,7 +347,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 extension = getVodb().getExtension(memberId);
             } else {
                 int refsetId = getVodb().getId(bean.getRefsetUid()).getNid();
-                I_IdVersioned componentUuid = getVodb().getId(bean.getComponentUid());
+                I_Identify componentUuid = getVodb().getId(bean.getComponentUid());
 
                 if (componentUuid == null) {
                     AceLog.getAppLog().severe(
@@ -365,7 +365,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     if (part.getTime() == Long.MAX_VALUE) {
                         ThinExtByRefPart newPart = ThinExtByRefVersioned.makePart(part);
                         newPart.setVersion(ThinVersionHelper.convert(time));
-                        if (extension.getVersions().contains(newPart)) {
+                        if (extension.getMutableIdParts().contains(newPart)) {
                             changed = false;
                         } else {
                             changed = true;
@@ -433,11 +433,11 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     } else {
                         newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
                     }
-                    if (tid.getVersions().contains(newPart)) {
+                    if (tid.getMutableIdParts().contains(newPart)) {
                         // Nothing changed...
                     } else {
                         values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
-                        tid.addVersion(newPart);
+                        tid.addMutableIdPart(newPart);
                         AceLog.getEditLog().fine(" add version: " + newPart);
                     }
                 }
@@ -498,7 +498,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         newPart.setStatusId(getNid(part.getConceptStatus()));
                         newPart.setDefined(part.isDefined());
                         newPart.setVersion(ThinVersionHelper.convert(time));
-                        if (thinAttributes.getVersions().contains(newPart)) {
+                        if (thinAttributes.getMutableIdParts().contains(newPart)) {
                             changed = false;
                         } else {
                             changed = true;
@@ -574,7 +574,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         newPart.setTextDescription(part.getTextDescription());
                         newPart.setTypeId(getNid(part.getTypeId()));
                         newPart.setVersion(ThinVersionHelper.convert(time));
-                        if (thinImage.getVersions().contains(newPart)) {
+                        if (thinImage.getMutableIdParts().contains(newPart)) {
                             changed = false;
                         } else {
                             changed = true;
@@ -707,7 +707,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         } else {
                             newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
                         }
-                        if (thinRel.getVersions().contains(newPart)) {
+                        if (thinRel.getMutableIdParts().contains(newPart)) {
                             changed = false;
                         } else {
                             changed = true;
@@ -731,7 +731,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                             newPart.setTypeId(getNid(part.getTypeId()));
                             newPart.setStatusId(getNid(part.getStatusId()));
                             newPart.setVersion(ThinVersionHelper.convert(time));
-                            if (thinRel.getVersions().contains(newPart)) {
+                            if (thinRel.getMutableIdParts().contains(newPart)) {
                                 changed = false;
                             } else {
                                 changed = true;
@@ -779,7 +779,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                                     newPart.setText(part.getText());
                                     newPart.setTypeId(getNid(part.getTypeId()));
                                     newPart.setVersion(ThinVersionHelper.convert(time));
-                                    if (thinDesc.getVersions().contains(newPart)) {
+                                    if (thinDesc.getMutableIdParts().contains(newPart)) {
                                         changed = false;
                                     } else {
                                         changed = true;
@@ -892,11 +892,11 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 } else {
                     newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
                 }
-                if (tid.getVersions().contains(newPart)) {
+                if (tid.getMutableIdParts().contains(newPart)) {
                     // already there
                 } else {
                     values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
-                    tid.addVersion(newPart);
+                    tid.addMutableIdPart(newPart);
                     AceLog.getEditLog().fine(" add version: " + newPart);
                 }
             }

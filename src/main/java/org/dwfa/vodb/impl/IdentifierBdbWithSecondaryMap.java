@@ -27,7 +27,7 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
@@ -198,7 +198,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
      * 
      * @see org.dwfa.vodb.I_StoreIdentifiers#getIdNullOk(int)
      */
-    public I_IdVersioned getIdNullOk(int nativeId) throws IOException {
+    public I_Identify getIdNullOk(int nativeId) throws IOException {
         Stopwatch timer = null;
         if (AceLog.getAppLog().isLoggable(Level.FINER)) {
             AceLog.getAppLog().finer("Getting id record for : " + nativeId);
@@ -214,7 +214,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
                     AceLog.getAppLog().finer(
                         "Got id record for: " + nativeId + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
                 }
-                return (I_IdVersioned) idBinding.entryToObject(idValue);
+                return (I_Identify) idBinding.entryToObject(idValue);
             }
         } catch (DatabaseException e) {
             new ToIoException(e);
@@ -242,7 +242,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
                 AceLog.getAppLog().finer(
                     "Got id record for: " + nativeId + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
             }
-            return ((I_IdVersioned) idBinding.entryToObject(idValue)).getUIDs();
+            return ((I_Identify) idBinding.entryToObject(idValue)).getUUIDs();
         }
         throw new DatabaseException("List<UUID> not found for: " + nativeId + " (a).");
     }
@@ -252,8 +252,8 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
      * 
      * @see org.dwfa.vodb.I_StoreIdentifiers#getId(int)
      */
-    public I_IdVersioned getId(int nativeId) throws IOException {
-        I_IdVersioned id = getIdNullOk(nativeId);
+    public I_Identify getId(int nativeId) throws IOException {
+        I_Identify id = getIdNullOk(nativeId);
         if (id != null) {
             return id;
         }
@@ -279,14 +279,14 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#writeId(org.dwfa.ace.api.I_IdVersioned)
      */
-    public void writeId(I_IdVersioned id) throws DatabaseException {
+    public void writeId(I_Identify id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
         intBinder.objectToEntry(id.getNid(), idKey);
         idBinding.objectToEntry(id, idValue);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Writing nativeId : " + id);
-            for (I_IdPart p : id.getVersions()) {
+            for (I_IdPart p : id.getMutableIdParts()) {
                 if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
                     UUID secondaryId = (UUID) p.getSourceId();
                     try {
@@ -316,7 +316,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#deleteId(org.dwfa.ace.api.I_IdVersioned)
      */
-    public void deleteId(I_IdVersioned id) throws DatabaseException {
+    public void deleteId(I_Identify id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
         intBinder.objectToEntry(id.getNid(), idKey);
@@ -335,7 +335,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
             IOException {
         // create a new one...
         try {
-            I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
+            I_Identify newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
             // AceLog.getLog().info("Last id: " + lastId + " NewId: " +
             // newId.getNativeId());
             ThinIdPart idPart = new ThinIdPart();
@@ -344,7 +344,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
             idPart.setSource(source);
             idPart.setSourceId(uid);
             idPart.setVersion(version);
-            newId.addVersion(idPart);
+            newId.addMutableIdPart(idPart);
             writeId(newId);
             return newId.getNid();
         } catch (DatabaseException e2) {
@@ -367,7 +367,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
         } catch (TerminologyException e) {
             // create a new one...
             try {
-                I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
+                I_Identify newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
                 // AceLog.getLog().info("Last id: " + lastId + " NewId: " +
                 // newId.getNativeId());
                 ThinIdPart idPart = new ThinIdPart();
@@ -377,7 +377,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
                     idPart.setSource(source);
                     idPart.setSourceId(uid);
                     idPart.setVersion(version);
-                    newId.addVersion(idPart);
+                    newId.addMutableIdPart(idPart);
                 }
 
                 writeId(newId);
@@ -403,7 +403,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
         } catch (NoMappingException e) {
             // create a new one...
             try {
-                I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
+                I_Identify newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
                 // AceLog.getLog().info("Last id: " + lastId + " NewId: " +
                 // newId.getNativeId());
                 ThinIdPart idPart = new ThinIdPart();
@@ -413,7 +413,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
                     idPart.setSource(source);
                     idPart.setSourceId(uid);
                     idPart.setVersion(version);
-                    newId.addVersion(idPart);
+                    newId.addMutableIdPart(idPart);
                 }
 
                 writeId(newId);
@@ -476,7 +476,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
      * 
      * @see org.dwfa.vodb.I_StoreIdentifiers#getId(java.util.Collection)
      */
-    public I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException {
+    public I_Identify getId(Collection<UUID> uids) throws TerminologyException, IOException {
         Set<ThinIdVersioned> ids = new HashSet<ThinIdVersioned>(1);
         for (UUID uid : uids) {
             ThinIdVersioned thinId = getId(uid);
@@ -588,7 +588,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
             return PrimordialId.INFERRED_CHARACTERISTIC_ID.getNativeId(Integer.MIN_VALUE);
         }
 
-        I_IdVersioned id = getId(uid);
+        I_Identify id = getId(uid);
         if (id != null) {
             return id.getNid();
         }
@@ -601,7 +601,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
      * @see org.dwfa.vodb.I_StoreIdentifiers#uuidToNative(java.util.Collection)
      */
     public int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException {
-        I_IdVersioned id = getId(uids);
+        I_Identify id = getId(uids);
         if (id == null) {
             throw new NoMappingException("No id for: " + uids);
         }
@@ -616,15 +616,15 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
         return PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE);
     }
 
-    public I_IdVersioned idEntryToObject(DatabaseEntry key, DatabaseEntry value) {
-        return (I_IdVersioned) idBinding.entryToObject(value);
+    public I_Identify idEntryToObject(DatabaseEntry key, DatabaseEntry value) {
+        return (I_Identify) idBinding.entryToObject(value);
     }
 
     public void commit(ConceptBean bean, int version, Set<TimePathId> values) throws DatabaseException, IOException {
         if (bean.uncommittedIds != null) {
             for (int id : bean.uncommittedIds.getSetValues()) {
-                I_IdVersioned idv = AceConfig.getVodb().getId(id);
-                for (I_IdPart p : idv.getVersions()) {
+                I_Identify idv = AceConfig.getVodb().getId(id);
+                for (I_IdPart p : idv.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));

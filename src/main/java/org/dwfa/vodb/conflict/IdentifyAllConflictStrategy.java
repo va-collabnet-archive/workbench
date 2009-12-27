@@ -115,7 +115,7 @@ public class IdentifyAllConflictStrategy extends ConflictManagementStrategy impl
         for (T t : tuples) {
             int termId;
             if (t instanceof I_AmTuple) {
-                termId = ((I_AmTuple) t).getFixedPartId();
+                termId = ((I_AmTuple) t).getNid();
             } else {
                 termId = 0;
             }

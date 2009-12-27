@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -86,7 +86,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 
         // See if the UUID generated a duplicate...
         // Check to be sure the UUID generated from nameUUID is unique.
-        I_IdVersioned dup = vodb.getId(snomedUid);
+        I_Identify dup = vodb.getId(snomedUid);
         if (dup != null) {
             boolean error = true;
             if (error) {
@@ -102,7 +102,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
 
         int newId = vodb.uuidToNativeWithGeneration(snomedUid, snomedType3UuidSource, snomedPath, thinVers);
         idMap.put(snomedId, newId);
-        I_IdVersioned idv = new ThinIdVersioned(newId, 2);
+        I_Identify idv = new ThinIdVersioned(newId, 2);
         // add
         ThinIdPart idPart = new ThinIdPart();
         idPart.setStatusId(currentId);
@@ -110,7 +110,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
         idPart.setSource(snomedType3UuidSource);
         idPart.setSourceId(snomedUid);
         idPart.setVersion(thinVers);
-        idv.addVersion(idPart);
+        idv.addMutableIdPart(idPart);
 
         idPart = new ThinIdPart();
         idPart.setStatusId(currentId);
@@ -118,7 +118,7 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
         idPart.setSource(snomedIntIdSource);
         idPart.setSourceId(new Long(snomedId));
         idPart.setVersion(thinVers);
-        idv.addVersion(idPart);
+        idv.addMutableIdPart(idPart);
         vodb.writeId(idv);
         return newId;
     }

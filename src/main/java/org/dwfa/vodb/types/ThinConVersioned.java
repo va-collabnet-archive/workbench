@@ -78,7 +78,7 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
      * 
      * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getVersions()
      */
-    public List<I_ConceptAttributePart> getVersions() {
+    public List<I_ConceptAttributePart> getMutableIdParts() {
         return versions;
     }
 
@@ -142,7 +142,7 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
     public boolean merge(I_ConceptAttributeVersioned jarCon) {
         HashSet<I_ConceptAttributePart> versionSet = new HashSet<I_ConceptAttributePart>(versions);
         boolean changed = false;
-        for (I_ConceptAttributePart jarPart : jarCon.getVersions()) {
+        for (I_ConceptAttributePart jarPart : jarCon.getMutableIdParts()) {
             if (!versionSet.contains(jarPart)) {
                 changed = true;
                 versions.add((ThinConPart) jarPart);
@@ -286,8 +286,8 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
         boolean promotedAnything = false;
         for (I_Path promotionPath : promotionPaths) {
             for (I_ConceptAttributeTuple tuple : getTuples(allowedStatus, viewPositionSet)) {
-                if (tuple.getPart().getPathId() == viewPathId) {
-                    I_ConceptAttributePart promotionPart = tuple.getPart().duplicate();
+                if (tuple.getMutableIdPart().getPathId() == viewPathId) {
+                    I_ConceptAttributePart promotionPart = tuple.getMutableIdPart().duplicate();
                     promotionPart.setVersion(Integer.MAX_VALUE);
                     promotionPart.setPathId(promotionPath.getConceptId());
                     addVersion(promotionPart);

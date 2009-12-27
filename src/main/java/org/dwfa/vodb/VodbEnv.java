@@ -57,7 +57,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntList;
@@ -560,7 +560,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
 
         public void processDescription(I_DescriptionVersioned desc) throws Exception {
-            for (I_DescriptionPart d : desc.getVersions()) {
+            for (I_DescriptionPart d : desc.getMutableIdParts()) {
                 TimePathId tb = new TimePathId(d.getVersion(), d.getPathId());
                 values.add(tb);
             }
@@ -568,8 +568,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
         public void processConceptAttributes(I_ConceptAttributeVersioned conc) throws Exception {
             if (conc != null) {
-                if (conc.getVersions() != null) {
-                    for (I_ConceptAttributePart c : conc.getVersions()) {
+                if (conc.getMutableIdParts() != null) {
+                    for (I_ConceptAttributePart c : conc.getMutableIdParts()) {
                         TimePathId tb = new TimePathId(c.getVersion(), c.getPathId());
                         values.add(tb);
                     }
@@ -582,14 +582,14 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
 
         public void processRelationship(I_RelVersioned rel) throws Exception {
-            for (I_RelPart r : rel.getVersions()) {
+            for (I_RelPart r : rel.getMutableIdParts()) {
                 TimePathId tb = new TimePathId(r.getVersion(), r.getPathId());
                 values.add(tb);
             }
         }
 
         public void processExtensionByReference(I_ThinExtByRefVersioned ext) throws Exception {
-            for (I_ThinExtByRefPart extPart : ext.getVersions()) {
+            for (I_ThinExtByRefPart extPart : ext.getMutableIdParts()) {
                 TimePathId tb = new TimePathId(extPart.getVersion(), extPart.getPathId());
                 values.add(tb);
             }
@@ -1066,7 +1066,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
 
         public void processId(DatabaseEntry key, DatabaseEntry value) throws Exception {
-            I_IdVersioned idv = bdbEnv.idEntryToObject(key, value);
+            I_Identify idv = bdbEnv.idEntryToObject(key, value);
             this.idProcessor.processId(idv);
         }
 
@@ -1485,15 +1485,15 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return deferredWrite;
     }
 
-    public void deleteId(I_IdVersioned id) throws DatabaseException {
+    public void deleteId(I_Identify id) throws DatabaseException {
         bdbEnv.deleteId(id);
     }
 
-    public I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException {
+    public I_Identify getId(Collection<UUID> uids) throws TerminologyException, IOException {
         return bdbEnv.getId(uids);
     }
 
-    public I_IdVersioned getId(int nativeId) throws IOException {
+    public I_Identify getId(int nativeId) throws IOException {
         return bdbEnv.getId(nativeId);
     }
 
@@ -1501,15 +1501,15 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return bdbEnv.getId(uid);
     }
 
-    public I_IdVersioned getAuthorityId() throws TerminologyException, IOException {
+    public I_Identify getAuthorityId() throws TerminologyException, IOException {
         return bdbEnv.getAuthorityId();
     }
 
-    public I_IdVersioned getPreviousAuthorityId() throws TerminologyException, IOException {
+    public I_Identify getPreviousAuthorityId() throws TerminologyException, IOException {
         return bdbEnv.getPreviousAuthorityId();
     }
 
-    public I_IdVersioned getIdNullOk(int nativeId) throws IOException {
+    public I_Identify getIdNullOk(int nativeId) throws IOException {
         return bdbEnv.getIdNullOk(nativeId);
     }
 
@@ -1574,7 +1574,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return bdbEnv.uuidToNativeWithGeneration(uid, source, idPath, version);
     }
 
-    public void writeId(I_IdVersioned id) throws IOException {
+    public void writeId(I_Identify id) throws IOException {
         try {
             bdbEnv.writeId(id);
         } catch (DatabaseException e) {
@@ -1654,7 +1654,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         bdbEnv.compress(minUtilization);
     }
 
-    public I_IdVersioned newIdVersionedBypassCommit(int nid) {
+    public I_Identify newIdVersionedBypassCommit(int nid) {
         return new ThinIdVersioned(nid, 1);
     }
 
@@ -1733,7 +1733,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             Document doc = hits.doc(i);
             int cnid = Integer.parseInt(doc.get("cnid"));
             I_GetConceptData concept = getConcept(cnid);
-            for (I_IdPart version : concept.getId().getVersions()) {
+            for (I_IdPart version : concept.getId().getMutableIdParts()) {
                 if (conceptId.equals(version.getSourceId().toString()) && (sourceId == version.getSource())) {
                     return concept;
                 }
@@ -1763,7 +1763,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             Document doc = hits.doc(i);
             int cnid = Integer.parseInt(doc.get("cnid"));
             I_GetConceptData concept = getConcept(cnid);
-            for (I_IdPart version : concept.getId().getVersions()) {
+            for (I_IdPart version : concept.getId().getMutableIdParts()) {
                 if (conceptId.equals(version.getSourceId().toString())) {
                     results.add(concept);
                 }

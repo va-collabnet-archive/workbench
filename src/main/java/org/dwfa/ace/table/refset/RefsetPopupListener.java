@@ -65,9 +65,9 @@ public class RefsetPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+                if (selectedObject.getTuple().getMutableIdPart().getVersion() != Integer.MAX_VALUE) {
                     for (I_Path p : config.getEditingPathSet()) {
-                        I_ThinExtByRefPart newPart = selectedObject.getTuple().getPart().duplicate();
+                        I_ThinExtByRefPart newPart = selectedObject.getTuple().getMutableIdPart().duplicate();
                         newPart.setPathId(p.getConceptId());
                         newPart.setVersion(Integer.MAX_VALUE);
                         setProperStatus(newPart);
@@ -95,8 +95,8 @@ public class RefsetPopupListener extends MouseAdapter {
             ExtensionByReferenceBean sourceBean = ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId());
             I_ThinExtByRefTuple tuple = selectedObject.getTuple();
             ThinExtByRefVersioned versioned = (ThinExtByRefVersioned) tuple.getCore();
-            versioned.getVersions().remove(tuple.getPart());
-            if (versioned.getVersions().size() == 0) {
+            versioned.getMutableIdParts().remove(tuple.getMutableIdPart());
+            if (versioned.getMutableIdParts().size() == 0) {
 
             }
             ACE.addUncommitted(sourceBean);
@@ -120,10 +120,10 @@ public class RefsetPopupListener extends MouseAdapter {
             try {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ThinExtByRefPart newPart;
-                    if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                        newPart = selectedObject.getTuple().getPart().duplicate();
+                    if (selectedObject.getTuple().getMutableIdPart().getVersion() != Integer.MAX_VALUE) {
+                        newPart = selectedObject.getTuple().getMutableIdPart().duplicate();
                     } else {
-                        newPart = selectedObject.getTuple().getPart();
+                        newPart = selectedObject.getTuple().getMutableIdPart();
                     }
 
                     newPart.setPathId(p.getConceptId());
@@ -168,7 +168,7 @@ public class RefsetPopupListener extends MouseAdapter {
                     model.referencedConcepts.put(AceConfig.getVodb().uuidToNative(ids),
                         ConceptBean.get((AceConfig.getVodb().uuidToNative(ids))));
                     model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
-                    if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+                    if (selectedObject.getTuple().getMutableIdPart().getVersion() != Integer.MAX_VALUE) {
                         selectedObject.getTuple().addVersion(newPart);
                     }
                 }
@@ -198,10 +198,10 @@ public class RefsetPopupListener extends MouseAdapter {
             try {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ThinExtByRefPart newPart;
-                    if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                        newPart = selectedObject.getTuple().getPart().duplicate();
+                    if (selectedObject.getTuple().getMutableIdPart().getVersion() != Integer.MAX_VALUE) {
+                        newPart = selectedObject.getTuple().getMutableIdPart().duplicate();
                     } else {
-                        newPart = selectedObject.getTuple().getPart();
+                        newPart = selectedObject.getTuple().getMutableIdPart();
                     }
 
                     newPart.setPathId(p.getConceptId());
@@ -229,7 +229,7 @@ public class RefsetPopupListener extends MouseAdapter {
                         throw new Exception("Don't know how to handle: " + field);
                     }
                     model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
-                    if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+                    if (selectedObject.getTuple().getMutableIdPart().getVersion() != Integer.MAX_VALUE) {
                         selectedObject.getTuple().addVersion(newPart);
                     }
                 }
@@ -259,10 +259,10 @@ public class RefsetPopupListener extends MouseAdapter {
             try {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ThinExtByRefPart newPart;
-                    if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                        newPart = selectedObject.getTuple().getPart().duplicate();
+                    if (selectedObject.getTuple().getMutableIdPart().getVersion() != Integer.MAX_VALUE) {
+                        newPart = selectedObject.getTuple().getMutableIdPart().duplicate();
                     } else {
-                        newPart = selectedObject.getTuple().getPart();
+                        newPart = selectedObject.getTuple().getMutableIdPart();
                     }
 
                     newPart.setPathId(p.getConceptId());
@@ -290,7 +290,7 @@ public class RefsetPopupListener extends MouseAdapter {
                     }
                     model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
 
-                    if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+                    if (selectedObject.getTuple().getMutableIdPart().getVersion() != Integer.MAX_VALUE) {
                         selectedObject.getTuple().addVersion(newPart);
                     }
                 }
@@ -320,10 +320,10 @@ public class RefsetPopupListener extends MouseAdapter {
             try {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ThinExtByRefPart newPart;
-                    if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
-                        newPart = selectedObject.getTuple().getPart().duplicate();
+                    if (selectedObject.getTuple().getMutableIdPart().getVersion() != Integer.MAX_VALUE) {
+                        newPart = selectedObject.getTuple().getMutableIdPart().duplicate();
                     } else {
-                        newPart = selectedObject.getTuple().getPart();
+                        newPart = selectedObject.getTuple().getMutableIdPart();
                     }
 
                     newPart.setPathId(p.getConceptId());
@@ -351,7 +351,7 @@ public class RefsetPopupListener extends MouseAdapter {
                     }
                     model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
 
-                    if (selectedObject.getTuple().getPart().getVersion() != Integer.MAX_VALUE) {
+                    if (selectedObject.getTuple().getMutableIdPart().getVersion() != Integer.MAX_VALUE) {
                         selectedObject.getTuple().addVersion(newPart);
                     }
                 }

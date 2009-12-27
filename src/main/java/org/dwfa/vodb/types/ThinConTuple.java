@@ -150,7 +150,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
             + " path: " + getPathId() + " version: " + getVersion();
     }
 
-    public I_ConceptAttributePart getPart() {
+    public I_ConceptAttributePart getMutableIdPart() {
         return part;
     }
 
@@ -174,7 +174,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
         return part.duplicate();
     }
 
-    public int getFixedPartId() {
+    public int getNid() {
         return core.getNid();
     }
 
