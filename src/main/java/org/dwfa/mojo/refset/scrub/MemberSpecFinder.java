@@ -125,7 +125,7 @@ public class MemberSpecFinder implements ConceptExtFinder {
         if (validTypeIds == null) {
             validTypeIds = new ArrayList<Integer>();
             for (ConceptDescriptor conceptDesc : validTypeConcepts) {
-                validTypeIds.add(conceptDesc.getVerifiedConcept().getId().getNativeId());
+                validTypeIds.add(conceptDesc.getVerifiedConcept().getId().getNid());
             }
         }
         return validTypeIds.contains(Integer.valueOf(inclusionType));

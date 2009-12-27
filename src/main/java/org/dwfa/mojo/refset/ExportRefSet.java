@@ -214,7 +214,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
             getLog().info("Processed: " + idCounter + " identifiers");
         }
 
-        int nativeId = id.getNativeId();
+        int nativeId = id.getNid();
 
         List<I_GetExtensionData> extensionData = termFactory.getExtensionsForComponent(nativeId);
 
