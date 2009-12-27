@@ -18,8 +18,6 @@ package org.dwfa.ace.api;
 
 public interface I_RelPart extends I_AmTypedPart {
 
-    public boolean hasNewData(I_RelPart another);
-
     public int getCharacteristicId();
 
     public void setCharacteristicId(int characteristicId);
