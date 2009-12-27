@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public interface I_IdTuple extends I_AmTuple {
 
-    public int getNativeId();
+    public int getNid();
 
     public Set<TimePathId> getTimePathSet();
 
@@ -31,8 +31,6 @@ public interface I_IdTuple extends I_AmTuple {
     public List<? extends I_IdPart> getVersions();
 
     public boolean hasVersion(I_IdPart newPart);
-
-    public void setNativeId(int nativeId);
 
     public int getSource();
 
