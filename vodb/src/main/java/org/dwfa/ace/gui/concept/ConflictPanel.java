@@ -625,67 +625,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
     private void processAttributesForImplementation(HashMap<Integer, I_ConceptAttributeTuple> attributesForResolution,
             I_Path editPath, Set<I_Position> positions, I_ConceptAttributeVersioned attributes) throws IOException,
             TerminologyException {
-        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-            AceLog.getEditLog().fine(
-                "  processing attributes: " + cb.getConceptAttributes().getConId() + " " + cb.getConceptAttributes());
-        }
-        List<I_ConceptAttributeTuple> tuples = new ArrayList<I_ConceptAttributeTuple>();
-        attributes.addTuples(config.getAllowedStatus(), positions, tuples);
-        if (attributesForResolution.containsKey(cb.getConceptAttributes().getConId())) {
-            // Already there, need to make sure tuple is equivalent.
-            if (tuples.size() == 0) {
-                // Not there, need to add
-                if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                    AceLog.getEditLog().fine("   attr not there, need to add...");
-                }
-                addAttrPart(attributesForResolution, editPath, attributes);
-            } else {
-                // already there with active status...
-                I_ConceptAttributeTuple attrTuple = attributesForResolution.get(attributes.getConId());
-                I_ConceptAttributePart possiblePart = attrTuple.duplicate();
-                I_IntSet allowedStatus = null;
-                ArrayList<I_ConceptAttributeTuple> currentParts = new ArrayList<I_ConceptAttributeTuple>();
-                attributes.addTuples(allowedStatus, positions, currentParts);
-                boolean newData = true;
-                for (I_ConceptAttributeTuple currentPart : currentParts) {
-                    if (possiblePart.hasNewData(currentPart.getPart()) == false) {
-                        newData = false;
-                        break;
-                    }
-                }
-                if (newData) {
-                    if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                        AceLog.getEditLog().fine("   attr already there, but needs updated part...");
-                    }
-                    possiblePart.setPathId(editPath.getConceptId());
-                    possiblePart.setStatusId(config.getDefaultStatus().getConceptId());
-                    possiblePart.setVersion(Integer.MAX_VALUE);
-                    boolean containsPart = false;
-                    for (I_ConceptAttributePart currentPart : attributes.getVersions()) {
-                        if (possiblePart.hasNewData(currentPart)) {
-                            containsPart = true;
-                            break;
-                        }
-                    }
-                    if (containsPart) {
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                            AceLog.getEditLog().fine("   uncommitted updated part already exists...");
-                        }
-                    } else {
-                        attributes.addVersion(possiblePart);
-                        if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                            AceLog.getEditLog().fine("   adding uncommitted part...");
-                        }
-                    }
-                } else {
-                    if (AceLog.getEditLog().isLoggable(Level.FINE)) {
-                        AceLog.getEditLog().fine("   attr already there, and needs no update...");
-                    }
-                }
-            }
-        } else {
-            AceLog.getEditLog().fine("   No change needed to attributes...");
-        }
+        throw new UnsupportedOperationException("Model change requires reimplementation...");
     }
 
     private void addAttrPart(HashMap<Integer, I_ConceptAttributeTuple> attrsForResolution, I_Path editPath,
