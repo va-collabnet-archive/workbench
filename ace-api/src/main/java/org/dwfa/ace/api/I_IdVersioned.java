@@ -28,8 +28,6 @@ public interface I_IdVersioned extends I_AmTermComponent {
 
     public int getNid();
 
-    public void setNid(int nid);
-
     public List<? extends I_IdPart> getVersions();
 
     public List<UUID> getUIDs();
