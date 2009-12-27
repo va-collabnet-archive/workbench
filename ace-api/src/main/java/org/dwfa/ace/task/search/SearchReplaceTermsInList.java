@@ -241,7 +241,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                         newLastPart = newDesc.getLastTuple().getPart().duplicate();
                                     }
                                     newLastPart.setStatusId(description.getStatusId());
-                                    newLastPart.setInitialCaseSignificant(description.getInitialCaseSignificant());
+                                    newLastPart.setInitialCaseSignificant(description.isInitialCaseSignificant());
                                     newLastPart.setPathId(path.getConceptId());
                                     termFactory.addUncommitted(child);
                                     newLastPart = null;

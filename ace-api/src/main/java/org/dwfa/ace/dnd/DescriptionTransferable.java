@@ -89,7 +89,7 @@ public class DescriptionTransferable implements Transferable {
             try {
                 return new UniversalFixedDescription(tuple.getDescVersioned().getUniversal().getDescId(),
                     tf.getConcept(tuple.getStatusId()).getUids(), tf.getConcept(tuple.getConceptId()).getUids(),
-                    tuple.getInitialCaseSignificant(), tf.getConcept(tuple.getTypeId()).getUids(), tuple.getText(),
+                    tuple.isInitialCaseSignificant(), tf.getConcept(tuple.getTypeId()).getUids(), tuple.getText(),
                     tuple.getLang());
             } catch (TerminologyException e) {
                 throw new IOException(e);
@@ -98,7 +98,7 @@ public class DescriptionTransferable implements Transferable {
             try {
                 return new UniversalFixedDescription(tuple.getDescVersioned().getUniversal().getDescId(),
                     tf.getConcept(tuple.getStatusId()).getUids(), tf.getConcept(tuple.getConceptId()).getUids(),
-                    tuple.getInitialCaseSignificant(), tf.getConcept(tuple.getTypeId()).getUids(), tuple.getText(),
+                    tuple.isInitialCaseSignificant(), tf.getConcept(tuple.getTypeId()).getUids(), tuple.getText(),
                     tuple.getLang());
             } catch (TerminologyException e) {
                 throw new IOException(e);

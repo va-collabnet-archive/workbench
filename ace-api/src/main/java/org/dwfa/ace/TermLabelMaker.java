@@ -137,7 +137,7 @@ public class TermLabelMaker {
         }
         writeBuff.append(")</font> &#151 <font face='Dialog' size='2' color='#00008B'>");
         if (desc != null) {
-            if (desc.getInitialCaseSignificant()) {
+            if (desc.isInitialCaseSignificant()) {
                 writeBuff.append("fixed case&nbsp;");
             } else {
                 writeBuff.append("changable case&nbsp;");

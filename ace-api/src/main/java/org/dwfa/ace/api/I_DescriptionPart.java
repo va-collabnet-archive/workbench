@@ -20,7 +20,7 @@ public interface I_DescriptionPart extends I_AmTypedPart {
 
     public boolean hasNewData(I_DescriptionPart another);
 
-    public boolean getInitialCaseSignificant();
+    public boolean isInitialCaseSignificant();
 
     public void setInitialCaseSignificant(boolean capStatus);
 
