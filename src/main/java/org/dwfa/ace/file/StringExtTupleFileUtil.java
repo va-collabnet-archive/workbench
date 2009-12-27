@@ -142,8 +142,8 @@ public class StringExtTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
             }
             try {
-                refsetHelper.newStringRefsetExtension(termFactory.getId(refsetUuid).getNativeId(), termFactory.getId(
-                    componentUuid).getNativeId(), extString, memberUuid, pathUuid, statusUuid, effectiveDate);
+                refsetHelper.newStringRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory.getId(
+                    componentUuid).getNid(), extString, memberUuid, pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Exception thrown while creating new string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");

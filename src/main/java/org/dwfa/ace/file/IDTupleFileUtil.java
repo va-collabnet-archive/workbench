@@ -43,7 +43,7 @@ public class IDTupleFileUtil {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
 
         UUID tupleUuid = ArchitectonicAuxiliary.Concept.ID_TUPLE.getUids().iterator().next();
-        UUID primaryUuid = termFactory.getUids(iIdVersioned.getNativeId()).iterator().next();
+        UUID primaryUuid = termFactory.getUids(iIdVersioned.getNid()).iterator().next();
         UUID sourceSystemUuid = termFactory.getUids(latestPart.getSource()).iterator().next();
 
         Object sourceId = latestPart.getSourceId();
@@ -98,7 +98,7 @@ public class IDTupleFileUtil {
 
             if (!termFactory.hasId(primaryUuid)) {
                 termFactory.uuidToNativeWithGeneration(primaryUuid, termFactory.getId(
-                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNativeId(),
+                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNid(),
                     termFactory.getPath(new UUID[] { pathUuid }), effectiveDate);
 
                 I_IdVersioned versioned = termFactory.getId(primaryUuid);
@@ -142,7 +142,7 @@ public class IDTupleFileUtil {
     public static void generateIdFromUuid(UUID uuidToGenerate, UUID pathUuid) throws TerminologyException, IOException {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         termFactory.uuidToNativeWithGeneration(uuidToGenerate, termFactory.getId(
-            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNativeId(),
+            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNid(),
             termFactory.getPath(new UUID[] { pathUuid }), Integer.MAX_VALUE);
     }
 }

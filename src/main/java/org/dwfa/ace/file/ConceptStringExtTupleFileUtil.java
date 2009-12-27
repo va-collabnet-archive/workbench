@@ -153,8 +153,8 @@ public class ConceptStringExtTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
             }
             try {
-                refsetHelper.newConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNativeId(),
-                    termFactory.getId(componentUuid).getNativeId(), termFactory.getId(conceptUuid).getNativeId(),
+                refsetHelper.newConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNid(),
+                    termFactory.getId(componentUuid).getNid(), termFactory.getId(conceptUuid).getNid(),
                     extString, memberUuid, pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Exception thrown while creating new concept string refset extension";

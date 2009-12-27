@@ -502,7 +502,7 @@ public class SpecRefsetHelper {
             if (!termFactory.hasId(memberUuid)) {
                 newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
             } else {
-                newMemberId = termFactory.getId(memberUuid).getNativeId();
+                newMemberId = termFactory.getId(memberUuid).getNid();
             }
 
             I_ThinExtByRefVersioned newExtension =
@@ -576,7 +576,7 @@ public class SpecRefsetHelper {
             if (!termFactory.hasId(memberUuid)) {
                 newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
             } else {
-                newMemberId = termFactory.getId(memberUuid).getNativeId();
+                newMemberId = termFactory.getId(memberUuid).getNid();
             }
 
             I_ThinExtByRefVersioned newExtension =
@@ -648,7 +648,7 @@ public class SpecRefsetHelper {
             if (!termFactory.hasId(memberUuid)) {
                 newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
             } else {
-                newMemberId = termFactory.getId(memberUuid).getNativeId();
+                newMemberId = termFactory.getId(memberUuid).getNid();
             }
 
             I_ThinExtByRefVersioned newExtension =
@@ -784,7 +784,7 @@ public class SpecRefsetHelper {
         if (!termFactory.hasId(memberUuid)) {
             newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
         } else {
-            newMemberId = termFactory.getId(memberUuid).getNativeId();
+            newMemberId = termFactory.getId(memberUuid).getNid();
         }
 
         I_ThinExtByRefVersioned newExtension = termFactory.newExtension(refsetId, newMemberId, componentId, extTypeId);
@@ -850,7 +850,7 @@ public class SpecRefsetHelper {
         if (!termFactory.hasId(memberUuid)) {
             newMemberId = termFactory.uuidToNativeWithGeneration(memberUuid, unspecifiedUuid, paths, effectiveTime);
         } else {
-            newMemberId = termFactory.getId(memberUuid).getNativeId();
+            newMemberId = termFactory.getId(memberUuid).getNid();
         }
 
         I_ThinExtByRefVersioned newExtension =

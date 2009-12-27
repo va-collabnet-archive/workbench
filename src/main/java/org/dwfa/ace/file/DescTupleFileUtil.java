@@ -160,11 +160,11 @@ public class DescTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(typeUuid, pathUuid);
             }
 
-            int conceptId = termFactory.getId(conceptUuid).getNativeId();
+            int conceptId = termFactory.getId(conceptUuid).getNid();
             I_IntSet allowedStatus = termFactory.newIntSet();
-            allowedStatus.add(termFactory.getId(statusUuid).getNativeId());
+            allowedStatus.add(termFactory.getId(statusUuid).getNid());
             I_IntSet allowedTypes = termFactory.newIntSet();
-            allowedTypes.add(termFactory.getId(typeUuid).getNativeId());
+            allowedTypes.add(termFactory.getId(typeUuid).getNid());
             I_GetConceptData concept = termFactory.getConcept(conceptId);
             // Set<I_Position> positions =
             // termFactory.getActiveAceFrameConfig().getViewPositionSet();
@@ -194,9 +194,9 @@ public class DescTupleFileUtil {
                 newLastPart.setLang(lang);
                 newLastPart.setText(text);
                 newLastPart.setInitialCaseSignificant(initialCapSignificant);
-                newLastPart.setTypeId(termFactory.getId(typeUuid).getNativeId());
-                newLastPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
-                newLastPart.setPathId(termFactory.getId(pathUuid).getNativeId());
+                newLastPart.setTypeId(termFactory.getId(typeUuid).getNid());
+                newLastPart.setStatusId(termFactory.getId(statusUuid).getNid());
+                newLastPart.setPathId(termFactory.getId(pathUuid).getNid());
                 newLastPart.setVersion(effectiveDate);
 
                 v.addVersion(newLastPart);
@@ -206,9 +206,9 @@ public class DescTupleFileUtil {
                 newLastPart.setLang(lang);
                 newLastPart.setText(text);
                 newLastPart.setInitialCaseSignificant(initialCapSignificant);
-                newLastPart.setTypeId(termFactory.getId(typeUuid).getNativeId());
-                newLastPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
-                newLastPart.setPathId(termFactory.getId(pathUuid).getNativeId());
+                newLastPart.setTypeId(termFactory.getId(typeUuid).getNid());
+                newLastPart.setStatusId(termFactory.getId(statusUuid).getNid());
+                newLastPart.setPathId(termFactory.getId(pathUuid).getNid());
                 newLastPart.setVersion(effectiveDate);
 
                 latestTuple.getDescVersioned().addVersion(newLastPart);

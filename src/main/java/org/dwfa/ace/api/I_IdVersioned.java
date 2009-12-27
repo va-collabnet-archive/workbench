@@ -26,9 +26,9 @@ import org.dwfa.tapi.TerminologyException;
 
 public interface I_IdVersioned extends I_AmTermComponent {
 
-    public int getNativeId();
+    public int getNid();
 
-    public void setNativeId(int nativeId);
+    public void setNid(int nid);
 
     public List<? extends I_IdPart> getVersions();
 

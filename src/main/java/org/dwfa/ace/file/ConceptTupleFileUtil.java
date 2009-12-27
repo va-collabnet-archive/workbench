@@ -134,11 +134,11 @@ public class ConceptTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
             }
 
-            if (termFactory.hasConcept(termFactory.getId(conceptUuid).getNativeId())) {
+            if (termFactory.hasConcept(termFactory.getId(conceptUuid).getNid())) {
 
-                int conceptId = termFactory.getId(conceptUuid).getNativeId();
+                int conceptId = termFactory.getId(conceptUuid).getNid();
                 I_IntSet allowedStatus = termFactory.newIntSet();
-                allowedStatus.add(termFactory.getId(statusUuid).getNativeId());
+                allowedStatus.add(termFactory.getId(statusUuid).getNid());
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
                 lastConcept = concept;
                 // Set<I_Position> positions =
@@ -166,9 +166,9 @@ public class ConceptTupleFileUtil {
                     throw new Exception("Concept UUID exists but has no tuples.");
                 } else {
                     I_ConceptAttributePart newPart = latestTuple.getPart().duplicate();
-                    newPart.setStatusId(termFactory.getId(statusUuid).getNativeId());
+                    newPart.setStatusId(termFactory.getId(statusUuid).getNid());
                     newPart.setDefined(isDefined);
-                    newPart.setPathId(termFactory.getId(pathUuid).getNativeId());
+                    newPart.setPathId(termFactory.getId(pathUuid).getNid());
                     newPart.setVersion(Integer.MAX_VALUE);
 
                     latestTuple.getConVersioned().addVersion(newPart);
@@ -190,11 +190,11 @@ public class ConceptTupleFileUtil {
                     part.setVersion(effectiveDate);
                 } else {
                     part = termFactory.newConceptAttributePart();
-                    part.setStatusId(termFactory.getId(statusUuid).getNativeId());
+                    part.setStatusId(termFactory.getId(statusUuid).getNid());
                     part.setDefined(isDefined);
                     part.setVersion(Integer.MAX_VALUE);
                 }
-                part.setPathId(termFactory.getId(pathUuid).getNativeId());
+                part.setPathId(termFactory.getId(pathUuid).getNid());
                 v.addVersion(part);
                 termFactory.addUncommittedNoChecks(newConcept);
 
