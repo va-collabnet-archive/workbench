@@ -140,7 +140,7 @@ public class InstructAndWaitDo extends AbstractTask {
         // });
         // }
         //
-        System.out.println(">>>descr init case: " + dp.getInitialCaseSignificant());
+        System.out.println(">>>descr init case: " + dp.isInitialCaseSignificant());
         System.out.println(">>>descr lang: " + dp.getLang());
         System.out.println(">>>descr path: " + dp.getPathId());
         System.out.println(">>>descr status: " + dp.getStatusId());

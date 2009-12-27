@@ -18,7 +18,7 @@ package org.dwfa.ace.api;
 
 public interface I_DescriptionTuple extends I_AmTypedTuple {
 
-    public abstract boolean getInitialCaseSignificant();
+    public abstract boolean isInitialCaseSignificant();
 
     public abstract String getLang();
 

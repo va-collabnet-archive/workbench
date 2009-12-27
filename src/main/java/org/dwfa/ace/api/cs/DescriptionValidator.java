@@ -95,7 +95,7 @@ public class DescriptionValidator extends SimpleValidator {
         } else {
             boolean match = false;
             for (I_DescriptionPart descriptionPart : thinDesc.getVersions()) {
-                if (descriptionPart.getInitialCaseSignificant() == newPart.getInitialCaseSignificant()
+                if (descriptionPart.isInitialCaseSignificant() == newPart.isInitialCaseSignificant()
                     && descriptionPart.getPathId() == newPart.getPathId()
                     && descriptionPart.getStatusId() == newPart.getStatusId()
                     && descriptionPart.getTypeId() == newPart.getTypeId()

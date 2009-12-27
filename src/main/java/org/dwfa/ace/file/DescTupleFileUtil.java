@@ -47,7 +47,7 @@ public class DescTupleFileUtil {
         UUID typeUuid = termFactory.getUids(descTuple.getTypeId()).iterator().next();
         UUID pathUuid = termFactory.getUids(descTuple.getPathId()).iterator().next();
         UUID statusUuid = termFactory.getUids(descTuple.getStatusId()).iterator().next();
-        boolean initialCapSignificant = descTuple.getInitialCaseSignificant();
+        boolean initialCapSignificant = descTuple.isInitialCaseSignificant();
         int effectiveDate = descTuple.getVersion();
 
         String idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(descUuid));
