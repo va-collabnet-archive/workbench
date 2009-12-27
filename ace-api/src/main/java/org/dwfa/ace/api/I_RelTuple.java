@@ -18,32 +18,32 @@ package org.dwfa.ace.api;
 
 public interface I_RelTuple extends I_AmTypedTuple {
 
-    public abstract int getC1Id();
+    public int getC1Id();
 
-    public abstract int getC2Id();
+    public int getC2Id();
 
-    public abstract int getRelId();
+    public int getRelId();
 
-    public abstract int getCharacteristicId();
+    public int getCharacteristicId();
 
-    public abstract int getGroup();
+    public int getGroup();
 
-    public abstract int getRefinabilityId();
+    public int getRefinabilityId();
 
-    public abstract void setStatusId(Integer statusId);
+    public void setStatusId(int statusId);
 
-    public abstract void setCharacteristicId(Integer characteristicId);
+    public void setCharacteristicId(int characteristicId);
 
-    public abstract void setRefinabilityId(Integer refinabilityId);
+    public void setRefinabilityId(int refinabilityId);
 
-    public abstract void setGroup(Integer group);
+    public void setGroup(int group);
 
     public I_RelPart duplicate();
 
-    public abstract I_RelPart getPart();
+    public I_RelPart getPart();
 
-    public abstract I_RelVersioned getRelVersioned();
+    public I_RelVersioned getRelVersioned();
 
-    public abstract I_RelVersioned getFixedPart();
+    public I_RelVersioned getFixedPart();
 
 }
