@@ -38,7 +38,7 @@ public interface I_IdVersioned extends I_AmTermComponent {
 
     public Set<TimePathId> getTimePathSet();
 
-    public List<I_IdTuple> getTuples();
+    public List<? extends I_IdTuple> getTuples();
 
     public UniversalAceIdentification getUniversal() throws IOException, TerminologyException;
 
