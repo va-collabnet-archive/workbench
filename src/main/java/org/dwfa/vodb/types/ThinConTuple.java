@@ -94,17 +94,6 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.dwfa.vodb.types.I_ConceptAttributeTuple#hasNewData(org.dwfa.vodb.
-     * types.ThinConPart)
-     */
-    public boolean hasNewData(I_ConceptAttributePart another) {
-        return part.hasNewData(another);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#isDefined()
      */
     public boolean isDefined() {
