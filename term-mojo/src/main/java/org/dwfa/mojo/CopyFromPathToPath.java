@@ -540,12 +540,12 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     private Collection<I_IdTuple> getLatest(List<I_IdTuple> tuples) {
         Map<Integer, I_IdTuple> map = new HashMap<Integer, I_IdTuple>();
         for (I_IdTuple ids : tuples) {
-            if (map.containsKey(ids.getNativeId())) {
-                if (map.get(ids.getNativeId()).getVersion() < ids.getVersion()) {
-                    map.put(ids.getNativeId(), ids);
+            if (map.containsKey(ids.getNid())) {
+                if (map.get(ids.getNid()).getVersion() < ids.getVersion()) {
+                    map.put(ids.getNid(), ids);
                 }
             } else {
-                map.put(ids.getNativeId(), ids);
+                map.put(ids.getNid(), ids);
             }
         }
         return map.values();
