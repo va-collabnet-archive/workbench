@@ -37,8 +37,8 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdTuple;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_IdVersion;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
@@ -499,22 +499,22 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         t.getCore().addVersion(newPart);
     }
 
-    public void processId(I_IdVersioned idVersioned) throws Exception {
+    public void processId(I_Identify idVersioned) throws Exception {
 
         if (++idCount % 1000 == 0) {
             getLog().info("processed id " + idCount);
         }
 
-        Collection<? extends I_IdTuple> ids;
+        Collection<? extends I_IdVersion> ids;
         if (readLatestPartOnly) {
-            ids = getLatest(idVersioned.getTuples());
+            ids = getLatest(idVersioned.getIdVersions());
         } else {
-            ids = idVersioned.getTuples();
+            ids = idVersioned.getIdVersions();
         }
 
         boolean datachanged = false;
-        I_IdTuple latestPart = null;
-        for (I_IdTuple t : ids) {
+        I_IdVersion latestPart = null;
+        for (I_IdVersion t : ids) {
 
             if (fromPathIds.contains(t.getPathId())) {
                 if (copyOnlyLatestState) {
@@ -537,9 +537,9 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    private Collection<I_IdTuple> getLatest(List<? extends I_IdTuple> tuples) {
-        Map<Integer, I_IdTuple> map = new HashMap<Integer, I_IdTuple>();
-        for (I_IdTuple ids : tuples) {
+    private Collection<I_IdVersion> getLatest(List<? extends I_IdVersion> tuples) {
+        Map<Integer, I_IdVersion> map = new HashMap<Integer, I_IdVersion>();
+        for (I_IdVersion ids : tuples) {
             if (map.containsKey(ids.getNid())) {
                 if (map.get(ids.getNid()).getVersion() < ids.getVersion()) {
                     map.put(ids.getNid(), ids);
@@ -551,14 +551,14 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         return map.values();
     }
 
-    private void duplicateIdTuple(I_IdTuple t) {
+    private void duplicateIdTuple(I_IdVersion t) {
         I_IdPart newPart = t.duplicate();
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
         if (statusId != 0) {
             newPart.setStatusId(statusId);
         }
-        t.getIdVersioned().addVersion(newPart);
+        t.getIdentifier().addMutableIdPart(newPart);
     }
 
     private void processImages(List<? extends I_ImageVersioned> images) throws Exception {

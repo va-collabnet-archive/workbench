@@ -43,7 +43,7 @@ public final class CandidateWriter {
         // First index the version parts so we can print back in chronological
         // order
         TreeMap<Long, PartDescription> partIndex = new TreeMap<Long, PartDescription>();
-        for (I_ThinExtByRefPart part : candidate.getVersions()) {
+        for (I_ThinExtByRefPart part : candidate.getMutableIdParts()) {
             if (part instanceof I_ThinExtByRefPartConcept) {
                 PartDescription partDesc = new PartDescription();
                 int inclusionType = ((I_ThinExtByRefPartConcept) part).getConceptId();

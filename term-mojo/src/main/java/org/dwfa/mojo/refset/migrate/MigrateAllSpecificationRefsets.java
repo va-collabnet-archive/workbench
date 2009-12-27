@@ -243,20 +243,20 @@ public class MigrateAllSpecificationRefsets extends AbstractMojo {
 
         // Attribute
         I_ConceptAttributeVersioned attribute = specRefsetConcept.getConceptAttributes();
-        for (I_ConceptAttributePart attribPart : retireParts(attribute.getVersions())) {
+        for (I_ConceptAttributePart attribPart : retireParts(attribute.getMutableIdParts())) {
             attribute.addVersion(attribPart);
         }
 
         // Descriptions
         for (I_DescriptionVersioned description : specRefsetConcept.getDescriptions()) {
-            for (I_DescriptionPart retiredDesc : retireParts(description.getVersions())) {
+            for (I_DescriptionPart retiredDesc : retireParts(description.getMutableIdParts())) {
                 description.addVersion(retiredDesc);
             }
         }
 
         // Source Relationships
         for (I_RelVersioned relationship : specRefsetConcept.getSourceRels()) {
-            for (I_RelPart retiredRel : retireParts(relationship.getVersions())) {
+            for (I_RelPart retiredRel : retireParts(relationship.getMutableIdParts())) {
                 relationship.addVersion(retiredRel);
             }
         }

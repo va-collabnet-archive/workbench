@@ -216,7 +216,7 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
             boolean foundCidSource = false;
             boolean foundDot1Source = false;
 
-            for (I_IdPart part : concept.getId().getVersions()) {
+            for (I_IdPart part : concept.getId().getMutableIdParts()) {
                 if (part.getSource() == cidSourceNid) {
                     foundCidSource = true;
                     if (part.getSourceId().equals(cid)) {
@@ -248,24 +248,24 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
             }
 
             if (foundDot1Source == false) {
-                I_IdPart aPart = concept.getId().getVersions().get(0).duplicate();
+                I_IdPart aPart = concept.getId().getMutableIdParts().get(0).duplicate();
                 aPart.setSource(dot1SourceNid);
                 aPart.setSourceId(dot1);
                 aPart.setPathId(kpPath.getNid());
                 aPart.setVersion(Integer.MAX_VALUE);
-                concept.getId().addVersion(aPart);
+                concept.getId().addMutableIdPart(aPart);
                 concept.getUncommittedIdVersioned().add(concept.getId());
                 tf.addUncommitted(concept);
                 dot1ValuesSynched++;
             }
 
             if (foundCidSource == false) {
-                I_IdPart aPart = concept.getId().getVersions().get(0).duplicate();
+                I_IdPart aPart = concept.getId().getMutableIdParts().get(0).duplicate();
                 aPart.setSource(cidSourceNid);
                 aPart.setSourceId(cid);
                 aPart.setPathId(kpPath.getNid());
                 aPart.setVersion(Integer.MAX_VALUE);
-                concept.getId().addVersion(aPart);
+                concept.getId().addMutableIdPart(aPart);
                 concept.getUncommittedIdVersioned().add(concept.getId());
                 tf.addUncommitted(concept);
                 cidValuesSynched++;

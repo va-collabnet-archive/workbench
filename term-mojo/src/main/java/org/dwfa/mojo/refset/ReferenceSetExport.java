@@ -242,7 +242,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         for (I_ConceptAttributeTuple tuple : concept.getConceptAttributeTuples(allowedStatuses,
             new PositionSetReadOnly(positions))) {
             if (latest == null || latest.getVersion() < tuple.getVersion()) {
-                latest = tuple.getPart();
+                latest = tuple.getMutableIdPart();
             }
         }
         return latest;
@@ -251,7 +251,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     private void processDescription(I_DescriptionVersioned versionedDesc) throws Exception {
         boolean exportableVersionFound = false;
         I_DescriptionPart latest = null;
-        for (I_DescriptionPart part : versionedDesc.getVersions()) {
+        for (I_DescriptionPart part : versionedDesc.getMutableIdParts()) {
             if (testSpecification(part.getTypeId()) && allowedStatuses.contains(part.getStatusId())
                 && checkPath(part.getPathId())) {
 
@@ -280,7 +280,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         if (testSpecification(versionedRel.getC2Id())) {
             boolean exportableVersionFound = false;
             I_RelPart latest = null;
-            for (I_RelPart part : versionedRel.getVersions()) {
+            for (I_RelPart part : versionedRel.getMutableIdParts()) {
                 if (testSpecification(part.getCharacteristicId()) && testSpecification(part.getPathId())
                     && testSpecification(part.getRefinabilityId()) && testSpecification(part.getTypeId())
                     && allowedStatuses.contains(part.getStatusId()) && checkPath(part.getPathId())) {
@@ -353,7 +353,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     void export(I_ThinExtByRefTuple thinExtByRefTuple) throws Exception {
-        export(thinExtByRefTuple.getPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
+        export(thinExtByRefTuple.getMutableIdPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
             thinExtByRefTuple.getComponentId());
     }
 
@@ -514,7 +514,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      */
     private I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned extension) {
         I_ThinExtByRefPart latestPart = null;
-        for (I_ThinExtByRefPart part : extension.getVersions()) {
+        for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
                 latestPart = part;
             }

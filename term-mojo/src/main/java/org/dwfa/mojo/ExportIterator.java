@@ -34,8 +34,8 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdTuple;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_IdVersion;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -203,19 +203,19 @@ public class ExportIterator implements I_ProcessConcepts {
 
     }// End method processConcept
 
-    private void writeUuidBasedIdDetails(I_IdVersioned idVersioned, I_IntSet allowedStatus, Object object)
+    private void writeUuidBasedIdDetails(I_Identify idVersioned, I_IntSet allowedStatus, Object object)
             throws TerminologyException, Exception {
 
-        Object[] idTuples = idVersioned.getTuples().toArray();
+        Object[] idTuples = idVersioned.getIdVersions().toArray();
         Arrays.sort(idTuples, new Comparator<Object>() {
             public int compare(Object o1, Object o2) {
-                return ((I_IdTuple) o1).getVersion() - ((I_IdTuple) o2).getVersion();
+                return ((I_IdVersion) o1).getVersion() - ((I_IdVersion) o2).getVersion();
             }
         });
 
         String uuidString = "";
         boolean firstRun = true;
-        for (UUID uuid : idVersioned.getUIDs()) {
+        for (UUID uuid : idVersioned.getUUIDs()) {
             if (!firstRun) {
                 uuidString += "\t" + uuid;
             } else {
@@ -227,9 +227,9 @@ public class ExportIterator implements I_ProcessConcepts {
         String snomedId = "";
 
         for (Object obj : idTuples) {
-            I_IdTuple tuple = (I_IdTuple) obj;
-            I_IdPart part = tuple.getPart();
-            I_IdVersioned id = tuple.getIdVersioned();
+            I_IdVersion tuple = (I_IdVersion) obj;
+            I_IdPart part = tuple.getMutableIdPart();
+            I_Identify id = tuple.getIdentifier();
             if (allowedStatus.contains(part.getStatusId())
                 && (!exportCohesiveSet || isExportable(ConceptBean.get(part.getSource())))
                 && (!validatePositions || validPosition(part.getPathId()))) {
@@ -244,7 +244,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
                 StringBuilder stringBuilder = new StringBuilder();
                 // primary UUID
-                createRecord(stringBuilder, id.getUIDs().iterator().next());
+                createRecord(stringBuilder, id.getUUIDs().iterator().next());
 
                 // source system UUID
                 createRecord(stringBuilder, getFirstUuid(part.getSource()));
@@ -369,12 +369,12 @@ public class ExportIterator implements I_ProcessConcepts {
             createRecord(stringBuilder, descForConceptFile.getText());
 
             // CTV3ID
-            I_IdPart ctv3IdPart = getLatestVersion(concept.getId().getVersions(),
+            I_IdPart ctv3IdPart = getLatestVersion(concept.getId().getMutableIdParts(),
                 ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID);
             createRecord(stringBuilder, (ctv3IdPart != null) ? ctv3IdPart.getSourceId().toString() : "null");
 
             // SNOMED 3 ID
-            I_IdPart snomedIdPart = getLatestVersion(concept.getId().getVersions(),
+            I_IdPart snomedIdPart = getLatestVersion(concept.getId().getMutableIdParts(),
                 ArchitectonicAuxiliary.Concept.SNOMED_INT_ID);
             createRecord(stringBuilder, (snomedIdPart != null) ? snomedIdPart.getSourceId().toString() : "null");
 
@@ -389,13 +389,13 @@ public class ExportIterator implements I_ProcessConcepts {
             createRecord(stringBuilder, getFirstUuid(latestAttrib.getConceptStatus()));
 
             // Effective time
-            createVersion(stringBuilder, latestAttrib.getPart().getVersion(), latestAttrib.getPart().getPathId());
+            createVersion(stringBuilder, latestAttrib.getMutableIdPart().getVersion(), latestAttrib.getMutableIdPart().getPathId());
 
             // Path Id
-            createRecord(stringBuilder, getFirstUuid(latestAttrib.getPart().getPathId()));
+            createRecord(stringBuilder, getFirstUuid(latestAttrib.getMutableIdPart().getPathId()));
 
             // Status active/inactive value
-            createRecord(stringBuilder, getBinaryStatusValue(latestAttrib.getPart().getStatusId()));
+            createRecord(stringBuilder, getBinaryStatusValue(latestAttrib.getMutableIdPart().getStatusId()));
 
             // End record
             createRecord(stringBuilder, System.getProperty("line.separator"));
@@ -497,7 +497,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
         int relId = 0;
         for (I_RelTuple tuple : latestRel.values()) {
-            I_RelPart part = tuple.getPart();
+            I_RelPart part = tuple.getMutableIdPart();
             I_RelVersioned rel = tuple.getRelVersioned();
             if (allowedStatus.contains(part.getStatusId())
                 && isExportable(ConceptBean.get(rel.getC2Id()))
@@ -672,7 +672,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
         for (I_DescriptionTuple desc : latestDesc.values()) {
 
-            I_DescriptionPart part = desc.getPart();
+            I_DescriptionPart part = desc.getMutableIdPart();
             if ((!validatePositions || validPosition(part.getPathId())) && allowedStatus.contains(part.getStatusId())
                 && (!exportCohesiveSet || isExportable(ConceptBean.get(part.getTypeId())))) {
 
@@ -748,7 +748,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
     private I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned extension) {
         I_ThinExtByRefPart latestPart = null;
-        for (I_ThinExtByRefPart part : extension.getVersions()) {
+        for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
                 latestPart = part;
             }

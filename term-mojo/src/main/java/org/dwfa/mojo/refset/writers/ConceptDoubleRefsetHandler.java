@@ -31,7 +31,7 @@ public class ConceptDoubleRefsetHandler extends MemberRefsetHandler {
     @Override
     public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid)
             throws TerminologyException, IOException {
-        I_ThinExtByRefPartMeasurement measurementPart = (I_ThinExtByRefPartMeasurement) tuple.getPart();
+        I_ThinExtByRefPartMeasurement measurementPart = (I_ThinExtByRefPartMeasurement) tuple.getMutableIdPart();
 
         return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER
             + toId(tf, measurementPart.getUnitsOfMeasureId(), sctid) + MemberRefsetHandler.FILE_DELIMITER

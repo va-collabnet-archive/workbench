@@ -35,7 +35,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_ProcessDescriptions;
 import org.dwfa.ace.api.I_ProcessRelationships;
@@ -208,7 +208,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
     int idCounter = 0;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public void processId(I_IdVersioned id, Set<I_ThinExtByRefVersioned> extensions) throws Exception {
+    public void processId(I_Identify id, Set<I_ThinExtByRefVersioned> extensions) throws Exception {
         idCounter++;
         if (idCounter % 10000 == 0) {
             getLog().info("Processed: " + idCounter + " identifiers");
@@ -228,7 +228,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
                     getLog().debug("Exporting UUID to refset:" + bean.getComponentUid());
                 }
 
-                for (I_ThinExtByRefPart version : ext.getVersions()) {
+                for (I_ThinExtByRefPart version : ext.getMutableIdParts()) {
                     boolean found = false;
                     for (I_ThinExtByRefVersioned previous : extensions) {
                         if (previous.getRefsetId() == ext.getRefsetId()) {
@@ -304,7 +304,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
         refsetWriter.write("Refset uuid\tEffectiveTime\tStatus\tName\tShortName\tRefSetType\t");
         refsetWriter.newLine();
 
-        for (I_ThinExtByRefPart version : ext.getVersions()) {
+        for (I_ThinExtByRefPart version : ext.getMutableIdParts()) {
             // Id SCTID
             refsetWriter.write(termFactory.getUids(ext.getRefsetId()).iterator().next().toString());
             refsetWriter.write("\t");
@@ -422,7 +422,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
         memberWriter.newLine();
 
         for (I_ThinExtByRefVersioned ext : ext_members) {
-            List<? extends I_ThinExtByRefPart> versions = ext.getVersions();
+            List<? extends I_ThinExtByRefPart> versions = ext.getMutableIdParts();
 
             /*
              * Probably should be able to filter on versions here based on

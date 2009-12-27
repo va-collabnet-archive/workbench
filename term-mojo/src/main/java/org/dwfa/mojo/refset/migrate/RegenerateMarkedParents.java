@@ -114,7 +114,7 @@ public class RegenerateMarkedParents extends AbstractMojo {
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
 
-                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getPart();
+                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutableIdPart();
                     if (part.getConceptId() == concepts.get("NORMAL_MEMBER").getConceptId()) {
                         normalMemberIds.add(thinExtByRefTuple.getComponentId());
                     }

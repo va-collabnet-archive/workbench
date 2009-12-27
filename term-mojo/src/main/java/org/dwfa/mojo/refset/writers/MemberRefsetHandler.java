@@ -32,7 +32,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -329,11 +329,11 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     public String getSnomedIntegerId(I_TermFactory tf, int componentId) throws TerminologyException, IOException {
 
-        I_IdVersioned idVersioned = tf.getId(componentId);
+        I_Identify idVersioned = tf.getId(componentId);
         int snomedIntegerId = tf.getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())
             .getNid();
 
-        List<? extends I_IdPart> parts = idVersioned.getVersions();
+        List<? extends I_IdPart> parts = idVersioned.getMutableIdParts();
         I_IdPart latestPart = null;
         for (I_IdPart part : parts) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {

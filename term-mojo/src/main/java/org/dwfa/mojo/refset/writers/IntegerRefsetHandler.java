@@ -30,7 +30,7 @@ public class IntegerRefsetHandler extends MemberRefsetHandler {
     @Override
     public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid)
             throws TerminologyException, IOException {
-        I_ThinExtByRefPartInteger integerPart = (I_ThinExtByRefPartInteger) tuple.getPart();
+        I_ThinExtByRefPartInteger integerPart = (I_ThinExtByRefPartInteger) tuple.getMutableIdPart();
 
         return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER + integerPart.getValue();
     }

@@ -379,7 +379,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	String region = null;
 	    	List<EpicItemIdentifier> refsetAppliesTo = new ArrayList<EpicItemIdentifier>();
 	    	
-	    	I_ThinExtByRefPart extensionTuplePart = extensionTuple.getPart();
+	    	I_ThinExtByRefPart extensionTuplePart = extensionTuple.getMutableIdPart();
 	    	// getLog().info("Processing refset: " + refsetName);	    	
 
 	    	List<I_RefsetInterpreter.I_RefsetApplication> applications = 
@@ -400,14 +400,14 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    		}
 	    		else if (app.getMasterfile().equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
 	    			if (app.getItemNumber().equals("2")) {
-		    			stringValue = description.getLastTuple().getPart().getText();
+		    			stringValue = description.getLastTuple().getMutableIdPart().getText();
 		    			previousStringValue = getPreviousDisplayName(description);
 		    			region = app.getRegion();
 	    			}
 	    			else if (app.getItemNumber().equals("50")){
 	    	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
 	    	    		if (doAdd.getValue() && description != null) {
-	    	    			stringValue = description.getLastTuple().getPart().getText();
+	    	    			stringValue = description.getLastTuple().getMutableIdPart().getText();
 	    	    			previousStringValue = getPreviousDisplayName(description);
 	    	    		}
 	    			}
@@ -461,7 +461,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
     			for (String t : displayTypes)
     				doAdd = doAdd || t.equals(descType);
     			if (doAdd) {
-    				String syn = d.getFirstTuple().getPart().getText();
+    				String syn = d.getFirstTuple().getMutableIdPart().getText();
 // getLog().info("Synonym: " + syn + " type=" + type); 
     				if (!getDisplayName(conceptForDescription).equals(syn))
     					exportManager.getLoadFileBuilder(masterFile)
@@ -548,7 +548,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	for (Iterator<? extends I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
 	    		I_DescriptionVersioned d = i.next();
 	    		I_DescriptionTuple dt = d.getLastTuple();
-	    		I_DescriptionPart part = dt.getPart();
+	    		I_DescriptionPart part = dt.getMutableIdPart();
 	    		ret = part.getText();
 	    	}
 	    	
@@ -573,7 +573,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    		}
 	    	}
 	    	if (newestOldTuple != null)
-	    		ret = newestOldTuple.getPart().getText();
+	    		ret = newestOldTuple.getMutableIdPart().getText();
 	    	return ret;
 	    }
 	    
@@ -593,7 +593,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
     				}
     		}
 	    	if (newestOldTuple != null)
-	    		ret = newestOldTuple.getPart().getText();
+	    		ret = newestOldTuple.getMutableIdPart().getText();
 	    	return ret;
 	    }
 	    
@@ -603,7 +603,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			I_GetConceptData idSourceConcept = termFactory.getConcept(new UUID[] { UUID
 					.fromString(idTypeUUID) }); 
 			int idSourceNid = idSourceConcept.getConceptId();
-			for (I_IdPart part : concept.getId().getVersions()) {
+			for (I_IdPart part : concept.getId().getMutableIdParts()) {
 				if (part.getSource() == idSourceNid) {
 					ret = part.getSourceId().toString();
 					break;
