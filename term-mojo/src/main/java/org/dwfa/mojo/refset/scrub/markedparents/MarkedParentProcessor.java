@@ -53,7 +53,7 @@ public final class MarkedParentProcessor {
         duplicateMarkedParentMarker = new DuplicateMarkedParentMarker();
         normalMemberId = new ConceptDescriptor(NORMAL_MEMBER_UUID, NORMAL_MEMBER_DESC).getVerifiedConcept()
             .getId()
-            .getNativeId();
+            .getNid();
 
         TerminologyFactoryUtil terminologyFactoryUtil = new TerminologyFactoryUtil();
         retiredStatusId = terminologyFactoryUtil.getNativeConceptId(ArchitectonicAuxiliary.Concept.RETIRED);
