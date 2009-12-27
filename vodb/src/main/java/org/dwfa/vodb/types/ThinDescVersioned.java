@@ -79,7 +79,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
      * 
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#getVersions()
      */
-    public List<I_DescriptionPart> getVersions() {
+    public List<I_DescriptionPart> getMutableIdParts() {
         return versions;
     }
 
@@ -176,7 +176,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
      */
     public List<I_DescriptionTuple> getTuples() {
         List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-        for (I_DescriptionPart p : getVersions()) {
+        for (I_DescriptionPart p : getMutableIdParts()) {
             tuples.add(new ThinDescTuple(this, p));
         }
 
@@ -285,7 +285,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
     public boolean merge(I_DescriptionVersioned jarDesc) {
         HashSet<I_DescriptionPart> versionSet = new HashSet<I_DescriptionPart>(versions);
         boolean changed = false;
-        for (I_DescriptionPart jarPart : jarDesc.getVersions()) {
+        for (I_DescriptionPart jarPart : jarDesc.getMutableIdParts()) {
             if (!versionSet.contains(jarPart)) {
                 changed = true;
                 versions.add(jarPart);
@@ -365,7 +365,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
         for (I_Path promotionPath : pomotionPaths) {
             for (I_DescriptionTuple dt : matchingTuples) {
                 if (dt.getPathId() == viewPathId) {
-                    I_DescriptionPart promotionPart = dt.getPart().duplicate();
+                    I_DescriptionPart promotionPart = dt.getMutableIdPart().duplicate();
                     promotionPart.setVersion(Integer.MAX_VALUE);
                     promotionPart.setPathId(promotionPath.getConceptId());
                     dt.getDescVersioned().addVersion(promotionPart);

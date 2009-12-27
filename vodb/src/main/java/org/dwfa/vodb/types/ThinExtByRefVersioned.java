@@ -129,7 +129,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
      * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getVersions()
      */
-    public List<? extends I_ThinExtByRefPart> getVersions() {
+    public List<? extends I_ThinExtByRefPart> getMutableIdParts() {
         return versions;
     }
 
@@ -423,7 +423,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
         for (I_Path promotionPath : pomotionPaths) {
             for (I_ThinExtByRefTuple it : matchingTuples) {
                 if (it.getPathId() == viewPathId) {
-                    I_ThinExtByRefPart promotionPart = it.getPart().duplicate();
+                    I_ThinExtByRefPart promotionPart = it.getMutableIdPart().duplicate();
                     promotionPart.setVersion(Integer.MAX_VALUE);
                     promotionPart.setPathId(promotionPath.getConceptId());
                     it.addVersion(promotionPart);

@@ -44,7 +44,7 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
 
     public String getConstraintDesc() {
         if (constraintDesc == null) {
-            ConceptBean thisConstraint = ConceptBean.get(((I_ThinExtByRefPartConceptConceptConcept) getExtension().getPart()).getC3id());
+            ConceptBean thisConstraint = ConceptBean.get(((I_ThinExtByRefPartConceptConceptConcept) getExtension().getMutableIdPart()).getC3id());
             try {
                 I_DescriptionTuple thisConstraintDesc = thisConstraint.getDescTuple(
                     aceConfig.getTreeDescPreferenceList(), aceConfig);
@@ -59,7 +59,7 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
 
     public String getClauseDesc() {
         if (clauseDesc == null) {
-            ConceptBean thisClause = ConceptBean.get(((I_ThinExtByRefPartConceptConcept) getExtension().getPart()).getC2id());
+            ConceptBean thisClause = ConceptBean.get(((I_ThinExtByRefPartConceptConcept) getExtension().getMutableIdPart()).getC2id());
             try {
                 I_DescriptionTuple thisClauseDesc = thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(),
                     aceConfig);
@@ -73,7 +73,7 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
 
     public int getTruthId() {
         if (truthId == Integer.MAX_VALUE) {
-            truthId = ((I_ThinExtByRefPartConceptConcept) getExtension().getPart()).getC1id();
+            truthId = ((I_ThinExtByRefPartConceptConcept) getExtension().getMutableIdPart()).getC1id();
         }
         return truthId;
     }
@@ -202,14 +202,14 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     }
 
     private int compareString(I_ThinExtByRefTuple thisExt, I_ThinExtByRefTuple otherExt) throws IOException {
-        String thisExtStr = ((I_ThinExtByRefPartConceptConceptString) thisExt.getPart()).getStr();
-        String otherExtStr = ((I_ThinExtByRefPartConceptConceptString) otherExt.getPart()).getStr();
+        String thisExtStr = ((I_ThinExtByRefPartConceptConceptString) thisExt.getMutableIdPart()).getStr();
+        String otherExtStr = ((I_ThinExtByRefPartConceptConceptString) otherExt.getMutableIdPart()).getStr();
         return thisExtStr.toLowerCase().compareTo(otherExtStr.toLowerCase());
     }
 
     private int compareConstraint(I_ThinExtByRefTuple thisExt, I_ThinExtByRefTuple otherExt) throws IOException {
-        ConceptBean thisClause = ConceptBean.get(((I_ThinExtByRefPartConceptConceptConcept) thisExt.getPart()).getC3id());
-        ConceptBean otherClause = ConceptBean.get(((I_ThinExtByRefPartConceptConceptConcept) otherExt.getPart()).getC3id());
+        ConceptBean thisClause = ConceptBean.get(((I_ThinExtByRefPartConceptConceptConcept) thisExt.getMutableIdPart()).getC3id());
+        ConceptBean otherClause = ConceptBean.get(((I_ThinExtByRefPartConceptConceptConcept) otherExt.getMutableIdPart()).getC3id());
         I_DescriptionTuple thisClauseDesc = thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
         I_DescriptionTuple otherClauseDesc = otherClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
         if (thisClauseDesc == null || otherClauseDesc == null) {

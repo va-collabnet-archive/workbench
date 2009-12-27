@@ -153,7 +153,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
             popup.addSeparator();
 
             boolean uncommitted = false;
-            for (I_ThinExtByRefPart part : specPart.getVersions()) {
+            for (I_ThinExtByRefPart part : specPart.getMutableIdParts()) {
                 if (part.getVersion() == Integer.MAX_VALUE) {
                     uncommitted = true;
                     break;
@@ -251,7 +251,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            I_ThinExtByRefPart newPart = thinExtByRefTuple.getPart().duplicate();
+            I_ThinExtByRefPart newPart = thinExtByRefTuple.getMutableIdPart().duplicate();
             newPart.setVersion(Integer.MAX_VALUE);
             try {
                 newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
@@ -277,19 +277,19 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         public void actionPerformed(ActionEvent arg0) {
             try {
                 List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
-                for (I_ThinExtByRefPart part : specPart.getVersions()) {
+                for (I_ThinExtByRefPart part : specPart.getMutableIdParts()) {
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         partsToRemove.add(part);
                     }
                 }
                 ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) LocalVersionedTerminology.get()
                     .getExtensionWrapper(specPart.getMemberId());
-                specPart.getVersions().removeAll(partsToRemove);
-                if (specPart.getVersions().size() == 0) {
+                specPart.getMutableIdParts().removeAll(partsToRemove);
+                if (specPart.getMutableIdParts().size() == 0) {
                     ebrBean.discard();
                 }
                 LocalVersionedTerminology.get().addUncommitted(specPart);
-                if (specPart.getVersions().size() == 0) {
+                if (specPart.getMutableIdParts().size() == 0) {
                     ebrBean.abort();
                 }
                 specEditor.updateSpecTree(false);
@@ -308,7 +308,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            I_ThinExtByRefPart newPart = thinExtByRefTuple.getPart().duplicate();
+            I_ThinExtByRefPart newPart = thinExtByRefTuple.getMutableIdPart().duplicate();
             newPart.setVersion(Integer.MAX_VALUE);
             thinExtByRefTuple.getCore().addVersion(newPart);
             LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());

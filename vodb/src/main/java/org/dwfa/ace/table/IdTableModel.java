@@ -46,8 +46,8 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdTuple;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_IdVersion;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -70,14 +70,14 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             I_CellTextWithTuple {
         String cellText;
 
-        I_IdTuple tuple;
+        I_IdVersion tuple;
 
-        public StringWithIdTuple(String cellText, I_IdTuple tuple, boolean isInConflict) {
+        public StringWithIdTuple(String cellText, I_IdVersion tuple, boolean isInConflict) {
             super(cellText, isInConflict);
             this.tuple = tuple;
         }
 
-        public I_IdTuple getTuple() {
+        public I_IdVersion getTuple() {
             return tuple;
         }
 
@@ -86,7 +86,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
         }
     }
 
-    private List<? extends I_IdTuple> allTuples;
+    private List<? extends I_IdVersion> allTuples;
 
     private TableChangedSwingWorker tableChangeWorker;
 
@@ -178,8 +178,8 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             }
             int nid = getNidFromTermComponent(tc);
 
-            I_IdVersioned id = LocalVersionedTerminology.get().getId(nid);
-            for (I_IdPart part : id.getVersions()) {
+            I_Identify id = LocalVersionedTerminology.get().getId(nid);
+            for (I_IdPart part : id.getMutableIdParts()) {
                 if (workStopped) {
                     return false;
                 }
@@ -324,14 +324,14 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
         return columns.length;
     }
 
-    private I_IdTuple getIdTuple(int rowIndex) throws IOException {
+    private I_IdVersion getIdTuple(int rowIndex) throws IOException {
         I_AmTermComponent tc = (I_AmTermComponent) host.getTermComponent();
         if (tc == null) {
             return null;
         }
         if (allTuples == null) {
             try {
-                allTuples = LocalVersionedTerminology.get().getId(getNidFromTermComponent(tc)).getTuples();
+                allTuples = LocalVersionedTerminology.get().getId(getNidFromTermComponent(tc)).getIdVersions();
             } catch (TerminologyException e) {
                 throw new ToIoException(e);
             }
@@ -368,14 +368,14 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             if (rowIndex >= getRowCount()) {
                 return null;
             }
-            I_IdTuple idTuple = getIdTuple(rowIndex);
+            I_IdVersion idTuple = getIdTuple(rowIndex);
             if (idTuple == null) {
                 return null;
             }
 
             I_ConfigAceFrame config = host.getConfig();
             boolean inConflict = config.getHighlightConflictsInComponentPanel()
-                && config.getConflictResolutionStrategy().isInConflict((I_IdVersioned) idTuple.getFixedPart());
+                && config.getConflictResolutionStrategy().isInConflict((I_Identify) idTuple.getFixedPart());
 
             switch (columns[columnIndex]) {
             case LOCAL_ID:
@@ -398,10 +398,10 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                 }
                 return new StringWithIdTuple(Integer.toString(idTuple.getPathId()), idTuple, inConflict);
             case SOURCE:
-                if (referencedConcepts.containsKey(idTuple.getSource())) {
-                    return new StringWithIdTuple(getPrefText(idTuple.getSource()), idTuple, inConflict);
+                if (referencedConcepts.containsKey(idTuple.getIdSource())) {
+                    return new StringWithIdTuple(getPrefText(idTuple.getIdSource()), idTuple, inConflict);
                 }
-                return new StringWithIdTuple(Integer.toString(idTuple.getSource()), idTuple, inConflict);
+                return new StringWithIdTuple(Integer.toString(idTuple.getIdSource()), idTuple, inConflict);
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -460,7 +460,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                     I_IdPart newPart = selectedObject.getTuple().duplicate();
                     newPart.setPathId(p.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);
-                    selectedObject.getTuple().getIdVersioned().addVersion(newPart);
+                    selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
                 }
                 ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNid()));
                 allTuples = null;
@@ -483,7 +483,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                         newPart.setStatusId(AceConfig.getVodb().uuidToNative(
                             ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
                         referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
-                        selectedObject.getTuple().getIdVersioned().addVersion(newPart);
+                        selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
                     }
                     ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNid()));
                     allTuples = null;

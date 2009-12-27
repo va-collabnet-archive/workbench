@@ -29,7 +29,7 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
@@ -88,16 +88,16 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
         }
     }
 
-    public class ThinIdCoreVersionedBinding extends TupleBinding<I_IdVersioned> {
+    public class ThinIdCoreVersionedBinding extends TupleBinding<I_Identify> {
 
         private static final byte INTEGER_ID = 1;
         private static final byte LONG_ID = 2;
         private static final byte UUID_ID = 3;
         private static final byte STRING_ID = 4;
 
-        public I_IdVersioned entryToObject(TupleInput ti) {
+        public I_Identify entryToObject(TupleInput ti) {
             short size = ti.readShort();
-            I_IdVersioned versioned = new ThinIdVersioned(Integer.MIN_VALUE, size);
+            I_Identify versioned = new ThinIdVersioned(Integer.MIN_VALUE, size);
             for (int x = 0; x < size; x++) {
                 short partId = ti.readShort();
                 ThinIdPartCore core;
@@ -111,26 +111,26 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                 switch (idType) {
                 case INTEGER_ID:
                     idPart = new ThinIdIntegerPartWithCoreDelegate(ti.readInt(), core);
-                    if (versioned.getVersions().contains(idPart) == false) {
-                        versioned.addVersion(idPart);
+                    if (versioned.getMutableIdParts().contains(idPart) == false) {
+                        versioned.addMutableIdPart(idPart);
                     }
                     break;
                 case LONG_ID:
                     idPart = new ThinIdLongPartWithCoreDelegate(ti.readLong(), core);
-                    if (versioned.getVersions().contains(idPart) == false) {
-                        versioned.addVersion(idPart);
+                    if (versioned.getMutableIdParts().contains(idPart) == false) {
+                        versioned.addMutableIdPart(idPart);
                     }
                     break;
                 case UUID_ID:
                     idPart = new ThinIdUuidPartWithCoreDelegate(ti.readLong(), ti.readLong(), core);
-                    if (versioned.getVersions().contains(idPart) == false) {
-                        versioned.addVersion(idPart);
+                    if (versioned.getMutableIdParts().contains(idPart) == false) {
+                        versioned.addMutableIdPart(idPart);
                     }
                     break;
                 case STRING_ID:
                     idPart = new ThinIdPartWithCoreDelegate(ti.readString(), core);
-                    if (versioned.getVersions().contains(idPart) == false) {
-                        versioned.addVersion(idPart);
+                    if (versioned.getMutableIdParts().contains(idPart) == false) {
+                        versioned.addMutableIdPart(idPart);
                     }
                     break;
                 }
@@ -138,9 +138,9 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
             return versioned;
         }
 
-        public void objectToEntry(I_IdVersioned versioned, TupleOutput to) {
-            to.writeShort(versioned.getVersions().size());
-            for (I_IdPart id : versioned.getVersions()) {
+        public void objectToEntry(I_Identify versioned, TupleOutput to) {
+            to.writeShort(versioned.getMutableIdParts().size());
+            for (I_IdPart id : versioned.getMutableIdParts()) {
                 try {
                     to.writeShort(idPartCoreBdb.getIdPartCoreId(id));
                 } catch (DatabaseException e) {
@@ -288,7 +288,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
      * 
      * @see org.dwfa.vodb.I_StoreIdentifiers#getIdNullOk(int)
      */
-    public I_IdVersioned getIdNullOk(int nativeId) throws IOException {
+    public I_Identify getIdNullOk(int nativeId) throws IOException {
         Stopwatch timer = null;
         if (AceLog.getAppLog().isLoggable(Level.FINER)) {
             AceLog.getAppLog().finer("Getting id record for : " + nativeId);
@@ -334,7 +334,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                 AceLog.getAppLog().finer(
                     "Got id record for: " + nativeId + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
             }
-            return ((I_IdVersioned) idBinding.entryToObject(idValue)).getUIDs();
+            return ((I_Identify) idBinding.entryToObject(idValue)).getUUIDs();
         }
         throw new DatabaseException("Concept: " + nativeId + " not found.");
     }
@@ -344,8 +344,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
      * 
      * @see org.dwfa.vodb.I_StoreIdentifiers#getId(int)
      */
-    public I_IdVersioned getId(int nativeId) throws IOException {
-        I_IdVersioned id = getIdNullOk(nativeId);
+    public I_Identify getId(int nativeId) throws IOException {
+        I_Identify id = getIdNullOk(nativeId);
         if (id != null) {
             return id;
         }
@@ -371,14 +371,14 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#writeId(org.dwfa.ace.api.I_IdVersioned)
      */
-    public void writeId(I_IdVersioned id) throws DatabaseException {
+    public void writeId(I_Identify id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
         intBinder.objectToEntry(id.getNid(), idKey);
         idBinding.objectToEntry(id, idValue);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Writing nativeId : " + id);
-            for (I_IdPart p : id.getVersions()) {
+            for (I_IdPart p : id.getMutableIdParts()) {
                 if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
                     UUID secondaryId = (UUID) p.getSourceId();
                     try {
@@ -398,7 +398,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
             idCoreDb.put(BdbEnv.transaction, idKey, idValue);
             idPutSemaphore.release();
             uuidToNidDbPutSemaphore.acquire();
-            for (I_IdPart p : id.getVersions()) {
+            for (I_IdPart p : id.getMutableIdParts()) {
                 if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
                     UUID secondaryId = (UUID) p.getSourceId();
                     intBinder.objectToEntry(id.getNid(), idValue);
@@ -418,11 +418,11 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#deleteId(org.dwfa.ace.api.I_IdVersioned)
      */
-    public void deleteId(I_IdVersioned id) throws DatabaseException {
+    public void deleteId(I_Identify id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         intBinder.objectToEntry(id.getNid(), idKey);
         idCoreDb.delete(null, idKey);
-        for (UUID uuid : id.getUIDs()) {
+        for (UUID uuid : id.getUUIDs()) {
             uuidBinding.objectToEntry(uuid, idKey);
             uuidToNidDb.delete(null, idKey);
         }
@@ -439,7 +439,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
             IOException {
         // create a new one...
         try {
-            I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
+            I_Identify newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
             // AceLog.getLog().info("Last id: " + lastId + " NewId: " +
             // newId.getNativeId());
             ThinIdPart idPart = new ThinIdPart();
@@ -448,7 +448,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
             idPart.setSource(source);
             idPart.setSourceId(uid);
             idPart.setVersion(version);
-            newId.addVersion(idPart);
+            newId.addMutableIdPart(idPart);
             writeId(newId);
             return newId.getNid();
         } catch (DatabaseException e2) {
@@ -472,7 +472,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
         if (rv == 0) {
             // create a new one...
             try {
-                I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
+                I_Identify newId = new ThinIdVersioned(nidGenerator.nextId(), 0);
                 // AceLog.getLog().info("Last id: " + lastId + " NewId: " +
                 // newId.getNativeId());
                 ThinIdPart idPart = new ThinIdPart();
@@ -482,7 +482,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                     idPart.setSource(source);
                     idPart.setSourceId(uid);
                     idPart.setVersion(version);
-                    newId.addVersion(idPart);
+                    newId.addMutableIdPart(idPart);
                 }
 
                 writeId(newId);
@@ -510,7 +510,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
         } catch (NoMappingException e) {
             // create a new one...
             try {
-                I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), idPaths.size());
+                I_Identify newId = new ThinIdVersioned(nidGenerator.nextId(), idPaths.size());
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine(" NewId: " + newId.getNid() + ", paths: " + idPaths);
                 }
@@ -524,7 +524,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                     if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                         AceLog.getAppLog().fine(" adding version: " + idPart);
                     }
-                    newId.addVersion(idPart);
+                    newId.addMutableIdPart(idPart);
                 }
                 writeId(newId);
                 return newId.getNid();
@@ -561,7 +561,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
      * 
      * @see org.dwfa.vodb.I_StoreIdentifiers#getId(java.util.Collection)
      */
-    public I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException {
+    public I_Identify getId(Collection<UUID> uids) throws TerminologyException, IOException {
         Set<ThinIdVersioned> ids = new HashSet<ThinIdVersioned>(1);
         for (UUID uid : uids) {
             ThinIdVersioned thinId = getId(uid);
@@ -743,7 +743,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
         return PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE);
     }
 
-    public I_IdVersioned idEntryToObject(DatabaseEntry key, DatabaseEntry value) {
+    public I_Identify idEntryToObject(DatabaseEntry key, DatabaseEntry value) {
         ThinIdVersioned theId = (ThinIdVersioned) idBinding.entryToObject(value);
         int nid = (Integer) intBinder.entryToObject(key);
         theId.setNid(nid);
@@ -753,10 +753,10 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
     public void commit(ConceptBean bean, int version, Set<TimePathId> values) throws DatabaseException, IOException {
         if (bean.uncommittedIds != null) {
             for (int id : bean.uncommittedIds.getSetValues()) {
-                I_IdVersioned idv = AceConfig.getVodb().getId(id);
+                I_Identify idv = AceConfig.getVodb().getId(id);
                 List<I_IdPart> partsToRemove = new ArrayList<I_IdPart>();
                 List<I_IdPart> partsToAdd = new ArrayList<I_IdPart>();
-                for (I_IdPart p : idv.getVersions()) {
+                for (I_IdPart p : idv.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         I_IdPart newPart = p.duplicate();
                         newPart.setVersion(version);
@@ -766,9 +766,9 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                         values.add(new TimePathId(version, p.getPathId()));
                     }
                 }
-                idv.getVersions().removeAll(partsToRemove);
+                idv.getMutableIdParts().removeAll(partsToRemove);
                 for (I_IdPart part: partsToAdd) {
-                	idv.addVersion(part);
+                	idv.addMutableIdPart(part);
                 }
                 this.writeId(idv);
                 if (AceLog.getEditLog().isLoggable(Level.FINE)) {

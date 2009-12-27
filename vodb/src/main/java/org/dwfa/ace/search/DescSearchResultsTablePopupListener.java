@@ -115,7 +115,7 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
             selectedRow = descTable.getSelectedRow();
             StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
             descTuple = swdt.getTuple();
-            UUID descUuid = AceConfig.getVodb().getId(descTuple.getDescId()).getUIDs().iterator().next();
+            UUID descUuid = AceConfig.getVodb().getId(descTuple.getDescId()).getUUIDs().iterator().next();
             descConcept = ConceptBean.get(descTuple.getConceptId());
 
             JPopupMenu popup = new JPopupMenu();

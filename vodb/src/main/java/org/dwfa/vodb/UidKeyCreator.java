@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.vodb.bind.ThinIdVersionedBinding;
 import org.dwfa.vodb.bind.UuidBinding;
 
@@ -44,8 +44,8 @@ public class UidKeyCreator implements SecondaryMultiKeyCreator {
     public void createSecondaryKeys(SecondaryDatabase secDb, DatabaseEntry keyEntry, DatabaseEntry dataEntry,
             Set results) throws DatabaseException {
         Set<DatabaseEntry> keySet = results;
-        I_IdVersioned id = (I_IdVersioned) idBinding.entryToObject(dataEntry);
-        for (I_IdPart p : id.getVersions()) {
+        I_Identify id = (I_Identify) idBinding.entryToObject(dataEntry);
+        for (I_IdPart p : id.getMutableIdParts()) {
             if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
                 UUID secondaryId = (UUID) p.getSourceId();
                 DatabaseEntry entry = new DatabaseEntry();

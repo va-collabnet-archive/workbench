@@ -287,7 +287,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
                 if (stopWork) {
                     return -1;
                 }
-                for (I_ImagePart part : i.getVersions()) {
+                for (I_ImagePart part : i.getMutableIdParts()) {
                     conceptsToFetch.add(part.getTypeId());
                     conceptsToFetch.add(part.getStatusId());
                     conceptsToFetch.add(part.getPathId());
@@ -620,16 +620,16 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
                 case CON_ID:
                     break;
                 case DESC:
-                    image.getPart().setTextDescription(value.toString());
+                    image.getMutableIdPart().setTextDescription(value.toString());
                     break;
                 case STATUS:
                     Integer statusId = (Integer) value;
-                    image.getPart().setStatusId(statusId);
+                    image.getMutableIdPart().setStatusId(statusId);
                     getReferencedConcepts().put(statusId, ConceptBean.get(statusId));
                     break;
                 case TYPE:
                     Integer typeId = (Integer) value;
-                    image.getPart().setTypeId(typeId);
+                    image.getMutableIdPart().setTypeId(typeId);
                     getReferencedConcepts().put(typeId, ConceptBean.get(typeId));
                     break;
                 case VERSION:

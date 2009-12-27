@@ -228,7 +228,7 @@ public class ImageBdb implements I_StoreInBdb, I_StoreImages {
         if (bean.images != null) {
             for (I_ImageVersioned image : bean.images) {
                 boolean changed = false;
-                for (I_ImagePart p : image.getVersions()) {
+                for (I_ImagePart p : image.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));
@@ -245,7 +245,7 @@ public class ImageBdb implements I_StoreInBdb, I_StoreImages {
         }
         if (bean.uncommittedImages != null) {
             for (I_ImageVersioned image : bean.uncommittedImages) {
-                for (I_ImagePart p : image.getVersions()) {
+                for (I_ImagePart p : image.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));

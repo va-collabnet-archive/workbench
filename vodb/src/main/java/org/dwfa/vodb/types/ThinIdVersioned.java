@@ -26,8 +26,8 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdTuple;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_IdVersion;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -40,7 +40,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
-public class ThinIdVersioned implements I_IdVersioned {
+public class ThinIdVersioned implements I_Identify {
     public static final int SNOMED_CT_T3_PREFIX = 1;
     private int nativeId;
     private List<I_IdPart> versions;
@@ -69,7 +69,7 @@ public class ThinIdVersioned implements I_IdVersioned {
      * 
      * @see org.dwfa.vodb.types.I_IdVersioned#getVersions()
      */
-    public List<I_IdPart> getVersions() {
+    public List<I_IdPart> getMutableIdParts() {
         return versions;
     }
 
@@ -78,7 +78,7 @@ public class ThinIdVersioned implements I_IdVersioned {
      * 
      * @see org.dwfa.vodb.types.I_IdVersioned#getUIDs()
      */
-    public List<UUID> getUIDs() {
+    public List<UUID> getUUIDs() {
         List<UUID> uids = new ArrayList<UUID>(versions.size());
         for (I_IdPart p : versions) {
             if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
@@ -95,7 +95,7 @@ public class ThinIdVersioned implements I_IdVersioned {
      * org.dwfa.vodb.types.I_IdVersioned#addVersion(org.dwfa.vodb.types.I_IdPart
      * )
      */
-    public boolean addVersion(I_IdPart srcId) {
+    public boolean addMutableIdPart(I_IdPart srcId) {
         assert versions.contains(srcId) == false;
         return versions.add(srcId);
     }
@@ -107,7 +107,7 @@ public class ThinIdVersioned implements I_IdVersioned {
      * org.dwfa.vodb.types.I_IdVersioned#hasVersion(org.dwfa.vodb.types.I_IdPart
      * )
      */
-    public boolean hasVersion(I_IdPart newPart) {
+    public boolean hasMutableIdPart(I_IdPart newPart) {
         return versions.contains(newPart);
     }
 
@@ -149,8 +149,8 @@ public class ThinIdVersioned implements I_IdVersioned {
      * 
      * @see org.dwfa.vodb.types.I_IdVersioned#getTuples()
      */
-    public List<I_IdTuple> getTuples() {
-        List<I_IdTuple> tuples = new ArrayList<I_IdTuple>();
+    public List<I_IdVersion> getIdVersions() {
+        List<I_IdVersion> tuples = new ArrayList<I_IdVersion>();
         for (I_IdPart p : versions) {
             tuples.add(new ThinIdTuple(this, p));
         }
@@ -161,7 +161,7 @@ public class ThinIdVersioned implements I_IdVersioned {
         return LocalFixedTerminology.getStore().getUids(id);
     }
 
-    public UniversalAceIdentification getUniversal() throws IOException, TerminologyException {
+    public UniversalAceIdentification getUniversalId() throws IOException, TerminologyException {
         UniversalAceIdentification universal = new UniversalAceIdentification(this.versions.size());
         for (I_IdPart part : versions) {
             UniversalAceIdentificationPart universalPart = new UniversalAceIdentificationPart();
@@ -204,17 +204,17 @@ public class ThinIdVersioned implements I_IdVersioned {
         return nativeId;
     }
 
-    private class IdTupleAdder extends TupleAdder<I_IdTuple, ThinIdVersioned> {
+    private class IdTupleAdder extends TupleAdder<I_IdVersion, ThinIdVersioned> {
 
         @Override
-        public I_IdTuple makeTuple(I_AmPart part, ThinIdVersioned core) {
+        public I_IdVersion makeTuple(I_AmPart part, ThinIdVersioned core) {
             return new ThinIdTuple(core, (I_IdPart) part);
         }
     }
 
     IdTupleAdder adder = new IdTupleAdder();
 
-    public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions, List<I_IdTuple> matchingTuples) {
+    public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions, List<I_IdVersion> matchingTuples) {
         adder.addTuples(allowedStatus, positions, matchingTuples, true, versions, this);
     }
 
@@ -222,20 +222,20 @@ public class ThinIdVersioned implements I_IdVersioned {
         int viewPathId = viewPosition.getPath().getConceptId();
         Set<I_Position> positions = new HashSet<I_Position>();
         positions.add(viewPosition);
-        List<I_IdTuple> matchingTuples = new ArrayList<I_IdTuple>();
+        List<I_IdVersion> matchingTuples = new ArrayList<I_IdVersion>();
         addTuples(allowedStatus, positions, matchingTuples);
         if (matchingTuples.size() == 0) {
             matchingTuples.add(new ThinIdTuple(this, versions.get(0)));
         }
         boolean promotedAnything = false;
         for (I_Path promotionPath : pomotionPaths) {
-            for (I_IdTuple it : matchingTuples) {
+            for (I_IdVersion it : matchingTuples) {
                 if (it.getPathId() == viewPathId) {
-                    I_IdPart promotionPart = it.getPart().duplicate();
+                    I_IdPart promotionPart = it.getMutableIdPart().duplicate();
                     promotionPart.setVersion(Integer.MAX_VALUE);
                     promotionPart.setPathId(promotionPath.getConceptId());
                     if (versions.contains(promotionPart) == false) {
-                        it.getIdVersioned().addVersion(promotionPart);
+                        it.getIdentifier().addMutableIdPart(promotionPart);
                         promotedAnything = true;
                     }
                 }

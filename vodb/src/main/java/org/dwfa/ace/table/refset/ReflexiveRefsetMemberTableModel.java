@@ -105,10 +105,10 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
                             break;
                         case PART:
                             if (col.readParamaters != null) {
-                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart(),
+                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getMutableIdPart(),
                                     col.readParamaters));
                             } else {
-                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getPart()));
+                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getMutableIdPart()));
                             }
                             break;
                         default:

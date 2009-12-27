@@ -30,7 +30,7 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_ManageConflict;
@@ -68,7 +68,7 @@ public class ConflictManagementStrategyTest {
             return extension.getNid() == 0;
         }
 
-        public boolean isInConflict(I_IdVersioned id) throws IOException {
+        public boolean isInConflict(I_Identify id) throws IOException {
             return id.getNid() == 0;
         }
 
@@ -153,8 +153,8 @@ public class ConflictManagementStrategyTest {
     I_RelVersioned relationshipWithConflcit;
     I_ThinExtByRefVersioned extensionWithoutConflcit;
     I_ThinExtByRefVersioned extensionWithConflcit;
-    I_IdVersioned idWithoutConflict;
-    I_IdVersioned idWithConflict;
+    I_Identify idWithoutConflict;
+    I_Identify idWithConflict;
     I_ImageVersioned imageWithoutConflict;
     I_ImageVersioned imageWithConflict;
     I_ManageConflict conflictResloutionStrategy = new TestConflictResolutionStrategy();

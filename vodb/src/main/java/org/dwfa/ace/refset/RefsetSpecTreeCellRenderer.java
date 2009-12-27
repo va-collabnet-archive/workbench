@@ -209,7 +209,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private void renderTextQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
-        I_ThinExtByRefPartConceptConceptString ccsPart = (I_ThinExtByRefPartConceptConceptString) firstTuple.getPart();
+        I_ThinExtByRefPartConceptConceptString ccsPart = (I_ThinExtByRefPartConceptConceptString) firstTuple.getMutableIdPart();
 
         if (indent) {
             htmlParts.add("&nbsp;&nbsp;");
@@ -230,7 +230,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private void renderStructuralQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
-        I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) firstTuple.getPart();
+        I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) firstTuple.getMutableIdPart();
         if (indent) {
             htmlParts.add("&nbsp;&nbsp;");
         }
@@ -245,7 +245,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private void renderBranchingClause(I_ThinExtByRefTuple firstTuple) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
-        I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) firstTuple.getPart();
+        I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) firstTuple.getMutableIdPart();
         htmlParts.add("&nbsp;&nbsp;&nbsp;");
         addPrefixImage(htmlParts, ccPart.getC1id());
         htmlParts.add("&nbsp;");
@@ -276,7 +276,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
                 htmlParts.add(cb.toString());
             }
         } else {
-            I_DescriptionVersioned desc = tf.getDescription(tf.getId(cid).getUIDs().iterator().next().toString());
+            I_DescriptionVersioned desc = tf.getDescription(tf.getId(cid).getUUIDs().iterator().next().toString());
             if (desc != null) {
                 String text = desc.getLastTuple().getText();
                 if (text.toLowerCase().startsWith("<html>")) {

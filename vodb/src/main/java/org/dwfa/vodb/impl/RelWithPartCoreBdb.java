@@ -148,7 +148,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
             to.writeInt(versioned.getC1Id());
             to.writeInt(versioned.getC2Id());
             to.writeShort(versioned.versionCount());
-            for (I_RelPart part : versioned.getVersions()) {
+            for (I_RelPart part : versioned.getMutableIdParts()) {
                 try {
                     to.writeInt(relPartBdb.getRelPartId(part));
                 } catch (DatabaseException e) {
@@ -521,7 +521,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
                     mySecCursor.close();
                     return true;
                 }
-                if (destRelTypeIds.contains(relFromConceptId.getVersions().get(0).getTypeId())) {
+                if (destRelTypeIds.contains(relFromConceptId.getMutableIdParts().get(0).getTypeId())) {
                     mySecCursor.close();
                     return true;
                 }
@@ -639,7 +639,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
                     mySecCursor.close();
                     return true;
                 }
-                if (srcRelTypeIds.contains(relFromConceptId.getVersions().get(0).getTypeId())) {
+                if (srcRelTypeIds.contains(relFromConceptId.getMutableIdParts().get(0).getTypeId())) {
                     mySecCursor.close();
                     return true;
                 }
@@ -775,7 +775,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
         if (bean.sourceRels != null) {
             for (I_RelVersioned srcRel : bean.sourceRels) {
                 boolean changed = false;
-                for (ListIterator<? extends I_RelPart> partItr = srcRel.getVersions().listIterator(); partItr.hasNext();) {
+                for (ListIterator<? extends I_RelPart> partItr = srcRel.getMutableIdParts().listIterator(); partItr.hasNext();) {
                     I_RelPart part = partItr.next();
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         changed = true;
@@ -792,7 +792,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
             for (I_RelVersioned rel : bean.uncommittedSourceRels) {
                 ConceptBean destBean = ConceptBean.get(rel.getC2Id());
                 destBean.flushDestRels();
-                for (I_RelPart p : rel.getVersions()) {
+                for (I_RelPart p : rel.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));

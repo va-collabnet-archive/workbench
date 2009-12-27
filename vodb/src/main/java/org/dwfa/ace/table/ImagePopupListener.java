@@ -87,7 +87,7 @@ public class ImagePopupListener extends MouseAdapter {
             ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
             I_ImageTuple tuple = selectedObject.getTuple();
             ThinImageVersioned versioned = (ThinImageVersioned) tuple.getVersioned();
-            versioned.getVersions().remove(tuple.getPart());
+            versioned.getMutableIdParts().remove(tuple.getMutableIdPart());
             ACE.addUncommitted(sourceBean);
             model.propertyChange(new PropertyChangeEvent(this, "undo", sourceBean, sourceBean));
         }

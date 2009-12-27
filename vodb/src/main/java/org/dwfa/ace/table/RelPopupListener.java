@@ -97,7 +97,7 @@ public class RelPopupListener extends MouseAdapter {
             ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getC1Id());
             I_RelTuple tuple = selectedObject.getTuple();
             ThinRelVersioned versioned = (ThinRelVersioned) tuple.getRelVersioned();
-            versioned.getVersions().remove(tuple.getPart());
+            versioned.getMutableIdParts().remove(tuple.getMutableIdPart());
             ACE.addUncommitted(sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();
@@ -121,7 +121,7 @@ public class RelPopupListener extends MouseAdapter {
                 ConceptBean destBean = ConceptBean.get(selectedObject.getTuple().getC2Id());
                 I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
                 for (I_Path p : config.getEditingPathSet()) {
-                    I_RelPart newPart = selectedObject.getTuple().getPart();
+                    I_RelPart newPart = selectedObject.getTuple().getMutableIdPart();
                     if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
                         newPart = selectedObject.getTuple().duplicate();
                         srcRel.addVersion(newPart);

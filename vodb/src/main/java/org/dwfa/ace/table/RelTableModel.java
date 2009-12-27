@@ -457,7 +457,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
     }
 
     public boolean allUncommitted(I_RelTuple rel) {
-        for (I_RelPart part : rel.getFixedPart().getVersions()) {
+        for (I_RelPart part : rel.getFixedPart().getMutableIdParts()) {
             if (part.getVersion() != Integer.MAX_VALUE) {
                 return false;
             }

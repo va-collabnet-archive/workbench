@@ -46,7 +46,7 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.CheckAndProcessLuceneMatch;
@@ -518,8 +518,8 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
         }
     }
 
-    private void addIdsToIndex(Document doc, I_IdVersioned did) {
-        for (I_IdPart p : did.getVersions()) {
+    private void addIdsToIndex(Document doc, I_Identify did) {
+        for (I_IdPart p : did.getMutableIdParts()) {
             doc.add(new Field("desc", p.getSourceId().toString(), Field.Store.NO, Field.Index.UN_TOKENIZED));
         }
     }
@@ -594,7 +594,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
         if (bean.descriptions != null) {
             for (I_DescriptionVersioned desc : bean.descriptions) {
                 boolean changed = false;
-                for (I_DescriptionPart p : desc.getVersions()) {
+                for (I_DescriptionPart p : desc.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));
@@ -611,7 +611,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
         }
         if (bean.uncommittedDescriptions != null) {
             for (I_DescriptionVersioned desc : bean.uncommittedDescriptions) {
-                for (I_DescriptionPart p : desc.getVersions()) {
+                for (I_DescriptionPart p : desc.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));

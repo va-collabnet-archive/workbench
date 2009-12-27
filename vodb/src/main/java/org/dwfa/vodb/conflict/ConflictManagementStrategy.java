@@ -27,7 +27,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
@@ -127,7 +127,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
         return doesConflictExist(conceptAttribute.getTuples(config.getAllowedStatus(), config.getViewPositionSet()));
     }
 
-    public boolean isInConflict(I_IdVersioned id) throws IOException {
+    public boolean isInConflict(I_Identify id) throws IOException {
         // TODO - must think of a better way to deal with IDs
         // the problem is that if the id parts are treated the same way as the
         // other entities parts then an entity with more than one identifier

@@ -39,7 +39,7 @@ import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -268,35 +268,35 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
 
     }
 
-    private I_IdVersioned previousAuthorityId;
+    private I_Identify previousAuthorityId;
 
     private void resetAuthorityId() throws DatabaseException, IOException {
         try {
             previousAuthorityId = getAuthorityId();
             AceLog.getAppLog().info(
-                "Old authority id: " + previousAuthorityId.getTuples().iterator().next().getSourceId());
+                "Old authority id: " + previousAuthorityId.getIdVersions().iterator().next().getSourceId());
         } catch (Exception e) {
             AceLog.getAppLog().warning("Unable to get previous authority id.");
         }
         PrimordialId primId = PrimordialId.AUTHORITY_ID;
-        I_IdVersioned thinId = new ThinIdVersioned(primId.getNativeId(Integer.MIN_VALUE), 1);
+        I_Identify thinId = new ThinIdVersioned(primId.getNativeId(Integer.MIN_VALUE), 1);
         ThinIdPart idPart = new ThinIdPart();
         idPart.setStatusId(PrimordialId.CURRENT_ID.getNativeId(Integer.MIN_VALUE));
         idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE));
         idPart.setSource(PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE));
         idPart.setSourceId(UUID.randomUUID());
         idPart.setVersion(Integer.MIN_VALUE);
-        thinId.addVersion(idPart);
+        thinId.addMutableIdPart(idPart);
         AceLog.getAppLog().info("New authority id: " + idPart.getSourceId());
         writeId(thinId);
         commitTransaction();
     }
 
-    public I_IdVersioned getAuthorityId() throws IOException {
+    public I_Identify getAuthorityId() throws IOException {
         return getId(PrimordialId.AUTHORITY_ID.getNativeId(Integer.MIN_VALUE));
     }
 
-    public I_IdVersioned getPreviousAuthorityId() throws TerminologyException, IOException {
+    public I_Identify getPreviousAuthorityId() throws TerminologyException, IOException {
         return previousAuthorityId;
     }
 
@@ -436,7 +436,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         relBdb.writeRel(rel);
     }
 
-    public void deleteId(I_IdVersioned id) throws DatabaseException {
+    public void deleteId(I_Identify id) throws DatabaseException {
         identifierDb.deleteId(id);
     }
 
@@ -448,11 +448,11 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         return identifierDb.getCurrentStatusNid();
     }
 
-    public I_IdVersioned getId(Collection<UUID> uids) throws TerminologyException, IOException {
+    public I_Identify getId(Collection<UUID> uids) throws TerminologyException, IOException {
         return identifierDb.getId(uids);
     }
 
-    public I_IdVersioned getId(int nativeId) throws IOException {
+    public I_Identify getId(int nativeId) throws IOException {
         return identifierDb.getId(nativeId);
     }
 
@@ -460,7 +460,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         return identifierDb.getId(uid);
     }
 
-    public I_IdVersioned getIdNullOk(int nativeId) throws IOException {
+    public I_Identify getIdNullOk(int nativeId) throws IOException {
         return identifierDb.getIdNullOk(nativeId);
     }
 
@@ -524,7 +524,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         return identifierDb.uuidToNativeWithGeneration(uid, source, idPath, version);
     }
 
-    public void writeId(I_IdVersioned id) throws DatabaseException {
+    public void writeId(I_Identify id) throws DatabaseException {
         identifierDb.writeId(id);
     }
 
@@ -764,7 +764,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         return extensionBdb.extEntryToObject(key, value);
     }
 
-    public I_IdVersioned idEntryToObject(DatabaseEntry key, DatabaseEntry value) {
+    public I_Identify idEntryToObject(DatabaseEntry key, DatabaseEntry value) {
         return identifierDb.idEntryToObject(key, value);
     }
 

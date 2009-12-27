@@ -253,7 +253,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(),
                                                 returnTuples, false);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
-                                                boolean extValue = ((I_ThinExtByRefPartBoolean) t.getPart()).getValue();
+                                                boolean extValue = ((I_ThinExtByRefPartBoolean) t.getMutableIdPart()).getValue();
 
                                                 try {
                                                     ConceptBean booleanImageBean =
@@ -282,7 +282,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                                 returnTuples, false);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
                                                 ConceptBean ebrCb =
-                                                        ConceptBean.get(((I_ThinExtByRefPartConcept) t.getPart())
+                                                        ConceptBean.get(((I_ThinExtByRefPartConcept) t.getMutableIdPart())
                                                             .getConceptId());
                                                 for (I_ImageTuple imageTuple : ebrCb.getImageTuples(aceConfig
                                                     .getAllowedStatus(), viewerImageTypes, aceConfig
@@ -296,7 +296,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(),
                                                 returnTuples, false);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
-                                                int extValue = ((I_ThinExtByRefPartInteger) t.getPart()).getValue();
+                                                int extValue = ((I_ThinExtByRefPartInteger) t.getMutableIdPart()).getValue();
                                                 htmlPrefixes
                                                     .add("<font color=blue>&nbsp;" + extValue + "&nbsp;</font>");
                                             }
@@ -312,7 +312,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                                 returnTuples, false);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
                                                 String strExt =
-                                                        ((I_ThinExtByRefPartString) t.getPart()).getStringValue();
+                                                        ((I_ThinExtByRefPartString) t.getMutableIdPart()).getStringValue();
                                                 htmlSuffixes.add("<code><strong>" + strExt + "'</strong></code>");
                                             }
                                             break;

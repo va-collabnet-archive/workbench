@@ -24,19 +24,19 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdTuple;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_IdVersion;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.TimePathId;
 
-public class ThinIdTuple implements I_IdTuple {
-    I_IdVersioned core;
+public class ThinIdTuple implements I_IdVersion {
+    I_Identify core;
     I_IdPart part;
 
     public ArrayIntList getPartComponentNids() {
         return part.getPartComponentNids();
     }
 
-    public ThinIdTuple(I_IdVersioned core, I_IdPart part) {
+    public ThinIdTuple(I_Identify core, I_IdPart part) {
         super();
         this.core = core;
         this.part = part;
@@ -65,8 +65,8 @@ public class ThinIdTuple implements I_IdTuple {
      * 
      * @see org.dwfa.vodb.types.I_IdTuple#getUIDs()
      */
-    public List<UUID> getUIDs() {
-        return core.getUIDs();
+    public List<UUID> getUUIDs() {
+        return core.getUUIDs();
     }
 
     /*
@@ -75,7 +75,7 @@ public class ThinIdTuple implements I_IdTuple {
      * @see org.dwfa.vodb.types.I_IdTuple#getVersions()
      */
     public List<? extends I_IdPart> getVersions() {
-        return core.getVersions();
+        return core.getMutableIdParts();
     }
 
     /*
@@ -85,7 +85,7 @@ public class ThinIdTuple implements I_IdTuple {
      * org.dwfa.vodb.types.I_IdTuple#hasVersion(org.dwfa.vodb.types.I_IdPart)
      */
     public boolean hasVersion(I_IdPart newPart) {
-        return core.hasVersion(newPart);
+        return core.hasMutableIdPart(newPart);
     }
 
     /*
@@ -112,7 +112,7 @@ public class ThinIdTuple implements I_IdTuple {
      * 
      * @see org.dwfa.vodb.types.I_IdTuple#getSource()
      */
-    public int getSource() {
+    public int getIdSource() {
         return part.getSource();
     }
 
@@ -139,7 +139,7 @@ public class ThinIdTuple implements I_IdTuple {
      * 
      * @see org.dwfa.vodb.types.I_IdTuple#getIdVersioned()
      */
-    public I_IdVersioned getIdVersioned() {
+    public I_Identify getIdentifier() {
         return core;
     }
 
@@ -154,12 +154,12 @@ public class ThinIdTuple implements I_IdTuple {
         newPart.setPathId(getPathId());
         newPart.setVersion(getVersion());
         newPart.setIdStatus(getIdStatus());
-        newPart.setSource(getSource());
+        newPart.setSource(getIdSource());
         newPart.setSourceId(getSourceId());
         return newPart;
     }
 
-    public I_IdPart getPart() {
+    public I_IdPart getMutableIdPart() {
         return part;
     }
 
@@ -181,10 +181,6 @@ public class ThinIdTuple implements I_IdTuple {
 
     public I_AmTermComponent getFixedPart() {
         return core;
-    }
-
-    public int getFixedPartId() {
-        return core.getNid();
     }
 
     public int getPositionId() {

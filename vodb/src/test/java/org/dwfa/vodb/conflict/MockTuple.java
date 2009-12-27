@@ -62,7 +62,7 @@ public class MockTuple implements I_AmTuple {
         };
     }
 
-    public I_AmPart getPart() {
+    public I_AmPart getMutableIdPart() {
         throw new UnsupportedOperationException();
     }
 
@@ -98,7 +98,7 @@ public class MockTuple implements I_AmTuple {
         return new MockTuple(id, pathId, version, value);
     }
 
-    public int getFixedPartId() {
+    public int getNid() {
         return id;
     }
 

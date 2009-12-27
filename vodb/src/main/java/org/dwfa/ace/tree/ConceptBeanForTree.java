@@ -30,7 +30,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
@@ -192,7 +192,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getUncommittedSourceRels();
     }
 
-    public I_IdVersioned getId() throws IOException {
+    public I_Identify getId() throws IOException {
         return bean.getId();
     }
 
@@ -367,7 +367,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getNid();
     }
 
-    public List<I_IdVersioned> getUncommittedIdVersioned() {
+    public List<I_Identify> getUncommittedIdVersioned() {
         return bean.getUncommittedIdVersioned();
     }
 
