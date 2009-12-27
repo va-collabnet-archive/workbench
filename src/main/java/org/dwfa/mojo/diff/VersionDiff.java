@@ -881,10 +881,10 @@ public class VersionDiff extends AbstractMojo {
                 && !d2.getLang().matches(v2_description_lang_filter))
                 continue;
             if (v1_description_case_filter != null && d1 != null
-                && !d1.getInitialCaseSignificant() == v1_description_case_filter)
+                && !d1.isInitialCaseSignificant() == v1_description_case_filter)
                 continue;
             if (v2_description_case_filter != null && d1 != null
-                && !d1.getInitialCaseSignificant() == v2_description_case_filter)
+                && !d1.isInitialCaseSignificant() == v2_description_case_filter)
                 continue;
             descriptions_filtered++;
             if (this.added_descriptions && d1 == null && d2 != null) {
@@ -927,10 +927,10 @@ public class VersionDiff extends AbstractMojo {
                     incr(this.description_language_change);
                 }
                 // case
-                if (this.changed_description_case && d1.getInitialCaseSignificant() != d2.getInitialCaseSignificant()) {
+                if (this.changed_description_case && d1.isInitialCaseSignificant() != d2.isInitialCaseSignificant()) {
                     addToRefset(c.getConceptId(), this.description_case_change, String.valueOf(d.getDescId()) + "\t"
-                        + d2.getText() + ": " + d1.getInitialCaseSignificant() + " -> "
-                        + d2.getInitialCaseSignificant());
+                        + d2.getText() + ": " + d1.isInitialCaseSignificant() + " -> "
+                        + d2.isInitialCaseSignificant());
                     incr(this.description_case_change);
                 }
             }

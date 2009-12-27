@@ -60,7 +60,7 @@ public class CompareComponents {
     }
 
     public static boolean descriptionEqual(I_DescriptionTuple tuple1, I_DescriptionTuple tuple2) {
-        if ((tuple1.getInitialCaseSignificant() != tuple2.getInitialCaseSignificant())
+        if ((tuple1.isInitialCaseSignificant() != tuple2.isInitialCaseSignificant())
             || (!tuple1.getLang().equals(tuple2.getLang())) || (tuple1.getStatusId() != tuple2.getStatusId())
             || (!tuple1.getText().equals(tuple2.getText())) || (tuple1.getTypeId() != tuple2.getTypeId())) {
             return false;

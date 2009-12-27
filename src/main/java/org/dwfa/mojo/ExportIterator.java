@@ -697,10 +697,10 @@ public class ExportIterator implements I_ProcessConcepts {
                 createRecord(stringBuilder, part.getText());
 
                 // Case sensitivity
-                createRecord(stringBuilder, part.getInitialCaseSignificant() ? 1 : 0);
+                createRecord(stringBuilder, part.isInitialCaseSignificant() ? 1 : 0);
 
                 // Initial Capital Status
-                createRecord(stringBuilder, part.getInitialCaseSignificant() ? 1 : 0);
+                createRecord(stringBuilder, part.isInitialCaseSignificant() ? 1 : 0);
 
                 // Description Type
                 createRecord(stringBuilder,
