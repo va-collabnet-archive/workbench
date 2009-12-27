@@ -53,7 +53,7 @@ public class ThinDescPart implements I_DescriptionPart {
      */
     public boolean hasNewData(I_DescriptionPart another) {
         return ((this.pathId != another.getPathId()) || (this.statusId != another.getStatusId()) || ((this.text.equals(another.getText()) == false)
-            || (this.initialCaseSignificant != another.getInitialCaseSignificant())
+            || (this.initialCaseSignificant != another.isInitialCaseSignificant())
             || (this.typeId != another.getTypeId()) || ((this.lang.equals(another.getLang()) == false))));
     }
 
@@ -80,7 +80,7 @@ public class ThinDescPart implements I_DescriptionPart {
      * 
      * @see org.dwfa.vodb.types.I_DescriptionPart#getInitialCaseSignificant()
      */
-    public boolean getInitialCaseSignificant() {
+    public boolean isInitialCaseSignificant() {
         return initialCaseSignificant;
     }
 
@@ -230,7 +230,7 @@ public class ThinDescPart implements I_DescriptionPart {
     @Override
     public boolean equals(Object obj) {
         I_DescriptionPart another = (I_DescriptionPart) obj;
-        return ((initialCaseSignificant == another.getInitialCaseSignificant()) && (lang.equals(another.getLang()))
+        return ((initialCaseSignificant == another.isInitialCaseSignificant()) && (lang.equals(another.getLang()))
             && (pathId == another.getPathId()) && (text.equals(another.getText())) && (typeId == another.getTypeId()) && (version == another.getVersion()));
     }
 

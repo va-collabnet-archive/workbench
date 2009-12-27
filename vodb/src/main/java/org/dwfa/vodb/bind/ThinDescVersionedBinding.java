@@ -104,7 +104,7 @@ public class ThinDescVersionedBinding extends TupleBinding {
             to.writeInt(desc.getPathId());
             to.writeInt(desc.getVersion());
             to.writeInt(desc.getStatusId());
-            to.writeBoolean(desc.getInitialCaseSignificant());
+            to.writeBoolean(desc.isInitialCaseSignificant());
             String lang = desc.getLang();
             if (lang == lastLang) {
                 to.writeInt(-1);

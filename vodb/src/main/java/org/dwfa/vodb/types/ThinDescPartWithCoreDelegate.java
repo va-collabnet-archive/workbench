@@ -50,7 +50,7 @@ public class ThinDescPartWithCoreDelegate implements I_DescriptionPart {
      */
     public boolean hasNewData(I_DescriptionPart another) {
         return ((core.getPathId() != another.getPathId()) || (core.getStatusId() != another.getStatusId()) || ((this.text.equals(another.getText()) == false)
-            || (core.getInitialCaseSignificant() != another.getInitialCaseSignificant())
+            || (core.getInitialCaseSignificant() != another.isInitialCaseSignificant())
             || (core.getTypeId() != another.getTypeId()) || ((core.getLang().equals(another.getLang()) == false))));
     }
 
@@ -77,7 +77,7 @@ public class ThinDescPartWithCoreDelegate implements I_DescriptionPart {
      * 
      * @see org.dwfa.vodb.types.I_DescriptionPart#getInitialCaseSignificant()
      */
-    public boolean getInitialCaseSignificant() {
+    public boolean isInitialCaseSignificant() {
         return core.getInitialCaseSignificant();
     }
 
@@ -225,7 +225,7 @@ public class ThinDescPartWithCoreDelegate implements I_DescriptionPart {
     @Override
     public boolean equals(Object obj) {
         I_DescriptionPart another = (I_DescriptionPart) obj;
-        return ((core.getInitialCaseSignificant() == another.getInitialCaseSignificant())
+        return ((core.getInitialCaseSignificant() == another.isInitialCaseSignificant())
             && (core.getLang().equals(another.getLang())) && (core.getPathId() == another.getPathId())
             && (text.equals(another.getText())) && (core.getTypeId() == another.getTypeId()) && (core.getVersion() == another.getVersion()));
     }

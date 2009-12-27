@@ -326,7 +326,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
      */
     public I_DescribeConceptLocally toLocalFixedDesc() {
         I_DescriptionPart part = versions.get(versions.size() - 1);
-        return new LocalFixedDesc(descId, part.getStatusId(), conceptId, part.getInitialCaseSignificant(),
+        return new LocalFixedDesc(descId, part.getStatusId(), conceptId, part.isInitialCaseSignificant(),
             part.getTypeId(), part.getText(), part.getLang());
     }
 
@@ -339,7 +339,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
             this.versionCount());
         for (I_DescriptionPart part : versions) {
             UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
-            universalPart.setInitialCaseSignificant(part.getInitialCaseSignificant());
+            universalPart.setInitialCaseSignificant(part.isInitialCaseSignificant());
             universalPart.setLang(part.getLang());
             universalPart.setPathId(getUids(part.getPathId()));
             universalPart.setStatusId(getUids(part.getStatusId()));

@@ -55,8 +55,8 @@ public class ThinDescTuple implements I_DescriptionTuple {
      * 
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getInitialCaseSignificant()
      */
-    public boolean getInitialCaseSignificant() {
-        return part.getInitialCaseSignificant();
+    public boolean isInitialCaseSignificant() {
+        return part.isInitialCaseSignificant();
     }
 
     /*
