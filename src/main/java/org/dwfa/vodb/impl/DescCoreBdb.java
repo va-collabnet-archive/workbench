@@ -113,7 +113,7 @@ public class DescCoreBdb implements I_StoreInBdb {
 
     public int getDescPartCoreId(I_DescriptionPart descPart) throws DatabaseException {
         ThinDescPartCore core = new ThinDescPartCore();
-        core.setInitialCaseSignificant(descPart.getInitialCaseSignificant());
+        core.setInitialCaseSignificant(descPart.isInitialCaseSignificant());
         core.setLang(descPart.getLang());
         core.setPathId(descPart.getPathId());
         core.setStatusId(descPart.getStatusId());

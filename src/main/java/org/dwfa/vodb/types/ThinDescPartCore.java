@@ -52,7 +52,7 @@ public class ThinDescPartCore implements I_AmPart {
      */
     public boolean hasNewData(I_DescriptionPart another) {
         return ((this.pathId != another.getPathId()) || (this.statusId != another.getStatusId())
-            || (this.initialCaseSignificant != another.getInitialCaseSignificant())
+            || (this.initialCaseSignificant != another.isInitialCaseSignificant())
             || (this.typeId != another.getTypeId()) || ((this.lang.equals(another.getLang()) == false)));
     }
 

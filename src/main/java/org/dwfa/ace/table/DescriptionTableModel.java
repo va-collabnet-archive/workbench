@@ -158,7 +158,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
             case LANG:
                 return new StringWithDescTuple(desc.getLang(), desc, false, inConflict);
             case CASE_FIXED:
-                return new StringWithDescTuple(Boolean.toString(desc.getInitialCaseSignificant()), desc, false,
+                return new StringWithDescTuple(Boolean.toString(desc.isInitialCaseSignificant()), desc, false,
                     inConflict);
             case STATUS:
                 if (getReferencedConcepts().containsKey(desc.getStatusId())) {

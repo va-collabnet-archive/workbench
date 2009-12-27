@@ -178,7 +178,7 @@ public class TerminologyTransferHandler extends TransferHandler {
                     case TYPE:
                         return new ConceptTransferable(ConceptBean.get(desc.getTypeId()));
                     case CASE_FIXED:
-                        return new StringSelection(Boolean.toString(desc.getInitialCaseSignificant()));
+                        return new StringSelection(Boolean.toString(desc.isInitialCaseSignificant()));
                     case LANG:
                         return new StringSelection(desc.getLang());
                     case TEXT:
