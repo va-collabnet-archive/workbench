@@ -86,7 +86,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
         }
     }
 
-    private List<I_IdTuple> allTuples;
+    private List<? extends I_IdTuple> allTuples;
 
     private TableChangedSwingWorker tableChangeWorker;
 
