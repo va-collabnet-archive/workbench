@@ -66,7 +66,7 @@ public class ThinIdVersionedBinding extends TupleBinding {
 
     public void objectToEntry(Object obj, TupleOutput to) {
         I_IdVersioned versioned = (I_IdVersioned) obj;
-        to.writeInt(versioned.getNativeId());
+        to.writeInt(versioned.getNid());
         to.writeInt(versioned.getVersions().size());
         for (I_IdPart id : versioned.getVersions()) {
             to.writeInt(id.getPathId());

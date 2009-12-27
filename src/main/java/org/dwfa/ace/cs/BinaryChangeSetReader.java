@@ -339,22 +339,22 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 memberId = getVodb().uuidToNativeWithGeneration(memberUid, Integer.MAX_VALUE, path,
                     ThinVersionHelper.convert(time));
             } else {
-                memberId = id.getNativeId();
+                memberId = id.getNid();
             }
 
             I_ThinExtByRefVersioned extension = null;
             if (getVodb().hasExtension(memberId)) {
                 extension = getVodb().getExtension(memberId);
             } else {
-                int refsetId = getVodb().getId(bean.getRefsetUid()).getNativeId();
+                int refsetId = getVodb().getId(bean.getRefsetUid()).getNid();
                 I_IdVersioned componentUuid = getVodb().getId(bean.getComponentUid());
 
                 if (componentUuid == null) {
                     AceLog.getAppLog().severe(
                         " Error importing extension... Component with id does not exist: " + bean.getComponentUid());
                 } else {
-                    int componentId = componentUuid.getNativeId();
-                    int typeId = getVodb().getId(bean.getTypeUid()).getNativeId();
+                    int componentId = componentUuid.getNid();
+                    int typeId = getVodb().getId(bean.getTypeUid()).getNid();
                     int partCount = bean.getVersions().size();
                     extension = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId, partCount);
                 }

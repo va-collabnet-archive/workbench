@@ -305,7 +305,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                         "Got id record for: " + nativeId + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
                 }
                 I_IdVersioned theId = (I_IdVersioned) idBinding.entryToObject(idValue);
-                theId.setNativeId(nativeId);
+                theId.setNid(nativeId);
                 return theId;
             }
         } catch (DatabaseException e) {
@@ -374,7 +374,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
     public void writeId(I_IdVersioned id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
-        intBinder.objectToEntry(id.getNativeId(), idKey);
+        intBinder.objectToEntry(id.getNid(), idKey);
         idBinding.objectToEntry(id, idValue);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Writing nativeId : " + id);
@@ -394,14 +394,14 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
         }
         try {
             idPutSemaphore.acquire();
-            nidGenerator.lastId = Math.max(nidGenerator.lastId, id.getNativeId());
+            nidGenerator.lastId = Math.max(nidGenerator.lastId, id.getNid());
             idCoreDb.put(BdbEnv.transaction, idKey, idValue);
             idPutSemaphore.release();
             uuidToNidDbPutSemaphore.acquire();
             for (I_IdPart p : id.getVersions()) {
                 if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
                     UUID secondaryId = (UUID) p.getSourceId();
-                    intBinder.objectToEntry(id.getNativeId(), idValue);
+                    intBinder.objectToEntry(id.getNid(), idValue);
                     uuidBinding.objectToEntry(secondaryId, idKey);
                     uuidToNidDb.put(BdbEnv.transaction, idKey, idValue);
                 }
@@ -420,7 +420,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
      */
     public void deleteId(I_IdVersioned id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
-        intBinder.objectToEntry(id.getNativeId(), idKey);
+        intBinder.objectToEntry(id.getNid(), idKey);
         idCoreDb.delete(null, idKey);
         for (UUID uuid : id.getUIDs()) {
             uuidBinding.objectToEntry(uuid, idKey);
@@ -450,7 +450,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
             idPart.setVersion(version);
             newId.addVersion(idPart);
             writeId(newId);
-            return newId.getNativeId();
+            return newId.getNid();
         } catch (DatabaseException e2) {
             throw new ToIoException(e2);
         }
@@ -486,7 +486,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                 }
 
                 writeId(newId);
-                return newId.getNativeId();
+                return newId.getNid();
             } catch (DatabaseException ex) {
                 throw new ToIoException(ex);
             }
@@ -512,7 +512,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
             try {
                 I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), idPaths.size());
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().fine(" NewId: " + newId.getNativeId() + ", paths: " + idPaths);
+                    AceLog.getAppLog().fine(" NewId: " + newId.getNid() + ", paths: " + idPaths);
                 }
                 ThinIdPart idPart = new ThinIdPart();
                 for (I_Path p : idPaths) {
@@ -527,7 +527,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                     newId.addVersion(idPart);
                 }
                 writeId(newId);
-                return newId.getNativeId();
+                return newId.getNid();
             } catch (DatabaseException e2) {
                 throw new ToIoException(e2);
             }
@@ -725,7 +725,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                             "Got nativeId: " + uid + " elapsed time: " + timer.getElapsedTime() / 1000 + " secs");
                     }
                     ThinIdVersioned theId = (ThinIdVersioned) idBinding.entryToObject(idValue);
-                    theId.setNativeId(nid);
+                    theId.setNid(nid);
                     return theId;
                 }
             }
@@ -746,7 +746,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
     public I_IdVersioned idEntryToObject(DatabaseEntry key, DatabaseEntry value) {
         ThinIdVersioned theId = (ThinIdVersioned) idBinding.entryToObject(value);
         int nid = (Integer) intBinder.entryToObject(key);
-        theId.setNativeId(nid);
+        theId.setNid(nid);
         return theId;
     }
 

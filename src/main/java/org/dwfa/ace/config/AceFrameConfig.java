@@ -643,15 +643,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 try {
                     defaultStatus = ConceptBean.get(AceConfig.getVodb().getId(
-                        ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNativeId());
+                        ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNid());
                     defaultDescriptionType = ConceptBean.get(AceConfig.getVodb().getId(
-                        ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNativeId());
+                        ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNid());
                     defaultRelationshipType = ConceptBean.get(AceConfig.getVodb().getId(
-                        ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNativeId());
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNid());
                     defaultRelationshipCharacteristic = ConceptBean.get(AceConfig.getVodb().getId(
-                        ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()).getNativeId());
+                        ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()).getNid());
                     defaultRelationshipRefinability = ConceptBean.get(AceConfig.getVodb().getId(
-                        ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNativeId());
+                        ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNid());
                 } catch (Exception e) {
                     IOException newEx = new IOException();
                     newEx.initCause(e);

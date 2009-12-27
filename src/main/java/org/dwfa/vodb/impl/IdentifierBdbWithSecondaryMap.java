@@ -282,7 +282,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
     public void writeId(I_IdVersioned id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
-        intBinder.objectToEntry(id.getNativeId(), idKey);
+        intBinder.objectToEntry(id.getNid(), idKey);
         idBinding.objectToEntry(id, idValue);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Writing nativeId : " + id);
@@ -302,7 +302,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
         }
         try {
             idPutSemaphore.acquire();
-            nidGenerator.lastId = Math.max(nidGenerator.lastId, id.getNativeId());
+            nidGenerator.lastId = Math.max(nidGenerator.lastId, id.getNid());
             idDb.put(BdbEnv.transaction, idKey, idValue);
             idPutSemaphore.release();
         } catch (InterruptedException e) {
@@ -319,7 +319,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
     public void deleteId(I_IdVersioned id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
-        intBinder.objectToEntry(id.getNativeId(), idKey);
+        intBinder.objectToEntry(id.getNid(), idKey);
         idBinding.objectToEntry(id, idValue);
         idDb.delete(null, idKey);
     }
@@ -346,7 +346,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
             idPart.setVersion(version);
             newId.addVersion(idPart);
             writeId(newId);
-            return newId.getNativeId();
+            return newId.getNid();
         } catch (DatabaseException e2) {
             throw new ToIoException(e2);
         }
@@ -381,7 +381,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
                 }
 
                 writeId(newId);
-                return newId.getNativeId();
+                return newId.getNid();
             } catch (DatabaseException ex) {
                 throw new ToIoException(ex);
             }
@@ -417,7 +417,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
                 }
 
                 writeId(newId);
-                return newId.getNativeId();
+                return newId.getNid();
             } catch (DatabaseException e2) {
                 throw new ToIoException(e2);
             }
@@ -590,7 +590,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
 
         I_IdVersioned id = getId(uid);
         if (id != null) {
-            return id.getNativeId();
+            return id.getNid();
         }
         throw new NoMappingException("No id for: " + uid);
     }
@@ -605,7 +605,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
         if (id == null) {
             throw new NoMappingException("No id for: " + uids);
         }
-        return id.getNativeId();
+        return id.getNid();
     }
 
     public int getCurrentStatusNid() {

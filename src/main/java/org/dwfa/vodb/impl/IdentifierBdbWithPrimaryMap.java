@@ -276,7 +276,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
     public void writeId(I_IdVersioned id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
-        intBinder.objectToEntry(id.getNativeId(), idKey);
+        intBinder.objectToEntry(id.getNid(), idKey);
         idBinding.objectToEntry(id, idValue);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Writing nativeId : " + id);
@@ -296,14 +296,14 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
         }
         try {
             idPutSemaphore.acquire();
-            nidGenerator.lastId = Math.max(nidGenerator.lastId, id.getNativeId());
+            nidGenerator.lastId = Math.max(nidGenerator.lastId, id.getNid());
             idDb.put(BdbEnv.transaction, idKey, idValue);
             idPutSemaphore.release();
             uuidToNidDbPutSemaphore.acquire();
             for (I_IdPart p : id.getVersions()) {
                 if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
                     UUID secondaryId = (UUID) p.getSourceId();
-                    intBinder.objectToEntry(id.getNativeId(), idValue);
+                    intBinder.objectToEntry(id.getNid(), idValue);
                     uuidBinding.objectToEntry(secondaryId, idKey);
                     uuidToNidDb.put(BdbEnv.transaction, idKey, idValue);
                 }
@@ -323,7 +323,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
     public void deleteId(I_IdVersioned id) throws DatabaseException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
-        intBinder.objectToEntry(id.getNativeId(), idKey);
+        intBinder.objectToEntry(id.getNid(), idKey);
         idBinding.objectToEntry(id, idValue);
         idDb.delete(null, idKey);
         for (UUID uuid : id.getUIDs()) {
@@ -354,7 +354,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
             idPart.setVersion(version);
             newId.addVersion(idPart);
             writeId(newId);
-            return newId.getNativeId();
+            return newId.getNid();
         } catch (DatabaseException e2) {
             throw new ToIoException(e2);
         }
@@ -390,7 +390,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
                 }
 
                 writeId(newId);
-                return newId.getNativeId();
+                return newId.getNid();
             } catch (DatabaseException ex) {
                 throw new ToIoException(ex);
             }
@@ -428,7 +428,7 @@ public class IdentifierBdbWithPrimaryMap implements I_StoreIdentifiers {
                 }
 
                 writeId(newId);
-                return newId.getNativeId();
+                return newId.getNid();
             } catch (DatabaseException e2) {
                 throw new ToIoException(e2);
             }
