@@ -25,10 +25,6 @@ public interface I_AmPart {
 	public long getTime();
 	public int getStatusId();
 	
-	public void setStatusId(int statusId);
-	
-	public I_AmPart duplicate();
-	
 	public ArrayIntList getPartComponentNids();
 	
 	/**
@@ -56,5 +52,11 @@ public interface I_AmPart {
 	@Deprecated 
 	public void setVersion(int version);
 	
+	
+	@Deprecated 
+	public void setStatusId(int statusId);
+	
+	@Deprecated 
+	public I_AmPart duplicate();
 
 }
