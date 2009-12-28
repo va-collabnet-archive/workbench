@@ -26,7 +26,7 @@ import org.dwfa.mojo.epicexport.I_ExportFactory;
 
 public class EpicExportBuilderWritesAll extends AbstractEpicExportBuilder implements I_EpicLoadFileBuilder {
 	
-	//public String masterfile;
+	public String masterfile;
 	
 	public EpicExportBuilderWritesAll(I_ExportFactory exportManager, EpicExportManager em) {
 		super(exportManager, em);
@@ -41,6 +41,7 @@ public class EpicExportBuilderWritesAll extends AbstractEpicExportBuilder implem
 		
 		I_EpicExportRecordWriter writer = getExportManager().getWriter(this.getMasterfile());
 		this.setWriter(writer);
+		writer.newRecord();
 		if (this.anyItemsHaveChanges())
 			this.writeLiteralItem("rel_ver", version);
 		
@@ -48,5 +49,15 @@ public class EpicExportBuilderWritesAll extends AbstractEpicExportBuilder implem
 		this.writeLiteralItem("300000", stringArrayToList(regions, ","));
 		writer.saveRecord();
 	}
+
+	public String getMasterfile() {
+		return masterfile;
+	}
+
+	public void setMasterfile(String masterfile) {
+		this.masterfile = masterfile;
+	}
+	
+	
 }
 

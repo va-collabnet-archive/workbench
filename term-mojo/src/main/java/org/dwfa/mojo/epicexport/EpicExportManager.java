@@ -83,7 +83,7 @@ public class EpicExportManager {
     public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile) throws Exception {
         I_EpicLoadFileBuilder ret = builders.get(masterfile);
         if (ret == null) {
-AceLog.getAppLog().info("Getting builder for masterfuile: " + masterfile);        	
+        	AceLog.getAppLog().info("Getting builder for masterfile: " + masterfile);        	
             ret = this.exportFactory.getLoadFileBuilder(masterfile, this);
             if (ret != null)
                 builders.put(masterfile, ret);

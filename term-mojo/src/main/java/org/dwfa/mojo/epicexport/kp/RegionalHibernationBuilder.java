@@ -31,7 +31,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.mojo.epicexport.I_RefsetInterpreter;
+import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
 import org.dwfa.tapi.TerminologyException;
 
 public class RegionalHibernationBuilder {
@@ -42,13 +42,13 @@ public class RegionalHibernationBuilder {
 	private HashSet<I_Position> positions;
 	private I_IntSet statusValues;
 	private List<MasterFileHibernater> masterfiles; 
-	private I_RefsetInterpreter interpreter;
+	private I_RefsetUsageInterpreter interpreter;
 
 	public RegionalHibernationBuilder(String dir, HashSet<I_Position> positions, I_IntSet statusValues) {
 		this.outputDirectory = dir;
 		this.positions = positions;
 		this.statusValues = statusValues;
-		this.interpreter = new RefsetApplicationInterpreter();
+		this.interpreter = new RefsetUsageInterpreter();
 		this.masterfiles = new ArrayList<MasterFileHibernater>();
 	}
 	
@@ -80,9 +80,9 @@ public class RegionalHibernationBuilder {
 	
 	public void getOwningRegionsFor(I_GetConceptData refsetConcept, String cid) throws IOException {
 		String refsetName = refsetConcept.getInitialText();
-    	List<I_RefsetInterpreter.I_RefsetApplication> applications = 
+    	List<I_RefsetUsageInterpreter.I_RefsetApplication> applications = 
     		this.interpreter.getApplications(refsetName);
-    	for (I_RefsetInterpreter.I_RefsetApplication app: applications) {
+    	for (I_RefsetUsageInterpreter.I_RefsetApplication app: applications) {
     		if(app.getItemNumber().equals("2")) {
     			MasterFileHibernater m = getMasterfile(app.getMasterfile());
     			m.addRegion(app.getRegion());

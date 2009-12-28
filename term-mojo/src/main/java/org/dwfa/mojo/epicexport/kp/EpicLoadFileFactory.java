@@ -21,12 +21,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.sql.SQLException;
 
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.EpicExportWriter;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 import org.dwfa.mojo.epicexport.I_ExportFactory;
-import org.dwfa.mojo.epicexport.I_RefsetInterpreter;
+import org.dwfa.mojo.epicexport.I_ExportValueConverter;
+import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
 
 import com.mysql.jdbc.Connection;
 
@@ -47,8 +49,11 @@ public class EpicLoadFileFactory implements I_ExportFactory {
             ret = new EpicExportBuilderEDGClinical(this, em);
         else if (masterfile.equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING))
             ret = new EpicExportBuilderEDGBilling(this, em);
-        else
-            throw new Exception("Unhandled masterfile: " + masterfile);
+        else {
+        	AceLog.getAppLog().warning("Using generic loadfile builder for unknown master file: " + masterfile);
+        	ret = new EpicExportBuilderWritesAll(this, em);
+        	ret.setMasterfile(masterfile);
+        }
         return ret;
     }
 
@@ -68,8 +73,12 @@ public class EpicLoadFileFactory implements I_ExportFactory {
         return ret;
     }
     
-    public I_RefsetInterpreter getInterpreter() {
-    	return new RefsetApplicationInterpreter();
+    public I_RefsetUsageInterpreter getInterpreter() {
+    	return new RefsetUsageInterpreter();
+    }
+    
+    public I_ExportValueConverter getValueConverter(int startingVersion) {
+    	return new ExportValueConverter(startingVersion);
     }
 
 }
