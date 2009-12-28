@@ -21,7 +21,8 @@ import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 import org.dwfa.mojo.epicexport.I_ExportFactory;
-import org.dwfa.mojo.epicexport.I_RefsetInterpreter;
+import org.dwfa.mojo.epicexport.I_ExportValueConverter;
+import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
 
 import com.mysql.jdbc.Connection;
 
@@ -52,8 +53,12 @@ public class EpicTermWarehouseFactory implements I_ExportFactory {
     	return ret;
     }
 
-    public I_RefsetInterpreter getInterpreter() {
-    	return new RefsetApplicationInterpreter();
+    public I_RefsetUsageInterpreter getInterpreter() {
+    	return new RefsetUsageInterpreter();
+    }
+    
+    public I_ExportValueConverter getValueConverter(int startingVersion) {
+    	return new ExportValueConverter(startingVersion);
     }
 }
 

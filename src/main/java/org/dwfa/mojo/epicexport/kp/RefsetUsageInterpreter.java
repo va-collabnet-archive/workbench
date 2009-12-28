@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.mojo.epicexport.I_RefsetInterpreter;
+import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
 
-public class RefsetApplicationInterpreter implements I_RefsetInterpreter{
+public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
 	public static final String EPIC_MASTERFILE_NAME_EDG_BILLING = "edgbilling";
 	public static final String EPIC_MASTERFILE_NAME_EDG_CLINICAL = "edgclinical";
 	public static final String EPIC_MASTERFILE_NAME_WILDCARD = "*";
@@ -43,7 +43,7 @@ public class RefsetApplicationInterpreter implements I_RefsetInterpreter{
 			applications.add(app);	
 		}
     	else if(refsetName.equals("EDG Billing Contact Date")) {
-    		applications.add(new RefsetApplication(RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING, "20"));
+    		applications.add(new RefsetApplication(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING, "20"));
     	}
 
 		/*
@@ -79,7 +79,7 @@ public class RefsetApplicationInterpreter implements I_RefsetInterpreter{
 		*/
     	else if(refsetName.equals("Reason for Soft Delete")) {
     		applications.add(new RefsetApplication(
-    				RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_WILDCARD, "300002"));
+    				RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_WILDCARD, "300002"));
     	}
     	else if (refsetName.equals("ICD10-CM Code Mapping Status") ||
     			refsetName.equals("ICD9-CM Code Mapping") ||
@@ -147,7 +147,7 @@ public class RefsetApplicationInterpreter implements I_RefsetInterpreter{
 		return (wildcards == found) ? arguments : null;
 	}
 
-	public class RefsetApplication implements I_RefsetInterpreter.I_RefsetApplication {
+	public class RefsetApplication implements I_RefsetUsageInterpreter.I_RefsetApplication {
 	
 		String masterfile;
 		String itemNumber;

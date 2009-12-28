@@ -27,6 +27,7 @@ public interface I_ExportFactory {
 	
 	public I_EpicExportRecordWriter getWriter(String writerName, String baseDir, Connection conn) throws Exception;
 	
-	public I_RefsetInterpreter getInterpreter();
+	public I_RefsetUsageInterpreter getInterpreter();
 
+	public I_ExportValueConverter getValueConverter(int startingVersion);
 }

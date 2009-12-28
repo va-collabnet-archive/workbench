@@ -49,9 +49,10 @@ public class EpicExportWriter implements I_EpicExportRecordWriter {
         return recordsWrittenCount;
     }
 
-    private List<EpicItem> values;
+    private List<EpicItem> values = new ArrayList<EpicItem>();;
 
     public EpicExportWriter(BufferedWriter wrtr) {
+    	newRecord();
         this.writer = wrtr;
     }
 

@@ -27,8 +27,6 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
@@ -38,9 +36,6 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.maven.MojoUtil;
@@ -49,9 +44,6 @@ import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 import org.dwfa.mojo.epicexport.kp.EpicTermWarehouseFactory;
 import org.dwfa.tapi.TerminologyException;
-
-
-
 
 
 /**
@@ -239,7 +231,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 		private List<String> masterFilesImpacted;
 		private I_ThinExtByRefTuple idTuple;
 		private List<DisplayName> displayNames;
-		private I_RefsetInterpreter interpreter;
+		private I_RefsetUsageInterpreter interpreter;
 		private List<ValuePair> wildcardItems;
 		
 		public ExportIterator(ExportToEpicLoadFilesMojo parent) throws Exception
@@ -374,102 +366,40 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    		I_DescriptionVersioned description, I_ThinExtByRefPart previousPart) throws Exception {
 	    	this.currentItem = null;
 	    	String refsetName = refsetConcept.getInitialText();
-	    	String stringValue = null;
-	    	String previousStringValue = null;
-	    	String region = null;
-	    	List<EpicItemIdentifier> refsetAppliesTo = new ArrayList<EpicItemIdentifier>();
 	    	
 	    	I_ThinExtByRefPart extensionTuplePart = extensionTuple.getMutableIdPart();
 	    	// getLog().info("Processing refset: " + refsetName);	    	
 
-	    	List<I_RefsetInterpreter.I_RefsetApplication> applications = 
+	    	List<I_RefsetUsageInterpreter.I_RefsetApplication> applications = 
 	    		this.interpreter.getApplications(refsetName);
-	    	
-	    	for (I_RefsetInterpreter.I_RefsetApplication app: applications) {
-	    		if (app.getMasterfile().equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
-	    			if (app.getItemNumber().equals("2")) {
-	    	    		stringValue = getDisplayName(conceptForDescription); 
-	    	    		previousStringValue = getPreviousDisplayName(conceptForDescription); 
-	    			}
-	    			else {
-	    				stringValue = getValueAsString(extensionTuplePart);
-	    				previousStringValue = getValueAsString(previousPart);
-	    			}
-		    		refsetAppliesTo.add(new EpicItemIdentifier(
-		    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING, app.getItemNumber()));
-	    		}
-	    		else if (app.getMasterfile().equals(EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
-	    			if (app.getItemNumber().equals("2")) {
-		    			stringValue = description.getLastTuple().getMutableIdPart().getText();
-		    			previousStringValue = getPreviousDisplayName(description);
-		    			region = app.getRegion();
-	    			}
-	    			else if (app.getItemNumber().equals("50")){
-	    	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
-	    	    		if (doAdd.getValue() && description != null) {
-	    	    			stringValue = description.getLastTuple().getMutableIdPart().getText();
-	    	    			previousStringValue = getPreviousDisplayName(description);
-	    	    		}
-	    			}
-	    			else {
-	    				stringValue = getValueAsString(extensionTuplePart);
-	    				previousStringValue = getValueAsString(previousPart);
-	    			}
-		    		refsetAppliesTo.add(new EpicItemIdentifier(
-		    				EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL, app.getItemNumber()));
-	    		}
-	    		else if (app.getMasterfile().equals(ExportToEpicLoadFilesMojo.EPIC_MASTERFILE_NAME_WILDCARD)) {
-		    		refsetAppliesTo.add(new EpicItemIdentifier(
-		    				ExportToEpicLoadFilesMojo.EPIC_MASTERFILE_NAME_WILDCARD, app.getItemNumber()));
-	    			stringValue = getValueAsString(extensionTuplePart);
-	    			previousStringValue = getValueAsString(previousPart);
-	    		}
-	    	}
-	    	
-	    	for (EpicItemIdentifier e: refsetAppliesTo) {
-	    		if (e.getMasterfile().equals(ExportToEpicLoadFilesMojo.EPIC_MASTERFILE_NAME_WILDCARD)) {
-	    			this.wildcardItems.add(new ValuePair(e.getItemNumber(), stringValue, previousStringValue));
+	    	I_ExportValueConverter populater = this.exportFactory.getValueConverter(startingVersion);
+	    	for (I_RefsetUsageInterpreter.I_RefsetApplication app: applications) {
+	    		populater.populateValues(app, conceptForDescription, description, extensionTuple, previousPart);
+	    		
+	    		if (app.getMasterfile().equals(ExportToEpicLoadFilesMojo.EPIC_MASTERFILE_NAME_WILDCARD)) {
+	    			this.wildcardItems.add(new ValuePair(app.getItemNumber(), 
+	    					populater.getItemValue(), populater.getPreviousItemValue()));
 	    		}
 	    		else {
-		    		I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(e.getMasterfile());
-		    		if (e.getItemNumber().equals("2")) {
-		    			if (isNewDisplayNameApplication(e.getMasterfile(), region)) {
+		    		I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(app.getMasterfile());
+		    		if (app.getItemNumber().equals("2")) {
+		    			if (isNewDisplayNameApplication(app.getMasterfile(), populater.getRegion())) {
 		    				this.idTuple = extensionTuple;
-		    				exportWriter.addItemForExport(e.getItemNumber(), stringValue, previousStringValue);
+		    				exportWriter.addItemForExport(app.getItemNumber(), 
+		    						populater.getItemValue(), populater.getPreviousItemValue());
 		    			}
 		    		}
 		    		else {
 			    		//getLog().info("Exporting item " + this.currentItem + " with a value of " + stringValue +
 			    		//		" and a previous value of " + previousStringValue);
 		    		
-			    		exportWriter.addItemForExport(e.getItemNumber(), stringValue, previousStringValue);
+			    		exportWriter.addItemForExport(app.getItemNumber(), 
+			    				populater.getItemValue(), populater.getPreviousItemValue());
 		    		}
 	    		}
 	    	}
 	    }
 	    
-	    public void addSynonyms(I_GetConceptData conceptForDescription, String[] displayTypes, 
-	    		String masterFile, String itemNumber) throws Exception {
-	    	
-    		List<? extends I_DescriptionVersioned> descs = conceptForDescription.getDescriptions();
-    		for(I_DescriptionVersioned d: descs) {
-    			int type = d.getFirstTuple().getTypeId();
-    			String descType = getDisplayName(termFactory.getConcept(type));
-    			//if (descType.equals(ExportToEpicLoadFilesMojo.DESCRIPTION_SYNONYM) || 
-    			//	descType.equals(ExportToEpicLoadFilesMojo.DESCRIPTION_PREFERED_TERM)) {
-    			boolean doAdd = false;
-    			for (String t : displayTypes)
-    				doAdd = doAdd || t.equals(descType);
-    			if (doAdd) {
-    				String syn = d.getFirstTuple().getMutableIdPart().getText();
-// getLog().info("Synonym: " + syn + " type=" + type); 
-    				if (!getDisplayName(conceptForDescription).equals(syn))
-    					exportManager.getLoadFileBuilder(masterFile)
-							.addItemForExport(itemNumber, syn, null);
-    			}
-    		}
-
-	    }
 	    public void writeRecordIds(I_ThinExtByRefTuple extensionTuple) throws Exception {
     		/* Special post handling, such writing id when we encounter a display name */
 	    	String dot11 = null;
@@ -512,26 +442,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	return ret;
 	    }
 	    
-	    public String getValueAsString(I_ThinExtByRefPart thinExtByRefPart) {
-	    	String value = null;
-	    	if (thinExtByRefPart != null) {
-		    	if (I_ThinExtByRefPartString.class.isAssignableFrom(thinExtByRefPart.getClass())) {
-		    		I_ThinExtByRefPartString str = (I_ThinExtByRefPartString) thinExtByRefPart;
-		    		value = str.getStringValue();
-		    	}
-		    	if (I_ThinExtByRefPartInteger.class.isAssignableFrom(thinExtByRefPart.getClass())) {
-		    		I_ThinExtByRefPartInteger str = (I_ThinExtByRefPartInteger) thinExtByRefPart;
-		    		value = new Integer(str.getIntValue()).toString();
-		    	}
-		    	if (I_ThinExtByRefPartBoolean.class.isAssignableFrom(thinExtByRefPart.getClass())) {
-		    		I_ThinExtByRefPartBoolean str = (I_ThinExtByRefPartBoolean) thinExtByRefPart;
-		    		value = (str.getValue()) ? "1" : "0";
-		    	}
-	    	}
-	    	return value;
-
-	    }
-	    
 	    public void writeWildcardValues(I_EpicLoadFileBuilder builder) {
 	    	for (ValuePair p: this.wildcardItems)
 	    		builder.addItemForExport(p.getItemNumber(), p.getValue(), p.getPreviousValue());
@@ -541,61 +451,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	this.currentItem = item;
 	    }
 	    
-	    public String getDisplayName(I_GetConceptData conceptData) throws Exception {
-	    	String ret = null;
-	
-	    	List<? extends I_DescriptionVersioned> descs = conceptData.getDescriptions();
-	    	for (Iterator<? extends I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
-	    		I_DescriptionVersioned d = i.next();
-	    		I_DescriptionTuple dt = d.getLastTuple();
-	    		I_DescriptionPart part = dt.getMutableIdPart();
-	    		ret = part.getText();
-	    	}
-	    	
-	    	return ret;
-	    }
-
-	    public String getPreviousDisplayName(I_GetConceptData conceptData) throws Exception {
-	    	String ret = null;
-	
-	    	List<? extends I_DescriptionVersioned> descs = conceptData.getDescriptions();
-	    	I_DescriptionTuple newestOldTuple = null;
-	    	for (Iterator<? extends I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
-	    		I_DescriptionVersioned d = i.next();
-	    		for (I_DescriptionTuple dt : d.getTuples()) {
-	    			if (dt.getVersion() < this.startingVersion)
-	    				if (newestOldTuple == null) {
-	    					newestOldTuple = dt;
-	    				}
-	    				else if (dt.getVersion() > newestOldTuple.getVersion()) {
-	    					newestOldTuple = dt;
-	    				}
-	    		}
-	    	}
-	    	if (newestOldTuple != null)
-	    		ret = newestOldTuple.getMutableIdPart().getText();
-	    	return ret;
-	    }
-	    
-
-	    public String getPreviousDisplayName(I_DescriptionVersioned d) throws Exception {
-	    	String ret = null;
-	
-
-	    	I_DescriptionTuple newestOldTuple = null;
-    		for (I_DescriptionTuple dt : d.getTuples()) {
-    			if (dt.getVersion() < this.startingVersion)
-    				if (newestOldTuple == null) {
-    					newestOldTuple = dt;
-    				}
-    				else if (dt.getVersion() > newestOldTuple.getVersion()) {
-    					newestOldTuple = dt;
-    				}
-    		}
-	    	if (newestOldTuple != null)
-	    		ret = newestOldTuple.getMutableIdPart().getText();
-	    	return ret;
-	    }
 	    
 	    public String getIdForConcept(I_GetConceptData concept, String idTypeUUID) throws Exception {
 	    	String ret = null;

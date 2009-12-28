@@ -18,7 +18,7 @@ package org.dwfa.mojo.epicexport;
 
 import java.util.List;
 
-public interface I_RefsetInterpreter {
+public interface I_RefsetUsageInterpreter {
 
 	public List<I_RefsetApplication> getApplications(String refsetName);
 	
