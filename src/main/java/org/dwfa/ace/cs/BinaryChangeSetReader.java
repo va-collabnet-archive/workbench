@@ -794,10 +794,12 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                             }
 
                         } else {
-                            commitNewDescription(time, values, desc);
-                            AceLog.getEditLog().warning(
-                                "Committed description missing from database: \n\n" + desc
-                                    + "\n\nAdding missing description and continuing.");
+                        	if (desc != null) {
+                                commitNewDescription(time, values, desc);
+                                AceLog.getEditLog().warning(
+                                    "Committed description missing from database: \n\n" + desc
+                                        + "\n\nAdding missing description and continuing.");                        		
+                        	}
                         }
                     } catch (IOException e) {
                         AceLog.getAppLog().info("Description: " + desc.getDescId() + "\n      " + desc + "\n");
@@ -817,7 +819,9 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
     private void commitUncommittedDescriptions(long time, UniversalAceBean bean, Set<TimePathId> values)
             throws DatabaseException, TerminologyException, IOException {
         for (UniversalAceDescription desc : bean.getUncommittedDescriptions()) {
-            commitNewDescription(time, values, desc);
+        	if (desc != null) {
+                commitNewDescription(time, values, desc);
+        	}
         }
     }
 
