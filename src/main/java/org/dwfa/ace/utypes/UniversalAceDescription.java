@@ -166,10 +166,14 @@ public class UniversalAceDescription implements Serializable {
         buff.append(" conId:");
         buff.append(conceptId);
         buff.append("\n");
-        for (UniversalAceDescriptionPart part : mutableParts) {
-            buff.append("     ");
-            buff.append(part.toString());
-            buff.append("\n");
+        if (mutableParts != null) {
+            for (UniversalAceDescriptionPart part : mutableParts) {
+                buff.append("     ");
+                buff.append(part.toString());
+                buff.append("\n");
+            }
+        } else {
+        	buff.append("###  mutableParts is null   ###");
         }
 
         return buff.toString();
