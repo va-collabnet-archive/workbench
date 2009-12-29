@@ -43,6 +43,8 @@ public abstract class AbstractEpicExportBuilder {
 	List<EpicItem> epicItems = new ArrayList<EpicItem>();
 	private I_EpicExportRecordWriter writer;
 	private String[] exportIfTheseItemsChanged;
+	private boolean hasErrors = false;
+	List<String> errors = new ArrayList<String>();
 	
 	public AbstractEpicExportBuilder(I_ExportFactory exportFactory, EpicExportManager em) {
 		this.exportFactory = exportFactory;
@@ -98,6 +100,8 @@ public abstract class AbstractEpicExportBuilder {
 	 */
 	public void clearRecordContents() {
 		epicItems = new ArrayList<EpicItem>();
+		errors = new ArrayList<String>();
+		this.hasErrors = false;
 	}
 	public abstract String getEpicItemNumber(int refsetNumber);
 	
@@ -292,6 +296,32 @@ public abstract class AbstractEpicExportBuilder {
 	public boolean isChangedRecord() {
 		return this.anyItemsHaveChanges(this.exportIfTheseItemsChanged);
 	}
+	
+	public void addError(String message) {
+		this.hasErrors = true;
+		this.errors.add(message);
+		AceLog.getAppLog().warning(message + ": " + toString());
+	}
+	
+	public void addErrorIfTrue(boolean condition, String message) {
+		if (condition)
+			addError(message);
+	}
+	
+	public List<String> getErrors() {
+		return this.errors;
+	}
+	
+	public void writeAnyErrors() throws IOException {
+		for (String e: this.errors) {
+			this.writer.writeLine("ERROR: " + e);
+		}
+	}
+	
+	public boolean hasErrors() {
+		return this.hasErrors;
+	}
+	
 	
 	public boolean onlyHasChangesIn(String[] itemList) {
 		boolean ret = anyItemsHaveChanges(itemList);

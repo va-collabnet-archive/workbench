@@ -18,7 +18,6 @@ package org.dwfa.mojo.epicexport.kp;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
 
@@ -183,6 +182,5 @@ public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
 		public void setRegion(String region) {
 			this.region = region;
 		}
-		
 	}
 }

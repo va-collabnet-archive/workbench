@@ -16,13 +16,10 @@
  */
 package org.dwfa.mojo.epicexport;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import org.dwfa.ace.log.AceLog;
-
 import com.mysql.jdbc.Connection;
 
 /**
@@ -43,8 +40,6 @@ public class EpicExportManager {
     private I_ExportFactory exportFactory;
     private HashMap<String, I_EpicExportRecordWriter> writers = new HashMap<String, I_EpicExportRecordWriter>();
     private HashMap<String, I_EpicLoadFileBuilder> builders = new HashMap<String, I_EpicLoadFileBuilder>();
-    public static final String EPIC_MASTERFILE_NAME_EDG_CLINICAL = "edgclinical";
-    public static final String EPIC_MASTERFILE_NAME_EDG_BILLING = "edgbilling";
 
     public EpicExportManager(String baseDir, I_ExportFactory exportFactory) {
         this.baseDir = baseDir;
