@@ -20,7 +20,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public interface I_IdVersion extends I_AmTuple {
+public interface I_IdVersion extends I_IdPart {
+
+    public int getNid();
+
+    public I_Identify getFixedIdPart();
 
     public Set<TimePathId> getTimePathSet();
 
@@ -38,11 +42,11 @@ public interface I_IdVersion extends I_AmTuple {
 
     public I_Identify getIdentifier();
 
-    public I_IdPart getMutablePart();
+    public I_IdPart getMutableIdPart();
 
 
     /**
      * @deprecated
      */
-    public I_IdPart duplicate();
+    public I_IdPart duplicateIdPart();
 }

@@ -28,7 +28,7 @@ public interface I_Identify extends I_AmTermComponent {
 
     public int getNid();
 
-    public List<? extends I_IdPart> getMutableIdParts();
+    public List<? extends I_IdPart> getMutableParts();
 
     public List<UUID> getUUIDs();
 

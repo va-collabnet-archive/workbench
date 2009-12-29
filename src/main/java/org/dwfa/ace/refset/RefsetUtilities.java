@@ -62,7 +62,7 @@ public abstract class RefsetUtilities {
         System.out.println("getInclusionTypeForRefset " + part);
         int typeId = ID_NOT_FOUND;
         I_ThinExtByRefPart latest = null;
-        List<? extends I_ThinExtByRefPart> versions = part.getMutableIdParts();
+        List<? extends I_ThinExtByRefPart> versions = part.getMutableParts();
         for (I_ThinExtByRefPart version : versions) {
 
             if (latest == null) {
@@ -328,7 +328,7 @@ public abstract class RefsetUtilities {
 
     public I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned ext) {
         I_ThinExtByRefPart latest = null;
-        List<? extends I_ThinExtByRefPart> versions = ext.getMutableIdParts();
+        List<? extends I_ThinExtByRefPart> versions = ext.getMutableParts();
         for (I_ThinExtByRefPart version : versions) {
 
             if (latest == null) {

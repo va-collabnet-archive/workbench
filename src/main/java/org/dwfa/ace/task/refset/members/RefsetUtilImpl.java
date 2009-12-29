@@ -43,7 +43,7 @@ import org.dwfa.tapi.TerminologyException;
 public final class RefsetUtilImpl implements RefsetUtil {
 
     public I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData refsetConcept) throws IOException {
-        List<? extends I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getMutableIdParts();
+        List<? extends I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getMutableParts();
         I_ConceptAttributePart latestAttributePart = null;
         for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
             if (latestAttributePart == null || attributePart.getVersion() >= latestAttributePart.getVersion()) {
@@ -63,7 +63,7 @@ public final class RefsetUtilImpl implements RefsetUtil {
     public I_ThinExtByRefPart getLatestVersion(final I_ThinExtByRefVersioned ext, final I_TermFactory termFactory)
             throws TerminologyException, IOException {
         I_ThinExtByRefPart latest = null;
-        List<? extends I_ThinExtByRefPart> versions = ext.getMutableIdParts();
+        List<? extends I_ThinExtByRefPart> versions = ext.getMutableParts();
         for (I_ThinExtByRefPart version : versions) {
 
             if (latest == null) {
@@ -96,7 +96,7 @@ public final class RefsetUtilImpl implements RefsetUtil {
         }
 
         I_Identify idVersioned = termFactory.getId(nid);
-        for (I_IdPart idPart : idVersioned.getMutableIdParts()) {
+        for (I_IdPart idPart : idVersioned.getMutableParts()) {
             if (idPart.getAuthorityNid() == termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids())) {
                 return idPart.getDenotation().toString();
             }

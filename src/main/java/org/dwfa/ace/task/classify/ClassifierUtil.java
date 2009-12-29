@@ -183,11 +183,11 @@ class ClassifierUtil {
         if (includeUncommitted) {
             final I_ConceptAttributeVersioned uncommittedConceptAttributes = concept.getUncommittedConceptAttributes();
             if (null != uncommittedConceptAttributes) {
-                parts.addAll(uncommittedConceptAttributes.getMutableIdParts());
+                parts.addAll(uncommittedConceptAttributes.getMutableParts());
             }
         }
 
-        parts.addAll(concept.getConceptAttributes().getMutableIdParts());
+        parts.addAll(concept.getConceptAttributes().getMutableParts());
 
         for (I_ConceptAttributePart attributePart : parts) {
             if (allowedPaths.contains(attributePart.getPathId())) {
@@ -206,7 +206,7 @@ class ClassifierUtil {
 
     private I_RelPart getLatestRel(final I_GetConceptData concept, final I_RelVersioned rel) {
         I_RelPart latestPart = null;
-        for (final I_RelPart part : rel.getMutableIdParts()) {
+        for (final I_RelPart part : rel.getMutableParts()) {
             if (allowedPaths.contains(part.getPathId())) {
                 if (latestPart == null || latestPart.getVersion() < part.getVersion()) {
                     latestPart = part;

@@ -193,7 +193,7 @@ public class LoadEDG extends AbstractTask {
         I_DescriptionVersioned matchedDesc = null;
         UUID descId = null;
         for (I_DescriptionVersioned desc : concept.getDescriptions()) {
-            for (I_DescriptionPart dt : desc.getMutableIdParts()) {
+            for (I_DescriptionPart dt : desc.getMutableParts()) {
                 if (dt.getText().toLowerCase().equals(fields[DESCRIPTION_FIELD].toLowerCase())) {
                     matchedDesc = desc;
                     descId = tf.getId(desc.getDescId()).getUUIDs().iterator().next();

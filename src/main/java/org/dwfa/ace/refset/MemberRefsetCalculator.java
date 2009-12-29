@@ -661,7 +661,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
     private boolean newestPartRetired(I_ThinExtByRefVersioned ext) {
         I_ThinExtByRefPart newestPart = null;
-        for (I_ThinExtByRefPart part : ext.getMutableIdParts()) {
+        for (I_ThinExtByRefPart part : ext.getMutableParts()) {
             if (newestPart == null || part.getVersion() > newestPart.getVersion()) {
                 newestPart = part;
             }

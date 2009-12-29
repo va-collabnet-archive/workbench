@@ -30,6 +30,9 @@ public interface I_RelPart extends I_AmTypedPart {
 
     public void setRefinabilityId(int refinabilityId);
 
+    /**
+     * @deprecated
+     */
     public I_RelPart duplicate();
 
 }

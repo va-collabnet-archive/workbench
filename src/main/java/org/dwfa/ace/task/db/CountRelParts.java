@@ -87,7 +87,7 @@ public class CountRelParts extends AbstractTask implements I_ProcessRelationship
 
     public void processRelationship(I_RelVersioned versionedRel) throws Exception {
         relCount++;
-        for (I_RelPart part : versionedRel.getMutableIdParts()) {
+        for (I_RelPart part : versionedRel.getMutableParts()) {
             partCount++;
             partsSet.add(part);
         }

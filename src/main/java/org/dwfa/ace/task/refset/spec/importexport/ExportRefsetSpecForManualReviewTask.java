@@ -240,7 +240,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         int snomedIntegerId = termFactory.getId(
             ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNid();
 
-        List<? extends I_IdPart> parts = idVersioned.getMutableIdParts();
+        List<? extends I_IdPart> parts = idVersioned.getMutableParts();
         I_IdPart latestPart = null;
         for (I_IdPart part : parts) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
