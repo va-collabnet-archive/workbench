@@ -93,7 +93,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
      * 
      * @see org.dwfa.vodb.types.I_ImageVersioned#getVersions()
      */
-    public List<I_ImagePart> getMutableIdParts() {
+    public List<I_ImagePart> getMutableParts() {
         return versions;
     }
 
@@ -141,7 +141,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
      */
     public List<I_ImageTuple> getTuples() {
         List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
-        for (I_ImagePart p : getMutableIdParts()) {
+        for (I_ImagePart p : getMutableParts()) {
             tuples.add(new ThinImageTuple(this, p));
         }
         return tuples;
@@ -171,7 +171,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
     public boolean merge(I_ImageVersioned jarImage) {
         HashSet<I_ImagePart> versionSet = new HashSet<I_ImagePart>(versions);
         boolean changed = false;
-        for (I_ImagePart jarPart : jarImage.getMutableIdParts()) {
+        for (I_ImagePart jarPart : jarImage.getMutableParts()) {
             if (!versionSet.contains(jarPart)) {
                 changed = true;
                 versions.add(jarPart);

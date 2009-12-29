@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
@@ -33,7 +32,6 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
 import org.dwfa.tapi.TerminologyException;
@@ -69,7 +67,7 @@ public class ThinIdVersioned implements I_Identify {
      * 
      * @see org.dwfa.vodb.types.I_IdVersioned#getVersions()
      */
-    public List<I_IdPart> getMutableIdParts() {
+    public List<I_IdPart> getMutableParts() {
         return versions;
     }
 
@@ -204,14 +202,6 @@ public class ThinIdVersioned implements I_Identify {
         return nativeId;
     }
 
-    private class IdTupleAdder extends TupleAdder<I_IdVersion, ThinIdVersioned> {
-
-        @Override
-        public I_IdVersion makeTuple(I_AmPart part, ThinIdVersioned core) {
-            return new ThinIdTuple(core, (I_IdPart) part);
-        }
-    }
-
     IdTupleAdder adder = new IdTupleAdder();
 
     public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions, List<I_IdVersion> matchingTuples) {
@@ -231,7 +221,7 @@ public class ThinIdVersioned implements I_Identify {
         for (I_Path promotionPath : pomotionPaths) {
             for (I_IdVersion it : matchingTuples) {
                 if (it.getPathId() == viewPathId) {
-                    I_IdPart promotionPart = it.getMutablePart().duplicate();
+                    I_IdPart promotionPart = it.getMutableIdPart().duplicateIdPart();
                     promotionPart.setVersion(Integer.MAX_VALUE);
                     promotionPart.setPathId(promotionPath.getConceptId());
                     if (versions.contains(promotionPart) == false) {

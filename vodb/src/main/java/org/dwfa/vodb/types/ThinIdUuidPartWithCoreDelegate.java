@@ -187,7 +187,7 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
         return HashFunction.hashCode(new int[] { core.hashCode(), getDenotation().hashCode() });
     }
 
-    public I_IdPart duplicate() {
+    public I_IdPart duplicateIdPart() {
         return new ThinIdPart(this);
     }
 
@@ -228,8 +228,8 @@ public class ThinIdUuidPartWithCoreDelegate implements I_IdPart {
 	}
 
 	@Override
-	public I_IdPart makeAnalog(int statusNid, int pathNid, long time) {
-		I_IdPart newPart = duplicate();
+	public I_IdPart makeIdAnalog(int statusNid, int pathNid, long time) {
+		I_IdPart newPart = duplicateIdPart();
 		newPart.setStatusId(statusNid);
 		newPart.setPathId(pathNid);
 		newPart.setVersion(ThinVersionHelper.convert(time));

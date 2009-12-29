@@ -181,7 +181,7 @@ public class ThinIdPart implements I_IdPart {
         return HashFunction.hashCode(new int[] { pathId, version, idStatus, source, sourceId.hashCode() });
     }
 
-    public I_IdPart duplicate() {
+    public I_IdPart duplicateIdPart() {
         return new ThinIdPart(this);
     }
 
@@ -206,8 +206,8 @@ public class ThinIdPart implements I_IdPart {
 	}
 
 	@Override
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		I_IdPart newPart = duplicate();
+	public I_IdPart makeIdAnalog(int statusNid, int pathNid, long time) {
+		I_IdPart newPart = duplicateIdPart();
 		newPart.setStatusId(statusNid);
 		newPart.setPathId(pathNid);
 		newPart.setVersion(ThinVersionHelper.convert(time));

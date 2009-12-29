@@ -179,7 +179,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             int nid = getNidFromTermComponent(tc);
 
             I_Identify id = LocalVersionedTerminology.get().getId(nid);
-            for (I_IdPart part : id.getMutableIdParts()) {
+            for (I_IdPart part : id.getMutableParts()) {
                 if (workStopped) {
                     return false;
                 }
@@ -375,7 +375,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
             I_ConfigAceFrame config = host.getConfig();
             boolean inConflict = config.getHighlightConflictsInComponentPanel()
-                && config.getConflictResolutionStrategy().isInConflict((I_Identify) idTuple.getFixedPart());
+                && config.getConflictResolutionStrategy().isInConflict((I_Identify) idTuple.getFixedIdPart());
 
             switch (columns[columnIndex]) {
             case LOCAL_ID:
@@ -457,7 +457,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
             public void actionPerformed(ActionEvent e) {
                 for (I_Path p : config.getEditingPathSet()) {
-                    I_IdPart newPart = selectedObject.getTuple().duplicate();
+                    I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
                     newPart.setPathId(p.getConceptId());
                     newPart.setVersion(Integer.MAX_VALUE);
                     selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
@@ -477,7 +477,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             public void actionPerformed(ActionEvent e) {
                 try {
                     for (I_Path p : config.getEditingPathSet()) {
-                        I_IdPart newPart = selectedObject.getTuple().duplicate();
+                        I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
                         newPart.setPathId(p.getConceptId());
                         newPart.setVersion(Integer.MAX_VALUE);
                         newPart.setStatusId(AceConfig.getVodb().uuidToNative(

@@ -87,7 +87,7 @@ public class AttributePopupListener extends MouseAdapter {
             ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConId());
             I_ConceptAttributeTuple tuple = selectedObject.getTuple();
             ThinConVersioned versioned = (ThinConVersioned) tuple.getConVersioned();
-            versioned.getMutableIdParts().remove(tuple.getMutablePart());
+            versioned.getMutableParts().remove(tuple.getMutablePart());
             ACE.addUncommitted(sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();

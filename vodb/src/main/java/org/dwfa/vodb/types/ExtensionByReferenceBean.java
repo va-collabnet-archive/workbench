@@ -133,8 +133,8 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
         } else if (ref != null) {
             ExtensionByReferenceBean ebr = ref.get();
             if (ebr != null) {
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
-                    if (ebr.extension.getMutableIdParts().contains(part) == false) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
+                    if (ebr.extension.getMutableParts().contains(part) == false) {
                         ebr.extension.addVersion(part);
                     }
                 }
@@ -241,7 +241,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
             buff = new StringBuffer();
         }
         if (extension != null) {
-            for (I_ThinExtByRefPart p : extension.getMutableIdParts()) {
+            for (I_ThinExtByRefPart p : extension.getMutableParts()) {
                 boolean changed = false;
                 if (p.getVersion() == Integer.MAX_VALUE) {
                     p.setVersion(version);
@@ -291,7 +291,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
         UniversalAceExtByRefBean uEbrBean = new UniversalAceExtByRefBean(tf.getUids(getExtension().getRefsetId()),
             tf.getUids(getExtension().getMemberId()), tf.getUids(getExtension().getComponentId()),
             tf.getUids(getExtension().getTypeId()));
-        for (I_ThinExtByRefPart part : getExtension().getMutableIdParts()) {
+        for (I_ThinExtByRefPart part : getExtension().getMutableParts()) {
             uEbrBean.getVersions().add(part.getUniversalPart());
         }
         return uEbrBean;
@@ -340,8 +340,8 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
             return false;
         }
         if (extension != null) {
-            if (extension.getMutableIdParts().size() > 0) {
-                for (I_ThinExtByRefPart part : getExtension().getMutableIdParts()) {
+            if (extension.getMutableParts().size() > 0) {
+                for (I_ThinExtByRefPart part : getExtension().getMutableParts()) {
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         return true;
                     }

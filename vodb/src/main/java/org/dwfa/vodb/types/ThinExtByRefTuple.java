@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
@@ -153,7 +153,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getVersions()
      */
     public List<? extends I_ThinExtByRefPart> getVersions() {
-        return core.getMutableIdParts();
+        return core.getMutableParts();
     }
 
     /*
@@ -188,7 +188,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
         return part.compareTo(o);
     }
 
-    public I_AmTermComponent getFixedPart() {
+    public I_ThinExtByRefVersioned getFixedPart() {
         return core;
     }
 

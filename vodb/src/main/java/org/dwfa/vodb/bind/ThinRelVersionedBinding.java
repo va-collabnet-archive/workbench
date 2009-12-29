@@ -53,7 +53,7 @@ public class ThinRelVersionedBinding extends TupleBinding {
         to.writeInt(versioned.getC1Id());
         to.writeInt(versioned.getC2Id());
         to.writeInt(versioned.versionCount());
-        for (I_RelPart rel : versioned.getMutableIdParts()) {
+        for (I_RelPart rel : versioned.getMutableParts()) {
             to.writeInt(rel.getPathId());
             to.writeInt(rel.getVersion());
             to.writeInt(rel.getStatusId());

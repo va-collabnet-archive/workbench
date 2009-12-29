@@ -539,13 +539,13 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                 if (getDescriptions().size() > 0) {
                     I_DescriptionVersioned desc = getDescriptions().get(0);
                     for (I_DescriptionVersioned d : getDescriptions()) {
-                        for (I_DescriptionPart part : d.getMutableIdParts()) {
+                        for (I_DescriptionPart part : d.getMutableParts()) {
                             if ((part.getTypeId() == fsDescNid) || (part.getTypeId() == fsXmlDescNid)) {
                                 return part.getText();
                             }
                         }
                     }
-                    return desc.getMutableIdParts().get(0).getText();
+                    return desc.getMutableParts().get(0).getText();
                 } else {
                     StringBuffer errorBuffer = new StringBuffer();
                     errorBuffer.append("No descriptions for concept. uuids: "
@@ -563,7 +563,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             }
         }
         I_DescriptionVersioned tdv = localDesc.get(0);
-        List<? extends I_DescriptionPart> versions = tdv.getMutableIdParts();
+        List<? extends I_DescriptionPart> versions = tdv.getMutableParts();
         I_DescriptionPart first = versions.get(0);
         return first.getText();
     }
@@ -742,7 +742,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                 boolean delete = true;
                 for (int id : uncommittedIds.getSetValues()) {
                     I_Identify idv = AceConfig.getVodb().getId(id);
-                    for (ListIterator<? extends I_IdPart> itr = idv.getMutableIdParts().listIterator(); itr.hasNext();) {
+                    for (ListIterator<? extends I_IdPart> itr = idv.getMutableParts().listIterator(); itr.hasNext();) {
                         I_IdPart p = itr.next();
                         if (p.getVersion() == Integer.MAX_VALUE) {
                             itr.remove();
@@ -761,7 +761,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             if (uncommittedIdVersioned != null) {
                 boolean delete = true;
                 for (I_Identify idv : uncommittedIdVersioned) {
-                    for (ListIterator<? extends I_IdPart> itr = idv.getMutableIdParts().listIterator(); itr.hasNext();) {
+                    for (ListIterator<? extends I_IdPart> itr = idv.getMutableParts().listIterator(); itr.hasNext();) {
                         I_IdPart p = itr.next();
                         if (p.getVersion() == Integer.MAX_VALUE) {
                             itr.remove();
@@ -780,7 +780,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
             // remove uncommitted parts...
             if (conceptAttributes != null) {
-                for (ListIterator<? extends I_ConceptAttributePart> partItr = conceptAttributes.getMutableIdParts().listIterator(); partItr.hasNext();) {
+                for (ListIterator<? extends I_ConceptAttributePart> partItr = conceptAttributes.getMutableParts().listIterator(); partItr.hasNext();) {
                     I_ConceptAttributePart part = partItr.next();
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         partItr.remove();
@@ -789,7 +789,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             }
             if (descriptions != null) {
                 for (I_DescriptionVersioned desc : descriptions) {
-                    for (ListIterator<? extends I_DescriptionPart> partItr = desc.getMutableIdParts().listIterator(); partItr.hasNext();) {
+                    for (ListIterator<? extends I_DescriptionPart> partItr = desc.getMutableParts().listIterator(); partItr.hasNext();) {
                         I_DescriptionPart part = partItr.next();
                         if (part.getVersion() == Integer.MAX_VALUE) {
                             partItr.remove();
@@ -800,7 +800,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
             if (sourceRels != null) {
                 for (I_RelVersioned srcRel : sourceRels) {
-                    for (ListIterator<? extends I_RelPart> partItr = srcRel.getMutableIdParts().listIterator(); partItr.hasNext();) {
+                    for (ListIterator<? extends I_RelPart> partItr = srcRel.getMutableParts().listIterator(); partItr.hasNext();) {
                         I_RelPart part = partItr.next();
                         if (part.getVersion() == Integer.MAX_VALUE) {
                             partItr.remove();
@@ -811,7 +811,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
             if (images != null) {
                 for (I_ImageVersioned img : images) {
-                    for (ListIterator<? extends I_ImagePart> partItr = img.getMutableIdParts().listIterator(); partItr.hasNext();) {
+                    for (ListIterator<? extends I_ImagePart> partItr = img.getMutableParts().listIterator(); partItr.hasNext();) {
                         I_ImagePart part = partItr.next();
                         if (part.getVersion() == Integer.MAX_VALUE) {
                             partItr.remove();
@@ -1043,7 +1043,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         // handle the parts first...
         if (images != null) {
             for (I_ImageVersioned image : images) {
-                for (I_ImagePart p : image.getMutableIdParts()) {
+                for (I_ImagePart p : image.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         return true;
                     }
@@ -1051,7 +1051,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             }
         }
         if (conceptAttributes != null) {
-            for (I_ConceptAttributePart p : conceptAttributes.getMutableIdParts()) {
+            for (I_ConceptAttributePart p : conceptAttributes.getMutableParts()) {
                 if (p.getVersion() == Integer.MAX_VALUE) {
                     return true;
                 }
@@ -1059,7 +1059,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         }
         if (descriptions != null) {
             for (I_DescriptionVersioned desc : descriptions) {
-                for (I_DescriptionPart p : desc.getMutableIdParts()) {
+                for (I_DescriptionPart p : desc.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         return true;
                     }
@@ -1068,7 +1068,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         }
         if (sourceRels != null) {
             for (I_RelVersioned rel : sourceRels) {
-                for (I_RelPart p : rel.getMutableIdParts()) {
+                for (I_RelPart p : rel.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         return true;
                     }
@@ -1078,11 +1078,11 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         if (uncommittedImages != null) {
             List<I_ImageVersioned> imagesToRemove = new ArrayList<I_ImageVersioned>();
             for (I_ImageVersioned image : uncommittedImages) {
-                if (image.getMutableIdParts().size() == 0) {
+                if (image.getMutableParts().size() == 0) {
                     uncommittedIds.remove(image.getImageId());
                     imagesToRemove.add(image);
                 }
-                for (I_ImagePart p : image.getMutableIdParts()) {
+                for (I_ImagePart p : image.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         return true;
                     }
@@ -1091,7 +1091,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             uncommittedImages.removeAll(imagesToRemove);
         }
         if (uncommittedConceptAttributes != null) {
-            for (I_ConceptAttributePart p : uncommittedConceptAttributes.getMutableIdParts()) {
+            for (I_ConceptAttributePart p : uncommittedConceptAttributes.getMutableParts()) {
                 if (p.getVersion() == Integer.MAX_VALUE) {
                     return true;
                 }
@@ -1100,11 +1100,11 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         if (uncommittedDescriptions != null) {
             List<I_DescriptionVersioned> descsToRemove = new ArrayList<I_DescriptionVersioned>();
             for (I_DescriptionVersioned desc : uncommittedDescriptions) {
-                if (desc.getMutableIdParts().size() == 0) {
+                if (desc.getMutableParts().size() == 0) {
                     uncommittedIds.remove(desc.getDescId());
                     descsToRemove.add(desc);
                 }
-                for (I_DescriptionPart p : desc.getMutableIdParts()) {
+                for (I_DescriptionPart p : desc.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         return true;
                     }
@@ -1115,11 +1115,11 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         if (uncommittedSourceRels != null) {
             List<I_RelVersioned> relsToRemove = new ArrayList<I_RelVersioned>();
             for (I_RelVersioned rel : uncommittedSourceRels) {
-                if (rel.getMutableIdParts().size() == 0) {
+                if (rel.getMutableParts().size() == 0) {
                     uncommittedIds.remove(rel.getRelId());
                     relsToRemove.add(rel);
                 }
-                for (I_RelPart p : rel.getMutableIdParts()) {
+                for (I_RelPart p : rel.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         return true;
                     }
@@ -1131,7 +1131,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             for (int id : uncommittedIds.getSetValues()) {
                 I_Identify idv;
                 idv = AceConfig.getVodb().getId(id);
-                for (I_IdPart p : idv.getMutableIdParts()) {
+                for (I_IdPart p : idv.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         return true;
                     }
@@ -1141,7 +1141,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
         if (uncommittedIdVersioned != null) {
             for (I_Identify edv : uncommittedIdVersioned) {
-                for (I_IdPart part : edv.getMutableIdParts()) {
+                for (I_IdPart part : edv.getMutableParts()) {
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         return true;
                     }
@@ -1432,7 +1432,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         possibleKindOfConcepts.setMember(this.conceptId);
         I_IntSet relTypes = config.getDestRelTypes();
         for (I_RelVersioned destRel : getDestRels()) {
-            for (I_RelPart part : destRel.getMutableIdParts()) {
+            for (I_RelPart part : destRel.getMutableParts()) {
                 if (relTypes.contains(part.getTypeId())) {
                     if (possibleKindOfConcepts.isMember(destRel.getC1Id()) == false) {
                         possibleKindOfConcepts.setMember(destRel.getC1Id());

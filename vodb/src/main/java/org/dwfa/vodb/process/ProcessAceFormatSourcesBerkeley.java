@@ -408,7 +408,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         idPart.setAuthorityNid(vodb.uuidToNative(sourceSystemUuid));
         idPart.setDenotation(sourceId);
         idPart.setVersion(ThinVersionHelper.convert(statusDate.getTime()));
-        if (idv.getMutableIdParts().contains(idPart) == false) {
+        if (idv.getMutableParts().contains(idPart) == false) {
             idv.addMutableIdPart(idPart);
             vodb.writeId(idv);
         }

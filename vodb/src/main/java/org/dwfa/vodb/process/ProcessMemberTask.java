@@ -102,7 +102,7 @@ public abstract class ProcessMemberTask implements Runnable {
 
                 if (tf.hasExtension(memberId)) {
                     ext = tf.getExtension(memberId);
-                    for (Object version : ext.getMutableIdParts()) {
+                    for (Object version : ext.getMutableParts()) {
                         if (version.getClass().equals(part.getClass()) == false) {
                             throw new Exception("Extension classes do not match: " + version.getClass().getName() + " "
                                 + part.getClass());
