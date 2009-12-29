@@ -174,7 +174,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
                 if (stopWork) {
                     return;
                 }
-                for (I_DescriptionPart descVersion : d.getMutableParts()) {
+                for (I_DescriptionPart descVersion : d.getMutableIdParts()) {
                     conceptsToFetch.add(descVersion.getTypeId());
                     conceptsToFetch.add(descVersion.getStatusId());
                     conceptsToFetch.add(descVersion.getPathId());

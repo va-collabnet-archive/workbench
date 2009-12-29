@@ -85,7 +85,7 @@ public class DescPopupListener extends MouseAdapter {
             ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
             I_DescriptionTuple tuple = selectedObject.getTuple();
             ThinDescVersioned versioned = (ThinDescVersioned) tuple.getDescVersioned();
-            versioned.getMutableParts().remove(tuple.getMutablePart());
+            versioned.getMutableIdParts().remove(tuple.getMutablePart());
             ACE.addUncommitted(sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();

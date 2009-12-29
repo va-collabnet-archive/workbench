@@ -95,8 +95,8 @@ public class RefsetPopupListener extends MouseAdapter {
             ExtensionByReferenceBean sourceBean = ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId());
             I_ThinExtByRefTuple tuple = selectedObject.getTuple();
             ThinExtByRefVersioned versioned = (ThinExtByRefVersioned) tuple.getCore();
-            versioned.getMutableParts().remove(tuple.getMutablePart());
-            if (versioned.getMutableParts().size() == 0) {
+            versioned.getMutableIdParts().remove(tuple.getMutablePart());
+            if (versioned.getMutableIdParts().size() == 0) {
 
             }
             ACE.addUncommitted(sourceBean);

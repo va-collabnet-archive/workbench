@@ -265,7 +265,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
                     mySecCursor.close();
                     return true;
                 }
-                if (srcRelTypeIds.contains(relFromConceptId.getMutableParts().get(0).getTypeId())) {
+                if (srcRelTypeIds.contains(relFromConceptId.getMutableIdParts().get(0).getTypeId())) {
                     mySecCursor.close();
                     return true;
                 }
@@ -423,7 +423,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
                     mySecCursor.close();
                     return true;
                 }
-                if (destRelTypeIds.contains(relFromConceptId.getMutableParts().get(0).getTypeId())) {
+                if (destRelTypeIds.contains(relFromConceptId.getMutableIdParts().get(0).getTypeId())) {
                     mySecCursor.close();
                     return true;
                 }
@@ -654,7 +654,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
         if (bean.sourceRels != null) {
             for (I_RelVersioned srcRel : bean.sourceRels) {
                 boolean changed = false;
-                for (ListIterator<? extends I_RelPart> partItr = srcRel.getMutableParts().listIterator(); partItr.hasNext();) {
+                for (ListIterator<? extends I_RelPart> partItr = srcRel.getMutableIdParts().listIterator(); partItr.hasNext();) {
                     I_RelPart part = partItr.next();
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         changed = true;
@@ -671,7 +671,7 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
             for (I_RelVersioned rel : bean.uncommittedSourceRels) {
                 ConceptBean destBean = ConceptBean.get(rel.getC2Id());
                 destBean.flushDestRels();
-                for (I_RelPart p : rel.getMutableParts()) {
+                for (I_RelPart p : rel.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));

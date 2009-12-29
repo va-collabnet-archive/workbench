@@ -153,7 +153,7 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
                     return returnTuples.get(0);
                 }
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().fine("No tuple for match: " + ext.getExtension().getMutableParts());
+                    AceLog.getAppLog().fine("No tuple for match: " + ext.getExtension().getMutableIdParts());
                 }
                 return null;
             }

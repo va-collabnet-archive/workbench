@@ -59,8 +59,8 @@ public class ThinImageBinder extends TupleBinding {
         to.writeFast(image, 0, image.length);
         to.writeString(versioned.getFormat());
         to.writeInt(versioned.getConceptId());
-        to.writeInt(versioned.getMutableParts().size());
-        for (I_ImagePart part : versioned.getMutableParts()) {
+        to.writeInt(versioned.getMutableIdParts().size());
+        for (I_ImagePart part : versioned.getMutableIdParts()) {
             to.writeInt(part.getPathId());
             to.writeInt(part.getVersion());
             to.writeInt(part.getStatusId());
