@@ -242,7 +242,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         for (I_ConceptAttributeTuple tuple : concept.getConceptAttributeTuples(allowedStatuses,
             new PositionSetReadOnly(positions))) {
             if (latest == null || latest.getVersion() < tuple.getVersion()) {
-                latest = tuple.getMutableIdPart();
+                latest = tuple.getMutablePart();
             }
         }
         return latest;
@@ -353,7 +353,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     }
 
     void export(I_ThinExtByRefTuple thinExtByRefTuple) throws Exception {
-        export(thinExtByRefTuple.getMutableIdPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
+        export(thinExtByRefTuple.getMutablePart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
             thinExtByRefTuple.getComponentId());
     }
 

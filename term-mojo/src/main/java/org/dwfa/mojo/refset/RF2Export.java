@@ -248,7 +248,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
     }
 
     void export(I_ThinExtByRefTuple thinExtByRefTuple) throws Exception {
-        export(thinExtByRefTuple.getMutableIdPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
+        export(thinExtByRefTuple.getMutablePart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
             thinExtByRefTuple.getComponentId());
     }
 

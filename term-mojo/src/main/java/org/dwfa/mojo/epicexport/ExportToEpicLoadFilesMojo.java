@@ -367,7 +367,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	this.currentItem = null;
 	    	String refsetName = refsetConcept.getInitialText();
 	    	
-	    	I_ThinExtByRefPart extensionTuplePart = extensionTuple.getMutableIdPart();
+	    	I_ThinExtByRefPart extensionTuplePart = extensionTuple.getMutablePart();
 	    	// getLog().info("Processing refset: " + refsetName);	    	
 
 	    	List<I_RefsetUsageInterpreter.I_RefsetApplication> applications = 

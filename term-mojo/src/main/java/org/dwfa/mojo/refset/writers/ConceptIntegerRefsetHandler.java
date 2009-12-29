@@ -31,7 +31,7 @@ public class ConceptIntegerRefsetHandler extends MemberRefsetHandler {
     @Override
     public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid)
             throws TerminologyException, IOException {
-        I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) tuple.getMutableIdPart();
+        I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) tuple.getMutablePart();
 
         return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER
             + toId(tf, conceptIntegerPart.getConceptId(), sctid) + MemberRefsetHandler.FILE_DELIMITER

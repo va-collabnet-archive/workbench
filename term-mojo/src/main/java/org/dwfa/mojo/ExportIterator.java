@@ -228,7 +228,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
         for (Object obj : idTuples) {
             I_IdVersion tuple = (I_IdVersion) obj;
-            I_IdPart part = tuple.getMutableIdPart();
+            I_IdPart part = tuple.getMutablePart();
             I_Identify id = tuple.getIdentifier();
             if (allowedStatus.contains(part.getStatusId())
                 && (!exportCohesiveSet || isExportable(ConceptBean.get(part.getAuthorityNid())))
@@ -389,13 +389,13 @@ public class ExportIterator implements I_ProcessConcepts {
             createRecord(stringBuilder, getFirstUuid(latestAttrib.getConceptStatus()));
 
             // Effective time
-            createVersion(stringBuilder, latestAttrib.getMutableIdPart().getVersion(), latestAttrib.getMutableIdPart().getPathId());
+            createVersion(stringBuilder, latestAttrib.getMutablePart().getVersion(), latestAttrib.getMutablePart().getPathId());
 
             // Path Id
-            createRecord(stringBuilder, getFirstUuid(latestAttrib.getMutableIdPart().getPathId()));
+            createRecord(stringBuilder, getFirstUuid(latestAttrib.getMutablePart().getPathId()));
 
             // Status active/inactive value
-            createRecord(stringBuilder, getBinaryStatusValue(latestAttrib.getMutableIdPart().getStatusId()));
+            createRecord(stringBuilder, getBinaryStatusValue(latestAttrib.getMutablePart().getStatusId()));
 
             // End record
             createRecord(stringBuilder, System.getProperty("line.separator"));
@@ -497,7 +497,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
         int relId = 0;
         for (I_RelTuple tuple : latestRel.values()) {
-            I_RelPart part = tuple.getMutableIdPart();
+            I_RelPart part = tuple.getMutablePart();
             I_RelVersioned rel = tuple.getRelVersioned();
             if (allowedStatus.contains(part.getStatusId())
                 && isExportable(ConceptBean.get(rel.getC2Id()))
@@ -672,7 +672,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
         for (I_DescriptionTuple desc : latestDesc.values()) {
 
-            I_DescriptionPart part = desc.getMutableIdPart();
+            I_DescriptionPart part = desc.getMutablePart();
             if ((!validatePositions || validPosition(part.getPathId())) && allowedStatus.contains(part.getStatusId())
                 && (!exportCohesiveSet || isExportable(ConceptBean.get(part.getTypeId())))) {
 

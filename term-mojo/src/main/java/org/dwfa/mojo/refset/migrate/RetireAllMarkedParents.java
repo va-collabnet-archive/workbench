@@ -105,7 +105,7 @@ public class RetireAllMarkedParents extends AbstractMojo {
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
 
-                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutableIdPart();
+                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutablePart();
                     if (part.getConceptId() == concepts.get("PARENT_MARKER").getConceptId()
                         && part.getStatusId() == concepts.get("CURRENT").getConceptId()) {
 
