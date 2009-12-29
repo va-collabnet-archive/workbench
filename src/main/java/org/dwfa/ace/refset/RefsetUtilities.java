@@ -451,12 +451,12 @@ public abstract class RefsetUtilities {
 
         if (membershipTypes.size() == 0) {
             throw new TerminologyException("A source relationship of type '" + relType.getDescription()
-                + "' was not found for concept " + concept.getId().getUUIDs().iterator().next());
+                + "' was not found for concept " + concept.getIdentifier().getUUIDs().iterator().next());
         }
 
         if (membershipTypes.size() > 1) {
             throw new TerminologyException("More than one source relationship of type '" + relType.getDescription()
-                + "' was found for concept " + concept.getId().getUUIDs().iterator().next());
+                + "' was found for concept " + concept.getIdentifier().getUUIDs().iterator().next());
         }
 
         return membershipTypes.iterator().next().getConceptId();

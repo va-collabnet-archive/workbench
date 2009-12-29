@@ -124,7 +124,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                     I_TermFactory tf = LocalVersionedTerminology.get();
                     I_GetConceptData concept = (I_GetConceptData) getTermComponent();
                     buff.append("  <concept-ids>\n");
-                    for (I_IdVersion idt : concept.getId().getIdVersions()) {
+                    for (I_IdVersion idt : concept.getIdentifier().getIdVersions()) {
                         writeIdentifiersToBuff("    ", buff, idt);
                     }
                     buff.append("  </concept-ids>\n");
@@ -162,7 +162,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             buff.append("<id source='");
             I_GetConceptData source;
             try {
-                source = LocalVersionedTerminology.get().getConcept(idt.getIdSource());
+                source = LocalVersionedTerminology.get().getConcept(idt.getAuthorityNid());
             } catch (TerminologyException e) {
                 throw new IOException(e);
             }
@@ -171,7 +171,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                 config.getLanguageSortPref());
             buff.append(sourceDesc.getText());
             buff.append("' value='");
-            buff.append(idt.getSourceId().toString());
+            buff.append(idt.getDenotation().toString());
             buff.append("'/>\n");
         }
     }
@@ -193,7 +193,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                     I_GetConceptData concept = (I_GetConceptData) getTermComponent();
                     buff.append("cid source\tcid\tdesc\n");
                     I_DescriptionTuple dt = concept.getDescTuple(config.getLongLabelDescPreferenceList(), config);
-                    for (I_IdVersion idt : concept.getId().getIdVersions()) {
+                    for (I_IdVersion idt : concept.getIdentifier().getIdVersions()) {
                         writeIdentifiersToBuff(buff, idt, dt.getText());
                     }
                 }
@@ -208,7 +208,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         private void writeIdentifiersToBuff(StringBuffer buff, I_IdVersion idt, String text) throws IOException {
             I_GetConceptData source;
             try {
-                source = LocalVersionedTerminology.get().getConcept(idt.getIdSource());
+                source = LocalVersionedTerminology.get().getConcept(idt.getAuthorityNid());
             } catch (TerminologyException e) {
                 throw new IOException(e);
             }
@@ -217,7 +217,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                 config.getLanguageSortPref());
             buff.append(sourceDesc.getText());
             buff.append("\t");
-            buff.append(idt.getSourceId().toString());
+            buff.append(idt.getDenotation().toString());
             buff.append("\t");
             buff.append(text);
             buff.append("\n");

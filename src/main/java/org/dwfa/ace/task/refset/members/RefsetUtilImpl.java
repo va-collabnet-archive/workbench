@@ -97,8 +97,8 @@ public final class RefsetUtilImpl implements RefsetUtil {
 
         I_Identify idVersioned = termFactory.getId(nid);
         for (I_IdPart idPart : idVersioned.getMutableIdParts()) {
-            if (idPart.getSource() == termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids())) {
-                return idPart.getSourceId().toString();
+            if (idPart.getAuthorityNid() == termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids())) {
+                return idPart.getDenotation().toString();
             }
         }
 

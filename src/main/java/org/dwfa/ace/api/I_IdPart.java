@@ -18,13 +18,13 @@ package org.dwfa.ace.api;
 
 public interface I_IdPart extends I_AmPart {
 
-    public int getSource();
+    public int getAuthorityNid();
 
-    public void setSource(int source);
+    public void setAuthorityNid(int sourceNid);
 
-    public Object getSourceId();
+    public Object getDenotation();
 
-    public void setSourceId(Object sourceId);
+    public void setDenotation(Object sourceId);
 
     public I_IdPart duplicate();
 

@@ -186,8 +186,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
                 if (excludeMembersRefsetId != ID_NOT_FOUND) {
                     I_GetConceptData exclusionSet = getConcept(excludeMembersRefsetId);
                     System.out.println("Applying additional exclusion members from "
-                        + exclusionSet.getId().getUUIDs().iterator().next() + " to member refset "
-                        + memberSet.getId().getUUIDs().iterator().next());
+                        + exclusionSet.getIdentifier().getUUIDs().iterator().next() + " to member refset "
+                        + memberSet.getIdentifier().getUUIDs().iterator().next());
 
                     for (I_ThinExtByRefVersioned additionalExclusionMember : termFactory.getRefsetExtensionMembers(excludeMembersRefsetId)) {
                         conceptsWithExcludeIndividual.add(additionalExclusionMember.getComponentId());

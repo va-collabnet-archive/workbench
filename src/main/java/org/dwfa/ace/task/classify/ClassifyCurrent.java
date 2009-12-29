@@ -166,7 +166,7 @@ public class ClassifyCurrent extends AbstractTask {
             return;
         }
 
-        logger.info("Add concept: " + concept + " : " + concept.getId() + ": " + isDefined);
+        logger.info("Add concept: " + concept + " : " + concept.getIdentifier() + ": " + isDefined);
 
         rocket.addConcept(conceptId, isDefined);
 

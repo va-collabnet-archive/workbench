@@ -48,7 +48,7 @@ public class ConceptListWriter extends GenericFileWriter<I_GetConceptData> {
             snomedIntId = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
         }
 
-        Object conceptId = concept.getId(snomedIntId);
+        Object conceptId = concept.getDenotation(snomedIntId);
 
         if (conceptId == null) {
             conceptId = concept.getUids().iterator().next();
