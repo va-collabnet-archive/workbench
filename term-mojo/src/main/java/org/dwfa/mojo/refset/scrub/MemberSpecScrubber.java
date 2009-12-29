@@ -71,7 +71,7 @@ public class MemberSpecScrubber implements ConceptExtHandler {
 
         // Get all the "current" parts
         ArrayList<I_ThinExtByRefPartConcept> subjects = new ArrayList<I_ThinExtByRefPartConcept>();
-        for (I_ThinExtByRefPart part : conceptExtension.getMutableIdParts()) {
+        for (I_ThinExtByRefPart part : conceptExtension.getMutableParts()) {
             if (part instanceof I_ThinExtByRefPartConcept) {
                 if (part.getStatus() == currentStatusId) {
                     subjects.add((I_ThinExtByRefPartConcept) part);
@@ -82,7 +82,7 @@ public class MemberSpecScrubber implements ConceptExtHandler {
         // Exclude all the matching "retired" parts (must have a later version
         // and the same path)
         ArrayList<I_ThinExtByRefPartConcept> retiredSubjects = new ArrayList<I_ThinExtByRefPartConcept>();
-        for (I_ThinExtByRefPart part : conceptExtension.getMutableIdParts()) {
+        for (I_ThinExtByRefPart part : conceptExtension.getMutableParts()) {
             if (part instanceof I_ThinExtByRefPartConcept) {
                 for (I_ThinExtByRefPartConcept subjectPart : subjects) {
                     if (part.getStatus() == retiredStatusId) {

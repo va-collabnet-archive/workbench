@@ -85,7 +85,7 @@ public final class DuplicateMarkedParentMarker {
         for (I_ThinExtByRefVersioned member : componentRefsetMembers.getMembers()) {
             TreeSet<I_ThinExtByRefPart> sortedVersionsSet = new TreeSet<I_ThinExtByRefPart>(
                 new LatestVersionComparator());
-            sortedVersionsSet.addAll(member.getMutableIdParts());
+            sortedVersionsSet.addAll(member.getMutableParts());
             if (sortedVersionsSet.last().getStatus() != currentStatusId) { // ignore
                 // non-current
                 // statuses

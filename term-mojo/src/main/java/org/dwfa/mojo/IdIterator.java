@@ -51,7 +51,7 @@ public class IdIterator implements I_ProcessIds {
     public void processId(I_Identify idv) throws Exception {
 
         for (UUID uuid : idv.getUUIDs()) {
-            for (I_IdPart idvPart : idv.getMutableIdParts()) {
+            for (I_IdPart idvPart : idv.getMutableParts()) {
 
                 Date date = new Date(ThinVersionHelper.convert(idvPart.getVersion()));
 

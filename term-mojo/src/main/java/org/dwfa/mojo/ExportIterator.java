@@ -228,7 +228,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
         for (Object obj : idTuples) {
             I_IdVersion tuple = (I_IdVersion) obj;
-            I_IdPart part = tuple.getMutablePart();
+            I_IdPart part = tuple.getMutableIdPart();
             I_Identify id = tuple.getIdentifier();
             if (allowedStatus.contains(part.getStatusId())
                 && (!exportCohesiveSet || isExportable(ConceptBean.get(part.getAuthorityNid())))
@@ -369,12 +369,12 @@ public class ExportIterator implements I_ProcessConcepts {
             createRecord(stringBuilder, descForConceptFile.getText());
 
             // CTV3ID
-            I_IdPart ctv3IdPart = getLatestVersion(concept.getIdentifier().getMutableIdParts(),
+            I_IdPart ctv3IdPart = getLatestVersion(concept.getIdentifier().getMutableParts(),
                 ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID);
             createRecord(stringBuilder, (ctv3IdPart != null) ? ctv3IdPart.getDenotation().toString() : "null");
 
             // SNOMED 3 ID
-            I_IdPart snomedIdPart = getLatestVersion(concept.getIdentifier().getMutableIdParts(),
+            I_IdPart snomedIdPart = getLatestVersion(concept.getIdentifier().getMutableParts(),
                 ArchitectonicAuxiliary.Concept.SNOMED_INT_ID);
             createRecord(stringBuilder, (snomedIdPart != null) ? snomedIdPart.getDenotation().toString() : "null");
 
@@ -748,7 +748,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
     private I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned extension) {
         I_ThinExtByRefPart latestPart = null;
-        for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+        for (I_ThinExtByRefPart part : extension.getMutableParts()) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
                 latestPart = part;
             }

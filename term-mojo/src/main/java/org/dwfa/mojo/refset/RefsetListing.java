@@ -186,7 +186,7 @@ public class RefsetListing extends AbstractMojo {
 		I_GetConceptData c = tf.getConcept(concept_id);
 		for (I_RelVersioned d : c.getDestRels()) {
 			I_RelPart dm = null;
-			for (I_RelPart dd : d.getMutableIdParts()) {
+			for (I_RelPart dd : d.getMutableParts()) {
 				if (path != null && dd.getPathId() != path.getConceptId())
 					continue;
 				if (!(dd.getTypeId() == tf.getConcept(
@@ -217,7 +217,7 @@ public class RefsetListing extends AbstractMojo {
 		for (I_RelVersioned d : c.getSourceRels()) {
 			// ret.add(d.getC2Id());
 			I_RelPart dm = null;
-			for (I_RelPart dd : d.getMutableIdParts()) {
+			for (I_RelPart dd : d.getMutableParts()) {
 				if (path != null && dd.getPathId() != path.getConceptId())
 					continue;
 				if (dd.getTypeId() != relationship_id)

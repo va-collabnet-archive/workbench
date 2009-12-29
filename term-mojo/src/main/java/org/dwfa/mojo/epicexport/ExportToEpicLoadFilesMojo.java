@@ -23,11 +23,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -420,8 +423,22 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	    	this.currentMasterFile = masterFile;
 	    	this.currentItem = item;
 	    }
+	    	    
+	    public String getIdForConcept(I_GetConceptData concept, String idTypeUUID) throws Exception {
+	    	String ret = null;
+	    	//getLog().info("Looking for id in: " + concept);
+			I_GetConceptData idSourceConcept = termFactory.getConcept(new UUID[] { UUID
+					.fromString(idTypeUUID) }); 
+			int idSourceNid = idSourceConcept.getConceptId();
+			for (I_IdPart part : concept.getIdentifier().getMutableParts()) {
+				if (part.getAuthorityNid() == idSourceNid) {
+					ret = part.getDenotation().toString();
+					break;
+				}
+			}
+			return ret;
+	    }
 	    
-
 	    public boolean isNewDisplayNameApplication(String masterFile, String region) {
 	    	boolean found = false;
 	    	boolean ret = false;
