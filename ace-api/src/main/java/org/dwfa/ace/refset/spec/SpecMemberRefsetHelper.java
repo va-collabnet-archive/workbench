@@ -258,7 +258,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == memberRefsetId) {
 
-                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutableIdPart();
+                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutablePart();
                     if (part.getC1id() == memberTypeId) {
                         results.add(thinExtByRefTuple.getComponentId());
                     }

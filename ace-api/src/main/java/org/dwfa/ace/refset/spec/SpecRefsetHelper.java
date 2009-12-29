@@ -1370,7 +1370,7 @@ public class SpecRefsetHelper {
                     termFactory.newDescription(descUuid, concept, "en", description, descriptionType, termFactory
                         .getActiveAceFrameConfig());
 
-            I_DescriptionPart part = descVersioned.getLastTuple().getMutableIdPart();
+            I_DescriptionPart part = descVersioned.getLastTuple().getMutablePart();
             part.setStatusId(status.getConceptId());
 
             descVersioned.addVersion(part);
@@ -1400,7 +1400,7 @@ public class SpecRefsetHelper {
                     termFactory.newRelationship(relUuid, concept, relationshipType, destination, charConcept,
                         refConcept, status, group, termFactory.getActiveAceFrameConfig());
 
-            I_RelPart newPart = relVersioned.getLastTuple().getMutableIdPart();
+            I_RelPart newPart = relVersioned.getLastTuple().getMutablePart();
             newPart.setStatusId(status.getConceptId());
 
             relVersioned.addVersion(newPart);

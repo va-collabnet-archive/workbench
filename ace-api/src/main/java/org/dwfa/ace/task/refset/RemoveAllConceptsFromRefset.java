@@ -96,7 +96,7 @@ public class RemoveAllConceptsFromRefset extends AbstractTask {
                     config.getViewPositionSet(), true);
                 for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                     if (thinExtByRefTuple.getRefsetId() == refsetId) {
-                        I_ThinExtByRefPart part = thinExtByRefTuple.getMutableIdPart();
+                        I_ThinExtByRefPart part = thinExtByRefTuple.getMutablePart();
                         I_ThinExtByRefPart clone = part.duplicate();
 
                         clone.setStatus(retiredConceptId);

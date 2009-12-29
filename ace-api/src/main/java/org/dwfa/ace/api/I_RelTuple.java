@@ -40,7 +40,7 @@ public interface I_RelTuple extends I_AmTypedTuple {
 
     public I_RelPart duplicate();
 
-    public I_RelPart getMutableIdPart();
+    public I_RelPart getMutablePart();
 
     public I_RelVersioned getRelVersioned();
 

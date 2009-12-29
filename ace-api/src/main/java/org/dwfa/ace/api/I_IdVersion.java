@@ -38,7 +38,7 @@ public interface I_IdVersion extends I_AmTuple {
 
     public I_Identify getIdentifier();
 
-    public I_IdPart getMutableIdPart();
+    public I_IdPart getMutablePart();
 
 
     /**

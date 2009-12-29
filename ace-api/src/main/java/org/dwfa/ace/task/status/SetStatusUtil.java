@@ -41,7 +41,7 @@ public class SetStatusUtil {
         }
     }
 
-    public static void setStatusOfDescriptionInfo(I_GetConceptData status, List<I_DescriptionTuple> desctuples) {
+    public static void setStatusOfDescriptionInfo(I_GetConceptData status, List<? extends I_DescriptionTuple> desctuples) {
         for (I_DescriptionTuple dt : desctuples) {
             dt.setStatusId(status.getConceptId());
         }

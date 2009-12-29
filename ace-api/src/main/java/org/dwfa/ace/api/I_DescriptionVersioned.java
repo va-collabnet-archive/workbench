@@ -49,7 +49,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
 
     public int getDescId();
 
-    public List<I_DescriptionTuple> getTuples();
+    public List<? extends I_DescriptionTuple> getTuples();
 
     /**
      * @param returnConflictResolvedLatestState

@@ -306,7 +306,7 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	        				
 	        				// Break down the tuple into it's component parts and check to see if any of 
 	        				// those parts need to be refreshed from the selected version of SNOMED. 
-	        				I_ThinExtByRefPartConceptConceptConcept ccPart = (I_ThinExtByRefPartConceptConceptConcept) tuple.getMutableIdPart();
+	        				I_ThinExtByRefPartConceptConceptConcept ccPart = (I_ThinExtByRefPartConceptConceptConcept) tuple.getMutablePart();
 	        				I_GetConceptData part1 = termFactory.getConcept(ccPart.getC1id());
 	        				I_GetConceptData part2 = termFactory.getConcept(ccPart.getC2id());
 	        				I_GetConceptData part3 = termFactory.getConcept(ccPart.getC3id());
@@ -349,7 +349,7 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	        				
 	        				// Break down the tuple into it's component parts and check to see if any of 
 	        				// those parts need to be refreshed from the selected version of SNOMED. 
-	        				I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) tuple.getMutableIdPart();
+	        				I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) tuple.getMutablePart();
 	        				I_GetConceptData part1 = termFactory.getConcept(ccPart.getC1id());
 	        				I_GetConceptData part2 = termFactory.getConcept(ccPart.getC2id());
                             boolean hasRetiredConcept = false;

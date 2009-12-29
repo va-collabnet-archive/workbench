@@ -214,7 +214,7 @@ public class RelTupleFileUtil {
                     termFactory.getConcept(new UUID[] { charUuid }), termFactory.getConcept(new UUID[] { refUuid }),
                     termFactory.getConcept(new UUID[] { statusUuid }), group, termFactory.getActiveAceFrameConfig());
 
-                I_RelPart newPart = v.getLastTuple().getMutableIdPart();
+                I_RelPart newPart = v.getLastTuple().getMutablePart();
                 newPart.setCharacteristicId(termFactory.getId(charUuid).getNid());
                 newPart.setGroup(group);
                 newPart.setPathId(termFactory.getId(pathUuid).getNid());
@@ -227,7 +227,7 @@ public class RelTupleFileUtil {
                 termFactory.addUncommittedNoChecks(concept);
             } else {
 
-                I_RelPart newPart = latestTuple.getMutableIdPart().duplicate();
+                I_RelPart newPart = latestTuple.getMutablePart().duplicate();
                 newPart.setCharacteristicId(termFactory.getId(charUuid).getNid());
                 newPart.setGroup(group);
                 newPart.setPathId(termFactory.getId(pathUuid).getNid());

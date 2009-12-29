@@ -36,7 +36,7 @@ public interface I_DescriptionTuple extends I_AmTypedTuple {
 
     public I_DescriptionPart duplicate();
 
-    public abstract I_DescriptionPart getMutableIdPart();
+    public abstract I_DescriptionPart getMutablePart();
 
     public abstract I_DescriptionVersioned getDescVersioned();
 
