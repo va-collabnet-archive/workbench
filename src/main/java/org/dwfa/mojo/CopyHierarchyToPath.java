@@ -375,7 +375,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
     }
 
     private void duplicateIdTuple(I_IdVersion t) {
-        I_IdPart newPart = t.duplicate();
+        I_IdPart newPart = t.duplicateIdPart();
         newPart.setPathId(toPathId);
         t.getIdentifier().addMutableIdPart(newPart);
 

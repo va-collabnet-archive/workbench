@@ -185,7 +185,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
     private void processDescription(I_DescriptionVersioned versionedDesc) throws Exception {
         boolean exportableVersionFound = false;
         I_DescriptionPart latest = null;
-        for (I_DescriptionPart part : versionedDesc.getMutableIdParts()) {
+        for (I_DescriptionPart part : versionedDesc.getMutableParts()) {
             if (testSpecification(part.getTypeId()) && allowedStatuses.contains(part.getStatusId())
                 && referenceSetExport.checkPath(part.getPathId())) {
 
@@ -210,7 +210,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
         if (testSpecification(versionedRel.getC2Id())) {
             boolean exportableVersionFound = false;
             I_RelPart latest = null;
-            for (I_RelPart part : versionedRel.getMutableIdParts()) {
+            for (I_RelPart part : versionedRel.getMutableParts()) {
                 if (testSpecification(part.getCharacteristicId()) && testSpecification(part.getPathId())
                     && testSpecification(part.getRefinabilityId()) && testSpecification(part.getTypeId())
                     && allowedStatuses.contains(part.getStatusId()) && referenceSetExport.checkPath(part.getPathId())) {

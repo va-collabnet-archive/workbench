@@ -552,7 +552,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateIdTuple(I_IdVersion t) {
-        I_IdPart newPart = t.duplicate();
+        I_IdPart newPart = t.duplicateIdPart();
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
         if (statusId != 0) {

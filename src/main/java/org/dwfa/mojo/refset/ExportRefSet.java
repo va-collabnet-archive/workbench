@@ -228,7 +228,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
                     getLog().debug("Exporting UUID to refset:" + bean.getComponentUid());
                 }
 
-                for (I_ThinExtByRefPart version : ext.getMutableIdParts()) {
+                for (I_ThinExtByRefPart version : ext.getMutableParts()) {
                     boolean found = false;
                     for (I_ThinExtByRefVersioned previous : extensions) {
                         if (previous.getRefsetId() == ext.getRefsetId()) {
@@ -304,7 +304,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
         refsetWriter.write("Refset uuid\tEffectiveTime\tStatus\tName\tShortName\tRefSetType\t");
         refsetWriter.newLine();
 
-        for (I_ThinExtByRefPart version : ext.getMutableIdParts()) {
+        for (I_ThinExtByRefPart version : ext.getMutableParts()) {
             // Id SCTID
             refsetWriter.write(termFactory.getUids(ext.getRefsetId()).iterator().next().toString());
             refsetWriter.write("\t");
@@ -422,7 +422,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
         memberWriter.newLine();
 
         for (I_ThinExtByRefVersioned ext : ext_members) {
-            List<? extends I_ThinExtByRefPart> versions = ext.getMutableIdParts();
+            List<? extends I_ThinExtByRefPart> versions = ext.getMutableParts();
 
             /*
              * Probably should be able to filter on versions here based on
