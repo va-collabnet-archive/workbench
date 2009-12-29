@@ -62,7 +62,7 @@ public class RelationshipValidator extends SimpleValidator {
         termFactory = tf;
         failureReport = new StringBuffer();
 
-        I_GetConceptData concept = tf.getConcept(tf.uuidToNative(bean.getId().getUIDs()));
+        I_GetConceptData concept = tf.getConcept(tf.uuidToNative(bean.getIdentifier().getUIDs()));
         List<? extends I_RelVersioned> databaseRelationships = concept.getSourceRels();
         List<UniversalAceRelationship> beanRelationships = bean.getSourceRels();
 

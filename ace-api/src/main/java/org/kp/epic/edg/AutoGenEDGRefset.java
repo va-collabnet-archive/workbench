@@ -491,11 +491,11 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             String ret = null;
             int lastVersion = Integer.MIN_VALUE;
 
-            List<? extends I_IdPart> idList = concept.getId().getMutableIdParts();
+            List<? extends I_IdPart> idList = concept.getIdentifier().getMutableIdParts();
             for (I_IdPart part : idList) {
-                if (part.getSource() == nidEDGClinicalDot1) {
+                if (part.getAuthorityNid() == nidEDGClinicalDot1) {
                     if (part.getVersion() >= lastVersion) {
-                        ret = part.getSourceId().toString();
+                        ret = part.getDenotation().toString();
                         lastVersion = part.getVersion();
                     }
                 }
@@ -1525,10 +1525,10 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                         // Get Identifiers for the ICD9 Code Concept
                         I_GetConceptData icd9CodeCB = tf.getConcept(icd9CodeNid);
 
-                        I_Identify icd9CodeId = icd9CodeCB.getId();
+                        I_Identify icd9CodeId = icd9CodeCB.getIdentifier();
                         for (I_IdPart idPart : icd9CodeId.getMutableIdParts()) {
-                            if (idPart.getSource() == nidIDC9Id) {
-                                result.add((String) idPart.getSourceId());
+                            if (idPart.getAuthorityNid() == nidIDC9Id) {
+                                result.add((String) idPart.getDenotation());
                             }
                         }
                     }

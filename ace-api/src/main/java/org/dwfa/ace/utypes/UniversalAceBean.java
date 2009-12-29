@@ -110,11 +110,11 @@ public class UniversalAceBean implements I_AmChangeSetObject, Serializable {
         this.descriptions = descriptions;
     }
 
-    public UniversalAceIdentification getId() {
+    public UniversalAceIdentification getIdentifier() {
         return id;
     }
 
-    public void setId(UniversalAceIdentification id) {
+    public void setIdentifier(UniversalAceIdentification id) {
         this.id = id;
     }
 

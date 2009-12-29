@@ -34,7 +34,7 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
 
     public int getConId();
 
-    public List<I_ConceptAttributeTuple> getTuples();
+    public List<? extends I_ConceptAttributeTuple> getTuples();
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 

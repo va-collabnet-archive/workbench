@@ -44,9 +44,9 @@ public class IDTupleFileUtil {
 
         UUID tupleUuid = ArchitectonicAuxiliary.Concept.ID_TUPLE.getUids().iterator().next();
         UUID primaryUuid = termFactory.getUids(iIdVersioned.getNid()).iterator().next();
-        UUID sourceSystemUuid = termFactory.getUids(latestPart.getSource()).iterator().next();
+        UUID sourceSystemUuid = termFactory.getUids(latestPart.getAuthorityNid()).iterator().next();
 
-        Object sourceId = latestPart.getSourceId();
+        Object sourceId = latestPart.getDenotation();
 
         UUID pathUuid = termFactory.getUids(latestPart.getPathId()).iterator().next();
         UUID statusUuid = termFactory.getUids(latestPart.getStatusId()).iterator().next();
@@ -105,16 +105,16 @@ public class IDTupleFileUtil {
                 I_IdPart part = versioned.getMutableIdParts().get(0).duplicate();
                 part.setStatusId(termFactory.uuidToNative(statusUuid));
                 part.setPathId(termFactory.uuidToNative(pathUuid));
-                part.setSource(termFactory.uuidToNative(sourceSystemUuid));
+                part.setAuthorityNid(termFactory.uuidToNative(sourceSystemUuid));
                 part.setVersion(effectiveDate);
                 if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next())) {
-                    part.setSourceId(UUID.fromString(sourceId));
+                    part.setDenotation(UUID.fromString(sourceId));
                 } else if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()
                     .iterator()
                     .next())) {
-                    part.setSourceId(new Long(sourceId));
+                    part.setDenotation(new Long(sourceId));
                 } else {
-                    part.setSourceId(sourceId); // use string
+                    part.setDenotation(sourceId); // use string
                 }
 
                 if (!versioned.hasMutableIdPart(part)) {

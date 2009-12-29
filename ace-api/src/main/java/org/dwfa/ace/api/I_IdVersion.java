@@ -26,9 +26,15 @@ public interface I_IdVersion extends I_AmTuple {
 
     public List<UUID> getUUIDs();
 
-    public int getIdSource();
+    public int getAuthorityNid();
 
-    public Object getSourceId();
+    /**
+     * Denotation: the act of pointing out by name. Used as an 
+     * alternative to the repeated use of identifier with different
+     * contextual meanings. 
+     * @return
+     */
+    public Object getDenotation();
 
     public I_Identify getIdentifier();
 

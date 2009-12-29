@@ -527,7 +527,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
     public List<I_ImageVersioned> getUncommittedImages();
 
-    public I_Identify getId() throws IOException;
+    public I_Identify getIdentifier() throws IOException;
 
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus,
             PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException;
@@ -550,7 +550,13 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public boolean isParentOfOrEqualTo(I_GetConceptData child, boolean addUncommitted) throws IOException,
             TerminologyException;
 
-    public Object getId(int identifierScheme) throws IOException, TerminologyException;
+    /**
+     * Denotation: the act of pointing out by name. Used as an 
+     * alternative to the repeated use of identifier with different
+     * contextual meanings. 
+     * @return
+     */
+    public Object getDenotation(int authorityNid) throws IOException, TerminologyException;
 
     /**
      * This method efficiently determines "possible" concepts that are a
