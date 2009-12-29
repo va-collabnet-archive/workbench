@@ -42,7 +42,7 @@ public class SimilarConceptQuery {
         TreeSet<String> commonWords = new TreeSet<String>();
         for (I_DescriptionVersioned dv : concept.getDescriptions()) {
             TreeSet<String> uniqueDescriptionWords = new TreeSet<String>();
-            for (I_DescriptionPart part : dv.getMutableParts()) {
+            for (I_DescriptionPart part : dv.getMutableIdParts()) {
                 String[] parts = part.getText().toLowerCase().split("\\s+");
                 for (String word : parts) {
                     if (word.length() > 2 && (word.toLowerCase().equals("the") == false)) {

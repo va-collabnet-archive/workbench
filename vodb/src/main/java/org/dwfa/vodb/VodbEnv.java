@@ -560,7 +560,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
 
         public void processDescription(I_DescriptionVersioned desc) throws Exception {
-            for (I_DescriptionPart d : desc.getMutableParts()) {
+            for (I_DescriptionPart d : desc.getMutableIdParts()) {
                 TimePathId tb = new TimePathId(d.getVersion(), d.getPathId());
                 values.add(tb);
             }
@@ -568,8 +568,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 
         public void processConceptAttributes(I_ConceptAttributeVersioned conc) throws Exception {
             if (conc != null) {
-                if (conc.getMutableParts() != null) {
-                    for (I_ConceptAttributePart c : conc.getMutableParts()) {
+                if (conc.getMutableIdParts() != null) {
+                    for (I_ConceptAttributePart c : conc.getMutableIdParts()) {
                         TimePathId tb = new TimePathId(c.getVersion(), c.getPathId());
                         values.add(tb);
                     }
@@ -582,14 +582,14 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
 
         public void processRelationship(I_RelVersioned rel) throws Exception {
-            for (I_RelPart r : rel.getMutableParts()) {
+            for (I_RelPart r : rel.getMutableIdParts()) {
                 TimePathId tb = new TimePathId(r.getVersion(), r.getPathId());
                 values.add(tb);
             }
         }
 
         public void processExtensionByReference(I_ThinExtByRefVersioned ext) throws Exception {
-            for (I_ThinExtByRefPart extPart : ext.getMutableParts()) {
+            for (I_ThinExtByRefPart extPart : ext.getMutableIdParts()) {
                 TimePathId tb = new TimePathId(extPart.getVersion(), extPart.getPathId());
                 values.add(tb);
             }
@@ -1733,7 +1733,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             Document doc = hits.doc(i);
             int cnid = Integer.parseInt(doc.get("cnid"));
             I_GetConceptData concept = getConcept(cnid);
-            for (I_IdPart version : concept.getIdentifier().getMutableParts()) {
+            for (I_IdPart version : concept.getIdentifier().getMutableIdParts()) {
                 if (conceptId.equals(version.getDenotation().toString()) && (sourceId == version.getAuthorityNid())) {
                     return concept;
                 }
@@ -1763,7 +1763,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             Document doc = hits.doc(i);
             int cnid = Integer.parseInt(doc.get("cnid"));
             I_GetConceptData concept = getConcept(cnid);
-            for (I_IdPart version : concept.getIdentifier().getMutableParts()) {
+            for (I_IdPart version : concept.getIdentifier().getMutableIdParts()) {
                 if (conceptId.equals(version.getDenotation().toString())) {
                     results.add(concept);
                 }

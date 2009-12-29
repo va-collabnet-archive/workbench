@@ -111,25 +111,25 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                 switch (idType) {
                 case INTEGER_ID:
                     idPart = new ThinIdIntegerPartWithCoreDelegate(ti.readInt(), core);
-                    if (versioned.getMutableParts().contains(idPart) == false) {
+                    if (versioned.getMutableIdParts().contains(idPart) == false) {
                         versioned.addMutableIdPart(idPart);
                     }
                     break;
                 case LONG_ID:
                     idPart = new ThinIdLongPartWithCoreDelegate(ti.readLong(), core);
-                    if (versioned.getMutableParts().contains(idPart) == false) {
+                    if (versioned.getMutableIdParts().contains(idPart) == false) {
                         versioned.addMutableIdPart(idPart);
                     }
                     break;
                 case UUID_ID:
                     idPart = new ThinIdUuidPartWithCoreDelegate(ti.readLong(), ti.readLong(), core);
-                    if (versioned.getMutableParts().contains(idPart) == false) {
+                    if (versioned.getMutableIdParts().contains(idPart) == false) {
                         versioned.addMutableIdPart(idPart);
                     }
                     break;
                 case STRING_ID:
                     idPart = new ThinIdPartWithCoreDelegate(ti.readString(), core);
-                    if (versioned.getMutableParts().contains(idPart) == false) {
+                    if (versioned.getMutableIdParts().contains(idPart) == false) {
                         versioned.addMutableIdPart(idPart);
                     }
                     break;
@@ -139,8 +139,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
         }
 
         public void objectToEntry(I_Identify versioned, TupleOutput to) {
-            to.writeShort(versioned.getMutableParts().size());
-            for (I_IdPart id : versioned.getMutableParts()) {
+            to.writeShort(versioned.getMutableIdParts().size());
+            for (I_IdPart id : versioned.getMutableIdParts()) {
                 try {
                     to.writeShort(idPartCoreBdb.getIdPartCoreId(id));
                 } catch (DatabaseException e) {
@@ -378,7 +378,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
         idBinding.objectToEntry(id, idValue);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Writing nativeId : " + id);
-            for (I_IdPart p : id.getMutableParts()) {
+            for (I_IdPart p : id.getMutableIdParts()) {
                 if (UUID.class.isAssignableFrom(p.getDenotation().getClass())) {
                     UUID secondaryId = (UUID) p.getDenotation();
                     try {
@@ -398,7 +398,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
             idCoreDb.put(BdbEnv.transaction, idKey, idValue);
             idPutSemaphore.release();
             uuidToNidDbPutSemaphore.acquire();
-            for (I_IdPart p : id.getMutableParts()) {
+            for (I_IdPart p : id.getMutableIdParts()) {
                 if (UUID.class.isAssignableFrom(p.getDenotation().getClass())) {
                     UUID secondaryId = (UUID) p.getDenotation();
                     intBinder.objectToEntry(id.getNid(), idValue);
@@ -756,7 +756,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                 I_Identify idv = AceConfig.getVodb().getId(id);
                 List<I_IdPart> partsToRemove = new ArrayList<I_IdPart>();
                 List<I_IdPart> partsToAdd = new ArrayList<I_IdPart>();
-                for (I_IdPart p : idv.getMutableParts()) {
+                for (I_IdPart p : idv.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         I_IdPart newPart = p.duplicateIdPart();
                         newPart.setVersion(version);
@@ -766,7 +766,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                         values.add(new TimePathId(version, p.getPathId()));
                     }
                 }
-                idv.getMutableParts().removeAll(partsToRemove);
+                idv.getMutableIdParts().removeAll(partsToRemove);
                 for (I_IdPart part: partsToAdd) {
                 	idv.addMutableIdPart(part);
                 }

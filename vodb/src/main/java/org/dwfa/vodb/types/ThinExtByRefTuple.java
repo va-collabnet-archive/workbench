@@ -153,7 +153,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getVersions()
      */
     public List<? extends I_ThinExtByRefPart> getVersions() {
-        return core.getMutableParts();
+        return core.getMutableIdParts();
     }
 
     /*

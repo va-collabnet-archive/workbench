@@ -153,7 +153,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
             popup.addSeparator();
 
             boolean uncommitted = false;
-            for (I_ThinExtByRefPart part : specPart.getMutableParts()) {
+            for (I_ThinExtByRefPart part : specPart.getMutableIdParts()) {
                 if (part.getVersion() == Integer.MAX_VALUE) {
                     uncommitted = true;
                     break;
@@ -277,19 +277,19 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         public void actionPerformed(ActionEvent arg0) {
             try {
                 List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
-                for (I_ThinExtByRefPart part : specPart.getMutableParts()) {
+                for (I_ThinExtByRefPart part : specPart.getMutableIdParts()) {
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         partsToRemove.add(part);
                     }
                 }
                 ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) LocalVersionedTerminology.get()
                     .getExtensionWrapper(specPart.getMemberId());
-                specPart.getMutableParts().removeAll(partsToRemove);
-                if (specPart.getMutableParts().size() == 0) {
+                specPart.getMutableIdParts().removeAll(partsToRemove);
+                if (specPart.getMutableIdParts().size() == 0) {
                     ebrBean.discard();
                 }
                 LocalVersionedTerminology.get().addUncommitted(specPart);
-                if (specPart.getMutableParts().size() == 0) {
+                if (specPart.getMutableIdParts().size() == 0) {
                     ebrBean.abort();
                 }
                 specEditor.updateSpecTree(false);

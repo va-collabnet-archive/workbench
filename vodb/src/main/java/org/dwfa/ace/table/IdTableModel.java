@@ -179,7 +179,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             int nid = getNidFromTermComponent(tc);
 
             I_Identify id = LocalVersionedTerminology.get().getId(nid);
-            for (I_IdPart part : id.getMutableParts()) {
+            for (I_IdPart part : id.getMutableIdParts()) {
                 if (workStopped) {
                     return false;
                 }

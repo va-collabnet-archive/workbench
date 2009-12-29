@@ -101,7 +101,7 @@ public class ThinRelVersioned implements I_RelVersioned {
      * 
      * @see org.dwfa.vodb.types.I_RelVersioned#getVersions()
      */
-    public List<I_RelPart> getMutableParts() {
+    public List<I_RelPart> getMutableIdParts() {
         return versions;
     }
 
@@ -191,10 +191,10 @@ public class ThinRelVersioned implements I_RelVersioned {
         for (Integer key : partMap.keySet()) {
             compact.addVersion(partMap.get(key));
         }
-        if (versions.size() == compact.getMutableParts().size()) {
+        if (versions.size() == compact.getMutableIdParts().size()) {
             return false;
         }
-        versions = (List<I_RelPart>) compact.getMutableParts();
+        versions = (List<I_RelPart>) compact.getMutableIdParts();
         return true;
     }
 
@@ -254,7 +254,7 @@ public class ThinRelVersioned implements I_RelVersioned {
      */
     public List<I_RelTuple> getTuples() {
         List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
-        for (I_RelPart p : getMutableParts()) {
+        for (I_RelPart p : getMutableIdParts()) {
             tuples.add(new ThinRelTuple(this, p));
         }
         return tuples;
@@ -458,7 +458,7 @@ public class ThinRelVersioned implements I_RelVersioned {
     public boolean merge(I_RelVersioned jarRel) {
         HashSet<I_RelPart> versionSet = new HashSet<I_RelPart>(versions);
         boolean changed = false;
-        for (I_RelPart jarPart : jarRel.getMutableParts()) {
+        for (I_RelPart jarPart : jarRel.getMutableIdParts()) {
             if (!versionSet.contains(jarPart)) {
                 changed = true;
                 versions.add(jarPart);

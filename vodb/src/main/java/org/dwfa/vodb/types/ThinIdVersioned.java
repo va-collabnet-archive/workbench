@@ -67,7 +67,7 @@ public class ThinIdVersioned implements I_Identify {
      * 
      * @see org.dwfa.vodb.types.I_IdVersioned#getVersions()
      */
-    public List<I_IdPart> getMutableParts() {
+    public List<I_IdPart> getMutableIdParts() {
         return versions;
     }
 

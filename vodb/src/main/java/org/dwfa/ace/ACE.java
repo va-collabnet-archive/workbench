@@ -599,7 +599,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     if (uncommittedBean.isUncommitted() && uncommittedBean.isExtensionUncommitted()) {
                         removeUncommitted(uncommittedBean);
                     }
-                    if (eb.getExtension().getMutableParts().size() == 0) {
+                    if (eb.getExtension().getMutableIdParts().size() == 0) {
                         eb.abort();
                     }
                     List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
@@ -607,7 +607,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     addUncommitted(uncommittedBean);
                     for (I_ThinExtByRefVersioned ext : LocalVersionedTerminology.get().getAllExtensionsForComponent(
                         uncommittedBean.getConceptId(), true)) {
-                        for (I_ThinExtByRefPart part : ext.getMutableParts()) {
+                        for (I_ThinExtByRefPart part : ext.getMutableIdParts()) {
                             if (part.getVersion() == Integer.MAX_VALUE) {
                                 addUncommitted(ExtensionByReferenceBean.get(ext.getMemberId()));
                                 break;

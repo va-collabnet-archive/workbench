@@ -519,7 +519,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
     }
 
     private void addIdsToIndex(Document doc, I_Identify did) {
-        for (I_IdPart p : did.getMutableParts()) {
+        for (I_IdPart p : did.getMutableIdParts()) {
             doc.add(new Field("desc", p.getDenotation().toString(), Field.Store.NO, Field.Index.UN_TOKENIZED));
         }
     }
@@ -594,7 +594,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
         if (bean.descriptions != null) {
             for (I_DescriptionVersioned desc : bean.descriptions) {
                 boolean changed = false;
-                for (I_DescriptionPart p : desc.getMutableParts()) {
+                for (I_DescriptionPart p : desc.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));
@@ -611,7 +611,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
         }
         if (bean.uncommittedDescriptions != null) {
             for (I_DescriptionVersioned desc : bean.uncommittedDescriptions) {
-                for (I_DescriptionPart p : desc.getMutableParts()) {
+                for (I_DescriptionPart p : desc.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));
