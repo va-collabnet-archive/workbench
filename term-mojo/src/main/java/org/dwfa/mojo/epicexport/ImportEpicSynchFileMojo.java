@@ -216,7 +216,7 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
             boolean foundCidSource = false;
             boolean foundDot1Source = false;
 
-            for (I_IdPart part : concept.getIdentifier().getMutableParts()) {
+            for (I_IdPart part : concept.getIdentifier().getMutableIdParts()) {
                 if (part.getAuthorityNid() == cidSourceNid) {
                     foundCidSource = true;
                     if (part.getDenotation().equals(cid)) {
@@ -248,7 +248,7 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
             }
 
             if (foundDot1Source == false) {
-                I_IdPart aPart = concept.getIdentifier().getMutableParts().get(0).duplicateIdPart();
+                I_IdPart aPart = concept.getIdentifier().getMutableIdParts().get(0).duplicateIdPart();
                 aPart.setAuthorityNid(dot1SourceNid);
                 aPart.setDenotation(dot1);
                 aPart.setPathId(kpPath.getNid());
@@ -260,7 +260,7 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
             }
 
             if (foundCidSource == false) {
-                I_IdPart aPart = concept.getIdentifier().getMutableParts().get(0).duplicateIdPart();
+                I_IdPart aPart = concept.getIdentifier().getMutableIdParts().get(0).duplicateIdPart();
                 aPart.setAuthorityNid(cidSourceNid);
                 aPart.setDenotation(cid);
                 aPart.setPathId(kpPath.getNid());

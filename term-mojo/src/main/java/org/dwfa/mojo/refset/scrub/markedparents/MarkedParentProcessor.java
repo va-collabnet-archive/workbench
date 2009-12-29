@@ -63,7 +63,7 @@ public final class MarkedParentProcessor {
     public void process(final String memberRefsetName, final List<I_ThinExtByRefVersioned> refsetMembers)
             throws Exception {
         for (I_ThinExtByRefVersioned member : refsetMembers) {
-            List<? extends I_ThinExtByRefPart> versions = member.getMutableParts();
+            List<? extends I_ThinExtByRefPart> versions = member.getMutableIdParts();
             for (I_ThinExtByRefPart version : versions) {
                 if (version instanceof I_ThinExtByRefPartConcept && isCurrentOrRetired(version)) {
                     int inclusionType = ((I_ThinExtByRefPartConcept) version).getConceptId();

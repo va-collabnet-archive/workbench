@@ -160,7 +160,7 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
         if (testSpecification(versionedRel.getC2Id())) {
             boolean exportableVersionFound = false;
             I_RelPart latest = null;
-            for (I_RelPart part : versionedRel.getMutableParts()) {
+            for (I_RelPart part : versionedRel.getMutableIdParts()) {
                 if (testSpecification(part.getCharacteristicId()) && testSpecification(part.getPathId())
                     && testSpecification(part.getRefinabilityId()) && allowedStatuses.contains(part.getStatusId())
                     && checkPath(part.getPathId())) {
