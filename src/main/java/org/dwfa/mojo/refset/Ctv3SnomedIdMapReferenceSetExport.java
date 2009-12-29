@@ -91,7 +91,7 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
     private void exportCtv3IdMap(I_AmPart latest, int conceptId) throws Exception {
         I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.CTV3_ID_MAP_EXTENSION);
         I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) tuple;
-        I_IdPart ctv3IdPart = getLatestVersion(tf.getConcept(conceptId).getIdentifier().getMutableParts(),
+        I_IdPart ctv3IdPart = getLatestVersion(tf.getConcept(conceptId).getIdentifier().getMutableIdParts(),
             ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID);
         if (part == null && ctv3IdPart != null) {
             part = tf.newStringExtensionPart();
@@ -117,7 +117,7 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
     private void exportSnomedIdMap(I_AmPart latest, int conceptId) throws Exception {
         I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.SNOMED_ID_MAP_EXTENSION);
         I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) tuple;
-        I_IdPart snomedIdPart = getLatestVersion(tf.getConcept(conceptId).getIdentifier().getMutableParts(),
+        I_IdPart snomedIdPart = getLatestVersion(tf.getConcept(conceptId).getIdentifier().getMutableIdParts(),
             ArchitectonicAuxiliary.Concept.SNOMED_INT_ID);
         if (part == null && snomedIdPart != null) {
             part = tf.newStringExtensionPart();

@@ -251,7 +251,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     private void processDescription(I_DescriptionVersioned versionedDesc) throws Exception {
         boolean exportableVersionFound = false;
         I_DescriptionPart latest = null;
-        for (I_DescriptionPart part : versionedDesc.getMutableParts()) {
+        for (I_DescriptionPart part : versionedDesc.getMutableIdParts()) {
             if (testSpecification(part.getTypeId()) && allowedStatuses.contains(part.getStatusId())
                 && checkPath(part.getPathId())) {
 
@@ -280,7 +280,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         if (testSpecification(versionedRel.getC2Id())) {
             boolean exportableVersionFound = false;
             I_RelPart latest = null;
-            for (I_RelPart part : versionedRel.getMutableParts()) {
+            for (I_RelPart part : versionedRel.getMutableIdParts()) {
                 if (testSpecification(part.getCharacteristicId()) && testSpecification(part.getPathId())
                     && testSpecification(part.getRefinabilityId()) && testSpecification(part.getTypeId())
                     && allowedStatuses.contains(part.getStatusId()) && checkPath(part.getPathId())) {
@@ -514,7 +514,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      */
     private I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned extension) {
         I_ThinExtByRefPart latestPart = null;
-        for (I_ThinExtByRefPart part : extension.getMutableParts()) {
+        for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
                 latestPart = part;
             }
