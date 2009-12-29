@@ -29,7 +29,7 @@ public interface I_RelVersioned extends I_AmTermComponent {
 
     public boolean addVersionNoRedundancyCheck(I_RelPart rel);
 
-    public List<? extends I_RelPart> getMutableParts();
+    public List<? extends I_RelPart> getMutableIdParts();
 
     public List<? extends I_RelPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException,
             IOException;
