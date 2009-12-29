@@ -197,31 +197,31 @@ public class JTableWithDragImage extends JTable {
                     return new StringSelection(swextt.getCellText());
                 case CONCEPT_ID:
                     return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartConcept) swextt.getTuple()
-                        .getMutableIdPart()).getConceptId()));
+                        .getMutablePart()).getConceptId()));
                 case INTEGER_VALUE:
                     return new StringSelection(swextt.getCellText());
                 case ACCEPTABILITY:
                     return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple()
-                        .getMutableIdPart()).getAcceptabilityId()));
+                        .getMutablePart()).getAcceptabilityId()));
                 case CORRECTNESS:
                     return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple()
-                        .getMutableIdPart()).getCorrectnessId()));
+                        .getMutablePart()).getCorrectnessId()));
                 case DEGREE_OF_SYNONYMY:
                     return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple()
-                        .getMutableIdPart()).getDegreeOfSynonymyId()));
+                        .getMutablePart()).getDegreeOfSynonymyId()));
                 case TAG:
                     return new ConceptTransferable(
-                        ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple().getMutableIdPart()).getTagId()));
+                        ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple().getMutablePart()).getTagId()));
                 case SCOPE:
                     return new ConceptTransferable(
-                        ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple().getMutableIdPart()).getScopeId()));
+                        ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple().getMutablePart()).getScopeId()));
                 case PRIORITY:
                     return new StringSelection(swextt.getCellText());
                 case MEASUREMENT_VALUE:
                     return new StringSelection(swextt.getCellText());
                 case MEASUREMENT_UNITS_ID:
                     return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartMeasurement) swextt.getTuple()
-                        .getMutableIdPart()).getUnitsOfMeasureId()));
+                        .getMutablePart()).getUnitsOfMeasureId()));
                 case STRING_VALUE:
                     return new StringSelection(swextt.getCellText());
                 default:

@@ -150,7 +150,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
             + " path: " + getPathId() + " version: " + getVersion();
     }
 
-    public I_ConceptAttributePart getMutableIdPart() {
+    public I_ConceptAttributePart getMutablePart() {
         return part;
     }
 

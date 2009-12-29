@@ -85,7 +85,7 @@ public class DescPopupListener extends MouseAdapter {
             ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
             I_DescriptionTuple tuple = selectedObject.getTuple();
             ThinDescVersioned versioned = (ThinDescVersioned) tuple.getDescVersioned();
-            versioned.getMutableIdParts().remove(tuple.getMutableIdPart());
+            versioned.getMutableIdParts().remove(tuple.getMutablePart());
             ACE.addUncommitted(sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();
@@ -107,7 +107,7 @@ public class DescPopupListener extends MouseAdapter {
             try {
                 ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
                 for (I_Path p : config.getEditingPathSet()) {
-                    I_DescriptionPart newPart = selectedObject.getTuple().getMutableIdPart();
+                    I_DescriptionPart newPart = selectedObject.getTuple().getMutablePart();
                     if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
                         newPart = selectedObject.getTuple().duplicate();
                         selectedObject.getTuple().getDescVersioned().addVersion(newPart);

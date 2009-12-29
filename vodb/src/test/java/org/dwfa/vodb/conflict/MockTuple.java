@@ -62,7 +62,7 @@ public class MockTuple implements I_AmTuple {
         };
     }
 
-    public I_AmPart getMutableIdPart() {
+    public I_AmPart getMutablePart() {
         throw new UnsupportedOperationException();
     }
 

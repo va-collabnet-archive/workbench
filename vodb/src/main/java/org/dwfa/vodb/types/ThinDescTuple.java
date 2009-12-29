@@ -209,7 +209,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
         return hash;
     }
 
-    public I_DescriptionPart getMutableIdPart() {
+    public I_DescriptionPart getMutablePart() {
         return part;
     }
 

@@ -159,7 +159,7 @@ public class ThinIdTuple implements I_IdVersion {
         return newPart;
     }
 
-    public I_IdPart getMutableIdPart() {
+    public I_IdPart getMutablePart() {
         return part;
     }
 

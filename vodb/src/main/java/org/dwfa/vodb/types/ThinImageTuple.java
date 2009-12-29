@@ -129,7 +129,7 @@ public class ThinImageTuple implements I_ImageTuple {
         return core;
     }
 
-    public I_ImagePart getMutableIdPart() {
+    public I_ImagePart getMutablePart() {
         return part;
     }
 
