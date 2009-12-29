@@ -29,7 +29,7 @@ public interface I_ImageVersioned extends I_AmTermComponent {
 
     public int getImageId();
 
-    public List<? extends I_ImagePart> getMutableParts();
+    public List<? extends I_ImagePart> getMutableIdParts();
 
     public boolean addVersion(I_ImagePart part);
 

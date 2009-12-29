@@ -135,7 +135,7 @@ public class ExtensionValidator {
 
             for (I_ThinExtByRefVersioned ext : termFactory.getAllExtensionsForComponent(componentId, true)) {
 
-                List<? extends I_ThinExtByRefPart> extensionVersions = ext.getMutableParts();
+                List<? extends I_ThinExtByRefPart> extensionVersions = ext.getMutableIdParts();
                 int latest = Integer.MIN_VALUE;
                 for (I_ThinExtByRefPart currentVersion : extensionVersions) {
                     if (currentVersion.getVersion() > latest) {

@@ -70,7 +70,7 @@ public class DescriptionValidator extends SimpleValidator {
                     if (!containsPart(thinDesc, newPart)) {
                         failureReport.append("concept does not contain a description part match.");
                         failureReport.append("\n       newPart: " + newPart);
-                        for (I_DescriptionPart descPart : thinDesc.getMutableParts()) {
+                        for (I_DescriptionPart descPart : thinDesc.getMutableIdParts()) {
                             failureReport.append("\n existing part: " + descPart);
                         }
                         failureReport.append("\n\n");
@@ -78,9 +78,9 @@ public class DescriptionValidator extends SimpleValidator {
                     }
                 }
             }
-            if (startParts.size() != thinDesc.getMutableParts().size()) {
+            if (startParts.size() != thinDesc.getMutableIdParts().size()) {
                 failureReport.append("number of concept attribute parts is different for " + bean + " and "
-                    + thinDesc.getMutableParts());
+                    + thinDesc.getMutableIdParts());
                 return false; // test 3
             }
         }
@@ -91,10 +91,10 @@ public class DescriptionValidator extends SimpleValidator {
 
     private boolean containsPart(I_DescriptionVersioned thinDesc, I_DescriptionPart newPart) {
         if (!timeLenient) {
-            return thinDesc.getMutableParts().contains(newPart);
+            return thinDesc.getMutableIdParts().contains(newPart);
         } else {
             boolean match = false;
-            for (I_DescriptionPart descriptionPart : thinDesc.getMutableParts()) {
+            for (I_DescriptionPart descriptionPart : thinDesc.getMutableIdParts()) {
                 if (descriptionPart.isInitialCaseSignificant() == newPart.isInitialCaseSignificant()
                     && descriptionPart.getPathId() == newPart.getPathId()
                     && descriptionPart.getStatusId() == newPart.getStatusId()

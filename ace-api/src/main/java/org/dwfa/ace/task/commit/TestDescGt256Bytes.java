@@ -102,7 +102,7 @@ public class TestDescGt256Bytes extends AbstractConceptTest {
         typesToCheck.add(pt_type.getConceptId());
         typesToCheck.add(syn_type.getConceptId());
         for (I_DescriptionVersioned desc : descriptions) {
-            for (I_DescriptionPart part : desc.getMutableParts()) {
+            for (I_DescriptionPart part : desc.getMutableIdParts()) {
                 if (part.getVersion() == Integer.MAX_VALUE) {
                     if (typesToCheck.contains(part.getTypeId())) {
                         Charset utf8 = Charset.forName("UTF-8");

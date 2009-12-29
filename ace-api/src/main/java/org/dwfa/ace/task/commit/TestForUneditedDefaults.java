@@ -69,7 +69,7 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
 
     private List<AlertToDataConstraintFailure> testDescription(I_GetConceptData concept, I_DescriptionVersioned desc,
             boolean forCommit) {
-        for (I_DescriptionPart part : desc.getMutableParts()) {
+        for (I_DescriptionPart part : desc.getMutableIdParts()) {
             if (part.getVersion() == Integer.MAX_VALUE) {
                 if (part.getText().equalsIgnoreCase("New Fully Specified Description")
                     || part.getText().equalsIgnoreCase("New Preferred Description")

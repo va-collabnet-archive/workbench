@@ -174,7 +174,7 @@ public class FasterLoad extends AbstractTask {
                 // check that concept has an IdPart with a source that
                 // corresponds to SNOMED CT
                 // (the corresponding sourceId == the SCTID)
-                for (final I_IdPart idPart : concept.getIdentifier().getMutableParts()) {
+                for (final I_IdPart idPart : concept.getIdentifier().getMutableIdParts()) {
                     if (idPart.getAuthorityNid() == -2147483005) { // FIXME find
                         // source of this
                         // constant

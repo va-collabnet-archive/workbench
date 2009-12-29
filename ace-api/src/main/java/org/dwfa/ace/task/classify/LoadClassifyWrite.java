@@ -367,7 +367,7 @@ public class LoadClassifyWrite extends AbstractTask {
                         case3Rel = rv;
 
                         // CHECK IMMUTABLE: CID1, CID2, ROLE, GROUP MATCH
-                        List<? extends I_RelPart> parts = rv.getMutableParts();
+                        List<? extends I_RelPart> parts = rv.getMutableIdParts();
                         for (I_RelPart part : parts) {
                             if (part.getTypeId() == roleId && part.getGroup() == group) {
                                 case2Rel = rv;
