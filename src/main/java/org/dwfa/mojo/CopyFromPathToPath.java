@@ -346,7 +346,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             getLog().info("processed description " + descriptionCount);
         }
 
-        Collection<I_DescriptionTuple> allTuples = descriptionVersioned.getTuples();
+        Collection<? extends I_DescriptionTuple> allTuples = descriptionVersioned.getTuples();
         Map<TupleKey, List<I_AmTypedTuple>> versionsMap = new HashMap<TupleKey, List<I_AmTypedTuple>>();
 
         // Check for multi-versioned descriptions, with the same path and
@@ -381,7 +381,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             versionsMap.put(key, versions);
         }
 
-        Collection<I_DescriptionTuple> descriptions;
+        Collection<? extends I_DescriptionTuple> descriptions;
 
         if (readLatestPartOnly) {
             descriptions = getLatestDescriptions((List<I_DescriptionTuple>) allTuples);

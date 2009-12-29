@@ -210,11 +210,11 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                     RefsetType refsetType = refsetTypeMap.get(refsetId);
                     if (refsetType == null) {
                         try {
-                            refsetType = RefsetType.findByExtension(thinExtByRefTuple.getMutableIdPart());
+                            refsetType = RefsetType.findByExtension(thinExtByRefTuple.getMutablePart());
                         } catch (EnumConstantNotPresentException e) {
                             getLog().warn(
-                                "No handler for tuple " + thinExtByRefTuple.getMutableIdPart() + " of type "
-                                    + thinExtByRefTuple.getMutableIdPart().getClass(), e);
+                                "No handler for tuple " + thinExtByRefTuple.getMutablePart() + " of type "
+                                    + thinExtByRefTuple.getMutablePart().getClass(), e);
                             return;
                         }
                         refsetTypeMap.put(refsetId, refsetType);
@@ -253,7 +253,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
     private void export(I_ThinExtByRefTuple thinExtByRefTuple, String subsetVersion, String subsetId, String subsetType)
             throws Exception {
-        export(thinExtByRefTuple.getMutableIdPart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
+        export(thinExtByRefTuple.getMutablePart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
             thinExtByRefTuple.getComponentId(), subsetVersion, subsetId, subsetType);
     }
 

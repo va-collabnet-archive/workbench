@@ -48,7 +48,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
 			I_DescriptionVersioned description, I_ThinExtByRefTuple extensionTuple, 
 			I_ThinExtByRefPart previousPart) throws Exception {
 		
-		I_ThinExtByRefPart extensionTuplePart = extensionTuple.getMutableIdPart();
+		I_ThinExtByRefPart extensionTuplePart = extensionTuple.getMutablePart();
 		this.itemValue = null;
 		this.previousItemValue = null;
 		this.region = null;
@@ -65,14 +65,14 @@ public class ExportValueConverter implements I_ExportValueConverter{
 		}
 		else if (refsetUsage.getMasterfile().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
 			if (refsetUsage.getItemNumber().equals("2")) {
-    			itemValue = description.getLastTuple().getMutableIdPart().getText();
+    			itemValue = description.getLastTuple().getMutablePart().getText();
     			previousItemValue = getPreviousDisplayName(description);
     			region = refsetUsage.getRegion();
 			}
 			else if (refsetUsage.getItemNumber().equals("50")){
 	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
 	    		if (doAdd.getValue() && description != null) {
-	    			itemValue = description.getLastTuple().getMutableIdPart().getText();
+	    			itemValue = description.getLastTuple().getMutablePart().getText();
 	    			previousItemValue = getPreviousDisplayName(description);
 	    		}
 			}
@@ -137,7 +137,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	for (Iterator<? extends I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
     		I_DescriptionVersioned d = i.next();
     		I_DescriptionTuple dt = d.getLastTuple();
-    		I_DescriptionPart part = dt.getMutableIdPart();
+    		I_DescriptionPart part = dt.getMutablePart();
     		ret = part.getText();
     	}
     	
@@ -162,7 +162,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
     		}
     	}
     	if (newestOldTuple != null)
-    		ret = newestOldTuple.getMutableIdPart().getText();
+    		ret = newestOldTuple.getMutablePart().getText();
     	return ret;
     }
     
@@ -182,7 +182,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
 				}
 		}
     	if (newestOldTuple != null)
-    		ret = newestOldTuple.getMutableIdPart().getText();
+    		ret = newestOldTuple.getMutablePart().getText();
     	return ret;
     }
 }
