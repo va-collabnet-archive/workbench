@@ -927,7 +927,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         return ConceptBeanConflictHelper.getCommonConceptAttributeTuples(this, config);
     }
 
-    public I_Identify getId() throws IOException {
+    public I_Identify getIdentifier() throws IOException {
         if (id == null) {
             id = AceConfig.getVodb().getId(conceptId);
         }
@@ -1182,7 +1182,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException {
         UniversalAceBean uab = new UniversalAceBean();
 
-        uab.setId(getId().getUniversalId());
+        uab.setIdentifier(getIdentifier().getUniversalId());
 
         if (conceptAttributes != null) {
             uab.setConceptAttributes(conceptAttributes.getUniversal());
@@ -1407,11 +1407,11 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         return LocalVersionedTerminology.get().getAllExtensionsForComponent(getConceptId());
     }
 
-    public Object getId(int identifierScheme) throws IOException, TerminologyException {
+    public Object getDenotation(int authorityNid) throws IOException, TerminologyException {
         I_IntSet allowedStatus = LocalVersionedTerminology.get().getActiveAceFrameConfig().getAllowedStatus();
-        for (I_IdVersion idTuple : getId().getIdVersions()) {
-            if (allowedStatus.contains(idTuple.getStatusId()) && idTuple.getIdSource() == identifierScheme) {
-                return idTuple.getSourceId();
+        for (I_IdVersion idTuple : getIdentifier().getIdVersions()) {
+            if (allowedStatus.contains(idTuple.getStatusId()) && idTuple.getAuthorityNid() == authorityNid) {
+                return idTuple.getDenotation();
             }
         }
         return null;
@@ -1448,7 +1448,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
             throws IOException, TerminologyException {
         boolean promotedAnything = false;
-        if (getId().promote(viewPosition, pomotionPaths, allowedStatus)) {
+        if (getIdentifier().promote(viewPosition, pomotionPaths, allowedStatus)) {
             promotedAnything = true;
         }
 

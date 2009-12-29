@@ -520,7 +520,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
 
     private void addIdsToIndex(Document doc, I_Identify did) {
         for (I_IdPart p : did.getMutableIdParts()) {
-            doc.add(new Field("desc", p.getSourceId().toString(), Field.Store.NO, Field.Index.UN_TOKENIZED));
+            doc.add(new Field("desc", p.getDenotation().toString(), Field.Store.NO, Field.Index.UN_TOKENIZED));
         }
     }
 

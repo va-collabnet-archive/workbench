@@ -274,7 +274,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         try {
             previousAuthorityId = getAuthorityId();
             AceLog.getAppLog().info(
-                "Old authority id: " + previousAuthorityId.getIdVersions().iterator().next().getSourceId());
+                "Old authority id: " + previousAuthorityId.getIdVersions().iterator().next().getDenotation());
         } catch (Exception e) {
             AceLog.getAppLog().warning("Unable to get previous authority id.");
         }
@@ -283,11 +283,11 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         ThinIdPart idPart = new ThinIdPart();
         idPart.setStatusId(PrimordialId.CURRENT_ID.getNativeId(Integer.MIN_VALUE));
         idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE));
-        idPart.setSource(PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE));
-        idPart.setSourceId(UUID.randomUUID());
+        idPart.setAuthorityNid(PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE));
+        idPart.setDenotation(UUID.randomUUID());
         idPart.setVersion(Integer.MIN_VALUE);
         thinId.addMutableIdPart(idPart);
-        AceLog.getAppLog().info("New authority id: " + idPart.getSourceId());
+        AceLog.getAppLog().info("New authority id: " + idPart.getDenotation());
         writeId(thinId);
         commitTransaction();
     }

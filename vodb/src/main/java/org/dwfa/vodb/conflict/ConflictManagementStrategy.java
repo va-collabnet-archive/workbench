@@ -90,7 +90,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
             }
         }
 
-        if (isInConflict(concept.getId())) {
+        if (isInConflict(concept.getIdentifier())) {
             return true;
         }
 

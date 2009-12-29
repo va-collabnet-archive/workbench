@@ -53,7 +53,7 @@ public class IdTableRenderer extends AceTableRenderer {
         boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
         if (row > 0) {
             StringWithIdTuple prevSwt = (StringWithIdTuple) table.getValueAt(row - 1, column);
-            same = swt.getTuple().getSourceId().equals(prevSwt.getTuple().getSourceId());
+            same = swt.getTuple().getDenotation().equals(prevSwt.getTuple().getDenotation());
             setBorder(column, this, same, uncommitted);
             if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
                 renderComponent.setText("");

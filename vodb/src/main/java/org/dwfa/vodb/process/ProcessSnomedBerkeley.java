@@ -107,16 +107,16 @@ public class ProcessSnomedBerkeley extends ProcessSnomed {
         ThinIdPart idPart = new ThinIdPart();
         idPart.setStatusId(currentId);
         idPart.setPathId(vodb.uuidToNative(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
-        idPart.setSource(snomedType3UuidSource);
-        idPart.setSourceId(snomedUid);
+        idPart.setAuthorityNid(snomedType3UuidSource);
+        idPart.setDenotation(snomedUid);
         idPart.setVersion(thinVers);
         idv.addMutableIdPart(idPart);
 
         idPart = new ThinIdPart();
         idPart.setStatusId(currentId);
         idPart.setPathId(snomedPath.getConceptId());
-        idPart.setSource(snomedIntIdSource);
-        idPart.setSourceId(new Long(snomedId));
+        idPart.setAuthorityNid(snomedIntIdSource);
+        idPart.setDenotation(new Long(snomedId));
         idPart.setVersion(thinVers);
         idv.addMutableIdPart(idPart);
         vodb.writeId(idv);

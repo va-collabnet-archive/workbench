@@ -112,8 +112,8 @@ public class ThinIdTuple implements I_IdVersion {
      * 
      * @see org.dwfa.vodb.types.I_IdTuple#getSource()
      */
-    public int getIdSource() {
-        return part.getSource();
+    public int getAuthorityNid() {
+        return part.getAuthorityNid();
     }
 
     /*
@@ -121,8 +121,8 @@ public class ThinIdTuple implements I_IdVersion {
      * 
      * @see org.dwfa.vodb.types.I_IdTuple#getSourceId()
      */
-    public Object getSourceId() {
-        return part.getSourceId();
+    public Object getDenotation() {
+        return part.getDenotation();
     }
 
     /*
@@ -154,8 +154,8 @@ public class ThinIdTuple implements I_IdVersion {
         newPart.setPathId(getPathId());
         newPart.setVersion(getVersion());
         newPart.setIdStatus(getIdStatus());
-        newPart.setSource(getIdSource());
-        newPart.setSourceId(getSourceId());
+        newPart.setAuthorityNid(getAuthorityNid());
+        newPart.setDenotation(getDenotation());
         return newPart;
     }
 
@@ -200,11 +200,11 @@ public class ThinIdTuple implements I_IdVersion {
 	}
 
 	public void setSource(int source) {
-		part.setSource(source);
+		part.setAuthorityNid(source);
 	}
 
 	public void setSourceId(Object sourceId) {
-		part.setSourceId(sourceId);
+		part.setDenotation(sourceId);
 	}
 
 }

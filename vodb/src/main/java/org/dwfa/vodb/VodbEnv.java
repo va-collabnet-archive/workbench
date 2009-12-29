@@ -1733,8 +1733,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             Document doc = hits.doc(i);
             int cnid = Integer.parseInt(doc.get("cnid"));
             I_GetConceptData concept = getConcept(cnid);
-            for (I_IdPart version : concept.getId().getMutableIdParts()) {
-                if (conceptId.equals(version.getSourceId().toString()) && (sourceId == version.getSource())) {
+            for (I_IdPart version : concept.getIdentifier().getMutableIdParts()) {
+                if (conceptId.equals(version.getDenotation().toString()) && (sourceId == version.getAuthorityNid())) {
                     return concept;
                 }
             }
@@ -1763,8 +1763,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
             Document doc = hits.doc(i);
             int cnid = Integer.parseInt(doc.get("cnid"));
             I_GetConceptData concept = getConcept(cnid);
-            for (I_IdPart version : concept.getId().getMutableIdParts()) {
-                if (conceptId.equals(version.getSourceId().toString())) {
+            for (I_IdPart version : concept.getIdentifier().getMutableIdParts()) {
+                if (conceptId.equals(version.getDenotation().toString())) {
                     results.add(concept);
                 }
             }

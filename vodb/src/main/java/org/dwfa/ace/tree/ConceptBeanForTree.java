@@ -192,8 +192,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getUncommittedSourceRels();
     }
 
-    public I_Identify getId() throws IOException {
-        return bean.getId();
+    public I_Identify getIdentifier() throws IOException {
+        return bean.getIdentifier();
     }
 
     public I_DescriptionTuple getDescTuple(I_ConfigAceFrame config) throws IOException {
@@ -350,8 +350,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getExtensions();
     }
 
-    public Object getId(int identifierScheme) throws IOException, TerminologyException {
-        return bean.getId(identifierScheme);
+    public Object getDenotation(int identifierScheme) throws IOException, TerminologyException {
+        return bean.getDenotation(identifierScheme);
     }
 
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {

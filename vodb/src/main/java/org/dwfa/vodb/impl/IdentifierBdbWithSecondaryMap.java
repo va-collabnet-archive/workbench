@@ -287,8 +287,8 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Writing nativeId : " + id);
             for (I_IdPart p : id.getMutableIdParts()) {
-                if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
-                    UUID secondaryId = (UUID) p.getSourceId();
+                if (UUID.class.isAssignableFrom(p.getDenotation().getClass())) {
+                    UUID secondaryId = (UUID) p.getDenotation();
                     try {
                         int nid = uuidToNative(secondaryId);
                         AceLog.getAppLog().fine("Found nid: " + nid + " for : " + secondaryId);
@@ -341,8 +341,8 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
             ThinIdPart idPart = new ThinIdPart();
             idPart.setIdStatus(getCurrentStatusNid());
             idPart.setPathId(pathId);
-            idPart.setSource(source);
-            idPart.setSourceId(uid);
+            idPart.setAuthorityNid(source);
+            idPart.setDenotation(uid);
             idPart.setVersion(version);
             newId.addMutableIdPart(idPart);
             writeId(newId);
@@ -374,8 +374,8 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
                 for (UUID uid : uids) {
                     idPart.setIdStatus(getCurrentStatusNid());
                     idPart.setPathId(idPath.getConceptId());
-                    idPart.setSource(source);
-                    idPart.setSourceId(uid);
+                    idPart.setAuthorityNid(source);
+                    idPart.setDenotation(uid);
                     idPart.setVersion(version);
                     newId.addMutableIdPart(idPart);
                 }
@@ -410,8 +410,8 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
                 for (I_Path p : idPaths) {
                     idPart.setIdStatus(getCurrentStatusNid());
                     idPart.setPathId(p.getConceptId());
-                    idPart.setSource(source);
-                    idPart.setSourceId(uid);
+                    idPart.setAuthorityNid(source);
+                    idPart.setDenotation(uid);
                     idPart.setVersion(version);
                     newId.addMutableIdPart(idPart);
                 }

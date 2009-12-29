@@ -46,8 +46,8 @@ public class UidKeyCreator implements SecondaryMultiKeyCreator {
         Set<DatabaseEntry> keySet = results;
         I_Identify id = (I_Identify) idBinding.entryToObject(dataEntry);
         for (I_IdPart p : id.getMutableIdParts()) {
-            if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
-                UUID secondaryId = (UUID) p.getSourceId();
+            if (UUID.class.isAssignableFrom(p.getDenotation().getClass())) {
+                UUID secondaryId = (UUID) p.getDenotation();
                 DatabaseEntry entry = new DatabaseEntry();
                 uuidBinding.objectToEntry(secondaryId, entry);
                 keySet.add(entry);

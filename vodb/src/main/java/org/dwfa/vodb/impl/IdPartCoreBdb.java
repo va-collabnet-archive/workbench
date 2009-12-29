@@ -140,7 +140,7 @@ public class IdPartCoreBdb implements I_StoreInBdb {
         ThinIdPartCore idPartCore = new ThinIdPartCore();
         idPartCore.setIdStatus(idPart.getStatusId());
         idPartCore.setPathId(idPart.getPathId());
-        idPartCore.setSource(idPart.getSource());
+        idPartCore.setSource(idPart.getAuthorityNid());
         idPartCore.setVersion(idPart.getVersion());
         return getIdPartCoreId(idPartCore);
     }
