@@ -97,7 +97,7 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
             descriptionListCopy = new ArrayList<I_DescriptionVersioned>(descriptionList);
         }
         for (I_DescriptionVersioned desc : descriptionListCopy) {
-            for (I_DescriptionPart part : desc.getMutableIdParts()) {
+            for (I_DescriptionPart part : desc.getMutableParts()) {
                 referencedConcept.put(part.getTypeId(), ConceptBean.get(part.getTypeId()));
                 referencedConcept.put(part.getStatusId(), ConceptBean.get(part.getStatusId()));
             }

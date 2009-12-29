@@ -97,7 +97,7 @@ public class RelPopupListener extends MouseAdapter {
             ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getC1Id());
             I_RelTuple tuple = selectedObject.getTuple();
             ThinRelVersioned versioned = (ThinRelVersioned) tuple.getRelVersioned();
-            versioned.getMutableIdParts().remove(tuple.getMutablePart());
+            versioned.getMutableParts().remove(tuple.getMutablePart());
             ACE.addUncommitted(sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();

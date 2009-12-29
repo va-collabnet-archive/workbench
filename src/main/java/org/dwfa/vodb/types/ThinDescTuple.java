@@ -21,6 +21,7 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;

@@ -21,8 +21,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
@@ -75,7 +73,7 @@ public class ThinIdTuple implements I_IdVersion {
      * @see org.dwfa.vodb.types.I_IdTuple#getVersions()
      */
     public List<? extends I_IdPart> getVersions() {
-        return core.getMutableIdParts();
+        return core.getMutableParts();
     }
 
     /*
@@ -149,7 +147,7 @@ public class ThinIdTuple implements I_IdVersion {
      * @see org.dwfa.vodb.types.I_IdTuple#duplicate()
      */
     @Deprecated
-    public I_IdPart duplicate() {
+    public I_IdPart duplicateIdPart() {
         ThinIdPart newPart = new ThinIdPart();
         newPart.setPathId(getPathId());
         newPart.setVersion(getVersion());
@@ -159,7 +157,7 @@ public class ThinIdTuple implements I_IdVersion {
         return newPart;
     }
 
-    public I_IdPart getMutablePart() {
+    public I_IdPart getMutableIdPart() {
         return part;
     }
 
@@ -179,7 +177,7 @@ public class ThinIdTuple implements I_IdVersion {
         part.setVersion(version);
     }
 
-    public I_AmTermComponent getFixedPart() {
+    public I_Identify getFixedIdPart() {
         return core;
     }
 
@@ -195,16 +193,15 @@ public class ThinIdTuple implements I_IdVersion {
 		return part.getTime();
 	}
 
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		return part.makeAnalog(statusNid, pathNid, time);
+	public I_IdPart makeIdAnalog(int statusNid, int pathNid, long time) {
+		return part.makeIdAnalog(statusNid, pathNid, time);
 	}
 
-	public void setSource(int source) {
-		part.setAuthorityNid(source);
+	public void setAuthorityNid(int authorityNid) {
+		part.setAuthorityNid(authorityNid);
 	}
 
-	public void setSourceId(Object sourceId) {
-		part.setDenotation(sourceId);
+	public void setDenotation(Object denotation) {
+		part.setDenotation(denotation);
 	}
-
 }

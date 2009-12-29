@@ -270,7 +270,7 @@ public abstract class ConceptAttributeBdb implements I_StoreConceptAttributes {
 
     public void commit(ConceptBean bean, int version, Set<TimePathId> values) throws DatabaseException {
         if (bean.conceptAttributes != null) {
-            for (I_ConceptAttributePart p : bean.conceptAttributes.getMutableIdParts()) {
+            for (I_ConceptAttributePart p : bean.conceptAttributes.getMutableParts()) {
                 boolean changed = false;
                 if (p.getVersion() == Integer.MAX_VALUE) {
                     p.setVersion(version);
@@ -286,7 +286,7 @@ public abstract class ConceptAttributeBdb implements I_StoreConceptAttributes {
             }
         }
         if (bean.uncommittedConceptAttributes != null) {
-            for (I_ConceptAttributePart p : bean.uncommittedConceptAttributes.getMutableIdParts()) {
+            for (I_ConceptAttributePart p : bean.uncommittedConceptAttributes.getMutableParts()) {
                 if (p.getVersion() == Integer.MAX_VALUE) {
                     p.setVersion(version);
                     values.add(new TimePathId(version, p.getPathId()));

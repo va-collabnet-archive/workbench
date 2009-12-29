@@ -1054,7 +1054,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     private I_ConceptAttributeTuple findSelf(ConceptBean cBean, List<I_Position> posList) {
         try {
             I_ConceptAttributeVersioned cv = cBean.getConceptAttributes();
-            List<? extends I_ConceptAttributePart> cvList = cv.getMutableIdParts();
+            List<? extends I_ConceptAttributePart> cvList = cv.getMutableParts();
             I_ConceptAttributePart cp1 = null;
             for (I_Position pos : posList) { // !!! <-- NullPointerException
                 int tmpCountDupl = 0;

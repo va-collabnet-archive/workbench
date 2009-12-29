@@ -18,7 +18,6 @@ package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
@@ -145,7 +144,7 @@ public class ThinImageTuple implements I_ImageTuple {
         part.setVersion(version);
     }
 
-    public I_AmTermComponent getFixedPart() {
+    public I_ImageVersioned getFixedPart() {
         return core;
     }
 

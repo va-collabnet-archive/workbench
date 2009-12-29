@@ -286,7 +286,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
         idBinding.objectToEntry(id, idValue);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Writing nativeId : " + id);
-            for (I_IdPart p : id.getMutableIdParts()) {
+            for (I_IdPart p : id.getMutableParts()) {
                 if (UUID.class.isAssignableFrom(p.getDenotation().getClass())) {
                     UUID secondaryId = (UUID) p.getDenotation();
                     try {
@@ -624,7 +624,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
         if (bean.uncommittedIds != null) {
             for (int id : bean.uncommittedIds.getSetValues()) {
                 I_Identify idv = AceConfig.getVodb().getId(id);
-                for (I_IdPart p : idv.getMutableIdParts()) {
+                for (I_IdPart p : idv.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));

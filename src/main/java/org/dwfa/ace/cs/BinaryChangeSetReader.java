@@ -365,7 +365,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     if (part.getTime() == Long.MAX_VALUE) {
                         ThinExtByRefPart newPart = ThinExtByRefVersioned.makePart(part);
                         newPart.setVersion(ThinVersionHelper.convert(time));
-                        if (extension.getMutableIdParts().contains(newPart)) {
+                        if (extension.getMutableParts().contains(newPart)) {
                             changed = false;
                         } else {
                             changed = true;
@@ -433,7 +433,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     } else {
                         newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
                     }
-                    if (tid.getMutableIdParts().contains(newPart)) {
+                    if (tid.getMutableParts().contains(newPart)) {
                         // Nothing changed...
                     } else {
                         values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
@@ -498,7 +498,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         newPart.setStatusId(getNid(part.getConceptStatus()));
                         newPart.setDefined(part.isDefined());
                         newPart.setVersion(ThinVersionHelper.convert(time));
-                        if (thinAttributes.getMutableIdParts().contains(newPart)) {
+                        if (thinAttributes.getMutableParts().contains(newPart)) {
                             changed = false;
                         } else {
                             changed = true;
@@ -574,7 +574,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         newPart.setTextDescription(part.getTextDescription());
                         newPart.setTypeId(getNid(part.getTypeId()));
                         newPart.setVersion(ThinVersionHelper.convert(time));
-                        if (thinImage.getMutableIdParts().contains(newPart)) {
+                        if (thinImage.getMutableParts().contains(newPart)) {
                             changed = false;
                         } else {
                             changed = true;
@@ -707,7 +707,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         } else {
                             newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
                         }
-                        if (thinRel.getMutableIdParts().contains(newPart)) {
+                        if (thinRel.getMutableParts().contains(newPart)) {
                             changed = false;
                         } else {
                             changed = true;
@@ -731,7 +731,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                             newPart.setTypeId(getNid(part.getTypeId()));
                             newPart.setStatusId(getNid(part.getStatusId()));
                             newPart.setVersion(ThinVersionHelper.convert(time));
-                            if (thinRel.getMutableIdParts().contains(newPart)) {
+                            if (thinRel.getMutableParts().contains(newPart)) {
                                 changed = false;
                             } else {
                                 changed = true;
@@ -779,7 +779,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                                     newPart.setText(part.getText());
                                     newPart.setTypeId(getNid(part.getTypeId()));
                                     newPart.setVersion(ThinVersionHelper.convert(time));
-                                    if (thinDesc.getMutableIdParts().contains(newPart)) {
+                                    if (thinDesc.getMutableParts().contains(newPart)) {
                                         changed = false;
                                     } else {
                                         changed = true;
@@ -896,7 +896,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 } else {
                     newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
                 }
-                if (tid.getMutableIdParts().contains(newPart)) {
+                if (tid.getMutableParts().contains(newPart)) {
                     // already there
                 } else {
                     values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));

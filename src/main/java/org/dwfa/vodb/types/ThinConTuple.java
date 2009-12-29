@@ -18,10 +18,10 @@ package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.util.HashFunction;
 
 public class ThinConTuple implements I_ConceptAttributeTuple {
@@ -166,7 +166,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
         part.setVersion(version);
     }
 
-    public I_AmTermComponent getFixedPart() {
+    public I_ConceptAttributeVersioned getFixedPart() {
         return core;
     }
 

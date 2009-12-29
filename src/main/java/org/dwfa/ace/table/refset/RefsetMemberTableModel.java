@@ -840,7 +840,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                         parts.add(tuple.getMutablePart());
                     }
                 } else {
-                    parts.addAll(ebrBean.getExtension().getMutableIdParts());
+                    parts.addAll(ebrBean.getExtension().getMutableParts());
                 }
                 for (I_ThinExtByRefPart part : parts) {
                     if (getExtPartClass().equals(part.getClass()) == false) {
