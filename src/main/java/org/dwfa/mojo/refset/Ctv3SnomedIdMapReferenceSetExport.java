@@ -91,17 +91,17 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
     private void exportCtv3IdMap(I_AmPart latest, int conceptId) throws Exception {
         I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.CTV3_ID_MAP_EXTENSION);
         I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) tuple;
-        I_IdPart ctv3IdPart = getLatestVersion(tf.getConcept(conceptId).getId().getMutableIdParts(),
+        I_IdPart ctv3IdPart = getLatestVersion(tf.getConcept(conceptId).getIdentifier().getMutableIdParts(),
             ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID);
         if (part == null && ctv3IdPart != null) {
             part = tf.newStringExtensionPart();
-            part.setStringValue(ctv3IdPart.getSourceId().toString());
+            part.setStringValue(ctv3IdPart.getDenotation().toString());
             part.setPathId(latest.getPathId());
             part.setStatusId(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
             part.setVersion(latest.getVersion());
             export(part, null, ConceptConstants.CTV3_ID_MAP_EXTENSION.localize().getNid(), conceptId);
         } else if (part.getStringValue().equals(latest.getPartComponentNids()) && ctv3IdPart != null) {
-            part.setStringValue(ctv3IdPart.getSourceId().toString());
+            part.setStringValue(ctv3IdPart.getDenotation().toString());
             export((I_ThinExtByRefTuple) part);
         }
     }
@@ -117,17 +117,17 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
     private void exportSnomedIdMap(I_AmPart latest, int conceptId) throws Exception {
         I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.SNOMED_ID_MAP_EXTENSION);
         I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) tuple;
-        I_IdPart snomedIdPart = getLatestVersion(tf.getConcept(conceptId).getId().getMutableIdParts(),
+        I_IdPart snomedIdPart = getLatestVersion(tf.getConcept(conceptId).getIdentifier().getMutableIdParts(),
             ArchitectonicAuxiliary.Concept.SNOMED_INT_ID);
         if (part == null && snomedIdPart != null) {
             part = tf.newStringExtensionPart();
-            part.setStringValue(snomedIdPart.getSourceId().toString());
+            part.setStringValue(snomedIdPart.getDenotation().toString());
             part.setPathId(latest.getPathId());
             part.setStatusId(org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
             part.setVersion(latest.getVersion());
             export(part, null, ConceptConstants.SNOMED_ID_MAP_EXTENSION.localize().getNid(), conceptId);
         } else if (part.getStringValue().equals(latest.getPartComponentNids()) && snomedIdPart != null) {
-            part.setStringValue(snomedIdPart.getSourceId().toString());
+            part.setStringValue(snomedIdPart.getDenotation().toString());
             export((I_ThinExtByRefTuple) part);
         }
     }
@@ -146,7 +146,7 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
         I_IdPart latestVersion = null;
 
         for (I_IdPart iIdPart : idParts) {
-            if (iIdPart.getSource() == tf.uuidToNative(sourceConcept.getUids())
+            if (iIdPart.getAuthorityNid() == tf.uuidToNative(sourceConcept.getUids())
                 && (latestVersion == null || iIdPart.getVersion() > latestVersion.getVersion())) {
                 latestVersion = iIdPart;
             }

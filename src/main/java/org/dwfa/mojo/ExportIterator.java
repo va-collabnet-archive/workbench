@@ -191,7 +191,7 @@ public class ExportIterator implements I_ProcessConcepts {
                 if (writeUuidBasedConceptDetails(concept, allowedStatus)) {
                     writeUuidBasedRelDetails(concept, allowedStatus, null);
                     writeUuidBasedDescriptionDetails(concept, allowedStatus, null);
-                    writeUuidBasedIdDetails(concept.getId(), allowedStatus, null);
+                    writeUuidBasedIdDetails(concept.getIdentifier(), allowedStatus, null);
                 }
             } else {
                 conceptsSuppressed++;
@@ -231,11 +231,11 @@ public class ExportIterator implements I_ProcessConcepts {
             I_IdPart part = tuple.getMutableIdPart();
             I_Identify id = tuple.getIdentifier();
             if (allowedStatus.contains(part.getStatusId())
-                && (!exportCohesiveSet || isExportable(ConceptBean.get(part.getSource())))
+                && (!exportCohesiveSet || isExportable(ConceptBean.get(part.getAuthorityNid())))
                 && (!validatePositions || validPosition(part.getPathId()))) {
 
-                if (snomedSource(part) && !snomedId.equals(part.getSourceId())) {
-                    snomedId = part.getSourceId().toString();
+                if (snomedSource(part) && !snomedId.equals(part.getDenotation())) {
+                    snomedId = part.getDenotation().toString();
                     idMapWriter.write(uuidString);
                     idMapWriter.write(System.getProperty("line.separator"));
                     idMapWriter.write(snomedId);
@@ -247,10 +247,10 @@ public class ExportIterator implements I_ProcessConcepts {
                 createRecord(stringBuilder, id.getUUIDs().iterator().next());
 
                 // source system UUID
-                createRecord(stringBuilder, getFirstUuid(part.getSource()));
+                createRecord(stringBuilder, getFirstUuid(part.getAuthorityNid()));
 
                 // source id
-                createRecord(stringBuilder, part.getSourceId());
+                createRecord(stringBuilder, part.getDenotation());
 
                 // status UUID
                 createRecord(stringBuilder, getBinaryStatusValue(part.getStatusId()));
@@ -269,14 +269,14 @@ public class ExportIterator implements I_ProcessConcepts {
     }
 
     private boolean snomedSource(I_IdPart idvPart) throws TerminologyException, IOException {
-        if (termFactory.hasConcept(idvPart.getSource())) {
-            for (UUID uuid : termFactory.getUids(idvPart.getSource())) {
+        if (termFactory.hasConcept(idvPart.getAuthorityNid())) {
+            for (UUID uuid : termFactory.getUids(idvPart.getAuthorityNid())) {
                 if (snomedIdUuids.contains(uuid)) {
                     return true;
                 }
             }
         } else {
-            System.out.println("no concept for source, id was " + idvPart.getSourceId());
+            System.out.println("no concept for source, id was " + idvPart.getDenotation());
         }
         return false;
     }
@@ -369,14 +369,14 @@ public class ExportIterator implements I_ProcessConcepts {
             createRecord(stringBuilder, descForConceptFile.getText());
 
             // CTV3ID
-            I_IdPart ctv3IdPart = getLatestVersion(concept.getId().getMutableIdParts(),
+            I_IdPart ctv3IdPart = getLatestVersion(concept.getIdentifier().getMutableIdParts(),
                 ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID);
-            createRecord(stringBuilder, (ctv3IdPart != null) ? ctv3IdPart.getSourceId().toString() : "null");
+            createRecord(stringBuilder, (ctv3IdPart != null) ? ctv3IdPart.getDenotation().toString() : "null");
 
             // SNOMED 3 ID
-            I_IdPart snomedIdPart = getLatestVersion(concept.getId().getMutableIdParts(),
+            I_IdPart snomedIdPart = getLatestVersion(concept.getIdentifier().getMutableIdParts(),
                 ArchitectonicAuxiliary.Concept.SNOMED_INT_ID);
-            createRecord(stringBuilder, (snomedIdPart != null) ? snomedIdPart.getSourceId().toString() : "null");
+            createRecord(stringBuilder, (snomedIdPart != null) ? snomedIdPart.getDenotation().toString() : "null");
 
             // IsPrimative value
             createRecord(stringBuilder, latestAttrib.isDefined() ? 0 : 1);
@@ -419,7 +419,7 @@ public class ExportIterator implements I_ProcessConcepts {
         I_IdPart latestVersion = null;
 
         for (I_IdPart iIdPart : idParts) {
-            if (iIdPart.getSource() == termFactory.uuidToNative(sourceConcept.getUids())
+            if (iIdPart.getAuthorityNid() == termFactory.uuidToNative(sourceConcept.getUids())
                 && (latestVersion == null || iIdPart.getVersion() > latestVersion.getVersion())) {
                 latestVersion = iIdPart;
             }

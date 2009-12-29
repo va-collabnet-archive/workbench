@@ -58,21 +58,21 @@ public class IdIterator implements I_ProcessIds {
                 if (snomedSource(idvPart)) {
                     mapfile.write(uuid.toString());
                     mapfile.newLine();
-                    mapfile.write(idvPart.getSourceId().toString());
+                    mapfile.write(idvPart.getDenotation().toString());
                     mapfile.newLine();
                 }
 
-                if (termFactory.hasConcept(idvPart.getSource())) {
-                    UUID sourceUuid = getFirstUuid(idvPart.getSource());
+                if (termFactory.hasConcept(idvPart.getAuthorityNid())) {
+                    UUID sourceUuid = getFirstUuid(idvPart.getAuthorityNid());
                     UUID statusUuid = getFirstUuid(idvPart.getStatusId());
                     UUID pathUuid = getFirstUuid(idvPart.getPathId());
-                    output.write(uuid.toString() + "\t" + sourceUuid + "\t" + idvPart.getSourceId() + "\t" + statusUuid
+                    output.write(uuid.toString() + "\t" + sourceUuid + "\t" + idvPart.getDenotation() + "\t" + statusUuid
                         + "\t" + dateFormat.format(date) + "\t" + pathUuid);
 
                     output.newLine();
                 } else {
-                    System.out.println("WARNING: id " + idv.getUUIDs() + " has source id " + idvPart.getSourceId()
-                        + " but the source " + idvPart.getSource() + " does not map to a source concept - skipping");
+                    System.out.println("WARNING: id " + idv.getUUIDs() + " has source id " + idvPart.getDenotation()
+                        + " but the source " + idvPart.getAuthorityNid() + " does not map to a source concept - skipping");
                     try {
                         System.out.println("the uuids do map to a concept - " + termFactory.getConcept(idv.getUUIDs()));
                     } catch (Exception e) {
@@ -90,14 +90,14 @@ public class IdIterator implements I_ProcessIds {
     }
 
     private boolean snomedSource(I_IdPart idvPart) throws TerminologyException, IOException {
-        if (termFactory.hasConcept(idvPart.getSource())) {
-            for (UUID uuid : termFactory.getUids(idvPart.getSource())) {
+        if (termFactory.hasConcept(idvPart.getAuthorityNid())) {
+            for (UUID uuid : termFactory.getUids(idvPart.getAuthorityNid())) {
                 if (snomedIdUuids.contains(uuid)) {
                     return true;
                 }
             }
         } else {
-            System.out.println("no concept for source, id was " + idvPart.getSourceId());
+            System.out.println("no concept for source, id was " + idvPart.getDenotation());
         }
         return false;
     }

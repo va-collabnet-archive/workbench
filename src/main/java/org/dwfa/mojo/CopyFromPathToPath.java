@@ -234,7 +234,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(arg0.getConceptId())) {
             processExtensionByReference(extension);
         }
-        processId(arg0.getId());
+        processId(arg0.getIdentifier());
         processImages(arg0.getImages());
         processRelationship(arg0.getSourceRels());
 
@@ -287,7 +287,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             conceptAttributes = new ArrayList<I_ConceptAttributeTuple>();
             conceptAttributes.add(getLatestAttributes(conceptAttributeVersioned.getTuples()));
         } else {
-            conceptAttributes = conceptAttributeVersioned.getTuples();
+            conceptAttributes = (Collection<I_ConceptAttributeTuple>) conceptAttributeVersioned.getTuples();
         }
 
         for (I_ConceptAttributeTuple t : conceptAttributes) {

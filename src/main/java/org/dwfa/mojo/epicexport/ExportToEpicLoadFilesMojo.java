@@ -458,9 +458,9 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			I_GetConceptData idSourceConcept = termFactory.getConcept(new UUID[] { UUID
 					.fromString(idTypeUUID) }); 
 			int idSourceNid = idSourceConcept.getConceptId();
-			for (I_IdPart part : concept.getId().getMutableIdParts()) {
-				if (part.getSource() == idSourceNid) {
-					ret = part.getSourceId().toString();
+			for (I_IdPart part : concept.getIdentifier().getMutableIdParts()) {
+				if (part.getAuthorityNid() == idSourceNid) {
+					ret = part.getDenotation().toString();
 					break;
 				}
 			}

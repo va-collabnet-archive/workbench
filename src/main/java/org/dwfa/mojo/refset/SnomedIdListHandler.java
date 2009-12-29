@@ -69,7 +69,7 @@ public class SnomedIdListHandler extends IterableFileReader<I_ThinExtByRefVersio
 
             int statusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 
-            int specTypeId = getRefsetType().getVerifiedConcept().getId().getNid();
+            int specTypeId = getRefsetType().getVerifiedConcept().getIdentifier().getNid();
 
             I_ThinExtByRefPartConcept extPart = termFactory.newConceptExtensionPart();
             extPart.setConceptId(specTypeId);

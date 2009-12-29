@@ -579,7 +579,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 
     public void processConcept(I_GetConceptData concept) throws Exception {
         if (testExportSpecification(concept)) {
-            this.processId(concept.getId(), concept_extensions);
+            this.processId(concept.getIdentifier(), concept_extensions);
         } else {
             getLog().debug("Suppressing export of concept " + concept + " refsets");
         }
