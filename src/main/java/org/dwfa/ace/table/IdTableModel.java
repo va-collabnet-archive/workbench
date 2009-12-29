@@ -185,7 +185,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                 }
                 conceptsToFetch.add(part.getStatusId());
                 conceptsToFetch.add(part.getPathId());
-                conceptsToFetch.add(part.getSource());
+                conceptsToFetch.add(part.getAuthorityNid());
             }
 
             if (workStopped) {
@@ -386,7 +386,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                 }
                 return new StringWithIdTuple(Integer.toString(idTuple.getStatusId()), idTuple, inConflict);
             case EXT_ID:
-                return new StringWithIdTuple(idTuple.getSourceId().toString(), idTuple, inConflict);
+                return new StringWithIdTuple(idTuple.getDenotation().toString(), idTuple, inConflict);
             case VERSION:
                 if (idTuple.getVersion() == Integer.MAX_VALUE) {
                     return new StringWithIdTuple(ThinVersionHelper.uncommittedHtml(), idTuple, inConflict);
@@ -398,10 +398,10 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                 }
                 return new StringWithIdTuple(Integer.toString(idTuple.getPathId()), idTuple, inConflict);
             case SOURCE:
-                if (referencedConcepts.containsKey(idTuple.getIdSource())) {
-                    return new StringWithIdTuple(getPrefText(idTuple.getIdSource()), idTuple, inConflict);
+                if (referencedConcepts.containsKey(idTuple.getAuthorityNid())) {
+                    return new StringWithIdTuple(getPrefText(idTuple.getAuthorityNid()), idTuple, inConflict);
                 }
-                return new StringWithIdTuple(Integer.toString(idTuple.getIdSource()), idTuple, inConflict);
+                return new StringWithIdTuple(Integer.toString(idTuple.getAuthorityNid()), idTuple, inConflict);
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);

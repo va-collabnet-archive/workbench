@@ -43,20 +43,20 @@ public class ThinIdVersionedBinding extends TupleBinding {
             id.setPathId(ti.readInt());
             id.setVersion(ti.readInt());
             id.setIdStatus(ti.readInt());
-            id.setSource(ti.readInt());
+            id.setAuthorityNid(ti.readInt());
             byte idType = ti.readByte();
             switch (idType) {
             case INTEGER_ID:
-                id.setSourceId(ti.readInt());
+                id.setDenotation(ti.readInt());
                 break;
             case LONG_ID:
-                id.setSourceId(ti.readLong());
+                id.setDenotation(ti.readLong());
                 break;
             case UUID_ID:
-                id.setSourceId(new UUID(ti.readLong(), ti.readLong()));
+                id.setDenotation(new UUID(ti.readLong(), ti.readLong()));
                 break;
             case STRING_ID:
-                id.setSourceId(ti.readString());
+                id.setDenotation(ti.readString());
                 break;
             }
             versioned.addMutableIdPart(id);
@@ -72,23 +72,23 @@ public class ThinIdVersionedBinding extends TupleBinding {
             to.writeInt(id.getPathId());
             to.writeInt(id.getVersion());
             to.writeInt(id.getStatusId());
-            to.writeInt(id.getSource());
-            if (Integer.class.isAssignableFrom(id.getSourceId().getClass())) {
+            to.writeInt(id.getAuthorityNid());
+            if (Integer.class.isAssignableFrom(id.getDenotation().getClass())) {
                 to.writeByte(INTEGER_ID);
-                Integer sourceId = (Integer) id.getSourceId();
+                Integer sourceId = (Integer) id.getDenotation();
                 to.writeInt(sourceId);
-            } else if (Long.class.isAssignableFrom(id.getSourceId().getClass())) {
+            } else if (Long.class.isAssignableFrom(id.getDenotation().getClass())) {
                 to.writeByte(LONG_ID);
-                Long sourceId = (Long) id.getSourceId();
+                Long sourceId = (Long) id.getDenotation();
                 to.writeLong(sourceId);
-            } else if (UUID.class.isAssignableFrom(id.getSourceId().getClass())) {
+            } else if (UUID.class.isAssignableFrom(id.getDenotation().getClass())) {
                 to.writeByte(UUID_ID);
-                UUID sourceId = (UUID) id.getSourceId();
+                UUID sourceId = (UUID) id.getDenotation();
                 to.writeLong(sourceId.getMostSignificantBits());
                 to.writeLong(sourceId.getLeastSignificantBits());
-            } else if (String.class.isAssignableFrom(id.getSourceId().getClass())) {
+            } else if (String.class.isAssignableFrom(id.getDenotation().getClass())) {
                 to.writeByte(STRING_ID);
-                String sourceId = (String) id.getSourceId();
+                String sourceId = (String) id.getDenotation();
                 to.writeString(sourceId);
             }
         }

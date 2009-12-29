@@ -81,8 +81,8 @@ public class ThinIdVersioned implements I_Identify {
     public List<UUID> getUUIDs() {
         List<UUID> uids = new ArrayList<UUID>(versions.size());
         for (I_IdPart p : versions) {
-            if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
-                uids.add((UUID) p.getSourceId());
+            if (UUID.class.isAssignableFrom(p.getDenotation().getClass())) {
+                uids.add((UUID) p.getDenotation());
             }
         }
         return uids;
@@ -167,8 +167,8 @@ public class ThinIdVersioned implements I_Identify {
             UniversalAceIdentificationPart universalPart = new UniversalAceIdentificationPart();
             universalPart.setIdStatus(getUids(part.getStatusId()));
             universalPart.setPathId(getUids(part.getPathId()));
-            universalPart.setSource(getUids(part.getSource()));
-            universalPart.setSourceId(part.getSourceId());
+            universalPart.setSource(getUids(part.getAuthorityNid()));
+            universalPart.setSourceId(part.getDenotation());
             universalPart.setTime(ThinVersionHelper.convert(part.getVersion()));
             universal.addVersion(universalPart);
         }

@@ -310,7 +310,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             commitRelationshipChanges(time, bean, values);
             commitImageChanges(time, bean, values);
 
-            ConceptBean localBean = ConceptBean.get(bean.getId().getUIDs());
+            ConceptBean localBean = ConceptBean.get(bean.getIdentifier().getUIDs());
             localBean.flush();
             return localBean;
         } catch (Exception e) {
@@ -426,8 +426,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     ThinIdPart newPart = new ThinIdPart();
                     newPart.setStatusId(getNid(part.getIdStatus()));
                     newPart.setPathId(getVodb().uuidToNative(part.getPathId()));
-                    newPart.setSource(getNid(part.getSource()));
-                    newPart.setSourceId(part.getSourceId());
+                    newPart.setAuthorityNid(getNid(part.getSource()));
+                    newPart.setDenotation(part.getSourceId());
                     if (part.getTime() == Long.MAX_VALUE) {
                         newPart.setVersion(ThinVersionHelper.convert(time));
                     } else {
@@ -889,8 +889,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 ThinIdPart newPart = new ThinIdPart();
                 newPart.setStatusId(getNid(part.getIdStatus()));
                 newPart.setPathId(getVodb().uuidToNative(part.getPathId()));
-                newPart.setSource(getNid(part.getSource()));
-                newPart.setSourceId(part.getSourceId());
+                newPart.setAuthorityNid(getNid(part.getSource()));
+                newPart.setDenotation(part.getSourceId());
                 if (part.getTime() == Long.MAX_VALUE) {
                     newPart.setVersion(ThinVersionHelper.convert(time));
                 } else {

@@ -30,7 +30,7 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
         ArrayIntList partComponentNids = new ArrayIntList(3);
         partComponentNids.add(getPathId());
         partComponentNids.add(getStatusId());
-        partComponentNids.add(getSource());
+        partComponentNids.add(getAuthorityNid());
         return partComponentNids;
     }
 
@@ -85,7 +85,7 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#getSource()
      */
-    public int getSource() {
+    public int getAuthorityNid() {
         return core.getSource();
     }
 
@@ -94,7 +94,7 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#setSource(int)
      */
-    public void setSource(int source) {
+    public void setAuthorityNid(int sourceNid) {
         throw new UnsupportedOperationException("Create a duplicate, then set values on the duplicate. ");
     }
 
@@ -103,7 +103,7 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#getSourceId()
      */
-    public Object getSourceId() {
+    public Object getDenotation() {
         return sourceId;
     }
 
@@ -112,7 +112,7 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#setSourceId(java.lang.Object)
      */
-    public void setSourceId(Object sourceId) {
+    public void setDenotation(Object sourceId) {
         this.sourceId = sourceId;
     }
 
@@ -142,14 +142,14 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
      */
     public boolean hasNewData(I_IdPart another) {
         return ((this.getPathId() != another.getPathId()) || (this.getIdStatus() != another.getStatusId())
-            || (this.getSource() != another.getSource()) || sourceId.equals(another.getSourceId()) == false);
+            || (this.getAuthorityNid() != another.getAuthorityNid()) || sourceId.equals(another.getDenotation()) == false);
     }
 
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("Source: ");
-        buf.append(getSource());
+        buf.append(getAuthorityNid());
         buf.append(" SourceId: ");
         buf.append(sourceId);
         buf.append(" StatusId: ");
@@ -165,7 +165,7 @@ public class ThinIdPartWithCoreDelegate implements I_IdPart {
     public boolean equals(Object obj) {
         I_IdPart another = (I_IdPart) obj;
         return ((getPathId() == another.getPathId()) && (getVersion() == another.getVersion())
-            && (getIdStatus() == another.getStatusId()) && (getSource() == another.getSource()) && (sourceId.equals(another.getSourceId())));
+            && (getIdStatus() == another.getStatusId()) && (getAuthorityNid() == another.getAuthorityNid()) && (sourceId.equals(another.getDenotation())));
     }
 
     @Override

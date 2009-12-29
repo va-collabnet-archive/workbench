@@ -86,7 +86,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#getSource()
      */
-    public int getSource() {
+    public int getAuthorityNid() {
         return core.getSource();
     }
 
@@ -95,7 +95,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#setSource(int)
      */
-    public void setSource(int source) {
+    public void setAuthorityNid(int sourceNid) {
         throw new UnsupportedOperationException("Create a duplicate, then set values on the duplicate. ");
     }
 
@@ -104,7 +104,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#getSourceId()
      */
-    public Object getSourceId() {
+    public Object getDenotation() {
         return sourceId;
     }
 
@@ -113,7 +113,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#setSourceId(java.lang.Object)
      */
-    public void setSourceId(Object sourceId) {
+    public void setDenotation(Object sourceId) {
         this.sourceId = (Integer) sourceId;
     }
 
@@ -143,16 +143,16 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
      */
     public boolean hasNewData(I_IdPart another) {
         return ((this.getPathId() != another.getPathId()) || (this.getStatusId() != another.getStatusId())
-            || (this.getSource() != another.getSource()) || getSourceId().equals(another.getSourceId()) == false);
+            || (this.getAuthorityNid() != another.getAuthorityNid()) || getDenotation().equals(another.getDenotation()) == false);
     }
 
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("Source: ");
-        buf.append(getSource());
+        buf.append(getAuthorityNid());
         buf.append(" SourceId: ");
-        buf.append(getSourceId().toString());
+        buf.append(getDenotation().toString());
         buf.append(" StatusId: ");
         buf.append(getIdStatus());
         buf.append(" pathId: ");
@@ -166,12 +166,12 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
     public boolean equals(Object obj) {
         I_IdPart another = (I_IdPart) obj;
         return ((getPathId() == another.getPathId()) && (getVersion() == another.getVersion())
-            && (getIdStatus() == another.getStatusId()) && (getSource() == another.getSource()) && (getSourceId().equals(another.getSourceId())));
+            && (getIdStatus() == another.getStatusId()) && (getAuthorityNid() == another.getAuthorityNid()) && (getDenotation().equals(another.getDenotation())));
     }
 
     @Override
     public int hashCode() {
-        return HashFunction.hashCode(new int[] { core.hashCode(), getSourceId().hashCode() });
+        return HashFunction.hashCode(new int[] { core.hashCode(), getDenotation().hashCode() });
     }
 
     public I_IdPart duplicate() {

@@ -146,22 +146,22 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                 } catch (DatabaseException e) {
                     throw new RuntimeException();
                 }
-                if (Integer.class.isAssignableFrom(id.getSourceId().getClass())) {
+                if (Integer.class.isAssignableFrom(id.getDenotation().getClass())) {
                     to.writeByte(INTEGER_ID);
-                    Integer sourceId = (Integer) id.getSourceId();
+                    Integer sourceId = (Integer) id.getDenotation();
                     to.writeInt(sourceId);
-                } else if (Long.class.isAssignableFrom(id.getSourceId().getClass())) {
+                } else if (Long.class.isAssignableFrom(id.getDenotation().getClass())) {
                     to.writeByte(LONG_ID);
-                    Long sourceId = (Long) id.getSourceId();
+                    Long sourceId = (Long) id.getDenotation();
                     to.writeLong(sourceId);
-                } else if (UUID.class.isAssignableFrom(id.getSourceId().getClass())) {
+                } else if (UUID.class.isAssignableFrom(id.getDenotation().getClass())) {
                     to.writeByte(UUID_ID);
-                    UUID sourceId = (UUID) id.getSourceId();
+                    UUID sourceId = (UUID) id.getDenotation();
                     to.writeLong(sourceId.getMostSignificantBits());
                     to.writeLong(sourceId.getLeastSignificantBits());
-                } else if (String.class.isAssignableFrom(id.getSourceId().getClass())) {
+                } else if (String.class.isAssignableFrom(id.getDenotation().getClass())) {
                     to.writeByte(STRING_ID);
-                    String sourceId = (String) id.getSourceId();
+                    String sourceId = (String) id.getDenotation();
                     to.writeString(sourceId);
                 }
             }
@@ -379,8 +379,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Writing nativeId : " + id);
             for (I_IdPart p : id.getMutableIdParts()) {
-                if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
-                    UUID secondaryId = (UUID) p.getSourceId();
+                if (UUID.class.isAssignableFrom(p.getDenotation().getClass())) {
+                    UUID secondaryId = (UUID) p.getDenotation();
                     try {
                         int nid = uuidToNative(secondaryId);
                         AceLog.getAppLog().fine("Found nid: " + nid + " for : " + secondaryId);
@@ -399,8 +399,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
             idPutSemaphore.release();
             uuidToNidDbPutSemaphore.acquire();
             for (I_IdPart p : id.getMutableIdParts()) {
-                if (UUID.class.isAssignableFrom(p.getSourceId().getClass())) {
-                    UUID secondaryId = (UUID) p.getSourceId();
+                if (UUID.class.isAssignableFrom(p.getDenotation().getClass())) {
+                    UUID secondaryId = (UUID) p.getDenotation();
                     intBinder.objectToEntry(id.getNid(), idValue);
                     uuidBinding.objectToEntry(secondaryId, idKey);
                     uuidToNidDb.put(BdbEnv.transaction, idKey, idValue);
@@ -445,8 +445,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
             ThinIdPart idPart = new ThinIdPart();
             idPart.setStatusId(getCurrentStatusNid());
             idPart.setPathId(pathId);
-            idPart.setSource(source);
-            idPart.setSourceId(uid);
+            idPart.setAuthorityNid(source);
+            idPart.setDenotation(uid);
             idPart.setVersion(version);
             newId.addMutableIdPart(idPart);
             writeId(newId);
@@ -479,8 +479,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                 for (UUID uid : uids) {
                     idPart.setStatusId(getCurrentStatusNid());
                     idPart.setPathId(idPath.getConceptId());
-                    idPart.setSource(source);
-                    idPart.setSourceId(uid);
+                    idPart.setAuthorityNid(source);
+                    idPart.setDenotation(uid);
                     idPart.setVersion(version);
                     newId.addMutableIdPart(idPart);
                 }
@@ -518,8 +518,8 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                 for (I_Path p : idPaths) {
                     idPart.setStatusId(getCurrentStatusNid());
                     idPart.setPathId(p.getConceptId());
-                    idPart.setSource(source);
-                    idPart.setSourceId(uid);
+                    idPart.setAuthorityNid(source);
+                    idPart.setDenotation(uid);
                     idPart.setVersion(version);
                     if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                         AceLog.getAppLog().fine(" adding version: " + idPart);

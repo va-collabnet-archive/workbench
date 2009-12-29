@@ -240,7 +240,7 @@ public class JTableWithDragImage extends JTable {
             case LOCAL_ID:
                 throw new UnsupportedOperationException();
             case EXT_ID:
-                return new StringSelection(seidt.getTuple().getSourceId().toString());
+                return new StringSelection(seidt.getTuple().getDenotation().toString());
             case STATUS:
                 return new ConceptTransferable(ConceptBean.get(seidt.getTuple().getStatusId()));
             case VERSION:

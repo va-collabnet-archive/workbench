@@ -163,8 +163,8 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             ThinIdPart idPart = new ThinIdPart();
             idPart.setStatusId(currentStatusId);
             idPart.setPathId(encodingPathId);
-            idPart.setSource(encodingSource);
-            idPart.setSourceId(uuid);
+            idPart.setAuthorityNid(encodingSource);
+            idPart.setDenotation(uuid);
             idPart.setVersion(Integer.MIN_VALUE);
             idv.addMutableIdPart(idPart);
         }
@@ -240,8 +240,8 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
                 encodingSource, idPath, version));
             idPart.setPathId(vodb.uuidToNativeWithGeneration(
                 ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids(), encodingSource, idPath, version));
-            idPart.setSource(encodingSource);
-            idPart.setSourceId(firstId);
+            idPart.setAuthorityNid(encodingSource);
+            idPart.setDenotation(firstId);
             idPart.setVersion(version);
             idv.addMutableIdPart(idPart);
         }
@@ -270,8 +270,8 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
                     ThinIdPart idPart = new ThinIdPart();
                     idPart.setStatusId(PrimordialId.CURRENT_ID.getNativeId(Integer.MIN_VALUE));
                     idPart.setPathId(PrimordialId.ACE_AUXILIARY_ID.getNativeId(Integer.MIN_VALUE));
-                    idPart.setSource(PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE));
-                    idPart.setSourceId(uid);
+                    idPart.setAuthorityNid(PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE));
+                    idPart.setDenotation(uid);
                     idPart.setVersion(Integer.MIN_VALUE);
                     thinId.addMutableIdPart(idPart);
                     vodb.writeId(thinId);
@@ -405,8 +405,8 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         ThinIdPart idPart = new ThinIdPart();
         idPart.setStatusId(vodb.uuidToNative(statusUuid));
         idPart.setPathId(vodb.uuidToNative(pathUuid));
-        idPart.setSource(vodb.uuidToNative(sourceSystemUuid));
-        idPart.setSourceId(sourceId);
+        idPart.setAuthorityNid(vodb.uuidToNative(sourceSystemUuid));
+        idPart.setDenotation(sourceId);
         idPart.setVersion(ThinVersionHelper.convert(statusDate.getTime()));
         if (idv.getMutableIdParts().contains(idPart) == false) {
             idv.addMutableIdPart(idPart);

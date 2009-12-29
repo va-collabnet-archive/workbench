@@ -46,8 +46,8 @@ public class ThinIdPart implements I_IdPart {
         this.pathId = another.getPathId();
         this.version = another.getVersion();
         this.idStatus = another.getStatusId();
-        this.source = another.getSource();
-        this.sourceId = another.getSourceId();
+        this.source = another.getAuthorityNid();
+        this.sourceId = another.getDenotation();
     }
 
     /*
@@ -93,7 +93,7 @@ public class ThinIdPart implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#getSource()
      */
-    public int getSource() {
+    public int getAuthorityNid() {
         return source;
     }
 
@@ -102,8 +102,8 @@ public class ThinIdPart implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#setSource(int)
      */
-    public void setSource(int source) {
-        this.source = source;
+    public void setAuthorityNid(int sourceNid) {
+        this.source = sourceNid;
     }
 
     /*
@@ -111,7 +111,7 @@ public class ThinIdPart implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#getSourceId()
      */
-    public Object getSourceId() {
+    public Object getDenotation() {
         return sourceId;
     }
 
@@ -120,7 +120,7 @@ public class ThinIdPart implements I_IdPart {
      * 
      * @see org.dwfa.vodb.types.I_IdPart#setSourceId(java.lang.Object)
      */
-    public void setSourceId(Object sourceId) {
+    public void setDenotation(Object sourceId) {
         this.sourceId = sourceId;
     }
 
@@ -150,7 +150,7 @@ public class ThinIdPart implements I_IdPart {
      */
     public boolean hasNewData(I_IdPart another) {
         return ((this.pathId != another.getPathId()) || (this.idStatus != another.getStatusId())
-            || (this.source != another.getSource()) || sourceId.equals(another.getSourceId()) == false);
+            || (this.source != another.getAuthorityNid()) || sourceId.equals(another.getDenotation()) == false);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class ThinIdPart implements I_IdPart {
     public boolean equals(Object obj) {
         I_IdPart another = (I_IdPart) obj;
         return ((pathId == another.getPathId()) && (version == another.getVersion())
-            && (idStatus == another.getStatusId()) && (source == another.getSource()) && (sourceId.equals(another.getSourceId())));
+            && (idStatus == another.getStatusId()) && (source == another.getAuthorityNid()) && (sourceId.equals(another.getDenotation())));
     }
 
     @Override
