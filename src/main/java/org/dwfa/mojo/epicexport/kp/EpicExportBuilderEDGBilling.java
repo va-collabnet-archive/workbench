@@ -29,7 +29,7 @@ public class EpicExportBuilderEDGBilling extends AbstractEpicExportBuilder imple
 	public static final String[] INTERESTED_ITEMS = {"2", "40", "40", "46", "47", "91", "207", "2000", "7000"};
 	public static final String[] EREC_ITEMS = {"50", "7010"};
 	
-	private String masterfile = EpicExportManager.EPIC_MASTERFILE_NAME_EDG_BILLING;
+	private String masterfile = RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING;
 	
 	public EpicExportBuilderEDGBilling(EpicLoadFileFactory exportManager, EpicExportManager em) {
 		super(exportManager, em);

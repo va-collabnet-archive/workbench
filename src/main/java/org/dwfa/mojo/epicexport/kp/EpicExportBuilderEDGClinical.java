@@ -33,7 +33,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 	public static final String[] EREC_ITEMS = {"50", "7010"};
 	public static final String[] MANDATORY_ITEMS = {"2", "40", "7000", "7010", "91", "80", "100", "207"};
 	
-	public String masterfile = EpicExportManager.EPIC_MASTERFILE_NAME_EDG_CLINICAL;
+	public String masterfile = RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL;
 	
 	public EpicExportBuilderEDGClinical(I_ExportFactory factory, EpicExportManager em) {
 		super(factory, em);
@@ -50,12 +50,15 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 		if (this.isChangedRecord()) {
 			if (getFirstItem("11") == null) {
 				//"NRNC" Its a new record
-				if (! this.allItemsArePopulated(MANDATORY_ITEMS))
-					AceLog.getAppLog().warning("One or more mandatory items are missing for record " + super.toString());
-				//	throw new Exception("One or more mandatory items are missing");
+				addErrorIfTrue(! this.allItemsArePopulated(MANDATORY_ITEMS),
+						"One or more mandatory items are missing");
+				addErrorIfTrue(!this.itemIsPopulated("2000") && this.itemIsPopulated("200"),
+					"Missing both item 200 and 2000");
+				
 				I_EpicExportRecordWriter writer = getExportManager().getWriter(getWriterName(masterfile, version, "nrnc"));
 				this.setWriter(writer);
 				writer.newRecord();
+				writeAnyErrors();
 				writeLiteralItem("1", "");
 				writeItems("2", "35", "40");
 				// writeLiteralItem("35x", this.getParentUUID());
@@ -129,6 +132,9 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 		if (contact != null) {
 			ret.append('_');
 			ret.append(contact);
+		}
+		if (this.hasErrors()) {
+			ret.append(".error");
 		}
 		return ret.toString();
 	}
