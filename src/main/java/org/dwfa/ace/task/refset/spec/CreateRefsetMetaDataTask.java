@@ -381,7 +381,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             I_DescriptionVersioned descVersioned = termFactory.newDescription(descUuid, concept, "en", description,
                 descriptionType, termFactory.getActiveAceFrameConfig());
 
-            I_DescriptionPart part = descVersioned.getLastTuple().getMutableIdPart();
+            I_DescriptionPart part = descVersioned.getLastTuple().getMutablePart();
             part.setStatusId(status.getConceptId());
 
             descVersioned.addVersion(part);
@@ -409,7 +409,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             I_RelVersioned relVersioned = termFactory.newRelationship(relUuid, concept, relationshipType, destination,
                 charConcept, refConcept, termFactory.getConcept(statusId), group, termFactory.getActiveAceFrameConfig());
 
-            I_RelPart newPart = relVersioned.getLastTuple().getMutableIdPart();
+            I_RelPart newPart = relVersioned.getLastTuple().getMutablePart();
             newPart.setStatusId(status.getConceptId());
 
             relVersioned.addVersion(newPart);

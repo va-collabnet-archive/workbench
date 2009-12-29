@@ -184,9 +184,9 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                 returnConflictResolvedLatestState);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : tuples) {
-                if (thinExtByRefTuple.getMutableIdPart() instanceof I_ThinExtByRefPartConcept) {
+                if (thinExtByRefTuple.getMutablePart() instanceof I_ThinExtByRefPartConcept) {
                     if (thinExtByRefTuple.getRefsetId() == memberRefset.getConceptId()) {
-                        I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutableIdPart();
+                        I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutablePart();
                         if (part.getC1id() == termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids())
                             .getConceptId()) {
                             lineCount++;

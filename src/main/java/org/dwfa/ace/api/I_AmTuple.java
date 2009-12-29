@@ -22,6 +22,6 @@ public interface I_AmTuple extends I_AmPart {
 
     public I_AmTermComponent getFixedPart();
 
-    public I_AmPart getMutableIdPart();
+    public I_AmPart getMutablePart();
 
 }

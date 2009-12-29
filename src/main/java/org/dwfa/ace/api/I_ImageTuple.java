@@ -20,8 +20,6 @@ public interface I_ImageTuple extends I_AmTypedTuple {
 
     public byte[] getImage();
 
-    public int getImageId();
-
     public String getTextDescription();
 
     public String getFormat();
@@ -30,8 +28,21 @@ public interface I_ImageTuple extends I_AmTypedTuple {
 
     public I_ImageVersioned getVersioned();
 
+    public I_ImagePart getMutablePart();
+
+    /**
+     * 
+     * @return
+     * @deprecated use getNid;
+     */
+    public int getImageId();
+
+    /**
+     * 
+     * @return
+     * @deprecated use getNid;
+     */
     public I_ImagePart duplicate();
 
-    public I_ImagePart getMutableIdPart();
 
 }

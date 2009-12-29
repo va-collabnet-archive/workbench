@@ -154,7 +154,7 @@ public class RefsetQueryFactory {
                     currExt.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSet(), addUncommitted,
                         returnConflictResolvedLatestState);
             if (extensions.size() > 0) {
-                I_ThinExtByRefPart thinPart = extensions.get(0).getMutableIdPart();
+                I_ThinExtByRefPart thinPart = extensions.get(0).getMutablePart();
 
                 if (thinPart instanceof I_ThinExtByRefPartConceptConceptConcept) {
 

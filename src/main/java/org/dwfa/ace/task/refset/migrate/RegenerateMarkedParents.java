@@ -93,7 +93,7 @@ public class RegenerateMarkedParents extends AbstractTask {
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
 
-                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutableIdPart();
+                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutablePart();
                     if (part.getConceptId() == memberConcept.getConceptId()) {
                         normalMemberIds.add(thinExtByRefTuple.getComponentId());
                     }

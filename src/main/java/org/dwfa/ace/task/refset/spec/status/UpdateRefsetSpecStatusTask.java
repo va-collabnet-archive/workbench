@@ -245,7 +245,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             List<? extends I_DescriptionVersioned> descs = currentConcept.getDescriptions();
             for (I_DescriptionVersioned descVersioned : descs) {
                 for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                    I_DescriptionPart newPart = descVersioned.getLastTuple().getMutableIdPart().duplicate();
+                    I_DescriptionPart newPart = descVersioned.getLastTuple().getMutablePart().duplicate();
                     if (newPart.getStatusId() != retiredStatusId) {
                         newPart.setStatusId(statusConcept.getConceptId());
                         newPart.setVersion(Integer.MAX_VALUE);
@@ -264,7 +264,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             List<? extends I_RelVersioned> rels = currentConcept.getSourceRels();
             for (I_RelVersioned relVersioned : rels) {
                 for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                    I_RelPart newPart = relVersioned.getLastTuple().getMutableIdPart().duplicate();
+                    I_RelPart newPart = relVersioned.getLastTuple().getMutablePart().duplicate();
                     if (newPart.getStatusId() != retiredStatusId) {
                         newPart.setStatusId(statusConcept.getConceptId());
                         newPart.setVersion(Integer.MAX_VALUE);
