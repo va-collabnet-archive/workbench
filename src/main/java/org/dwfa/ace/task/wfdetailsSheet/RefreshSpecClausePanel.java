@@ -145,7 +145,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 		List<I_ThinExtByRefTuple> tuples = member.getTuples(frameConfig.getAllowedStatus(), refsetSpecVersionSet, false, false);
 		for (I_ThinExtByRefTuple tuple: tuples) {
 			if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
-				I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) tuple.getMutableIdPart();
+				I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) tuple.getMutablePart();
 				I_GetConceptData part1 = tf.getConcept(ccPart.getC1id());
 				I_GetConceptData part2 = tf.getConcept(ccPart.getC2id());
 
@@ -157,7 +157,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 				}
 				break;
 			} else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
-				I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) tuple.getMutableIdPart();
+				I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) tuple.getMutablePart();
 				I_GetConceptData part1 = tf.getConcept(cccPart.getC1id());
 				I_GetConceptData part2 = tf.getConcept(cccPart.getC2id());
 				I_GetConceptData part3 = tf.getConcept(cccPart.getC3id());
@@ -271,12 +271,12 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 		
 		I_ThinExtByRefTuple tuple = tuples.iterator().next();
 		if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
-			I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) tuple.getMutableIdPart();
+			I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) tuple.getMutablePart();
 			buff.append(tf.getConcept(ccPart.getC1id()).toString());
 			buff.append(" ");
 			buff.append(tf.getConcept(ccPart.getC2id()).toString());
 		} else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
-			I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) tuple.getMutableIdPart();
+			I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) tuple.getMutablePart();
 			buff.append(tf.getConcept(cccPart.getC1id()).toString());
 			buff.append(" ");
 			buff.append(tf.getConcept(cccPart.getC2id()).toString());
@@ -609,7 +609,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 				PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
 				for (I_Path p : config.getEditingPathSet()) {
 					for (I_ThinExtByRefTuple tuple : tuples) {
-						I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) tuple.getMutableIdPart().makeAnalog(currentNid, p.getConceptId(), Long.MAX_VALUE);
+						I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) tuple.getMutablePart().makeAnalog(currentNid, p.getConceptId(), Long.MAX_VALUE);
 						if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
 							I_ThinExtByRefPartConceptConcept newCCPart = (I_ThinExtByRefPartConceptConcept) newPart;
 							tuple.addVersion(newCCPart);
@@ -691,7 +691,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 			PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
 			for (I_Path p : config.getEditingPathSet()) {
 				for (I_ThinExtByRefTuple tuple : tuples) {
-					I_ThinExtByRefPart newPart = tuple.getMutableIdPart().duplicate();
+					I_ThinExtByRefPart newPart = tuple.getMutablePart().duplicate();
 					newPart.setVersion(Integer.MAX_VALUE);
 					newPart.setStatusId(retiredNid);
 					tuple.getCore().addVersion(newPart);

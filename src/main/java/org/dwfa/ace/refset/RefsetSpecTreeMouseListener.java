@@ -251,7 +251,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            I_ThinExtByRefPart newPart = thinExtByRefTuple.getMutableIdPart().duplicate();
+            I_ThinExtByRefPart newPart = thinExtByRefTuple.getMutablePart().duplicate();
             newPart.setVersion(Integer.MAX_VALUE);
             try {
                 newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
@@ -308,7 +308,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            I_ThinExtByRefPart newPart = thinExtByRefTuple.getMutableIdPart().duplicate();
+            I_ThinExtByRefPart newPart = thinExtByRefTuple.getMutablePart().duplicate();
             newPart.setVersion(Integer.MAX_VALUE);
             thinExtByRefTuple.getCore().addVersion(newPart);
             LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());

@@ -209,7 +209,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private void renderTextQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
-        I_ThinExtByRefPartConceptConceptString ccsPart = (I_ThinExtByRefPartConceptConceptString) firstTuple.getMutableIdPart();
+        I_ThinExtByRefPartConceptConceptString ccsPart = (I_ThinExtByRefPartConceptConceptString) firstTuple.getMutablePart();
 
         if (indent) {
             htmlParts.add("&nbsp;&nbsp;");
@@ -230,7 +230,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private void renderStructuralQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
-        I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) firstTuple.getMutableIdPart();
+        I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) firstTuple.getMutablePart();
         if (indent) {
             htmlParts.add("&nbsp;&nbsp;");
         }
@@ -245,7 +245,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private void renderBranchingClause(I_ThinExtByRefTuple firstTuple) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
-        I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) firstTuple.getMutableIdPart();
+        I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) firstTuple.getMutablePart();
         htmlParts.add("&nbsp;&nbsp;&nbsp;");
         addPrefixImage(htmlParts, ccPart.getC1id());
         htmlParts.add("&nbsp;");

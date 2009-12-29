@@ -620,16 +620,16 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
                 case CON_ID:
                     break;
                 case DESC:
-                    image.getMutableIdPart().setTextDescription(value.toString());
+                    image.getMutablePart().setTextDescription(value.toString());
                     break;
                 case STATUS:
                     Integer statusId = (Integer) value;
-                    image.getMutableIdPart().setStatusId(statusId);
+                    image.getMutablePart().setStatusId(statusId);
                     getReferencedConcepts().put(statusId, ConceptBean.get(statusId));
                     break;
                 case TYPE:
                     Integer typeId = (Integer) value;
-                    image.getMutableIdPart().setTypeId(typeId);
+                    image.getMutablePart().setTypeId(typeId);
                     getReferencedConcepts().put(typeId, ConceptBean.get(typeId));
                     break;
                 case VERSION:

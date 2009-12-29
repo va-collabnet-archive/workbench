@@ -231,7 +231,7 @@ public class ThinIdVersioned implements I_Identify {
         for (I_Path promotionPath : pomotionPaths) {
             for (I_IdVersion it : matchingTuples) {
                 if (it.getPathId() == viewPathId) {
-                    I_IdPart promotionPart = it.getMutableIdPart().duplicate();
+                    I_IdPart promotionPart = it.getMutablePart().duplicate();
                     promotionPart.setVersion(Integer.MAX_VALUE);
                     promotionPart.setPathId(promotionPath.getConceptId());
                     if (versions.contains(promotionPart) == false) {

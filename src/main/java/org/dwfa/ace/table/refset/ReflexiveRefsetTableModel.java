@@ -130,19 +130,19 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                 break;
                             case PART:
                                 if (col.readParamaters != null) {
-                                    conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getMutableIdPart(),
+                                    conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getMutablePart(),
                                         col.readParamaters));
                                 } else {
                                     switch (col.type) {
                                     case COMPONENT_IDENTIFIER:
                                         if (LocalVersionedTerminology.get().hasConcept(
-                                            (Integer) col.getReadMethod().invoke(ebrTuple.getMutableIdPart())) == false) {
+                                            (Integer) col.getReadMethod().invoke(ebrTuple.getMutablePart())) == false) {
                                             conceptsToFetch.add((Integer) col.getReadMethod()
-                                                .invoke(ebrTuple.getMutableIdPart()));
+                                                .invoke(ebrTuple.getMutablePart()));
                                             break;
                                         }
                                     case CONCEPT_IDENTIFIER:
-                                        I_ThinExtByRefPart conceptIdPart = ebrTuple.getMutableIdPart();
+                                        I_ThinExtByRefPart conceptIdPart = ebrTuple.getMutablePart();
                                         try {
                                             Object obj = col.getReadMethod().invoke(conceptIdPart);
                                             if (obj instanceof Integer) {
@@ -248,7 +248,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 List<I_ThinExtByRefTuple> promotionTuples = extForMember.getTuples(host.getConfig().getAllowedStatus(),
                     host.getConfig().getViewPositionSet(), false);
                 if (promotionTuples.size() > 0) {
-                    return col.getReadMethod().invoke(promotionTuples.get(0).getMutableIdPart());
+                    return col.getReadMethod().invoke(promotionTuples.get(0).getMutablePart());
                 }
             }
         }

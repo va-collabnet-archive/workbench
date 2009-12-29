@@ -170,7 +170,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
      * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getPart()
      */
-    public I_ThinExtByRefPart getMutableIdPart() {
+    public I_ThinExtByRefPart getMutablePart() {
         return part;
     }
 
