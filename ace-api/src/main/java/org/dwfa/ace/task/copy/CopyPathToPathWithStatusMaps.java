@@ -207,7 +207,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
 
     public static void copyId(I_Path toPath, I_Identify id, Map<Integer, Integer> statusMap) {
         for (I_IdVersion t : id.getIdVersions()) {
-            I_IdPart newPart = t.duplicate();
+            I_IdPart newPart = t.duplicateIdPart();
             newPart.setPathId(toPath.getConceptId());
             newPart.setVersion(Integer.MAX_VALUE);
             if (statusMap != null) {

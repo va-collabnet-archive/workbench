@@ -47,7 +47,7 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
      */
     public int getTypeId();
 
-    public List<? extends I_ThinExtByRefPart> getMutableIdParts();
+    public List<? extends I_ThinExtByRefPart> getMutableParts();
 
     /**
      * @return <code><b>int</b></code> -- native identifier (nid) for the reference set to which this <code>I_ThinExtByRefVersioned</code>

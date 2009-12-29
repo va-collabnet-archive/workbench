@@ -100,7 +100,7 @@ public class SpecRefsetHelper {
             I_ThinExtByRefPartConcept latestPart = null;
             if (extension.getRefsetId() == refsetId) {
                 // get the latest version
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                     if (part instanceof I_ThinExtByRefPartConcept && (latestPart == null)
                         || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = (I_ThinExtByRefPartConcept) part;
@@ -125,7 +125,7 @@ public class SpecRefsetHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -186,7 +186,7 @@ public class SpecRefsetHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -217,7 +217,7 @@ public class SpecRefsetHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -246,7 +246,7 @@ public class SpecRefsetHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -276,7 +276,7 @@ public class SpecRefsetHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -305,7 +305,7 @@ public class SpecRefsetHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -333,7 +333,7 @@ public class SpecRefsetHelper {
             if (extension.getRefsetId() == refsetId) {
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -364,7 +364,7 @@ public class SpecRefsetHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -527,9 +527,9 @@ public class SpecRefsetHelper {
             // edit the existing part's effectiveDate/version - this needs to
             // occur after the part has been committed, or else the
             // effectiveDate is set to the time at commit
-            int index = newExtension.getMutableIdParts().size() - 1;
+            int index = newExtension.getMutableParts().size() - 1;
             I_ThinExtByRefPartConceptConcept extension =
-                    (I_ThinExtByRefPartConceptConcept) newExtension.getMutableIdParts().get(index);
+                    (I_ThinExtByRefPartConceptConcept) newExtension.getMutableParts().get(index);
             extension.setVersion(effectiveTime);
             newExtension.addVersion(extension);
 
@@ -599,8 +599,8 @@ public class SpecRefsetHelper {
             // edit the existing part's effectiveDate/version - this needs to
             // occur after the part has been committed, or else the
             // effectiveDate is set to the time at commit
-            int index = newExtension.getMutableIdParts().size() - 1;
-            I_ThinExtByRefPartString extension = (I_ThinExtByRefPartString) newExtension.getMutableIdParts().get(index);
+            int index = newExtension.getMutableParts().size() - 1;
+            I_ThinExtByRefPartString extension = (I_ThinExtByRefPartString) newExtension.getMutableParts().get(index);
             extension.setVersion(effectiveTime);
             newExtension.addVersion(extension);
 
@@ -672,9 +672,9 @@ public class SpecRefsetHelper {
             // edit the existing part's effectiveDate/version - this needs to
             // occur after the part has been committed, or else the
             // effectiveDate is set to the time at commit
-            int index = newExtension.getMutableIdParts().size() - 1;
+            int index = newExtension.getMutableParts().size() - 1;
             I_ThinExtByRefPartConceptString extension =
-                    (I_ThinExtByRefPartConceptString) newExtension.getMutableIdParts().get(index);
+                    (I_ThinExtByRefPartConceptString) newExtension.getMutableParts().get(index);
             extension.setVersion(effectiveTime);
             newExtension.addVersion(extension);
 
@@ -740,8 +740,8 @@ public class SpecRefsetHelper {
         // edit the existing part's effectiveDate/version - this needs to occur
         // after the part has been committed, or else the effectiveDate is set
         // to the time at commit
-        int index = newExtension.getMutableIdParts().size() - 1;
-        I_ThinExtByRefPartInteger extension = (I_ThinExtByRefPartInteger) newExtension.getMutableIdParts().get(index);
+        int index = newExtension.getMutableParts().size() - 1;
+        I_ThinExtByRefPartInteger extension = (I_ThinExtByRefPartInteger) newExtension.getMutableParts().get(index);
         extension.setVersion(effectiveTime);
         newExtension.addVersion(extension);
 
@@ -807,8 +807,8 @@ public class SpecRefsetHelper {
         // edit the existing part's effectiveDate/version - this needs to occur
         // after the part has been committed, or else the effectiveDate is set
         // to the time at commit
-        int index = newExtension.getMutableIdParts().size() - 1;
-        I_ThinExtByRefPartConcept extension = (I_ThinExtByRefPartConcept) newExtension.getMutableIdParts().get(index);
+        int index = newExtension.getMutableParts().size() - 1;
+        I_ThinExtByRefPartConcept extension = (I_ThinExtByRefPartConcept) newExtension.getMutableParts().get(index);
         extension.setVersion(effectiveTime);
         newExtension.addVersion(extension);
 
@@ -875,9 +875,9 @@ public class SpecRefsetHelper {
         // edit the existing part's effectiveDate/version - this needs to occur
         // after the part has been committed, or else the effectiveDate is set
         // to the time at commit
-        int index = newExtension.getMutableIdParts().size() - 1;
+        int index = newExtension.getMutableParts().size() - 1;
         I_ThinExtByRefPartConceptConceptConcept extension =
-                (I_ThinExtByRefPartConceptConceptConcept) newExtension.getMutableIdParts().get(index);
+                (I_ThinExtByRefPartConceptConceptConcept) newExtension.getMutableParts().get(index);
         extension.setVersion(effectiveTime);
         newExtension.addVersion(extension);
 
@@ -941,9 +941,9 @@ public class SpecRefsetHelper {
         // edit the existing part's effectiveDate/version - this needs to occur
         // after the part has been committed, or else the effectiveDate is set
         // to the time at commit
-        int index = newExtension.getMutableIdParts().size() - 1;
+        int index = newExtension.getMutableParts().size() - 1;
         I_ThinExtByRefPartConceptConceptString extension =
-                (I_ThinExtByRefPartConceptConceptString) newExtension.getMutableIdParts().get(index);
+                (I_ThinExtByRefPartConceptConceptString) newExtension.getMutableParts().get(index);
         extension.setVersion(effectiveTime);
         newExtension.addVersion(extension);
 
@@ -969,7 +969,7 @@ public class SpecRefsetHelper {
 
                 // get the latest version
                 I_ThinExtByRefPart latestPart = null;
-                for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                     if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                         latestPart = part;
                     }
@@ -1199,7 +1199,7 @@ public class SpecRefsetHelper {
                 if (extension.getRefsetId() == refsetId) {
                     // get the latest version
                     I_ThinExtByRefPart latestPart = null;
-                    for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                    for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                         if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                             latestPart = part;
                         }
@@ -1239,7 +1239,7 @@ public class SpecRefsetHelper {
                 if (extension.getRefsetId() == refsetId) {
                     // get the latest version
                     I_ThinExtByRefPart latestPart = null;
-                    for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+                    for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                         if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                             latestPart = part;
                         }
@@ -1315,7 +1315,7 @@ public class SpecRefsetHelper {
             throws TerminologyException, IOException {
         I_ThinExtByRefPart latestPart = null;
 
-        for (I_ThinExtByRefPart part : memberExtension.getMutableIdParts()) {
+        for (I_ThinExtByRefPart part : memberExtension.getMutableParts()) {
             if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                 for (Integer currentStatus : getCurrentStatusIds()) {
                     if (part.getStatusId() == currentStatus) {
@@ -1340,10 +1340,10 @@ public class SpecRefsetHelper {
             // edit the existing part's status
             I_ConceptAttributeVersioned v = newConcept.getConceptAttributes();
 
-            int index = v.getMutableIdParts().size() - 1;
+            int index = v.getMutableParts().size() - 1;
             I_ConceptAttributePart part;
             if (index >= 0) {
-                part = (I_ConceptAttributePart) v.getMutableIdParts().get(index);
+                part = (I_ConceptAttributePart) v.getMutableParts().get(index);
             } else {
                 part = termFactory.newConceptAttributePart();
             }

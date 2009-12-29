@@ -92,7 +92,7 @@ public class AutoGenPathProcess implements I_ProcessConcepts {
 
         // GET LATEST CONCEPT PART
         List<? extends I_ConceptAttributePart> cParts;
-        cParts = concept.getConceptAttributes().getMutableIdParts();
+        cParts = concept.getConceptAttributes().getMutableParts();
         I_ConceptAttributePart cPart1 = null;
         for (I_Position pos : fromPathPos) { // FOR PATHS_IN_PRIORITY_ORDER
             for (I_ConceptAttributePart cPart : cParts) {
@@ -156,7 +156,7 @@ public class AutoGenPathProcess implements I_ProcessConcepts {
             // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
             I_RelPart rPart1 = null;
             for (I_Position pos : fromPathPos) { // PATHS_IN_PRIORITY_ORDER
-                for (I_RelPart rPart : rel.getMutableIdParts()) {
+                for (I_RelPart rPart : rel.getMutableParts()) {
                     if (pos.getPath().getConceptId() == rPart.getPathId()) {
                         if (rPart1 == null) {
                             rPart1 = rPart; // ... KEEP FIRST_INSTANCE

@@ -18,26 +18,29 @@ package org.dwfa.ace.api;
 
 public interface I_DescriptionTuple extends I_AmTypedTuple {
 
-    public abstract boolean isInitialCaseSignificant();
+    public boolean isInitialCaseSignificant();
 
-    public abstract String getLang();
+    public String getLang();
 
-    public abstract String getText();
+    public String getText();
 
-    public abstract int getConceptId();
+    public int getConceptId();
 
-    public abstract int getDescId();
+    public int getDescId();
 
-    public abstract void setInitialCaseSignificant(boolean capStatus);
+    public void setInitialCaseSignificant(boolean capStatus);
 
-    public abstract void setLang(String lang);
+    public void setLang(String lang);
 
-    public abstract void setText(String text);
+    public void setText(String text);
 
+    /**
+     * @deprecated
+     */
     public I_DescriptionPart duplicate();
 
-    public abstract I_DescriptionPart getMutablePart();
+    public I_DescriptionPart getMutablePart();
 
-    public abstract I_DescriptionVersioned getDescVersioned();
+    public I_DescriptionVersioned getDescVersioned();
 
 }

@@ -38,6 +38,9 @@ public interface I_RelTuple extends I_AmTypedTuple {
 
     public void setGroup(int group);
 
+    /**
+     * @deprecated
+     */
     public I_RelPart duplicate();
 
     public I_RelPart getMutablePart();

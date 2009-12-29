@@ -32,7 +32,7 @@ public class IDTupleFileUtil {
 
     public static String exportTuple(I_Identify iIdVersioned) throws TerminologyException, IOException {
 
-        List<? extends I_IdPart> parts = iIdVersioned.getMutableIdParts();
+        List<? extends I_IdPart> parts = iIdVersioned.getMutableParts();
         I_IdPart latestPart = null;
         for (I_IdPart part : parts) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
@@ -102,7 +102,7 @@ public class IDTupleFileUtil {
                     termFactory.getPath(new UUID[] { pathUuid }), effectiveDate);
 
                 I_Identify versioned = termFactory.getId(primaryUuid);
-                I_IdPart part = versioned.getMutableIdParts().get(0).duplicate();
+                I_IdPart part = versioned.getMutableParts().get(0).duplicateIdPart();
                 part.setStatusId(termFactory.uuidToNative(statusUuid));
                 part.setPathId(termFactory.uuidToNative(pathUuid));
                 part.setAuthorityNid(termFactory.uuidToNative(sourceSystemUuid));
