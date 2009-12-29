@@ -337,14 +337,14 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         I_IdPart latestPart = null;
         for (I_IdPart part : parts) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
-                if (part.getSource() == snomedIntegerId) {
+                if (part.getAuthorityNid() == snomedIntegerId) {
                     latestPart = part;
                 }
             }
         }
 
         if (latestPart != null) {
-            return latestPart.getSourceId().toString();
+            return latestPart.getDenotation().toString();
         } else {
             return null;
         }

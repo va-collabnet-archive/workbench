@@ -104,7 +104,7 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
     private void injectValidTypeIds() throws Exception {
         validTypeIds = new ArrayList<Integer>();
         for (ConceptDescriptor conceptDesc : validTypeConcepts) {
-            validTypeIds.add(conceptDesc.getVerifiedConcept().getId().getNid());
+            validTypeIds.add(conceptDesc.getVerifiedConcept().getIdentifier().getNid());
         }
     }
 

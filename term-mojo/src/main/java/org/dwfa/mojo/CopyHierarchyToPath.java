@@ -210,7 +210,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
             for (I_ThinExtByRefVersioned ext : tf.getRefsetExtensionMembers(concept.getConceptId())) {
                 processExtensionByReference(ext);
             }
-            processId(concept.getId());
+            processId(concept.getIdentifier());
             processImages(concept.getImages());
             processRelationship(concept.getSourceRels());
         }

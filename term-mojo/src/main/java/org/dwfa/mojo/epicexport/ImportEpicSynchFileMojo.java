@@ -216,10 +216,10 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
             boolean foundCidSource = false;
             boolean foundDot1Source = false;
 
-            for (I_IdPart part : concept.getId().getMutableIdParts()) {
-                if (part.getSource() == cidSourceNid) {
+            for (I_IdPart part : concept.getIdentifier().getMutableIdParts()) {
+                if (part.getAuthorityNid() == cidSourceNid) {
                     foundCidSource = true;
-                    if (part.getSourceId().equals(cid)) {
+                    if (part.getDenotation().equals(cid)) {
                         cidValuesMatched++;
                     } else {
                         getLog().warn(
@@ -231,9 +231,9 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
                     }
                 }
 
-                if (part.getSource() == dot1SourceNid) {
+                if (part.getAuthorityNid() == dot1SourceNid) {
                     foundDot1Source = true;
-                    if (part.getSourceId().equals(dot1)) {
+                    if (part.getDenotation().equals(dot1)) {
                         dot1ValuesMatched++;
                     } else {
                         getLog().warn(
@@ -248,25 +248,25 @@ public class ImportEpicSynchFileMojo extends AbstractMojo {
             }
 
             if (foundDot1Source == false) {
-                I_IdPart aPart = concept.getId().getMutableIdParts().get(0).duplicate();
-                aPart.setSource(dot1SourceNid);
-                aPart.setSourceId(dot1);
+                I_IdPart aPart = concept.getIdentifier().getMutableIdParts().get(0).duplicate();
+                aPart.setAuthorityNid(dot1SourceNid);
+                aPart.setDenotation(dot1);
                 aPart.setPathId(kpPath.getNid());
                 aPart.setVersion(Integer.MAX_VALUE);
-                concept.getId().addMutableIdPart(aPart);
-                concept.getUncommittedIdVersioned().add(concept.getId());
+                concept.getIdentifier().addMutableIdPart(aPart);
+                concept.getUncommittedIdVersioned().add(concept.getIdentifier());
                 tf.addUncommitted(concept);
                 dot1ValuesSynched++;
             }
 
             if (foundCidSource == false) {
-                I_IdPart aPart = concept.getId().getMutableIdParts().get(0).duplicate();
-                aPart.setSource(cidSourceNid);
-                aPart.setSourceId(cid);
+                I_IdPart aPart = concept.getIdentifier().getMutableIdParts().get(0).duplicate();
+                aPart.setAuthorityNid(cidSourceNid);
+                aPart.setDenotation(cid);
                 aPart.setPathId(kpPath.getNid());
                 aPart.setVersion(Integer.MAX_VALUE);
-                concept.getId().addMutableIdPart(aPart);
-                concept.getUncommittedIdVersioned().add(concept.getId());
+                concept.getIdentifier().addMutableIdPart(aPart);
+                concept.getUncommittedIdVersioned().add(concept.getIdentifier());
                 tf.addUncommitted(concept);
                 cidValuesSynched++;
             }

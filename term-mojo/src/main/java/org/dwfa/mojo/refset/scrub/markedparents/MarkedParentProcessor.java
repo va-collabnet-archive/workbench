@@ -52,7 +52,7 @@ public final class MarkedParentProcessor {
         normalMemberList = new ArrayList<ComponentRefsetKey>();
         duplicateMarkedParentMarker = new DuplicateMarkedParentMarker();
         normalMemberId = new ConceptDescriptor(NORMAL_MEMBER_UUID, NORMAL_MEMBER_DESC).getVerifiedConcept()
-            .getId()
+            .getIdentifier()
             .getNid();
 
         TerminologyFactoryUtil terminologyFactoryUtil = new TerminologyFactoryUtil();
