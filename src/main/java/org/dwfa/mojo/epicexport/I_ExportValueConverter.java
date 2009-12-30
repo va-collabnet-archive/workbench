@@ -42,5 +42,7 @@ public interface I_ExportValueConverter {
 	
 	public void writeRecordIds(I_ThinExtByRefTuple extensionTuple, List<String> masterFilesImpacted,
     		EpicExportManager exportManager) throws Exception;
-    	
+
+	public void addRecordIds(I_ThinExtByRefTuple extensionTuple, 
+			List<ExternalTermRecord> records) throws Exception;
 }

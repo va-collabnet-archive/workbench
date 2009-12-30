@@ -5,6 +5,9 @@ import java.util.List;
 
 public class ExternalTermRecord {
 	private String masterFileName;
+	private String version;
+	private List<String> regions;
+	
 	List<Item> items;
 	
 	public ExternalTermRecord(String name) {
@@ -19,6 +22,24 @@ public class ExternalTermRecord {
 		this.masterFileName = masterFileName;
 	}
 	
+	public void addRegion(String region) {
+		if (this.regions == null)
+			regions = new ArrayList<String>();
+		regions.add(region);
+	}
+	
+	public List<String> getRegions() {
+		return regions;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
 	public Item getFirstItem(String name) {
 		Item ret = null;
 		for (Item i: this.items) {

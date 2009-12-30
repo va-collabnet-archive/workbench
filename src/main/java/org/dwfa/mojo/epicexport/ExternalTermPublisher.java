@@ -95,6 +95,9 @@ public class ExternalTermPublisher {
 		//if (this.idTuple != null)
 		//	this.exportFactory.getValueConverter(startingVersion).writeRecordIds(this.idTuple,
 		//			masterFilesImpacted, exportManager);
+		if (this.idTuple != null)
+			this.exportFactory.getValueConverter(startingVersion).
+				addRecordIds(this.idTuple, this.externalRecords);
 		// Write all of the records
         writeWildcardValues();
         return this.externalRecords;
@@ -181,6 +184,7 @@ public class ExternalTermPublisher {
 	    				this.idTuple = extensionTuple;
 	    				addItem(app.getMasterfile(), app.getItemNumber(), 
 	    						populater.getItemValue(), populater.getPreviousItemValue());
+	    				addRegion(app.getMasterfile(), app.getRegion());
 	    			}
 	    		}
 	    		else {
@@ -189,6 +193,12 @@ public class ExternalTermPublisher {
 	    		}
     		}
     	}
+    }
+    
+    public void addRegion(String masterfile, String region) {
+    	ExternalTermRecord record = getExternalRecordForMasterfile(masterfile);
+    	record.addRegion(region);
+
     }
     
     public void addItem(String masterFile, String item, Object value, Object previousValue) {

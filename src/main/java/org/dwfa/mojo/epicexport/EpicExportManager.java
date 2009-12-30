@@ -86,6 +86,17 @@ public class EpicExportManager {
         return ret;
     }
 
+    public void exportExternalTermRecord(ExternalTermRecord term) throws Exception {
+    	I_EpicLoadFileBuilder builder = getLoadFileBuilder(term.getMasterFileName());
+    	if (builder != null) {
+    		builder.clearRecordContents();
+    		for (ExternalTermRecord.Item i: term.items) {
+    			builder.addItemForExport(i.getName(), i.getValue(), i.getPreviousValue());
+    		}
+    		builder.writeRecord(term.getVersion(), term.getRegions());
+    	}
+    }
+    
     public void close() throws IOException {
 
         for (Iterator<I_EpicExportRecordWriter> i = writers.values().iterator(); i.hasNext();) {
