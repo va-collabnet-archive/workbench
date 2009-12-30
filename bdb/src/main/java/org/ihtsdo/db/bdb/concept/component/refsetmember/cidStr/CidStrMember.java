@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.cidString;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidStr;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;

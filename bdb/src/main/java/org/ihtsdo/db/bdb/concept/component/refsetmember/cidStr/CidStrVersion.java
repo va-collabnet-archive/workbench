@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.cidString;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidStr;
 
 import java.io.IOException;
 

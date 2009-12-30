@@ -24,7 +24,7 @@ import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid.CidCidCidVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr.CidCidStrVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidInt.CidIntVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidString.CidStrVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidStr.CidStrVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMap.CrossMapVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMapForRel.CrossMapForRelVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept.FloatCidVersion;
