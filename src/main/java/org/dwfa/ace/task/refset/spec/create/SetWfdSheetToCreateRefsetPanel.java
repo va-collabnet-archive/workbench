@@ -23,16 +23,13 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.spec.SpecRefsetHelper;
@@ -44,7 +41,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -168,19 +164,7 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
 
             // create list of all users
             SpecRefsetHelper helper = new SpecRefsetHelper();
-            I_IntSet allowedStatuses = helper.getCurrentStatusIntSet();
-            I_GetConceptData userParent = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
-            I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
-            final Set<? extends I_GetConceptData> allUsers =
-                    userParent.getDestRelOrigins(allowedStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
-                        .getViewPositionSetReadOnly(), true, true);
-
-            Set<I_GetConceptData> allValidUsers = new HashSet<I_GetConceptData>();
-            for (I_GetConceptData user : allUsers) {
-                if (getInbox(user) != null) {
-                    allValidUsers.add(user);
-                }
-            }
+            Set<? extends I_GetConceptData> allValidUsers = helper.getAllValidUsers();
 
             // check permissions for the current user - they require
             // "create new refset" permission either as a user role or
@@ -212,31 +196,6 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
         } catch (Exception e) {
             ex = e;
         }
-    }
-
-    public String getInbox(I_GetConceptData concept) throws Exception {
-        // find the inbox string using the concept's "user inbox" description
-
-        I_GetConceptData descriptionType =
-                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
-        I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
-        allowedTypes.add(descriptionType.getConceptId());
-        String latestDescription = null;
-        int latestVersion = Integer.MIN_VALUE;
-
-        SpecRefsetHelper helper = new SpecRefsetHelper();
-        I_IntSet activeStatuses = helper.getCurrentStatusIntSet();
-
-        List<? extends I_DescriptionTuple> descriptionResults =
-                concept.getDescriptionTuples(activeStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
-                    .getViewPositionSetReadOnly(), true);
-        for (I_DescriptionTuple descriptionTuple : descriptionResults) {
-            if (descriptionTuple.getVersion() > latestVersion) {
-                latestVersion = descriptionTuple.getVersion();
-                latestDescription = descriptionTuple.getText();
-            }
-        }
-        return latestDescription;
     }
 
     public int[] getDataContainerIds() {

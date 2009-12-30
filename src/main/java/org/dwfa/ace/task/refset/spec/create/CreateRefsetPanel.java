@@ -53,24 +53,21 @@ import org.dwfa.ace.task.util.DatePicker;
 import org.dwfa.bpa.data.ArrayListModel;
 
 /**
- * Table to support selection of more than one reviewer. 
+ * Table to support selection of more than one reviewer.
+ * 
  * @author kec
- *
+ * 
  */
 class ReviewerTableModel extends AbstractTableModel {
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-    
-    String[] columnNames = {"name", "reviewer"};
-    Object[][] data = {
-            {"reviewer 1", new Boolean(false) },
-            {"reviewer 2", new Boolean(true) },
-            {"reviewer 3", new Boolean(false) }
-    };
-            
 
+    String[] columnNames = { "name", "reviewer" };
+    Object[][] data =
+            { { "reviewer 1", new Boolean(false) }, { "reviewer 2", new Boolean(true) },
+             { "reviewer 3", new Boolean(false) } };
 
     public int getColumnCount() {
         return columnNames.length;
@@ -97,8 +94,8 @@ class ReviewerTableModel extends AbstractTableModel {
      * editable.
      */
     public boolean isCellEditable(int row, int col) {
-        //Note that the data/cell address is constant,
-        //no matter where the cell appears onscreen.
+        // Note that the data/cell address is constant,
+        // no matter where the cell appears onscreen.
         if (col < 1) {
             return false;
         } else {
@@ -168,16 +165,15 @@ public class CreateRefsetPanel extends JPanel {
     private HashSet<File> attachmentSet = new HashSet<File>();
     private ArrayListModel<File> attachmentListModel;
 
-    private Set<I_GetConceptData> refsetParents;
-    private Set<I_GetConceptData> editors;
+    private Set<? extends I_GetConceptData> refsetParents;
+    private Set<? extends I_GetConceptData> editors;
     private Set<Object> reviewers;
-    private Set<I_GetConceptData> validUsers;
-    
+    private Set<? extends I_GetConceptData> validUsers;
+
     private String noReviewText = "no reviewer assigned";
 
-    
-
-    public CreateRefsetPanel(Set<I_GetConceptData> allValidUsers, Set<I_GetConceptData> permissibleRefsetParents) {
+    public CreateRefsetPanel(Set<? extends I_GetConceptData> allValidUsers,
+            Set<I_GetConceptData> permissibleRefsetParents) {
         super(new GridBagLayout());
 
         this.refsetParents = permissibleRefsetParents;
@@ -362,7 +358,7 @@ public class CreateRefsetPanel extends JPanel {
         gbc.insets = new Insets(5, 10, 0, 5); // padding (top, left, bottom, right)
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(reviewerLabel, gbc);
-        
+
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
@@ -375,16 +371,16 @@ public class CreateRefsetPanel extends JPanel {
         }
 
         /*
-         * Table for selecting multiple reviewers. Not needed now, may use in the future. 
-        gbc.gridy++;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        JTable table = new JTable(new ReviewerTableModel());
-        this.add(new JScrollPane(table), gbc);
-        table.setFillsViewportHeight(true);
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        */
+         * Table for selecting multiple reviewers. Not needed now, may use in the future.
+         * gbc.gridy++;
+         * gbc.weighty = 1.0;
+         * gbc.fill = GridBagConstraints.BOTH;
+         * JTable table = new JTable(new ReviewerTableModel());
+         * this.add(new JScrollPane(table), gbc);
+         * table.setFillsViewportHeight(true);
+         * gbc.weighty = 0;
+         * gbc.fill = GridBagConstraints.HORIZONTAL;
+         */
 
         // deadline
         gbc.gridx = 0;
@@ -448,7 +444,7 @@ public class CreateRefsetPanel extends JPanel {
 
     }
 
-    private Set<I_GetConceptData> getPermissibleEditors(I_GetConceptData refsetParent) {
+    private Set<? extends I_GetConceptData> getPermissibleEditors(I_GetConceptData refsetParent) {
         /*
          * -------------------------------------------------
          * Get a list of valid editors

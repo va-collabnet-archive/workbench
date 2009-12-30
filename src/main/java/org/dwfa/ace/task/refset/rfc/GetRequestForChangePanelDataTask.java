@@ -59,12 +59,13 @@ import org.dwfa.util.bean.Spec;
 public class GetRequestForChangePanelDataTask extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
     private String nextUserTermEntryPropName = ProcessAttachmentKeys.NEXT_USER.getAttachmentKey();
     private String commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
     private String originalRequestPropName = ProcessAttachmentKeys.SEARCH_ALL.getAttachmentKey();
+    private String reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
 
     private I_TermFactory termFactory;
 
@@ -75,6 +76,7 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
         out.writeObject(refsetUuidPropName);
         out.writeObject(originalRequestPropName);
         out.writeObject(refsetSpecUuidPropName);
+        out.writeObject(reviewerUuidPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -88,6 +90,11 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                 refsetSpecUuidPropName = (String) in.readObject();
             } else {
                 refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
+            }
+            if (objDataVersion >= 3) {
+                reviewerUuidPropName = (String) in.readObject();
+            } else {
+                reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -117,6 +124,7 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                     String priority = panel.getPriority();
                     HashSet<File> attachments = panel.getAttachments();
                     I_GetConceptData owner = config.getDbConfig().getUserConcept();
+                    I_GetConceptData reviewer = panel.getReviewer();
 
                     Priority p;
                     if (priority == null) {
@@ -167,6 +175,11 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
 
                     if (originalRequest != null) {
                         process.setProperty(originalRequestPropName, originalRequest);
+                    }
+
+                    // optional reviewer
+                    if (reviewer != null) {
+                        process.setProperty(reviewerUuidPropName, new UUID[] { reviewer.getUids().iterator().next() });
                     }
 
                     process.setOriginator(config.getUsername());
@@ -257,6 +270,14 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
 
     public void setRefsetSpecUuidPropName(String refsetSpecUuidPropName) {
         this.refsetSpecUuidPropName = refsetSpecUuidPropName;
+    }
+
+    public String getReviewerUuidPropName() {
+        return reviewerUuidPropName;
+    }
+
+    public void setReviewerUuidPropName(String reviewerUuidPropName) {
+        this.reviewerUuidPropName = reviewerUuidPropName;
     }
 
 }
