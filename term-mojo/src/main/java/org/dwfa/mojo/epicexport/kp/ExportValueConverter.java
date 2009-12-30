@@ -34,6 +34,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.ExportToEpicLoadFilesMojo;
+import org.dwfa.mojo.epicexport.ExternalTermRecord;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 import org.dwfa.mojo.epicexport.I_ExportValueConverter;
 import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter.I_RefsetApplication;
@@ -222,6 +223,39 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	}
     }
 
+    public void addRecordIds(I_ThinExtByRefTuple extensionTuple, List<ExternalTermRecord> records) 
+    	throws Exception {
+    	
+    	//List<ExternalTermRecord.Item> ret = new ArrayList<ExternalTermRecord.Item>();
+    	
+    	String dot11 = null;
+    	String dot1 = null;
+    	String uuid = null;
+    	
+    	I_GetConceptData idConcept = LocalVersionedTerminology.get().getConcept(extensionTuple.getComponentId());
+    	
+    	for (ExternalTermRecord record: records) {
+	    	// I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(masterfile);
+    		
+    		//exportWriter.setIdConcept(idConcept);
+    		uuid = getIdForConcept(idConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
+    		
+    		if(record.getMasterFileName().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
+				dot11 = getIdForConcept(idConcept, "e3dadc2a-196d-5525-879a-3037af99607d");
+				dot1 = getIdForConcept(idConcept, "e49a55a7-319d-5744-b8a9-9b7cc86fd1c6");
+    		}
+    		else if(record.getMasterFileName().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
+				dot11 = getIdForConcept(idConcept, "bf3e7556-38cb-5395-970d-f11851c9f41e");
+				dot1 = getIdForConcept(idConcept, "af8be384-dc60-5b56-9ad8-bc1e4b5dfbae");
+    		}
+    		if (dot11 != null)
+    			record.addItem("11", dot11, dot11);
+    		if (dot1 != null)
+    			record.addItem("1", dot1, dot1);
+    			record.addItem("35", uuid, uuid);
+    	}
+	
+    }
 
     public String getIdForConcept(I_GetConceptData concept, String idTypeUUID) throws Exception {
     	String ret = null;

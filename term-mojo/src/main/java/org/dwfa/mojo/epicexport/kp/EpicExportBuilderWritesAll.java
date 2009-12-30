@@ -46,7 +46,8 @@ public class EpicExportBuilderWritesAll extends AbstractEpicExportBuilder implem
 			this.writeLiteralItem("rel_ver", version);
 		
 		this.writeAll();
-		this.writeLiteralItem("300000", stringArrayToList(regions, ","));
+		if (regions != null)
+			this.writeLiteralItem("300000", stringArrayToList(regions, ","));
 		writer.saveRecord();
 	}
 
