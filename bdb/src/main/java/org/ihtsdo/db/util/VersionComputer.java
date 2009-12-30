@@ -17,12 +17,10 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.PositionMapper;
 import org.ihtsdo.db.bdb.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.bdb.concept.component.MutablePart;
 import org.ihtsdo.db.bdb.concept.component.Version;
 
-public abstract class VersionComputer<T extends Version<P, C>, 
-									C extends ConceptComponent<P>, 
-									P extends MutablePart<P>> {
+public abstract class VersionComputer<C extends ConceptComponent<P, C>, 
+									P extends Version<P, C>> {
 
 	private class SortPartsByTime implements Comparator<P> {
 
@@ -48,7 +46,7 @@ public abstract class VersionComputer<T extends Version<P, C>,
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<T> matchingTuples, List<P> versions, C core) {
+			List<P> matchingTuples, List<P> versions, C core) {
 
 		HashSet<P> partsToAdd = new HashSet<P>();
 		List<P> partsForPosition = new LinkedList<P>();
@@ -107,13 +105,11 @@ public abstract class VersionComputer<T extends Version<P, C>,
 			partsToAdd.addAll(partsForPosition);
 		}
 
-		for (P part : partsToAdd) {
-			matchingTuples.add(makeTuple(part, core));
-		}
+		matchingTuples.addAll(partsToAdd);
 	}
 
 	public void addTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions, List<T> matchingTuples,
+			PositionSetReadOnly positions, List<P> matchingTuples,
 			boolean addUncommitted, List<P> versions, C core) {
 		addTuples(allowedStatus, null, positions, matchingTuples,
 				addUncommitted, versions, core);
@@ -135,7 +131,7 @@ public abstract class VersionComputer<T extends Version<P, C>,
 	 * @param core
 	 */
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<T> matchingTuples,
+			PositionSetReadOnly positions, List<P> matchingTuples,
 			boolean addUncommitted, List<P> versions, C core) {
 		if (positions == null) {
 			addTuplesNullPositions(allowedStatus, allowedTypes, matchingTuples,
@@ -148,7 +144,7 @@ public abstract class VersionComputer<T extends Version<P, C>,
 
 	public void addTuplesWithPositions(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, PositionSetReadOnly positions,
-			List<T> matchingTuples, List<P> versions, C core) {
+			List<P> matchingTuples, List<P> versions, C core) {
 		HashSet<P> partsToAdd = new HashSet<P>();
 		List<P> partsForPosition = new LinkedList<P>();
 		for (I_Position p : positions) {
@@ -215,9 +211,7 @@ public abstract class VersionComputer<T extends Version<P, C>,
 				partsToAdd.addAll(partsForPosition);
 			}
 		}
-		for (P part : partsToAdd) {
-			matchingTuples.add(makeTuple(part, core));
-		}
+		matchingTuples.addAll(partsToAdd);
 	}
 
 	/**
@@ -230,7 +224,7 @@ public abstract class VersionComputer<T extends Version<P, C>,
 	 * @param core
 	 */
 	public void addTuplesNullPositions(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, List<T> matchingTuples,
+			I_IntSet allowedTypes, List<P> matchingTuples,
 			boolean addUncommitted, List<P> versions, C core) {
 		HashSet<P> partsToAdd = new HashSet<P>();
 		HashSet<P> uncommittedParts = new HashSet<P>();
@@ -269,18 +263,14 @@ public abstract class VersionComputer<T extends Version<P, C>,
 
 		SortedSet<P> sortedPartsToAdd = new TreeSet<P>(new SortPartsByTime());
 		sortedPartsToAdd.addAll(partsToAdd);
-		for (P part : sortedPartsToAdd) {
-			matchingTuples.add(makeTuple(part, core));
-		}
+		matchingTuples.addAll(sortedPartsToAdd);
 		for (P part : uncommittedParts) {
 			if (allowedTypes == null
 					|| allowedTypes
 							.contains(((I_AmTypedPart) part).getTypeId()) == true) {
-				matchingTuples.add(makeTuple(part, core));
+				matchingTuples.add(part);
 			}
 		}
 	}
-
-	public abstract T makeTuple(P part, C core);
 
 }

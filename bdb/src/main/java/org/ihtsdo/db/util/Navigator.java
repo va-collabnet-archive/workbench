@@ -12,7 +12,7 @@ import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.PositionMapper;
-import org.ihtsdo.db.bdb.concept.component.MutablePart;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
 /**
  * The Navigation class can take multiple positions and determine where they are
@@ -25,15 +25,15 @@ import org.ihtsdo.db.bdb.concept.component.MutablePart;
  */
 public abstract class Navigator {
 
-	public <T extends MutablePart<T>> List<T> locateLatest(List<T> parts,
+	public <V extends Version<V,?>> List<V> locateLatest(List<V> parts,
 			I_ConfigAceFrame config) throws IOException, PathNotExistsException, TerminologyException {
-		T latest = null;
+		V latest = null;
 		OpenBitSet resultsPartSet = new OpenBitSet(parts.size());
 		for (I_Position pos : config.getViewPositionSetReadOnly()) {
 			PositionMapper mapper = Bdb.getStatusAtPositionDb().getMapper(pos);
 			OpenBitSet iteratorPartSet = new OpenBitSet(parts.size());
 			for (int i = 0; i < parts.size(); i++) {
-				T part = parts.get(i);
+				V part = parts.get(i);
 				if (mapper.onRoute(part)) {
 					if (latest == null) {
 						latest = part;
@@ -62,7 +62,7 @@ public abstract class Navigator {
 			}
 			resultsPartSet.or(iteratorPartSet);
 		}
-		List<T> resultsList = new ArrayList<T>((int) resultsPartSet.cardinality());
+		List<V> resultsList = new ArrayList<V>((int) resultsPartSet.cardinality());
 		DocIdSetIterator resultsItr = resultsPartSet.iterator();
 		int id = resultsItr.nextDoc();
 		while (id != DocIdSetIterator.NO_MORE_DOCS) {
