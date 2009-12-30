@@ -748,7 +748,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
     private I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned extension) {
         I_ThinExtByRefPart latestPart = null;
-        for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+        for (I_ThinExtByRefPart part : extension.getMutableParts()) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
                 latestPart = part;
             }

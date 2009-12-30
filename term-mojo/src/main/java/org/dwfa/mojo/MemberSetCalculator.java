@@ -244,7 +244,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
         int fsnId = LocalVersionedTerminology.get().uuidToNative(
             ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next());
         for (I_DescriptionVersioned description : descriptions) {
-            List<? extends I_DescriptionPart> parts = description.getMutableIdParts();
+            List<? extends I_DescriptionPart> parts = description.getMutableParts();
             for (I_DescriptionPart part : parts) {
                 if (fsnId == part.getTypeId()) {
                     return part.getText();
@@ -359,7 +359,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
                 int typeId = 0;
                 getLog().debug("processConcept(I_GetConceptData) - valid type/refset, processing");
 
-                List<? extends I_ThinExtByRefPart> versions = part.getMutableIdParts();
+                List<? extends I_ThinExtByRefPart> versions = part.getMutableParts();
                 for (I_ThinExtByRefPart version : versions) {
                     I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) version;
                     typeId = temp.getConceptId();
