@@ -44,5 +44,7 @@ public interface I_ExportValueConverter {
     		EpicExportManager exportManager) throws Exception;
 
 	public void addRecordIds(I_ThinExtByRefTuple extensionTuple, 
-			List<ExternalTermRecord> records) throws Exception;
+			List<ExternalTermRecord> records, I_GetConceptData rootConcept) throws Exception;
+	
+	public String getIdForConcept(I_GetConceptData concept, String idTypeUUID) throws Exception;
 }

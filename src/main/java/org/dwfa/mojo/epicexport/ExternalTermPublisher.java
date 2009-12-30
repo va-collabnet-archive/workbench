@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -17,18 +16,12 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
-import org.dwfa.mojo.epicexport.kp.EpicTermWarehouseFactory;
 import org.dwfa.tapi.TerminologyException;
 
 public class ExternalTermPublisher {
-	private String currentItem;
-	
-	private String currentMasterFile;
 	private I_ExportFactory exportFactory;
 	private EpicExportManager exportManager;
 	private int startingVersion;
-	private String dropName;
 	private List<String> masterFilesImpacted;
 	private I_ThinExtByRefTuple idTuple;
 	private List<DisplayName> displayNames;
@@ -39,6 +32,9 @@ public class ExternalTermPublisher {
 	private I_IntSet statusValues;
 	private List<ExternalTermRecord> externalRecords;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
+	private I_GetConceptData rootConcept;
+	private String currentItem;
+	private String currentMasterFile;
 
 	
 	public ExternalTermPublisher(I_ExportFactory exportFactory) throws Exception
@@ -83,21 +79,22 @@ public class ExternalTermPublisher {
 		List<? extends I_DescriptionVersioned> descs = concept.getDescriptions();
 
 		this.setCurrentItem(null, null);
+		this.rootConcept = concept;
 		int extensionsProcessed = 0;
 		for (I_DescriptionVersioned desc : descs) {
-			// String name = desc.getLastTuple().getPart().getText();
 			I_GetConceptData descriptionConcept = termFactory.getConcept(desc.getConceptId());
 			extensionsProcessed += processDescriptionConcept(descriptionConcept, desc);
 		}
 		// Finally, process this concept directly if it is a description concept, or process the root concept
 		// for extensions attached to the root concept
 		processDescriptionConcept(concept, null);
-		//if (this.idTuple != null)
-		//	this.exportFactory.getValueConverter(startingVersion).writeRecordIds(this.idTuple,
-		//			masterFilesImpacted, exportManager);
 		if (this.idTuple != null)
 			this.exportFactory.getValueConverter(startingVersion).
-				addRecordIds(this.idTuple, this.externalRecords);
+				addRecordIds(this.idTuple, this.externalRecords, concept);
+		//if (descs.size() > 1)
+		//	System.out.println("--------------> Found multiple description concept: " + 
+		//			this.exportFactory.getValueConverter(startingVersion).
+		//				getIdForConcept(concept, "2faa9262-8fb2-11db-b606-0800200c9a66"));
 		// Write all of the records
         writeWildcardValues();
         return this.externalRecords;
@@ -110,34 +107,26 @@ public class ExternalTermPublisher {
     		extensions = termFactory.getAllExtensionsForComponent(description.getDescId());
     	else
     		extensions = termFactory.getAllExtensionsForComponent(concept.getConceptId());
-    	// getLog().info("Found " + extensions.size() + " extensions");
-    	// getLog().info("--------------------------------- Processing extensions: " );
-    	
-    	I_ThinExtByRefTuple lastTuple = null;
     	for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
-    		// getLog().info("Processing extension: " + thinExtByRefVersioned );
         	if (termFactory.hasConcept(thinExtByRefVersioned.getRefsetId())) {
                 for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(statusValues,
                     positions, false, false)) {
-                	lastTuple = thinExtByRefTuple;
-                	export(thinExtByRefTuple, concept, description);
+                	processExtension(thinExtByRefTuple, concept, description);
                 }
-        	}else {
+        	}
+        	else {
         		throw new Exception("No concept for ID " + thinExtByRefVersioned.getRefsetId());
         	}
         }
-    	// if (lastTuple != null)
-    		
-        
         return extensions.size();
     }
 
-    void export(I_ThinExtByRefTuple extensionTuple, I_GetConceptData extendedConcept, 
+    private void processExtension(I_ThinExtByRefTuple extensionTuple, I_GetConceptData extendedConcept, 
     		I_DescriptionVersioned description) throws Exception {
     	
     	int refsetId = extensionTuple.getRefsetId();
     	I_GetConceptData refsetConcept = termFactory.getConcept(refsetId);
-    	exportRefset(refsetConcept, extensionTuple, extendedConcept, description, 
+    	mineRefsetsForItems(refsetConcept, extensionTuple, extendedConcept, description, 
     			getPreviousVersion(extensionTuple));
     }
     
@@ -160,7 +149,7 @@ public class ExternalTermPublisher {
     }
 
     
-    public void exportRefset(I_GetConceptData refsetConcept, 
+    private void mineRefsetsForItems(I_GetConceptData refsetConcept, 
     		I_ThinExtByRefTuple extensionTuple, I_GetConceptData conceptForDescription,
     		I_DescriptionVersioned description, I_ThinExtByRefPart previousPart) throws Exception {
     	this.currentItem = null;
@@ -195,18 +184,18 @@ public class ExternalTermPublisher {
     	}
     }
     
-    public void addRegion(String masterfile, String region) {
+    private void addRegion(String masterfile, String region) {
     	ExternalTermRecord record = getExternalRecordForMasterfile(masterfile);
     	record.addRegion(region);
 
     }
     
-    public void addItem(String masterFile, String item, Object value, Object previousValue) {
+    private void addItem(String masterFile, String item, Object value, Object previousValue) {
     	ExternalTermRecord record = getExternalRecordForMasterfile(masterFile);
     	record.addItem(item, value, previousValue);
     }
     
-    public ExternalTermRecord getExternalRecordForMasterfile(String masterFile) {
+    private ExternalTermRecord getExternalRecordForMasterfile(String masterFile) {
     	ExternalTermRecord ret = null;
     	if (this.externalRecords == null)
     		this.externalRecords = new ArrayList<ExternalTermRecord>();
@@ -222,7 +211,7 @@ public class ExternalTermPublisher {
     	return ret;
     }
     
-	public String convertToIntString(String str) {
+    private String convertToIntString(String str) {
     	String ret = null;
     	try {
     		ret = new Integer(str).toString();
@@ -233,7 +222,7 @@ public class ExternalTermPublisher {
     	return ret;
     }
     
-    public void writeWildcardValues() {
+    private void writeWildcardValues() {
     	for (ValuePair p: this.wildcardItems) {
     		for (String m: this.masterFilesImpacted) {
     			addItem(m, p.getItemNumber(), 
@@ -242,13 +231,13 @@ public class ExternalTermPublisher {
     		}
     	}
     }
-    public void setCurrentItem(String masterFile, String item) {
+    private void setCurrentItem(String masterFile, String item) {
     	this.currentMasterFile = masterFile;
     	this.currentItem = item;
     }
     
 
-    public boolean isNewDisplayNameApplication(String masterFile, String region) {
+    private boolean isNewDisplayNameApplication(String masterFile, String region) {
     	boolean found = false;
     	boolean ret = false;
     	for (String m : this.masterFilesImpacted) {
@@ -281,28 +270,6 @@ public class ExternalTermPublisher {
     	return ret;
     }
     
-    private class EpicItemIdentifier {
-    	String masterfile;
-    	String itemNumber;
-		
-    	public EpicItemIdentifier(String masterfile, String ItemNumber) {
-    		this.setMasterfile(masterfile);
-    		this.setItemNumber(ItemNumber);
-    	}
-    	
-    	public String getMasterfile() {
-			return masterfile;
-		}
-		public void setMasterfile(String masterfile) {
-			this.masterfile = masterfile;
-		}
-		public String getItemNumber() {
-			return itemNumber;
-		}
-		public void setItemNumber(String itemNumber) {
-			this.itemNumber = itemNumber;
-		}
-    }
     
     private class DisplayName {
     	public String masterFile;
