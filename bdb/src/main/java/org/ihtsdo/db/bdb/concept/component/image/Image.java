@@ -54,7 +54,7 @@ public class Image
 		image = uImage.getImage();
 		format = uImage.getFormat();
 		for (UniversalAceImagePart uPart: uImage.getVersions()) {
-			mutableComponentParts.add(new ImageVersion(uPart));
+			componentVersion.add(new ImageVersion(uPart));
 		}
 	}
 
@@ -68,14 +68,14 @@ public class Image
 		image = new byte[imageBytes];
 		input.read(image, 0, imageBytes);
 		for (int i = 0; i < listSize; i++) {
-			mutableComponentParts.add(new ImageVersion(input));
+			componentVersion.add(new ImageVersion(input));
 		}
 	}
 
 	@Override
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<ImageVersion> partsToWrite = new ArrayList<ImageVersion>();
-		for (ImageVersion p: mutableComponentParts) {
+		for (ImageVersion p: componentVersion) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
@@ -135,7 +135,7 @@ public class Image
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getLastTuple()
 	 */
 	public ImageVersion getLastTuple() {
-		return mutableComponentParts.get(mutableComponentParts.size() - 1);
+		return componentVersion.get(componentVersion.size() - 1);
 	}
 
 	/*
@@ -145,7 +145,7 @@ public class Image
 	 */
 	public List<I_ImageTuple> getTuples() {
 		List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
-		for (ImageVersion p : mutableComponentParts) {
+		for (ImageVersion p : componentVersion) {
 			tuples.add(p);
 		}
 		return tuples;
@@ -178,9 +178,9 @@ public class Image
 	public UniversalAceImage getUniversal() throws IOException,
 			TerminologyException {
 		UniversalAceImage universal = new UniversalAceImage(getUids(nid),
-				getImage(), new ArrayList<UniversalAceImagePart>(mutableComponentParts
+				getImage(), new ArrayList<UniversalAceImagePart>(componentVersion
 						.size()), getFormat(), getUids(conceptNid));
-		for (ImageVersion part : mutableComponentParts) {
+		for (ImageVersion part : componentVersion) {
 			UniversalAceImagePart universalPart = new UniversalAceImagePart();
 			universalPart.setPathId(getUids(part.getPathId()));
 			universalPart.setStatusId(getUids(part.getStatusId()));
@@ -197,7 +197,7 @@ public class Image
 		int viewPathId = viewPosition.getPath().getConceptId();
 		List<ImageVersion> matchingTuples = new ArrayList<ImageVersion>();
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples, 
-				mutableComponentParts, this);
+				componentVersion, this);
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {
 			for (ImageVersion it : matchingTuples) {
@@ -215,7 +215,7 @@ public class Image
 
 	@Override
 	public boolean addVersion(I_ImagePart part) {
-		return mutableComponentParts.add((ImageVersion) part);
+		return componentVersion.add((ImageVersion) part);
 	}
 
 	@Override

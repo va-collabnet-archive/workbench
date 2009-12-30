@@ -62,7 +62,7 @@ public class Description
 		super(Bdb.uuidsToNid(uDesc.getDescId()), uDesc.getVersions().size(), editable);
 		setConceptNid(Bdb.uuidsToNid(uDesc.getConceptId()));
 		for (UniversalAceDescriptionPart umPart: uDesc.getMutableParts()) {
-			mutableComponentParts.add(new DescriptionVersion(umPart));
+			componentVersion.add(new DescriptionVersion(umPart));
 		}
 	}
 
@@ -71,14 +71,14 @@ public class Description
 		// nid, list size, and conceptNid are read already by the binder...
 		this.conceptNid = conceptNid;
 		for (int i = 0; i < listSize; i++) {
-			mutableComponentParts.add(new DescriptionVersion(input));
+			componentVersion.add(new DescriptionVersion(input));
 		}
 	}
 
 	@Override
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<DescriptionVersion> partsToWrite = new ArrayList<DescriptionVersion>();
-		for (DescriptionVersion p: mutableComponentParts) {
+		for (DescriptionVersion p: componentVersion) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
@@ -110,12 +110,12 @@ public class Description
 
 	@Override
 	public DescriptionVersion getFirstTuple() {
-		return mutableComponentParts.get(0);
+		return componentVersion.get(0);
 	}
 
 	@Override
 	public DescriptionVersion getLastTuple() {
-		return mutableComponentParts.get(mutableComponentParts.size() - 1);
+		return componentVersion.get(componentVersion.size() - 1);
 	}
 
 
@@ -135,7 +135,7 @@ public class Description
 			TerminologyException {
 		UniversalAceDescription universal = new UniversalAceDescription(
 				getUids(nid), getUids(conceptNid), this.versionCount());
-		for (DescriptionVersion part : mutableComponentParts) {
+		for (DescriptionVersion part : componentVersion) {
 			UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
 			universalPart.setInitialCaseSignificant(part
 					.isInitialCaseSignificant());
@@ -153,7 +153,7 @@ public class Description
 	@Override
 	public boolean matches(Pattern p) {
 		String lastText = null;
-		for (DescriptionVersion desc : mutableComponentParts) {
+		for (DescriptionVersion desc : componentVersion) {
 			if (desc.getText() != lastText) {
 				lastText = desc.getText();
 				Matcher m = p.matcher(lastText);
@@ -207,7 +207,7 @@ public class Description
 
 	@Override
 	public boolean addVersion(I_DescriptionPart newPart) {
-		return mutableComponentParts.add((DescriptionVersion) newPart);
+		return componentVersion.add((DescriptionVersion) newPart);
 	}
 
 	@Override
@@ -231,10 +231,10 @@ public class Description
 
 	public final List<? extends I_DescriptionTuple> getTuples() {
 		List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-		for (DescriptionVersion p : mutableComponentParts) {
+		for (DescriptionVersion p : componentVersion) {
 			tuples.add(p);
 		}
-		return mutableComponentParts;
+		return componentVersion;
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
@@ -263,7 +263,7 @@ public class Description
 		List<DescriptionVersion> tuples = new ArrayList<DescriptionVersion>();
 
 		computer.addTuples(allowedStatus, allowedTypes, positions,
-				tuples, addUncommitted, mutableComponentParts, this);
+				tuples, addUncommitted, componentVersion, this);
 
 		if (returnConflictResolvedLatestState) {
 			I_ConfigAceFrame config = AceConfig.getVodb()

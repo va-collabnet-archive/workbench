@@ -1,32 +1,34 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.idString;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidInteger;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.id.ConceptVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.ConceptVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class ConceptStringVersion extends ConceptVersion 
-	implements I_ThinExtByRefPartConceptString {
+public class ConceptIntegerVersion extends ConceptVersion
+	implements I_ThinExtByRefPartConceptInt {
 
-	private String str;
+	private int intValue;
 	
-	public ConceptStringVersion(int statusNid, int pathNid, long time) {
+	protected ConceptIntegerVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
-	}
-
-	public ConceptStringVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
-	}
-
-	public ConceptStringVersion(TupleInput input) {
-		super(input);
 		// TODO Auto-generated constructor stub
+	}
+
+	protected ConceptIntegerVersion(int statusAtPositionNid) {
+		super(statusAtPositionNid);
+		// TODO Auto-generated constructor stub
+	}
+
+	public ConceptIntegerVersion(TupleInput input) {
+		super(input);
+		intValue = input.readInt();
 	}
 
 	@Override
@@ -49,13 +51,13 @@ public class ConceptStringVersion extends ConceptVersion
 	}
 
 	@Override
-	public String getStr() {
-		return str;
+	public int getIntValue() {
+		return intValue;
 	}
 
 	@Override
-	public void setStr(String str) {
-		this.str = str;
+	public void setIntValue(int intValue) {
+		this.intValue = intValue;
 	}
 
 }

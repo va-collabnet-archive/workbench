@@ -12,7 +12,6 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
-import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersion;
@@ -23,9 +22,12 @@ import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.utypes.UniversalAceIdentification;
+import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
+import org.dwfa.cement.PrimordialId;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.ConceptBdb;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersion;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionLong;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionString;
@@ -36,9 +38,15 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public abstract class ConceptComponent<V extends Version<V, C>, C extends ConceptComponent<V, C>> 
 	implements I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion {
+	
+	private static ConceptBdb conceptBdb = Bdb.getConceptDb();
+	
+	private static List<UUID> getUuids(int conceptNid) throws IOException {
+		return conceptBdb.getUuidsForConcept(conceptNid);
+	}
 
 	public enum IDENTIFIER_PART_TYPES {
-		LONG(1), STRING(2), UUID(3);
+		LONG(1), STRING(2), UUID(3), PRIMORDIAL(4);
 
 		private int partTypeId;
 
@@ -58,6 +66,8 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 				return STRING;
 			case 3:
 				return UUID;
+			case 4:
+				return PRIMORDIAL;
 			}
 			throw new UnsupportedOperationException();
 		}
@@ -83,14 +93,14 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	 */
 	public long primordialUuidLsb;
 	
-	public ArrayList<V> mutableComponentParts;
-	public ArrayList<IdentifierVersion> identifierParts;
+	public ArrayList<V> componentVersion;
+	private ArrayList<IdentifierVersion> identifierParts;
 	
 	protected ConceptComponent(int nid, int listSize, boolean editable) {
 		super();
 		this.nid = nid;
 		this.editable = editable;
-		this.mutableComponentParts = new ArrayList<V>(listSize);
+		this.componentVersion = new ArrayList<V>(listSize);
 	}
 	
 	public void readIdentifierFromBdb(TupleInput input, int conceptNid, int listSize) {
@@ -106,6 +116,10 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 			case UUID:
 				identifierParts.add(new IdentifierVersionUuid(input));
 				break;
+			case PRIMORDIAL:
+				primordialUuidMsb = input.readLong();
+				primordialUuidLsb = input.readLong();
+				break;
 				default:
 					throw new UnsupportedOperationException();
 			}
@@ -115,47 +129,58 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	public void writeIdentifierToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
 		List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
-		for (IdentifierVersion p: identifierParts) {
-			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
-				partsToWrite.add(p);
+		if (identifierParts != null) {
+			for (IdentifierVersion p: identifierParts) {
+				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
+					partsToWrite.add(p);
+				}
 			}
 		}
 		// Start writing
 		output.writeInt(nid);
-		output.writeShort(partsToWrite.size());
+		if (primordialStatusAtPositionNid > maxReadOnlyStatusAtPositionNid) {
+			output.writeShort(partsToWrite.size() + 1);
+			IDENTIFIER_PART_TYPES.PRIMORDIAL.writeType(output);
+			output.writeLong(primordialUuidMsb);
+			output.writeLong(primordialUuidLsb);
+		} else {
+			output.writeShort(partsToWrite.size());
+		}
 		for (IdentifierVersion p: partsToWrite) {
 			p.getType().writeType(output);
-			p.writePartToBdb(output);
+			p.writeIdPartToBdb(output);
 		}
 	}
 	
-
 	@Override
 	public boolean addMutableIdPart(I_IdPart srcId) {
-		return identifierParts.add((IdentifierVersion) srcId);
+		return addIdVersion((IdentifierVersion) srcId);
+	}
+	public boolean addIdVersion(IdentifierVersion srcId) {
+		if (identifierParts == null) {
+			identifierParts = new ArrayList<IdentifierVersion>();
+		}
+		return identifierParts.add(srcId);
 	}
 
 	@Override
 	public final List<I_IdVersion> getIdVersions() {
 		List<I_IdVersion> returnValues = new ArrayList<I_IdVersion>();
-		for (IdentifierVersion idv : identifierParts) {
-			returnValues.add(idv);
-		}
-		return returnValues;
+		returnValues.addAll(identifierParts);
+		returnValues.add(this);
+		return Collections.unmodifiableList(returnValues);
 	}
 
 
 	@Override
 	public final int getAuthorityNid() {
-		// TODO Auto-generated method stub
-		return 0;
+		return PrimordialId.PRIMORDIAL_UUID.getNativeId(Integer.MIN_VALUE);
 	}
 
 
 	@Override
 	public final Object getDenotation() {
-		// TODO Auto-generated method stub
-		return null;
+		return new UUID(primordialUuidMsb, primordialUuidLsb);
 	}
 
 
@@ -191,8 +216,31 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	@Override
 	public UniversalAceIdentification getUniversalId() throws IOException,
 			TerminologyException {
-		// TODO Auto-generated method stub
-		return null;
+        UniversalAceIdentification universal = new UniversalAceIdentification(1);
+		if (identifierParts == null) {
+			universal = new UniversalAceIdentification(1);
+		} else {
+			universal = new UniversalAceIdentification(identifierParts.size() + 1);
+		}
+        UniversalAceIdentificationPart universalPart = new UniversalAceIdentificationPart();
+        universalPart.setIdStatus(getUuids(getStatusId()));
+        universalPart.setPathId(getUuids(getPathId()));
+        universalPart.setSource(getUuids(getAuthorityNid()));
+        universalPart.setSourceId(getDenotation());
+        universalPart.setTime(getTime());
+        universal.addVersion(universalPart);
+        if (identifierParts != null) {
+            for (IdentifierVersion part : identifierParts) {
+                universalPart = new UniversalAceIdentificationPart();
+                universalPart.setIdStatus(getUuids(part.getStatusId()));
+                universalPart.setPathId(getUuids(part.getPathId()));
+                universalPart.setSource(getUuids(part.getAuthorityNid()));
+                universalPart.setSourceId(part.getDenotation());
+                universalPart.setTime(part.getTime());
+                universal.addVersion(universalPart);
+            }
+        }
+        return universal;
 	}
 
 	@Override
@@ -209,21 +257,21 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	}
 
 
-	public final boolean addMutablePart(V part) {
-		return mutableComponentParts.add(part);
+	public final boolean addMutablePart(V version) {
+		return addVersion(version);
 	}
 
 	public final List<V> getMutableParts() {
 		if (editable) {
-			return mutableComponentParts;
+			return componentVersion;
 		}
-		return Collections.unmodifiableList(mutableComponentParts);
+		return Collections.unmodifiableList(componentVersion);
 	}
 	
 
 	public final List<V> getMutableParts(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
 		if (returnConflictResolvedLatestState) {
-	        List<V> returnList = new ArrayList<V>(mutableComponentParts.size());
+	        List<V> returnList = new ArrayList<V>(componentVersion.size());
 	        if (returnConflictResolvedLatestState) {
 	            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 	            returnList = config.getConflictResolutionStrategy().resolveParts(returnList);
@@ -235,7 +283,7 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 	
 	public final int getMutablePartCount() {
-		return mutableComponentParts.size();
+		return componentVersion.size();
 	}
 
 	public final int getNid() {
@@ -256,17 +304,20 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 	public final boolean addVersion(V newPart) {
 		if (editable) {
-			return mutableComponentParts.add(newPart);
+			return componentVersion.add(newPart);
 		}
 		throw new RuntimeException("versions is not editable");
 	}
 	
 	public final boolean addVersionNoRedundancyCheck(V newPart) {
-		return mutableComponentParts.add(newPart);
+		if (editable) {
+			return componentVersion.add(newPart);
+		}
+		throw new RuntimeException("versions is not editable");
 	}
 	
-	public final boolean hasVersion(V p) {
-		return mutableComponentParts.contains(p);
+	public final boolean hasVersion(V version) {
+		return componentVersion.contains(version);
 	}
 	
 	public final List<? extends V> getVersions(boolean returnConflictResolvedLatestState)
@@ -275,13 +326,19 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	}
 
 	public final int versionCount() {
-		return mutableComponentParts.size();
+		if (componentVersion == null) {
+			return 1;
+		}
+		return componentVersion.size() + 1;
 	}
 	
 	public final Set<TimePathId> getTimePathSet() {
 		Set<TimePathId> set = new TreeSet<TimePathId>();
-		for (V p : mutableComponentParts) {
-			set.add(new TimePathId(p.getVersion(), p.getPathId()));
+		set.add(new TimePathId(getVersion(), getPathId()));
+		if (componentVersion != null) {
+			for (V p : componentVersion) {
+				set.add(new TimePathId(p.getVersion(), p.getPathId()));
+			}
 		}
 		return set;
 	}
@@ -293,7 +350,15 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 	public Object getDenotation(int authorityNid) throws IOException,
 			TerminologyException {
-		return data.getDenotation(authorityNid);
+		if (getAuthorityNid() == authorityNid) {
+			return new UUID(primordialUuidMsb, primordialUuidLsb);
+		}
+		for (I_IdPart id: getMutableIdParts()) {
+			if (id.getAuthorityNid() == authorityNid) {
+				return id.getDenotation();
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -362,14 +427,6 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 	@Override
 	public I_AmPart duplicate() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
-
-	@Override
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

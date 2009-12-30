@@ -1,33 +1,33 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.idIdString;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.idId.ConceptConceptVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.ConceptConceptVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class ConceptConceptStringVersion extends ConceptConceptVersion
-	implements I_ThinExtByRefPartConceptConceptString {
+public class ConceptConceptConceptVersion extends ConceptConceptVersion
+	implements I_ThinExtByRefPartConceptConceptConcept {
 
-	private String str;
+	private int c3nid;
 	
-	public ConceptConceptStringVersion(int statusNid, int pathNid,
+	public ConceptConceptConceptVersion(int statusNid, int pathNid,
 			long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public ConceptConceptStringVersion(int statusAtPositionNid) {
+	public ConceptConceptConceptVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public ConceptConceptStringVersion(TupleInput input) {
+	public ConceptConceptConceptVersion(TupleInput input) {
 		super(input);
-		this.str = input.readString();
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -50,23 +50,13 @@ public class ConceptConceptStringVersion extends ConceptConceptVersion
 	}
 
 	@Override
-	public String getStr() {
-		return str;
+	public int getC3id() {
+		return c3nid;
 	}
 
 	@Override
-	public String getStringValue() {
-		return str;
-	}
-
-	@Override
-	public void setStr(String str) {
-		this.str = str;
-	}
-
-	@Override
-	public void setStringValue(String value) {
-		this.str = value;
+	public void setC3id(int c3nid) {
+		this.c3nid = c3nid;
 	}
 
 }

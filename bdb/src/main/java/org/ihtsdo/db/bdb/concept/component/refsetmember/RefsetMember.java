@@ -19,15 +19,15 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.ConceptVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.ConceptConceptVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid.ConceptConceptConceptVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidString.ConceptConceptStringVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidInteger.ConceptIntegerVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidString.ConceptStringVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMap.CrossMapVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMapForRel.CrossMapForRelVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept.MeasurementVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.id.ConceptVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.idId.ConceptConceptVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.idIdId.ConceptConceptConceptVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.idIdString.ConceptConceptStringVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.idInteger.ConceptIntegerVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.idString.ConceptStringVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept.FloatConcept;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntegerVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.language.LanguageVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.membership.MembershipVersion;
@@ -42,15 +42,15 @@ import com.sleepycat.bind.tuple.TupleOutput;
 public abstract class RefsetMember extends ConceptComponent<RefsetMemberMutablePart, RefsetMember> 
 	implements I_ThinExtByRefVersioned {
 	/**
-	 * 
+	 * CID = Component Identifier
 	 * @author kec
 	 *
 	 */
 	protected enum REFSET_MEMBER_TYPE {
 	    MEMBER(RefsetAuxiliary.Concept.MEMBERSHIP_EXTENSION.getUids()), 
 	    BOOLEAN(RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids()), 
-	    CONCEPT(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids()), 
-	    CON_INT(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids()),
+	    CID(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids()), 
+	    CID_INT(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids()),
 	    STRING(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids()), 
 	    INTEGER(RefsetAuxiliary.Concept.INT_EXTENSION.getUids()), 
 	    MEASUREMENT(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids()), 
@@ -60,10 +60,10 @@ public abstract class RefsetMember extends ConceptComponent<RefsetMemberMutableP
 	    TEMPLATE(RefsetAuxiliary.Concept.TEMPLATE_EXTENSION.getUids()),
 	    CROSS_MAP_FOR_REL(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids()),
 	    CROSS_MAP(RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids()),
-	    CONCEPT_CONCEPT(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids()),
-	    CONCEPT_CONCEPT_CONCEPT(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids()),
-	    CONCEPT_CONCEPT_STRING(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids()),
-	    CONCEPT_STRING(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids()),
+	    CID_CID(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids()),
+	    CID_CID_CID(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids()),
+	    CID_CID_STRING(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids()),
+	    CID_STRING(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids()),
 	    	;
 
 	    private int typeNid;
@@ -106,7 +106,7 @@ public abstract class RefsetMember extends ConceptComponent<RefsetMemberMutableP
 	@Override
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<RefsetMemberMutablePart> partsToWrite = new ArrayList<RefsetMemberMutablePart>();
-		for (RefsetMemberMutablePart p: mutableComponentParts) {
+		for (RefsetMemberMutablePart p: componentVersion) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
@@ -135,55 +135,55 @@ public abstract class RefsetMember extends ConceptComponent<RefsetMemberMutableP
 		for (int i = 0; i < listSize; i++) {
 			switch (memberType) {
 			case BOOLEAN:
-				mutableComponentParts.add(new MembershipVersion(input));
+				componentVersion.add(new MembershipVersion(input));
 				break;
-			case CON_INT:
-				mutableComponentParts.add(new ConceptIntegerVersion(input));
+			case CID_INT:
+				componentVersion.add(new ConceptIntegerVersion(input));
 				break;
-			case CONCEPT:
-				mutableComponentParts.add(new ConceptVersion(input));
+			case CID:
+				componentVersion.add(new ConceptVersion(input));
 				break;
-			case CONCEPT_CONCEPT:
-				mutableComponentParts.add(new ConceptConceptVersion(input));
+			case CID_CID:
+				componentVersion.add(new ConceptConceptVersion(input));
 				break;
-			case CONCEPT_CONCEPT_CONCEPT:
-				mutableComponentParts.add(new ConceptConceptConceptVersion(input));
+			case CID_CID_CID:
+				componentVersion.add(new ConceptConceptConceptVersion(input));
 				break;
-			case CONCEPT_CONCEPT_STRING:
-				mutableComponentParts.add(new ConceptConceptStringVersion(input));
+			case CID_CID_STRING:
+				componentVersion.add(new ConceptConceptStringVersion(input));
 				break;
-			case CONCEPT_STRING:
-				mutableComponentParts.add(new ConceptStringVersion(input));
+			case CID_STRING:
+				componentVersion.add(new ConceptStringVersion(input));
 				break;
 			case CROSS_MAP:
-				mutableComponentParts.add(new CrossMapVersion(input));
+				componentVersion.add(new CrossMapVersion(input));
 				break;
 			case CROSS_MAP_FOR_REL:
-				mutableComponentParts.add(new CrossMapForRelVersion(input));
+				componentVersion.add(new CrossMapForRelVersion(input));
 				break;
 			case INTEGER:
-				mutableComponentParts.add(new IntegerVersion(input));
+				componentVersion.add(new IntegerVersion(input));
 				break;
 			case LANGUAGE:
-				mutableComponentParts.add(new LanguageVersion(input));
+				componentVersion.add(new LanguageVersion(input));
 				break;
 			case MEASUREMENT:
-				mutableComponentParts.add(new MeasurementVersion(input));
+				componentVersion.add(new FloatConcept(input));
 				break;
 			case MEMBER:
-				mutableComponentParts.add(new MembershipVersion(input));
+				componentVersion.add(new MembershipVersion(input));
 				break;
 			case SCOPED_LANGUAGE:
-				mutableComponentParts.add(new ScopedLanguageVersion(input));
+				componentVersion.add(new ScopedLanguageVersion(input));
 				break;
 			case STRING:
-				mutableComponentParts.add(new StringVersion(input));
+				componentVersion.add(new StringVersion(input));
 				break;
 			case TEMPLATE:
-				mutableComponentParts.add(new TemplateVersion(input));
+				componentVersion.add(new TemplateVersion(input));
 				break;
 			case TEMPLATE_FOR_REL:
-				mutableComponentParts.add(new TemplateForRelVersion(input));
+				componentVersion.add(new TemplateForRelVersion(input));
 				break;
 				default:
 					throw new UnsupportedOperationException();
@@ -203,7 +203,7 @@ public abstract class RefsetMember extends ConceptComponent<RefsetMemberMutableP
 
 	@Override
 	public void addVersion(I_ThinExtByRefPart part) {
-		mutableComponentParts.add((RefsetMemberMutablePart) part);
+		componentVersion.add((RefsetMemberMutablePart) part);
 	}
 
 

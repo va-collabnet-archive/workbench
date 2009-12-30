@@ -51,8 +51,8 @@ public class ConceptComponentBinder<C extends ConceptComponent<P, C>,
 			C conceptComponent;
 			if (nidToConceptComponentMap != null && nidToConceptComponentMap.containsKey(nid)) {
 				conceptComponent = nidToConceptComponentMap.get(nid);
-				int totalSize = conceptComponent.mutableComponentParts.size() + partCount;
-				conceptComponent.mutableComponentParts.ensureCapacity(totalSize);
+				int totalSize = conceptComponent.componentVersion.size() + partCount;
+				conceptComponent.componentVersion.ensureCapacity(totalSize);
 			} else {
 				conceptComponent = factory.create(nid, partCount, editable);
 				newConceptComponentList.add(conceptComponent);
@@ -67,7 +67,7 @@ public class ConceptComponentBinder<C extends ConceptComponent<P, C>,
 	public void objectToEntry(ArrayList<C> conceptComponentList, TupleOutput output) {
 		List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
 		for (C conceptComponent: conceptComponentList) {
-			for (P part: conceptComponent.mutableComponentParts) {
+			for (P part: conceptComponent.componentVersion) {
 				if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
 					componentListToWrite.add(conceptComponent);
 					break;

@@ -1,34 +1,34 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.idInteger;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.id.ConceptVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.ConceptVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class ConceptIntegerVersion extends ConceptVersion
-	implements I_ThinExtByRefPartConceptInt {
+public class ConceptConceptVersion extends ConceptVersion 
+	implements I_ThinExtByRefPartConceptConcept {
 
-	private int intValue;
+	private int c2nid;
 	
-	protected ConceptIntegerVersion(int statusNid, int pathNid, long time) {
+	public ConceptConceptVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 		// TODO Auto-generated constructor stub
 	}
 
-	protected ConceptIntegerVersion(int statusAtPositionNid) {
+	public ConceptConceptVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 		// TODO Auto-generated constructor stub
 	}
 
-	public ConceptIntegerVersion(TupleInput input) {
+	public ConceptConceptVersion(TupleInput input) {
 		super(input);
-		intValue = input.readInt();
+		c2nid = input.readInt();
 	}
 
 	@Override
@@ -51,13 +51,13 @@ public class ConceptIntegerVersion extends ConceptVersion
 	}
 
 	@Override
-	public int getIntValue() {
-		return intValue;
+	public int getC2id() {
+		return c2nid;
 	}
 
 	@Override
-	public void setIntValue(int intValue) {
-		this.intValue = intValue;
+	public void setC2id(int c2id) {
+		this.c2nid = c2id;
 	}
 
 }

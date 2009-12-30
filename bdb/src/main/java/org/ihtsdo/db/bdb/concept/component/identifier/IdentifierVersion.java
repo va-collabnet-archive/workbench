@@ -35,7 +35,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion {
 	
 	public abstract ConceptComponent.IDENTIFIER_PART_TYPES getType();
 
-	public final void writePartToBdb(TupleOutput output) {
+	public final void writeIdPartToBdb(TupleOutput output) {
 		output.writeInt(statusAtPositionNid);
 		output.writeInt(authorityNid);
 		writeSourceIdToBdb(output);

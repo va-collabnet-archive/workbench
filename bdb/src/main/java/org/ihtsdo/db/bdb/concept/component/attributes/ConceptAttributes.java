@@ -52,7 +52,7 @@ public class ConceptAttributes
 	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
 		for (int i = 0; i < listSize; i++) {
-			mutableComponentParts.add(new ConceptAttributesVersion(input));
+			componentVersion.add(new ConceptAttributesVersion(input));
 		}
 	}
 
@@ -60,7 +60,7 @@ public class ConceptAttributes
 	public void writeComponentToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
 		List<ConceptAttributesVersion> partsToWrite = new ArrayList<ConceptAttributesVersion>();
-		for (ConceptAttributesVersion p : mutableComponentParts) {
+		for (ConceptAttributesVersion p : componentVersion) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
@@ -88,7 +88,7 @@ public class ConceptAttributes
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getTuples()
 	 */
 	public List<ConceptAttributesVersion> getTuples() {
-		return Collections.unmodifiableList(mutableComponentParts);
+		return Collections.unmodifiableList(componentVersion);
 	}
 
 	/*
@@ -131,7 +131,7 @@ public class ConceptAttributes
 			List<ConceptAttributesVersion> matchingTuples,
 			boolean addUncommitted) {
 		computer.addTuples(allowedStatus, positions, matchingTuples,
-				addUncommitted, mutableComponentParts, this);
+				addUncommitted, componentVersion, this);
 	}
 
 	public void addTuples(I_IntSet allowedStatus,
@@ -168,7 +168,7 @@ public class ConceptAttributes
 	 * org.dwfa.vodb.types.I_ConceptAttributeVersioned#getLocalFixedConcept()
 	 */
 	public I_ConceptualizeLocally getLocalFixedConcept() {
-		boolean isDefined = mutableComponentParts.get(mutableComponentParts.size() - 1)
+		boolean isDefined = componentVersion.get(componentVersion.size() - 1)
 				.isDefined();
 		boolean isPrimitive = !isDefined;
 		return LocalFixedConcept.get(nid, isPrimitive);
@@ -194,7 +194,7 @@ public class ConceptAttributes
 			TerminologyException {
 		UniversalAceConceptAttributes conceptAttributes = new UniversalAceConceptAttributes(
 				getUids(nid), this.versionCount());
-		for (ConceptAttributesVersion part : mutableComponentParts) {
+		for (ConceptAttributesVersion part : componentVersion) {
 			UniversalAceConceptAttributesPart universalPart = new UniversalAceConceptAttributesPart();
 			universalPart.setStatusId(getUids(part.getStatusId()));
 			universalPart.setDefined(part.isDefined());
@@ -211,9 +211,9 @@ public class ConceptAttributes
 		buf.append("NativeId: ");
 		buf.append(nid);
 		buf.append(" parts: ");
-		buf.append(mutableComponentParts.size());
+		buf.append(componentVersion.size());
 		buf.append("\n  ");
-		for (ConceptAttributesVersion p : mutableComponentParts) {
+		for (ConceptAttributesVersion p : componentVersion) {
 			buf.append(p);
 			buf.append("\n  ");
 		}
@@ -240,7 +240,7 @@ public class ConceptAttributes
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
 			List<ConceptAttributesVersion> returnTuples) {
 		computer.addTuples(allowedStatus, viewPosition, returnTuples,
-				mutableComponentParts, this);
+				componentVersion, this);
 	}
 
 	public List<ConceptAttributesVersion> getTuples(I_IntSet allowedStatus,
@@ -278,7 +278,7 @@ public class ConceptAttributes
 
 	@Override
 	public boolean addVersion(I_ConceptAttributePart part) {
-		return mutableComponentParts.add(new ConceptAttributesVersion(part));
+		return componentVersion.add(new ConceptAttributesVersion(part));
 	}
 
 	@Override

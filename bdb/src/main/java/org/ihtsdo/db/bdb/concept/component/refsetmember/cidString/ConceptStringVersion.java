@@ -1,27 +1,30 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidString;
 
 import java.io.IOException;
 
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMemberMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.ConceptVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class MeasurementVersion extends RefsetMemberMutablePart {
+public class ConceptStringVersion extends ConceptVersion 
+	implements I_ThinExtByRefPartConceptString {
 
-	public MeasurementVersion(int statusNid, int pathNid, long time) {
+	private String str;
+	
+	public ConceptStringVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public MeasurementVersion(int statusAtPositionNid) {
+	public ConceptStringVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public MeasurementVersion(TupleInput input) {
+	public ConceptStringVersion(TupleInput input) {
 		super(input);
 		// TODO Auto-generated constructor stub
 	}
@@ -46,8 +49,13 @@ public class MeasurementVersion extends RefsetMemberMutablePart {
 	}
 
 	@Override
-	public MeasurementVersion getMutablePart() {
-		return this;
+	public String getStr() {
+		return str;
+	}
+
+	@Override
+	public void setStr(String str) {
+		this.str = str;
 	}
 
 }
