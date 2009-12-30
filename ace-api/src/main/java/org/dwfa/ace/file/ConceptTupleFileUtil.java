@@ -183,10 +183,10 @@ public class ConceptTupleFileUtil {
                 lastConcept = newConcept;
 
                 // edit the existing part's effectiveDate/version
-                int index = v.getMutableIdParts().size() - 1;
+                int index = v.getMutableParts().size() - 1;
                 I_ConceptAttributePart part;
                 if (index >= 0) {
-                    part = (I_ConceptAttributePart) v.getMutableIdParts().get(index);
+                    part = (I_ConceptAttributePart) v.getMutableParts().get(index);
                     part.setVersion(effectiveDate);
                 } else {
                     part = termFactory.newConceptAttributePart();

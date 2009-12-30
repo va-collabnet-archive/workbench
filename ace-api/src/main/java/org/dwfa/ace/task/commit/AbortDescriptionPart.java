@@ -37,7 +37,7 @@ public class AbortDescriptionPart implements I_Fixup {
 
     public void fix() throws Exception {
         I_TermFactory tf = LocalVersionedTerminology.get();
-        desc.getMutableIdParts().remove(part);
+        desc.getMutableParts().remove(part);
         tf.addUncommitted(concept);
         AceLog.getAppLog().info("Aborted add desc part: " + part);
     }

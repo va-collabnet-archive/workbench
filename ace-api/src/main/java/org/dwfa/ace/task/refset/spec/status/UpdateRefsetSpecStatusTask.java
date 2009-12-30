@@ -218,7 +218,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
         for (I_ThinExtByRefVersioned extension : extensions) {
             // get the latest version
             I_ThinExtByRefPart latestPart = null;
-            for (I_ThinExtByRefPart part : extension.getMutableIdParts()) {
+            for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                 if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
                     latestPart = part;
                 }
@@ -282,11 +282,11 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
         for (I_GetConceptData currentConcept : concepts) {
             I_ConceptAttributeVersioned v = currentConcept.getConceptAttributes();
 
-            int index = v.getMutableIdParts().size() - 1;
+            int index = v.getMutableParts().size() - 1;
             for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
                 I_ConceptAttributePart part;
                 if (index >= 0) {
-                    part = (I_ConceptAttributePart) v.getMutableIdParts().get(index).duplicate();
+                    part = (I_ConceptAttributePart) v.getMutableParts().get(index).duplicate();
                 } else {
                     part = termFactory.newConceptAttributePart();
                 }

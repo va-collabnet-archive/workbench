@@ -29,7 +29,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
 
     public boolean addVersion(I_DescriptionPart newPart);
 
-    public List<? extends I_DescriptionPart> getMutableIdParts();
+    public List<? extends I_DescriptionPart> getMutableParts();
 
     /**
      * @param returnConflictResolvedLatestState
