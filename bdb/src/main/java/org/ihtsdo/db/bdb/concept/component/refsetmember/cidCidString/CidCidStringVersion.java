@@ -1,33 +1,33 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidString;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.ConceptConceptVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class ConceptConceptConceptVersion extends ConceptConceptVersion
-	implements I_ThinExtByRefPartConceptConceptConcept {
+public class CidCidStringVersion extends CidCidVersion
+	implements I_ThinExtByRefPartConceptConceptString {
 
-	private int c3nid;
+	private String str;
 	
-	public ConceptConceptConceptVersion(int statusNid, int pathNid,
+	public CidCidStringVersion(int statusNid, int pathNid,
 			long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public ConceptConceptConceptVersion(int statusAtPositionNid) {
+	public CidCidStringVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public ConceptConceptConceptVersion(TupleInput input) {
+	public CidCidStringVersion(TupleInput input) {
 		super(input);
-		// TODO Auto-generated constructor stub
+		this.str = input.readString();
 	}
 
 	@Override
@@ -50,13 +50,23 @@ public class ConceptConceptConceptVersion extends ConceptConceptVersion
 	}
 
 	@Override
-	public int getC3id() {
-		return c3nid;
+	public String getStr() {
+		return str;
 	}
 
 	@Override
-	public void setC3id(int c3nid) {
-		this.c3nid = c3nid;
+	public String getStringValue() {
+		return str;
+	}
+
+	@Override
+	public void setStr(String str) {
+		this.str = str;
+	}
+
+	@Override
+	public void setStringValue(String value) {
+		this.str = value;
 	}
 
 }

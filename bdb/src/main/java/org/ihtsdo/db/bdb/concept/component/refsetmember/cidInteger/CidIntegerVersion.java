@@ -7,26 +7,26 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.ConceptVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class ConceptIntegerVersion extends ConceptVersion
+public class CidIntegerVersion extends CidVersion
 	implements I_ThinExtByRefPartConceptInt {
 
 	private int intValue;
 	
-	protected ConceptIntegerVersion(int statusNid, int pathNid, long time) {
+	protected CidIntegerVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 		// TODO Auto-generated constructor stub
 	}
 
-	protected ConceptIntegerVersion(int statusAtPositionNid) {
+	protected CidIntegerVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 		// TODO Auto-generated constructor stub
 	}
 
-	public ConceptIntegerVersion(TupleInput input) {
+	public CidIntegerVersion(TupleInput input) {
 		super(input);
 		intValue = input.readInt();
 	}

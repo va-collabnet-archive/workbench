@@ -12,20 +12,20 @@ import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMemberMutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class ConceptVersion extends RefsetMemberMutablePart
+public class CidVersion extends RefsetMemberMutablePart
 	implements I_ThinExtByRefPartConcept {
 	
 	private int c1Nid;
 
-	protected ConceptVersion(int statusNid, int pathNid, long time) {
+	protected CidVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	protected ConceptVersion(int statusAtPositionNid) {
+	protected CidVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public ConceptVersion(TupleInput input) {
+	public CidVersion(TupleInput input) {
 		super(input);
 		c1Nid = input.readInt();
 	}
@@ -72,7 +72,7 @@ public class ConceptVersion extends RefsetMemberMutablePart
 	}
 
 	@Override
-	public ConceptVersion getMutablePart() {
+	public CidVersion getMutablePart() {
 		return this;
 	}
 

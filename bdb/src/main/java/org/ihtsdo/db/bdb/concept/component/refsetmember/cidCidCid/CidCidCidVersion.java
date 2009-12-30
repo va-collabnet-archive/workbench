@@ -1,30 +1,31 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.cidString;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.ConceptVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class ConceptStringVersion extends ConceptVersion 
-	implements I_ThinExtByRefPartConceptString {
+public class CidCidCidVersion extends CidCidVersion
+	implements I_ThinExtByRefPartConceptConceptConcept {
 
-	private String str;
+	private int c3nid;
 	
-	public ConceptStringVersion(int statusNid, int pathNid, long time) {
+	public CidCidCidVersion(int statusNid, int pathNid,
+			long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public ConceptStringVersion(int statusAtPositionNid) {
+	public CidCidCidVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public ConceptStringVersion(TupleInput input) {
+	public CidCidCidVersion(TupleInput input) {
 		super(input);
 		// TODO Auto-generated constructor stub
 	}
@@ -49,13 +50,13 @@ public class ConceptStringVersion extends ConceptVersion
 	}
 
 	@Override
-	public String getStr() {
-		return str;
+	public int getC3id() {
+		return c3nid;
 	}
 
 	@Override
-	public void setStr(String str) {
-		this.str = str;
+	public void setC3id(int c3nid) {
+		this.c3nid = c3nid;
 	}
 
 }

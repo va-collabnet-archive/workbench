@@ -19,12 +19,12 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.ConceptVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.ConceptConceptVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid.ConceptConceptConceptVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidString.ConceptConceptStringVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidInteger.ConceptIntegerVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidString.ConceptStringVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid.CidCidCidVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidString.CidCidStringVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidInteger.CidIntegerVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidString.CidStringVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMap.CrossMapVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMapForRel.CrossMapForRelVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept.FloatConcept;
@@ -138,22 +138,22 @@ public abstract class RefsetMember extends ConceptComponent<RefsetMemberMutableP
 				componentVersion.add(new MembershipVersion(input));
 				break;
 			case CID_INT:
-				componentVersion.add(new ConceptIntegerVersion(input));
+				componentVersion.add(new CidIntegerVersion(input));
 				break;
 			case CID:
-				componentVersion.add(new ConceptVersion(input));
+				componentVersion.add(new CidVersion(input));
 				break;
 			case CID_CID:
-				componentVersion.add(new ConceptConceptVersion(input));
+				componentVersion.add(new CidCidVersion(input));
 				break;
 			case CID_CID_CID:
-				componentVersion.add(new ConceptConceptConceptVersion(input));
+				componentVersion.add(new CidCidCidVersion(input));
 				break;
 			case CID_CID_STRING:
-				componentVersion.add(new ConceptConceptStringVersion(input));
+				componentVersion.add(new CidCidStringVersion(input));
 				break;
 			case CID_STRING:
-				componentVersion.add(new ConceptStringVersion(input));
+				componentVersion.add(new CidStringVersion(input));
 				break;
 			case CROSS_MAP:
 				componentVersion.add(new CrossMapVersion(input));
