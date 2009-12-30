@@ -74,9 +74,16 @@ public class GetRequestForChangePanelDataTaskBeanInfo extends SimpleBeanInfo {
             originalRequestPropName.setDisplayName("<html><font color='green'>original request prop:");
             originalRequestPropName.setShortDescription("The property to put the original request into.");
 
+            PropertyDescriptor reviewerUuidPropName;
+            reviewerUuidPropName = new PropertyDescriptor("reviewerUuidPropName", getBeanDescriptor().getBeanClass());
+            reviewerUuidPropName.setBound(true);
+            reviewerUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            reviewerUuidPropName.setDisplayName("<html><font color='green'>reviewer UUID prop name:");
+            reviewerUuidPropName.setShortDescription("The property to put the reviewer uuid into.");
+
             PropertyDescriptor rv[] =
                     { nextUserTermEntryPropName, commentsPropName, refsetUuidPropName, originalRequestPropName,
-                     refsetSpecUuidPropName };
+                     refsetSpecUuidPropName, reviewerUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

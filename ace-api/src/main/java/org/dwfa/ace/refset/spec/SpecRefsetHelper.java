@@ -32,6 +32,7 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -1410,5 +1411,48 @@ public class SpecRefsetHelper {
             e.printStackTrace();
             throw new Exception(e.getMessage());
         }
+    }
+
+    public Set<? extends I_GetConceptData> getAllValidUsers() throws Exception {
+        I_IntSet allowedStatuses = getCurrentStatusIntSet();
+        I_GetConceptData userParent = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+        I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
+
+        final Set<? extends I_GetConceptData> allUsers =
+                userParent.getDestRelOrigins(allowedStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
+                    .getViewPositionSetReadOnly(), true, true);
+
+        Set<I_GetConceptData> allValidUsers = new HashSet<I_GetConceptData>();
+        for (I_GetConceptData user : allUsers) {
+            if (getInbox(user) != null) {
+                allValidUsers.add(user);
+            }
+        }
+        return allValidUsers;
+    }
+
+    public String getInbox(I_GetConceptData concept) throws Exception {
+        // find the inbox string using the concept's "user inbox" description
+
+        I_GetConceptData descriptionType =
+                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
+        I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
+        allowedTypes.add(descriptionType.getConceptId());
+        String latestDescription = null;
+        int latestVersion = Integer.MIN_VALUE;
+
+        SpecRefsetHelper helper = new SpecRefsetHelper();
+        I_IntSet activeStatuses = helper.getCurrentStatusIntSet();
+
+        List<? extends I_DescriptionTuple> descriptionResults =
+                concept.getDescriptionTuples(activeStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
+                    .getViewPositionSetReadOnly(), true);
+        for (I_DescriptionTuple descriptionTuple : descriptionResults) {
+            if (descriptionTuple.getVersion() > latestVersion) {
+                latestVersion = descriptionTuple.getVersion();
+                latestDescription = descriptionTuple.getText();
+            }
+        }
+        return latestDescription;
     }
 }

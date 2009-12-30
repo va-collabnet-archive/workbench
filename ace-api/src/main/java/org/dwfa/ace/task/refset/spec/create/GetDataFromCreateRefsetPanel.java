@@ -33,6 +33,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -49,27 +50,28 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * This task collects the data entered on the CreateRefsetPanel panel 
- * currently displayed in the Workflow Details Sheet and verifies that 
+ * This task collects the data entered on the CreateRefsetPanel panel
+ * currently displayed in the Workflow Details Sheet and verifies that
  * the required data has been filled in.
  * 
  * @author Perry Reid
- * @version 1.0, December 2009 
+ * @version 1.0, December 2009
  * 
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/wf", type = BeanType.TASK_BEAN) })
 public class GetDataFromCreateRefsetPanel extends AbstractTask {
 
-    /* -----------------------
-     * Properties 
+    /*
+     * -----------------------
+     * Properties
      * -----------------------
      */
-	// Serialization Properties 
+    // Serialization Properties
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
-    
-	// Task Attribute Properties         
-	private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();  
+
+    // Task Attribute Properties
+    private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
     private String refsetNamePropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String refsetParentUuidPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
     private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
@@ -79,15 +81,15 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
     private String reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
     private String fileAttachmentsPropName = ProcessAttachmentKeys.FILE_ATTACHMENTS.getAttachmentKey();
-	
-	// Other Properties 
+
+    // Other Properties
     private I_TermFactory termFactory;
     private I_GetConceptData status;
     private transient Exception ex = null;
     private transient Condition returnCondition = Condition.ITEM_COMPLETE;
 
-    
-    /* -----------------------
+    /*
+     * -----------------------
      * Serialization Methods
      * -----------------------
      */
@@ -104,72 +106,71 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
         out.writeObject(reviewerUuidPropName);
         out.writeObject(fileAttachmentsPropName);
     }
+
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        
+
         if (objDataVersion <= dataVersion) {
             if (objDataVersion >= 1) {
                 // Read version 1 data fields...
-            	profilePropName = (String) in.readObject();
-            	refsetNamePropName = (String) in.readObject();
-            	refsetParentUuidPropName = (String) in.readObject();
-            	statusTermEntry = (TermEntry) in.readObject();
-            	commentsPropName = (String) in.readObject();
-            	ownerUuidPropName = (String) in.readObject();
-            	requestorPropName = (String) in.readObject();
-            	editorUuidPropName = (String) in.readObject();
-            	reviewerUuidPropName = (String) in.readObject();
-            	fileAttachmentsPropName = (String) in.readObject();
+                profilePropName = (String) in.readObject();
+                refsetNamePropName = (String) in.readObject();
+                refsetParentUuidPropName = (String) in.readObject();
+                statusTermEntry = (TermEntry) in.readObject();
+                commentsPropName = (String) in.readObject();
+                ownerUuidPropName = (String) in.readObject();
+                requestorPropName = (String) in.readObject();
+                editorUuidPropName = (String) in.readObject();
+                reviewerUuidPropName = (String) in.readObject();
+                fileAttachmentsPropName = (String) in.readObject();
             }
-            // Initialize transient properties 
+            // Initialize transient properties
             ex = null;
-            returnCondition = Condition.ITEM_COMPLETE;           
+            returnCondition = Condition.ITEM_COMPLETE;
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    
-	/**
-	 * Handles actions required by the task after normal task completion (such as moving a 
-	 * process to another user's input queue).   
-	 * @return  	void
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#complete(
-	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
-	 */
+    /**
+     * Handles actions required by the task after normal task completion (such as moving a
+     * process to another user's input queue).
+     * 
+     * @return void
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-
     /**
-	 * Performs the primary action of the task, which in this case is to gather and 
-	 * validate data that has been entered by the user on the Workflow Details Sheet.
-	 * @return  	The exit condition of the task
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#evaluate(
-	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
+     * Performs the primary action of the task, which in this case is to gather and
+     * validate data that has been entered by the user on the Workflow Details Sheet.
+     * 
+     * @return The exit condition of the task
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
      */
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
 
         try {
-        	
+
             termFactory = LocalVersionedTerminology.get();
             I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
             JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
-            
+
             for (Component c : workflowDetailsSheet.getComponents()) {
                 if (CreateRefsetPanel.class.isAssignableFrom(c.getClass())) {
-                	CreateRefsetPanel panel = (CreateRefsetPanel) c;
-                	
+                    CreateRefsetPanel panel = (CreateRefsetPanel) c;
+
                     // ---------------------------------------------
                     // Retrieve values from the panel / environment
                     // ---------------------------------------------
@@ -182,46 +183,40 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
                     Calendar deadline = panel.getDeadline();
                     String priority = panel.getPriority();
                     HashSet<File> fileAttachments = panel.getAttachments();
-                    I_GetConceptData owner = config.getDbConfig().getUserConcept();   
-                    SetWfdSheetToCreateRefsetPanel setCreateTask = new SetWfdSheetToCreateRefsetPanel(); 
-                    
+                    I_GetConceptData owner = config.getDbConfig().getUserConcept();
+
                     // -------------------------------------------------------------------------
                     // VERIFY ALL REQUIRED FIELDS AND STORE THE ENTERED DATA INTO PROPERTY KEYS
                     // -------------------------------------------------------------------------
-                    
-                    
+
                     // -----------------------------------------
                     // Refset Name Field (REQUIRED)
                     // -----------------------------------------
                     if (refsetName == null || refsetName.isEmpty()) {
-                    	// Warn the user that Refset is required. 
-                    	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), 
-                    			"You must enter a Refset Name. ",
-                    			"", JOptionPane.ERROR_MESSAGE);
-                    	return Condition.ITEM_CANCELED;
+                        // Warn the user that Refset is required.
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "You must enter a Refset Name. ", "", JOptionPane.ERROR_MESSAGE);
+                        return Condition.ITEM_CANCELED;
                     } else {
-                    	// Set the Refset Name property 
-                    	process.setSubject("Creation Request");
-                    	process.setName(refsetName);
-                    	process.setProperty(refsetNamePropName, refsetName);
+                        // Set the Refset Name property
+                        process.setSubject("Creation Request");
+                        process.setName(refsetName);
+                        process.setProperty(refsetNamePropName, refsetName);
 
                     }
-
 
                     // -----------------------------------------
                     // Refset Parent Field (REQUIRED)
                     // -----------------------------------------
                     if (refsetParent == null) {
-                    	// Warn the user that Refset is required. 
-                    	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), 
-                    			"You must select a Refset Parent. ",
-                    			"", JOptionPane.ERROR_MESSAGE);
-                    	return Condition.ITEM_CANCELED;
+                        // Warn the user that Refset is required.
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "You must select a Refset Parent. ", "", JOptionPane.ERROR_MESSAGE);
+                        return Condition.ITEM_CANCELED;
                     } else {
-                    	// Set the Refset Parent property 
+                        // Set the Refset Parent property
                         process.setProperty(refsetParentUuidPropName, refsetParent.getUids().iterator().next());
-                   }
-                   
+                    }
 
                     // -----------------------------------------
                     // Comments (OPTIONAL)
@@ -232,17 +227,14 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
                         process.setProperty(commentsPropName, "");
                     }
 
-                    
                     // -----------------------------------------
                     // Owner
                     // -----------------------------------------
                     // Set owner as the originator
-                    process.setOriginator(config.getUsername()); 
+                    process.setOriginator(config.getUsername());
                     // Remember the owner's UUID
-                    process.setProperty(ownerUuidPropName, 
-                    		new UUID[] { owner.getUids().iterator().next() });
+                    process.setProperty(ownerUuidPropName, new UUID[] { owner.getUids().iterator().next() });
 
-                    
                     // -----------------------------------------
                     // Requestor (OPTIONAL)
                     // -----------------------------------------
@@ -252,119 +244,112 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
                         process.setProperty(requestorPropName, "");
                     }
 
-                    
                     // -----------------------------------------
                     // Editor Field (REQUIRED)
                     // -----------------------------------------
                     if (editor == null) {
-                    	// Warn the user that Editor is required. 
-                    	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    			"You must select an editor. ", "", JOptionPane.ERROR_MESSAGE);
-                    	return Condition.ITEM_CANCELED;                         
+                        // Warn the user that Editor is required.
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "You must select an editor. ", "", JOptionPane.ERROR_MESSAGE);
+                        return Condition.ITEM_CANCELED;
                     } else {
-                        setCreateTask.setTermFactory(termFactory);
-                    	String editorInbox = setCreateTask.getInbox(editor);
-                    	if (editorInbox == null) {
-                    		JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    				"Creation Request cannot be completed. The selected editor has no assigned inbox.",
-                    				"", JOptionPane.ERROR_MESSAGE);
-                    		return Condition.ITEM_CANCELED;
-                    	} else {
+                        SpecRefsetHelper helper = new SpecRefsetHelper();
+                        String editorInbox = helper.getInbox(editor);
+
+                        if (editorInbox == null) {
+                            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                                "Creation Request cannot be completed. The selected editor has no assigned inbox.", "",
+                                JOptionPane.ERROR_MESSAGE);
+                            return Condition.ITEM_CANCELED;
+                        } else {
                             process.setDestination(editorInbox);
 
-                    		// Set the Editor property 
-                    		process.setProperty(editorUuidPropName, new UUID[] { 
-                    				editor.getUids().iterator().next() });
-                    	}
+                            // Set the Editor property
+                            process.setProperty(editorUuidPropName, new UUID[] { editor.getUids().iterator().next() });
+                        }
 
                     }
 
-
                     // -----------------------------------------
-                    // Reviewer Field  (OPTIONAL)
+                    // Reviewer Field (OPTIONAL)
                     // -----------------------------------------
                     if (reviewer != null) {
-                    	// Set the Reviewer UUID property 
-                        process.setProperty(reviewerUuidPropName, 
-                        		new UUID[] { reviewer.getUids().iterator().next() });    
+                        // Set the Reviewer UUID property
+                        process.setProperty(reviewerUuidPropName, new UUID[] { reviewer.getUids().iterator().next() });
                     }
-
 
                     // -----------------------------------------
                     // Deadline Field (REQUIRED)
                     // -----------------------------------------
                     if (deadline == null) {
-                    	// Warn the user that Editor is required. 
+                        // Warn the user that Editor is required.
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "You must select a deadline. ", "", JOptionPane.ERROR_MESSAGE);
                         return Condition.ITEM_CANCELED;
                     } else {
-                       	// Set the Deadline property 
-                       process.setDeadline(deadline.getTime());                   	
+                        // Set the Deadline property
+                        process.setDeadline(deadline.getTime());
                     }
 
-                    
                     // -----------------------------------------
                     // Priority Field (REQUIRED)
                     // -----------------------------------------
                     Priority newPriority;
                     if (priority == null) {
-                    	// Warn the user that Priority is required! 
+                        // Warn the user that Priority is required!
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "You must select a priority. ", "", JOptionPane.ERROR_MESSAGE);
                         return Condition.ITEM_CANCELED;
                     } else {
-                    	// Set the priority based on the value selected 
+                        // Set the priority based on the value selected
                         if (priority.equals("Highest")) {
-                        	newPriority = Priority.HIGHEST;
+                            newPriority = Priority.HIGHEST;
                         } else if (priority.equals("High")) {
-                        	newPriority = Priority.HIGH;
+                            newPriority = Priority.HIGH;
                         } else if (priority.equals("Normal")) {
-                        	newPriority = Priority.NORMAL;
+                            newPriority = Priority.NORMAL;
                         } else if (priority.equals("Low")) {
-                        	newPriority = Priority.LOW;
+                            newPriority = Priority.LOW;
                         } else if (priority.equals("Lowest")) {
-                        	newPriority = Priority.LOWEST;
+                            newPriority = Priority.LOWEST;
                         } else {
-                        	newPriority = null;
+                            newPriority = null;
                         }
                         process.setPriority(newPriority);
                     }
-
 
                     // -----------------------------------------
                     // File attachments (OPTIONAL)
                     // -----------------------------------------
                     process.setProperty(fileAttachmentsPropName, fileAttachments);
-                    
-                    for (File f: fileAttachments) {
+
+                    for (File f : fileAttachments) {
                         FileContent fileContent = new FileContent(f);
                         process.writeAttachment(fileContent.getFilename(), fileContent);
                     }
-                    
-                   
-                    // Under normal conditions this is where we should return from 
+
+                    // Under normal conditions this is where we should return from
                     return Condition.ITEM_COMPLETE;
 
                 }
             }
-            
-            // If we got here we could not find the PanelRefsetAndParameters panel 
-            // so warn the user and cancel the task. 
+
+            // If we got here we could not find the PanelRefsetAndParameters panel
+            // so warn the user and cancel the task.
             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    "Could not locate the 'CreateRefsetPanel' panel. \n " + 
-                    "Canceling the task. ", "", JOptionPane.ERROR_MESSAGE);           
+                "Could not locate the 'CreateRefsetPanel' panel. \n " + "Canceling the task. ", "",
+                JOptionPane.ERROR_MESSAGE);
             return Condition.ITEM_CANCELED;
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new TaskFailedException(e.getMessage());
         }
     }
 
-
     /**
      * This method overrides: getDataContainerIds() in AbstractTask
+     * 
      * @return The data container identifiers used by this task.
      */
     public int[] getDataContainerIds() {
@@ -373,77 +358,97 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
 
     /**
      * This method implements the interface method specified by: getConditions() in I_DefineTask
+     * 
      * @return The possible evaluation conditions for this task.
-	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
     public Collection<Condition> getConditions() {
         return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
     }
-   
-	/* ====================================================================
-	 * Getters and Setters
-	 * ====================================================================
-	 */
+
+    /*
+     * ====================================================================
+     * Getters and Setters
+     * ====================================================================
+     */
     public String getCommentsPropName() {
         return commentsPropName;
     }
+
     public void setCommentsPropName(String commentsPropName) {
         this.commentsPropName = commentsPropName;
     }
-    public String getProfilePropName() {
-		return profilePropName;
-	}
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
-	}
-	public String getEditorUuidPropName() {
-		return editorUuidPropName;
-	}
-	public void setEditorUuidPropName(String editorUuidPropName) {
-		this.editorUuidPropName = editorUuidPropName;
-	}
-	public String getOwnerUuidPropName() {
-		return ownerUuidPropName;
-	}
-	public void setOwnerUuidPropName(String ownerUuidPropName) {
-		this.ownerUuidPropName = ownerUuidPropName;
-	}
-	public String getFileAttachmentsPropName() {
-		return fileAttachmentsPropName;
-	}
-	public void setFileAttachmentsPropName(String fileAttachmentsPropName) {
-		this.fileAttachmentsPropName = fileAttachmentsPropName;
-	}
-	public String getReviewerUuidPropName() {
-		return reviewerUuidPropName;
-	}
-	public void setReviewerUuidPropName(String reviewerUuidPropName) {
-		this.reviewerUuidPropName = reviewerUuidPropName;
-	}
-	public String getRefsetNamePropName() {
-		return refsetNamePropName;
-	}
-	public void setRefsetNamePropName(String refsetNamePropName) {
-		this.refsetNamePropName = refsetNamePropName;
-	}
-	public String getRefsetParentUuidPropName() {
-		return refsetParentUuidPropName;
-	}
-	public void setRefsetParentUuidPropName(String refsetParentPropName) {
-		this.refsetParentUuidPropName = refsetParentPropName;
-	}
-	public TermEntry getStatusTermEntry() {
-		return statusTermEntry;
-	}
-	public void setStatusTermEntry(TermEntry statusTermEntry) {
-		this.statusTermEntry = statusTermEntry;
-	}
-	public String getRequestorPropName() {
-		return requestorPropName;
-	}
-	public void setRequestorPropName(String requestorPropName) {
-		this.requestorPropName = requestorPropName;
-	}
 
+    public String getProfilePropName() {
+        return profilePropName;
+    }
+
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
+    }
+
+    public String getEditorUuidPropName() {
+        return editorUuidPropName;
+    }
+
+    public void setEditorUuidPropName(String editorUuidPropName) {
+        this.editorUuidPropName = editorUuidPropName;
+    }
+
+    public String getOwnerUuidPropName() {
+        return ownerUuidPropName;
+    }
+
+    public void setOwnerUuidPropName(String ownerUuidPropName) {
+        this.ownerUuidPropName = ownerUuidPropName;
+    }
+
+    public String getFileAttachmentsPropName() {
+        return fileAttachmentsPropName;
+    }
+
+    public void setFileAttachmentsPropName(String fileAttachmentsPropName) {
+        this.fileAttachmentsPropName = fileAttachmentsPropName;
+    }
+
+    public String getReviewerUuidPropName() {
+        return reviewerUuidPropName;
+    }
+
+    public void setReviewerUuidPropName(String reviewerUuidPropName) {
+        this.reviewerUuidPropName = reviewerUuidPropName;
+    }
+
+    public String getRefsetNamePropName() {
+        return refsetNamePropName;
+    }
+
+    public void setRefsetNamePropName(String refsetNamePropName) {
+        this.refsetNamePropName = refsetNamePropName;
+    }
+
+    public String getRefsetParentUuidPropName() {
+        return refsetParentUuidPropName;
+    }
+
+    public void setRefsetParentUuidPropName(String refsetParentPropName) {
+        this.refsetParentUuidPropName = refsetParentPropName;
+    }
+
+    public TermEntry getStatusTermEntry() {
+        return statusTermEntry;
+    }
+
+    public void setStatusTermEntry(TermEntry statusTermEntry) {
+        this.statusTermEntry = statusTermEntry;
+    }
+
+    public String getRequestorPropName() {
+        return requestorPropName;
+    }
+
+    public void setRequestorPropName(String requestorPropName) {
+        this.requestorPropName = requestorPropName;
+    }
 
 }

@@ -25,7 +25,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -42,13 +41,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
+import org.dwfa.ace.task.commit.TestForReviewRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 
 /**
  * The request for change panel that allows user to input:
@@ -59,6 +55,7 @@ import org.dwfa.tapi.TerminologyException;
  * 5) deadline (date picker)
  * 6) priority (from pulldown menu)
  * 7) request attachments (file chooser)
+ * 8) reviewer (from pulldown menu)
  * 
  * @author Chrissy Hill
  * 
@@ -78,9 +75,11 @@ public class RequestForChangePanel extends JPanel {
     private JLabel deadlineLabel;
     private JLabel priorityLabel;
     private JLabel fileAttachmentLabel;
+    private JLabel reviewerLabel;
     private JButton openFileChooserButton;
     private JComboBox refsetNameComboBox;
     private JComboBox editorComboBox;
+    private JComboBox reviewerComboBox;
     private JComboBox priorityComboBox;
     private JTextArea originalRequestTextField;
     private JTextArea commentsTextField;
@@ -91,11 +90,14 @@ public class RequestForChangePanel extends JPanel {
     private HashSet<File> attachments = new HashSet<File>();
     private Set<I_GetConceptData> refsets;
     private JPanel wfPanel;
+    private Set<? extends I_GetConceptData> allValidUsers;
 
-    public RequestForChangePanel(Set<I_GetConceptData> refsets, JPanel wfPanel) {
+    public RequestForChangePanel(Set<I_GetConceptData> refsets, JPanel wfPanel,
+            Set<? extends I_GetConceptData> allValidUsers) {
         super();
         this.wfPanel = wfPanel;
         this.refsets = refsets;
+        this.allValidUsers = allValidUsers;
         init();
     }
 
@@ -115,6 +117,7 @@ public class RequestForChangePanel extends JPanel {
         deadlineLabel = new JLabel("Deadline (required):");
         priorityLabel = new JLabel("Priority (required):");
         fileAttachmentLabel = new JLabel("Request attachment(s) (optional):");
+        reviewerLabel = new JLabel("Reviewer (optional):");
 
         // buttons and boxes
         openFileChooserButton = new JButton("Attach a file");
@@ -190,7 +193,7 @@ public class RequestForChangePanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 0, 5);
         if (editorComboBox == null) {
-            try {           
+            try {
                 editorComboBox = new JComboBox(getValidEditors().toArray());
             } catch (Exception e) {
                 editorComboBox = new JComboBox();
@@ -199,9 +202,36 @@ public class RequestForChangePanel extends JPanel {
         }
         this.add(editorComboBox, gbc);
 
-        // original request
+        // reviewer
         gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(reviewerLabel, gbc);
+
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        if (reviewerComboBox == null) {
+            try {
+                reviewerComboBox = new JComboBox(getValidReviewers().toArray());
+            } catch (Exception e) {
+                reviewerComboBox = new JComboBox();
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+        this.add(reviewerComboBox, gbc);
+
+        // original request
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         gbc.weighty = 0.0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -210,7 +240,7 @@ public class RequestForChangePanel extends JPanel {
         this.add(originalRequestLabel, gbc);
 
         gbc.gridx = 2;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.weighty = 0.0;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.BOTH;
@@ -220,7 +250,7 @@ public class RequestForChangePanel extends JPanel {
 
         // comments
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.weighty = 0.0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -229,7 +259,7 @@ public class RequestForChangePanel extends JPanel {
         this.add(commentsLabel, gbc);
 
         gbc.gridx = 2;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.weighty = 0.0;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.BOTH;
@@ -239,7 +269,7 @@ public class RequestForChangePanel extends JPanel {
 
         // deadline
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.weighty = 0.0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -248,7 +278,7 @@ public class RequestForChangePanel extends JPanel {
         this.add(deadlineLabel, gbc);
 
         gbc.gridx = 2;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.weighty = 0.0;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -258,7 +288,7 @@ public class RequestForChangePanel extends JPanel {
 
         // priority
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.weighty = 0.0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -267,7 +297,7 @@ public class RequestForChangePanel extends JPanel {
         this.add(priorityLabel, gbc);
 
         gbc.gridx = 2;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.weighty = 0.0;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -277,7 +307,7 @@ public class RequestForChangePanel extends JPanel {
 
         // file attachments
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 7;
         gbc.weighty = 0.0;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
@@ -285,7 +315,7 @@ public class RequestForChangePanel extends JPanel {
         this.add(fileAttachmentLabel, gbc);
 
         gbc.gridx = 2;
-        gbc.gridy = 6;
+        gbc.gridy = 7;
         gbc.weighty = 0.0;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -301,7 +331,7 @@ public class RequestForChangePanel extends JPanel {
             checkBox.addItemListener(new CheckBoxListener(attachment));
             gbc = new GridBagConstraints();
             gbc.gridx = 1;
-            gbc.gridy = 7 + fileCount;
+            gbc.gridy = 8 + fileCount;
             gbc.weighty = 0.0;
             gbc.weightx = 0.0;
             gbc.anchor = GridBagConstraints.LINE_END;
@@ -311,7 +341,7 @@ public class RequestForChangePanel extends JPanel {
             JLabel attachmentLabel = new JLabel(attachment.getName());
             gbc = new GridBagConstraints();
             gbc.gridx = 2;
-            gbc.gridy = 7 + fileCount;
+            gbc.gridy = 8 + fileCount;
             gbc.weighty = 0.0;
             gbc.weightx = 0.0;
             gbc.anchor = GridBagConstraints.LINE_START;
@@ -322,7 +352,7 @@ public class RequestForChangePanel extends JPanel {
 
         // column filler
         gbc.gridx = 5;
-        gbc.gridy = 8 + fileCount;
+        gbc.gridy = 9 + fileCount;
         gbc.weighty = 1.0;
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.LINE_END;
@@ -342,22 +372,12 @@ public class RequestForChangePanel extends JPanel {
 
     }
 
-    private Set<? extends I_GetConceptData> getAllUsers() throws IOException, TerminologyException {
-        I_GetConceptData userParent =
-                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
-        I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
-        allowedTypes.add(LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
-            .getConceptId());
-
-        return userParent.getDestRelOrigins(allowedTypes, true, true);
-    }
-
     private Set<I_GetConceptData> getValidEditors() throws Exception {
         I_GetConceptData selectedRefset = getRefset();
         Set<I_GetConceptData> editors = new HashSet<I_GetConceptData>();
         if (selectedRefset != null) {
-            for (I_GetConceptData user : getAllUsers()) {
-                if (hasPermission(user, selectedRefset)) {
+            for (I_GetConceptData user : allValidUsers) {
+                if (hasEditPermission(user, selectedRefset)) {
                     editors.add(user);
                 }
             }
@@ -366,8 +386,46 @@ public class RequestForChangePanel extends JPanel {
         return editors;
     }
 
-    private boolean hasPermission(I_GetConceptData user, I_GetConceptData selectedRefset) throws Exception {
+    private boolean hasEditPermission(I_GetConceptData user, I_GetConceptData selectedRefset) throws Exception {
         TestForEditRefsetPermission permissionTest = new TestForEditRefsetPermission();
+        Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
+        parents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(user));
+        parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
+
+        for (I_GetConceptData parent : parents) {
+            if (parent.isParentOfOrEqualTo(selectedRefset, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Set<Object> getValidReviewers() {
+        I_GetConceptData selectedRefset = getRefset();
+        Set<Object> permissibleReviewers = new HashSet<Object>();
+        permissibleReviewers.add("no reviewer assigned");
+        try {
+            if (selectedRefset == null) {
+                permissibleReviewers.addAll(allValidUsers);
+                return permissibleReviewers;
+            }
+
+            for (I_GetConceptData user : allValidUsers) {
+                if (hasReviewerPermission(user, selectedRefset)) {
+                    permissibleReviewers.add(user);
+                }
+            }
+
+            return permissibleReviewers;
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            permissibleReviewers.addAll(allValidUsers);
+            return permissibleReviewers;
+        }
+    }
+
+    private boolean hasReviewerPermission(I_GetConceptData user, I_GetConceptData selectedRefset) throws Exception {
+        TestForReviewRefsetPermission permissionTest = new TestForReviewRefsetPermission();
         Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
         parents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(user));
         parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
@@ -451,6 +509,15 @@ public class RequestForChangePanel extends JPanel {
 
     public I_GetConceptData getEditor() {
         return (I_GetConceptData) editorComboBox.getSelectedItem();
+    }
+
+    public I_GetConceptData getReviewer() {
+        Object selectedObject = reviewerComboBox.getSelectedItem();
+        if (selectedObject == null || I_GetConceptData.class.isAssignableFrom(selectedObject.getClass())) {
+            return (I_GetConceptData) selectedObject;
+        } else {
+            return null;
+        }
     }
 
     public Calendar getDeadline() {

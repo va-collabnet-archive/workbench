@@ -36,6 +36,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.commit.TestForCreateNewRefsetPermission;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -128,7 +129,10 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
             wfSheet.setSize(width, height);
             wfSheet.setLayout(new GridLayout(1, 1));
 
-            wfSheet.add(new RequestForChangePanel(refsets, wfSheet));
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            Set<? extends I_GetConceptData> allValidUsers = helper.getAllValidUsers();
+
+            wfSheet.add(new RequestForChangePanel(refsets, wfSheet, allValidUsers));
             wfSheet.repaint();
         } catch (Exception e) {
             ex = e;
