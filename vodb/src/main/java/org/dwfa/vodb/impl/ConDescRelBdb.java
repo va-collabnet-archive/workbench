@@ -261,7 +261,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                         to.writeShort(0);
                     } else {
                         to.writeShort(conceptBean.conceptAttributes.versionCount());
-                        for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes.getMutableIdParts()) {
+                        for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes.getMutableParts()) {
                             to.writeInt(conPartBdb.getConPartId(conAttrPart));
                         }
                     }
@@ -279,7 +279,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                             to.writeInt(desc.getDescId());
                             to.writeShort(desc.versionCount());
                             I_DescriptionPart lastPart = null;
-                            for (I_DescriptionPart part : desc.getMutableIdParts()) {
+                            for (I_DescriptionPart part : desc.getMutableParts()) {
                                 try {
                                     to.writeInt(descCoreBdb.getDescPartCoreId(part));
                                     if (lastPart == null) {
@@ -317,7 +317,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                             to.writeInt(rel.getRelId());
                             to.writeInt(rel.getC2Id());
                             to.writeShort(rel.versionCount());
-                            for (I_RelPart part : rel.getMutableIdParts()) {
+                            for (I_RelPart part : rel.getMutableParts()) {
                                 try {
                                     assert part.getTypeId() != Integer.MAX_VALUE;
                                     to.writeInt(relPartBdb.getRelPartId(part));
@@ -383,7 +383,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             super();
             if (descriptions != null && descriptions.size() > 0) {
                 for (I_DescriptionVersioned desc : descriptions) {
-                    for (I_DescriptionPart part : desc.getMutableIdParts()) {
+                    for (I_DescriptionPart part : desc.getMutableParts()) {
                         addToMap(part.getText());
                     }
                 }
@@ -462,7 +462,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             super();
             if (descriptions != null && descriptions.size() > 0) {
                 for (I_DescriptionVersioned desc : descriptions) {
-                    for (I_DescriptionPart part : desc.getMutableIdParts()) {
+                    for (I_DescriptionPart part : desc.getMutableParts()) {
                         addToMap(part.getText());
                     }
                 }
@@ -651,7 +651,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                         to.writeShort(0);
                     } else {
                         to.writeShort(conceptBean.conceptAttributes.versionCount());
-                        for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes.getMutableIdParts()) {
+                        for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes.getMutableParts()) {
                             to.writeInt(conPartBdb.getConPartId(conAttrPart));
                         }
                     }
@@ -663,7 +663,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                             to.writeInt(rel.getRelId());
                             to.writeInt(rel.getC2Id());
                             to.writeShort(rel.versionCount());
-                            for (I_RelPart part : rel.getMutableIdParts()) {
+                            for (I_RelPart part : rel.getMutableParts()) {
                                 try {
                                     to.writeShort(relPartBdb.getRelPartId(part));
                                 } catch (DatabaseException e) {
@@ -688,7 +688,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                         for (I_DescriptionVersioned desc : conceptBean.descriptions) {
                             to.writeInt(desc.getDescId());
                             to.writeShort(desc.versionCount());
-                            for (I_DescriptionPart part : desc.getMutableIdParts()) {
+                            for (I_DescriptionPart part : desc.getMutableParts()) {
                                 try {
                                     to.writeInt(descCoreBdb.getDescPartCoreId(part));
                                     to.writeShort(descMap.getId(part.getText()));
@@ -862,7 +862,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                         to.writeShort(0);
                     } else {
                         to.writeShort(conceptBean.conceptAttributes.versionCount());
-                        for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes.getMutableIdParts()) {
+                        for (I_ConceptAttributePart conAttrPart : conceptBean.conceptAttributes.getMutableParts()) {
                             to.writeInt(conPartBdb.getConPartId(conAttrPart));
                         }
                     }
@@ -878,7 +878,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                                     "Relationship has " + rel.versionCount() + " versions: \n\n" + conceptBean);
                             }
                             to.writeShort(rel.versionCount());
-                            for (I_RelPart part : rel.getMutableIdParts()) {
+                            for (I_RelPart part : rel.getMutableParts()) {
                                 assert part.getTypeId() != Integer.MAX_VALUE;
                                 try {
                                     to.writeShort(relPartBdb.getRelPartId(part));
@@ -911,7 +911,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                                     "Description has " + descSize + " versions: \n\n" + conceptBean);
                             }
                             to.writeShort(desc.versionCount());
-                            for (I_DescriptionPart part : desc.getMutableIdParts()) {
+                            for (I_DescriptionPart part : desc.getMutableParts()) {
                                 try {
                                     to.writeInt(descCoreBdb.getDescPartCoreId(part));
                                     to.writeShort(descMap.getId(part.getText()));
@@ -1457,7 +1457,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         }
 
         if (bean.conceptAttributes != null) {
-            for (I_ConceptAttributePart p : bean.conceptAttributes.getMutableIdParts()) {
+            for (I_ConceptAttributePart p : bean.conceptAttributes.getMutableParts()) {
                 if (p.getVersion() == Integer.MAX_VALUE) {
                     p.setVersion(version);
                     values.add(new TimePathId(version, p.getPathId()));
@@ -1469,7 +1469,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             }
         }
         if (bean.uncommittedConceptAttributes != null) {
-            for (I_ConceptAttributePart p : bean.uncommittedConceptAttributes.getMutableIdParts()) {
+            for (I_ConceptAttributePart p : bean.uncommittedConceptAttributes.getMutableParts()) {
                 if (p.getVersion() == Integer.MAX_VALUE) {
                     changed = true;
                     p.setVersion(version);
@@ -1484,7 +1484,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         }
         if (bean.descriptions != null) {
             for (I_DescriptionVersioned desc : bean.descriptions) {
-                for (I_DescriptionPart p : desc.getMutableIdParts()) {
+                for (I_DescriptionPart p : desc.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         writeToLucene(desc);
@@ -1499,7 +1499,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         }
         if (bean.uncommittedDescriptions != null) {
             for (I_DescriptionVersioned desc : bean.uncommittedDescriptions) {
-                for (I_DescriptionPart p : desc.getMutableIdParts()) {
+                for (I_DescriptionPart p : desc.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         changed = true;
                         p.setVersion(version);
@@ -1519,7 +1519,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         }
         if (bean.sourceRels != null) {
             for (I_RelVersioned srcRel : bean.sourceRels) {
-                for (ListIterator<? extends I_RelPart> partItr = srcRel.getMutableIdParts().listIterator(); partItr.hasNext();) {
+                for (ListIterator<? extends I_RelPart> partItr = srcRel.getMutableParts().listIterator(); partItr.hasNext();) {
                     I_RelPart part = partItr.next();
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         changed = true;
@@ -1539,7 +1539,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                 destBean.getRelOrigins().add(bean.getConceptId());
                 destBean.flushDestRels();
                 writeConceptToBdb(destBean);
-                for (I_RelPart p : rel.getMutableIdParts()) {
+                for (I_RelPart p : rel.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));
@@ -1938,7 +1938,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
     public boolean hasSrcRel(int conceptId, Set<Integer> srcRelTypeIds) throws DatabaseException, IOException {
         ConceptBean concept = ConceptBean.get(conceptId);
         for (I_RelVersioned rel : concept.getSourceRels()) {
-            for (I_RelPart part : rel.getMutableIdParts()) {
+            for (I_RelPart part : rel.getMutableParts()) {
                 if (srcRelTypeIds.contains(part.getTypeId())) {
                     return true;
                 }
@@ -1978,7 +1978,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                 ConceptBean relOrigin = ConceptBean.get(originNid);
                 for (I_RelVersioned rel : relOrigin.getSourceRels()) {
                     if (rel.getC2Id() == conceptId) {
-                        for (I_RelPart part : rel.getMutableIdParts()) {
+                        for (I_RelPart part : rel.getMutableParts()) {
                             if (destRelTypeIds.contains(part.getTypeId())) {
                                 return true;
                             }

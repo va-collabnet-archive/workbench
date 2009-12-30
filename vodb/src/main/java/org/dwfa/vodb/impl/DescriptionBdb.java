@@ -594,7 +594,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
         if (bean.descriptions != null) {
             for (I_DescriptionVersioned desc : bean.descriptions) {
                 boolean changed = false;
-                for (I_DescriptionPart p : desc.getMutableIdParts()) {
+                for (I_DescriptionPart p : desc.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));
@@ -611,7 +611,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
         }
         if (bean.uncommittedDescriptions != null) {
             for (I_DescriptionVersioned desc : bean.uncommittedDescriptions) {
-                for (I_DescriptionPart p : desc.getMutableIdParts()) {
+                for (I_DescriptionPart p : desc.getMutableParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         p.setVersion(version);
                         values.add(new TimePathId(version, p.getPathId()));
