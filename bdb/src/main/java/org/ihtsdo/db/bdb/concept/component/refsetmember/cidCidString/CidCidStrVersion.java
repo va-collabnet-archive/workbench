@@ -1,32 +1,33 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.integer;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidString;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMemberMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class IntegerVersion extends RefsetMemberMutablePart
-	implements I_ThinExtByRefPartInteger {
+public class CidCidStrVersion extends CidCidVersion
+	implements I_ThinExtByRefPartConceptConceptString {
 
-	private int intValue;
+	private String str;
 	
-	public IntegerVersion(int statusNid, int pathNid, long time) {
+	public CidCidStrVersion(int statusNid, int pathNid,
+			long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public IntegerVersion(int statusAtPositionNid) {
+	public CidCidStrVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public IntegerVersion(TupleInput input) {
+	public CidCidStrVersion(TupleInput input) {
 		super(input);
-		intValue = input.readInt();
+		this.str = input.readString();
 	}
 
 	@Override
@@ -49,28 +50,23 @@ public class IntegerVersion extends RefsetMemberMutablePart
 	}
 
 	@Override
-	public int getIntValue() {
-		return intValue;
+	public String getStr() {
+		return str;
 	}
 
 	@Override
-	public int getValue() {
-		return intValue;
+	public String getStringValue() {
+		return str;
 	}
 
 	@Override
-	public void setIntValue(int value) {
-		this.intValue = value;
+	public void setStr(String str) {
+		this.str = str;
 	}
 
 	@Override
-	public void setValue(int value) {
-		this.intValue = value;
-	}
-
-	@Override
-	public IntegerVersion getMutablePart() {
-		return this;
+	public void setStringValue(String value) {
+		this.str = value;
 	}
 
 }

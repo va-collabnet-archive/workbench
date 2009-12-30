@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.language;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept;
 
 import java.io.IOException;
 
@@ -10,17 +10,17 @@ import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMemberMutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class LanguageVersion extends RefsetMemberMutablePart {
+public class FloatCidVersion extends RefsetMemberMutablePart {
 
-	public LanguageVersion(int statusNid, int pathNid, long time) {
+	public FloatCidVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public LanguageVersion(int statusAtPositionNid) {
+	public FloatCidVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public LanguageVersion(TupleInput input) {
+	public FloatCidVersion(TupleInput input) {
 		super(input);
 		// TODO Auto-generated constructor stub
 	}
@@ -45,7 +45,7 @@ public class LanguageVersion extends RefsetMemberMutablePart {
 	}
 
 	@Override
-	public LanguageVersion getMutablePart() {
+	public FloatCidVersion getMutablePart() {
 		return this;
 	}
 

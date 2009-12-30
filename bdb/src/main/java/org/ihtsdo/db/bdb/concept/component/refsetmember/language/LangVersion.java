@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.string;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.language;
 
 import java.io.IOException;
 
@@ -10,21 +10,17 @@ import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMemberMutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class StringVersion extends RefsetMemberMutablePart 
-	//implements I_ThinExtByRefPartString 
-	{
+public class LangVersion extends RefsetMemberMutablePart {
 
-	private String stringValue;
-	
-	public StringVersion(int statusNid, int pathNid, long time) {
+	public LangVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public StringVersion(int statusAtPositionNid) {
+	public LangVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public StringVersion(TupleInput input) {
+	public LangVersion(TupleInput input) {
 		super(input);
 		// TODO Auto-generated constructor stub
 	}
@@ -48,16 +44,8 @@ public class StringVersion extends RefsetMemberMutablePart
 		throw new UnsupportedOperationException();
 	}
 
-	public String getStringValue() {
-		return stringValue;
-	}
-
-	public void setStringValue(String stringValue) {
-		this.stringValue = stringValue;
-	}
-
 	@Override
-	public StringVersion getMutablePart() {
+	public LangVersion getMutablePart() {
 		return this;
 	}
 

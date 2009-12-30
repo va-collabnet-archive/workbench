@@ -1,34 +1,32 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.cidInteger;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.string;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMemberMutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidIntegerVersion extends CidVersion
-	implements I_ThinExtByRefPartConceptInt {
+public class StrVersion extends RefsetMemberMutablePart 
+	//implements I_ThinExtByRefPartString 
+	{
 
-	private int intValue;
+	private String stringValue;
 	
-	protected CidIntegerVersion(int statusNid, int pathNid, long time) {
+	public StrVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
-		// TODO Auto-generated constructor stub
 	}
 
-	protected CidIntegerVersion(int statusAtPositionNid) {
+	public StrVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
-		// TODO Auto-generated constructor stub
 	}
 
-	public CidIntegerVersion(TupleInput input) {
+	public StrVersion(TupleInput input) {
 		super(input);
-		intValue = input.readInt();
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -50,14 +48,17 @@ public class CidIntegerVersion extends CidVersion
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public int getIntValue() {
-		return intValue;
+	public String getStringValue() {
+		return stringValue;
+	}
+
+	public void setStringValue(String stringValue) {
+		this.stringValue = stringValue;
 	}
 
 	@Override
-	public void setIntValue(int intValue) {
-		this.intValue = intValue;
+	public StrVersion getMutablePart() {
+		return this;
 	}
 
 }

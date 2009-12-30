@@ -11,20 +11,20 @@ import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidStringVersion extends CidVersion 
+public class CidStrVersion extends CidVersion 
 	implements I_ThinExtByRefPartConceptString {
 
 	private String str;
 	
-	public CidStringVersion(int statusNid, int pathNid, long time) {
+	public CidStrVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public CidStringVersion(int statusAtPositionNid) {
+	public CidStrVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public CidStringVersion(TupleInput input) {
+	public CidStrVersion(TupleInput input) {
 		super(input);
 		// TODO Auto-generated constructor stub
 	}

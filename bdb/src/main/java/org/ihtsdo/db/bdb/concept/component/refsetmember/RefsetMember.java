@@ -22,17 +22,17 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid.CidCidCidVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidString.CidCidStringVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidInteger.CidIntegerVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidString.CidStringVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidString.CidCidStrVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidInteger.CidIntVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidString.CidStrVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMap.CrossMapVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMapForRel.CrossMapForRelVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept.FloatConcept;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntegerVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.language.LanguageVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept.FloatCidVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.language.LangVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.membership.MembershipVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.scopedLanguage.ScopedLanguageVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.string.StringVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.scopedLanguage.ScopedLangVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.string.StrVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.template.TemplateVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.templateForRel.TemplateForRelVersion;
 
@@ -138,7 +138,7 @@ public abstract class RefsetMember extends ConceptComponent<RefsetMemberMutableP
 				componentVersion.add(new MembershipVersion(input));
 				break;
 			case CID_INT:
-				componentVersion.add(new CidIntegerVersion(input));
+				componentVersion.add(new CidIntVersion(input));
 				break;
 			case CID:
 				componentVersion.add(new CidVersion(input));
@@ -150,10 +150,10 @@ public abstract class RefsetMember extends ConceptComponent<RefsetMemberMutableP
 				componentVersion.add(new CidCidCidVersion(input));
 				break;
 			case CID_CID_STRING:
-				componentVersion.add(new CidCidStringVersion(input));
+				componentVersion.add(new CidCidStrVersion(input));
 				break;
 			case CID_STRING:
-				componentVersion.add(new CidStringVersion(input));
+				componentVersion.add(new CidStrVersion(input));
 				break;
 			case CROSS_MAP:
 				componentVersion.add(new CrossMapVersion(input));
@@ -162,22 +162,22 @@ public abstract class RefsetMember extends ConceptComponent<RefsetMemberMutableP
 				componentVersion.add(new CrossMapForRelVersion(input));
 				break;
 			case INTEGER:
-				componentVersion.add(new IntegerVersion(input));
+				componentVersion.add(new IntVersion(input));
 				break;
 			case LANGUAGE:
-				componentVersion.add(new LanguageVersion(input));
+				componentVersion.add(new LangVersion(input));
 				break;
 			case MEASUREMENT:
-				componentVersion.add(new FloatConcept(input));
+				componentVersion.add(new FloatCidVersion(input));
 				break;
 			case MEMBER:
 				componentVersion.add(new MembershipVersion(input));
 				break;
 			case SCOPED_LANGUAGE:
-				componentVersion.add(new ScopedLanguageVersion(input));
+				componentVersion.add(new ScopedLangVersion(input));
 				break;
 			case STRING:
-				componentVersion.add(new StringVersion(input));
+				componentVersion.add(new StrVersion(input));
 				break;
 			case TEMPLATE:
 				componentVersion.add(new TemplateVersion(input));

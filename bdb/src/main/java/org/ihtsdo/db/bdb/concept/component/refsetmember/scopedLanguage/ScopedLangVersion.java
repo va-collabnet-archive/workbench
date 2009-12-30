@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.scopedLanguage;
 
 import java.io.IOException;
 
@@ -10,17 +10,17 @@ import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMemberMutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class FloatConcept extends RefsetMemberMutablePart {
+public class ScopedLangVersion extends RefsetMemberMutablePart {
 
-	public FloatConcept(int statusNid, int pathNid, long time) {
+	public ScopedLangVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public FloatConcept(int statusAtPositionNid) {
+	public ScopedLangVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public FloatConcept(TupleInput input) {
+	public ScopedLangVersion(TupleInput input) {
 		super(input);
 		// TODO Auto-generated constructor stub
 	}
@@ -45,7 +45,7 @@ public class FloatConcept extends RefsetMemberMutablePart {
 	}
 
 	@Override
-	public FloatConcept getMutablePart() {
+	public ScopedLangVersion getMutablePart() {
 		return this;
 	}
 

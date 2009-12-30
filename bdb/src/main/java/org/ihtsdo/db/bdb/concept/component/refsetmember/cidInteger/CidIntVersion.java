@@ -1,33 +1,34 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidString;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidInteger;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidCidStringVersion extends CidCidVersion
-	implements I_ThinExtByRefPartConceptConceptString {
+public class CidIntVersion extends CidVersion
+	implements I_ThinExtByRefPartConceptInt {
 
-	private String str;
+	private int intValue;
 	
-	public CidCidStringVersion(int statusNid, int pathNid,
-			long time) {
+	protected CidIntVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
+		// TODO Auto-generated constructor stub
 	}
 
-	public CidCidStringVersion(int statusAtPositionNid) {
+	protected CidIntVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
+		// TODO Auto-generated constructor stub
 	}
 
-	public CidCidStringVersion(TupleInput input) {
+	public CidIntVersion(TupleInput input) {
 		super(input);
-		this.str = input.readString();
+		intValue = input.readInt();
 	}
 
 	@Override
@@ -50,23 +51,13 @@ public class CidCidStringVersion extends CidCidVersion
 	}
 
 	@Override
-	public String getStr() {
-		return str;
+	public int getIntValue() {
+		return intValue;
 	}
 
 	@Override
-	public String getStringValue() {
-		return str;
-	}
-
-	@Override
-	public void setStr(String str) {
-		this.str = str;
-	}
-
-	@Override
-	public void setStringValue(String value) {
-		this.str = value;
+	public void setIntValue(int intValue) {
+		this.intValue = intValue;
 	}
 
 }
