@@ -158,9 +158,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	private I_TermFactory termFactory;
 	private I_ExportFactory exportFactory;
 	private EpicExportManager exportManager;
-	
-	
-	//private HashMap<Integer, RefsetType> refsetTypeMap = new HashMap<Integer, RefsetType>();
 
      public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
@@ -191,12 +188,13 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			mapper.setStartingDate(deltaStartDate);
 			mapper.setPositions(positions);
 			mapper.setStatusValues(statusValues);
+			/* //TEST CODE:
 			I_GetConceptData concept = termFactory.getConcept(UUID.fromString("3073adf3-0c10-3cbb-975f-7bfc0c9cbd17"));
 
 			List<ExternalTermRecord> er = mapper.getExternalTermRecordsForConcept(concept);
 			for (ExternalTermRecord record: er)
 				System.out.println(record.toString());
-			// END TEST CODE
+			// END TEST CODE */
 			
 			getLog().info(
 					" processing concepts for positions: " + positions
@@ -216,11 +214,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			 * EDG Billing = a7130b8c-e6c1-57d8-986a-0d88552c12e4
 			 * 
 			*/
-			
-			//I_GetConceptData concept = termFactory.getConcept(UUID.fromString("3073adf3-0c10-3cbb-975f-7bfc0c9cbd17"));
-			// expItr.processConcept(concept);
-			
-			
 			// Iterate through all concepts
 			LocalVersionedTerminology.get().iterateConcepts(expItr);
 			expItr.close();

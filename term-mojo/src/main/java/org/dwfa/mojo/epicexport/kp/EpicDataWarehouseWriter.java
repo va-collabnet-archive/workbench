@@ -322,6 +322,25 @@ public class EpicDataWarehouseWriter implements I_EpicExportRecordWriter {
 		while (r.next()) {
 			this.multiValueItems.add(new DatabaseColumn(r.getString("cs_item_num"), "varchar(80)"));
 		}
+		assureColumnIsAdded("5");
+		assureColumnIsAdded("icd9");
+		assureColumnIsAdded("icd10");
+		assureColumnIsAdded("snomed");
+		
+	}
+	
+	private void assureColumnIsAdded(String name) {
+		DatabaseColumn d = this.getColumn(name);
+		if (d == null)
+			this.singleValueItems.add(new DatabaseColumn(name, "varchar(20)"));
+	}
+	
+	private DatabaseColumn getColumn(String name) {
+		for (DatabaseColumn d: this.singleValueItems) {
+			if (d.getName().equalsIgnoreCase(name))
+				return d;
+		}
+		return null;
 	}
 	
 	private String buildMasterFileName(String ini, String identifier, String usage, String type) {
