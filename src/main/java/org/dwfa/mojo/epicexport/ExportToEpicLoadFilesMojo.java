@@ -182,6 +182,19 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 				statusValues.add(statusConcept.getConceptId());
 				statusValueList.add(statusConcept);
 			}
+			
+			// BEGIN TEST CODE
+			ExternalRecordMapper mapper = new ExternalRecordMapper(new EpicLoadFileFactory());
+			mapper.setStartingDate(deltaStartDate);
+			mapper.setPositions(positions);
+			mapper.setStatusValues(statusValues);
+			I_GetConceptData concept = termFactory.getConcept(UUID.fromString("3073adf3-0c10-3cbb-975f-7bfc0c9cbd17"));
+
+			List<ExternalRecord> er = mapper.getExternalRecordsForConcept(concept);
+			for (ExternalRecord record: er)
+				System.out.println(record.toString());
+			// END TEST CODE
+			
 			getLog().info(
 					" processing concepts for positions: " + positions
 							+ " with status: " + statusValueList);
@@ -194,7 +207,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			
 			
 			/*
-			 * Single process debuging sample EDG Clinical = 3073adf3-0c10-3cbb-975f-7bfc0c9cbd17 
+			 * Single process debugging sample EDG Clinical = 3073adf3-0c10-3cbb-975f-7bfc0c9cbd17 
 			 * EDG Clinical soft delete = 6b9d08a1-d645-3d85-84aa-85c90e48c53d
 			 * EDG Clinical description concept 528a6294-a8be-5443-ac3d-e87195f88191
 			 * EDG Billing = a7130b8c-e6c1-57d8-986a-0d88552c12e4

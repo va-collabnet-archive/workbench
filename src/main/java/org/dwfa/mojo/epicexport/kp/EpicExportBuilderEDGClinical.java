@@ -52,7 +52,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 				//"NRNC" Its a new record
 				addErrorIfTrue(! this.allItemsArePopulated(MANDATORY_ITEMS),
 						"One or more mandatory items are missing");
-				addErrorIfTrue(!this.itemIsPopulated("2000") && this.itemIsPopulated("200"),
+				addErrorIfTrue(!this.itemIsPopulated("2000") && !this.itemIsPopulated("200"),
 					"Missing both item 200 and 2000");
 				
 				I_EpicExportRecordWriter writer = getExportManager().getWriter(getWriterName(masterfile, version, "nrnc"));
@@ -66,9 +66,6 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					writeItem("2000");
 				else if (this.itemIsPopulated("200"))
 					writeItem("200");
-				/* else
-					throw new Exception("Missing both items 200 and 2000");
-					*/
 				writeItemsIfChanged("50", "80", "91", "100", "207", "7000", "7010");
 				writer.saveRecord();
 			}
