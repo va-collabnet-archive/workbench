@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
@@ -19,30 +20,42 @@ import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.ace.utypes.UniversalAceImagePart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class Image extends ConceptComponent<ImageMutablePart> implements
-		I_ImageVersioned {
+public class Image 
+	extends ConceptComponent<ImageVersion, Image> 
+	implements I_ImageVersioned, I_ImagePart, I_ImageTuple {
 
 	private static class ImageTupleComputer extends
-			VersionComputer<ImageVersion, Image, ImageMutablePart> {
+			VersionComputer<Image, ImageVersion> {
 
-		public ImageVersion makeTuple(ImageMutablePart part, Image core) {
-			return new ImageVersion(core, part);
-		}
 	}
 
 	private static ImageTupleComputer computer = new ImageTupleComputer();
 	private String format;
 	private byte[] image;
 	private int conceptNid;
+	
+	private String textDescription;
+	private int typeNid;
 
 	protected Image(int nid, int listSize, boolean editable) {
 		super(nid, listSize, editable);
+	}
+
+	public Image(UniversalAceImage uImage, boolean editable) {
+		super(Bdb.uuidsToNid(uImage.getImageId()), uImage.getVersions().size(), editable);
+		conceptNid = Bdb.uuidsToNid(uImage.getConceptId());
+		image = uImage.getImage();
+		format = uImage.getFormat();
+		for (UniversalAceImagePart uPart: uImage.getVersions()) {
+			mutableComponentParts.add(new ImageVersion(uPart));
+		}
 	}
 
 	@Override
@@ -55,14 +68,14 @@ public class Image extends ConceptComponent<ImageMutablePart> implements
 		image = new byte[imageBytes];
 		input.read(image, 0, imageBytes);
 		for (int i = 0; i < listSize; i++) {
-			mutableParts.add(new ImageMutablePart(input));
+			mutableComponentParts.add(new ImageVersion(input));
 		}
 	}
 
 	@Override
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-		List<ImageMutablePart> partsToWrite = new ArrayList<ImageMutablePart>();
-		for (ImageMutablePart p: mutableParts) {
+		List<ImageVersion> partsToWrite = new ArrayList<ImageVersion>();
+		for (ImageVersion p: mutableComponentParts) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
@@ -74,7 +87,7 @@ public class Image extends ConceptComponent<ImageMutablePart> implements
 		output.writeString(format);
 		output.writeInt(image.length);
 		output.write(image);
-		for (ImageMutablePart p: partsToWrite) {
+		for (ImageVersion p: partsToWrite) {
 			p.writePartToBdb(output);
 		}
 	}
@@ -122,7 +135,7 @@ public class Image extends ConceptComponent<ImageMutablePart> implements
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getLastTuple()
 	 */
 	public ImageVersion getLastTuple() {
-		return new ImageVersion(this, mutableParts.get(mutableParts.size() - 1));
+		return mutableComponentParts.get(mutableComponentParts.size() - 1);
 	}
 
 	/*
@@ -132,8 +145,8 @@ public class Image extends ConceptComponent<ImageMutablePart> implements
 	 */
 	public List<I_ImageTuple> getTuples() {
 		List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
-		for (ImageMutablePart p : getVersions()) {
-			tuples.add(new ImageVersion(this, p));
+		for (ImageVersion p : mutableComponentParts) {
+			tuples.add(p);
 		}
 		return tuples;
 	}
@@ -165,9 +178,9 @@ public class Image extends ConceptComponent<ImageMutablePart> implements
 	public UniversalAceImage getUniversal() throws IOException,
 			TerminologyException {
 		UniversalAceImage universal = new UniversalAceImage(getUids(nid),
-				getImage(), new ArrayList<UniversalAceImagePart>(mutableParts
+				getImage(), new ArrayList<UniversalAceImagePart>(mutableComponentParts
 						.size()), getFormat(), getUids(conceptNid));
-		for (ImageMutablePart part : mutableParts) {
+		for (ImageVersion part : mutableComponentParts) {
 			UniversalAceImagePart universalPart = new UniversalAceImagePart();
 			universalPart.setPathId(getUids(part.getPathId()));
 			universalPart.setStatusId(getUids(part.getStatusId()));
@@ -184,12 +197,12 @@ public class Image extends ConceptComponent<ImageMutablePart> implements
 		int viewPathId = viewPosition.getPath().getConceptId();
 		List<ImageVersion> matchingTuples = new ArrayList<ImageVersion>();
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples, 
-				mutableParts, this);
+				mutableComponentParts, this);
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {
 			for (ImageVersion it : matchingTuples) {
 				if (it.getPathId() == viewPathId) {
-					ImageMutablePart promotionPart = it.getPart().makeAnalog(
+					ImageVersion promotionPart = it.makeAnalog(
 							it.getStatusId(), promotionPath.getConceptId(),
 							Long.MAX_VALUE);
 					it.getVersioned().addVersion(promotionPart);
@@ -202,11 +215,59 @@ public class Image extends ConceptComponent<ImageMutablePart> implements
 
 	@Override
 	public boolean addVersion(I_ImagePart part) {
-		return mutableParts.add((ImageMutablePart) part);
+		return mutableComponentParts.add((ImageVersion) part);
 	}
 
 	@Override
 	public boolean merge(I_ImageVersioned jarImage) {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public ArrayIntList getVariableVersionNids() {
+		ArrayIntList nidList = new ArrayIntList(3);
+		nidList.add(typeNid);
+		return nidList;
+	}
+
+	@Override
+	public String getTextDescription() {
+		return textDescription;
+	}
+
+	@Override
+	public void setTextDescription(String textDescription) {
+		this.textDescription = textDescription;
+	}
+
+	@Override
+	public int getTypeId() {
+		return typeNid;
+	}
+
+	@Override
+	public void setTypeId(int typeNid) {
+		this.typeNid = typeNid;
+	}
+
+	@Override
+	public ImageVersion makeAnalog(int statusNid, int pathNid, long time) {
+		return new ImageVersion(this, statusNid, pathNid, time);
+	}
+
+	@Override
+	public I_ImageVersioned getVersioned() {
+		return this;
+	}
+
+	@Override
+	public Image getMutablePart() {
+		return this;
+	}
+
+	@Override
+	public Image duplicate() {
+		throw new UnsupportedOperationException();
+	}
+	
 }

@@ -1,60 +1,106 @@
 package org.ihtsdo.db.bdb.concept.component.description;
 
+import java.nio.charset.Charset;
+
+import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Version;
 
+import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
+
 public class DescriptionVersion 
-	extends Version<DescriptionMutablePart, Description> 
-	implements I_DescriptionTuple {
+	extends Version<DescriptionVersion, Description> 
+	implements I_DescriptionPart, I_DescriptionTuple {
+	
+	@SuppressWarnings("unused")
+	private static Charset utf8 = Charset.forName("UTF-8");
+	
+	private transient Description description;
+	
+	private String text;
+	private boolean initialCaseSignificant;
+	private int typeNid; 
+	private String lang;
 
-	protected DescriptionVersion(Description component, DescriptionMutablePart part) {
-		super(component, part);
+	public DescriptionVersion(int statusAtPositionNid) {
+		super(statusAtPositionNid);
+	}
+	
+	protected DescriptionVersion(DescriptionVersion another) {
+		super(another.getStatusAtPositionNid());
+		this.text = another.text;
+		this.typeNid = another.typeNid;
+		this.lang = another.lang;
+		this.initialCaseSignificant = another.initialCaseSignificant;
+	}
+
+	protected DescriptionVersion(I_DescriptionPart another, int statusNid, int pathNid, long time) {
+		super(statusNid, pathNid, time);
+		this.text = another.getText();
+		this.typeNid = another.getTypeId();
+		this.lang = another.getLang();
+		this.initialCaseSignificant = another.isInitialCaseSignificant();
+	}
+
+	protected DescriptionVersion(TupleInput input) {
+		super(input.readInt());
+		text = input.readString();
+		lang = input.readString();
+		initialCaseSignificant = input.readBoolean();
+		typeNid = input.readInt();
+	}
+
+	public DescriptionVersion(UniversalAceDescriptionPart umPart) {
+		super(Bdb.uuidsToNid(umPart.getStatusId()),
+				Bdb.uuidsToNid(umPart.getPathId()),
+				umPart.getTime());
+		text = umPart.getText();
+		lang = umPart.getLang();
+		initialCaseSignificant = umPart.getInitialCaseSignificant();
+		typeNid = Bdb.uuidsToNid(umPart.getTypeId());
 	}
 
 	@Override
-	public int getConceptId() {
-		return getFixedPart().getConceptId();
+	protected void writeFieldsToBdb(TupleOutput output) {
+		output.writeString(text);
+		output.writeString(lang);
+		output.writeBoolean(initialCaseSignificant);
+		output.writeInt(typeNid);
 	}
 
 	@Override
-	public int getDescId() {
-		return getFixedPart().getDescId();
-	}
-
-	@Override
-	public Description getDescVersioned() {
-		return getFixedPart();
-	}
-
-	@Override
-	public boolean getInitialCaseSignificant() {
-		return getPart().getInitialCaseSignificant();
+	public boolean isInitialCaseSignificant() {
+		return initialCaseSignificant;
 	}
 
 	@Override
 	public String getLang() {
-		return getPart().getLang();
+		return lang;
 	}
-	
+
 	@Override
 	public String getText() {
-		return getPart().getText();
+		return text;
 	}
 
 	@Override
 	public void setInitialCaseSignificant(boolean capStatus) {
-		getPart().setInitialCaseSignificant(capStatus);
+		initialCaseSignificant = capStatus;
 	}
 
 	@Override
 	public void setLang(String lang) {
-		getPart().setLang(lang);
+		this.lang = lang;
 	}
 
 	@Override
 	public void setText(String text) {
-		getPart().setText(text);
+		this.text = text;
 	}
 
 	@Override
@@ -64,12 +110,49 @@ public class DescriptionVersion
 
 	@Override
 	public int getTypeId() {
-		return getPart().getTypeId();
+		return typeNid;
 	}
 
 	@Override
 	public void setTypeId(int typeNid) {
-		getPart().setTypeId(typeNid);
+		this.typeNid = typeNid;
 	}
-	
+
+	@Override
+	public DescriptionVersion duplicate() {
+		return new DescriptionVersion(this);
+	}
+
+	@Override
+	public DescriptionVersion makeAnalog(int statusNid, int pathNid, long time) {
+		return new DescriptionVersion(this, statusNid, pathNid, time);
+	}
+
+	@Override
+	protected ArrayIntList getVariableVersionNids() {
+		ArrayIntList list = new ArrayIntList(3);
+		list.add(typeNid);
+		return list;
+	}
+
+	@Override
+	public int getConceptId() {
+		return description.getConceptNid();
+	}
+
+	@Override
+	public int getDescId() {
+		return description.nid;
+	}
+
+	@Override
+	public Description getDescVersioned() {
+		return description;
+	}
+
+	@Override
+	public I_DescriptionPart getMutablePart() {
+		return this;
+	}
+
 }

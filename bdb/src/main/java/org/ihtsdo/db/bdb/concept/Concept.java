@@ -12,7 +12,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
@@ -36,12 +36,12 @@ import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesMutablePart;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesVersion;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesVersion;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
-import org.ihtsdo.db.bdb.concept.component.identifier.Identifier;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
 import org.ihtsdo.db.bdb.concept.component.image.ImageVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMember;
@@ -68,33 +68,35 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public static Concept get(UniversalAceBean universal) throws IOException {
-		int conceptNid = Bdb.uuidsToNid(universal.getId().getUIDs());
+		int conceptNid = Bdb.uuidsToNid(universal.getIdentifier().getUIDs());
 		
-		Concept c = get(conceptNid, false);
+		Concept c = get(conceptNid, true);
 		
 		UniversalAceConceptAttributes uAttr = universal.getConceptAttributes();
 		
 		ConceptAttributes attr = new ConceptAttributes(c.nid, uAttr.getVersions().size(), true);
+		c.unsubmittedComponents.add(attr);
 		for (UniversalAceConceptAttributesPart uPart: uAttr.getVersions()) {
-			ConceptAttributesMutablePart part = 
-				new ConceptAttributesMutablePart(Bdb.uuidsToNid(uPart.getStatusId()), 
+			ConceptAttributesVersion part = 
+				new ConceptAttributesVersion(Bdb.uuidsToNid(uPart.getStatusId()), 
 						Bdb.uuidsToNid(uPart.getPathId()), 
 						uPart.getTime());
 			attr.addVersion(part);
 		}
-		
-		
-		UniversalAceIdentification uId = universal.getId();
+			
+		UniversalAceIdentification uId = universal.getIdentifier();
 		
 		for (UniversalAceDescription uDesc: universal.getDescriptions()) {
-			Description desc = new Description(uDesc, true);
-			c.unsubmittedDescriptions.add(desc);
-		}
-		for (UniversalAceImage uImage: universal.getImages()) {
-			
+			Description desc = new Description(uDesc, c.editable);
+			c.unsubmittedComponents.add(desc);
 		}
 		for (UniversalAceRelationship uRel: universal.getSourceRels()) {
-			
+			Relationship rel = new Relationship(uRel, c.editable);
+			c.unsubmittedComponents.add(rel);
+		}
+		for (UniversalAceImage uImage: universal.getImages()) {
+			Image img = new Image(uImage, c.editable);
+			c.unsubmittedComponents.add(img);
 		}
 		return c;
 	}
@@ -110,8 +112,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	private boolean editable;
 	private ConceptData data;
 
-	private List<Description> unsubmittedDescriptions;
-	private List<Relationship> unsubmittedRelationships;
+	private List<ConceptComponent<?, ?>> unsubmittedComponents;
 
 	protected Concept(int nid, boolean editable) throws IOException {
 		super();
@@ -298,7 +299,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipVersion> getDestRelTuples(I_IntSet allowedTypes,
+	public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
 		//TODO
@@ -312,15 +313,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 	public List<RefsetMember> getExtensions() throws IOException,
 			TerminologyException {
 		return data.getExtensions();
-	}
-
-	public Identifier getId() throws IOException {
-		return data.getId();
-	}
-
-	public Object getId(int identifierScheme) throws IOException,
-			TerminologyException {
-		return data.getId(identifierScheme);
 	}
 
 	public List<ImageVersion> getImageTuples(I_IntSet allowedStatus,
@@ -418,7 +410,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return null;
 	}
 
-	public List<I_IdVersioned> getUncommittedIdVersioned() {
+	public List<I_Identify> getUncommittedIdVersioned() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -682,4 +674,19 @@ public class Concept implements I_Transact, I_GetConceptData {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
+
+
+	@Override
+	public Object getDenotation(int authorityNid) throws IOException,
+			TerminologyException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public I_Identify getIdentifier() throws IOException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}	
 }

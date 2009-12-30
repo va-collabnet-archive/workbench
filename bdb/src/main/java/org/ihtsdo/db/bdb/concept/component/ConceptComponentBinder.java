@@ -11,8 +11,10 @@ import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ConceptComponentBinder<C extends ConceptComponent<P>, P extends MutablePart<P>> extends TupleBinding<ArrayList<C>> 
-							  implements I_BindConceptComponents {
+public class ConceptComponentBinder<C extends ConceptComponent<P, C>, 
+									P extends Version<P, C>> 
+	extends TupleBinding<ArrayList<C>> 
+	implements I_BindConceptComponents {
 
 
     private static int maxReadOnlyStatusAtPositionId = Bdb.getStatusAtPositionDb().getReadOnlyMax();
@@ -49,8 +51,8 @@ public class ConceptComponentBinder<C extends ConceptComponent<P>, P extends Mut
 			C conceptComponent;
 			if (nidToConceptComponentMap != null && nidToConceptComponentMap.containsKey(nid)) {
 				conceptComponent = nidToConceptComponentMap.get(nid);
-				int totalSize = conceptComponent.mutableParts.size() + partCount;
-				conceptComponent.mutableParts.ensureCapacity(totalSize);
+				int totalSize = conceptComponent.mutableComponentParts.size() + partCount;
+				conceptComponent.mutableComponentParts.ensureCapacity(totalSize);
 			} else {
 				conceptComponent = factory.create(nid, partCount, editable);
 				newConceptComponentList.add(conceptComponent);
@@ -65,7 +67,7 @@ public class ConceptComponentBinder<C extends ConceptComponent<P>, P extends Mut
 	public void objectToEntry(ArrayList<C> conceptComponentList, TupleOutput output) {
 		List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
 		for (C conceptComponent: conceptComponentList) {
-			for (P part: conceptComponent.mutableParts) {
+			for (P part: conceptComponent.mutableComponentParts) {
 				if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
 					componentListToWrite.add(conceptComponent);
 					break;

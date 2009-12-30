@@ -2,12 +2,12 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.ihtsdo.db.bdb.concept.component.MutablePart;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class RefsetMemberMutablePart extends MutablePart<RefsetMemberMutablePart> 
+public abstract class RefsetMemberMutablePart extends Version<RefsetMemberMutablePart, RefsetMember> 
 	implements I_ThinExtByRefPart {
 
 

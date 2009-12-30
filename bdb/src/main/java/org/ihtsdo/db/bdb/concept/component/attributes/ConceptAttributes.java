@@ -3,11 +3,13 @@ package org.ihtsdo.db.bdb.concept.component.attributes;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -35,9 +37,13 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ConceptAttributes 
-		extends ConceptComponent<ConceptAttributesMutablePart>
-		implements I_ConceptAttributeVersioned {
+		extends ConceptComponent<ConceptAttributesVersion, ConceptAttributes>
+		implements I_ConceptAttributeVersioned,
+				   I_ConceptAttributePart, 
+				   I_ConceptAttributeTuple {
 
+	private boolean defined;
+	
 	public ConceptAttributes(int nid, int parts, boolean editable) {
 		super(nid, parts, editable);
 	}
@@ -46,15 +52,15 @@ public class ConceptAttributes
 	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
 		for (int i = 0; i < listSize; i++) {
-			mutableParts.add(new ConceptAttributesMutablePart(input));
+			mutableComponentParts.add(new ConceptAttributesVersion(input));
 		}
 	}
 
 	@Override
 	public void writeComponentToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
-		List<ConceptAttributesMutablePart> partsToWrite = new ArrayList<ConceptAttributesMutablePart>();
-		for (ConceptAttributesMutablePart p : mutableParts) {
+		List<ConceptAttributesVersion> partsToWrite = new ArrayList<ConceptAttributesVersion>();
+		for (ConceptAttributesVersion p : mutableComponentParts) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
@@ -62,7 +68,7 @@ public class ConceptAttributes
 		// Start writing
 		output.writeInt(nid);
 		output.writeShort(partsToWrite.size());
-		for (ConceptAttributesMutablePart p : partsToWrite) {
+		for (ConceptAttributesVersion p : partsToWrite) {
 			p.writePartToBdb(output);
 		}
 	}
@@ -81,12 +87,8 @@ public class ConceptAttributes
 	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getTuples()
 	 */
-	public List<I_ConceptAttributeTuple> getTuples() {
-		List<I_ConceptAttributeTuple> tuples = new ArrayList<I_ConceptAttributeTuple>();
-		for (ConceptAttributesMutablePart p : mutableParts) {
-			tuples.add(new ConceptAttributesVersion(this, p));
-		}
-		return tuples;
+	public List<ConceptAttributesVersion> getTuples() {
+		return Collections.unmodifiableList(mutableComponentParts);
 	}
 
 	/*
@@ -108,16 +110,7 @@ public class ConceptAttributes
 	 * .ThinConVersioned)
 	 */
 	public boolean merge(ConceptAttributes jarCon) {
-		HashSet<ConceptAttributesMutablePart> versionSet = new HashSet<ConceptAttributesMutablePart>(
-				mutableParts);
-		boolean changed = false;
-		for (ConceptAttributesMutablePart jarPart : jarCon.getVersions()) {
-			if (!versionSet.contains(jarPart)) {
-				changed = true;
-				mutableParts.add((ConceptAttributesMutablePart) jarPart);
-			}
-		}
-		return changed;
+		throw new UnsupportedOperationException();
 	}
 
 	public void addTuples(I_IntSet allowedStatus,
@@ -128,13 +121,7 @@ public class ConceptAttributes
 
 	private static class AttributeTupleComputer
 			extends
-			VersionComputer<ConceptAttributesVersion, ConceptAttributes, ConceptAttributesMutablePart> {
-
-		@Override
-		public ConceptAttributesVersion makeTuple(
-				ConceptAttributesMutablePart part, ConceptAttributes core) {
-			return new ConceptAttributesVersion(core, part);
-		}
+			VersionComputer<ConceptAttributes, ConceptAttributesVersion> {
 	}
 
 	private static AttributeTupleComputer computer = new AttributeTupleComputer();
@@ -144,7 +131,7 @@ public class ConceptAttributes
 			List<ConceptAttributesVersion> matchingTuples,
 			boolean addUncommitted) {
 		computer.addTuples(allowedStatus, positions, matchingTuples,
-				addUncommitted, mutableParts, this);
+				addUncommitted, mutableComponentParts, this);
 	}
 
 	public void addTuples(I_IntSet allowedStatus,
@@ -181,7 +168,7 @@ public class ConceptAttributes
 	 * org.dwfa.vodb.types.I_ConceptAttributeVersioned#getLocalFixedConcept()
 	 */
 	public I_ConceptualizeLocally getLocalFixedConcept() {
-		boolean isDefined = mutableParts.get(mutableParts.size() - 1)
+		boolean isDefined = mutableComponentParts.get(mutableComponentParts.size() - 1)
 				.isDefined();
 		boolean isPrimitive = !isDefined;
 		return LocalFixedConcept.get(nid, isPrimitive);
@@ -207,7 +194,7 @@ public class ConceptAttributes
 			TerminologyException {
 		UniversalAceConceptAttributes conceptAttributes = new UniversalAceConceptAttributes(
 				getUids(nid), this.versionCount());
-		for (ConceptAttributesMutablePart part : mutableParts) {
+		for (ConceptAttributesVersion part : mutableComponentParts) {
 			UniversalAceConceptAttributesPart universalPart = new UniversalAceConceptAttributesPart();
 			universalPart.setStatusId(getUids(part.getStatusId()));
 			universalPart.setDefined(part.isDefined());
@@ -224,9 +211,9 @@ public class ConceptAttributes
 		buf.append("NativeId: ");
 		buf.append(nid);
 		buf.append(" parts: ");
-		buf.append(mutableParts.size());
+		buf.append(mutableComponentParts.size());
 		buf.append("\n  ");
-		for (ConceptAttributesMutablePart p : mutableParts) {
+		for (ConceptAttributesVersion p : mutableComponentParts) {
 			buf.append(p);
 			buf.append("\n  ");
 		}
@@ -253,7 +240,7 @@ public class ConceptAttributes
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
 			List<ConceptAttributesVersion> returnTuples) {
 		computer.addTuples(allowedStatus, viewPosition, returnTuples,
-				mutableParts, this);
+				mutableComponentParts, this);
 	}
 
 	public List<ConceptAttributesVersion> getTuples(I_IntSet allowedStatus,
@@ -272,9 +259,9 @@ public class ConceptAttributes
 		for (I_Path promotionPath : promotionPaths) {
 			for (ConceptAttributesVersion tuple : getTuples(allowedStatus,
 					viewPosition)) {
-				if (tuple.getPart().getPathId() == viewPathId) {
-					ConceptAttributesMutablePart promotionPart = tuple
-							.getPart().makeAnalog(tuple.getStatusId(),
+				if (tuple.getMutablePart().getPathId() == viewPathId) {
+					ConceptAttributesVersion promotionPart = tuple
+							.getMutablePart().makeAnalog(tuple.getStatusId(),
 									promotionPath.getConceptId(),
 									Long.MAX_VALUE);
 					addVersion(promotionPart);
@@ -291,7 +278,7 @@ public class ConceptAttributes
 
 	@Override
 	public boolean addVersion(I_ConceptAttributePart part) {
-		return mutableParts.add(new ConceptAttributesMutablePart(part));
+		return mutableComponentParts.add(new ConceptAttributesVersion(part));
 	}
 
 	@Override
@@ -303,14 +290,14 @@ public class ConceptAttributes
 	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
 			List<I_ConceptAttributeTuple> returnTuples) {
 		// TODO Auto-generated method stub
-		
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
 			List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted) {
 		// TODO Auto-generated method stub
-		
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -319,13 +306,55 @@ public class ConceptAttributes
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 		// TODO Auto-generated method stub
-		
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public List<I_ConceptAttributeTuple> getTuples(I_IntSet allowedStatus,
 			Set<I_Position> viewPositionSet) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public boolean isDefined() {
+		return defined;
+	}
+
+	@Override
+	public void setDefined(boolean defined) {
+		this.defined = defined;
+	}
+
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		return new ConceptAttributesVersion(this, statusNid, pathNid, time);
+	}
+
+	
+	@Override
+	public I_ConceptAttributeVersioned getConVersioned() {
+		return this;
+	}
+
+	@Override
+	public int getConceptStatus() {
+		return getStatusId();
+	}
+
+	@Override
+	public ArrayIntList getVariableVersionNids() {
+		return new ArrayIntList(2);
+	}
+
+	@Override
+	public I_ConceptAttributePart duplicate() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public ConceptAttributes getMutablePart() {
+		return this;
+	}
+	
 }

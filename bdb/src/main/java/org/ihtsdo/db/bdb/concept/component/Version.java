@@ -8,110 +8,138 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.StatusAtPositionBdb;
 
-public class Version<V extends MutablePart<V>, C extends ConceptComponent<V>> 
-	implements I_AmTuple {
+import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
-	protected C component;
-	protected V version;
+public abstract class Version<V extends Version<V, C>, 
+							  C extends ConceptComponent<V, C>> 
+	implements I_AmPart, I_AmTuple {
 	
-	protected Version(C component, V version) {
+	private static StatusAtPositionBdb sapBdb = Bdb.getStatusAtPositionDb();
+	
+	public int statusAtPositionNid;
+	public C conceptComponent;
+
+	public Version(int statusAtPositionNid) {
 		super();
-		this.component = component;
-		this.version = version;
+		this.statusAtPositionNid = statusAtPositionNid;
 	}
 
+	public Version(int statusNid, int pathNid, long time) {
+		this.statusAtPositionNid = sapBdb.getStatusAtPositionNid(statusNid, pathNid, time);
+	}
+	
+	public Version(TupleInput input) {
+		this(input.readInt());
+	}
+
+	
+	public final void writePartToBdb(TupleOutput output) {
+		output.writeInt(statusAtPositionNid);
+		writeFieldsToBdb(output);
+	}
+
+	protected abstract void writeFieldsToBdb(TupleOutput output);
+	
 	public final C getVersioned() {
-		return component;
+		return conceptComponent;
 	}
 
 	@Override
 	public final C getFixedPart() {
-		return component;
+		return conceptComponent;
 	}
 
 	@Override
-	public final int getFixedPartId() {
-		return component.getNid();
-	}
-
-	@Override
-	public final V getPart() {
-		return version;
-	}
-
-	@Override
-	public final V duplicate() {
-		return version.duplicate();
-	}
-
-	@Override
-	public final ArrayIntList getPartComponentNids() {
-		return version.getPartComponentNids();
-	}
-
-	@Override
-	public final int getPathId() {
-		return version.getPathId();
-	}
-
-	@Override
-	public final int getStatusId() {
-		return version.getStatusId();
-	}
-
-	@Override
-	public final long getTime() {
-		return version.getTime();
-	}
-
-	@Override
-	public final int getVersion() {
-		return version.getVersion();
-	}
-
-	@Override
-	public final I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		return version.makeAnalog(statusNid, pathNid, time);
-	}
-	
-	@Override
-	public final void setPathId(int pathId) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public final void setStatusId(int statusId) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public final void setVersion(int version) {
-		throw new UnsupportedOperationException();
+	public final int getNid() {
+		return conceptComponent.getNid();
 	}
 
 	public final Set<TimePathId> getTimePathSet() {
-		return component.getTimePathSet();
+		return conceptComponent.getTimePathSet();
 	}
+	
 	public List<V> getVersions() {
-		return component.mutableParts;
-	}
-
-
-
-	@Override
-	public final boolean equals(Object obj) {
-		if (Version.class.isAssignableFrom(obj.getClass())) {
-			Version<?,?> another = (Version<?,?>) obj;
-			return component.getNid() == another.component.getNid() && 
-			 this.getPart().equals(another.getPart());
-		}
-		return false;
+		return conceptComponent.mutableComponentParts;
 	}
 
 	@Override
 	public final int hashCode() {
-		return HashFunction.hashCode( new int[] { component.nid });
+		return HashFunction.hashCode( new int[] { conceptComponent.nid });
 	}
+
+
+	public final int getStatusAtPositionNid() {
+		return statusAtPositionNid;
+	}
+
+	public final ArrayIntList getPartComponentNids() {
+		ArrayIntList resultList = getVariableVersionNids();
+		resultList.add(getPathId());
+		resultList.add(getStatusId());
+		return resultList;
+	}
+	
+	protected abstract ArrayIntList getVariableVersionNids();
+	
+	@Override
+	public int getPathId() {
+		return sapBdb.getPathId(statusAtPositionNid);
+	}
+
+	@Override
+	public int getStatusId() {
+		return sapBdb.getStatusId(statusAtPositionNid);
+	}
+
+	@Override
+	public int getVersion() {
+		return sapBdb.getVersion(statusAtPositionNid);
+	}
+
+	public long getTime() {
+		return sapBdb.getTime(statusAtPositionNid);
+	}
+
+	@Override
+	public V duplicate() {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * 1. Analog, an object, concept or situation which in some way resembles a different situation
+	 * 2. Analogy, in language, a comparison between concepts
+	 * @param statusNid
+	 * @param pathNid
+	 * @param time
+	 * @return
+	 */
+	public abstract V makeAnalog(int statusNid, int pathNid, long time);
+
+	public void setStatusAtPosition(int statusNid, int pathNid, long time) {
+		this.statusAtPositionNid = sapBdb.getStatusAtPositionNid(statusNid, pathNid, time);
+	}
+
+	@Override
+	@Deprecated
+	public void setPathId(int pathId) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	@Deprecated
+	public void setStatusId(int statusId) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	@Deprecated
+	public void setVersion(int version) {
+		throw new UnsupportedOperationException();
+	}
+	
 
 }

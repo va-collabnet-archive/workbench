@@ -4,16 +4,16 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 
 public class ImageBinder {
 
-	private static final ThreadLocal<ConceptComponentBinder<Image, ImageMutablePart>> binders = new ThreadLocal<ConceptComponentBinder<Image, ImageMutablePart>>() {
+	private static final ThreadLocal<ConceptComponentBinder<Image, ImageVersion>> binders = new ThreadLocal<ConceptComponentBinder<Image, ImageVersion>>() {
 
 		@Override
-		protected ConceptComponentBinder<Image, ImageMutablePart> initialValue() {
+		protected ConceptComponentBinder<Image, ImageVersion> initialValue() {
 			ImageFactory factory = new ImageFactory();
-			return new ConceptComponentBinder<Image, ImageMutablePart>(factory);
+			return new ConceptComponentBinder<Image, ImageVersion>(factory);
 		}
 	};
 
-	public static ConceptComponentBinder<Image, ImageMutablePart> getBinder() {
+	public static ConceptComponentBinder<Image, ImageVersion> getBinder() {
 		return binders.get();
 	}
 

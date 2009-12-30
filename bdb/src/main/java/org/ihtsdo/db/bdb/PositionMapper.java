@@ -12,7 +12,7 @@ import java.util.TreeSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.MutablePart;
+import org.ihtsdo.db.bdb.concept.component.Version;
 
 import cern.colt.bitvector.BitMatrix;
 
@@ -51,7 +51,7 @@ public class PositionMapper {
 	 *         the class's instance.
 	 * @throws IOException
 	 */
-	public <T extends MutablePart<T>> boolean onRoute(T part) {
+	public <V extends Version<V, ?>> boolean onRoute(V part) {
 		return positionDistance[part.getStatusAtPositionNid()] >= 0;
 	}
 
@@ -67,7 +67,7 @@ public class PositionMapper {
 	 *         with respect to the destination position of the class's instance.
 	 * @throws IOException
 	 */
-	public <T extends MutablePart<T>> RELATIVE_POSITION relativePosition(T part1, T part2)
+	public <V extends Version<V, ?>> RELATIVE_POSITION relativePosition(V part1, V part2)
 			throws IOException {
 		if (onRoute(part1) && onRoute(part2)) {
 			if (conflictMatrix.get(part1.getStatusAtPositionNid(), part2
@@ -94,8 +94,8 @@ public class PositionMapper {
 	 * @return
 	 * @throws IOException
 	 */
-	public <T extends MutablePart<T>> RELATIVE_POSITION fastRelativePosition(T part1,
-			T part2) {
+	public <V extends Version<V, ?>> RELATIVE_POSITION fastRelativePosition(V part1,
+			V part2) {
 		if (conflictMatrix.get(part1.getStatusAtPositionNid(), part2
 				.getStatusAtPositionNid())) {
 			return RELATIVE_POSITION.CONFLICTING;
