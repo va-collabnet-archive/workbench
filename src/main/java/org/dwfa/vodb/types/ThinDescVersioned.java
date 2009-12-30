@@ -79,7 +79,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
      * 
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#getVersions()
      */
-    public List<I_DescriptionPart> getMutableIdParts() {
+    public List<I_DescriptionPart> getMutableParts() {
         return versions;
     }
 
@@ -176,7 +176,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
      */
     public List<I_DescriptionTuple> getTuples() {
         List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-        for (I_DescriptionPart p : getMutableIdParts()) {
+        for (I_DescriptionPart p : getMutableParts()) {
             tuples.add(new ThinDescTuple(this, p));
         }
 
@@ -285,7 +285,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
     public boolean merge(I_DescriptionVersioned jarDesc) {
         HashSet<I_DescriptionPart> versionSet = new HashSet<I_DescriptionPart>(versions);
         boolean changed = false;
-        for (I_DescriptionPart jarPart : jarDesc.getMutableIdParts()) {
+        for (I_DescriptionPart jarPart : jarDesc.getMutableParts()) {
             if (!versionSet.contains(jarPart)) {
                 changed = true;
                 versions.add(jarPart);

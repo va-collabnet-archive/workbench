@@ -129,7 +129,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
      * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getVersions()
      */
-    public List<? extends I_ThinExtByRefPart> getMutableIdParts() {
+    public List<? extends I_ThinExtByRefPart> getMutableParts() {
         return versions;
     }
 

@@ -89,7 +89,7 @@ public class ThinRelVersionedTest extends TestCase {
         part2.setVersion(time2);
         rel.addVersion(part2);
 
-        assertEquals(3, rel.getMutableIdParts().size());
+        assertEquals(3, rel.getMutableParts().size());
 
         I_IntSet allowedStatus = null;
         I_IntSet allowedTypes = null;
@@ -230,7 +230,7 @@ public class ThinRelVersionedTest extends TestCase {
         part1.setVersion(time1);
         rel.addVersion(part1);
 
-        assertEquals(2, rel.getMutableIdParts().size());
+        assertEquals(2, rel.getMutableParts().size());
 
         I_IntSet allowedStatus = null;
         I_IntSet allowedTypes = null;

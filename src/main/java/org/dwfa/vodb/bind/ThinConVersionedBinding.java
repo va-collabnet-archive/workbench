@@ -46,7 +46,7 @@ public class ThinConVersionedBinding extends TupleBinding {
         I_ConceptAttributeVersioned versioned = (I_ConceptAttributeVersioned) obj;
         to.writeInt(versioned.getConId());
         to.writeInt(versioned.versionCount());
-        for (I_ConceptAttributePart con : versioned.getMutableIdParts()) {
+        for (I_ConceptAttributePart con : versioned.getMutableParts()) {
             to.writeInt(con.getPathId());
             to.writeInt(con.getVersion());
             to.writeInt(con.getStatusId());

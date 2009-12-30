@@ -287,7 +287,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
                 if (stopWork) {
                     return -1;
                 }
-                for (I_ImagePart part : i.getMutableIdParts()) {
+                for (I_ImagePart part : i.getMutableParts()) {
                     conceptsToFetch.add(part.getTypeId());
                     conceptsToFetch.add(part.getStatusId());
                     conceptsToFetch.add(part.getPathId());
