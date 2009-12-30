@@ -184,14 +184,14 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			}
 			
 			// BEGIN TEST CODE
-			ExternalRecordMapper mapper = new ExternalRecordMapper(new EpicLoadFileFactory());
+			ExternalTermPublisher mapper = new ExternalTermPublisher(new EpicLoadFileFactory());
 			mapper.setStartingDate(deltaStartDate);
 			mapper.setPositions(positions);
 			mapper.setStatusValues(statusValues);
 			I_GetConceptData concept = termFactory.getConcept(UUID.fromString("3073adf3-0c10-3cbb-975f-7bfc0c9cbd17"));
 
-			List<ExternalRecord> er = mapper.getExternalRecordsForConcept(concept);
-			for (ExternalRecord record: er)
+			List<ExternalTermRecord> er = mapper.getExternalTermRecordsForConcept(concept);
+			for (ExternalTermRecord record: er)
 				System.out.println(record.toString());
 			// END TEST CODE
 			
