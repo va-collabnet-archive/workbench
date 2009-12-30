@@ -126,7 +126,7 @@ public class TestGetUncommittedRefset extends AbstractTask {
                 true);
             msg.append(comment + extensions.size() + "\n");
             for (I_ThinExtByRefVersioned ext : extensions) {
-                for (I_ThinExtByRefPart part : ext.getMutableIdParts()) {
+                for (I_ThinExtByRefPart part : ext.getMutableParts()) {
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         msg.append("\n     Uncommitted extension: " + ext + "\n");
                         break;

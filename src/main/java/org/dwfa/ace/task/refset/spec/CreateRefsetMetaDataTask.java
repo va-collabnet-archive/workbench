@@ -375,10 +375,10 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             // edit the existing part's status
             I_ConceptAttributeVersioned v = newConcept.getConceptAttributes();
 
-            int index = v.getMutableIdParts().size() - 1;
+            int index = v.getMutableParts().size() - 1;
             I_ConceptAttributePart part;
             if (index >= 0) {
-                part = (I_ConceptAttributePart) v.getMutableIdParts().get(index);
+                part = (I_ConceptAttributePart) v.getMutableParts().get(index);
             } else {
                 part = termFactory.newConceptAttributePart();
             }
@@ -409,7 +409,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                 if (cnid == concept.getConceptId())
                     continue;
                 I_DescriptionVersioned potential_fsn = termFactory.getDescription(dnid, cnid);
-                for (I_DescriptionPart part_search : potential_fsn.getMutableIdParts()) {
+                for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
                     if (actives.contains(part_search.getStatusId())
                         && part_search.getTypeId() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
                             .localize().getNid() && part_search.getText().equals(description)) {
