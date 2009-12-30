@@ -96,7 +96,7 @@ public class MemberSpecFinder implements ConceptExtFinder {
 
                 List<I_ThinExtByRefVersioned> refsetMembers = termFactory.getRefsetExtensionMembers(memberRefsetId);
                 for (I_ThinExtByRefVersioned member : refsetMembers) {
-                    List<? extends I_ThinExtByRefPart> versions = member.getMutableIdParts();
+                    List<? extends I_ThinExtByRefPart> versions = member.getMutableParts();
                     for (I_ThinExtByRefPart version : versions) {
                         if (version.getStatus() == CURRENT_STATUS_ID) {
                             if (version instanceof I_ThinExtByRefPartConcept) {
