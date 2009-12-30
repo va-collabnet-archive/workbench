@@ -21,7 +21,7 @@ import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 import org.dwfa.mojo.epicexport.kp.EpicTermWarehouseFactory;
 import org.dwfa.tapi.TerminologyException;
 
-public class ExternalRecordMapper {
+public class ExternalTermPublisher {
 	private String currentItem;
 	
 	private String currentMasterFile;
@@ -37,11 +37,11 @@ public class ExternalRecordMapper {
 	private I_TermFactory termFactory;
 	private HashSet<I_Position> positions;
 	private I_IntSet statusValues;
-	private List<ExternalRecord> externalRecords;
+	private List<ExternalTermRecord> externalRecords;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
 
 	
-	public ExternalRecordMapper(I_ExportFactory exportFactory) throws Exception
+	public ExternalTermPublisher(I_ExportFactory exportFactory) throws Exception
 	{
 		this.exportFactory = exportFactory;
 		this.interpreter = exportFactory.getInterpreter();
@@ -73,11 +73,11 @@ public class ExternalRecordMapper {
 
 	}
 
-	public List<ExternalRecord> getExternalRecordsForConcept(I_GetConceptData concept) throws Exception {
+	public List<ExternalTermRecord> getExternalTermRecordsForConcept(I_GetConceptData concept) throws Exception {
 		masterFilesImpacted = new ArrayList<String>();
 		displayNames = new ArrayList<DisplayName>();
 		wildcardItems = new ArrayList<ValuePair>();
-		this.externalRecords = new ArrayList<ExternalRecord>();
+		this.externalRecords = new ArrayList<ExternalTermRecord>();
 		
 		this.idTuple = null;
 		List<? extends I_DescriptionVersioned> descs = concept.getDescriptions();
@@ -192,21 +192,21 @@ public class ExternalRecordMapper {
     }
     
     public void addItem(String masterFile, String item, Object value, Object previousValue) {
-    	ExternalRecord record = getExternalRecordForMasterfile(masterFile);
+    	ExternalTermRecord record = getExternalRecordForMasterfile(masterFile);
     	record.addItem(item, value, previousValue);
     }
     
-    public ExternalRecord getExternalRecordForMasterfile(String masterFile) {
-    	ExternalRecord ret = null;
+    public ExternalTermRecord getExternalRecordForMasterfile(String masterFile) {
+    	ExternalTermRecord ret = null;
     	if (this.externalRecords == null)
-    		this.externalRecords = new ArrayList<ExternalRecord>();
+    		this.externalRecords = new ArrayList<ExternalTermRecord>();
     	
-    	for (ExternalRecord er: this.externalRecords) {
+    	for (ExternalTermRecord er: this.externalRecords) {
     		if (er.getMasterFileName().equals(masterFile))
     			ret = er;
     	}
     	if (ret == null) {
-    		ret = new ExternalRecord(masterFile);
+    		ret = new ExternalTermRecord(masterFile);
     		this.externalRecords.add(ret);
     	}
     	return ret;

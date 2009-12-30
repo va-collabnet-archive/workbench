@@ -3,11 +3,11 @@ package org.dwfa.mojo.epicexport;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExternalRecord {
+public class ExternalTermRecord {
 	private String masterFileName;
 	List<Item> items;
 	
-	public ExternalRecord(String name) {
+	public ExternalTermRecord(String name) {
 		this.setMasterFileName(name);
 	}
 	
