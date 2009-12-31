@@ -189,7 +189,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			mapper.setPositions(positions);
 			mapper.setStatusValues(statusValues);
 			/* //TEST CODE:
-			I_GetConceptData concept = termFactory.getConcept(UUID.fromString("3073adf3-0c10-3cbb-975f-7bfc0c9cbd17"));
+			I_GetConceptData concept = termFactory.getConcept(UUID.fromString("1ca9b835-cbf6-40e8-82b3-acbf0eb30293"));
 
 			List<ExternalTermRecord> er = mapper.getExternalTermRecordsForConcept(concept);
 			for (ExternalTermRecord record: er)

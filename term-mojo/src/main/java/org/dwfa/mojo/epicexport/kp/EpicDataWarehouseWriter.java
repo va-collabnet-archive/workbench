@@ -326,13 +326,14 @@ public class EpicDataWarehouseWriter implements I_EpicExportRecordWriter {
 		assureColumnIsAdded("icd9");
 		assureColumnIsAdded("icd10");
 		assureColumnIsAdded("snomed");
+		assureColumnIsAdded("rootuuid");
 		
 	}
 	
 	private void assureColumnIsAdded(String name) {
 		DatabaseColumn d = this.getColumn(name);
 		if (d == null)
-			this.singleValueItems.add(new DatabaseColumn(name, "varchar(20)"));
+			this.singleValueItems.add(new DatabaseColumn(name, "varchar(80)"));
 	}
 	
 	private DatabaseColumn getColumn(String name) {
