@@ -49,6 +49,15 @@ public class ExternalTermRecord {
 		return ret;
 	}
 	
+	public boolean hasItem(String name) {
+		boolean ret = false;
+		for (Item i: this.items) {
+			if (i.getName().equalsIgnoreCase(name))
+				return true;
+		}	
+		return ret;
+	}
+
 	public void addItem(String name, Object value) {
 		if (items == null)
 			items = new ArrayList<Item>();
@@ -59,6 +68,12 @@ public class ExternalTermRecord {
 		if (items == null)
 			items = new ArrayList<Item>();
 		items.add(new Item(name, value, previousValue));
+	}
+
+	public void addItem(Item i) {
+		if (items == null)
+			items = new ArrayList<Item>();
+		items.add(i);
 	}
 
 	public Object getItemValue(String name) {
