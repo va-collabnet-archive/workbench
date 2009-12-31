@@ -51,7 +51,8 @@ public class RefsetSpec {
         termFactory = LocalVersionedTerminology.get();
         if (memberRefsetInputted) {
             try {
-                I_GetConceptData specifiesRefsetRel = termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+                I_GetConceptData specifiesRefsetRel =
+                        termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
                 this.spec = getLatestDestinationRelationshipSource(concept, specifiesRefsetRel);
                 termFactory = LocalVersionedTerminology.get();
             } catch (Exception e) {
@@ -62,13 +63,83 @@ public class RefsetSpec {
         }
     }
 
+    public boolean isConceptComputeType() {
+        try {
+            I_GetConceptData refsetComputeTypeRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
+            I_GetConceptData computeType = getLatestSourceRelationshipTarget(spec, refsetComputeTypeRel);
+
+            if (computeType == null) {
+                // backwards compatability - if no compute type has been specified, then a default compute type of
+                // concept is used
+                return true;
+            } else {
+                if (computeType.getConceptId() == RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.localize().getNid()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean isDescriptionComputeType() {
+        try {
+            I_GetConceptData refsetComputeTypeRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
+            I_GetConceptData computeType = getLatestSourceRelationshipTarget(spec, refsetComputeTypeRel);
+
+            if (computeType == null) {
+                // backwards compatability - if no compute type has been specified, then a default compute type of
+                // concept is used
+                return false;
+            } else {
+                if (computeType.getConceptId() == RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.localize().getNid()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean isRelationshipComputeType() {
+        try {
+            I_GetConceptData refsetComputeTypeRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
+            I_GetConceptData computeType = getLatestSourceRelationshipTarget(spec, refsetComputeTypeRel);
+
+            if (computeType == null) {
+                // backwards compatability - if no compute type has been specified, then a default compute type of
+                // concept is used
+                return false;
+            } else {
+                if (computeType.getConceptId() == RefsetAuxiliary.Concept.RELATIONSHIP_COMPUTE_TYPE.localize().getNid()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public I_GetConceptData getRefsetSpecConcept() {
         return spec;
     }
 
     public I_GetConceptData getMemberRefsetConcept() {
         try {
-            I_GetConceptData specifiesRefsetRel = termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+            I_GetConceptData specifiesRefsetRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             return getLatestSourceRelationshipTarget(getRefsetSpecConcept(), specifiesRefsetRel);
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,7 +149,8 @@ public class RefsetSpec {
 
     public I_GetConceptData getMarkedParentRefsetConcept() {
         try {
-            I_GetConceptData markedParentRel = termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
+            I_GetConceptData markedParentRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
                 return null;
@@ -93,7 +165,8 @@ public class RefsetSpec {
 
     public I_GetConceptData getRefsetPurposeConcept() {
         try {
-            I_GetConceptData refsetPurposeRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
+            I_GetConceptData refsetPurposeRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
                 return null;

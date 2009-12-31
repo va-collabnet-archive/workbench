@@ -119,7 +119,8 @@ public enum ProcessAttachmentKeys {
     REVIEW_INDEX,
     REVIEWER_INBOX,
     REVIEWER_COMMENTS,
-    ACTIVE_DESCRIPTION_UUID;
+    ACTIVE_DESCRIPTION_UUID,
+    REFSET_COMPUTE_TYPE_UUID;
 
     public String getAttachmentKey() {
         return "A: " + this.name();

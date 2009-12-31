@@ -20,12 +20,12 @@ import java.beans.BeanDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-public class ComputeRefsetFromSpecTaskBeanInfo extends SimpleBeanInfo {
+public class IsConceptComputeTypeTaskBeanInfo extends SimpleBeanInfo {
 
     /**
      *
      */
-    public ComputeRefsetFromSpecTaskBeanInfo() {
+    public IsConceptComputeTypeTaskBeanInfo() {
         super();
     }
 
@@ -40,8 +40,8 @@ public class ComputeRefsetFromSpecTaskBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(ComputeRefsetFromSpecTask.class);
-        bd.setDisplayName("<html><font color='green'><center>Compute concept refset from<br>Refset Spec");
+        BeanDescriptor bd = new BeanDescriptor(IsConceptComputeTypeTask.class);
+        bd.setDisplayName("<html><font color='green'><center>Is concept compute type?");
         return bd;
     }
 

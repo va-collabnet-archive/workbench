@@ -68,7 +68,7 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
      */
     // Serialization Properties
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
     // Task Attribute Properties
     private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
@@ -81,10 +81,11 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
     private String reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
     private String fileAttachmentsPropName = ProcessAttachmentKeys.FILE_ATTACHMENTS.getAttachmentKey();
+    private String computeTypeUuidPropName = ProcessAttachmentKeys.REFSET_COMPUTE_TYPE_UUID.getAttachmentKey();
 
     // Other Properties
     private I_TermFactory termFactory;
-    private I_GetConceptData status;
+
     private transient Exception ex = null;
     private transient Condition returnCondition = Condition.ITEM_COMPLETE;
 
@@ -105,6 +106,7 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
         out.writeObject(editorUuidPropName);
         out.writeObject(reviewerUuidPropName);
         out.writeObject(fileAttachmentsPropName);
+        out.writeObject(computeTypeUuidPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -123,6 +125,11 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
                 editorUuidPropName = (String) in.readObject();
                 reviewerUuidPropName = (String) in.readObject();
                 fileAttachmentsPropName = (String) in.readObject();
+            }
+            if (objDataVersion >= 2) {
+                computeTypeUuidPropName = (String) in.readObject();
+            } else {
+                computeTypeUuidPropName = ProcessAttachmentKeys.REFSET_COMPUTE_TYPE_UUID.getAttachmentKey();
             }
             // Initialize transient properties
             ex = null;
@@ -184,6 +191,7 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
                     String priority = panel.getPriority();
                     HashSet<File> fileAttachments = panel.getAttachments();
                     I_GetConceptData owner = config.getDbConfig().getUserConcept();
+                    I_GetConceptData computeType = panel.getComputeType();
 
                     // -------------------------------------------------------------------------
                     // VERIFY ALL REQUIRED FIELDS AND STORE THE ENTERED DATA INTO PROPERTY KEYS
@@ -328,6 +336,20 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
                         process.writeAttachment(fileContent.getFilename(), fileContent);
                     }
 
+                    // -----------------------------------------
+                    // Compute type (REQUIRED)
+                    // -----------------------------------------
+                    if (computeType == null) {
+                        // Warn the user that compute type is required!
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "You must select a refset compute type (concept or description). ", "",
+                            JOptionPane.ERROR_MESSAGE);
+                        return Condition.ITEM_CANCELED;
+                    } else {
+                        process.setProperty(computeTypeUuidPropName, new UUID[] { computeType.getUids().iterator()
+                            .next() });
+                    }
+
                     // Under normal conditions this is where we should return from
                     return Condition.ITEM_COMPLETE;
 
@@ -449,6 +471,14 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
 
     public void setRequestorPropName(String requestorPropName) {
         this.requestorPropName = requestorPropName;
+    }
+
+    public String getComputeTypeUuidPropName() {
+        return computeTypeUuidPropName;
+    }
+
+    public void setComputeTypeUuidPropName(String computeTypeUuidPropName) {
+        this.computeTypeUuidPropName = computeTypeUuidPropName;
     }
 
 }
