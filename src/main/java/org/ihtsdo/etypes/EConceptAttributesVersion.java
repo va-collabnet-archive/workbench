@@ -1,0 +1,47 @@
+package org.ihtsdo.etypes;
+
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
+import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.tapi.TerminologyException;
+
+public class EConceptAttributesVersion extends EVersion {
+
+	private boolean defined;
+
+	public EConceptAttributesVersion(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		super();
+		readExternal(in);
+	}
+
+	public EConceptAttributesVersion(I_ConceptAttributePart part) throws TerminologyException, IOException {
+		defined = part.isDefined();
+		pathUuid = nidToUuid(part.getPathId());
+		statusUuid = nidToUuid(part.getStatusId());
+		time = part.getTime();
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		super.readExternal(in);
+		defined = in.readBoolean();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		super.writeExternal(out);
+		out.writeBoolean(defined);
+	}
+
+	public boolean isDefined() {
+		return defined;
+	}
+
+	public void setDefined(boolean defined) {
+		this.defined = defined;
+	}
+}

@@ -1,0 +1,74 @@
+package org.ihtsdo.etypes;
+
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.UUID;
+
+import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.tapi.TerminologyException;
+
+public class ERelationshipVersion extends EVersion {
+
+	private UUID characteristicUuid;
+	private UUID refinabilityUuid;
+	private int relGroup; 
+
+	public ERelationshipVersion(ObjectInput in) throws IOException, ClassNotFoundException {
+		super();
+		readExternal(in);
+	}
+
+	public ERelationshipVersion(I_RelPart part) throws TerminologyException, IOException {
+		characteristicUuid = nidToUuid(part.getCharacteristicId());
+		refinabilityUuid = nidToUuid(part.getRefinabilityId());
+		relGroup = part.getGroup();
+		pathUuid = nidToUuid(part.getPathId());
+		statusUuid = nidToUuid(part.getStatusId());
+		time = part.getTime();
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		super.readExternal(in);
+		characteristicUuid = new UUID(in.readLong(), in.readLong());
+		refinabilityUuid = new UUID(in.readLong(), in.readLong());
+		relGroup = in.readInt();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		super.writeExternal(out);
+		out.writeLong(characteristicUuid.getMostSignificantBits());
+		out.writeLong(characteristicUuid.getLeastSignificantBits());
+		out.writeLong(refinabilityUuid.getMostSignificantBits());
+		out.writeLong(refinabilityUuid.getLeastSignificantBits());
+		out.writeInt(relGroup);
+	}
+
+	public UUID getCharacteristicUuid() {
+		return characteristicUuid;
+	}
+
+	public void setCharacteristicUuid(UUID characteristicUuid) {
+		this.characteristicUuid = characteristicUuid;
+	}
+
+	public UUID getRefinabilityUuid() {
+		return refinabilityUuid;
+	}
+
+	public void setRefinabilityUuid(UUID refinabilityUuid) {
+		this.refinabilityUuid = refinabilityUuid;
+	}
+
+	public int getRelGroup() {
+		return relGroup;
+	}
+
+	public void setRelGroup(int relGroup) {
+		this.relGroup = relGroup;
+	}
+
+}
