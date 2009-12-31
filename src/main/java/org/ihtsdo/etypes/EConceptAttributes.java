@@ -24,6 +24,7 @@ public class EConceptAttributes extends EComponent {
 
 	public EConceptAttributes(I_ConceptAttributeVersioned conceptAttributes) throws TerminologyException, IOException {
 		super();
+		convert(nidToIdentifier(conceptAttributes.getNid()));
 		int partCount = conceptAttributes.getMutableParts().size();
 		I_ConceptAttributePart part = conceptAttributes.getMutableParts().get(0);
 		defined = part.isDefined();
