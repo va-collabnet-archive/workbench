@@ -30,7 +30,6 @@ public class ExternalTermPublisher {
 	private I_TermFactory termFactory;
 	private HashSet<I_Position> positions;
 	private I_IntSet statusValues;
-	private List<ExternalTermRecord> externalRecords;
 	private List<ExternalTermRecord> recordQueue;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
 	private I_GetConceptData rootConcept;
@@ -76,7 +75,7 @@ public class ExternalTermPublisher {
 		masterFilesImpacted = new ArrayList<String>();
 		displayNames = new ArrayList<DisplayName>();
 		wildcardItems = new ArrayList<ValuePair>();
-		this.externalRecords = new ArrayList<ExternalTermRecord>();
+		List<ExternalTermRecord> externalRecords = new ArrayList<ExternalTermRecord>();
 		this.recordQueue = new ArrayList<ExternalTermRecord>();
 		List<ExternalTermRecord> standAloneRecords = new ArrayList<ExternalTermRecord>();
 		List<ExternalTermRecord> commonItemRecords = new ArrayList<ExternalTermRecord>();
@@ -89,35 +88,32 @@ public class ExternalTermPublisher {
 		int extensionsProcessed = 0;
 		for (I_DescriptionVersioned desc : descs) {
 			I_GetConceptData descriptionConcept = termFactory.getConcept(desc.getConceptId());
-			// System.out.println("Processing description " + desc.getLastTuple().getText());
 			extensionsProcessed += processDescriptionConcept(descriptionConcept, desc);
 			writeWildcardValues();
 			saveAndCloseRecordQueue(concept, standAloneRecords, commonItemRecords);
 		}
 		// Finally, process this concept directly if it is a description concept, or process the root concept
 		// for extensions attached to the root concept
-		// System.out.println("Processing concept " + concept) ;
 		processDescriptionConcept(concept, null);
         writeWildcardValues();
         saveAndCloseRecordQueue(concept, standAloneRecords, commonItemRecords);
         for (ExternalTermRecord r : standAloneRecords) {
-        	// System.out.println("Adding record for " + r.getMasterFileName()) ;       	
         	for (ExternalTermRecord c : commonItemRecords) {
         		if (c.getMasterFileName().equals(r.getMasterFileName())) {
         			for (ExternalTermRecord.Item i : c.items)
         				r.addItem(i);
         		}
         	}
-        	this.externalRecords.add(r);
+        	externalRecords.add(r);
         }
-        return this.externalRecords;
+        return externalRecords;
 	}
 	
 		
 	private void saveAndCloseRecordQueue(I_GetConceptData concept, List<ExternalTermRecord> standAloneRecords, 
 			List<ExternalTermRecord> commonItemRecords) throws Exception {
 		for (ExternalTermRecord r: this.recordQueue) {
-			if (r.hasItem("2")) {
+			if (this.converter.recordIsStandAloneTerm(r)) {
 				if (this.idTuple != null)
 					this.converter.addRecordIds(this.idTuple, concept, r);
 				standAloneRecords.add(r);
@@ -196,7 +192,7 @@ public class ExternalTermPublisher {
     					this.converter.getItemValue(), this.converter.getPreviousItemValue()));
     		}
     		else {
-	    		if (app.getItemNumber().equals("2")) {
+	    		if (app.itemIsTermName()) {
 	    			if (isNewDisplayNameApplication(app.getMasterfile(), this.converter.getRegion())) {
 	    				this.idTuple = extensionTuple;
 	    				addItem(app.getMasterfile(), app.getItemNumber(), 
@@ -247,6 +243,7 @@ public class ExternalTermPublisher {
 
     		}
     	}
+    	this.wildcardItems.clear();
     }
     private void setCurrentItem(String masterFile, String item) {
     	this.currentMasterFile = masterFile;

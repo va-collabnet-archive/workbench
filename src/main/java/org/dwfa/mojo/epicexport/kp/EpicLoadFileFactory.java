@@ -33,7 +33,12 @@ import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
 import com.mysql.jdbc.Connection;
 
 public class EpicLoadFileFactory implements I_ExportFactory {
-
+	public static final String EPIC_MASTERFILE_NAME_EDG_BILLING = "edgbilling";
+	public static final String EPIC_MASTERFILE_NAME_EDG_CLINICAL = "edgclinical";
+	
+	public static final String EPIC_MASTERFILE_NAME_WILDCARD = "*";
+	public static final String DISPLAYNAME_ITEM = "2";
+	
     public EpicExportManager getExportManager(String baseDir) {
         return new EpicExportManager(baseDir, this);
     }
@@ -45,9 +50,9 @@ public class EpicLoadFileFactory implements I_ExportFactory {
 
     public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile, EpicExportManager em) throws Exception {
         I_EpicLoadFileBuilder ret;
-        if (masterfile.equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL))
+        if (masterfile.equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_CLINICAL))
             ret = new EpicExportBuilderEDGClinical(this, em);
-        else if (masterfile.equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING))
+        else if (masterfile.equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_BILLING))
             ret = new EpicExportBuilderEDGBilling(this, em);
         else {
         	AceLog.getAppLog().warning("Using generic loadfile builder for unknown master file: " + masterfile);
