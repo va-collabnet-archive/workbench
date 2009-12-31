@@ -257,8 +257,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
     		 List<ExternalTermRecord> terms = publisher.getExternalTermRecordsForConcept(concept);
     		 for (ExternalTermRecord term: terms) {
     			 term.setVersion(version);
-    			 if (term.getFirstItem("2") != null)
-    				 exportManager.exportExternalTermRecord(term);
+    		     exportManager.exportExternalTermRecord(term);
     		 }
     	 }
     	 

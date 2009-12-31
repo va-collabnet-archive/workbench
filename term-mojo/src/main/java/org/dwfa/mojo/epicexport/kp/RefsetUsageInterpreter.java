@@ -22,9 +22,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
 
 public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
-	public static final String EPIC_MASTERFILE_NAME_EDG_BILLING = "edgbilling";
-	public static final String EPIC_MASTERFILE_NAME_EDG_CLINICAL = "edgclinical";
-	public static final String EPIC_MASTERFILE_NAME_WILDCARD = "*";
 
 	public List<I_RefsetApplication> getApplications(String refsetName) {
 		List<I_RefsetApplication> applications = new ArrayList<I_RefsetApplication>();
@@ -42,43 +39,12 @@ public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
 			applications.add(app);	
 		}
     	else if(refsetName.equals("EDG Billing Contact Date")) {
-    		applications.add(new RefsetApplication(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING, "20"));
+    		applications.add(new RefsetApplication(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_BILLING, "20"));
     	}
 
-		/*
-		if(refsetName.equals("EDG Billing Item 2")) {
-    		applications.add(new RefsetApplication(
-    				RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING, "2"));
-    	}
-    	else if(refsetName.startsWith("EDG Billing Item ")) {
-    		String item = refsetName.substring(17);
-    		applications.add(new RefsetApplication(
-    				RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING, item));
-    	}
-    	else if(refsetName.equals("EDG Billing Contact Date")) {
-    		applications.add(new RefsetApplication(RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING, "20"));
-    	}
-
-    	
-    	//
-    	 //  EDG Clinical refsets
-    	 //
-    	else if (refsetName.startsWith("EDG Clinical Item 2 "))
-    	{
-    		String region = refsetName.substring(20);
-    		RefsetApplication app = new RefsetApplication(RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL, "2");
-    		applications.add(app);
-    		app.setRegion(region);
-    	}
-    	else if(refsetName.startsWith("EDG Clinical Item ")) {
-    		String item = refsetName.substring(18);
-    		applications.add(new RefsetApplication(
-    				RefsetApplicationInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL, item));
-    	}
-		*/
     	else if(refsetName.equals("Reason for Soft Delete")) {
     		applications.add(new RefsetApplication(
-    				RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_WILDCARD, "300002"));
+    				EpicLoadFileFactory.EPIC_MASTERFILE_NAME_WILDCARD, "300002"));
     	}
     	else if (refsetName.equals("ICD10-CM Code Mapping Status") ||
     			refsetName.equals("ICD9-CM Code Mapping") ||
@@ -113,7 +79,6 @@ public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
 				wildcards++;
 				jumpto = -1;
 				int locationOfNextWildcard = pattern.indexOf("*", i + 1);
-				//System.out.format("locationOfNextWildcard=%d i=%d found=%d\n", locationOfNextWildcard, i + 1, found);
 				if (locationOfNextWildcard == -1) {
 					if (wildcards > found + 1)
 						break;
@@ -121,7 +86,6 @@ public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
 				}
 				else
 					next = pattern.substring(i + 1, locationOfNextWildcard);
-				//System.out.println("\"" + next + "\"");
 				if (next.length() > 0) {
 					jumpto = lookin.indexOf(next, lookforPointer);
 				}
@@ -140,8 +104,6 @@ public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
 				}
 			}
 			lookforPointer++;
-			//if (lookforPointer >= lookin.length())
-			//	break;
 		}
 		return (wildcards == found) ? arguments : null;
 	}
@@ -181,6 +143,10 @@ public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
 		
 		public void setRegion(String region) {
 			this.region = region;
+		}
+		
+		public boolean itemIsTermName() {
+			return this.itemNumber.equals(EpicLoadFileFactory.DISPLAYNAME_ITEM);
 		}
 	}
 }

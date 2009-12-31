@@ -34,5 +34,8 @@ public interface I_RefsetUsageInterpreter {
 		public void setRegion(String region);
 		
 		public String getRegion();
+		
+		public boolean itemIsTermName();
+
 	}
 }

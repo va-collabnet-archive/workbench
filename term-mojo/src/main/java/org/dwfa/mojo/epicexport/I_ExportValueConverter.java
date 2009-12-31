@@ -46,5 +46,7 @@ public interface I_ExportValueConverter {
 	public void addRecordIds(I_ThinExtByRefTuple extensionTuple, I_GetConceptData rootConcept,
 			ExternalTermRecord record) throws Exception;
 	
+	public boolean recordIsStandAloneTerm(ExternalTermRecord record);
+	
 	public String getIdForConcept(I_GetConceptData concept, String idTypeUUID) throws Exception;
 }

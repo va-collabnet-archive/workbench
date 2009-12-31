@@ -59,7 +59,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
 		this.previousItemValue = null;
 		this.region = null;
 		
-		if (refsetUsage.getMasterfile().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
+		if (refsetUsage.getMasterfile().equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
 			if (refsetUsage.getItemNumber().equals("2")) {
 	    		itemValue = getDisplayName(conceptForDescription); 
 	    		previousItemValue = getPreviousDisplayName(conceptForDescription); 
@@ -69,7 +69,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
 				previousItemValue = getValueAsString(previousPart);
 			}
 		}
-		else if (refsetUsage.getMasterfile().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
+		else if (refsetUsage.getMasterfile().equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
 			if (refsetUsage.getItemNumber().equals("2")) {
     			itemValue = description.getLastTuple().getMutablePart().getText();
     			previousItemValue = getPreviousDisplayName(description);
@@ -208,11 +208,11 @@ public class ExportValueConverter implements I_ExportValueConverter{
     		exportWriter.setIdConcept(idConcept);
     		uuid = getIdForConcept(idConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
     		
-    		if(masterfile.equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
+    		if(masterfile.equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
 				dot11 = getIdForConcept(idConcept, "e3dadc2a-196d-5525-879a-3037af99607d");
 				dot1 = getIdForConcept(idConcept, "e49a55a7-319d-5744-b8a9-9b7cc86fd1c6");
     		}
-    		else if(masterfile.equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
+    		else if(masterfile.equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
 				dot11 = getIdForConcept(idConcept, "bf3e7556-38cb-5395-970d-f11851c9f41e");
 				dot1 = getIdForConcept(idConcept, "af8be384-dc60-5b56-9ad8-bc1e4b5dfbae");
     		}
@@ -240,11 +240,11 @@ public class ExportValueConverter implements I_ExportValueConverter{
 		uuid = getIdForConcept(idConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
 		rootUuid = getIdForConcept(rootConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
 		
-		if(record.getMasterFileName().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
+		if(record.getMasterFileName().equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
 			dot11 = getIdForConcept(idConcept, "e3dadc2a-196d-5525-879a-3037af99607d");
 			dot1 = getIdForConcept(idConcept, "e49a55a7-319d-5744-b8a9-9b7cc86fd1c6");
 		}
-		else if(record.getMasterFileName().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
+		else if(record.getMasterFileName().equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
 			dot11 = getIdForConcept(idConcept, "bf3e7556-38cb-5395-970d-f11851c9f41e");
 			dot1 = getIdForConcept(idConcept, "af8be384-dc60-5b56-9ad8-bc1e4b5dfbae");
 		}
@@ -266,6 +266,10 @@ public class ExportValueConverter implements I_ExportValueConverter{
    			record.addItem("icd10", icd10, icd10);
     }
 
+    public boolean recordIsStandAloneTerm(ExternalTermRecord record) {
+    	return record.hasItem("2");
+    }
+    
     public String getIdForConcept(I_GetConceptData concept, String idTypeUUID) throws Exception {
     	String ret = null;
     	//getLog().info("Looking for id in: " + concept);

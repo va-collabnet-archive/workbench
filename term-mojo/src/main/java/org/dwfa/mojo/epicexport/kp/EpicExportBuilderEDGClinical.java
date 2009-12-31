@@ -33,7 +33,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 	public static final String[] EREC_ITEMS = {"50", "7010"};
 	public static final String[] MANDATORY_ITEMS = {"2", "40", "7000", "7010", "91", "80", "100", "207"};
 	
-	public String masterfile = RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL;
+	public String masterfile = EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_CLINICAL;
 	
 	public EpicExportBuilderEDGClinical(I_ExportFactory factory, EpicExportManager em) {
 		super(factory, em);
