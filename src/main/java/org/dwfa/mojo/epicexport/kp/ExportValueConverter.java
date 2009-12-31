@@ -224,11 +224,9 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	}
     }
 
-    public void addRecordIds(I_ThinExtByRefTuple extensionTuple, List<ExternalTermRecord> records, 
-    		I_GetConceptData rootConcept) 
+    public void addRecordIds(I_ThinExtByRefTuple extensionTuple, I_GetConceptData rootConcept,
+    		ExternalTermRecord record) 
     	throws Exception {
-    	
-    	//List<ExternalTermRecord.Item> ret = new ArrayList<ExternalTermRecord.Item>();
     	
     	String dot11 = null;
     	String dot1 = null;
@@ -239,40 +237,33 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	String icd10 = null;
     	
     	I_GetConceptData idConcept = LocalVersionedTerminology.get().getConcept(extensionTuple.getComponentId());
-    	
-    	for (ExternalTermRecord record: records) {
-	    	// I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(masterfile);
-    		
-    		//exportWriter.setIdConcept(idConcept);
-    		uuid = getIdForConcept(idConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
-    		rootUuid = getIdForConcept(rootConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
-    		
-    		if(record.getMasterFileName().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
-				dot11 = getIdForConcept(idConcept, "e3dadc2a-196d-5525-879a-3037af99607d");
-				dot1 = getIdForConcept(idConcept, "e49a55a7-319d-5744-b8a9-9b7cc86fd1c6");
-    		}
-    		else if(record.getMasterFileName().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
-				dot11 = getIdForConcept(idConcept, "bf3e7556-38cb-5395-970d-f11851c9f41e");
-				dot1 = getIdForConcept(idConcept, "af8be384-dc60-5b56-9ad8-bc1e4b5dfbae");
-    		}
-    		snomed = getIdForConcept(rootConcept, "0418a591-f75b-39ad-be2c-3ab849326da9");
-    		icd9 = getIdForConcept(idConcept, "a8160cc4-c49c-3a56-aa82-ea51e6c538ba");
-    		icd10 = getIdForConcept(idConcept, "9228d285-e625-33f9-bf46-9cfba3beee6d");
-    		
-    		if (dot11 != null)
-    			record.addItem("11", dot11, dot11);
-    		if (dot1 != null)
-    			record.addItem("1", dot1, dot1);
-    		record.addItem("35", uuid, uuid);
-    		record.addItem("rootuuid", rootUuid, rootUuid);
-       		if (snomed != null)
-       			record.addItem("snomed", snomed, snomed);
-       		if (icd9 != null)
-       			record.addItem("icd9", icd9, icd9);
-       		if (icd10 != null)
-       			record.addItem("icd10", icd10, icd10);
-    	}
-	
+		uuid = getIdForConcept(idConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
+		rootUuid = getIdForConcept(rootConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
+		
+		if(record.getMasterFileName().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
+			dot11 = getIdForConcept(idConcept, "e3dadc2a-196d-5525-879a-3037af99607d");
+			dot1 = getIdForConcept(idConcept, "e49a55a7-319d-5744-b8a9-9b7cc86fd1c6");
+		}
+		else if(record.getMasterFileName().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
+			dot11 = getIdForConcept(idConcept, "bf3e7556-38cb-5395-970d-f11851c9f41e");
+			dot1 = getIdForConcept(idConcept, "af8be384-dc60-5b56-9ad8-bc1e4b5dfbae");
+		}
+		snomed = getIdForConcept(rootConcept, "0418a591-f75b-39ad-be2c-3ab849326da9");
+		icd9 = getIdForConcept(idConcept, "a8160cc4-c49c-3a56-aa82-ea51e6c538ba");
+		icd10 = getIdForConcept(idConcept, "9228d285-e625-33f9-bf46-9cfba3beee6d");
+		
+		if (dot11 != null)
+			record.addItem("11", dot11, dot11);
+		if (dot1 != null)
+			record.addItem("1", dot1, dot1);
+		record.addItem("35", uuid, uuid);
+		record.addItem("rootuuid", rootUuid, rootUuid);
+   		if (snomed != null)
+   			record.addItem("snomed", snomed, snomed);
+   		if (icd9 != null)
+   			record.addItem("icd9", icd9, icd9);
+   		if (icd10 != null)
+   			record.addItem("icd10", icd10, icd10);
     }
 
     public String getIdForConcept(I_GetConceptData concept, String idTypeUUID) throws Exception {

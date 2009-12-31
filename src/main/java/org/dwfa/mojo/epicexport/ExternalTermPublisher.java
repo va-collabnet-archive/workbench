@@ -36,6 +36,7 @@ public class ExternalTermPublisher {
 	private I_GetConceptData rootConcept;
 	private String currentItem;
 	private String currentMasterFile;
+	private I_ExportValueConverter converter;
 
 	
 	public ExternalTermPublisher(I_ExportFactory exportFactory) throws Exception
@@ -43,6 +44,7 @@ public class ExternalTermPublisher {
 		this.exportFactory = exportFactory;
 		this.interpreter = exportFactory.getInterpreter();
 		this.termFactory = LocalVersionedTerminology.get();
+		this.converter = this.exportFactory.getValueConverter(Integer.MAX_VALUE);
 	}
 
 	public void close() throws Exception {
@@ -67,7 +69,7 @@ public class ExternalTermPublisher {
 		}
     	
     	this.startingVersion = termFactory.convertToThinVersion(parsedDate.getTime());
-
+    	this.converter = this.exportFactory.getValueConverter(startingVersion);
 	}
 
 	public List<ExternalTermRecord> getExternalTermRecordsForConcept(I_GetConceptData concept) throws Exception {
@@ -85,28 +87,19 @@ public class ExternalTermPublisher {
 		this.setCurrentItem(null, null);
 		this.rootConcept = concept;
 		int extensionsProcessed = 0;
-		int recsAdded = 0;
 		for (I_DescriptionVersioned desc : descs) {
 			I_GetConceptData descriptionConcept = termFactory.getConcept(desc.getConceptId());
 			// System.out.println("Processing description " + desc.getLastTuple().getText());
 			extensionsProcessed += processDescriptionConcept(descriptionConcept, desc);
-			for (ExternalTermRecord r: this.recordQueue) {
-				if (r.hasItem("2"))
-					standAloneRecords.add(r);
-				else
-					commonItemRecords.add(r);
-			}
-			this.recordQueue.clear();
+			writeWildcardValues();
+			saveAndCloseRecordQueue(concept, standAloneRecords, commonItemRecords);
 		}
 		// Finally, process this concept directly if it is a description concept, or process the root concept
 		// for extensions attached to the root concept
 		// System.out.println("Processing concept " + concept) ;
 		processDescriptionConcept(concept, null);
-		if (this.idTuple != null)
-			this.exportFactory.getValueConverter(startingVersion).
-				addRecordIds(this.idTuple, this.recordQueue, concept);
         writeWildcardValues();
-        copyQueuedRecordsTo(commonItemRecords);
+        saveAndCloseRecordQueue(concept, standAloneRecords, commonItemRecords);
         for (ExternalTermRecord r : standAloneRecords) {
         	// System.out.println("Adding record for " + r.getMasterFileName()) ;       	
         	for (ExternalTermRecord c : commonItemRecords) {
@@ -120,9 +113,21 @@ public class ExternalTermPublisher {
         return this.externalRecords;
 	}
 	
-	private void copyQueuedRecordsTo(List<ExternalTermRecord> queue) {
-		for (ExternalTermRecord r: this.recordQueue)
-			queue.add(r);
+		
+	private void saveAndCloseRecordQueue(I_GetConceptData concept, List<ExternalTermRecord> standAloneRecords, 
+			List<ExternalTermRecord> commonItemRecords) throws Exception {
+		for (ExternalTermRecord r: this.recordQueue) {
+			if (r.hasItem("2")) {
+				if (this.idTuple != null)
+					this.converter.addRecordIds(this.idTuple, concept, r);
+				standAloneRecords.add(r);
+
+			}
+			else
+				commonItemRecords.add(r);
+		}
+		this.recordQueue.clear();
+
 	}
 
     private int processDescriptionConcept(I_GetConceptData concept, I_DescriptionVersioned description) throws TerminologyException, Exception {
@@ -182,26 +187,26 @@ public class ExternalTermPublisher {
     	// System.out.println("Processing refset " + refsetName);
     	List<I_RefsetUsageInterpreter.I_RefsetApplication> applications = 
     		this.interpreter.getApplications(refsetName);
-    	I_ExportValueConverter populater = this.exportFactory.getValueConverter(startingVersion);
+    	
     	for (I_RefsetUsageInterpreter.I_RefsetApplication app: applications) {
-    		populater.populateValues(app, conceptForDescription, description, extensionTuple, previousPart);
+    		this.converter.populateValues(app, conceptForDescription, description, extensionTuple, previousPart);
     		
     		if (app.getMasterfile().equals(ExportToEpicLoadFilesMojo.EPIC_MASTERFILE_NAME_WILDCARD)) {
     			this.wildcardItems.add(new ValuePair(app.getItemNumber(), 
-    					populater.getItemValue(), populater.getPreviousItemValue()));
+    					this.converter.getItemValue(), this.converter.getPreviousItemValue()));
     		}
     		else {
 	    		if (app.getItemNumber().equals("2")) {
-	    			if (isNewDisplayNameApplication(app.getMasterfile(), populater.getRegion())) {
+	    			if (isNewDisplayNameApplication(app.getMasterfile(), this.converter.getRegion())) {
 	    				this.idTuple = extensionTuple;
 	    				addItem(app.getMasterfile(), app.getItemNumber(), 
-	    						populater.getItemValue(), populater.getPreviousItemValue());
+	    						this.converter.getItemValue(), this.converter.getPreviousItemValue());
 	    				addRegion(app.getMasterfile(), app.getRegion());
 	    			}
 	    		}
 	    		else {
     				addItem(app.getMasterfile(), app.getItemNumber(), 
-    						populater.getItemValue(), populater.getPreviousItemValue());
+    						this.converter.getItemValue(), this.converter.getPreviousItemValue());
 	    		}
     		}
     	}
@@ -230,17 +235,6 @@ public class ExternalTermPublisher {
     	if (ret == null) {
     		ret = new ExternalTermRecord(masterFile);
     		this.recordQueue.add(ret);
-    	}
-    	return ret;
-    }
-    
-    private String convertToIntString(String str) {
-    	String ret = null;
-    	try {
-    		ret = new Integer(str).toString();
-    	}
-    	catch (NumberFormatException e) {
-    		ret = null; // Ignore
     	}
     	return ret;
     }
