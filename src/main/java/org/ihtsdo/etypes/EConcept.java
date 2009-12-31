@@ -191,6 +191,7 @@ public class EConcept extends EComponent implements Externalizable {
 	public EConcept(I_GetConceptData c) throws IOException, TerminologyException {
 		convert(c.getIdentifier());
 		conceptAttributes = new EConceptAttributes(c.getConceptAttributes());
+		relationships = new ArrayList<ERelationship>(c.getSourceRels().size());
 		for (I_RelVersioned rel: c.getSourceRels()) {
 			relationships.add(new ERelationship(rel));
 		}
