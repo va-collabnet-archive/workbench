@@ -25,32 +25,33 @@ import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
- * The GetRefreshRefsetSpecParamsPanelDataTaskBeanInfo class describes the visible elements of the 
- * Workflow task GetRefreshRefsetSpecParamsPanelDataTask so that it can be displayed in the 
- * Process Builder. 
+ * The GetRefreshRefsetSpecParamsPanelDataTaskBeanInfo class describes the visible elements of the
+ * Workflow task GetRefreshRefsetSpecParamsPanelDataTask so that it can be displayed in the
+ * Process Builder.
  * 
- * @author  Perry Reid
- * @version 1.0, December 2009 
+ * @author Perry Reid
+ * @version 1.0, December 2009
  */
 public class GetDataFromCreateRefsetPanelBeanInfo extends SimpleBeanInfo {
 
-     public GetDataFromCreateRefsetPanelBeanInfo() {
+    public GetDataFromCreateRefsetPanelBeanInfo() {
         super();
     }
 
-	/**
-	 * Returns a list of property descriptors for this task.   
-	 * @return  	Returns a PropertyDescriptor array containing the properties of this task  
-	 * @exception  	Error Thrown when an exception happens during Introspection
-	 */
+    /**
+     * Returns a list of property descriptors for this task.
+     * 
+     * @return Returns a PropertyDescriptor array containing the properties of this task
+     * @exception Error Thrown when an exception happens during Introspection
+     */
     public PropertyDescriptor[] getPropertyDescriptors() {
 
         try {
 
-        	// The color "green" = denotes an [IN] property 
-        	// The color "blue"  = denotes an [OUT] property 
+            // The color "green" = denotes an [IN] property
+            // The color "blue" = denotes an [OUT] property
             PropertyDescriptor profilePropName =
-                new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
+                    new PropertyDescriptor("profilePropName", getBeanDescriptor().getBeanClass());
             profilePropName.setBound(true);
             profilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             profilePropName.setDisplayName("<html><font color='green'>profile prop:");
@@ -64,7 +65,8 @@ public class GetDataFromCreateRefsetPanelBeanInfo extends SimpleBeanInfo {
             refsetNamePropName.setShortDescription("[OUT] The property to put the refset name into.");
 
             PropertyDescriptor refsetParentUuidPropName;
-            refsetParentUuidPropName = new PropertyDescriptor("refsetParentUuidPropName", getBeanDescriptor().getBeanClass());
+            refsetParentUuidPropName =
+                    new PropertyDescriptor("refsetParentUuidPropName", getBeanDescriptor().getBeanClass());
             refsetParentUuidPropName.setBound(true);
             refsetParentUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             refsetParentUuidPropName.setDisplayName("<html><font color='blue'>refset parent uuid prop name:");
@@ -113,28 +115,38 @@ public class GetDataFromCreateRefsetPanelBeanInfo extends SimpleBeanInfo {
             reviewerUuidPropName.setShortDescription("[OUT] The property to put the reviewer uuid into.");
 
             PropertyDescriptor fileAttachmentsPropName;
-            fileAttachmentsPropName = new PropertyDescriptor("fileAttachmentsPropName", getBeanDescriptor().getBeanClass());
+            fileAttachmentsPropName =
+                    new PropertyDescriptor("fileAttachmentsPropName", getBeanDescriptor().getBeanClass());
             fileAttachmentsPropName.setBound(true);
             fileAttachmentsPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             fileAttachmentsPropName.setDisplayName("<html><font color='blue'>file attachments prop name:");
             fileAttachmentsPropName.setShortDescription("[OUT] The property to put the file attachments into.");
-         
-            PropertyDescriptor rv[] = { profilePropName, refsetNamePropName, refsetParentUuidPropName,
-                                       statusTermEntry, commentsPropName, ownerUuidPropName, 
-                                       requestorPropName, editorUuidPropName, reviewerUuidPropName, 
-                                       fileAttachmentsPropName };
+
+            PropertyDescriptor computeTypeUuidPropName;
+            computeTypeUuidPropName =
+                    new PropertyDescriptor("computeTypeUuidPropName", getBeanDescriptor().getBeanClass());
+            computeTypeUuidPropName.setBound(true);
+            computeTypeUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            computeTypeUuidPropName.setDisplayName("<html><font color='blue'>compute type uuid prop name:");
+            computeTypeUuidPropName.setShortDescription("[OUT] The property to put the compute type uuid into.");
+
+            PropertyDescriptor rv[] =
+                    { profilePropName, refsetNamePropName, refsetParentUuidPropName, statusTermEntry, commentsPropName,
+                     ownerUuidPropName, requestorPropName, editorUuidPropName, reviewerUuidPropName,
+                     fileAttachmentsPropName, computeTypeUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
         }
     }
 
-    /** 
-     * Return the descriptor for this JavaBean which contains a reference to the JavaBean 
-	 * that implements this task as well as the display name of the task along with 
-	 * formating information.
+    /**
+     * Return the descriptor for this JavaBean which contains a reference to the JavaBean
+     * that implements this task as well as the display name of the task along with
+     * formating information.
+     * 
      * @see java.beans.BeanInfo#getBeanDescriptor()
-	 * @return	Returns the BeanDescriptor for this task      
+     * @return Returns the BeanDescriptor for this task
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(GetDataFromCreateRefsetPanel.class);

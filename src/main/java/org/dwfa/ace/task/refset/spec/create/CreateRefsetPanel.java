@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -39,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -46,11 +49,14 @@ import javax.swing.KeyStroke;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
 import org.dwfa.ace.task.commit.TestForReviewRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
 import org.dwfa.bpa.data.ArrayListModel;
+import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 
 /**
  * Table to support selection of more than one reviewer.
@@ -126,6 +132,7 @@ class ReviewerTableModel extends AbstractTableModel {
  * 9) file attachments (file chooser)
  * 
  * @author Perry Reid
+ * @author Chrissy Hill
  * @version 1.0, December 2009
  * 
  */
@@ -148,6 +155,7 @@ public class CreateRefsetPanel extends JPanel {
     private JLabel reviewerLabel;
     private JLabel deadlineLabel;
     private JLabel priorityLabel;
+    private JLabel computeTypeLabel;
 
     private JTextField refsetNameTextField;
     private JComboBox refsetParentComboBox;
@@ -159,6 +167,9 @@ public class CreateRefsetPanel extends JPanel {
     private DatePicker deadlinePicker;
     private JComboBox priorityComboBox;
     private JButton openFileChooserButton;
+    private ButtonGroup computeTypeGroup;
+    private JRadioButton conceptTypeChoice;
+    private JRadioButton descriptionTypeChoice;
 
     // File Attachments
     private JList attachmentList;
@@ -202,6 +213,7 @@ public class CreateRefsetPanel extends JPanel {
         reviewerLabel = new JLabel("Reviewer(s) (optional):");
         deadlineLabel = new JLabel("Deadline (required):");
         priorityLabel = new JLabel("Priority (required):");
+        computeTypeLabel = new JLabel("Compute type (required):");
 
         // Data Controls
         refsetNameTextField = new JTextField(20);
@@ -218,6 +230,12 @@ public class CreateRefsetPanel extends JPanel {
         deadlinePicker = new DatePicker(Calendar.getInstance(), null, dateFormat);
         priorityComboBox = new JComboBox(new String[] { "Highest", "High", "Normal", "Low", "Lowest" });
         openFileChooserButton = new JButton("Attach a file...");
+        computeTypeGroup = new ButtonGroup();
+        conceptTypeChoice = new JRadioButton("Concept");
+        descriptionTypeChoice = new JRadioButton("Description");
+        computeTypeGroup.add(conceptTypeChoice);
+        computeTypeGroup.add(descriptionTypeChoice);
+        conceptTypeChoice.setSelected(true);
 
         // Add Listeners
         openFileChooserButton.addActionListener(new AddAttachmentActionLister());
@@ -409,6 +427,28 @@ public class CreateRefsetPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(priorityComboBox, gbc);
 
+        // refset compute type (description or concept)
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.insets = new Insets(5, 5, 0, 5); // padding (top, left, bottom, right)
+        gbc.anchor = GridBagConstraints.LINE_START;
+        this.add(computeTypeLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 10, 10); // padding (top, left, bottom, right)
+        this.add(conceptTypeChoice, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(0, 5, 10, 10); // padding (top, left, bottom, right)
+        this.add(descriptionTypeChoice, gbc);
+
         // file attachments
         gbc.gridx = 0;
         gbc.gridy++;
@@ -436,7 +476,7 @@ public class CreateRefsetPanel extends JPanel {
         attachmentScroller.setMaximumSize(new Dimension(500, 300));
         attachmentScroller.setPreferredSize(new Dimension(150, 150));
         attachmentScroller.setBorder(BorderFactory.createTitledBorder("Attachments (optional):"));
-        add(attachmentScroller, gbc);
+        this.add(attachmentScroller, gbc);
 
         // Using validate(), Tell the panel to lay out its subcomponents again. It should be invoked
         // when this container's subcomponents are modified after the container has been displayed.
@@ -690,6 +730,19 @@ public class CreateRefsetPanel extends JPanel {
         attachmentSet.addAll(files);
         attachmentListModel.clear();
         attachmentListModel.addAll(files);
+    }
+
+    public I_GetConceptData getComputeType() throws TerminologyException, IOException {
+
+        if (conceptTypeChoice.isSelected()) {
+            return LocalVersionedTerminology.get().getConcept(
+                RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.localize().getNid());
+        } else if (descriptionTypeChoice.isSelected()) {
+            return LocalVersionedTerminology.get().getConcept(
+                RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.localize().getNid());
+        } else {
+            return null;
+        }
     }
 
     // -----------------------

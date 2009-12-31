@@ -81,7 +81,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
      * -----------------------
      */
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 3;
+    private static final int dataVersion = 4;
     private String newRefsetPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
     private String reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
@@ -89,6 +89,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
     private String newRefsetUUIDPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
     private String newRefsetSpecUUIDPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
+    private String computeTypeUUIDPropName = ProcessAttachmentKeys.REFSET_COMPUTE_TYPE_UUID.getAttachmentKey();
 
     private I_TermFactory termFactory;
     private I_GetConceptData status;
@@ -110,6 +111,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         out.writeObject(editorUuidPropName);
         out.writeObject(newRefsetUUIDPropName);
         out.writeObject(newRefsetSpecUUIDPropName);
+        out.writeObject(computeTypeUUIDPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -146,6 +148,11 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                 // values for them.
                 newRefsetUUIDPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
                 newRefsetSpecUUIDPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
+            }
+            if (objDataVersion >= 4) {
+                computeTypeUUIDPropName = (String) in.readObject();
+            } else {
+                computeTypeUUIDPropName = ProcessAttachmentKeys.REFSET_COMPUTE_TYPE_UUID.getAttachmentKey();
             }
 
             // Initialize transient properties
@@ -230,6 +237,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             UUID[] reviewerUuids = (UUID[]) process.getProperty(reviewerUuidPropName);
             I_GetConceptData owner = termFactory.getConcept((UUID[]) process.getProperty(ownerUuidPropName));
             I_GetConceptData editor = termFactory.getConcept((UUID[]) process.getProperty(editorUuidPropName));
+            I_GetConceptData refsetComputeType =
+                    termFactory.getConcept((UUID[]) process.getProperty(computeTypeUUIDPropName));
 
             I_GetConceptData parent =
                     termFactory.getConcept(new UUID[] { (UUID) process.getProperty(ProcessAttachmentKeys.ACTIVE_CONCEPT
@@ -255,6 +264,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
             I_GetConceptData commentsRel = termFactory.getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
             I_GetConceptData purposeRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
+            I_GetConceptData refsetComputeTypeRel =
+                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
             I_GetConceptData stringAnnotation =
                     termFactory.getConcept(RefsetAuxiliary.Concept.STRING_ANNOTATION_PURPOSE.getUids());
             I_GetConceptData markedParentAnnotation =
@@ -334,6 +345,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
             newRelationship(memberRefset, promotionRel, promotionRefset, aceConfig);
             newRelationship(memberRefset, commentsRel, commentsRefset, aceConfig);
+
+            newRelationship(refsetSpec, refsetComputeTypeRel, refsetComputeType, aceConfig);
 
             // supporting refsets purpose relationships
             newRelationship(commentsRefset, purposeRel, stringAnnotation, aceConfig);
@@ -527,6 +540,14 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
     public void setNewRefsetSpecUUIDPropName(String newRefsetSpecUUIDPropName) {
         this.newRefsetSpecUUIDPropName = newRefsetSpecUUIDPropName;
+    }
+
+    public String getComputeTypeUUIDPropName() {
+        return computeTypeUUIDPropName;
+    }
+
+    public void setComputeTypeUUIDPropName(String computeTypeUUIDPropName) {
+        this.computeTypeUUIDPropName = computeTypeUUIDPropName;
     }
 
 }
