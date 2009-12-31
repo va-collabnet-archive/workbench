@@ -31,6 +31,7 @@ public class ExternalTermPublisher {
 	private HashSet<I_Position> positions;
 	private I_IntSet statusValues;
 	private List<ExternalTermRecord> externalRecords;
+	private List<ExternalTermRecord> recordQueue;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
 	private I_GetConceptData rootConcept;
 	private String currentItem;
@@ -74,6 +75,7 @@ public class ExternalTermPublisher {
 		displayNames = new ArrayList<DisplayName>();
 		wildcardItems = new ArrayList<ValuePair>();
 		this.externalRecords = new ArrayList<ExternalTermRecord>();
+		this.recordQueue = new ArrayList<ExternalTermRecord>();
 		
 		this.idTuple = null;
 		List<? extends I_DescriptionVersioned> descs = concept.getDescriptions();
@@ -81,25 +83,48 @@ public class ExternalTermPublisher {
 		this.setCurrentItem(null, null);
 		this.rootConcept = concept;
 		int extensionsProcessed = 0;
+		int recsAdded = 0;
 		for (I_DescriptionVersioned desc : descs) {
 			I_GetConceptData descriptionConcept = termFactory.getConcept(desc.getConceptId());
 			extensionsProcessed += processDescriptionConcept(descriptionConcept, desc);
+
+			/* processDescriptionConcept(concept, null);
+			if (this.idTuple != null)
+				this.exportFactory.getValueConverter(startingVersion).
+					addRecordIds(this.idTuple, this.recordQueue, concept);
+			writeWildcardValues();
+			recsAdded += addQueuedRecords();
+			*/
 		}
-		// Finally, process this concept directly if it is a description concept, or process the root concept
-		// for extensions attached to the root concept
-		processDescriptionConcept(concept, null);
-		if (this.idTuple != null)
-			this.exportFactory.getValueConverter(startingVersion).
-				addRecordIds(this.idTuple, this.externalRecords, concept);
-		//if (descs.size() > 1)
-		//	System.out.println("--------------> Found multiple description concept: " + 
-		//			this.exportFactory.getValueConverter(startingVersion).
-		//				getIdForConcept(concept, "2faa9262-8fb2-11db-b606-0800200c9a66"));
-		// Write all of the records
-        writeWildcardValues();
+		// if (recsAdded == 0) {
+			// Finally, process this concept directly if it is a description concept, or process the root concept
+			// for extensions attached to the root concept
+			processDescriptionConcept(concept, null);
+			if (this.idTuple != null)
+				this.exportFactory.getValueConverter(startingVersion).
+					addRecordIds(this.idTuple, this.recordQueue, concept);
+	        writeWildcardValues();
+	        addQueuedRecords();
+		// }
         return this.externalRecords;
 	}
 	
+	public int addQueuedRecords() {
+		int count = 0;
+		ExternalTermRecord d = null;
+		for (ExternalTermRecord r: this.recordQueue) {
+			if (r.getFirstItem("2") != null) {
+				// System.out.println("Adding record " + r.toString());			
+				this.externalRecords.add(r);
+				d = r;
+				count++;
+			}
+		}
+		if (d != null)
+			this.recordQueue.remove(d);
+		// this.recordQueue = new ArrayList<ExternalTermRecord>();
+		return count;
+	}
 
     private int processDescriptionConcept(I_GetConceptData concept, I_DescriptionVersioned description) throws TerminologyException, Exception {
     	List<I_ThinExtByRefVersioned> extensions;
@@ -197,16 +222,16 @@ public class ExternalTermPublisher {
     
     private ExternalTermRecord getExternalRecordForMasterfile(String masterFile) {
     	ExternalTermRecord ret = null;
-    	if (this.externalRecords == null)
-    		this.externalRecords = new ArrayList<ExternalTermRecord>();
+    	if (this.recordQueue == null)
+    		this.recordQueue = new ArrayList<ExternalTermRecord>();
     	
-    	for (ExternalTermRecord er: this.externalRecords) {
+    	for (ExternalTermRecord er: this.recordQueue) {
     		if (er.getMasterFileName().equals(masterFile))
     			ret = er;
     	}
     	if (ret == null) {
     		ret = new ExternalTermRecord(masterFile);
-    		this.externalRecords.add(ret);
+    		this.recordQueue.add(ret);
     	}
     	return ret;
     }

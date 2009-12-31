@@ -67,6 +67,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 				else if (this.itemIsPopulated("200"))
 					writeItem("200");
 				writeItemsIfChanged("50", "80", "91", "100", "207", "7000", "7010");
+				// writeItem("rootuuid");			
 				writer.saveRecord();
 			}
 			else {
@@ -92,6 +93,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					writeItemIfChanged("91");
 					writeItemIfChanged("7000");
 					writeItemIfChanged("7010");
+					// writeItem("rootuuid");	
 					writer.saveRecord();
 				} else {
 					// "ERNC" Existing record new contact
@@ -114,6 +116,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					writeItemIfChanged("91");
 					writeItemIfChanged("7000");
 					writeItemIfChanged("7010");
+					// writeItem("rootuuid");
 					writer.saveRecord();
 				}
 			}

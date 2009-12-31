@@ -76,6 +76,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
     			region = refsetUsage.getRegion();
 			}
 			else if (refsetUsage.getItemNumber().equals("50")){
+			
 	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
 	    		if (doAdd.getValue() && description != null) {
 	    			itemValue = description.getLastTuple().getMutablePart().getText();
@@ -232,6 +233,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	String dot11 = null;
     	String dot1 = null;
     	String uuid = null;
+    	String rootUuid = null;
     	String snomed = null;
     	String icd9 = null;
     	String icd10 = null;
@@ -243,6 +245,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
     		
     		//exportWriter.setIdConcept(idConcept);
     		uuid = getIdForConcept(idConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
+    		rootUuid = getIdForConcept(rootConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
     		
     		if(record.getMasterFileName().equals(RefsetUsageInterpreter.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
 				dot11 = getIdForConcept(idConcept, "e3dadc2a-196d-5525-879a-3037af99607d");
@@ -253,14 +256,15 @@ public class ExportValueConverter implements I_ExportValueConverter{
 				dot1 = getIdForConcept(idConcept, "af8be384-dc60-5b56-9ad8-bc1e4b5dfbae");
     		}
     		snomed = getIdForConcept(rootConcept, "0418a591-f75b-39ad-be2c-3ab849326da9");
-    		icd9 = getIdForConcept(rootConcept, "a8160cc4-c49c-3a56-aa82-ea51e6c538ba");
-    		icd10 = getIdForConcept(rootConcept, "9228d285-e625-33f9-bf46-9cfba3beee6d");
+    		icd9 = getIdForConcept(idConcept, "a8160cc4-c49c-3a56-aa82-ea51e6c538ba");
+    		icd10 = getIdForConcept(idConcept, "9228d285-e625-33f9-bf46-9cfba3beee6d");
     		
     		if (dot11 != null)
     			record.addItem("11", dot11, dot11);
     		if (dot1 != null)
     			record.addItem("1", dot1, dot1);
     		record.addItem("35", uuid, uuid);
+    		record.addItem("rootuuid", rootUuid, rootUuid);
        		if (snomed != null)
        			record.addItem("snomed", snomed, snomed);
        		if (icd9 != null)
