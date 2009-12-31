@@ -291,13 +291,8 @@ public class GenerateScripts extends AbstractMojo {
 
             // write profiling options
             if (profile) {
-                writeFileLine(fw, "-DDYLD_LIBRARY_PATH=/Applications/jprofiler5/bin/macos/");
-                writeFileLine(fw, "-Xint");
-                writeFileLine(fw,
-                    "-agentlib:jprofilerti=port=8849,nowait,id=183,config=/Users/kec/.jprofiler5/config.xml");
-                writeFileLine(fw, "-Xbootclasspath/a:/Applications/jprofiler5/bin/agent.jar");
-                writeFileLine(fw, "-Xdebug");
-                writeFileLine(fw, "-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
+            	writeFileLine(fw, "-Xbootclasspath/a:/Applications/jprofiler6/bin/agent.jar");
+            	writeFileLine(fw, "-agentpath:/Applications/jprofiler6/bin/macos/libjprofilerti.jnilib");
             }
 
             // write heap size
