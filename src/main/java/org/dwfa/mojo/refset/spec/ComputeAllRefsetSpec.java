@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
+import org.dwfa.ace.task.refset.spec.compute.ComputeDescRefsetFromSpecTask;
 import org.dwfa.ace.task.refset.spec.compute.ComputeRefsetFromSpecTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -102,31 +103,40 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
 
                     RefsetSpec refsetSpecHelper = new RefsetSpec(child);
                     I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
-
+                    boolean showActivityPanel = false;
                     if (!computedRefsets.contains(memberRefset.getConceptId())) {
 
                         if (!excludedRefsets.contains(memberRefset.getConceptId())) {
 
-                            ComputeRefsetFromSpecTask task = new ComputeRefsetFromSpecTask();
-                            boolean showActivityPanel = false;
-                            task.setExcludedRefsets(excludedRefsets); /*
-                                                                       * so that when we calculate any dependent /
-                                                                       * nested
-                                                                       * refsets we know which ones to exclude
-                                                                       */
-                            task.computeRefset(LocalVersionedTerminology.get().getActiveAceFrameConfig(), memberRefset,
-                                showActivityPanel);
+                            if (refsetSpecHelper.isConceptComputeType()) {
+                                ComputeRefsetFromSpecTask task = new ComputeRefsetFromSpecTask();
+                                task.setExcludedRefsets(excludedRefsets);
+                                task.computeRefset(LocalVersionedTerminology.get().getActiveAceFrameConfig(),
+                                    memberRefset, showActivityPanel);
+                                /*
+                                 * need to keep track of any calculated nested
+                                 * refsets so we don't compute them twice
+                                 */
+                                computedRefsets.add(memberRefset.getConceptId());
+                                for (Integer nestedRefsetId : task.getNestedRefsets()) {
+                                    if (!excludedRefsets.contains(nestedRefsetId)) {
+                                        computedRefsets.add(nestedRefsetId);
+                                    }
+                                }
+                            } else {
+                                ComputeDescRefsetFromSpecTask task = new ComputeDescRefsetFromSpecTask();
+                                task.setExcludedRefsets(excludedRefsets);
+                                task.computeRefset(LocalVersionedTerminology.get().getActiveAceFrameConfig(),
+                                    memberRefset, showActivityPanel);
 
-                            /*
-                             * need to keep track of any calculated nested
-                             * refsets so we don't compute them twice
-                             */
-                            computedRefsets.add(memberRefset.getConceptId());
-                            for (Integer nestedRefsetId : task.getNestedRefsets()) {
-                                if (!excludedRefsets.contains(nestedRefsetId)) {
-                                    computedRefsets.add(nestedRefsetId);
+                                computedRefsets.add(memberRefset.getConceptId());
+                                for (Integer nestedRefsetId : task.getNestedRefsets()) {
+                                    if (!excludedRefsets.contains(nestedRefsetId)) {
+                                        computedRefsets.add(nestedRefsetId);
+                                    }
                                 }
                             }
+
                         }
                     }
                 } else {
