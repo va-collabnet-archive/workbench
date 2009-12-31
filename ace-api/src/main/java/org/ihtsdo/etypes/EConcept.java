@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -76,6 +77,7 @@ public class EConcept extends EComponent implements Externalizable {
 	private EConceptAttributes conceptAttributes;
 	private List<EDescription> descriptions;
 	private List<ERelationship> relationships;
+	private List<EImage> images;
 	private List<ERefset> refsetMembers;
 
 	public EConcept(ObjectInput in) throws IOException, ClassNotFoundException {
@@ -104,6 +106,13 @@ public class EConcept extends EComponent implements Externalizable {
 			relationships = new ArrayList<ERelationship>(relCount);
 			for (int i = 0; i < relCount; i++) {
 				relationships.add(new ERelationship(in));
+			}
+		}
+		int imgCount = in.readInt();
+		if (imgCount > 0) {
+			images = new ArrayList<EImage>(imgCount);
+			for (int i = 0; i < imgCount; i++) {
+				images.add(new EImage(in));
 			}
 		}
 		int refsetMemberCount = in.readInt();
@@ -161,6 +170,14 @@ public class EConcept extends EComponent implements Externalizable {
 				r.writeExternal(out);
 			}
 		}		
+		if (images == null) {
+			out.writeInt(0);
+		} else {
+			out.writeInt(images.size());
+			for (EImage img: images) {
+				img.writeExternal(out);
+			}
+		}		
 		if (refsetMembers == null) {
 			out.writeInt(0);
 		} else {
@@ -199,6 +216,10 @@ public class EConcept extends EComponent implements Externalizable {
 		for (I_DescriptionVersioned desc: c.getDescriptions()) {
 			descriptions.add(new EDescription(desc));
 		}
+		images = new ArrayList<EImage>(c.getImages().size());
+		for (I_ImageVersioned img: c.getImages()) {
+			images.add(new EImage(img));
+		}
 		Collection<I_ThinExtByRefVersioned> members = getRefsetMembers(c.getNid());
 		if (members != null) {
 			refsetMembers = new ArrayList<ERefset>(members.size());
@@ -207,5 +228,4 @@ public class EConcept extends EComponent implements Externalizable {
 			}
 		}
 	}
-
 }
