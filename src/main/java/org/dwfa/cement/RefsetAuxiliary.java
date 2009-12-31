@@ -110,6 +110,11 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "CHANGED RELATIONSHIP REFINABILITY", "changed relationship language" }, DIFFERENCE_QUERY), CHANGED_RELATIONSHIP_GROUP(new String[] {
             "CHANGED RELATIONSHIP GROUP", "changed relationship group" }, DIFFERENCE_QUERY), 
             
+            REFSET_COMPUTE_TYPE(new String[] {"refset compute type", "refset compute type" }, REFSET_AUXILIARY), 
+            CONCEPT_COMPUTE_TYPE(new String[] {"concept compute type", "concept compute type" }, REFSET_COMPUTE_TYPE), 
+            DESCRIPTION_COMPUTE_TYPE(new String[] {"description compute type", "description compute type" }, REFSET_COMPUTE_TYPE), 
+            RELATIONSHIP_COMPUTE_TYPE(new String[] {"relationship compute type", "relationship compute type" }, REFSET_COMPUTE_TYPE), 
+            
             REFSET_TYPE(new String[] {"refset type", "refset type" }, REFSET_AUXILIARY), 
         		MEMBERSHIP_EXTENSION(new String[] {"membership extension by reference", "membership extension" }, REFSET_TYPE), 
         		BOOLEAN_EXTENSION(new String[] {"boolean extension by reference", "boolean extension" }, REFSET_TYPE), 
@@ -224,6 +229,8 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "marked parent is-a type", "marked parent is-a type" }, REFSET_RELATIONSHIP), PROMOTION_REL(new String[] {
             "promotion rel", "promotion rel" }, REFSET_RELATIONSHIP), COMMENTS_REL(new String[] { "comments rel",
             "comments rel" }, REFSET_RELATIONSHIP),
+            REFSET_COMPUTE_TYPE_REL(new String[] { "refset compute type rel", "refset compute type rel" }, REFSET_RELATIONSHIP),
+            
 
         SUPPORTING_REFSETS(new String[] { "supporting refsets", "supporting refsets" }, REFSET_AUXILIARY),
 
