@@ -253,7 +253,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(),
                                                 returnTuples, false);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
-                                                boolean extValue = ((I_ThinExtByRefPartBoolean) t.getMutablePart()).getValue();
+                                                boolean extValue = ((I_ThinExtByRefPartBoolean) t.getMutablePart()).getBooleanValue();
 
                                                 try {
                                                     ConceptBean booleanImageBean =

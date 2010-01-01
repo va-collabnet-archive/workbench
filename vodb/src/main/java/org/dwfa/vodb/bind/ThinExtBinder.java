@@ -190,7 +190,7 @@ public class ThinExtBinder extends TupleBinding {
                 part.setPathId(ti.readInt());
                 part.setVersion(ti.readInt());
                 part.setStatusId(ti.readInt());
-                part.setValue(ti.readBoolean());
+                part.setBooleanValue(ti.readBoolean());
                 versioned.addVersion(part);
             }
             break;
@@ -623,7 +623,7 @@ public class ThinExtBinder extends TupleBinding {
                 to.writeInt(part.getPathId());
                 to.writeInt(part.getVersion());
                 to.writeInt(part.getStatusId());
-                to.writeBoolean(part.getValue());
+                to.writeBoolean(part.getBooleanValue());
             }
             break;
         case STRING:

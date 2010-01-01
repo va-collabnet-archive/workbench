@@ -43,7 +43,7 @@ public class ThinExtByRefPartBoolean extends ThinExtByRefPart implements I_ThinE
      * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartBoolean#getValue()
      */
-    public boolean getValue() {
+    public boolean getBooleanValue() {
         return value;
     }
 
@@ -52,7 +52,7 @@ public class ThinExtByRefPartBoolean extends ThinExtByRefPart implements I_ThinE
      * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefPartBoolean#setValue(boolean)
      */
-    public void setValue(boolean value) {
+    public void setBooleanValue(boolean value) {
         this.value = value;
     }
 
