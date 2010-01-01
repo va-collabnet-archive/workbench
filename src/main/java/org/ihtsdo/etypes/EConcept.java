@@ -27,7 +27,8 @@ public class EConcept extends EComponent implements Externalizable {
 		CID_CID_CID(4, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION), 
 		CID_CID_STR(5, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION),
 		STR(6, RefsetAuxiliary.Concept.STRING_EXTENSION),
-		INT(7, RefsetAuxiliary.Concept.INT_EXTENSION)
+		INT(7, RefsetAuxiliary.Concept.INT_EXTENSION), 
+		CID_INT(8, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION)
 		;
 
 		private int externalizedToken;
@@ -69,6 +70,8 @@ public class EConcept extends EComponent implements Externalizable {
 				return STR;
 			case 7:
 				return INT;
+			case 8:
+				return CID_INT;
 			}
 			throw new UnsupportedOperationException();
 		}
@@ -143,6 +146,10 @@ public class EConcept extends EComponent implements Externalizable {
 			case STR:
 				refsetMembers.add(new ERefsetStrMember(in));
 				break;
+			case CID_INT:
+				refsetMembers.add(new ERefsetCidIntMember(in));
+				break;
+				
 				default:
 					throw new UnsupportedOperationException("Can't handle refset type: " + type);
 				}
