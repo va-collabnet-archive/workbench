@@ -18,6 +18,7 @@ public class ERelationship extends EComponent {
 	private UUID characteristicUuid;
 	private UUID refinabilityUuid;
 	private int relGroup; 
+	private UUID typeUuid;
 	
 	private List<ERelationshipVersion> extraVersions;
 
@@ -35,6 +36,7 @@ public class ERelationship extends EComponent {
 		characteristicUuid = nidToUuid(part.getCharacteristicId());
 		refinabilityUuid = nidToUuid(part.getRefinabilityId());
 		relGroup = part.getGroup();
+		typeUuid = nidToUuid(part.getTypeId());
 		pathUuid = nidToUuid(part.getPathId());
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
@@ -55,6 +57,7 @@ public class ERelationship extends EComponent {
 		characteristicUuid = new UUID(in.readLong(), in.readLong());
 		refinabilityUuid = new UUID(in.readLong(), in.readLong());
 		relGroup = in.readInt();
+		typeUuid = new UUID(in.readLong(), in.readLong());
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
 			extraVersions = new ArrayList<ERelationshipVersion>(versionSize);
@@ -76,6 +79,8 @@ public class ERelationship extends EComponent {
 		out.writeLong(refinabilityUuid.getMostSignificantBits());
 		out.writeLong(refinabilityUuid.getLeastSignificantBits());
 		out.writeInt(relGroup);
+		out.writeLong(typeUuid.getMostSignificantBits());
+		out.writeLong(typeUuid.getLeastSignificantBits());
 		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
@@ -128,6 +133,14 @@ public class ERelationship extends EComponent {
 
 	public List<ERelationshipVersion> getExtraVersionsList() {
 		return extraVersions;
+	}
+
+	public UUID getTypeUuid() {
+		return typeUuid;
+	}
+
+	public void setTypeUuid(UUID typeUuid) {
+		this.typeUuid = typeUuid;
 	}
 
 }

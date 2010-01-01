@@ -12,7 +12,8 @@ public class ERelationshipVersion extends EVersion {
 
 	private UUID characteristicUuid;
 	private UUID refinabilityUuid;
-	private int relGroup; 
+	private int group; 
+	private UUID typeUuid;
 
 	public ERelationshipVersion(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -22,7 +23,8 @@ public class ERelationshipVersion extends EVersion {
 	public ERelationshipVersion(I_RelPart part) throws TerminologyException, IOException {
 		characteristicUuid = nidToUuid(part.getCharacteristicId());
 		refinabilityUuid = nidToUuid(part.getRefinabilityId());
-		relGroup = part.getGroup();
+		group = part.getGroup();
+		typeUuid = nidToUuid(part.getTypeId());
 		pathUuid = nidToUuid(part.getPathId());
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
@@ -34,7 +36,8 @@ public class ERelationshipVersion extends EVersion {
 		super.readExternal(in);
 		characteristicUuid = new UUID(in.readLong(), in.readLong());
 		refinabilityUuid = new UUID(in.readLong(), in.readLong());
-		relGroup = in.readInt();
+		group = in.readInt();
+		typeUuid = new UUID(in.readLong(), in.readLong());
 	}
 
 	@Override
@@ -44,7 +47,9 @@ public class ERelationshipVersion extends EVersion {
 		out.writeLong(characteristicUuid.getLeastSignificantBits());
 		out.writeLong(refinabilityUuid.getMostSignificantBits());
 		out.writeLong(refinabilityUuid.getLeastSignificantBits());
-		out.writeInt(relGroup);
+		out.writeInt(group);
+		out.writeLong(typeUuid.getMostSignificantBits());
+		out.writeLong(typeUuid.getLeastSignificantBits());
 	}
 
 	public UUID getCharacteristicUuid() {
@@ -63,12 +68,20 @@ public class ERelationshipVersion extends EVersion {
 		this.refinabilityUuid = refinabilityUuid;
 	}
 
-	public int getRelGroup() {
-		return relGroup;
+	public int getGroup() {
+		return group;
 	}
 
 	public void setRelGroup(int relGroup) {
-		this.relGroup = relGroup;
+		this.group = relGroup;
+	}
+
+	public UUID getTypeUuid() {
+		return typeUuid;
+	}
+
+	public void setTypeUuid(UUID typeUuid) {
+		this.typeUuid = typeUuid;
 	}
 
 }
