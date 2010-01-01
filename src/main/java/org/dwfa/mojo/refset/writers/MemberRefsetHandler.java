@@ -125,7 +125,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
             } else if (part instanceof I_ThinExtByRefPartBoolean) {
                 I_ThinExtByRefPartBoolean stringPart = (I_ThinExtByRefPartBoolean) part;
 
-                formattedLine += stringPart.getValue();
+                formattedLine += stringPart.getBooleanValue();
             } else {
                 throw new Exception("No known refset format type for this extension " + part.getClass().getName());
             }

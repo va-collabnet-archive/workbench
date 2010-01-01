@@ -33,7 +33,7 @@ public class BooleanRefsetHandler extends MemberRefsetHandler {
         I_ThinExtByRefPartBoolean booleanPart = (I_ThinExtByRefPartBoolean) tuple.getMutablePart();
 
         return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER
-            + (booleanPart.getValue() ? 1 : 0); // 1 for true, 0 for false
+            + (booleanPart.getBooleanValue() ? 1 : 0); // 1 for true, 0 for false
     }
 
     @Override
@@ -42,7 +42,7 @@ public class BooleanRefsetHandler extends MemberRefsetHandler {
         I_ThinExtByRefPartBoolean booleanPart = (I_ThinExtByRefPartBoolean) part;
 
         return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId)
-            + MemberRefsetHandler.FILE_DELIMITER + (booleanPart.getValue() ? 1 : 0); // 1
+            + MemberRefsetHandler.FILE_DELIMITER + (booleanPart.getBooleanValue() ? 1 : 0); // 1
         // for
         // true,
         // 0
@@ -68,7 +68,7 @@ public class BooleanRefsetHandler extends MemberRefsetHandler {
             String value = getNextCurrentRowToken();
             assert value.equals("0") || value.equals("1");
 
-            part.setValue(value.equals("1") ? true : false);
+            part.setBooleanValue(value.equals("1") ? true : false);
 
             versioned.addVersion(part);
 
