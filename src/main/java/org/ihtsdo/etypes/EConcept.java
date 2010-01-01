@@ -20,6 +20,11 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class EConcept extends EComponent implements Externalizable {
+	/**
+	 * CID = Component IDentifier
+	 * @author kec
+	 *
+	 */
 	public enum REFSET_TYPES {
 		MEMBER(1, RefsetAuxiliary.Concept.MEMBER_TYPE), 
 		CID(2, RefsetAuxiliary.Concept.CONCEPT_EXTENSION), 
@@ -29,7 +34,10 @@ public class EConcept extends EComponent implements Externalizable {
 		STR(6, RefsetAuxiliary.Concept.STRING_EXTENSION),
 		INT(7, RefsetAuxiliary.Concept.INT_EXTENSION), 
 		CID_INT(8, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION),
-		BOOLEAN(9, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION)
+		BOOLEAN(9, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION), 
+		CID_STR(10, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION), 
+		CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION),
+		CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION),
 		;
 
 		private int externalizedToken;
@@ -73,6 +81,14 @@ public class EConcept extends EComponent implements Externalizable {
 				return INT;
 			case 8:
 				return CID_INT;
+			case 9:
+				return BOOLEAN;
+			case 10:
+				return CID_STR;
+			case 11:
+				return CID_FLOAT;
+			case 12:
+				return CID_LONG;
 			}
 			throw new UnsupportedOperationException();
 		}
@@ -150,7 +166,18 @@ public class EConcept extends EComponent implements Externalizable {
 			case CID_INT:
 				refsetMembers.add(new ERefsetCidIntMember(in));
 				break;
-				
+			case BOOLEAN:
+				refsetMembers.add(new ERefsetBooleanMember(in));
+				break;
+			case CID_FLOAT:
+				refsetMembers.add(new ERefsetCidFloatMember(in));
+				break;
+			case CID_LONG:
+				refsetMembers.add(new ERefsetCidLongMember(in));
+				break;
+			case CID_STR:
+				refsetMembers.add(new ERefsetCidStrMember(in));
+				break;
 				default:
 					throw new UnsupportedOperationException("Can't handle refset type: " + type);
 				}
