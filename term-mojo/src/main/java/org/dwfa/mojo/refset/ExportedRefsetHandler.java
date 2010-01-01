@@ -115,7 +115,7 @@ public class ExportedRefsetHandler extends IterableFileReader<I_ThinExtByRefVers
 
             case BOOLEAN:
                 extPart = termFactory.newBooleanExtensionPart();
-                ((I_ThinExtByRefPartBoolean) extPart).setValue(new Boolean(tokens[6]).booleanValue());
+                ((I_ThinExtByRefPartBoolean) extPart).setBooleanValue(new Boolean(tokens[6]).booleanValue());
                 break;
 
             case CONCEPT:

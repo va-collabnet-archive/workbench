@@ -78,7 +78,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
 			else if (refsetUsage.getItemNumber().equals("50")){
 			
 	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
-	    		if (doAdd.getValue() && description != null) {
+	    		if (doAdd.getBooleanValue() && description != null) {
 	    			itemValue = description.getLastTuple().getMutablePart().getText();
 	    			previousItemValue = getPreviousDisplayName(description);
 	    		}
@@ -128,7 +128,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
 	    	}
 	    	else if (I_ThinExtByRefPartBoolean.class.isAssignableFrom(thinExtByRefPart.getClass())) {
 	    		I_ThinExtByRefPartBoolean str = (I_ThinExtByRefPartBoolean) thinExtByRefPart;
-	    		value = (str.getValue()) ? "1" : "0";
+	    		value = (str.getBooleanValue()) ? "1" : "0";
 	    	}
 	    	else
 	    		AceLog.getAppLog().warning("Unhandled refset data type for I_ThinExtByRefPart: " + thinExtByRefPart);

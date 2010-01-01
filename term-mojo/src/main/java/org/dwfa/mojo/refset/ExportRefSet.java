@@ -456,7 +456,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
                 case BOOLEAN:
                     memberWriter.write("\t");
                     // BOOLEAN
-                    memberWriter.write(new Boolean(((I_ThinExtByRefPartBoolean) version).getValue()).toString());
+                    memberWriter.write(new Boolean(((I_ThinExtByRefPartBoolean) version).getBooleanValue()).toString());
                     memberWriter.newLine();
                     break;
                 case CONCEPT:
