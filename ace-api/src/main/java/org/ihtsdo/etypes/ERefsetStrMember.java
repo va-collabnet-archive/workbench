@@ -15,7 +15,7 @@ public class ERefsetStrMember extends ERefset {
 
 	private String stringValue;
 	
-	protected List<ERefsetStrMemberVersion> versions;
+	protected List<ERefsetStrMemberVersion> extraVersions;
 	
 	public ERefsetStrMember(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -36,9 +36,9 @@ public class ERefsetStrMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			versions = new ArrayList<ERefsetStrMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetStrMemberVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				versions.add(new ERefsetStrMemberVersion((I_ThinExtByRefPartString) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetStrMemberVersion((I_ThinExtByRefPartString) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -51,9 +51,9 @@ public class ERefsetStrMember extends ERefset {
 		stringValue = (String) in.readObject();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			versions = new ArrayList<ERefsetStrMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetStrMemberVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				versions.add(new ERefsetStrMemberVersion(in));
+				extraVersions.add(new ERefsetStrMemberVersion(in));
 			}
 		}
 	}
@@ -62,11 +62,11 @@ public class ERefsetStrMember extends ERefset {
 	public void writeExternal(ObjectOutput out) throws IOException {
 		super.writeExternal(out);
 		out.writeObject(stringValue);
-		if (versions == null) {
+		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
-			out.writeInt(versions.size());
-			for (ERefsetStrMemberVersion rmv: versions) {
+			out.writeInt(extraVersions.size());
+			for (ERefsetStrMemberVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -75,6 +75,10 @@ public class ERefsetStrMember extends ERefset {
 	@Override
 	public REFSET_TYPES getType() {
 		return REFSET_TYPES.STR;
+	}
+
+	public List<ERefsetStrMemberVersion> getExtraVersionsList() {
+		return extraVersions;
 	}
 
 }

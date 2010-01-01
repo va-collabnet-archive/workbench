@@ -15,7 +15,7 @@ public class ERefsetIntMember extends ERefset {
 
 	private int intValue;
 	
-	protected List<ERefsetIntMemberVersion> versions;
+	protected List<ERefsetIntMemberVersion> extraVersions;
 	
 	public ERefsetIntMember(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -36,9 +36,9 @@ public class ERefsetIntMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			versions = new ArrayList<ERefsetIntMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetIntMemberVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				versions.add(new ERefsetIntMemberVersion((I_ThinExtByRefPartInteger) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetIntMemberVersion((I_ThinExtByRefPartInteger) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -51,9 +51,9 @@ public class ERefsetIntMember extends ERefset {
 		intValue = in.readInt();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			versions = new ArrayList<ERefsetIntMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetIntMemberVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				versions.add(new ERefsetIntMemberVersion(in));
+				extraVersions.add(new ERefsetIntMemberVersion(in));
 			}
 		}
 	}
@@ -62,11 +62,11 @@ public class ERefsetIntMember extends ERefset {
 	public void writeExternal(ObjectOutput out) throws IOException {
 		super.writeExternal(out);
 		out.writeInt(intValue);
-		if (versions == null) {
+		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
-			out.writeInt(versions.size());
-			for (ERefsetIntMemberVersion rmv: versions) {
+			out.writeInt(extraVersions.size());
+			for (ERefsetIntMemberVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -75,6 +75,10 @@ public class ERefsetIntMember extends ERefset {
 	@Override
 	public REFSET_TYPES getType() {
 		return REFSET_TYPES.INT;
+	}
+
+	public List<ERefsetIntMemberVersion> getExtraVersionsList() {
+		return extraVersions;
 	}
 
 }

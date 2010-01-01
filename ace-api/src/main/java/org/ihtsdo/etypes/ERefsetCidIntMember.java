@@ -17,7 +17,7 @@ public class ERefsetCidIntMember extends ERefset {
 	private UUID c1Uuid;
 	private int intValue;
 	
-	protected List<ERefsetCidIntMemberVersion> versions;
+	protected List<ERefsetCidIntMemberVersion> extraVersions;
 	
 	public ERefsetCidIntMember(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -39,9 +39,9 @@ public class ERefsetCidIntMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			versions = new ArrayList<ERefsetCidIntMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetCidIntMemberVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				versions.add(new ERefsetCidIntMemberVersion((I_ThinExtByRefPartConceptInt) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetCidIntMemberVersion((I_ThinExtByRefPartConceptInt) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -55,9 +55,9 @@ public class ERefsetCidIntMember extends ERefset {
 		intValue = in.readInt();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			versions = new ArrayList<ERefsetCidIntMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetCidIntMemberVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				versions.add(new ERefsetCidIntMemberVersion(in));
+				extraVersions.add(new ERefsetCidIntMemberVersion(in));
 			}
 		}
 	}
@@ -68,11 +68,11 @@ public class ERefsetCidIntMember extends ERefset {
 		out.writeLong(c1Uuid.getMostSignificantBits());
 		out.writeLong(c1Uuid.getLeastSignificantBits());
 		out.writeInt(intValue);
-		if (versions == null) {
+		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
-			out.writeInt(versions.size());
-			for (ERefsetCidIntMemberVersion rmv: versions) {
+			out.writeInt(extraVersions.size());
+			for (ERefsetCidIntMemberVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -82,6 +82,10 @@ public class ERefsetCidIntMember extends ERefset {
 	@Override
 	public REFSET_TYPES getType() {
 		return REFSET_TYPES.CID_INT;
+	}
+
+	public List<ERefsetCidIntMemberVersion> getExtraVersionsList() {
+		return extraVersions;
 	}
 
 }

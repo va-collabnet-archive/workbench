@@ -14,7 +14,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 
-public class EVersion implements Externalizable {
+public class EVersion implements Externalizable, I_VersionExternally {
 	
 	private static I_TermFactory tf = LocalVersionedTerminology.get();
 	
@@ -63,5 +63,26 @@ public class EVersion implements Externalizable {
 		out.writeLong(statusUuid.getMostSignificantBits());
 		out.writeLong(statusUuid.getLeastSignificantBits());
 		out.writeLong(time);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.etypes.I_VersionExternal#getPathUuid()
+	 */
+	public UUID getPathUuid() {
+		return pathUuid;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.etypes.I_VersionExternal#getStatusUuid()
+	 */
+	public UUID getStatusUuid() {
+		return statusUuid;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.etypes.I_VersionExternal#getTime()
+	 */
+	public long getTime() {
+		return time;
 	}
 }

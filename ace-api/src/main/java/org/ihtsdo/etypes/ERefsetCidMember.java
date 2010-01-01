@@ -16,7 +16,7 @@ public class ERefsetCidMember extends ERefset {
 
 	private UUID c1Uuid;
 	
-	protected List<ERefsetCidMemberVersion> versions;
+	protected List<ERefsetCidMemberVersion> extraVersions;
 	
 	public ERefsetCidMember(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -37,9 +37,9 @@ public class ERefsetCidMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			versions = new ArrayList<ERefsetCidMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetCidMemberVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				versions.add(new ERefsetCidMemberVersion((I_ThinExtByRefPartConcept) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetCidMemberVersion((I_ThinExtByRefPartConcept) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -52,9 +52,9 @@ public class ERefsetCidMember extends ERefset {
 		c1Uuid = new UUID(in.readLong(), in.readLong());
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			versions = new ArrayList<ERefsetCidMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetCidMemberVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				versions.add(new ERefsetCidMemberVersion(in));
+				extraVersions.add(new ERefsetCidMemberVersion(in));
 			}
 		}
 	}
@@ -64,11 +64,11 @@ public class ERefsetCidMember extends ERefset {
 		super.writeExternal(out);
 		out.writeLong(c1Uuid.getMostSignificantBits());
 		out.writeLong(c1Uuid.getLeastSignificantBits());
-		if (versions == null) {
+		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
-			out.writeInt(versions.size());
-			for (ERefsetCidMemberVersion rmv: versions) {
+			out.writeInt(extraVersions.size());
+			for (ERefsetCidMemberVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -78,6 +78,10 @@ public class ERefsetCidMember extends ERefset {
 	@Override
 	public REFSET_TYPES getType() {
 		return REFSET_TYPES.CID;
+	}
+
+	public List<ERefsetCidMemberVersion> getExtraVersionsList() {
+		return extraVersions;
 	}
 
 }

@@ -7,7 +7,8 @@ import java.io.ObjectOutput;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.tapi.TerminologyException;
 
-public class EConceptAttributesVersion extends EVersion {
+public class EConceptAttributesVersion extends EVersion 
+	implements I_ConceptualizeExternally {
 
 	private boolean defined;
 
@@ -37,6 +38,9 @@ public class EConceptAttributesVersion extends EVersion {
 		out.writeBoolean(defined);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.etypes.I_ConceptualizeExternally#isDefined()
+	 */
 	public boolean isDefined() {
 		return defined;
 	}

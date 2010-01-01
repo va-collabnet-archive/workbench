@@ -19,7 +19,7 @@ public class ERelationship extends EComponent {
 	private UUID refinabilityUuid;
 	private int relGroup; 
 	
-	private List<ERelationshipVersion> versions;
+	private List<ERelationshipVersion> extraVersions;
 
 	public ERelationship(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -39,9 +39,9 @@ public class ERelationship extends EComponent {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			versions = new ArrayList<ERelationshipVersion>(partCount -1);
+			extraVersions = new ArrayList<ERelationshipVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				versions.add(new ERelationshipVersion(rel.getMutableParts().get(i)));
+				extraVersions.add(new ERelationshipVersion(rel.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -57,9 +57,9 @@ public class ERelationship extends EComponent {
 		relGroup = in.readInt();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			versions = new ArrayList<ERelationshipVersion>(versionSize);
+			extraVersions = new ArrayList<ERelationshipVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				versions.add(new ERelationshipVersion(in));
+				extraVersions.add(new ERelationshipVersion(in));
 			}
 		}
 	}
@@ -76,11 +76,11 @@ public class ERelationship extends EComponent {
 		out.writeLong(refinabilityUuid.getMostSignificantBits());
 		out.writeLong(refinabilityUuid.getLeastSignificantBits());
 		out.writeInt(relGroup);
-		if (versions == null) {
+		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
-			out.writeInt(versions.size());
-			for (ERelationshipVersion erv: versions) {
+			out.writeInt(extraVersions.size());
+			for (ERelationshipVersion erv: extraVersions) {
 				erv.writeExternal(out);
 			}
 		}
@@ -124,6 +124,10 @@ public class ERelationship extends EComponent {
 
 	public void setRelGroup(int relGroup) {
 		this.relGroup = relGroup;
+	}
+
+	public List<ERelationshipVersion> getExtraVersionsList() {
+		return extraVersions;
 	}
 
 }

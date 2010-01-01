@@ -11,7 +11,8 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.tapi.TerminologyException;
 
-public class EDescription extends EComponent {
+public class EDescription extends EComponent 
+	implements I_DescribeExternally {
 
 	private UUID conceptUuid;
 	
@@ -21,7 +22,9 @@ public class EDescription extends EComponent {
 	
 	private String text;
 	
-	private List<EDescriptionVersion> versions;
+	private UUID typeUuid;
+	
+	private List<EDescriptionVersion> extraVersions;
 	
 	public EDescription(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -36,13 +39,14 @@ public class EDescription extends EComponent {
 		initialCaseSignificant = part.isInitialCaseSignificant();
 		lang = part.getLang();
 		text = part.getText();
+		typeUuid = nidToUuid(part.getTypeId());
 		pathUuid = nidToUuid(part.getPathId());
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			versions = new ArrayList<EDescriptionVersion>(partCount -1);
+			extraVersions = new ArrayList<EDescriptionVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				versions.add(new EDescriptionVersion(desc.getMutableParts().get(i)));
+				extraVersions.add(new EDescriptionVersion(desc.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -55,11 +59,12 @@ public class EDescription extends EComponent {
 		initialCaseSignificant = in.readBoolean();
 		lang = (String) in.readObject();
 		text = (String) in.readObject();
+		typeUuid = new UUID(in.readLong(), in.readLong());
 		int versionLength = in.readInt();
 		if (versionLength > 0) {
-			versions = new ArrayList<EDescriptionVersion>(versionLength);
+			extraVersions = new ArrayList<EDescriptionVersion>(versionLength);
 			for (int i = 0; i < versionLength; i++) {
-				versions.add(new EDescriptionVersion(in));
+				extraVersions.add(new EDescriptionVersion(in));
 			}
 		}
 	}
@@ -71,11 +76,13 @@ public class EDescription extends EComponent {
 		out.writeLong(conceptUuid.getLeastSignificantBits());
 		out.writeObject(lang);
 		out.writeObject(text);
-		if (versions == null) {
+		out.writeLong(typeUuid.getMostSignificantBits());
+		out.writeLong(typeUuid.getLeastSignificantBits());
+		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
-			out.writeInt(versions.size());
-			for (EDescriptionVersion edv: versions) {
+			out.writeInt(extraVersions.size());
+			for (EDescriptionVersion edv: extraVersions) {
 				edv.writeExternal(out);
 			}
 		}
@@ -111,6 +118,14 @@ public class EDescription extends EComponent {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public List<EDescriptionVersion> getExtraVersionsList() {
+		return extraVersions;
+	}
+
+	public UUID getTypeUuid() {
+		return typeUuid;
 	}
 
 }
