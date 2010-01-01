@@ -235,4 +235,8 @@ public class EConcept extends EComponent implements Externalizable {
 			}
 		}
 	}
+
+	public List<EImage> getImages() {
+		return images;
+	}
 }
