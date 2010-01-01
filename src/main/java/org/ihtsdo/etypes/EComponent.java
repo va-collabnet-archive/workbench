@@ -145,4 +145,15 @@ public class EComponent extends EVersion implements Externalizable {
 		}
 	}
 
+	public List<EIdentifierVersion> getEIdentifiers() {
+		List<EIdentifierVersion> ids;
+		if (idVersions != null) {
+			ids = new ArrayList<EIdentifierVersion>(idVersions.size() + 1);
+			ids.addAll(idVersions);
+		} else {
+			ids = new ArrayList<EIdentifierVersion>(1);
+		}
+		ids.add(new EIdentifierVersionUuid(this));
+		return ids;
+	}
 }
