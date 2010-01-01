@@ -3,7 +3,9 @@ package org.ihtsdo.db.bdb.concept.component.attributes;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.etypes.I_ConceptualizeExternally;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -20,6 +22,12 @@ public class ConceptAttributesVersion
 		super(statusAtPositionNid);
 	}
 
+	public ConceptAttributesVersion(I_ConceptualizeExternally another) {
+		super(Bdb.uuidToNid(another.getStatusUuid()), 
+				Bdb.uuidToNid(another.getPathUuid()),
+				another.getTime());
+		defined = isDefined();
+	}
 	public ConceptAttributesVersion(I_ConceptAttributePart another,
 			int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);

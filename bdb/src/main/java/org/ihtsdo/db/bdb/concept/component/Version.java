@@ -63,7 +63,7 @@ public abstract class Version<V extends Version<V, C>,
 	}
 	
 	public List<V> getVersions() {
-		return conceptComponent.componentVersion;
+		return conceptComponent.additionalVersions;
 	}
 
 	@Override

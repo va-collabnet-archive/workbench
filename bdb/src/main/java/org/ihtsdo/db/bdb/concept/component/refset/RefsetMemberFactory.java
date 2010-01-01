@@ -18,6 +18,8 @@ import org.ihtsdo.db.bdb.concept.component.refsetmember.scopedLanguage.ScopedLan
 import org.ihtsdo.db.bdb.concept.component.refsetmember.string.StrMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.template.TemplateMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.templateForRel.TemplateForRelMember;
+import org.ihtsdo.etypes.ERefset;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -64,6 +66,31 @@ public class RefsetMemberFactory extends
 		case TEMPLATE_FOR_REL:
 			return new TemplateForRelMember(nid, partCount, editable);
 
+		default:
+			throw new UnsupportedOperationException(
+					"Can't handle member type: " + memberType);
+		}
+	}
+
+	public static AbstractRefsetMember create(ERefset refsetMember) {
+		REFSET_TYPES memberType = refsetMember.getType();
+		switch (memberType) {
+		case CID:
+			return new CidMember(refsetMember, true);
+		case CID_CID:
+			return new CidCidMember(refsetMember, true);
+		case CID_CID_CID:
+			return new CidCidCidMember(refsetMember, true);
+		case CID_INT:
+			return new CidIntMember(refsetMember, true);
+		case MEMBER:
+			return new RefsetMember(refsetMember, true);
+		case CID_CID_STR:
+			return new CidCidStrMember(refsetMember, true);
+		case INT:
+			return new IntMember(refsetMember, true);
+		case STR:
+			return new StrMember(refsetMember, true);
 		default:
 			throw new UnsupportedOperationException(
 					"Can't handle member type: " + memberType);

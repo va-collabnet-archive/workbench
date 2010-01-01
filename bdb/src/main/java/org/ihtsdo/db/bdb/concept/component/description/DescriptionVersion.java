@@ -9,6 +9,7 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.etypes.EDescriptionVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -63,6 +64,17 @@ public class DescriptionVersion
 		lang = umPart.getLang();
 		initialCaseSignificant = umPart.getInitialCaseSignificant();
 		typeNid = Bdb.uuidsToNid(umPart.getTypeId());
+	}
+
+	public DescriptionVersion(EDescriptionVersion edv) {
+		super(Bdb.uuidToNid(edv.getStatusUuid()),
+				Bdb.uuidToNid(edv.getPathUuid()),
+				edv.getTime());
+		initialCaseSignificant = edv.isInitialCaseSignificant();
+		lang = edv.getLang();
+		text = edv.getText();
+		typeNid = Bdb.uuidToNid(edv.getTypeUuid());
+		statusAtPositionNid = Bdb.getStatusAtPositionNid(edv);
 	}
 
 	@Override

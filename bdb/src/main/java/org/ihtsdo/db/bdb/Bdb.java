@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.ConceptBdb;
+import org.ihtsdo.etypes.EVersion;
 
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
@@ -93,6 +94,13 @@ public class Bdb {
 				AceLog.getAppLog().alertAndLogException(dbe);
 			}
 		}
+	}
+	
+	public static int getStatusAtPositionNid(EVersion version) {
+		return statusAtPositionDb.getStatusAtPositionNid(
+				uuidToNid(version.getStatusUuid()), 
+				uuidToNid(version.getPathUuid()), 
+				version.getTime());
 	}
 
 	public static StatusAtPositionBdb getStatusAtPositionDb() {

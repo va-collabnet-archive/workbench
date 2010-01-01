@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.etypes.EConcept;
 
 public class Temp {
 	public static void main(String[] args) {
@@ -30,31 +31,12 @@ public class Temp {
 			    DataInputStream idsDis = new DataInputStream(bis);
 			    
 			    File metaFile = new File(idsFile.getParent(), "exportData.xml");
-			    File conceptsFile = new File(idsFile.getParent(), "concepts.jbin");
+			    File conceptsFile = new File(idsFile.getParent(), "eConcepts.jbin");
 			    Properties dataProps = new Properties();
 			    dataProps.loadFromXML(new FileInputStream(metaFile));
-			    int numIdWritten = Integer.parseInt(dataProps.getProperty("idCount"));
-			    int numUuidWritten = Integer.parseInt(dataProps.getProperty("uuidCount"));
 			    
 			    int numIdsRead = 0;
 			    int numUuidsRead = 0;
-	            AceLog.getAppLog().info("Starting read");
-
-	            while (idsDis.available() > 0) {
-			    	numIdsRead++;
-			    	int uuidCount = idsDis.readInt();
-			    	for (int i = 0; i < uuidCount; i++) {
-			    		idsDis.readLong();
-			    		idsDis.readLong();
-			    		numUuidsRead++;
-			    	}
-			    }
-	            idsDis.close();
-	            
-	            AceLog.getAppLog().info("Wrote " + numIdWritten + " ids");
-	            AceLog.getAppLog().info("Wrote " + numUuidWritten + " uuids");
-	            AceLog.getAppLog().info("Read " + numIdsRead + " ids");
-	            AceLog.getAppLog().info("Read " + numUuidsRead + " uuids");
 	            AceLog.getAppLog().info("Starting populateHashMap\n\n");
 	            Runtime.getRuntime().gc();
 	            AceLog.getAppLog().info("freeMemory: " + Runtime.getRuntime().freeMemory());
@@ -93,8 +75,8 @@ public class Temp {
 			    int conceptsRead = 0;
 	            while (fis.available() > 0) {
 	            	conceptsRead++;
-			    	UniversalAceBean conceptBean = (UniversalAceBean) cis.readObject();
-			    	Concept newConcept = Concept.get(conceptBean);
+	            	EConcept eConcept = (EConcept) cis.readObject();
+			    	Concept newConcept = Concept.get(eConcept);
 			    }
 
 	            AceLog.getAppLog().info("\n\nconceptsRead: " + conceptsRead);

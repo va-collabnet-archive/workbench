@@ -7,6 +7,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.etypes.ERelationshipVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -50,13 +51,15 @@ public class RelationshipVersion
 		this.refinabilityNid = input.readInt();
 		this.typeNid = input.readInt();
 	}
-	public RelationshipVersion(UniversalAceRelationshipPart uPart) {
-		super(Bdb.uuidsToNid(uPart.getStatusId()), 
-				Bdb.uuidsToNid(uPart.getPathId()), uPart.getTime());
-		this.characteristicNid = Bdb.uuidsToNid(uPart.getCharacteristicId());
-		this.group = uPart.getGroup();
-		this.refinabilityNid = Bdb.uuidsToNid(uPart.getRefinabilityId());
-		this.typeNid = Bdb.uuidsToNid(uPart.getTypeId());
+
+	public RelationshipVersion(ERelationshipVersion erv) {
+		super(Bdb.uuidToNid(erv.getStatusUuid()), 
+				Bdb.uuidToNid(erv.getPathUuid()), erv.getTime());
+		this.characteristicNid = Bdb.uuidToNid(erv.getCharacteristicUuid());
+		this.group = erv.getGroup();
+		this.refinabilityNid = Bdb.uuidToNid(erv.getRefinabilityUuid());
+		this.typeNid = Bdb.uuidToNid(erv.getTypeUuid());
+		this.statusAtPositionNid = Bdb.getStatusAtPositionNid(erv);
 	}
 
 	@Override

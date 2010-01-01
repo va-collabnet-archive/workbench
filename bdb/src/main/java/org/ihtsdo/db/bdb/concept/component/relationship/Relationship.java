@@ -24,6 +24,8 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
+import org.ihtsdo.etypes.ERelationship;
+import org.ihtsdo.etypes.ERelationshipVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -51,12 +53,20 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	}
 	
 
-	public Relationship(UniversalAceRelationship uRel, boolean editable) {
-		super(Bdb.uuidsToNid(uRel.getRelId()), uRel.getVersions().size(), editable);
-		c1Nid = Bdb.uuidsToNid(uRel.getC1Id());
-		c2Nid = Bdb.uuidsToNid(uRel.getC2Id());
-		for (UniversalAceRelationshipPart uPart: uRel.getVersions()) {
-			componentVersion.add(new RelationshipVersion(uPart));
+	public Relationship(ERelationship eRel, boolean editable) {
+		super(Bdb.uuidsToNid(eRel.getUuids()), eRel.getVersionCount(), editable);
+		c1Nid = Bdb.uuidToNid(eRel.getC1Uuid());
+		c2Nid = Bdb.uuidToNid(eRel.getC2Uuid());
+		characteristicNid = Bdb.uuidToNid(eRel.getCharacteristicUuid());
+		group = eRel.getRelGroup();
+		refinabilityNid = Bdb.uuidToNid(eRel.getRefinabilityUuid());
+		typeNid = Bdb.uuidToNid(eRel.getTypeUuid());
+		primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(eRel);
+		if (eRel.getExtraVersionsList() != null) {
+			additionalVersions = new ArrayList<RelationshipVersion>(eRel.getExtraVersionsList().size());
+			for (ERelationshipVersion erv: eRel.getExtraVersionsList()) {
+				additionalVersions.add(new RelationshipVersion(erv));
+			}
 		}
 	}
 
@@ -67,7 +77,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 		this.c1Nid = conceptNid;
 		this.c2Nid = input.readInt();
 		for (int i = 0; i < listSize; i++) {
-			componentVersion.add(new RelationshipVersion(input));
+			additionalVersions.add(new RelationshipVersion(input));
 		}
 	}
 
@@ -75,7 +85,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		//
 		List<RelationshipVersion> partsToWrite = new ArrayList<RelationshipVersion>();
-		for (RelationshipVersion p : componentVersion) {
+		for (RelationshipVersion p : additionalVersions) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
@@ -114,7 +124,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	private void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
 			List<RelationshipVersion> matchingTuples) {
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples,
-				componentVersion, this);
+				additionalVersions, this);
 	}
 
 	public void addTuples(I_IntSet allowedTypes, 
@@ -128,11 +138,11 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	}
 
 	public boolean addVersion(I_RelPart part) {
-		return componentVersion.add((RelationshipVersion) part);
+		return additionalVersions.add((RelationshipVersion) part);
 	}
 
 	public boolean addPart(RelationshipVersion part) {
-		return componentVersion.add(part);
+		return additionalVersions.add(part);
 	}
 
 	@Override
@@ -152,12 +162,12 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 
 	@Override
 	public RelationshipVersion getFirstTuple() {
-		return componentVersion.get(0);
+		return additionalVersions.get(0);
 	}
 
 	@Override
 	public RelationshipVersion getLastTuple() {
-		return componentVersion.get(componentVersion.size() - 1);
+		return additionalVersions.get(additionalVersions.size() - 1);
 	}
 
 	@Override
@@ -168,7 +178,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	@Override
 	public List<I_RelTuple> getTuples() {
 		List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
-		for (RelationshipVersion p: componentVersion) {
+		for (RelationshipVersion p: additionalVersions) {
 			tuples.add(p);
 		}
 		return tuples;
@@ -191,8 +201,8 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 				Bdb.getConceptDb().getConcept(c1Nid).getUidsForComponent(nid), 
 				Bdb.getConceptDb().getConcept(c1Nid).getUids(), 
 				Bdb.getConceptDb().getConcept(c2Nid).getUids(),
-				componentVersion.size());
-		for (RelationshipVersion part : componentVersion) {
+				additionalVersions.size());
+		for (RelationshipVersion part : additionalVersions) {
 			UniversalAceRelationshipPart universalPart = new UniversalAceRelationshipPart();
 			universalPart.setPathId(Bdb.getConceptDb().getConcept(part.getPathId()).getUids());
 			universalPart.setStatusId(Bdb.getConceptDb().getConcept(part.getStatusId()).getUids());

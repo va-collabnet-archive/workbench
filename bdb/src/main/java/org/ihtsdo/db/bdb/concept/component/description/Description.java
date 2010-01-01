@@ -32,6 +32,8 @@ import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
+import org.ihtsdo.etypes.EDescription;
+import org.ihtsdo.etypes.EDescriptionVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -62,7 +64,23 @@ public class Description
 		super(Bdb.uuidsToNid(uDesc.getDescId()), uDesc.getVersions().size(), editable);
 		setConceptNid(Bdb.uuidsToNid(uDesc.getConceptId()));
 		for (UniversalAceDescriptionPart umPart: uDesc.getMutableParts()) {
-			componentVersion.add(new DescriptionVersion(umPart));
+			additionalVersions.add(new DescriptionVersion(umPart));
+		}
+	}
+
+	public Description(EDescription eDesc, boolean editable) {
+		super(Bdb.uuidsToNid(eDesc.getUuids()), eDesc.getVersionCount(), editable);
+		setConceptNid(Bdb.uuidToNid(eDesc.getConceptUuid()));
+		initialCaseSignificant = eDesc.isInitialCaseSignificant();
+		lang = eDesc.getLang();
+		text = eDesc.getText();
+		typeNid = Bdb.uuidToNid(eDesc.getTypeUuid());
+		primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(eDesc);
+		if (eDesc.getExtraVersionsList() != null) {
+			additionalVersions = new ArrayList<DescriptionVersion>(eDesc.getExtraVersionsList().size());
+			for (EDescriptionVersion edv: eDesc.getExtraVersionsList()) {
+				additionalVersions.add(new DescriptionVersion(edv));
+			}
 		}
 	}
 
@@ -71,14 +89,14 @@ public class Description
 		// nid, list size, and conceptNid are read already by the binder...
 		this.conceptNid = conceptNid;
 		for (int i = 0; i < listSize; i++) {
-			componentVersion.add(new DescriptionVersion(input));
+			additionalVersions.add(new DescriptionVersion(input));
 		}
 	}
 
 	@Override
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<DescriptionVersion> partsToWrite = new ArrayList<DescriptionVersion>();
-		for (DescriptionVersion p: componentVersion) {
+		for (DescriptionVersion p: additionalVersions) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
@@ -110,12 +128,12 @@ public class Description
 
 	@Override
 	public DescriptionVersion getFirstTuple() {
-		return componentVersion.get(0);
+		return additionalVersions.get(0);
 	}
 
 	@Override
 	public DescriptionVersion getLastTuple() {
-		return componentVersion.get(componentVersion.size() - 1);
+		return additionalVersions.get(additionalVersions.size() - 1);
 	}
 
 
@@ -135,7 +153,7 @@ public class Description
 			TerminologyException {
 		UniversalAceDescription universal = new UniversalAceDescription(
 				getUids(nid), getUids(conceptNid), this.versionCount());
-		for (DescriptionVersion part : componentVersion) {
+		for (DescriptionVersion part : additionalVersions) {
 			UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
 			universalPart.setInitialCaseSignificant(part
 					.isInitialCaseSignificant());
@@ -153,7 +171,7 @@ public class Description
 	@Override
 	public boolean matches(Pattern p) {
 		String lastText = null;
-		for (DescriptionVersion desc : componentVersion) {
+		for (DescriptionVersion desc : additionalVersions) {
 			if (desc.getText() != lastText) {
 				lastText = desc.getText();
 				Matcher m = p.matcher(lastText);
@@ -207,7 +225,7 @@ public class Description
 
 	@Override
 	public boolean addVersion(I_DescriptionPart newPart) {
-		return componentVersion.add((DescriptionVersion) newPart);
+		return additionalVersions.add((DescriptionVersion) newPart);
 	}
 
 	@Override
@@ -231,10 +249,10 @@ public class Description
 
 	public final List<? extends I_DescriptionTuple> getTuples() {
 		List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-		for (DescriptionVersion p : componentVersion) {
+		for (DescriptionVersion p : additionalVersions) {
 			tuples.add(p);
 		}
-		return componentVersion;
+		return additionalVersions;
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
@@ -263,7 +281,7 @@ public class Description
 		List<DescriptionVersion> tuples = new ArrayList<DescriptionVersion>();
 
 		computer.addTuples(allowedStatus, allowedTypes, positions,
-				tuples, addUncommitted, componentVersion, this);
+				tuples, addUncommitted, additionalVersions, this);
 
 		if (returnConflictResolvedLatestState) {
 			I_ConfigAceFrame config = AceConfig.getVodb()

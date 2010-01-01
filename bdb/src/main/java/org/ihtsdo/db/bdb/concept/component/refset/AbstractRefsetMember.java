@@ -106,7 +106,7 @@ public abstract class AbstractRefsetMember extends ConceptComponent<RefsetMember
 	@Override
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<RefsetMemberMutablePart> partsToWrite = new ArrayList<RefsetMemberMutablePart>();
-		for (RefsetMemberMutablePart p: componentVersion) {
+		for (RefsetMemberMutablePart p: additionalVersions) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
@@ -135,55 +135,55 @@ public abstract class AbstractRefsetMember extends ConceptComponent<RefsetMember
 		for (int i = 0; i < listSize; i++) {
 			switch (memberType) {
 			case BOOLEAN:
-				componentVersion.add(new MembershipVersion(input));
+				additionalVersions.add(new MembershipVersion(input));
 				break;
 			case CID_INT:
-				componentVersion.add(new CidIntVersion(input));
+				additionalVersions.add(new CidIntVersion(input));
 				break;
 			case CID:
-				componentVersion.add(new CidVersion(input));
+				additionalVersions.add(new CidVersion(input));
 				break;
 			case CID_CID:
-				componentVersion.add(new CidCidVersion(input));
+				additionalVersions.add(new CidCidVersion(input));
 				break;
 			case CID_CID_CID:
-				componentVersion.add(new CidCidCidVersion(input));
+				additionalVersions.add(new CidCidCidVersion(input));
 				break;
 			case CID_CID_STRING:
-				componentVersion.add(new CidCidStrVersion(input));
+				additionalVersions.add(new CidCidStrVersion(input));
 				break;
 			case CID_STRING:
-				componentVersion.add(new CidStrVersion(input));
+				additionalVersions.add(new CidStrVersion(input));
 				break;
 			case CROSS_MAP:
-				componentVersion.add(new CrossMapVersion(input));
+				additionalVersions.add(new CrossMapVersion(input));
 				break;
 			case CROSS_MAP_FOR_REL:
-				componentVersion.add(new CrossMapForRelVersion(input));
+				additionalVersions.add(new CrossMapForRelVersion(input));
 				break;
 			case INTEGER:
-				componentVersion.add(new IntVersion(input));
+				additionalVersions.add(new IntVersion(input));
 				break;
 			case LANGUAGE:
-				componentVersion.add(new LangVersion(input));
+				additionalVersions.add(new LangVersion(input));
 				break;
 			case MEASUREMENT:
-				componentVersion.add(new FloatCidVersion(input));
+				additionalVersions.add(new FloatCidVersion(input));
 				break;
 			case MEMBER:
-				componentVersion.add(new MembershipVersion(input));
+				additionalVersions.add(new MembershipVersion(input));
 				break;
 			case SCOPED_LANGUAGE:
-				componentVersion.add(new ScopedLangVersion(input));
+				additionalVersions.add(new ScopedLangVersion(input));
 				break;
 			case STRING:
-				componentVersion.add(new StrVersion(input));
+				additionalVersions.add(new StrVersion(input));
 				break;
 			case TEMPLATE:
-				componentVersion.add(new TemplateVersion(input));
+				additionalVersions.add(new TemplateVersion(input));
 				break;
 			case TEMPLATE_FOR_REL:
-				componentVersion.add(new TemplateForRelVersion(input));
+				additionalVersions.add(new TemplateForRelVersion(input));
 				break;
 				default:
 					throw new UnsupportedOperationException();
@@ -203,7 +203,7 @@ public abstract class AbstractRefsetMember extends ConceptComponent<RefsetMember
 
 	@Override
 	public void addVersion(I_ThinExtByRefPart part) {
-		componentVersion.add((RefsetMemberMutablePart) part);
+		additionalVersions.add((RefsetMemberMutablePart) part);
 	}
 
 

@@ -22,7 +22,11 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
 import org.ihtsdo.db.util.VersionComputer;
+import org.ihtsdo.etypes.EDescriptionVersion;
+import org.ihtsdo.etypes.EImage;
+import org.ihtsdo.etypes.EImageVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -48,13 +52,17 @@ public class Image
 		super(nid, listSize, editable);
 	}
 
-	public Image(UniversalAceImage uImage, boolean editable) {
-		super(Bdb.uuidsToNid(uImage.getImageId()), uImage.getVersions().size(), editable);
-		conceptNid = Bdb.uuidsToNid(uImage.getConceptId());
-		image = uImage.getImage();
-		format = uImage.getFormat();
-		for (UniversalAceImagePart uPart: uImage.getVersions()) {
-			componentVersion.add(new ImageVersion(uPart));
+	public Image(EImage eImage, boolean editable) {
+		super(Bdb.uuidsToNid(eImage.getUuids()), eImage.getVersionCount(), editable);
+		conceptNid = Bdb.uuidToNid(eImage.getConceptUuid());
+		image = eImage.getImage();
+		format = eImage.getFormat();
+		primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(eImage);
+		if (eImage.getExtraVersionsList() != null) {
+			additionalVersions = new ArrayList<ImageVersion>(eImage.getExtraVersionsList().size());
+			for (EImageVersion eiv: eImage.getExtraVersionsList()) {
+				additionalVersions.add(new ImageVersion(eiv));
+			}
 		}
 	}
 
@@ -68,14 +76,14 @@ public class Image
 		image = new byte[imageBytes];
 		input.read(image, 0, imageBytes);
 		for (int i = 0; i < listSize; i++) {
-			componentVersion.add(new ImageVersion(input));
+			additionalVersions.add(new ImageVersion(input));
 		}
 	}
 
 	@Override
 	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<ImageVersion> partsToWrite = new ArrayList<ImageVersion>();
-		for (ImageVersion p: componentVersion) {
+		for (ImageVersion p: additionalVersions) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
@@ -135,7 +143,7 @@ public class Image
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getLastTuple()
 	 */
 	public ImageVersion getLastTuple() {
-		return componentVersion.get(componentVersion.size() - 1);
+		return additionalVersions.get(additionalVersions.size() - 1);
 	}
 
 	/*
@@ -145,7 +153,7 @@ public class Image
 	 */
 	public List<I_ImageTuple> getTuples() {
 		List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
-		for (ImageVersion p : componentVersion) {
+		for (ImageVersion p : additionalVersions) {
 			tuples.add(p);
 		}
 		return tuples;
@@ -178,9 +186,9 @@ public class Image
 	public UniversalAceImage getUniversal() throws IOException,
 			TerminologyException {
 		UniversalAceImage universal = new UniversalAceImage(getUids(nid),
-				getImage(), new ArrayList<UniversalAceImagePart>(componentVersion
+				getImage(), new ArrayList<UniversalAceImagePart>(additionalVersions
 						.size()), getFormat(), getUids(conceptNid));
-		for (ImageVersion part : componentVersion) {
+		for (ImageVersion part : additionalVersions) {
 			UniversalAceImagePart universalPart = new UniversalAceImagePart();
 			universalPart.setPathId(getUids(part.getPathId()));
 			universalPart.setStatusId(getUids(part.getStatusId()));
@@ -197,7 +205,7 @@ public class Image
 		int viewPathId = viewPosition.getPath().getConceptId();
 		List<ImageVersion> matchingTuples = new ArrayList<ImageVersion>();
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples, 
-				componentVersion, this);
+				additionalVersions, this);
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {
 			for (ImageVersion it : matchingTuples) {
@@ -215,7 +223,7 @@ public class Image
 
 	@Override
 	public boolean addVersion(I_ImagePart part) {
-		return componentVersion.add((ImageVersion) part);
+		return additionalVersions.add((ImageVersion) part);
 	}
 
 	@Override

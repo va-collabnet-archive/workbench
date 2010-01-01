@@ -4,9 +4,9 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.utypes.UniversalAceImagePart;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.etypes.EImageVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -58,11 +58,13 @@ public class ImageVersion extends Version<ImageVersion, Image>
 		// TODO Auto-generated constructor stub
 	}
 
-	public ImageVersion(UniversalAceImagePart uPart) {
-		super(Bdb.uuidsToNid(uPart.getStatusId()), 
-				Bdb.uuidsToNid(uPart.getPathId()), uPart.getTime());
-		this.textDescription = uPart.getTextDescription();
-		this.typeNid = Bdb.uuidsToNid(uPart.getTypeId());
+
+	public ImageVersion(EImageVersion eiv) {
+		super(Bdb.uuidToNid(eiv.getStatusUuid()), 
+			  Bdb.uuidToNid(eiv.getPathUuid()), 
+			  eiv.getTime());
+		this.textDescription = eiv.getTextDescription();
+		this.typeNid = Bdb.uuidToNid(eiv.getTypeUuid());
 	}
 
 	/* (non-Javadoc)

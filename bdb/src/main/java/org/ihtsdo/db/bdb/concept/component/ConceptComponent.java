@@ -93,14 +93,14 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	 */
 	public long primordialUuidLsb;
 	
-	public ArrayList<V> componentVersion;
+	public ArrayList<V> additionalVersions;
 	private ArrayList<IdentifierVersion> identifierParts;
 	
-	protected ConceptComponent(int nid, int listSize, boolean editable) {
+	protected ConceptComponent(int nid, int versionCount, boolean editable) {
 		super();
 		this.nid = nid;
 		this.editable = editable;
-		this.componentVersion = new ArrayList<V>(listSize);
+		this.additionalVersions = new ArrayList<V>(versionCount - 1);
 	}
 	
 	public void readIdentifierFromBdb(TupleInput input, int conceptNid, int listSize) {
@@ -263,15 +263,15 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 	public final List<V> getMutableParts() {
 		if (editable) {
-			return componentVersion;
+			return additionalVersions;
 		}
-		return Collections.unmodifiableList(componentVersion);
+		return Collections.unmodifiableList(additionalVersions);
 	}
 	
 
 	public final List<V> getMutableParts(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
 		if (returnConflictResolvedLatestState) {
-	        List<V> returnList = new ArrayList<V>(componentVersion.size());
+	        List<V> returnList = new ArrayList<V>(additionalVersions.size());
 	        if (returnConflictResolvedLatestState) {
 	            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 	            returnList = config.getConflictResolutionStrategy().resolveParts(returnList);
@@ -283,7 +283,7 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 	
 	public final int getMutablePartCount() {
-		return componentVersion.size();
+		return additionalVersions.size();
 	}
 
 	public final int getNid() {
@@ -304,20 +304,20 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 	public final boolean addVersion(V newPart) {
 		if (editable) {
-			return componentVersion.add(newPart);
+			return additionalVersions.add(newPart);
 		}
 		throw new RuntimeException("versions is not editable");
 	}
 	
 	public final boolean addVersionNoRedundancyCheck(V newPart) {
 		if (editable) {
-			return componentVersion.add(newPart);
+			return additionalVersions.add(newPart);
 		}
 		throw new RuntimeException("versions is not editable");
 	}
 	
 	public final boolean hasVersion(V version) {
-		return componentVersion.contains(version);
+		return additionalVersions.contains(version);
 	}
 	
 	public final List<? extends V> getVersions(boolean returnConflictResolvedLatestState)
@@ -326,17 +326,17 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	}
 
 	public final int versionCount() {
-		if (componentVersion == null) {
+		if (additionalVersions == null) {
 			return 1;
 		}
-		return componentVersion.size() + 1;
+		return additionalVersions.size() + 1;
 	}
 	
 	public final Set<TimePathId> getTimePathSet() {
 		Set<TimePathId> set = new TreeSet<TimePathId>();
 		set.add(new TimePathId(getVersion(), getPathId()));
-		if (componentVersion != null) {
-			for (V p : componentVersion) {
+		if (additionalVersions != null) {
+			for (V p : additionalVersions) {
 				set.add(new TimePathId(p.getVersion(), p.getPathId()));
 			}
 		}

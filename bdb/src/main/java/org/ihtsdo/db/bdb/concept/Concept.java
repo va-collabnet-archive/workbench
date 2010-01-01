@@ -27,12 +27,6 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.utypes.UniversalAceBean;
-import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
-import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
-import org.dwfa.ace.utypes.UniversalAceDescription;
-import org.dwfa.ace.utypes.UniversalAceIdentification;
-import org.dwfa.ace.utypes.UniversalAceImage;
-import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
@@ -44,8 +38,16 @@ import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
 import org.ihtsdo.db.bdb.concept.component.image.ImageVersion;
 import org.ihtsdo.db.bdb.concept.component.refset.AbstractRefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipVersion;
+import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.etypes.EConceptAttributes;
+import org.ihtsdo.etypes.EDescription;
+import org.ihtsdo.etypes.EImage;
+import org.ihtsdo.etypes.ERefset;
+import org.ihtsdo.etypes.ERelationship;
+import org.ihtsdo.etypes.I_ConceptualizeExternally;
 
 public class Concept implements I_Transact, I_GetConceptData {
 
@@ -66,40 +68,42 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	}
 
-	public static Concept get(UniversalAceBean universal) throws IOException {
-		int conceptNid = Bdb.uuidsToNid(universal.getIdentifier().getUIDs());
+	public static Concept get(EConcept eConcept) throws IOException {
+		int conceptNid = Bdb.uuidsToNid(eConcept.getUuids());
 		
 		Concept c = get(conceptNid, true);
 		
-		UniversalAceConceptAttributes uAttr = universal.getConceptAttributes();
+		eConcept.getEIdentifiers(); // TODO
 		
-		ConceptAttributes attr = new ConceptAttributes(c.nid, uAttr.getVersions().size(), true);
+		EConceptAttributes eAttr = eConcept.getConceptAttributes();
+		
+		ConceptAttributes attr = new ConceptAttributes(c.nid, eAttr.getVersionCount(), true);
 		c.unsubmittedComponents.add(attr);
-		for (UniversalAceConceptAttributesPart uPart: uAttr.getVersions()) {
-			ConceptAttributesVersion part = 
-				new ConceptAttributesVersion(Bdb.uuidsToNid(uPart.getStatusId()), 
-						Bdb.uuidsToNid(uPart.getPathId()), 
-						uPart.getTime());
-			attr.addVersion(part);
+		attr.addVersion(new ConceptAttributesVersion(eAttr));
+		if (eAttr.getExtraVersionsList() != null) {
+			for (I_ConceptualizeExternally eav: eAttr.getExtraVersionsList()) {
+				attr.addVersion(new ConceptAttributesVersion(eav));
+			}
 		}
 			
-		UniversalAceIdentification uId = universal.getIdentifier();
-		
-		for (UniversalAceDescription uDesc: universal.getDescriptions()) {
-			Description desc = new Description(uDesc, c.editable);
+		for (EDescription eDesc: eConcept.getDescriptions()) {
+			Description desc = new Description(eDesc, c.editable);
 			c.unsubmittedComponents.add(desc);
 		}
-		for (UniversalAceRelationship uRel: universal.getSourceRels()) {
-			Relationship rel = new Relationship(uRel, c.editable);
+		for (ERelationship eRel: eConcept.getRelationships()) {
+			Relationship rel = new Relationship(eRel, c.editable);
 			c.unsubmittedComponents.add(rel);
 		}
-		for (UniversalAceImage uImage: universal.getImages()) {
-			Image img = new Image(uImage, c.editable);
+		for (EImage eImage: eConcept.getImages()) {
+			Image img = new Image(eImage, c.editable);
 			c.unsubmittedComponents.add(img);
 		}
+		for (ERefset eRefsetMember: eConcept.getRefsetMembers()) {
+			AbstractRefsetMember refsetMember = RefsetMemberFactory.create(eRefsetMember);
+			c.unsubmittedComponents.add(refsetMember);
+		}
 		return c;
-	}
-	
+	}	
 	
 	public static Concept get(int nid, boolean editable) throws IOException {
 		return new Concept(nid, editable);
