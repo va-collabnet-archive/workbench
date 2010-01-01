@@ -18,8 +18,8 @@ package org.dwfa.ace.api.ebr;
 
 public interface I_ThinExtByRefPartBoolean extends I_ThinExtByRefPart {
 
-    public boolean getValue();
+    public boolean getBooleanValue();
 
-    public void setValue(boolean value);
+    public void setBooleanValue(boolean value);
 
 }

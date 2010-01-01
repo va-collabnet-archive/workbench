@@ -28,7 +28,8 @@ public class EConcept extends EComponent implements Externalizable {
 		CID_CID_STR(5, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION),
 		STR(6, RefsetAuxiliary.Concept.STRING_EXTENSION),
 		INT(7, RefsetAuxiliary.Concept.INT_EXTENSION), 
-		CID_INT(8, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION)
+		CID_INT(8, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION),
+		BOOLEAN(9, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION)
 		;
 
 		private int externalizedToken;
