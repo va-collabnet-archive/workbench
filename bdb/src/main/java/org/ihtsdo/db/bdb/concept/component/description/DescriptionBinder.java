@@ -4,18 +4,18 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 
 public class DescriptionBinder {
 
-		private static final ThreadLocal<ConceptComponentBinder<Description, DescriptionVersion>> binders = 
-				new ThreadLocal<ConceptComponentBinder<Description, DescriptionVersion>>() {
+		private static final ThreadLocal<ConceptComponentBinder<DescriptionVersion, Description>> binders = 
+				new ThreadLocal<ConceptComponentBinder<DescriptionVersion, Description>>() {
 			
 			@Override
-			protected ConceptComponentBinder<Description, DescriptionVersion> initialValue() {
+			protected ConceptComponentBinder<DescriptionVersion, Description> initialValue() {
 				DescriptionFactory factory = new DescriptionFactory();
-				return new ConceptComponentBinder<Description, DescriptionVersion>(
+				return new ConceptComponentBinder<DescriptionVersion, Description>(
 						factory);
 			}
 		};
 
-		public static ConceptComponentBinder<Description, DescriptionVersion> getBinder() {
+		public static ConceptComponentBinder<DescriptionVersion, Description> getBinder() {
 			return binders.get();
 		}
 

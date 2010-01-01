@@ -2,19 +2,22 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr;
 
 import java.io.IOException;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidCidStrVersion extends CidCidVersion
+public class CidCidStrVersion extends RefsetVersion<CidCidStrVersion, CidCidStrMember>
 	implements I_ThinExtByRefPartConceptConceptString {
 
-	private String str;
+	private int c1Nid;
+	private int c2Nid;
+	private String strValue;
 	
 	public CidCidStrVersion(int statusNid, int pathNid,
 			long time) {
@@ -27,7 +30,9 @@ public class CidCidStrVersion extends CidCidVersion
 
 	public CidCidStrVersion(TupleInput input) {
 		super(input);
-		this.str = input.readString();
+		c1Nid = input.readInt();
+		c2Nid = input.readInt();
+		strValue = input.readString();
 	}
 
 	@Override
@@ -51,22 +56,71 @@ public class CidCidStrVersion extends CidCidVersion
 
 	@Override
 	public String getStr() {
-		return str;
+		return strValue;
 	}
 
 	@Override
 	public String getStringValue() {
-		return str;
+		return strValue;
 	}
 
 	@Override
 	public void setStr(String str) {
-		this.str = str;
+		this.strValue = str;
 	}
 
 	@Override
 	public void setStringValue(String value) {
-		this.str = value;
+		this.strValue = value;
+	}
+
+	public int getC1Nid() {
+		return c1Nid;
+	}
+
+	public void setC1Nid(int c1Nid) {
+		this.c1Nid = c1Nid;
+	}
+
+	public int getC2Nid() {
+		return c2Nid;
+	}
+
+	public void setC2Nid(int c2Nid) {
+		this.c2Nid = c2Nid;
+	}
+
+	public String getStrValue() {
+		return strValue;
+	}
+
+	public void setStrValue(String strValue) {
+		this.strValue = strValue;
+	}
+
+	@Override
+	public int getC1id() {
+		return c1Nid;
+	}
+
+	@Override
+	public int getC2id() {
+		return c2Nid;
+	}
+
+	@Override
+	public void setC1id(int c1id) {
+		this.c1Nid = c1id;
+	}
+
+	@Override
+	public void setC2id(int c2id) {
+		this.c2Nid = c2id;
+	}
+
+	@Override
+	public I_AmPart getMutablePart() {
+		return this;
 	}
 
 }

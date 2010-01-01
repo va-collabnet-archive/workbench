@@ -1,28 +1,33 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.Boolean;
 
 import java.io.IOException;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class RefsetMemberVersion extends RefsetMemberMutablePart
-	implements I_ThinExtByRefPart {
+public class BooleanVersion extends RefsetVersion<BooleanVersion, BooleanMember>
+	implements I_ThinExtByRefPartBoolean {
 	
-	protected RefsetMemberVersion(int statusNid, int pathNid, long time) {
+	private boolean booleanValue;
+
+	protected BooleanVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	protected RefsetMemberVersion(int statusAtPositionNid) {
+	protected BooleanVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public RefsetMemberVersion(TupleInput input) {
+	public BooleanVersion(TupleInput input) {
 		super(input);
+		booleanValue = input.readBoolean();
 	}
 
 	@Override
@@ -44,9 +49,16 @@ public class RefsetMemberVersion extends RefsetMemberMutablePart
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public RefsetMemberVersion getMutablePart() {
-		return this;
+	public boolean getBooleanValue() {
+		return booleanValue;
 	}
 
+	public void setBooleanValue(boolean booleanValue) {
+		this.booleanValue = booleanValue;
+	}
+
+	@Override
+	public I_AmPart getMutablePart() {
+		return this;
+	}
 }

@@ -11,8 +11,8 @@ import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ConceptComponentBinder<C extends ConceptComponent<P, C>, 
-									P extends Version<P, C>> 
+public class ConceptComponentBinder<V extends Version<V, C>, 
+									C extends ConceptComponent<V, C>> 
 	extends TupleBinding<ArrayList<C>> 
 	implements I_BindConceptComponents {
 
@@ -21,9 +21,9 @@ public class ConceptComponentBinder<C extends ConceptComponent<P, C>,
 	private int conceptNid;
 	private boolean editable;
 	private ArrayList<C> readOnlyConceptComponentList;
-	private ComponentFactory<C, P> factory;
+	private ComponentFactory<V, C> factory;
 
-	public ConceptComponentBinder(ComponentFactory<C, P> factory) {
+	public ConceptComponentBinder(ComponentFactory<V, C> factory) {
 		super();
 		this.factory = factory;
 	}
@@ -67,7 +67,7 @@ public class ConceptComponentBinder<C extends ConceptComponent<P, C>,
 	public void objectToEntry(ArrayList<C> conceptComponentList, TupleOutput output) {
 		List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
 		for (C conceptComponent: conceptComponentList) {
-			for (P part: conceptComponent.additionalVersions) {
+			for (V part: conceptComponent.additionalVersions) {
 				if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
 					componentListToWrite.add(conceptComponent);
 					break;

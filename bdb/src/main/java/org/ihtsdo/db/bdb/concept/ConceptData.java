@@ -21,7 +21,7 @@ import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionBinder;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
-import org.ihtsdo.db.bdb.concept.component.refset.AbstractRefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipVersion;
@@ -101,7 +101,7 @@ public class ConceptData  {
 	}
 
 	public ArrayList<Relationship> getSourceRels() throws IOException {
-		ConceptComponentBinder<Relationship, RelationshipVersion> binder = RelationshipBinder.getBinder();
+		ConceptComponentBinder<RelationshipVersion, Relationship> binder = RelationshipBinder.getBinder();
 		binder.setupBinder(nid, editable);
 		try {
 			TupleInput readOnlyInput = data.getReadOnlyTupleInput();
@@ -120,7 +120,7 @@ public class ConceptData  {
 	}
 	
 	public List<Description> getDescriptions() throws IOException {
-		ConceptComponentBinder<Description, DescriptionVersion> binder = DescriptionBinder.getBinder();
+		ConceptComponentBinder<DescriptionVersion, Description> binder = DescriptionBinder.getBinder();
 		binder.setupBinder(nid, editable);
 		try {
 			TupleInput readOnlyInput = data.getReadOnlyTupleInput();
@@ -141,7 +141,7 @@ public class ConceptData  {
 
 	public ConceptAttributes getConceptAttributes()
 			throws IOException {
-		ConceptComponentBinder<ConceptAttributes, ConceptAttributesVersion> binder = 
+		ConceptComponentBinder<ConceptAttributesVersion, ConceptAttributes> binder = 
 				ConceptAttributesBinder.getBinder();
 		binder.setupBinder(nid, editable);
 		try {
@@ -201,7 +201,7 @@ public class ConceptData  {
 		}
 	}
 
-	public List<AbstractRefsetMember> getExtensions() throws IOException,
+	public List<RefsetMember> getExtensions() throws IOException,
 			TerminologyException {
 		//TODO
 		throw new UnsupportedOperationException();

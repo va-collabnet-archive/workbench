@@ -37,7 +37,7 @@ import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
 import org.ihtsdo.db.bdb.concept.component.image.ImageVersion;
-import org.ihtsdo.db.bdb.concept.component.refset.AbstractRefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipVersion;
@@ -99,7 +99,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 			c.unsubmittedComponents.add(img);
 		}
 		for (ERefset eRefsetMember: eConcept.getRefsetMembers()) {
-			AbstractRefsetMember refsetMember = RefsetMemberFactory.create(eRefsetMember);
+			RefsetMember refsetMember = RefsetMemberFactory.create(eRefsetMember);
 			c.unsubmittedComponents.add(refsetMember);
 		}
 		return c;
@@ -313,7 +313,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return data.getDestRels();
 	}
 
-	public List<AbstractRefsetMember> getExtensions() throws IOException,
+	public List<RefsetMember> getExtensions() throws IOException,
 			TerminologyException {
 		return data.getExtensions();
 	}

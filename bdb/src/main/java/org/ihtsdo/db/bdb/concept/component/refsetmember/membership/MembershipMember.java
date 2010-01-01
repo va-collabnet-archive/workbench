@@ -2,14 +2,25 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.membership;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
-import org.ihtsdo.db.bdb.concept.component.refset.AbstractRefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 
-public class MembershipMember extends AbstractRefsetMember {
+import com.sleepycat.bind.tuple.TupleInput;
+
+public class MembershipMember extends RefsetMember<MembershipVersion, MembershipMember> {
 
 	public MembershipMember(int nid, int partCount, boolean editable) {
 		super(nid, partCount, editable);
-		// TODO Auto-generated constructor stub
 	}
+
+	@Override
+	protected final void readMemberParts(TupleInput input) {
+		if (additionalVersions != null) {
+			for (int i = 0; i < additionalVersions.size(); i++) {
+				additionalVersions.add(new MembershipVersion(input));
+			}
+		}
+	}
+
 
 	@Override
 	protected ArrayIntList getVariableVersionNids() {
@@ -22,5 +33,4 @@ public class MembershipMember extends AbstractRefsetMember {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

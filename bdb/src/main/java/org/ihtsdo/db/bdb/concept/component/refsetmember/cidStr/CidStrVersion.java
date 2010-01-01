@@ -2,19 +2,21 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.cidStr;
 
 import java.io.IOException;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidStrVersion extends CidVersion 
+public class CidStrVersion extends RefsetVersion<CidStrVersion, CidStrMember> 
 	implements I_ThinExtByRefPartConceptString {
 
-	private String str;
+	private int c1Nid;
+	private String strValue;
 	
 	public CidStrVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
@@ -26,7 +28,8 @@ public class CidStrVersion extends CidVersion
 
 	public CidStrVersion(TupleInput input) {
 		super(input);
-		// TODO Auto-generated constructor stub
+		c1Nid = input.readInt();
+		strValue = input.readString();
 	}
 
 	@Override
@@ -48,14 +51,46 @@ public class CidStrVersion extends CidVersion
 		throw new UnsupportedOperationException();
 	}
 
+
+	public int getC1Nid() {
+		return c1Nid;
+	}
+
+	public void setC1Nid(int c1Nid) {
+		this.c1Nid = c1Nid;
+	}
+
+	public String getStrValue() {
+		return strValue;
+	}
+
+	public void setStrValue(String strValue) {
+		this.strValue = strValue;
+	}
+
+	@Override
+	public int getC1id() {
+		return c1Nid;
+	}
+
 	@Override
 	public String getStr() {
-		return str;
+		return strValue;
+	}
+
+	@Override
+	public void setC1id(int c1id) {
+		this.c1Nid = c1id;
 	}
 
 	@Override
 	public void setStr(String str) {
-		this.str = str;
+		this.strValue = str;
+	}
+
+	@Override
+	public I_AmPart getMutablePart() {
+		return this;
 	}
 
 }

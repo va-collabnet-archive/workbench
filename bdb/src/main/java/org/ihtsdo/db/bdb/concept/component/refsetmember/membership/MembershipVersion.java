@@ -6,11 +6,11 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class MembershipVersion extends RefsetMemberMutablePart {
+public class MembershipVersion extends RefsetVersion<MembershipVersion, MembershipMember> {
 
 	
 	public MembershipVersion(int statusNid, int pathNid, long time) {
@@ -33,7 +33,7 @@ public class MembershipVersion extends RefsetMemberMutablePart {
 	}
 
 	@Override
-	public RefsetMemberMutablePart makePromotionPart(I_Path promotionPath) {
+	public RefsetVersion<MembershipVersion, MembershipMember> makePromotionPart(I_Path promotionPath) {
 		// TODO
 		throw new UnsupportedOperationException();
 	}

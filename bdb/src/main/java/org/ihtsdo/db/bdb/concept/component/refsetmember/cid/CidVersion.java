@@ -7,11 +7,11 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidVersion extends RefsetMemberMutablePart
+public class CidVersion<V extends CidVersion<V, C>, C extends CidMember<V, C>> extends RefsetVersion<V, C>
 	implements I_ThinExtByRefPartConcept {
 	
 	private int c1Nid;

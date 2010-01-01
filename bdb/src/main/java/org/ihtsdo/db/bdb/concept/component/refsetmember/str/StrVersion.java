@@ -6,11 +6,11 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberMutablePart;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class StrVersion extends RefsetMemberMutablePart 
+public class StrVersion extends RefsetVersion<StrVersion, StrMember> 
 	//implements I_ThinExtByRefPartString 
 	{
 
@@ -26,9 +26,10 @@ public class StrVersion extends RefsetMemberMutablePart
 
 	public StrVersion(TupleInput input) {
 		super(input);
-		// TODO Auto-generated constructor stub
+		stringValue = input.readString();
 	}
 
+	
 	@Override
 	public UniversalAceExtByRefPart getUniversalPart()
 			throws TerminologyException, IOException {

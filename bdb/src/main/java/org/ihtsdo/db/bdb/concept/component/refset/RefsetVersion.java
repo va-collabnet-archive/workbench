@@ -7,19 +7,21 @@ import org.ihtsdo.db.bdb.concept.component.Version;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class RefsetMemberMutablePart extends Version<RefsetMemberMutablePart, AbstractRefsetMember> 
+public abstract class RefsetVersion<V extends RefsetVersion<V, C>, 
+                                              C extends RefsetMember<V, C>> 
+	extends Version<V, C> 
 	implements I_ThinExtByRefPart {
 
 
-	public RefsetMemberMutablePart(int statusNid, int pathNid, long time) {
+	public RefsetVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public RefsetMemberMutablePart(int statusAtPositionNid) {
+	public RefsetVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public RefsetMemberMutablePart(TupleInput input) {
+	public RefsetVersion(TupleInput input) {
 		super(input);
 	}
 
@@ -35,7 +37,7 @@ public abstract class RefsetMemberMutablePart extends Version<RefsetMemberMutabl
 
 
 	@Override
-	public RefsetMemberMutablePart makeAnalog(int statusNid, int pathNid, long time) {
+	public V makeAnalog(int statusNid, int pathNid, long time) {
 		// TODO Auto-generated method stub
 		return null;
 	}
