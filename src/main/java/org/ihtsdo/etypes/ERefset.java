@@ -6,6 +6,7 @@ import java.io.ObjectOutput;
 import java.util.UUID;
 
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
@@ -60,24 +61,29 @@ public abstract class ERefset extends EComponent {
 
 	public static ERefset convert(I_ThinExtByRefVersioned m) throws TerminologyException, IOException {
 		REFSET_TYPES type = REFSET_TYPES.nidToType(m.getTypeId());
-		switch (type) {
-		case CID:
-			return new ERefsetCidMember(m);
-		case CID_CID:
-			return new ERefsetCidCidMember(m);
-		case CID_CID_CID:
-			return new ERefsetCidCidCidMember(m);
-		case CID_CID_STR:
-			return new ERefsetCidCidStrMember(m);
-		case INT:
-			return new ERefsetIntMember(m);
-		case MEMBER:
-			return new ERefsetMember(m);
-		case STR:
-			return new ERefsetStrMember(m);
-			
-		default:
-			throw new UnsupportedOperationException("Cannot handle: " + type);
+		if (type != null) {
+			switch (type) {
+			case CID:
+				return new ERefsetCidMember(m);
+			case CID_CID:
+				return new ERefsetCidCidMember(m);
+			case CID_CID_CID:
+				return new ERefsetCidCidCidMember(m);
+			case CID_CID_STR:
+				return new ERefsetCidCidStrMember(m);
+			case INT:
+				return new ERefsetIntMember(m);
+			case MEMBER:
+				return new ERefsetMember(m);
+			case STR:
+				return new ERefsetStrMember(m);
+				
+			default:
+				throw new UnsupportedOperationException("Cannot handle: " + type);
+			}
+		} else {
+			AceLog.getAppLog().severe("Can't handle refset type: " + m);
 		}
+		return null;
 	}
 }

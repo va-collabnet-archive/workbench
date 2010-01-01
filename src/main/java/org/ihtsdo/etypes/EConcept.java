@@ -15,6 +15,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -224,7 +225,13 @@ public class EConcept extends EComponent implements Externalizable {
 		if (members != null) {
 			refsetMembers = new ArrayList<ERefset>(members.size());
 			for (I_ThinExtByRefVersioned m: members) {
-				refsetMembers.add(ERefset.convert(m));
+				ERefset member = ERefset.convert(m);
+				if (member != null) {
+					refsetMembers.add(ERefset.convert(m));
+				} else {
+					AceLog.getAppLog().severe("Could not convert refset member: " + m +
+							"\nfrom refset: " + c);
+				}
 			}
 		}
 	}
