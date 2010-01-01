@@ -77,7 +77,8 @@ public abstract class ERefset extends EComponent {
 				return new ERefsetMember(m);
 			case STR:
 				return new ERefsetStrMember(m);
-				
+			case CID_INT:
+				return new ERefsetCidIntMember(m);
 			default:
 				throw new UnsupportedOperationException("Cannot handle: " + type);
 			}
