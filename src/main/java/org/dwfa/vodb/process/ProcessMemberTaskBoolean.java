@@ -46,7 +46,7 @@ public class ProcessMemberTaskBoolean extends ProcessMemberTask {
 
     protected ThinExtByRefPartBoolean makeNewPart() throws Exception {
         ThinExtByRefPartBoolean part = new ThinExtByRefPartBoolean();
-        part.setValue(booleanExt);
+        part.setBooleanValue(booleanExt);
         return part;
     }
 

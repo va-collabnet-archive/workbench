@@ -224,7 +224,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
             setStandardFields(part, vodb, thinPart);
 
             UniversalAceExtByRefPartBoolean booleanPart = (UniversalAceExtByRefPartBoolean) part;
-            thinPart.setValue(booleanPart.getBooleanValue());
+            thinPart.setBooleanValue(booleanPart.getBooleanValue());
             return thinPart;
 
         } else if (UniversalAceExtByRefPartConcept.class.equals(part.getClass())) {

@@ -1098,7 +1098,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
             case BOOLEAN_VALUE:
                 return new StringWithExtTuple(
-                    Boolean.toString(((I_ThinExtByRefPartBoolean) tuple.getMutablePart()).getValue()), tuple,
+                    Boolean.toString(((I_ThinExtByRefPartBoolean) tuple.getMutablePart()).getBooleanValue()), tuple,
                     tuple.getMemberId(), inConflict);
 
             case STRING_VALUE:
@@ -1303,7 +1303,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     ThinExtByRefPartBoolean booleanPart = new ThinExtByRefPartBoolean();
                     booleanPart.setPathId(editPath.getConceptId());
                     booleanPart.setStatusId(refsetDefaults.getDefaultStatusForRefset().getConceptId());
-                    booleanPart.setValue(preferences.getBooleanPreferences().getDefaultForBooleanRefset());
+                    booleanPart.setBooleanValue(preferences.getBooleanPreferences().getDefaultForBooleanRefset());
                     booleanPart.setVersion(Integer.MAX_VALUE);
                     extension.addVersion(booleanPart);
                 }
@@ -1561,8 +1561,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 break;
             case BOOLEAN_VALUE:
                 Boolean booleanValue = (Boolean) value;
-                if (booleanValue != ((I_ThinExtByRefPartBoolean) extTuple.getMutablePart()).getValue()) {
-                    ((I_ThinExtByRefPartBoolean) extTuple.getMutablePart()).setValue(booleanValue);
+                if (booleanValue != ((I_ThinExtByRefPartBoolean) extTuple.getMutablePart()).getBooleanValue()) {
+                    ((I_ThinExtByRefPartBoolean) extTuple.getMutablePart()).setBooleanValue(booleanValue);
                     changed = true;
                 }
                 break;

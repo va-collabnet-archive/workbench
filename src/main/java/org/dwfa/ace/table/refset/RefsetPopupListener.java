@@ -331,7 +331,7 @@ public class RefsetPopupListener extends MouseAdapter {
                     setProperStatus(newPart);
                     switch (field) {
                     case BOOLEAN_VALUE:
-                        ((I_ThinExtByRefPartBoolean) newPart).setValue(value);
+                        ((I_ThinExtByRefPartBoolean) newPart).setBooleanValue(value);
                         break;
 
                     case PRIORITY:
