@@ -45,4 +45,20 @@ public class EImageVersion extends EVersion {
 		out.writeLong(typeUuid.getLeastSignificantBits());
 	}
 
+	public String getTextDescription() {
+		return textDescription;
+	}
+
+	public void setTextDescription(String textDescription) {
+		this.textDescription = textDescription;
+	}
+
+	public UUID getTypeUuid() {
+		return typeUuid;
+	}
+
+	public void setTypeUuid(UUID typeUuid) {
+		this.typeUuid = typeUuid;
+	}
+
 }

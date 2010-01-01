@@ -94,4 +94,44 @@ public class EImage extends EComponent {
 		return extraVersions;
 	}
 
+	public UUID getConceptUuid() {
+		return conceptUuid;
+	}
+
+	public void setConceptUuid(UUID conceptUuid) {
+		this.conceptUuid = conceptUuid;
+	}
+
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
+	}
+
+	public String getTextDescription() {
+		return textDescription;
+	}
+
+	public void setTextDescription(String textDescription) {
+		this.textDescription = textDescription;
+	}
+
+	public UUID getTypeUuid() {
+		return typeUuid;
+	}
+
+	public void setTypeUuid(UUID typeUuid) {
+		this.typeUuid = typeUuid;
+	}
+
 }
