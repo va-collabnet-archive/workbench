@@ -43,7 +43,7 @@ import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
 import org.ihtsdo.db.bdb.concept.component.image.ImageVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refset.AbstractRefsetMember;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipVersion;
 
@@ -309,7 +309,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return data.getDestRels();
 	}
 
-	public List<RefsetMember> getExtensions() throws IOException,
+	public List<AbstractRefsetMember> getExtensions() throws IOException,
 			TerminologyException {
 		return data.getExtensions();
 	}

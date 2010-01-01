@@ -2,9 +2,9 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.crossMapForRel;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refset.AbstractRefsetMember;
 
-public class CrossMapForRelMember extends RefsetMember {
+public class CrossMapForRelMember extends AbstractRefsetMember {
 
 	public CrossMapForRelMember(int nid, int partCount, boolean editable) {
 		super(nid, partCount, editable);

@@ -2,9 +2,9 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refset.AbstractRefsetMember;
 
-public class CidCidCidMember extends RefsetMember {
+public class CidCidCidMember extends AbstractRefsetMember {
 
 	public CidCidCidMember(int nid, int partCount, boolean editable) {
 		super(nid, partCount, editable);

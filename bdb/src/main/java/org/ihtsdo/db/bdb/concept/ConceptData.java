@@ -21,7 +21,7 @@ import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionBinder;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refset.AbstractRefsetMember;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipVersion;
@@ -201,7 +201,7 @@ public class ConceptData  {
 		}
 	}
 
-	public List<RefsetMember> getExtensions() throws IOException,
+	public List<AbstractRefsetMember> getExtensions() throws IOException,
 			TerminologyException {
 		//TODO
 		throw new UnsupportedOperationException();

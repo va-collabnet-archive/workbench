@@ -54,7 +54,7 @@ public class ConceptComponentBinder<C extends ConceptComponent<P, C>,
 				int totalSize = conceptComponent.componentVersion.size() + partCount;
 				conceptComponent.componentVersion.ensureCapacity(totalSize);
 			} else {
-				conceptComponent = factory.create(nid, partCount, editable);
+				conceptComponent = factory.create(nid, partCount, editable, input);
 				newConceptComponentList.add(conceptComponent);
 			}
 			conceptComponent.readComponentFromBdb(input, conceptNid, partCount);

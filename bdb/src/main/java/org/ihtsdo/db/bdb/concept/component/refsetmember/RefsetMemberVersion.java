@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.template;
+package org.ihtsdo.db.bdb.concept.component.refsetmember;
 
 import java.io.IOException;
 
@@ -10,19 +10,19 @@ import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberMutablePart;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class TemplateVersion extends RefsetMemberMutablePart {
-
-	public TemplateVersion(int statusNid, int pathNid, long time) {
+public class RefsetMemberVersion extends RefsetMemberMutablePart
+	implements I_ThinExtByRefPart {
+	
+	protected RefsetMemberVersion(int statusNid, int pathNid, long time) {
 		super(statusNid, pathNid, time);
 	}
 
-	public TemplateVersion(int statusAtPositionNid) {
+	protected RefsetMemberVersion(int statusAtPositionNid) {
 		super(statusAtPositionNid);
 	}
 
-	public TemplateVersion(TupleInput input) {
+	public RefsetMemberVersion(TupleInput input) {
 		super(input);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class TemplateVersion extends RefsetMemberMutablePart {
 	}
 
 	@Override
-	public TemplateVersion getMutablePart() {
+	public RefsetMemberVersion getMutablePart() {
 		return this;
 	}
 
