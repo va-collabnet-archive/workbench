@@ -10,11 +10,12 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.tapi.TerminologyException;
 
-public class EConceptAttributes extends EComponent {
+public class EConceptAttributes extends EComponent 
+	implements I_ConceptualizeExternally {
 
 	private boolean defined;
 
-	private List<EConceptAttributesVersion> versions;
+	private List<EConceptAttributesVersion> extraVersions;
 
 	public EConceptAttributes(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -32,9 +33,9 @@ public class EConceptAttributes extends EComponent {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			versions = new ArrayList<EConceptAttributesVersion>(partCount -1);
+			extraVersions = new ArrayList<EConceptAttributesVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				versions.add(new EConceptAttributesVersion(conceptAttributes.getMutableParts().get(i)));
+				extraVersions.add(new EConceptAttributesVersion(conceptAttributes.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -45,10 +46,10 @@ public class EConceptAttributes extends EComponent {
 		super.readExternal(in);
 		defined = in.readBoolean();
 		int versionCount = in.readInt();
-		versions = new ArrayList<EConceptAttributesVersion>();
+		extraVersions = new ArrayList<EConceptAttributesVersion>();
 		if (versionCount > 0) {
 			for (int i = 0; i < versionCount; i++) {
-				versions.add(new EConceptAttributesVersion(in));
+				extraVersions.add(new EConceptAttributesVersion(in));
 			}
 		}
 	}
@@ -57,11 +58,11 @@ public class EConceptAttributes extends EComponent {
 	public void writeExternal(ObjectOutput out) throws IOException {
 		super.writeExternal(out);
 		out.writeBoolean(defined);
-		if (versions == null) {
+		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
-			out.writeInt(versions.size());
-			for (EConceptAttributesVersion cav: versions) {
+			out.writeInt(extraVersions.size());
+			for (EConceptAttributesVersion cav: extraVersions) {
 				cav.writeExternal(out);
 			}
 		}
@@ -73,5 +74,9 @@ public class EConceptAttributes extends EComponent {
 
 	public void setDefined(boolean defined) {
 		this.defined = defined;
+	}
+	
+	public List<EConceptAttributesVersion> getExtraVersionsList() {
+		return extraVersions;
 	}
 }

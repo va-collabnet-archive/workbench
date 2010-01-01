@@ -3,18 +3,21 @@ package org.ihtsdo.etypes;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.tapi.TerminologyException;
 
-public class EDescriptionVersion extends EVersion {
+public class EDescriptionVersion extends EVersion implements I_DescribeExternally {
 
 	private boolean initialCaseSignificant;
 	
 	private String lang;
 	
 	private String text;
-	
+
+	private UUID typeUuid;
+
 	public EDescriptionVersion(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
 		readExternal(in);
@@ -24,6 +27,7 @@ public class EDescriptionVersion extends EVersion {
 		initialCaseSignificant = part.isInitialCaseSignificant();
 		lang = part.getLang();
 		text = part.getText();
+		typeUuid = nidToUuid(part.getTypeId());
 		pathUuid = nidToUuid(part.getPathId());
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
@@ -36,6 +40,7 @@ public class EDescriptionVersion extends EVersion {
 		initialCaseSignificant = in.readBoolean();
 		lang = (String) in.readObject();
 		text = (String) in.readObject();
+		typeUuid = new UUID(in.readLong(), in.readLong());
 
 	}
 
@@ -44,8 +49,13 @@ public class EDescriptionVersion extends EVersion {
 		super.writeExternal(out);
 		out.writeObject(lang);
 		out.writeObject(text);
+		out.writeLong(typeUuid.getMostSignificantBits());
+		out.writeLong(typeUuid.getLeastSignificantBits());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.etypes.I_DescribeExternally#isInitialCaseSignificant()
+	 */
 	public boolean isInitialCaseSignificant() {
 		return initialCaseSignificant;
 	}
@@ -54,6 +64,9 @@ public class EDescriptionVersion extends EVersion {
 		this.initialCaseSignificant = initialCaseSignificant;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.etypes.I_DescribeExternally#getLang()
+	 */
 	public String getLang() {
 		return lang;
 	}
@@ -62,11 +75,22 @@ public class EDescriptionVersion extends EVersion {
 		this.lang = lang;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.etypes.I_DescribeExternally#getText()
+	 */
 	public String getText() {
 		return text;
 	}
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public UUID getTypeUuid() {
+		return typeUuid;
+	}
+
+	public void setTypeUuid(UUID typeUuid) {
+		this.typeUuid = typeUuid;
 	}
 }

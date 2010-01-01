@@ -18,7 +18,7 @@ public class ERefsetCidCidStrMember extends ERefset {
 	private UUID c2Uuid;
 	private String strValue;
 	
-	protected List<ERefsetCidCidStrMemberVersion> versions;
+	protected List<ERefsetCidCidStrMemberVersion> extraVersions;
 	
 	public ERefsetCidCidStrMember(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -41,9 +41,9 @@ public class ERefsetCidCidStrMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			versions = new ArrayList<ERefsetCidCidStrMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetCidCidStrMemberVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				versions.add(new ERefsetCidCidStrMemberVersion((I_ThinExtByRefPartConceptConceptString) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetCidCidStrMemberVersion((I_ThinExtByRefPartConceptConceptString) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -58,9 +58,9 @@ public class ERefsetCidCidStrMember extends ERefset {
 		strValue = (String) in.readObject();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			versions = new ArrayList<ERefsetCidCidStrMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetCidCidStrMemberVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				versions.add(new ERefsetCidCidStrMemberVersion(in));
+				extraVersions.add(new ERefsetCidCidStrMemberVersion(in));
 			}
 		}
 	}
@@ -73,11 +73,11 @@ public class ERefsetCidCidStrMember extends ERefset {
 		out.writeLong(c2Uuid.getMostSignificantBits());
 		out.writeLong(c2Uuid.getLeastSignificantBits());
 		out.writeObject(strValue);
-		if (versions == null) {
+		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
-			out.writeInt(versions.size());
-			for (ERefsetCidCidStrMemberVersion rmv: versions) {
+			out.writeInt(extraVersions.size());
+			for (ERefsetCidCidStrMemberVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -87,6 +87,10 @@ public class ERefsetCidCidStrMember extends ERefset {
 	@Override
 	public REFSET_TYPES getType() {
 		return REFSET_TYPES.CID_CID_STR;
+	}
+
+	public List<ERefsetCidCidStrMemberVersion> getExtraVersionsList() {
+		return extraVersions;
 	}
 
 }

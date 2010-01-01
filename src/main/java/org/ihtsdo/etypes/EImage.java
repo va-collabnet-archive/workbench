@@ -22,7 +22,7 @@ public class EImage extends EComponent {
     
     private UUID typeUuid;
 
-	private List<EImageVersion> versions;
+	private List<EImageVersion> extraVersions;
 	
 	public EImage(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -42,9 +42,9 @@ public class EImage extends EComponent {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			versions = new ArrayList<EImageVersion>(partCount -1);
+			extraVersions = new ArrayList<EImageVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				versions.add(new EImageVersion(imageVer.getMutableParts().get(i)));
+				extraVersions.add(new EImageVersion(imageVer.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -62,9 +62,9 @@ public class EImage extends EComponent {
 		typeUuid = new UUID(in.readLong(), in.readLong());
 		int versionLength = in.readInt();
 		if (versionLength > 0) {
-			versions = new ArrayList<EImageVersion>(versionLength);
+			extraVersions = new ArrayList<EImageVersion>(versionLength);
 			for (int i = 0; i < versionLength; i++) {
-				versions.add(new EImageVersion(in));
+				extraVersions.add(new EImageVersion(in));
 			}
 		}
 	}
@@ -80,14 +80,18 @@ public class EImage extends EComponent {
 		out.writeObject(textDescription);
 		out.writeLong(typeUuid.getMostSignificantBits());
 		out.writeLong(typeUuid.getLeastSignificantBits());
-		if (versions == null) {
+		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
-			out.writeInt(versions.size());
-			for (EImageVersion eiv: versions) {
+			out.writeInt(extraVersions.size());
+			for (EImageVersion eiv: extraVersions) {
 				eiv.writeExternal(out);
 			}
 		}
+	}
+	
+	public List<EImageVersion> getExtraVersionsList() {
+		return extraVersions;
 	}
 
 }

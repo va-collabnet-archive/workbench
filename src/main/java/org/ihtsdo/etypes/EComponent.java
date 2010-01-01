@@ -12,7 +12,7 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.tapi.TerminologyException;
 
-public class EComponent extends EVersion implements Externalizable {
+public abstract class EComponent extends EVersion implements Externalizable {
 
 	private static final int dataVersion = 1;
 
@@ -56,7 +56,7 @@ public class EComponent extends EVersion implements Externalizable {
 
 	protected UUID primordialComponentUuid;
 
-	protected List<EIdentifierVersion> idVersions;
+	protected List<EIdentifierVersion> idComponents;
 
 	public EComponent() {
 		super();
@@ -79,17 +79,17 @@ public class EComponent extends EVersion implements Externalizable {
 		primordialComponentUuid = new UUID(in.readLong(), in.readLong());
 		short idVersionCount = in.readShort();
 		if (idVersionCount > 0) {
-			idVersions = new ArrayList<EIdentifierVersion>(idVersionCount);
+			idComponents = new ArrayList<EIdentifierVersion>(idVersionCount);
 			for (int i = 0; i < idVersionCount; i++) {
 				switch (IDENTIFIER_PART_TYPES.readType(in)) {
 				case LONG:
-					idVersions.add(new EIdentifierVersionLong(in));
+					idComponents.add(new EIdentifierVersionLong(in));
 					break;
 				case STRING:
-					idVersions.add(new EIdentifierVersionString(in));
+					idComponents.add(new EIdentifierVersionString(in));
 					break;
 				case UUID:
-					idVersions.add(new EIdentifierVersionUuid(in));
+					idComponents.add(new EIdentifierVersionUuid(in));
 					break;
 				default:
 					throw new UnsupportedOperationException();
@@ -103,11 +103,11 @@ public class EComponent extends EVersion implements Externalizable {
 		out.writeInt(dataVersion);
 		out.writeLong(primordialComponentUuid.getMostSignificantBits());
 		out.writeLong(primordialComponentUuid.getLeastSignificantBits());
-		if (idVersions == null) {
+		if (idComponents == null) {
 			out.writeShort(0);
 		} else {
-			out.writeShort(idVersions.size());
-			for (EIdentifierVersion idv : idVersions) {
+			out.writeShort(idComponents.size());
+			for (EIdentifierVersion idv : idComponents) {
 				idv.writeExternal(out);
 			}
 		}
@@ -117,19 +117,19 @@ public class EComponent extends EVersion implements Externalizable {
 		boolean primordialWritten = false;
 		int partCount = id.getMutableIdParts().size() - 1;
 		if (partCount > 0) {
-			idVersions = new ArrayList<EIdentifierVersion>(partCount);
+			idComponents = new ArrayList<EIdentifierVersion>(partCount);
 			for (I_IdPart idp : id.getMutableIdParts()) {
 				Object denotation = idp.getDenotation();
 				switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
 				case LONG:
-					idVersions.add(new EIdentifierVersionLong(idp));
+					idComponents.add(new EIdentifierVersionLong(idp));
 					break;
 				case STRING:
-					idVersions.add(new EIdentifierVersionString(idp));
+					idComponents.add(new EIdentifierVersionString(idp));
 					break;
 				case UUID:
 					if (primordialWritten) {
-						idVersions.add(new EIdentifierVersionUuid(idp));
+						idComponents.add(new EIdentifierVersionUuid(idp));
 					} else {
 						primordialComponentUuid = (UUID) idp.getDenotation();
 						primordialWritten = true;
@@ -144,16 +144,46 @@ public class EComponent extends EVersion implements Externalizable {
 			primordialComponentUuid = (UUID) id.getUUIDs().get(0);
 		}
 	}
+	
+	public int getIdComponentCount() {
+		if (idComponents == null) {
+			return 1;
+		}
+		return idComponents.size() + 1;
+	}
 
 	public List<EIdentifierVersion> getEIdentifiers() {
 		List<EIdentifierVersion> ids;
-		if (idVersions != null) {
-			ids = new ArrayList<EIdentifierVersion>(idVersions.size() + 1);
-			ids.addAll(idVersions);
+		if (idComponents != null) {
+			ids = new ArrayList<EIdentifierVersion>(idComponents.size() + 1);
+			ids.addAll(idComponents);
 		} else {
 			ids = new ArrayList<EIdentifierVersion>(1);
 		}
 		ids.add(new EIdentifierVersionUuid(this));
 		return ids;
 	}
+	
+	public List<UUID> getUuids() {
+		List<UUID> uuids = new ArrayList<UUID>();
+		uuids.add(primordialComponentUuid);
+		if (idComponents != null) {
+			for (EIdentifierVersion idv: idComponents) {
+				if (EIdentifierVersionUuid.class.isAssignableFrom(idv.getClass())) {
+					uuids.add((UUID) idv.getDenotation());
+				}
+			}
+		}
+		return uuids;
+	}
+	
+	public int getVersionCount() {
+		List<? extends EVersion> extraVersions = getExtraVersionsList();
+		if (extraVersions == null) {
+			return 1;
+		}
+		return extraVersions.size() + 1;
+	}
+	
+	public abstract List<? extends EVersion> getExtraVersionsList();
 }
