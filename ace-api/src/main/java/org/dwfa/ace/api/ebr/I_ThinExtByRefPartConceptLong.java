@@ -5,6 +5,6 @@ public interface I_ThinExtByRefPartConceptLong extends
 
 	   public long getLongValue();
 
-	    public void setIntValue(int longValue);
+	    public void setLongValue(long longValue);
 
 }
