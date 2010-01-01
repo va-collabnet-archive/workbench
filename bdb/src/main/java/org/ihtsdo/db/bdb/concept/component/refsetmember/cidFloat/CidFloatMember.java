@@ -1,12 +1,12 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidFloat;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.concept.component.refset.AbstractRefsetMember;
 
-public class FloatCidMember extends AbstractRefsetMember {
+public class CidFloatMember extends AbstractRefsetMember {
 
-	public FloatCidMember(int nid, int partCount, boolean editable) {
+	public CidFloatMember(int nid, int partCount, boolean editable) {
 		super(nid, partCount, editable);
 		// TODO Auto-generated constructor stub
 	}

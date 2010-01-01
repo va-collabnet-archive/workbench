@@ -23,18 +23,12 @@ import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid.CidCidCidVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr.CidCidStrVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidFloat.CidFloatVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidInt.CidIntVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidStr.CidStrVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMap.CrossMapVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMapForRel.CrossMapForRelVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept.FloatCidVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.language.LangVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.membership.MembershipVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.scopedLanguage.ScopedLangVersion;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.str.StrVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.template.TemplateVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.templateForRel.TemplateForRelVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -51,15 +45,10 @@ public abstract class AbstractRefsetMember extends ConceptComponent<RefsetMember
 	    BOOLEAN(RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids()), 
 	    CID(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids()), 
 	    CID_INT(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids()),
+	    CID_LONG(RefsetAuxiliary.Concept.CID_LONG_EXTENSION.getUids()),
 	    STRING(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids()), 
 	    INTEGER(RefsetAuxiliary.Concept.INT_EXTENSION.getUids()), 
-	    MEASUREMENT(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids()), 
-	    LANGUAGE(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids()), 
-	    SCOPED_LANGUAGE(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids()), 
-	    TEMPLATE_FOR_REL(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids()),
-	    TEMPLATE(RefsetAuxiliary.Concept.TEMPLATE_EXTENSION.getUids()),
-	    CROSS_MAP_FOR_REL(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids()),
-	    CROSS_MAP(RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids()),
+	    CID_FLOAT(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids()), 
 	    CID_CID(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids()),
 	    CID_CID_CID(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids()),
 	    CID_CID_STRING(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids()),
@@ -155,35 +144,20 @@ public abstract class AbstractRefsetMember extends ConceptComponent<RefsetMember
 			case CID_STRING:
 				additionalVersions.add(new CidStrVersion(input));
 				break;
-			case CROSS_MAP:
-				additionalVersions.add(new CrossMapVersion(input));
-				break;
-			case CROSS_MAP_FOR_REL:
-				additionalVersions.add(new CrossMapForRelVersion(input));
-				break;
 			case INTEGER:
 				additionalVersions.add(new IntVersion(input));
 				break;
-			case LANGUAGE:
-				additionalVersions.add(new LangVersion(input));
-				break;
-			case MEASUREMENT:
-				additionalVersions.add(new FloatCidVersion(input));
+			case CID_FLOAT:
+				additionalVersions.add(new CidFloatVersion(input));
 				break;
 			case MEMBER:
 				additionalVersions.add(new MembershipVersion(input));
 				break;
-			case SCOPED_LANGUAGE:
-				additionalVersions.add(new ScopedLangVersion(input));
-				break;
 			case STRING:
 				additionalVersions.add(new StrVersion(input));
 				break;
-			case TEMPLATE:
-				additionalVersions.add(new TemplateVersion(input));
-				break;
-			case TEMPLATE_FOR_REL:
-				additionalVersions.add(new TemplateForRelVersion(input));
+			case CID_LONG:
+				additionalVersions.add(new CidLongVersion(input));
 				break;
 				default:
 					throw new UnsupportedOperationException();

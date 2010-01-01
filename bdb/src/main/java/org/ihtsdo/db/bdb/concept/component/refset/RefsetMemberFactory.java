@@ -7,11 +7,11 @@ import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid.CidCidCidMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr.CidCidStrMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidFloat.CidFloatMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidInt.CidIntMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidStr.CidStrMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMap.CrossMapMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.crossMapForRel.CrossMapForRelMember;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.floatConcept.FloatCidMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.language.LangMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.scopedLanguage.ScopedLangMember;
@@ -53,8 +53,8 @@ public class RefsetMemberFactory extends
 			return new IntMember(nid, partCount, editable);
 		case LANGUAGE:
 			return new LangMember(nid, partCount, editable);
-		case MEASUREMENT:
-			return new FloatCidMember(nid, partCount, editable);
+		case CID_FLOAT:
+			return new CidFloatMember(nid, partCount, editable);
 		case MEMBER:
 			return new RefsetMember(nid, partCount, editable);
 		case SCOPED_LANGUAGE:
