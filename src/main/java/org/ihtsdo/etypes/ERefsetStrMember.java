@@ -13,7 +13,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public class ERefsetStrMember extends ERefset {
 
-	private String stringValue;
+	private String strValue;
 	
 	protected List<ERefsetStrMemberVersion> extraVersions;
 	
@@ -31,7 +31,7 @@ public class ERefsetStrMember extends ERefset {
 		componentUuid = nidToUuid(m.getComponentId());
 		
 		I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) m.getMutableParts().get(0);
-		stringValue = part.getStringValue();
+		strValue = part.getStringValue();
 		pathUuid = nidToUuid(part.getPathId());
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
@@ -48,7 +48,7 @@ public class ERefsetStrMember extends ERefset {
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
-		stringValue = (String) in.readObject();
+		strValue = (String) in.readObject();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
 			extraVersions = new ArrayList<ERefsetStrMemberVersion>(versionSize);
@@ -61,7 +61,7 @@ public class ERefsetStrMember extends ERefset {
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		super.writeExternal(out);
-		out.writeObject(stringValue);
+		out.writeObject(strValue);
 		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {
@@ -79,6 +79,16 @@ public class ERefsetStrMember extends ERefset {
 
 	public List<ERefsetStrMemberVersion> getExtraVersionsList() {
 		return extraVersions;
+	}
+
+
+	public String getStrValue() {
+		return strValue;
+	}
+
+
+	public void setStrValue(String strValue) {
+		this.strValue = strValue;
 	}
 
 }

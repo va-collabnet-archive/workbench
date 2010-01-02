@@ -13,7 +13,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public class ERefsetMember extends ERefset {
 
-	protected List<ERefsetMemberVersion> extraVersions;
+	protected List<ERefsetVersion> extraVersions;
 
 	public ERefsetMember() {
 		super();
@@ -36,9 +36,9 @@ public class ERefsetMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			extraVersions = new ArrayList<ERefsetMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				extraVersions.add(new ERefsetMemberVersion((I_ThinExtByRefPart) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetVersion((I_ThinExtByRefPart) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -49,9 +49,9 @@ public class ERefsetMember extends ERefset {
 		super.readExternal(in);
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			extraVersions = new ArrayList<ERefsetMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				extraVersions.add(new ERefsetMemberVersion(in));
+				extraVersions.add(new ERefsetVersion(in));
 			}
 		}
 	}
@@ -63,7 +63,7 @@ public class ERefsetMember extends ERefset {
 			out.writeInt(0);
 		} else {
 			out.writeInt(extraVersions.size());
-			for (ERefsetMemberVersion rmv: extraVersions) {
+			for (ERefsetVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -74,7 +74,7 @@ public class ERefsetMember extends ERefset {
 		return REFSET_TYPES.MEMBER;
 	}
 	
-	public List<ERefsetMemberVersion> getExtraVersionsList() {
+	public List<ERefsetVersion> getExtraVersionsList() {
 		return extraVersions;
 	}
 

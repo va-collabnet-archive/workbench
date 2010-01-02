@@ -7,17 +7,17 @@ import java.io.ObjectOutput;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.tapi.TerminologyException;
 
-public class ERefsetIntMemberVersion extends EVersion {
+public class ERefsetIntVersion extends EVersion {
 
 	private int intValue;
 
-	public ERefsetIntMemberVersion(ObjectInput in) throws IOException,
+	public ERefsetIntVersion(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		super();
 		readExternal(in);
 	}
 
-	public ERefsetIntMemberVersion(
+	public ERefsetIntVersion(
 			I_ThinExtByRefPartInteger part) throws TerminologyException, IOException {
 		intValue = part.getIntValue();
 		pathUuid = nidToUuid(part.getPathId());

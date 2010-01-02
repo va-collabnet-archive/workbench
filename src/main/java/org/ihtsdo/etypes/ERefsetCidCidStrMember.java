@@ -18,7 +18,7 @@ public class ERefsetCidCidStrMember extends ERefset {
 	private UUID c2Uuid;
 	private String strValue;
 	
-	protected List<ERefsetCidCidStrMemberVersion> extraVersions;
+	protected List<ERefsetCidCidStrVersion> extraVersions;
 	
 	public ERefsetCidCidStrMember(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -41,9 +41,9 @@ public class ERefsetCidCidStrMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			extraVersions = new ArrayList<ERefsetCidCidStrMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetCidCidStrVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				extraVersions.add(new ERefsetCidCidStrMemberVersion((I_ThinExtByRefPartConceptConceptString) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetCidCidStrVersion((I_ThinExtByRefPartConceptConceptString) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -58,9 +58,9 @@ public class ERefsetCidCidStrMember extends ERefset {
 		strValue = (String) in.readObject();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			extraVersions = new ArrayList<ERefsetCidCidStrMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetCidCidStrVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				extraVersions.add(new ERefsetCidCidStrMemberVersion(in));
+				extraVersions.add(new ERefsetCidCidStrVersion(in));
 			}
 		}
 	}
@@ -77,7 +77,7 @@ public class ERefsetCidCidStrMember extends ERefset {
 			out.writeInt(0);
 		} else {
 			out.writeInt(extraVersions.size());
-			for (ERefsetCidCidStrMemberVersion rmv: extraVersions) {
+			for (ERefsetCidCidStrVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -89,8 +89,38 @@ public class ERefsetCidCidStrMember extends ERefset {
 		return REFSET_TYPES.CID_CID_STR;
 	}
 
-	public List<ERefsetCidCidStrMemberVersion> getExtraVersionsList() {
+	public List<ERefsetCidCidStrVersion> getExtraVersionsList() {
 		return extraVersions;
+	}
+
+
+	public UUID getC1Uuid() {
+		return c1Uuid;
+	}
+
+
+	public void setC1Uuid(UUID c1Uuid) {
+		this.c1Uuid = c1Uuid;
+	}
+
+
+	public UUID getC2Uuid() {
+		return c2Uuid;
+	}
+
+
+	public void setC2Uuid(UUID c2Uuid) {
+		this.c2Uuid = c2Uuid;
+	}
+
+
+	public String getStrValue() {
+		return strValue;
+	}
+
+
+	public void setStrValue(String strValue) {
+		this.strValue = strValue;
 	}
 
 }

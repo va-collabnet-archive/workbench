@@ -17,7 +17,7 @@ public class ERefsetCidCidMember extends ERefset {
 	private UUID c1Uuid;
 	private UUID c2Uuid;
 	
-	protected List<ERefsetCidCidMemberVersion> extraVersions;
+	protected List<ERefsetCidCidVersion> extraVersions;
 	
 	public ERefsetCidCidMember(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -39,9 +39,9 @@ public class ERefsetCidCidMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			extraVersions = new ArrayList<ERefsetCidCidMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetCidCidVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				extraVersions.add(new ERefsetCidCidMemberVersion((I_ThinExtByRefPartConceptConcept) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetCidCidVersion((I_ThinExtByRefPartConceptConcept) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -55,9 +55,9 @@ public class ERefsetCidCidMember extends ERefset {
 		c2Uuid = new UUID(in.readLong(), in.readLong());
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			extraVersions = new ArrayList<ERefsetCidCidMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetCidCidVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				extraVersions.add(new ERefsetCidCidMemberVersion(in));
+				extraVersions.add(new ERefsetCidCidVersion(in));
 			}
 		}
 	}
@@ -73,7 +73,7 @@ public class ERefsetCidCidMember extends ERefset {
 			out.writeInt(0);
 		} else {
 			out.writeInt(extraVersions.size());
-			for (ERefsetCidCidMemberVersion rmv: extraVersions) {
+			for (ERefsetCidCidVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -85,8 +85,28 @@ public class ERefsetCidCidMember extends ERefset {
 		return REFSET_TYPES.CID_CID;
 	}
 
-	public List<ERefsetCidCidMemberVersion> getExtraVersionsList() {
+	public List<ERefsetCidCidVersion> getExtraVersionsList() {
 		return extraVersions;
+	}
+
+
+	public UUID getC1Uuid() {
+		return c1Uuid;
+	}
+
+
+	public void setC1Uuid(UUID c1Uuid) {
+		this.c1Uuid = c1Uuid;
+	}
+
+
+	public UUID getC2Uuid() {
+		return c2Uuid;
+	}
+
+
+	public void setC2Uuid(UUID c2Uuid) {
+		this.c2Uuid = c2Uuid;
 	}
 
 }

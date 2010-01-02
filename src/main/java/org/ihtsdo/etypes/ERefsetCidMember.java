@@ -16,7 +16,7 @@ public class ERefsetCidMember extends ERefset {
 
 	private UUID c1Uuid;
 	
-	protected List<ERefsetCidMemberVersion> extraVersions;
+	protected List<ERefsetCidVersion> extraVersions;
 	
 	public ERefsetCidMember(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -37,9 +37,9 @@ public class ERefsetCidMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			extraVersions = new ArrayList<ERefsetCidMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetCidVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				extraVersions.add(new ERefsetCidMemberVersion((I_ThinExtByRefPartConcept) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetCidVersion((I_ThinExtByRefPartConcept) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -52,9 +52,9 @@ public class ERefsetCidMember extends ERefset {
 		c1Uuid = new UUID(in.readLong(), in.readLong());
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			extraVersions = new ArrayList<ERefsetCidMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetCidVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				extraVersions.add(new ERefsetCidMemberVersion(in));
+				extraVersions.add(new ERefsetCidVersion(in));
 			}
 		}
 	}
@@ -68,7 +68,7 @@ public class ERefsetCidMember extends ERefset {
 			out.writeInt(0);
 		} else {
 			out.writeInt(extraVersions.size());
-			for (ERefsetCidMemberVersion rmv: extraVersions) {
+			for (ERefsetCidVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -80,8 +80,18 @@ public class ERefsetCidMember extends ERefset {
 		return REFSET_TYPES.CID;
 	}
 
-	public List<ERefsetCidMemberVersion> getExtraVersionsList() {
+	public List<ERefsetCidVersion> getExtraVersionsList() {
 		return extraVersions;
+	}
+
+
+	public UUID getC1Uuid() {
+		return c1Uuid;
+	}
+
+
+	public void setC1Uuid(UUID c1Uuid) {
+		this.c1Uuid = c1Uuid;
 	}
 
 }

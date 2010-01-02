@@ -5,24 +5,26 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.UUID;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.tapi.TerminologyException;
 
-public class ERefsetCidIntMemberVersion extends EVersion {
+public class ERefsetCidCidCidVersion extends EVersion {
 
 	private UUID c1Uuid;
-	private int intValue;
+	private UUID c2Uuid;
+	private UUID c3Uuid;
 
-	public ERefsetCidIntMemberVersion(ObjectInput in) throws IOException,
+	public ERefsetCidCidCidVersion(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		super();
 		readExternal(in);
 	}
 
-	public ERefsetCidIntMemberVersion(
-			I_ThinExtByRefPartConceptInt part) throws TerminologyException, IOException {
+	public ERefsetCidCidCidVersion(
+			I_ThinExtByRefPartConceptConceptConcept part) throws TerminologyException, IOException {
 		c1Uuid = nidToUuid(part.getC1id());
-		intValue = part.getIntValue();
+		c2Uuid = nidToUuid(part.getC2id());
+		c3Uuid = nidToUuid(part.getC3id());
 		pathUuid = nidToUuid(part.getPathId());
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
@@ -33,7 +35,8 @@ public class ERefsetCidIntMemberVersion extends EVersion {
 			ClassNotFoundException {
 		super.readExternal(in);
 		c1Uuid = new UUID(in.readLong(), in.readLong());
-		intValue = in.readInt();
+		c2Uuid = new UUID(in.readLong(), in.readLong());
+		c3Uuid = new UUID(in.readLong(), in.readLong());
 	}
 
 	@Override
@@ -41,7 +44,10 @@ public class ERefsetCidIntMemberVersion extends EVersion {
 		super.writeExternal(out);
 		out.writeLong(c1Uuid.getMostSignificantBits());
 		out.writeLong(c1Uuid.getLeastSignificantBits());
-		out.writeInt(intValue);
+		out.writeLong(c2Uuid.getMostSignificantBits());
+		out.writeLong(c2Uuid.getLeastSignificantBits());
+		out.writeLong(c3Uuid.getMostSignificantBits());
+		out.writeLong(c3Uuid.getLeastSignificantBits());
 	}
 
 }
