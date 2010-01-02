@@ -18,7 +18,7 @@ public class ERefsetCidCidCidMember extends ERefset {
 	private UUID c2Uuid;
 	private UUID c3Uuid;
 	
-	protected List<ERefsetCidCidCidMemberVersion> extraVersions;
+	protected List<ERefsetCidCidCidVersion> extraVersions;
 	
 	public ERefsetCidCidCidMember(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -41,9 +41,9 @@ public class ERefsetCidCidCidMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			extraVersions = new ArrayList<ERefsetCidCidCidMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetCidCidCidVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				extraVersions.add(new ERefsetCidCidCidMemberVersion((I_ThinExtByRefPartConceptConceptConcept) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetCidCidCidVersion((I_ThinExtByRefPartConceptConceptConcept) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -58,9 +58,9 @@ public class ERefsetCidCidCidMember extends ERefset {
 		c3Uuid = new UUID(in.readLong(), in.readLong());
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			extraVersions = new ArrayList<ERefsetCidCidCidMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetCidCidCidVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				extraVersions.add(new ERefsetCidCidCidMemberVersion(in));
+				extraVersions.add(new ERefsetCidCidCidVersion(in));
 			}
 		}
 	}
@@ -78,7 +78,7 @@ public class ERefsetCidCidCidMember extends ERefset {
 			out.writeInt(0);
 		} else {
 			out.writeInt(extraVersions.size());
-			for (ERefsetCidCidCidMemberVersion rmv: extraVersions) {
+			for (ERefsetCidCidCidVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -90,8 +90,38 @@ public class ERefsetCidCidCidMember extends ERefset {
 		return REFSET_TYPES.CID_CID_CID;
 	}
 
-	public List<ERefsetCidCidCidMemberVersion> getExtraVersionsList() {
+	public List<ERefsetCidCidCidVersion> getExtraVersionsList() {
 		return extraVersions;
+	}
+
+
+	public UUID getC1Uuid() {
+		return c1Uuid;
+	}
+
+
+	public void setC1Uuid(UUID c1Uuid) {
+		this.c1Uuid = c1Uuid;
+	}
+
+
+	public UUID getC2Uuid() {
+		return c2Uuid;
+	}
+
+
+	public void setC2Uuid(UUID c2Uuid) {
+		this.c2Uuid = c2Uuid;
+	}
+
+
+	public UUID getC3Uuid() {
+		return c3Uuid;
+	}
+
+
+	public void setC3Uuid(UUID c3Uuid) {
+		this.c3Uuid = c3Uuid;
 	}
 
 }

@@ -15,7 +15,7 @@ public class ERefsetIntMember extends ERefset {
 
 	private int intValue;
 	
-	protected List<ERefsetIntMemberVersion> extraVersions;
+	protected List<ERefsetIntVersion> extraVersions;
 	
 	public ERefsetIntMember(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -36,9 +36,9 @@ public class ERefsetIntMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			extraVersions = new ArrayList<ERefsetIntMemberVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetIntVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				extraVersions.add(new ERefsetIntMemberVersion((I_ThinExtByRefPartInteger) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetIntVersion((I_ThinExtByRefPartInteger) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -51,9 +51,9 @@ public class ERefsetIntMember extends ERefset {
 		intValue = in.readInt();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			extraVersions = new ArrayList<ERefsetIntMemberVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetIntVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				extraVersions.add(new ERefsetIntMemberVersion(in));
+				extraVersions.add(new ERefsetIntVersion(in));
 			}
 		}
 	}
@@ -66,7 +66,7 @@ public class ERefsetIntMember extends ERefset {
 			out.writeInt(0);
 		} else {
 			out.writeInt(extraVersions.size());
-			for (ERefsetIntMemberVersion rmv: extraVersions) {
+			for (ERefsetIntVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -77,8 +77,18 @@ public class ERefsetIntMember extends ERefset {
 		return REFSET_TYPES.INT;
 	}
 
-	public List<ERefsetIntMemberVersion> getExtraVersionsList() {
+	public List<ERefsetIntVersion> getExtraVersionsList() {
 		return extraVersions;
+	}
+
+
+	public int getIntValue() {
+		return intValue;
+	}
+
+
+	public void setIntValue(int intValue) {
+		this.intValue = intValue;
 	}
 
 }
