@@ -19,9 +19,13 @@ package org.dwfa.mojo.refset;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,6 +58,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 /**
@@ -76,47 +81,76 @@ public class RefsetListing extends AbstractMojo {
 	 * 
 	 * @parameter
 	 */
-	private String path_uuid;
+	private String path_uuid = null;
 
-	private I_Path path;
+	private I_Path path = null;
+
+	/**
+	 * The uuid of the refset concept. Can be set to some descendant to limit
+	 * the scope of the report.
+	 * 
+	 * @parameter default-value="3e0cd740-2cc6-3d68-ace7-bad2eb2621da"
+	 */
+	private String refset_con_uuid;
+
+	private I_GetConceptData refset_con;
+
+	/**
+	 * Set to true to sort by name. Default order is hierarchical with siblings
+	 * sorted by name.
+	 * 
+	 * @parameter default-value=false
+	 */
+	private boolean sort_by_name;
 
 	/**
 	 * List refset to file
 	 * 
-	 * @parameter
+	 * @parameter default-value="refsets.html"
 	 */
 	private File list_file;
-
-	private I_GetConceptData refset;
-
-	private I_Path processConfig() throws Exception {
-		I_TermFactory tf = LocalVersionedTerminology.get();
-		I_Path path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
-		return path;
-	}
 
 	private void listRefset() throws Exception {
 		getLog().info("refset list");
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
-				list_file)));
-		I_TermFactory tf = LocalVersionedTerminology.get();
-		this.path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
-		I_Path path = processConfig();
+				this.list_file)));
+		final I_TermFactory tf = LocalVersionedTerminology.get();
+		if (this.path_uuid != null) {
+			this.path = tf.getPath(Arrays.asList(UUID
+					.fromString(this.path_uuid)));
+		}
 		// I_IntSet allowed_status = tf.newIntSet();
 		// allowed_status.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-		I_GetConceptData refset_con = tf.getConcept(Arrays.asList(UUID
-				.fromString("3e0cd740-2cc6-3d68-ace7-bad2eb2621da")));
+		refset_con = tf.getConcept(Arrays.asList(UUID
+				.fromString(this.refset_con_uuid)));
 		out.println("<html>");
 		out.println("<body>");
-		for (Integer con_id : getDescendants(refset_con.getConceptId(), null,
-				Integer.MAX_VALUE)) {
+		out.println("<h2>");
+		out.println("Refset Report");
+		out.println("</h2>");
+		out.println("<p>");
+		out.println(DateFormat.getDateTimeInstance(DateFormat.LONG,
+				DateFormat.LONG).format(new Date()));
+		ArrayList<Integer> refsets = getDescendants(refset_con.getConceptId(),
+				this.path, Integer.MAX_VALUE);
+		if (this.sort_by_name) {
+			Collections.sort(refsets, new Comparator<Integer>() {
+				public int compare(Integer obj1, Integer obj2) {
+					try {
+						String s1 = tf.getConcept(obj1).getInitialText();
+						String s2 = tf.getConcept(obj2).getInitialText();
+						return s1.compareTo(s2);
+					} catch (Exception e) {
+					}
+					return obj1.compareTo(obj2);
+				}
+			});
+		}
+		for (Integer con_id : refsets) {
 			I_GetConceptData con = tf.getConcept(con_id);
-			// I_GetConceptData con = tf.getConcept(Arrays.asList(UUID
-			// .fromString("fb98edf7-779f-4560-b410-4675b94a9d0a")));
-
-			out.println("<h1>");
+			out.println("<h3>");
 			out.println(con.getInitialText());
-			out.println("</h1>");
+			out.println("</h3>");
 			out.println("<table border=\"1\">");
 			for (UUID id : con.getUids()) {
 				out.println("<tr>");
@@ -162,15 +196,15 @@ public class RefsetListing extends AbstractMojo {
 		out.close();
 	}
 
-	private HashSet<Integer> getDescendants(int concept_id, I_Path path,
+	private ArrayList<Integer> getDescendants(int concept_id, I_Path path,
 			int version) throws Exception {
-		HashSet<Integer> ret = new HashSet<Integer>();
+		ArrayList<Integer> ret = new ArrayList<Integer>();
 		getDescendants1(concept_id, path, version, ret);
 		return ret;
 	}
 
 	private void getDescendants1(int concept_id, I_Path path, int version,
-			HashSet<Integer> ret) throws Exception {
+			ArrayList<Integer> ret) throws Exception {
 		if (ret.contains(concept_id))
 			return;
 		ret.add(concept_id);
@@ -182,7 +216,7 @@ public class RefsetListing extends AbstractMojo {
 	private ArrayList<Integer> getChildren(int concept_id, I_Path path,
 			int version) throws Exception {
 		ArrayList<Integer> ret = new ArrayList<Integer>();
-		I_TermFactory tf = LocalVersionedTerminology.get();
+		final I_TermFactory tf = LocalVersionedTerminology.get();
 		I_GetConceptData c = tf.getConcept(concept_id);
 		for (I_RelVersioned d : c.getDestRels()) {
 			I_RelPart dm = null;
@@ -200,12 +234,30 @@ public class RefsetListing extends AbstractMojo {
 						&& (dm == null || dm.getVersion() < dd.getVersion()))
 					dm = dd;
 			}
-			if (dm != null)
-//					&& dm.getStatusId() == tf.getConcept(
-//							ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-//							.getConceptId())
+			// if (dm != null)
+			// System.out.println("Status: "
+			// + dm.getStatusId()
+			// + " "
+			// + tf.getConcept(
+			// ArchitectonicAuxiliary.Concept.CURRENT
+			// .getUids()).getConceptId());
+			if (dm != null
+					&& dm.getStatusId() == tf.getConcept(
+							ArchitectonicAuxiliary.Concept.CURRENT.getUids())
+							.getConceptId())
 				ret.add(d.getC1Id());
 		}
+		Collections.sort(ret, new Comparator<Integer>() {
+			public int compare(Integer obj1, Integer obj2) {
+				try {
+					String s1 = tf.getConcept(obj1).getInitialText();
+					String s2 = tf.getConcept(obj2).getInitialText();
+					return s1.compareTo(s2);
+				} catch (Exception e) {
+				}
+				return obj1.compareTo(obj2);
+			}
+		});
 		return ret;
 	}
 
