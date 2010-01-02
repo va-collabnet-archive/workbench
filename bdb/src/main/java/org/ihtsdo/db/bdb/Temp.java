@@ -14,7 +14,6 @@ import java.util.UUID;
 import javax.swing.JFrame;
 
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.utypes.UniversalAceBean;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.etypes.EConcept;
 

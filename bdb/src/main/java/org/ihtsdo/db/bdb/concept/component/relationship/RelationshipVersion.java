@@ -4,7 +4,6 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Version;
 import org.ihtsdo.etypes.ERelationshipVersion;

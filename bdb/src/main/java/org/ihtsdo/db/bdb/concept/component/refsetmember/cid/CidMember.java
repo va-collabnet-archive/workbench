@@ -2,11 +2,13 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.cid;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.etypes.ERefsetCidMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidMember<V extends CidVersion<V, C>, C extends CidMember<V, C>> extends RefsetMember<V, C> {
+public class CidMember extends RefsetMember<CidVersion, CidMember> {
 
 	private int c1Nid;
 
@@ -15,12 +17,19 @@ public class CidMember<V extends CidVersion<V, C>, C extends CidMember<V, C>> ex
 		// TODO Auto-generated constructor stub
 	}
 
+
+	public CidMember(ERefsetCidMember refsetMember) {
+		super(refsetMember);
+		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
+	}
+
+
 	@Override
 	protected final void readMemberParts(TupleInput input) {
 		c1Nid = input.readInt();
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add((V) new CidVersion(input));
+				additionalVersions.add(new CidVersion(input));
 			}
 		}
 	}

@@ -2,20 +2,21 @@ package org.ihtsdo.db.bdb.concept.component.refset;
 
 import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 
-public class RefsetMemberBinder {
+public class RefsetMemberBinder<V extends RefsetVersion<V, C>, C extends RefsetMember<V, C>> {
 
-	private static final ThreadLocal<ConceptComponentBinder<RefsetVersion, RefsetMember>> binders = 
-		new ThreadLocal<ConceptComponentBinder<RefsetVersion, RefsetMember>>() {
+	private ThreadLocal<ConceptComponentBinder<V, C>> 
+	binders = 
+		new ThreadLocal<ConceptComponentBinder<V, C>>() {
 
 		@Override
-		protected ConceptComponentBinder<RefsetVersion, RefsetMember> initialValue() {
-			RefsetMemberFactory factory = new RefsetMemberFactory();
-			return new ConceptComponentBinder<RefsetVersion, RefsetMember>(
+		protected ConceptComponentBinder<V, C> initialValue() {
+			RefsetMemberFactory<V, C> factory = new RefsetMemberFactory<V, C>();
+			return new ConceptComponentBinder<V, C>(
 					factory);
 		}
 	};
 
-	public static ConceptComponentBinder<RefsetVersion, RefsetMember> getBinder() {
+	public ConceptComponentBinder<V, C> getBinder() {
 		return binders.get();
 	}
 

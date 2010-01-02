@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.integer;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.etypes.ERefsetIntMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -12,6 +13,11 @@ public class IntMember extends RefsetMember<IntVersion, IntMember> {
 	public IntMember(int nid, int partCount, boolean editable) {
 		super(nid, partCount, editable);
 		throw new UnsupportedOperationException();
+	}
+
+	public IntMember(ERefsetIntMember refsetMember) {
+		super(refsetMember);
+		intValue =refsetMember.getIntValue();
 	}
 
 	@Override

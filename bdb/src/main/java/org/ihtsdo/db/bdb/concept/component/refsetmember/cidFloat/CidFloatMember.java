@@ -2,7 +2,9 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.cidFloat;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.etypes.ERefsetCidFloatMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -14,6 +16,12 @@ public class CidFloatMember extends RefsetMember<CidFloatVersion, CidFloatMember
 	public CidFloatMember(int nid, int partCount, boolean editable) {
 		super(nid, partCount, editable);
 		// TODO Auto-generated constructor stub
+	}
+
+	public CidFloatMember(ERefsetCidFloatMember refsetMember) {
+		super(refsetMember);
+		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
+		floatValue = refsetMember.getFloatValue();
 	}
 
 	@Override

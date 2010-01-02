@@ -22,9 +22,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
 import org.ihtsdo.db.util.VersionComputer;
-import org.ihtsdo.etypes.EDescriptionVersion;
 import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.EImageVersion;
 

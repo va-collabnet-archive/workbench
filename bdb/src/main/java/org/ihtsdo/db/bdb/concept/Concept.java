@@ -99,7 +99,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 			c.unsubmittedComponents.add(img);
 		}
 		for (ERefset eRefsetMember: eConcept.getRefsetMembers()) {
-			RefsetMember refsetMember = RefsetMemberFactory.create(eRefsetMember);
+			RefsetMember<?,?> refsetMember = RefsetMemberFactory.create(eRefsetMember);
 			c.unsubmittedComponents.add(refsetMember);
 		}
 		return c;

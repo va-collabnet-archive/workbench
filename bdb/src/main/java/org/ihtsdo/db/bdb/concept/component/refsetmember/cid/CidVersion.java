@@ -11,7 +11,7 @@ import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidVersion<V extends CidVersion<V, C>, C extends CidMember<V, C>> extends RefsetVersion<V, C>
+public class CidVersion extends RefsetVersion<CidVersion, CidMember>
 	implements I_ThinExtByRefPartConcept {
 	
 	private int c1Nid;

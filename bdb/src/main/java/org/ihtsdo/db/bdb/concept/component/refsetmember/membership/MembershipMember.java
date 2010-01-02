@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.membership;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.etypes.ERefset;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -10,6 +11,10 @@ public class MembershipMember extends RefsetMember<MembershipVersion, Membership
 
 	public MembershipMember(int nid, int partCount, boolean editable) {
 		super(nid, partCount, editable);
+	}
+
+	public MembershipMember(ERefset refsetMember) {
+		super(refsetMember);
 	}
 
 	@Override

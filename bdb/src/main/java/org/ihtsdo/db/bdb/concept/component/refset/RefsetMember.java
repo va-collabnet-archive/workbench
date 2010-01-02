@@ -12,7 +12,9 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.etypes.ERefset;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -31,17 +33,21 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 		super(nid, partCount, editable);
 	}
 	
+	public RefsetMember(ERefset refsetMember) {
+		super(Bdb.uuidsToNid(refsetMember.getUuids()), refsetMember.getVersionCount(), true);
+		refsetNid = Bdb.uuidToNid(refsetMember.getRefsetUuid());
+		memberTypeNid = refsetMember.getType().getTypeNid();
+		referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());
+		
+	}
+	
 
-	@Override
-	public void readComponentFromBdb(TupleInput input, int conceptNid,
-			int listSize) throws TerminologyException, IOException {
+	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize)  {
 		refsetNid = input.readInt();
 		memberTypeNid = input.readInt();
 		referencedComponentNid = input.readInt();
 		readMemberParts(input);
 	}
-
-
 
 	protected abstract void readMemberParts(TupleInput input);
 

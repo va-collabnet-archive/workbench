@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.Boolean;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.etypes.ERefsetBooleanMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -13,6 +14,11 @@ public class BooleanMember extends RefsetMember<BooleanVersion, BooleanMember> {
 	public BooleanMember(int nid, int partCount, boolean editable) {
 		super(nid, partCount, editable);
 		// TODO Auto-generated constructor stub
+	}
+
+	public BooleanMember(ERefsetBooleanMember refsetMember) {
+		super(refsetMember);
+		booleanValue = refsetMember.getBooleanValue();
 	}
 
 	@Override
