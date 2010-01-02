@@ -273,7 +273,7 @@ public class EConcept implements Externalizable {
 			for (I_ThinExtByRefVersioned m: members) {
 				ERefset member = ERefset.convert(m);
 				if (member != null) {
-					refsetMembers.add(ERefset.convert(m));
+					refsetMembers.add(member);
 				} else {
 					AceLog.getAppLog().severe("Could not convert refset member: " + m +
 							"\nfrom refset: " + c);
