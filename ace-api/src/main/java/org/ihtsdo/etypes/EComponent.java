@@ -21,14 +21,14 @@ public abstract class EComponent extends EVersion implements Externalizable {
 	public enum IDENTIFIER_PART_TYPES {
 		LONG(1), STRING(2), UUID(3);
 
-		private int partTypeId;
+		private int externalPartTypeToken;
 
-		IDENTIFIER_PART_TYPES(int partTypeId) {
-			this.partTypeId = partTypeId;
+		IDENTIFIER_PART_TYPES(int externalPartTypeToken) {
+			this.externalPartTypeToken = externalPartTypeToken;
 		}
 
 		public void writeType(ObjectOutput output) throws IOException {
-			output.writeByte(partTypeId);
+			output.writeByte(externalPartTypeToken);
 		}
 
 		public static IDENTIFIER_PART_TYPES getType(Class<?> c) {
@@ -44,7 +44,8 @@ public abstract class EComponent extends EVersion implements Externalizable {
 
 		public static IDENTIFIER_PART_TYPES readType(ObjectInput input)
 				throws IOException {
-			switch (input.readByte()) {
+			byte typeByte = input.readByte();
+			switch (typeByte) {
 			case 1:
 				return LONG;
 			case 2:
@@ -52,7 +53,7 @@ public abstract class EComponent extends EVersion implements Externalizable {
 			case 3:
 				return UUID;
 			}
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException("Can't find byte: " + typeByte);
 		}
 	};
 
@@ -111,6 +112,7 @@ public abstract class EComponent extends EVersion implements Externalizable {
 		} else {
 			out.writeShort(idComponents.size());
 			for (EIdentifierVersion idv : idComponents) {
+				idv.getIdType().writeType(out);
 				idv.writeExternal(out);
 			}
 		}

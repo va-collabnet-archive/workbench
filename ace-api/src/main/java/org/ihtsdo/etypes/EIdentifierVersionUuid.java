@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.cement.PrimordialId;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.etypes.EComponent.IDENTIFIER_PART_TYPES;
 
 public class EIdentifierVersionUuid extends EIdentifierVersion {
 
@@ -51,4 +52,10 @@ public class EIdentifierVersionUuid extends EIdentifierVersion {
 	public UUID getDenotation() {
 		return denotation;
 	}
+	
+	@Override
+	public IDENTIFIER_PART_TYPES getIdType() {
+		return IDENTIFIER_PART_TYPES.UUID;
+	}
+
 }
