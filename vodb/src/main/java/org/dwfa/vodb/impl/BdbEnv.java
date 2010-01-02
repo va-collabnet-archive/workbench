@@ -497,7 +497,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         return identifierDb.nativeGenerationForUuid(uid, source, pathId, version);
     }
 
-    public List<UUID> nativeToUuid(int nativeId) throws DatabaseException {
+    public List<UUID> nativeToUuid(int nativeId) throws IOException {
         return identifierDb.nativeToUuid(nativeId);
     }
 
@@ -524,7 +524,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         return identifierDb.uuidToNativeWithGeneration(uid, source, idPath, version);
     }
 
-    public void writeId(I_Identify id) throws DatabaseException {
+    public void writeId(I_Identify id) throws IOException {
         identifierDb.writeId(id);
     }
 
@@ -576,7 +576,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         relBdb.iterateRelationshipEntries(processor);
     }
 
-    public I_ImageVersioned getImage(int nativeId) throws DatabaseException {
+    public I_ImageVersioned getImage(int nativeId) throws IOException {
         return imageBdb.getImage(nativeId);
     }
 
@@ -640,7 +640,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         positionBdb.writeTimePath(jarTimePath);
     }
 
-    public I_Path getPath(int nativeId) throws DatabaseException {
+    public I_Path getPath(int nativeId) throws IOException {
         return pathBdb.getPath(nativeId);
     }
 

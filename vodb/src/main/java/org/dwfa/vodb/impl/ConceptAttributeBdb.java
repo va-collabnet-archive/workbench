@@ -145,7 +145,7 @@ public abstract class ConceptAttributeBdb implements I_StoreConceptAttributes {
         } catch (DatabaseException e) {
             throw new ToIoException(e);
         }
-        throw new ToIoException(new DatabaseException("Concept attributes for: " + ConceptBean.get(conceptId)
+        throw new ToIoException(new IOException("Concept attributes for: " + ConceptBean.get(conceptId)
             + " not found."));
     }
 

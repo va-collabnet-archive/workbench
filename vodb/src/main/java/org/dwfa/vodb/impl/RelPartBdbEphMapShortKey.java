@@ -152,11 +152,11 @@ public class RelPartBdbEphMapShortKey implements I_StoreInBdb, I_StoreRelParts<S
      * 
      * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPart(int)
      */
-    public I_RelPart getRelPart(Short partId) throws DatabaseException {
+    public I_RelPart getRelPart(Short partId) throws IOException {
         if (idPartMap.containsKey(partId)) {
             return idPartMap.get(partId);
         }
-        throw new DatabaseException("Rel part: " + partId + " not found.");
+        throw new IOException("Rel part: " + partId + " not found.");
     }
 
     public void close() throws DatabaseException {

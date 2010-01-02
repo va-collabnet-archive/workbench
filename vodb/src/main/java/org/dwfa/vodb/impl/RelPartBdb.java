@@ -158,14 +158,14 @@ public class RelPartBdb implements I_StoreInBdb, I_StoreRelParts<Integer> {
      * 
      * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPart(int)
      */
-    public I_RelPart getRelPart(Integer partId) throws DatabaseException {
+    public I_RelPart getRelPart(Integer partId) throws IOException {
         DatabaseEntry partKey = new DatabaseEntry();
         DatabaseEntry partValue = new DatabaseEntry();
         intBinder.objectToEntry(partId, partKey);
         if (relPartDb.get(BdbEnv.transaction, partKey, partValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
             return (I_RelPart) relPartBinding.entryToObject(partValue);
         }
-        throw new DatabaseException("Rel part: " + partId + " not found.");
+        throw new IOException("Rel part: " + partId + " not found.");
     }
 
     public void close() throws DatabaseException {

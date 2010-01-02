@@ -16,6 +16,8 @@
  */
 package org.dwfa.vodb.impl;
 
+import java.io.IOException;
+
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.vodb.I_StoreInBdb;
 
@@ -25,6 +27,6 @@ public interface I_StoreRelParts<T extends Number> extends I_StoreInBdb {
 
     public abstract T getRelPartId(I_RelPart part) throws DatabaseException;
 
-    public abstract I_RelPart getRelPart(T partId) throws DatabaseException;
+    public abstract I_RelPart getRelPart(T partId) throws DatabaseException, IOException;
 
 }

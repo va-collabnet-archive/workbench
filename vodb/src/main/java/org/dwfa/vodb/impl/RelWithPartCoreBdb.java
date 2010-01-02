@@ -135,7 +135,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
                 I_RelPart relPart;
                 try {
                     relPart = relPartBdb.getRelPart(relPartId);
-                } catch (DatabaseException e) {
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 versioned.addVersionNoRedundancyCheck(relPart);
@@ -453,7 +453,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
         return matches;
     }
 
-    public I_RelVersioned getRel(int relId, int conceptId) throws DatabaseException {
+    public I_RelVersioned getRel(int relId, int conceptId) throws IOException {
         DatabaseEntry relKey = new DatabaseEntry();
         DatabaseEntry relValue = new DatabaseEntry();
         intBinder.objectToEntry(relId, relKey);
@@ -462,7 +462,7 @@ public class RelWithPartCoreBdb implements I_StoreRelationships {
             rel.setRelId(relId);
             return rel;
         }
-        throw new DatabaseException("Rel: " + relId + " not found.");
+        throw new IOException("Rel: " + relId + " not found.");
     }
 
     public List<I_RelVersioned> getSrcRels(int conceptId) throws DatabaseException {

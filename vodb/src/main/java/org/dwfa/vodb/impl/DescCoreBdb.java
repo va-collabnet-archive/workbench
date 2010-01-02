@@ -156,11 +156,11 @@ public class DescCoreBdb implements I_StoreInBdb {
      * 
      * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPart(int)
      */
-    public ThinDescPartCore getDescPartCore(int partId) throws DatabaseException {
+    public ThinDescPartCore getDescPartCore(int partId) throws IOException {
         if (conPartMap.containsKey(partId)) {
             return conPartMap.get(partId);
         }
-        throw new DatabaseException("Desc part core: " + partId + " not found.");
+        throw new IOException("Desc part core: " + partId + " not found.");
     }
 
     public void close() throws DatabaseException {

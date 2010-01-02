@@ -16,6 +16,7 @@
  */
 package org.dwfa.vodb;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.dwfa.ace.api.I_ImageVersioned;
@@ -30,7 +31,7 @@ public interface I_StoreImages extends I_StoreInBdb {
 
     public boolean hasImage(int imageId) throws DatabaseException;
 
-    public I_ImageVersioned getImage(int nativeId) throws DatabaseException;
+    public I_ImageVersioned getImage(int nativeId) throws DatabaseException, IOException;
 
     public List<I_ImageVersioned> getImages(int conceptId) throws DatabaseException;
 

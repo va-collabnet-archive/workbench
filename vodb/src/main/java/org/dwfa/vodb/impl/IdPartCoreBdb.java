@@ -150,11 +150,11 @@ public class IdPartCoreBdb implements I_StoreInBdb {
      * 
      * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPart(int)
      */
-    public ThinIdPartCore getIdPartCore(short partId) throws DatabaseException {
+    public ThinIdPartCore getIdPartCore(short partId) throws IOException {
         if (idPartMap.containsKey(partId)) {
             return idPartMap.get(partId);
         }
-        throw new DatabaseException("Id part: " + partId + " not found.");
+        throw new IOException("Id part: " + partId + " not found.");
     }
 
     public void close() throws DatabaseException {

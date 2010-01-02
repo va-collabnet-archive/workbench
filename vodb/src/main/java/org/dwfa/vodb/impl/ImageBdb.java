@@ -124,7 +124,7 @@ public class ImageBdb implements I_StoreInBdb, I_StoreImages {
      * 
      * @see org.dwfa.vodb.impl.I_StoreImages#getImage(int)
      */
-    public I_ImageVersioned getImage(int nativeId) throws DatabaseException {
+    public I_ImageVersioned getImage(int nativeId) throws IOException {
         Stopwatch timer = null;
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Getting image : " + nativeId);
@@ -143,7 +143,7 @@ public class ImageBdb implements I_StoreInBdb, I_StoreImages {
             }
             return image;
         }
-        throw new DatabaseException("Image for: " + nativeId + " not found.");
+        throw new IOException("Image for: " + nativeId + " not found.");
     }
 
     /*
