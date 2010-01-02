@@ -10,6 +10,7 @@ import org.dwfa.tapi.TerminologyException;
 
 public class EDescriptionVersion extends EVersion implements I_DescribeExternally {
 
+	public static final long serialVersionUID = 1;
 	private boolean initialCaseSignificant;
 	
 	private String lang;

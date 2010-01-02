@@ -10,6 +10,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class EImageVersion extends EVersion {
 
+	public static final long serialVersionUID = 1;
+
 	private String textDescription;
 
 	private UUID typeUuid;

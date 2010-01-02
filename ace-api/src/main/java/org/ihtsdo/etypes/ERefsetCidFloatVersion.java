@@ -10,6 +10,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERefsetCidFloatVersion extends EVersion {
 
+	public static final long serialVersionUID = 1;
+
 	private UUID c1Uuid;
 	private float floatValue;
 

@@ -16,6 +16,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class EVersion implements Externalizable, I_VersionExternally {
 	
+	public static final long serialVersionUID = 1;
+
 	private static I_TermFactory tf = LocalVersionedTerminology.get();
 	
 	protected static UUID nidToUuid(int nid) throws TerminologyException, IOException {

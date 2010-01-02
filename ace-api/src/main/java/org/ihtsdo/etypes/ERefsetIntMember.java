@@ -13,6 +13,8 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public class ERefsetIntMember extends ERefset {
 
+	public static final long serialVersionUID = 1;
+
 	private int intValue;
 	
 	protected List<ERefsetIntVersion> extraVersions;

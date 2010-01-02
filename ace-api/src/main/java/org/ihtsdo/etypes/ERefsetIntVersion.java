@@ -9,6 +9,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERefsetIntVersion extends EVersion {
 
+	public static final long serialVersionUID = 1;
+
 	private int intValue;
 
 	public ERefsetIntVersion(ObjectInput in) throws IOException,

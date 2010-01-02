@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public abstract class EIdentifierVersion extends EVersion implements Externalizable {
 
+	public static final long serialVersionUID = 1;
 	protected UUID authorityUuid;
 
 	public EIdentifierVersion(ObjectInput in) throws IOException, ClassNotFoundException {

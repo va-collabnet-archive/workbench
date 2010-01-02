@@ -20,6 +20,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class EConcept extends EComponent implements Externalizable {
+	public static final long serialVersionUID = 1;
 	/**
 	 * CID = Component IDentifier
 	 * @author kec

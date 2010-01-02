@@ -14,6 +14,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public abstract class EComponent extends EVersion implements Externalizable {
 
+	public static final long serialVersionUID = 1;
+		
 	private static final int dataVersion = 1;
 
 	public enum IDENTIFIER_PART_TYPES {

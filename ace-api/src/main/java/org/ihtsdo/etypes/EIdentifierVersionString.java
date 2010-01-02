@@ -9,6 +9,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class EIdentifierVersionString extends EIdentifierVersion {
 
+	public static final long serialVersionUID = 1;
+
 	private String denotation;
 	
 	public EIdentifierVersionString(ObjectInput in) throws IOException,
