@@ -11,7 +11,7 @@ public class ERefsetIntVersion extends EVersion {
 
 	public static final long serialVersionUID = 1;
 
-	private int intValue;
+	protected int intValue;
 
 	public ERefsetIntVersion(ObjectInput in) throws IOException,
 			ClassNotFoundException {

@@ -11,7 +11,7 @@ public class ERefsetBooleanVersion extends EVersion {
 
 	public static final long serialVersionUID = 1;
 
-	private boolean booleanValue;
+	protected boolean booleanValue;
 
 	public ERefsetBooleanVersion(ObjectInput in) throws IOException,
 			ClassNotFoundException {

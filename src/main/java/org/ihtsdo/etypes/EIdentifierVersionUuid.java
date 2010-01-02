@@ -13,8 +13,8 @@ public class EIdentifierVersionUuid extends EIdentifierVersion {
 
 	public static final long serialVersionUID = 1;
 
-	private static UUID primordialAuthority;
-	private UUID denotation;
+	protected static UUID primordialAuthority;
+	protected UUID denotation;
 	
 	public EIdentifierVersionUuid(ObjectInput in) throws IOException,
 			ClassNotFoundException {

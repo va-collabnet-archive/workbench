@@ -12,8 +12,8 @@ public class ERefsetCidIntVersion extends EVersion {
 
 	public static final long serialVersionUID = 1;
 
-	private UUID c1Uuid;
-	private int intValue;
+	protected UUID c1Uuid;
+	protected int intValue;
 
 	public ERefsetCidIntVersion(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -28,6 +28,9 @@ public class ERefsetCidIntVersion extends EVersion {
 		pathUuid = nidToUuid(part.getPathId());
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
+	}
+
+	public ERefsetCidIntVersion() {
 	}
 
 	@Override

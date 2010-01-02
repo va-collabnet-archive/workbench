@@ -14,9 +14,14 @@ public class EConceptAttributes extends EComponent
 	implements I_ConceptualizeExternally {
 	public static final long serialVersionUID = 1;
 
-	private boolean defined;
+	protected boolean defined;
 
-	private List<EConceptAttributesVersion> extraVersions;
+	protected List<EConceptAttributesVersion> extraVersions;
+
+	
+	public EConceptAttributes() {
+		super();
+	}
 
 	public EConceptAttributes(ObjectInput in) throws IOException,
 			ClassNotFoundException {

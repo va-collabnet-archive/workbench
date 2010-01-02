@@ -12,9 +12,9 @@ public class ERefsetCidCidStrVersion extends EVersion {
 
 	public static final long serialVersionUID = 1;
 
-	private UUID c1Uuid;
-	private UUID c2Uuid;
-	private String stringValue;
+	protected UUID c1Uuid;
+	protected UUID c2Uuid;
+	protected String stringValue;
 
 	public ERefsetCidCidStrVersion(ObjectInput in) throws IOException,
 			ClassNotFoundException {

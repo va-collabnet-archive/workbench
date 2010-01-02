@@ -56,9 +56,9 @@ public abstract class EComponent extends EVersion implements Externalizable {
 		}
 	};
 
-	protected UUID primordialComponentUuid;
+	public UUID primordialComponentUuid;
 
-	protected List<EIdentifierVersion> idComponents;
+	public List<EIdentifierVersion> idComponents;
 
 	public EComponent() {
 		super();
@@ -102,6 +102,7 @@ public abstract class EComponent extends EVersion implements Externalizable {
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
+		super.writeExternal(out);
 		out.writeInt(dataVersion);
 		out.writeLong(primordialComponentUuid.getMostSignificantBits());
 		out.writeLong(primordialComponentUuid.getLeastSignificantBits());

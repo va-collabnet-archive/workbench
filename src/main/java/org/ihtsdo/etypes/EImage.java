@@ -15,17 +15,17 @@ public class EImage extends EComponent {
 
 	public static final long serialVersionUID = 1;
 
-	private UUID conceptUuid;
+	protected UUID conceptUuid;
 	
-    private String format;
+	protected String format;
 
-    private byte[] image;
+	protected byte[] image;
 	
-    private String textDescription;
+	protected String textDescription;
     
-    private UUID typeUuid;
+	protected UUID typeUuid;
 
-	private List<EImageVersion> extraVersions;
+	protected List<EImageVersion> extraVersions;
 	
 	public EImage(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -50,6 +50,9 @@ public class EImage extends EComponent {
 				extraVersions.add(new EImageVersion(imageVer.getMutableParts().get(i)));
 			}
 		} 
+	}
+
+	public EImage() {
 	}
 
 	@Override

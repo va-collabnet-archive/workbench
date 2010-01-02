@@ -16,8 +16,8 @@ public class ERefsetCidIntMember extends ERefset {
 
 	public static final long serialVersionUID = 1;
 
-	private UUID c1Uuid;
-	private int intValue;
+	protected UUID c1Uuid;
+	protected int intValue;
 	
 	protected List<ERefsetCidIntVersion> extraVersions;
 	
@@ -46,6 +46,10 @@ public class ERefsetCidIntMember extends ERefset {
 				extraVersions.add(new ERefsetCidIntVersion((I_ThinExtByRefPartConceptInt) m.getMutableParts().get(i)));
 			}
 		} 
+	}
+
+
+	public ERefsetCidIntMember() {
 	}
 
 

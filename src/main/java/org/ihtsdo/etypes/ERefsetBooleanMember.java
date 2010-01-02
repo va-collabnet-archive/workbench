@@ -15,7 +15,7 @@ public class ERefsetBooleanMember extends ERefset {
 
 	public static final long serialVersionUID = 1;
 
-	private boolean booleanValue;
+	protected boolean booleanValue;
 	
 	protected List<ERefsetBooleanVersion> extraVersions;
 	

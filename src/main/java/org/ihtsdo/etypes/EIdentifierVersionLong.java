@@ -11,7 +11,7 @@ public class EIdentifierVersionLong extends EIdentifierVersion {
 
 	public static final long serialVersionUID = 1;
 
-	private long denotation;
+	protected long denotation;
 	
 	public EIdentifierVersionLong(ObjectInput in) throws IOException,
 			ClassNotFoundException {

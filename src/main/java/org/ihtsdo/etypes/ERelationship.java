@@ -15,14 +15,14 @@ public class ERelationship extends EComponent {
 
 	public static final long serialVersionUID = 1;
 
-	private UUID c1Uuid;
-	private UUID c2Uuid;
-	private UUID characteristicUuid;
-	private UUID refinabilityUuid;
-	private int relGroup; 
-	private UUID typeUuid;
+	protected UUID c1Uuid;
+	protected UUID c2Uuid;
+	protected UUID characteristicUuid;
+	protected UUID refinabilityUuid;
+	protected int relGroup; 
+	protected UUID typeUuid;
 	
-	private List<ERelationshipVersion> extraVersions;
+	protected List<ERelationshipVersion> extraVersions;
 
 	public ERelationship(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -48,6 +48,9 @@ public class ERelationship extends EComponent {
 				extraVersions.add(new ERelationshipVersion(rel.getMutableParts().get(i)));
 			}
 		} 
+	}
+
+	public ERelationship() {
 	}
 
 	@Override

@@ -12,8 +12,8 @@ public class ERefsetCidLongVersion extends EVersion {
 
 	public static final long serialVersionUID = 1;
 
-	private UUID c1Uuid;
-	private long longValue;
+	protected UUID c1Uuid;
+	protected long longValue;
 
 	public ERefsetCidLongVersion(ObjectInput in) throws IOException,
 			ClassNotFoundException {

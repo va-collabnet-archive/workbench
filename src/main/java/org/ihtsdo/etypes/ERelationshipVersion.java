@@ -12,10 +12,10 @@ public class ERelationshipVersion extends EVersion {
 
 	public static final long serialVersionUID = 1;
 
-	private UUID characteristicUuid;
-	private UUID refinabilityUuid;
-	private int group; 
-	private UUID typeUuid;
+	protected UUID characteristicUuid;
+	protected UUID refinabilityUuid;
+	protected int group; 
+	protected UUID typeUuid;
 
 	public ERelationshipVersion(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -30,6 +30,9 @@ public class ERelationshipVersion extends EVersion {
 		pathUuid = nidToUuid(part.getPathId());
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
+	}
+
+	public ERelationshipVersion() {
 	}
 
 	@Override

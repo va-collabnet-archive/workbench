@@ -16,8 +16,8 @@ public class ERefsetCidFloatMember extends ERefset {
 
 	public static final long serialVersionUID = 1;
 
-	private UUID c1Uuid;
-	private float floatValue;
+	protected UUID c1Uuid;
+	protected float floatValue;
 	
 	protected List<ERefsetCidFloatVersion> extraVersions;
 	
