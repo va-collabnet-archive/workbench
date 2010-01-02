@@ -83,7 +83,7 @@ public class PathBdb implements I_StoreInBdb, I_StorePaths {
      * 
      * @see org.dwfa.vodb.impl.I_StorePaths#getPath(int)
      */
-    public I_Path getPath(int nativeId) throws DatabaseException {
+    public I_Path getPath(int nativeId) throws IOException {
         Stopwatch timer = null;
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Getting path : " + nativeId);
@@ -100,7 +100,7 @@ public class PathBdb implements I_StoreInBdb, I_StorePaths {
             }
             return (I_Path) pathBinder.entryToObject(pathValue);
         }
-        throw new DatabaseException("Path: " + ConceptBean.get(nativeId).toString() + " not found.");
+        throw new IOException("Path: " + ConceptBean.get(nativeId).toString() + " not found.");
     }
 
     /*

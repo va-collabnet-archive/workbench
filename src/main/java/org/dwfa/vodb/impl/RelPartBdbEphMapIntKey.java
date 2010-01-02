@@ -159,13 +159,13 @@ public class RelPartBdbEphMapIntKey implements I_StoreInBdb, I_StoreRelParts<Int
      * 
      * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPart(int)
      */
-    public I_RelPart getRelPart(Integer partId) throws DatabaseException {
+    public I_RelPart getRelPart(Integer partId) throws IOException {
         if (idPartMap.containsKey(partId)) {
             I_RelPart part = idPartMap.get(idPartMap);
             assert part.getTypeId() != Integer.MAX_VALUE;
             return part;
         }
-        throw new DatabaseException("Rel part: " + partId + " not found.");
+        throw new IOException("Rel part: " + partId + " not found.");
     }
 
     public void close() throws DatabaseException {

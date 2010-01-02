@@ -148,11 +148,11 @@ public class ConCoreBdb implements I_StoreInBdb {
      * 
      * @see org.dwfa.vodb.impl.crel.I_StoreRelParts#getRelPart(int)
      */
-    public I_ConceptAttributePart getConPart(int partId) throws DatabaseException {
+    public I_ConceptAttributePart getConPart(int partId) throws IOException {
         if (conPartMap.containsKey(partId)) {
             return conPartMap.get(partId);
         }
-        throw new DatabaseException("Con part: " + partId + " not found.");
+        throw new IOException("Con part: " + partId + " not found.");
     }
 
     public void close() throws DatabaseException {

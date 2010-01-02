@@ -180,7 +180,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             throw new UnsupportedOperationException();
         }
 
-        public ConceptBean populateBean(TupleInput ti, ConceptBean conceptBean) {
+        public ConceptBean populateBean(TupleInput ti, ConceptBean conceptBean) throws IOException {
             try {
                 synchronized (conceptBean) {
 
@@ -972,7 +972,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
     private IndexSearcher luceneSearcher = null;
 
     public ConDescRelBdb(Environment env, DatabaseConfig dbConfig, File luceneDir, I_StoreIdentifiers identifierDb,
-            DatabaseSetupConfig.CORE_DB_TYPE type) throws DatabaseException {
+            DatabaseSetupConfig.CORE_DB_TYPE type) throws IOException {
         super();
         this.luceneDir = luceneDir;
 
@@ -988,7 +988,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             break;
 
         default:
-            throw new DatabaseException("Unsupported CORE_DB_TYPE: " + type);
+            throw new IOException("Unsupported CORE_DB_TYPE: " + type);
         }
         conDescRelDb = env.openDatabase(null, "conDescRelDb", dbConfig);
         PreloadConfig preloadConfig = new PreloadConfig();
@@ -1572,7 +1572,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         conDescRelDb.put(BdbEnv.transaction, key, value);
     }
 
-    private void writeToLucene(I_DescriptionVersioned desc) throws DatabaseException {
+    private void writeToLucene(I_DescriptionVersioned desc) throws IOException {
         try {
             IndexReader reader = IndexReader.open(luceneDir);
             reader.deleteDocuments(new Term("dnid", Integer.toString(desc.getDescId())));
@@ -1604,9 +1604,9 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
             }
             luceneSearcher = null;
         } catch (CorruptIndexException e) {
-            throw new DatabaseException(e);
+            throw new IOException(e);
         } catch (IOException e) {
-            throw new DatabaseException(e);
+            throw new IOException(e);
         }
     }
 

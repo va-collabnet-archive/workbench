@@ -228,14 +228,14 @@ public class RelationshipBdb implements I_StoreInBdb, I_StoreRelationships {
      * 
      * @see org.dwfa.vodb.impl.I_StoreRelationships#getRel(int)
      */
-    public I_RelVersioned getRel(int relId, int conceptId) throws DatabaseException {
+    public I_RelVersioned getRel(int relId, int conceptId) throws IOException {
         DatabaseEntry relKey = new DatabaseEntry();
         DatabaseEntry relValue = new DatabaseEntry();
         intBinder.objectToEntry(relId, relKey);
         if (relDb.get(BdbEnv.transaction, relKey, relValue, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
             return (I_RelVersioned) relBinding.entryToObject(relValue);
         }
-        throw new DatabaseException("Rel: " + relId + " not found.");
+        throw new IOException("Rel: " + relId + " not found.");
     }
 
     /*

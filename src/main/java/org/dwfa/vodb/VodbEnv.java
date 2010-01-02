@@ -718,7 +718,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
     }
 
-    public I_ImageVersioned getImage(int nativeId) throws DatabaseException {
+    public I_ImageVersioned getImage(int nativeId) throws IOException {
         return bdbEnv.getImage(nativeId);
     }
 
@@ -1542,7 +1542,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return bdbEnv.nativeGenerationForUuid(uid, source, pathId, version);
     }
 
-    public List<UUID> nativeToUuid(int nativeId) throws DatabaseException {
+    public List<UUID> nativeToUuid(int nativeId) throws IOException {
         return bdbEnv.nativeToUuid(nativeId);
     }
 

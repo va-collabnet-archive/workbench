@@ -227,7 +227,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
      * 
      * @see org.dwfa.vodb.I_StoreIdentifiers#nativeToUuid(int)
      */
-    public List<UUID> nativeToUuid(int nativeId) throws DatabaseException {
+    public List<UUID> nativeToUuid(int nativeId) throws IOException {
         Stopwatch timer = null;
         if (AceLog.getAppLog().isLoggable(Level.FINER)) {
             AceLog.getAppLog().finer("Getting id record for : " + nativeId);
@@ -244,7 +244,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
             }
             return ((I_Identify) idBinding.entryToObject(idValue)).getUUIDs();
         }
-        throw new DatabaseException("List<UUID> not found for: " + nativeId + " (a).");
+        throw new IOException("List<UUID> not found for: " + nativeId + " (a).");
     }
 
     /*
@@ -257,7 +257,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
         if (id != null) {
             return id;
         }
-        throw new ToIoException(new DatabaseException("I_IdVersioned for " + nativeId + " not found (b)."));
+        throw new IOException("I_IdVersioned for " + nativeId + " not found (b).");
     }
 
     /*
@@ -279,7 +279,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
      * @see
      * org.dwfa.vodb.I_StoreIdentifiers#writeId(org.dwfa.ace.api.I_IdVersioned)
      */
-    public void writeId(I_Identify id) throws DatabaseException {
+    public void writeId(I_Identify id) throws IOException {
         DatabaseEntry idKey = new DatabaseEntry();
         DatabaseEntry idValue = new DatabaseEntry();
         intBinder.objectToEntry(id.getNid(), idKey);
@@ -306,7 +306,7 @@ public class IdentifierBdbWithSecondaryMap implements I_StoreIdentifiers {
             idDb.put(BdbEnv.transaction, idKey, idValue);
             idPutSemaphore.release();
         } catch (InterruptedException e) {
-            throw new DatabaseException(e);
+            throw new IOException(e);
         }
     }
 

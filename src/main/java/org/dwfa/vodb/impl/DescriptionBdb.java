@@ -211,7 +211,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
      * org.dwfa.vodb.impl.I_StoreDescriptions#writeDescription(org.dwfa.ace.
      * api.I_DescriptionVersioned)
      */
-    public void writeDescription(I_DescriptionVersioned desc) throws DatabaseException {
+    public void writeDescription(I_DescriptionVersioned desc) throws IOException {
         writeToLucene(desc);
         writeDescriptionNoLuceneUpdate(desc);
     }
@@ -224,7 +224,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
         descDb.put(BdbEnv.transaction, key, value);
     }
 
-    private void writeToLucene(I_DescriptionVersioned desc) throws DatabaseException {
+    private void writeToLucene(I_DescriptionVersioned desc) throws IOException {
         try {
             IndexReader reader = IndexReader.open(luceneDir);
             reader.deleteDocuments(new Term("dnid", Integer.toString(desc.getDescId())));
@@ -250,9 +250,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
             writer.addDocument(doc);
             writer.close();
         } catch (CorruptIndexException e) {
-            throw new DatabaseException(e);
-        } catch (IOException e) {
-            throw new DatabaseException(e);
+            throw new IOException(e);
         }
     }
 
@@ -590,7 +588,7 @@ public class DescriptionBdb implements I_StoreInBdb, I_StoreDescriptions {
         return (I_DescriptionVersioned) descBinding.entryToObject(value);
     }
 
-    public void commit(ConceptBean bean, int version, Set<TimePathId> values) throws DatabaseException {
+    public void commit(ConceptBean bean, int version, Set<TimePathId> values) throws IOException {
         if (bean.descriptions != null) {
             for (I_DescriptionVersioned desc : bean.descriptions) {
                 boolean changed = false;

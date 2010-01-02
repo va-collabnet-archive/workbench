@@ -38,13 +38,13 @@ public interface I_StoreIdentifiers extends I_StoreInBdb {
 
     public I_Identify getIdNullOk(int nativeId) throws IOException;
 
-    public List<UUID> nativeToUuid(int nativeId) throws DatabaseException;
+    public List<UUID> nativeToUuid(int nativeId) throws IOException;
 
     public I_Identify getId(int nativeId) throws IOException;
 
     public Collection<UUID> getUids(int nativeId) throws TerminologyException, IOException;
 
-    public void writeId(I_Identify id) throws DatabaseException;
+    public void writeId(I_Identify id) throws DatabaseException, IOException;
 
     public void deleteId(I_Identify id) throws DatabaseException;
 

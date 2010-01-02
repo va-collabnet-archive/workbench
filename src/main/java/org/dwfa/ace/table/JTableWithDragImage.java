@@ -36,6 +36,7 @@ import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.KeyEvent;
 import java.awt.image.FilteredImageSource;
+import java.io.IOException;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -135,7 +136,7 @@ public class JTableWithDragImage extends JTable {
             }
         }
 
-        private Transferable getTransferable(Object obj, int column) throws DatabaseException {
+        private Transferable getTransferable(Object obj, int column) throws IOException {
             if (I_CellTextWithTuple.class.isAssignableFrom(obj.getClass())) {
                 if (StringWithConceptTuple.class.isAssignableFrom(obj.getClass())) {
                     return TransferableFromSWCT(obj, column);
@@ -329,13 +330,13 @@ public class JTableWithDragImage extends JTable {
             }
         }
 
-        private Transferable transferableFromIWImgT(Object obj) throws DatabaseException {
+        private Transferable transferableFromIWImgT(Object obj) throws IOException {
             ImageWithImageTuple iwit = (ImageWithImageTuple) obj;
             return new StringSelection("<img src='ace:" + AceConfig.getVodb().nativeToUuid(iwit.tuple.getImageId())
                 + "$" + AceConfig.getVodb().nativeToUuid(iwit.tuple.getConceptId()) + "'>");
         }
 
-        private Transferable transferableFromSWImgT(Object obj, int column) throws DatabaseException {
+        private Transferable transferableFromSWImgT(Object obj, int column) throws IOException {
             StringWithImageTuple swit = (StringWithImageTuple) obj;
             IMAGE_FIELD field = (IMAGE_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
