@@ -41,6 +41,7 @@ public class EConcept extends EComponent implements Externalizable {
 		;
 
 		private int externalizedToken;
+		private int typeNid;
 		private RefsetAuxiliary.Concept typeConcept;
 		private static Map<Integer, REFSET_TYPES> nidTypeMap;
 
@@ -53,7 +54,8 @@ public class EConcept extends EComponent implements Externalizable {
 			if (nidTypeMap == null) {
 				nidTypeMap = new HashMap<Integer, REFSET_TYPES>();
 				for (REFSET_TYPES type: REFSET_TYPES.values()) {
-					nidTypeMap.put(uuidToNid(type.typeConcept.getUids()), type);
+					type.typeNid = uuidToNid(type.typeConcept.getUids());
+					nidTypeMap.put(type.typeNid, type);
 				}
 			}
 			return nidTypeMap.get(nid);
@@ -91,6 +93,10 @@ public class EConcept extends EComponent implements Externalizable {
 				return CID_LONG;
 			}
 			throw new UnsupportedOperationException();
+		}
+
+		public int getTypeNid() {
+			return typeNid;
 		}
 	};
 
