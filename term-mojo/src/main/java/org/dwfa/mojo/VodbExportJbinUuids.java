@@ -54,7 +54,7 @@ public class VodbExportJbinUuids extends AbstractMojo implements I_ProcessIds, I
 	private ObjectOutputStream oos;
 
 
-	private ObjectOutputStream eConceptsOos;
+	private DataOutputStream eConceptDOS;
     private static int conceptLimit = Integer.MAX_VALUE;
     
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -91,12 +91,12 @@ public class VodbExportJbinUuids extends AbstractMojo implements I_ProcessIds, I
             
             File eConceptsFile = new File(targetDirectory, "classes/eConcepts.jbin");
             BufferedOutputStream eConceptsBos = new BufferedOutputStream(new FileOutputStream(eConceptsFile));
-            eConceptsOos = new ObjectOutputStream(eConceptsBos);
+            eConceptDOS = new DataOutputStream(eConceptsBos);
             
             tf.iterateConcepts(this);
 
             oos.close();
-            eConceptsOos.close();
+            eConceptDOS.close();
             getLog().info("Wrote " + conceptCount + " concepts");
 
             
@@ -134,7 +134,7 @@ public class VodbExportJbinUuids extends AbstractMojo implements I_ProcessIds, I
 			//UniversalAceBean ubean = concept.getUniversalAceBean();
 			//oos.writeObject(ubean);
 			EConcept eC = new EConcept(concept);
-			eConceptsOos.writeObject(eC);
+			eC.writeExternal(eConceptDOS);
 			conceptCount++;
 			if (conceptCount % 100 == 0) {
 				System.out.print("\b\b\b\b\b\b\b\b");
