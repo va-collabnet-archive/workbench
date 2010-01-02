@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.DataInput;
+import java.io.DataOutput;
 
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.tapi.TerminologyException;
@@ -14,7 +14,7 @@ public class EIdentifierVersionLong extends EIdentifierVersion {
 
 	protected long denotation;
 	
-	public EIdentifierVersionLong(ObjectInput in) throws IOException,
+	public EIdentifierVersionLong(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super(in);
 		denotation = in.readLong();
@@ -30,7 +30,7 @@ public class EIdentifierVersionLong extends EIdentifierVersion {
 	}
 
 	@Override
-	public void writeDenotation(ObjectOutput out) throws IOException {
+	public void writeDenotation(DataOutput out) throws IOException {
 		out.writeLong(denotation);
 	}
 

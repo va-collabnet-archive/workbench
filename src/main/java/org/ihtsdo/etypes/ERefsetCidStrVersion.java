@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.util.UUID;
 
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
@@ -15,7 +15,7 @@ public class ERefsetCidStrVersion extends EVersion {
 	protected UUID c1Uuid;
 	protected String strValue;
 
-	public ERefsetCidStrVersion(ObjectInput in) throws IOException,
+	public ERefsetCidStrVersion(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super();
 		readExternal(in);
@@ -31,19 +31,19 @@ public class ERefsetCidStrVersion extends EVersion {
 	}
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
 		c1Uuid = new UUID(in.readLong(), in.readLong());
-		strValue = (String) in.readObject();
+		strValue = in.readUTF();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		super.writeExternal(out);
 		out.writeLong(c1Uuid.getMostSignificantBits());
 		out.writeLong(c1Uuid.getLeastSignificantBits());
-		out.writeObject(strValue);
+		out.writeUTF(strValue);
 	}
 
 	public UUID getC1Uuid() {

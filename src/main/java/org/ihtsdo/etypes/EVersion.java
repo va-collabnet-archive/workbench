@@ -1,9 +1,8 @@
 package org.ihtsdo.etypes;
 
-import java.io.Externalizable;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +13,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 
-public class EVersion implements Externalizable, I_VersionExternally {
+public class EVersion implements I_VersionExternally {
 	
 	public static final long serialVersionUID = 1;
 
@@ -41,7 +40,7 @@ public class EVersion implements Externalizable, I_VersionExternally {
 	protected UUID statusUuid;
 	protected long time;
 	
-	public EVersion(ObjectInput in) throws IOException, ClassNotFoundException {
+	public EVersion(DataInput in) throws IOException, ClassNotFoundException {
 		super();
 		readExternal(in);
 	}
@@ -50,16 +49,14 @@ public class EVersion implements Externalizable, I_VersionExternally {
 		super();
 	}
 
-	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		pathUuid = new UUID(in.readLong(), in.readLong());
 		statusUuid = new UUID(in.readLong(), in.readLong());
 		time = in.readLong();
 	}
 
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		out.writeLong(pathUuid.getMostSignificantBits());
 		out.writeLong(pathUuid.getLeastSignificantBits());
 		out.writeLong(statusUuid.getMostSignificantBits());
