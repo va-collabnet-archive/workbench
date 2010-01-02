@@ -16,8 +16,8 @@ public class ERefsetCidCidMember extends ERefset {
 
 	public static final long serialVersionUID = 1;
 
-	private UUID c1Uuid;
-	private UUID c2Uuid;
+	protected UUID c1Uuid;
+	protected UUID c2Uuid;
 	
 	protected List<ERefsetCidCidVersion> extraVersions;
 	

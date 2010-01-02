@@ -12,9 +12,9 @@ public class EImageVersion extends EVersion {
 
 	public static final long serialVersionUID = 1;
 
-	private String textDescription;
+	protected String textDescription;
 
-	private UUID typeUuid;
+	protected UUID typeUuid;
 
 	public EImageVersion(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -29,6 +29,9 @@ public class EImageVersion extends EVersion {
 		pathUuid = nidToUuid(part.getPathId());
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
+	}
+
+	public EImageVersion() {
 	}
 
 	@Override

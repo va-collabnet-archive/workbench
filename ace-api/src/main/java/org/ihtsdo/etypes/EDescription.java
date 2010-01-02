@@ -15,17 +15,17 @@ public class EDescription extends EComponent
 	implements I_DescribeExternally {
 	public static final long serialVersionUID = 1;
 
-	private UUID conceptUuid;
+	protected UUID conceptUuid;
 	
-	private boolean initialCaseSignificant;
+	protected boolean initialCaseSignificant;
 	
-	private String lang;
+	protected String lang;
 	
-	private String text;
+	protected String text;
 	
-	private UUID typeUuid;
+	protected UUID typeUuid;
 	
-	private List<EDescriptionVersion> extraVersions;
+	protected List<EDescriptionVersion> extraVersions;
 	
 	public EDescription(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -52,6 +52,9 @@ public class EDescription extends EComponent
 		} 
 	}
 
+	public EDescription() {
+	}
+
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -75,6 +78,7 @@ public class EDescription extends EComponent
 		super.writeExternal(out);
 		out.writeLong(conceptUuid.getMostSignificantBits());
 		out.writeLong(conceptUuid.getLeastSignificantBits());
+		out.writeBoolean(initialCaseSignificant);
 		out.writeObject(lang);
 		out.writeObject(text);
 		out.writeLong(typeUuid.getMostSignificantBits());

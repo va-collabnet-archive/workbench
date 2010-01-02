@@ -11,13 +11,13 @@ import org.dwfa.tapi.TerminologyException;
 public class EDescriptionVersion extends EVersion implements I_DescribeExternally {
 
 	public static final long serialVersionUID = 1;
-	private boolean initialCaseSignificant;
+	protected boolean initialCaseSignificant;
 	
-	private String lang;
+	protected String lang;
 	
-	private String text;
+	protected String text;
 
-	private UUID typeUuid;
+	protected UUID typeUuid;
 
 	public EDescriptionVersion(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -34,6 +34,9 @@ public class EDescriptionVersion extends EVersion implements I_DescribeExternall
 		time = part.getTime();
 	}
 
+	protected EDescriptionVersion() {
+	}
+
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
@@ -42,12 +45,12 @@ public class EDescriptionVersion extends EVersion implements I_DescribeExternall
 		lang = (String) in.readObject();
 		text = (String) in.readObject();
 		typeUuid = new UUID(in.readLong(), in.readLong());
-
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		super.writeExternal(out);
+		out.writeBoolean(initialCaseSignificant);
 		out.writeObject(lang);
 		out.writeObject(text);
 		out.writeLong(typeUuid.getMostSignificantBits());

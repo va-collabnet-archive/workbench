@@ -15,7 +15,7 @@ public class ERefsetStrMember extends ERefset {
 
 	public static final long serialVersionUID = 1;
 
-	private String strValue;
+	protected String strValue;
 	
 	protected List<ERefsetStrMemberVersion> extraVersions;
 	

@@ -19,7 +19,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
-public class EConcept extends EComponent implements Externalizable {
+public class EConcept implements Externalizable {
 	public static final long serialVersionUID = 1;
 	/**
 	 * CID = Component IDentifier
@@ -55,7 +55,7 @@ public class EConcept extends EComponent implements Externalizable {
 			if (nidTypeMap == null) {
 				nidTypeMap = new HashMap<Integer, REFSET_TYPES>();
 				for (REFSET_TYPES type: REFSET_TYPES.values()) {
-					type.typeNid = uuidToNid(type.typeConcept.getUids());
+					type.typeNid = EComponent.uuidToNid(type.typeConcept.getUids());
 					nidTypeMap.put(type.typeNid, type);
 				}
 			}
@@ -101,12 +101,12 @@ public class EConcept extends EComponent implements Externalizable {
 		}
 	};
 
-	private static final int dataVersion = 1;
-	private EConceptAttributes conceptAttributes;
-	private List<EDescription> descriptions;
-	private List<ERelationship> relationships;
-	private List<EImage> images;
-	private List<ERefset> refsetMembers;
+	protected static final int dataVersion = 1;
+	protected EConceptAttributes conceptAttributes;
+	protected List<EDescription> descriptions;
+	protected List<ERelationship> relationships;
+	protected List<EImage> images;
+	protected List<ERefset> refsetMembers;
 
 	public EConcept(ObjectInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -116,7 +116,6 @@ public class EConcept extends EComponent implements Externalizable {
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		super.readExternal(in);
 		int readDataVersion = in.readInt();
 		if (readDataVersion != dataVersion) {
 			throw new IOException("Unsupported dataVersion: " + readDataVersion);
@@ -194,7 +193,6 @@ public class EConcept extends EComponent implements Externalizable {
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		super.writeExternal(out);
 		out.writeInt(dataVersion);
 		conceptAttributes.writeExternal(out);		
 		if (descriptions == null) {
@@ -248,9 +246,15 @@ public class EConcept extends EComponent implements Externalizable {
 		return conceptAttributes;
 	}
 	
+	
+	
+	public EConcept() {
+		super();
+	}
+
 	public EConcept(I_GetConceptData c) throws IOException, TerminologyException {
-		convert(c.getIdentifier());
 		conceptAttributes = new EConceptAttributes(c.getConceptAttributes());
+		conceptAttributes.convert(c.getIdentifier());
 		relationships = new ArrayList<ERelationship>(c.getSourceRels().size());
 		for (I_RelVersioned rel: c.getSourceRels()) {
 			relationships.add(new ERelationship(rel));
@@ -263,7 +267,7 @@ public class EConcept extends EComponent implements Externalizable {
 		for (I_ImageVersioned img: c.getImages()) {
 			images.add(new EImage(img));
 		}
-		Collection<I_ThinExtByRefVersioned> members = getRefsetMembers(c.getNid());
+		Collection<I_ThinExtByRefVersioned> members = EComponent.getRefsetMembers(c.getNid());
 		if (members != null) {
 			refsetMembers = new ArrayList<ERefset>(members.size());
 			for (I_ThinExtByRefVersioned m: members) {
