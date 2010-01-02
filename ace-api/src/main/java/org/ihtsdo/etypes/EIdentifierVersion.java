@@ -1,19 +1,18 @@
 package org.ihtsdo.etypes;
 
-import java.io.Externalizable;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.UUID;
 
 import org.ihtsdo.etypes.EComponent.IDENTIFIER_PART_TYPES;
 
-public abstract class EIdentifierVersion extends EVersion implements Externalizable {
+public abstract class EIdentifierVersion extends EVersion {
 
 	public static final long serialVersionUID = 1;
 	protected UUID authorityUuid;
 
-	public EIdentifierVersion(ObjectInput in) throws IOException, ClassNotFoundException {
+	public EIdentifierVersion(DataInput in) throws IOException, ClassNotFoundException {
 		super();
 		readExternal(in);
 	}
@@ -23,21 +22,21 @@ public abstract class EIdentifierVersion extends EVersion implements Externaliza
 	}
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
 		authorityUuid = new UUID(in.readLong(), in.readLong());
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		super.writeExternal(out);
 		out.writeLong(authorityUuid.getMostSignificantBits());
 		out.writeLong(authorityUuid.getLeastSignificantBits());
 		writeDenotation(out);
 	}
 	
-	public abstract void writeDenotation(ObjectOutput out) throws IOException;
+	public abstract void writeDenotation(DataOutput out) throws IOException;
 
 	
 	public abstract Object getDenotation();

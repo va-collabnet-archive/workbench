@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -19,7 +19,7 @@ public class EDescriptionVersion extends EVersion implements I_DescribeExternall
 
 	protected UUID typeUuid;
 
-	public EDescriptionVersion(ObjectInput in) throws IOException, ClassNotFoundException {
+	public EDescriptionVersion(DataInput in) throws IOException, ClassNotFoundException {
 		super();
 		readExternal(in);
 	}
@@ -38,21 +38,21 @@ public class EDescriptionVersion extends EVersion implements I_DescribeExternall
 	}
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
 		initialCaseSignificant = in.readBoolean();
-		lang = (String) in.readObject();
-		text = (String) in.readObject();
+		lang = in.readUTF();
+		text = in.readUTF();
 		typeUuid = new UUID(in.readLong(), in.readLong());
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		super.writeExternal(out);
 		out.writeBoolean(initialCaseSignificant);
-		out.writeObject(lang);
-		out.writeObject(text);
+		out.writeUTF(lang);
+		out.writeUTF(text);
 		out.writeLong(typeUuid.getMostSignificantBits());
 		out.writeLong(typeUuid.getLeastSignificantBits());
 	}

@@ -1,9 +1,8 @@
 package org.ihtsdo.etypes;
 
-import java.io.Externalizable;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +11,7 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.tapi.TerminologyException;
 
-public abstract class EComponent extends EVersion implements Externalizable {
+public abstract class EComponent extends EVersion {
 
 	public static final long serialVersionUID = 1;
 		
@@ -27,7 +26,7 @@ public abstract class EComponent extends EVersion implements Externalizable {
 			this.externalPartTypeToken = externalPartTypeToken;
 		}
 
-		public void writeType(ObjectOutput output) throws IOException {
+		public void writeType(DataOutput output) throws IOException {
 			output.writeByte(externalPartTypeToken);
 		}
 
@@ -42,7 +41,7 @@ public abstract class EComponent extends EVersion implements Externalizable {
 			throw new UnsupportedOperationException();
 		}
 
-		public static IDENTIFIER_PART_TYPES readType(ObjectInput input)
+		public static IDENTIFIER_PART_TYPES readType(DataInput input)
 				throws IOException {
 			byte typeByte = input.readByte();
 			switch (typeByte) {
@@ -65,14 +64,14 @@ public abstract class EComponent extends EVersion implements Externalizable {
 		super();
 	}
 
-	public EComponent(ObjectInput in) throws IOException,
+	public EComponent(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super();
 		readExternal(in);
 	}
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
 		int readDataVersion = in.readInt();
@@ -102,7 +101,7 @@ public abstract class EComponent extends EVersion implements Externalizable {
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		super.writeExternal(out);
 		out.writeInt(dataVersion);
 		out.writeLong(primordialComponentUuid.getMostSignificantBits());

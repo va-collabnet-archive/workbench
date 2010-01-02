@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.DataInput;
+import java.io.DataOutput;
 
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
@@ -11,7 +11,7 @@ public class ERefsetVersion extends EVersion {
 
 	protected static final long serialVersionUID = 1;
 
-	public ERefsetVersion(ObjectInput in) throws IOException,
+	public ERefsetVersion(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super();
 		readExternal(in);
@@ -24,13 +24,13 @@ public class ERefsetVersion extends EVersion {
 	}
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		super.writeExternal(out);
 	}
 

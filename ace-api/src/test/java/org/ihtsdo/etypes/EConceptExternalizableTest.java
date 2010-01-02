@@ -4,9 +4,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -30,14 +30,14 @@ public class EConceptExternalizableTest {
 			EConcept testConcept = makeTestConcept();
 			
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
-			oos.writeObject(testConcept);
-			oos.close();
+			DataOutputStream dos = new DataOutputStream(baos);
+			testConcept.writeExternal(dos);
+			dos.close();
 			
 			
 			ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-			ObjectInputStream ois = new ObjectInputStream(bais);
-			EConcept testConcept2 = (EConcept) ois.readObject();
+			DataInputStream dis = new DataInputStream(bais);
+			EConcept testConcept2 = new EConcept(dis);
 			assertTrue(testConcept.conceptAttributes.primordialComponentUuid.equals(testConcept2.conceptAttributes.primordialComponentUuid));
 			assertTrue(testConcept.conceptAttributes.defined == testConcept2.conceptAttributes.defined);
 			assertTrue(testConcept.conceptAttributes.pathUuid.equals(testConcept2.conceptAttributes.pathUuid));

@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ImagePart;
@@ -16,7 +16,7 @@ public class EImageVersion extends EVersion {
 
 	protected UUID typeUuid;
 
-	public EImageVersion(ObjectInput in) throws IOException,
+	public EImageVersion(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super();
 		readExternal(in);
@@ -35,17 +35,17 @@ public class EImageVersion extends EVersion {
 	}
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
-		textDescription = (String) in.readObject();
+		textDescription = in.readUTF();
 		typeUuid = new UUID(in.readLong(), in.readLong());
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		super.writeExternal(out);
-		out.writeObject(textDescription);
+		out.writeUTF(textDescription);
 		out.writeLong(typeUuid.getMostSignificantBits());
 		out.writeLong(typeUuid.getLeastSignificantBits());
 	}

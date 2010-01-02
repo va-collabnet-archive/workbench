@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.DataInput;
+import java.io.DataOutput;
 
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.tapi.TerminologyException;
@@ -14,10 +14,10 @@ public class EIdentifierVersionString extends EIdentifierVersion {
 
 	protected String denotation;
 	
-	public EIdentifierVersionString(ObjectInput in) throws IOException,
+	public EIdentifierVersionString(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super(in);
-		denotation = (String) in.readObject();
+		denotation = in.readUTF();
 	}
 
 	public EIdentifierVersionString(I_IdPart idp) throws TerminologyException, IOException {
@@ -29,8 +29,8 @@ public class EIdentifierVersionString extends EIdentifierVersion {
 	}
 
 	@Override
-	public void writeDenotation(ObjectOutput out) throws IOException {
-		out.writeObject(denotation);
+	public void writeDenotation(DataOutput out) throws IOException {
+		out.writeUTF(denotation);
 	}
 
 	@Override

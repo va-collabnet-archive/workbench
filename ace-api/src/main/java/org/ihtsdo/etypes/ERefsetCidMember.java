@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +20,7 @@ public class ERefsetCidMember extends ERefset {
 	
 	protected List<ERefsetCidVersion> extraVersions;
 	
-	public ERefsetCidMember(ObjectInput in) throws IOException,
+	public ERefsetCidMember(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super();
 		readExternal(in);
@@ -48,7 +48,7 @@ public class ERefsetCidMember extends ERefset {
 
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
 		c1Uuid = new UUID(in.readLong(), in.readLong());
@@ -62,7 +62,7 @@ public class ERefsetCidMember extends ERefset {
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		super.writeExternal(out);
 		out.writeLong(c1Uuid.getMostSignificantBits());
 		out.writeLong(c1Uuid.getLeastSignificantBits());

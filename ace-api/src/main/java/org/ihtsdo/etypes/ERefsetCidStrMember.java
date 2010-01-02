@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +21,7 @@ public class ERefsetCidStrMember extends ERefset {
 	
 	protected List<ERefsetCidStrVersion> extraVersions;
 	
-	public ERefsetCidStrMember(ObjectInput in) throws IOException,
+	public ERefsetCidStrMember(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super();
 		readExternal(in);
@@ -50,11 +50,11 @@ public class ERefsetCidStrMember extends ERefset {
 
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
 		c1Uuid = new UUID(in.readLong(), in.readLong());
-		strValue = (String) in.readObject();
+		strValue = in.readUTF();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
 			extraVersions = new ArrayList<ERefsetCidStrVersion>(versionSize);
@@ -65,11 +65,11 @@ public class ERefsetCidStrMember extends ERefset {
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		super.writeExternal(out);
 		out.writeLong(c1Uuid.getMostSignificantBits());
 		out.writeLong(c1Uuid.getLeastSignificantBits());
-		out.writeObject(strValue);
+		out.writeUTF(strValue);
 		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {

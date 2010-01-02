@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class ERefsetStrMember extends ERefset {
 	
 	protected List<ERefsetStrMemberVersion> extraVersions;
 	
-	public ERefsetStrMember(ObjectInput in) throws IOException,
+	public ERefsetStrMember(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super();
 		readExternal(in);
@@ -47,10 +47,10 @@ public class ERefsetStrMember extends ERefset {
 
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
-		strValue = (String) in.readObject();
+		strValue = in.readUTF();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
 			extraVersions = new ArrayList<ERefsetStrMemberVersion>(versionSize);
@@ -61,9 +61,9 @@ public class ERefsetStrMember extends ERefset {
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		super.writeExternal(out);
-		out.writeObject(strValue);
+		out.writeUTF(strValue);
 		if (extraVersions == null) {
 			out.writeInt(0);
 		} else {

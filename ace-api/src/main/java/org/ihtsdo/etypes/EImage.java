@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +27,7 @@ public class EImage extends EComponent {
 
 	protected List<EImageVersion> extraVersions;
 	
-	public EImage(ObjectInput in) throws IOException, ClassNotFoundException {
+	public EImage(DataInput in) throws IOException, ClassNotFoundException {
 		super();
 		readExternal(in);
 	}
@@ -56,15 +56,15 @@ public class EImage extends EComponent {
 	}
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super.readExternal(in);
 		conceptUuid = new UUID(in.readLong(), in.readLong());
-		format = (String) in.readObject();
+		format = in.readUTF();
 		int imageSize = in.readInt();
 		image = new byte[imageSize];
-		in.read(image, 0, imageSize);
-		textDescription = (String) in.readObject();
+		in.readFully(image);
+		textDescription = in.readUTF();
 		typeUuid = new UUID(in.readLong(), in.readLong());
 		int versionLength = in.readInt();
 		if (versionLength > 0) {
@@ -76,14 +76,14 @@ public class EImage extends EComponent {
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		super.writeExternal(out);
 		out.writeLong(conceptUuid.getMostSignificantBits());
 		out.writeLong(conceptUuid.getLeastSignificantBits());
-		out.writeObject(format);
+		out.writeUTF(format);
 		out.writeInt(image.length);
 		out.write(image);
-		out.writeObject(textDescription);
+		out.writeUTF(textDescription);
 		out.writeLong(typeUuid.getMostSignificantBits());
 		out.writeLong(typeUuid.getLeastSignificantBits());
 		if (extraVersions == null) {

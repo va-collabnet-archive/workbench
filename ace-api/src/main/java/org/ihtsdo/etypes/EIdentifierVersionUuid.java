@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IdPart;
@@ -17,7 +17,7 @@ public class EIdentifierVersionUuid extends EIdentifierVersion {
 	protected static UUID primordialAuthority;
 	protected UUID denotation;
 	
-	public EIdentifierVersionUuid(ObjectInput in) throws IOException,
+	public EIdentifierVersionUuid(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super(in);
 		denotation = new UUID(in.readLong(), in.readLong());
@@ -43,7 +43,7 @@ public class EIdentifierVersionUuid extends EIdentifierVersion {
 	}
 
 	@Override
-	public void writeDenotation(ObjectOutput out) throws IOException {
+	public void writeDenotation(DataOutput out) throws IOException {
 		out.writeLong(denotation.getMostSignificantBits());
 		out.writeLong(denotation.getLeastSignificantBits());
 	}

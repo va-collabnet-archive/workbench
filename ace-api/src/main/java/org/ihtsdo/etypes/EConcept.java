@@ -1,9 +1,8 @@
 package org.ihtsdo.etypes;
 
-import java.io.Externalizable;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,7 +18,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
-public class EConcept implements Externalizable {
+public class EConcept  {
 	public static final long serialVersionUID = 1;
 	/**
 	 * CID = Component IDentifier
@@ -61,11 +60,11 @@ public class EConcept implements Externalizable {
 			}
 			return nidTypeMap.get(nid);
 		}
-		public void writeType(ObjectOutput output) throws IOException {
+		public void writeType(DataOutput output) throws IOException {
 			output.writeByte(externalizedToken);
 		}
 
-		public static REFSET_TYPES readType(ObjectInput input)
+		public static REFSET_TYPES readType(DataInput input)
 				throws IOException {
 			switch (input.readByte()) {
 			case 1:
@@ -108,13 +107,12 @@ public class EConcept implements Externalizable {
 	protected List<EImage> images;
 	protected List<ERefset> refsetMembers;
 
-	public EConcept(ObjectInput in) throws IOException, ClassNotFoundException {
+	public EConcept(DataInput in) throws IOException, ClassNotFoundException {
 		super();
 		readExternal(in);
 	}
 
-	@Override
-	public void readExternal(ObjectInput in) throws IOException,
+	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {
 		int readDataVersion = in.readInt();
 		if (readDataVersion != dataVersion) {
@@ -191,8 +189,7 @@ public class EConcept implements Externalizable {
 		}
 	}
 
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(DataOutput out) throws IOException {
 		out.writeInt(dataVersion);
 		conceptAttributes.writeExternal(out);		
 		if (descriptions == null) {
