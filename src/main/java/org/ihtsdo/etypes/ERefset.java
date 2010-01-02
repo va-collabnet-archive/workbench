@@ -12,6 +12,8 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public abstract class ERefset extends EComponent {
 
+	public static final long serialVersionUID = 1;
+
 	protected UUID refsetUuid;
 	protected UUID componentUuid;
 

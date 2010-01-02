@@ -10,6 +10,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERelationshipVersion extends EVersion {
 
+	public static final long serialVersionUID = 1;
+
 	private UUID characteristicUuid;
 	private UUID refinabilityUuid;
 	private int group; 

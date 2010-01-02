@@ -12,6 +12,9 @@ import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.tapi.TerminologyException;
 
 public class EImage extends EComponent {
+
+	public static final long serialVersionUID = 1;
+
 	private UUID conceptUuid;
 	
     private String format;

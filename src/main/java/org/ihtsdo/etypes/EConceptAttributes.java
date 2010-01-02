@@ -12,6 +12,7 @@ import org.dwfa.tapi.TerminologyException;
 
 public class EConceptAttributes extends EComponent 
 	implements I_ConceptualizeExternally {
+	public static final long serialVersionUID = 1;
 
 	private boolean defined;
 

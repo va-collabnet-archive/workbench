@@ -14,6 +14,8 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public class ERefsetCidStrMember extends ERefset {
 
+	public static final long serialVersionUID = 1;
+
 	private UUID c1Uuid;
 	private String strValue;
 	

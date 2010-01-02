@@ -13,6 +13,7 @@ import org.dwfa.tapi.TerminologyException;
 
 public class EDescription extends EComponent 
 	implements I_DescribeExternally {
+	public static final long serialVersionUID = 1;
 
 	private UUID conceptUuid;
 	

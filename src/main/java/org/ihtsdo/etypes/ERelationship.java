@@ -13,6 +13,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERelationship extends EComponent {
 
+	public static final long serialVersionUID = 1;
+
 	private UUID c1Uuid;
 	private UUID c2Uuid;
 	private UUID characteristicUuid;

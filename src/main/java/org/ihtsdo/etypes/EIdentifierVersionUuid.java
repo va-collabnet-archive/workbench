@@ -11,6 +11,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class EIdentifierVersionUuid extends EIdentifierVersion {
 
+	public static final long serialVersionUID = 1;
+
 	private static UUID primordialAuthority;
 	private UUID denotation;
 	

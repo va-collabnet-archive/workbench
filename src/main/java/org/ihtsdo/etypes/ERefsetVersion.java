@@ -9,6 +9,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERefsetVersion extends EVersion {
 
+	public static final long serialVersionUID = 1;
+
 	public ERefsetVersion(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		super();

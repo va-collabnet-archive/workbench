@@ -9,6 +9,8 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERefsetBooleanVersion extends EVersion {
 
+	public static final long serialVersionUID = 1;
+
 	private boolean booleanValue;
 
 	public ERefsetBooleanVersion(ObjectInput in) throws IOException,
