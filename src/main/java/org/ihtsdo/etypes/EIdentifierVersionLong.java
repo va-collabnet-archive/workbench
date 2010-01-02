@@ -6,6 +6,7 @@ import java.io.ObjectOutput;
 
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.etypes.EComponent.IDENTIFIER_PART_TYPES;
 
 public class EIdentifierVersionLong extends EIdentifierVersion {
 
@@ -36,5 +37,10 @@ public class EIdentifierVersionLong extends EIdentifierVersion {
 	@Override
 	public Long getDenotation() {
 		return denotation;
+	}
+
+	@Override
+	public IDENTIFIER_PART_TYPES getIdType() {
+		return IDENTIFIER_PART_TYPES.LONG;
 	}
 }

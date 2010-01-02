@@ -6,6 +6,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.UUID;
 
+import org.ihtsdo.etypes.EComponent.IDENTIFIER_PART_TYPES;
+
 public abstract class EIdentifierVersion extends EVersion implements Externalizable {
 
 	public static final long serialVersionUID = 1;
@@ -39,5 +41,7 @@ public abstract class EIdentifierVersion extends EVersion implements Externaliza
 
 	
 	public abstract Object getDenotation();
+	
+	public abstract IDENTIFIER_PART_TYPES getIdType();
 
 }
