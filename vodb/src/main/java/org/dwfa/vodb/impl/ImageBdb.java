@@ -143,7 +143,7 @@ public class ImageBdb implements I_StoreInBdb, I_StoreImages {
             }
             return image;
         }
-        throw new IOException("Image for: " + nativeId + " not found.");
+        return null;
     }
 
     /*
