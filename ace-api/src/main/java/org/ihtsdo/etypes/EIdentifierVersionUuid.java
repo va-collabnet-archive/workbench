@@ -6,6 +6,7 @@ import java.io.DataOutput;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EComponent.IDENTIFIER_PART_TYPES;
@@ -34,7 +35,7 @@ public class EIdentifierVersionUuid extends EIdentifierVersion {
 	public EIdentifierVersionUuid(EComponent eComponent) {
 		denotation = eComponent.primordialComponentUuid;
 		if (primordialAuthority == null) {
-			primordialAuthority = PrimordialId.PRIMORDIAL_UUID.getUids().iterator().next();
+			primordialAuthority = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next();
 		}
 		authorityUuid = primordialAuthority;
 		pathUuid = eComponent.pathUuid;
