@@ -632,8 +632,6 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             AMT_SOURCE_DATA("AMT Source Data", new I_ConceptualizeUniversally[] { DEVELOPMENT }),
     ID_SOURCE("identifier source",
             new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
-        PRIMORDIAL_UUID(PrimordialId.PRIMORDIAL_UUID, new String[] {"primordial UUID"}, null,
-                    new I_ConceptualizeUniversally[] { ID_SOURCE }),
         SNOMED_INT_ID("SNOMED integer id",
                 new I_ConceptualizeUniversally[] { ID_SOURCE }),
         SNOMED_T3_UUID("SNOMED Type 3 UUID",
