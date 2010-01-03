@@ -37,7 +37,8 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public abstract class ConceptComponent<V extends Version<V, C>, C extends ConceptComponent<V, C>> 
-	implements I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion {
+	implements I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion,
+	I_HandleFutureStatusAtPositionSetup {
 	
 	private static ConceptBdb conceptBdb = Bdb.getConceptDb();
 	
@@ -81,7 +82,7 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	 * priámorádiáal:  first created or developed
 	 * 
 	 */
-	public int primordialStatusAtPositionNid;
+	public int primordialStatusAtPositionNid = Integer.MAX_VALUE;
 	/**
 	 * priámorádiáal:  first created or developed
 	 * 
@@ -101,6 +102,20 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 		this.nid = nid;
 		this.editable = editable;
 		this.additionalVersions = new ArrayList<V>(versionCount - 1);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
+	 */
+	public boolean isSetup() {
+		return primordialStatusAtPositionNid != Integer.MAX_VALUE;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#setStatusAtPositionNid(int)
+	 */
+	public void setStatusAtPositionNid(int sapNid) {
+		this.primordialStatusAtPositionNid = sapNid;
 	}
 	
 	public void readIdentifierFromBdb(TupleInput input, int conceptNid, int listSize) {

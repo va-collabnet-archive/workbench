@@ -69,15 +69,16 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public static Concept get(EConcept eConcept) throws IOException {
-		int conceptNid = Bdb.uuidsToNid(eConcept.getUuids());
+		int conceptNid = Bdb.uuidsToNid(eConcept.getConceptAttributes().getUuids());
 		
 		Concept c = get(conceptNid, true);
 		
-		eConcept.getEIdentifiers(); // TODO
+		eConcept.getConceptAttributes().getEIdentifiers(); // TODO
 		
 		EConceptAttributes eAttr = eConcept.getConceptAttributes();
 		
 		ConceptAttributes attr = new ConceptAttributes(c.nid, eAttr.getVersionCount(), true);
+		c.unsubmittedComponents = new ArrayList<ConceptComponent<?,?>>();
 		c.unsubmittedComponents.add(attr);
 		attr.addVersion(new ConceptAttributesVersion(eAttr));
 		if (eAttr.getExtraVersionsList() != null) {
@@ -85,22 +86,29 @@ public class Concept implements I_Transact, I_GetConceptData {
 				attr.addVersion(new ConceptAttributesVersion(eav));
 			}
 		}
-			
-		for (EDescription eDesc: eConcept.getDescriptions()) {
-			Description desc = new Description(eDesc, c.editable);
-			c.unsubmittedComponents.add(desc);
+		if (eConcept.getDescriptions() != null) {
+			for (EDescription eDesc: eConcept.getDescriptions()) {
+				Description desc = new Description(eDesc, c.editable);
+				c.unsubmittedComponents.add(desc);
+			}
 		}
-		for (ERelationship eRel: eConcept.getRelationships()) {
-			Relationship rel = new Relationship(eRel, c.editable);
-			c.unsubmittedComponents.add(rel);
+		if (eConcept.getRelationships() != null) {
+			for (ERelationship eRel: eConcept.getRelationships()) {
+				Relationship rel = new Relationship(eRel, c.editable);
+				c.unsubmittedComponents.add(rel);
+			}
 		}
-		for (EImage eImage: eConcept.getImages()) {
-			Image img = new Image(eImage, c.editable);
-			c.unsubmittedComponents.add(img);
+		if (eConcept.getImages() != null) {
+			for (EImage eImage: eConcept.getImages()) {
+				Image img = new Image(eImage, c.editable);
+				c.unsubmittedComponents.add(img);
+			}
 		}
-		for (ERefset eRefsetMember: eConcept.getRefsetMembers()) {
-			RefsetMember<?,?> refsetMember = RefsetMemberFactory.create(eRefsetMember);
-			c.unsubmittedComponents.add(refsetMember);
+		if (eConcept.getRefsetMembers() != null) {
+			for (ERefset eRefsetMember: eConcept.getRefsetMembers()) {
+				RefsetMember<?,?> refsetMember = RefsetMemberFactory.create(eRefsetMember);
+				c.unsubmittedComponents.add(refsetMember);
+			}
 		}
 		return c;
 	}	

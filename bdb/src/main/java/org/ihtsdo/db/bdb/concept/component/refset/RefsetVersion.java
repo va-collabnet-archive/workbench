@@ -1,6 +1,7 @@
 package org.ihtsdo.db.bdb.concept.component.refset;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.ihtsdo.db.bdb.concept.component.Version;
 
@@ -50,6 +51,11 @@ public abstract class RefsetVersion<V extends RefsetVersion<V, C>,
 
 	@Override
 	protected ArrayIntList getVariableVersionNids() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public I_ThinExtByRefPart duplicate() {
 		throw new UnsupportedOperationException();
 	}
 

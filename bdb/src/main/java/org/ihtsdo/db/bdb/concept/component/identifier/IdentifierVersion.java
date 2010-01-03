@@ -13,10 +13,11 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.StatusAtPositionBdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.I_HandleFutureStatusAtPositionSetup;
 
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class IdentifierVersion implements I_IdPart, I_IdVersion {
+public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
 	
 	private static StatusAtPositionBdb sapBdb = Bdb.getStatusAtPositionDb();
 
@@ -33,6 +34,20 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion {
 		this.statusAtPositionNid = statusAtPositionNid;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
+	 */
+	public boolean isSetup() {
+		return statusAtPositionNid != Integer.MAX_VALUE;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#setStatusAtPositionNid(int)
+	 */
+	public void setStatusAtPositionNid(int sapNid) {
+		this.statusAtPositionNid = sapNid;
+	}
+
 	public abstract ConceptComponent.IDENTIFIER_PART_TYPES getType();
 
 	public final void writeIdPartToBdb(TupleOutput output) {

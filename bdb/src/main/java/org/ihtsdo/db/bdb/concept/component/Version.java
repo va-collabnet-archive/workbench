@@ -16,11 +16,11 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public abstract class Version<V extends Version<V, C>, 
 							  C extends ConceptComponent<V, C>> 
-	implements I_AmPart, I_AmTuple {
+	implements I_AmPart, I_AmTuple, I_HandleFutureStatusAtPositionSetup {
 	
 	private static StatusAtPositionBdb sapBdb = Bdb.getStatusAtPositionDb();
 	
-	public int statusAtPositionNid;
+	public int statusAtPositionNid = Integer.MAX_VALUE;
 	public C conceptComponent;
 
 	public Version(int statusAtPositionNid) {
@@ -41,7 +41,21 @@ public abstract class Version<V extends Version<V, C>,
 		output.writeInt(statusAtPositionNid);
 		writeFieldsToBdb(output);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
+	 */
+	public boolean isSetup() {
+		return statusAtPositionNid != Integer.MAX_VALUE;
+	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#setStatusAtPositionNid(int)
+	 */
+	public void setStatusAtPositionNid(int sapNid) {
+		this.statusAtPositionNid = sapNid;
+	}
+	
 	protected abstract void writeFieldsToBdb(TupleOutput output);
 	
 	public final C getVersioned() {
@@ -105,7 +119,7 @@ public abstract class Version<V extends Version<V, C>,
 	}
 
 	@Override
-	public V duplicate() {
+	public I_AmPart duplicate() {
 		throw new UnsupportedOperationException();
 	}
 	

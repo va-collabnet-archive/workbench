@@ -32,13 +32,13 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class RefsetMemberFactory<V extends RefsetVersion<V, C>, C extends RefsetMember<V, C>>
+public class RefsetMemberFactory
 	extends
-		ComponentFactory<V, C> {
+		ComponentFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public C create(int nid, int partCount, boolean editable,
+	public RefsetMember create(int nid, int partCount, boolean editable,
 			TupleInput input) {
 		int typeNid = input.readInt();
 		REFSET_TYPES memberType;
@@ -51,29 +51,29 @@ public class RefsetMemberFactory<V extends RefsetVersion<V, C>, C extends Refset
 		}
 		switch (memberType) {
 		case BOOLEAN:
-			return (C) new BooleanMember(nid, partCount, editable);
+			return new BooleanMember(nid, partCount, editable);
 		case CID:
-			return (C) new CidMember(nid, partCount, editable);
+			return new CidMember(nid, partCount, editable);
 		case CID_CID:
-			return (C) new CidCidMember(nid, partCount, editable);
+			return new CidCidMember(nid, partCount, editable);
 		case CID_CID_CID:
-			return (C) new CidCidCidMember(nid, partCount, editable);
+			return new CidCidCidMember(nid, partCount, editable);
 		case CID_CID_STR:
-			return (C) new CidCidStrMember(nid, partCount, editable);
+			return new CidCidStrMember(nid, partCount, editable);
 		case CID_INT:
-			return (C) new CidIntMember(nid, partCount, editable);
+			return new CidIntMember(nid, partCount, editable);
 		case CID_STR:
-			return (C) new CidStrMember(nid, partCount, editable);
+			return new CidStrMember(nid, partCount, editable);
 		case INT:
-			return (C) new IntMember(nid, partCount, editable);
+			return new IntMember(nid, partCount, editable);
 		case CID_FLOAT:
-			return (C) new CidFloatMember(nid, partCount, editable);
+			return new CidFloatMember(nid, partCount, editable);
 		case MEMBER:
-			return (C) new MembershipMember(nid, partCount, editable);
+			return new MembershipMember(nid, partCount, editable);
 		case STR:
-			return (C) new StrMember(nid, partCount, editable);
+			return new StrMember(nid, partCount, editable);
 		case CID_LONG:
-			return (C) new CidLongMember(nid, partCount, editable);
+			return new CidLongMember(nid, partCount, editable);
 
 		default:
 			throw new UnsupportedOperationException(

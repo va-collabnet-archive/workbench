@@ -8,9 +8,10 @@ public class RefsetMemberBinder<V extends RefsetVersion<V, C>, C extends RefsetM
 	binders = 
 		new ThreadLocal<ConceptComponentBinder<V, C>>() {
 
+		@SuppressWarnings("unchecked")
 		@Override
 		protected ConceptComponentBinder<V, C> initialValue() {
-			RefsetMemberFactory<V, C> factory = new RefsetMemberFactory<V, C>();
+			RefsetMemberFactory factory = new RefsetMemberFactory();
 			return new ConceptComponentBinder<V, C>(
 					factory);
 		}

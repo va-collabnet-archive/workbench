@@ -5,7 +5,6 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
@@ -14,6 +13,7 @@ import java.util.UUID;
 import javax.swing.JFrame;
 
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.util.io.FileIO;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.etypes.EConcept;
 
@@ -22,9 +22,13 @@ public class Temp {
         try {
 			FileDialog fd = new FileDialog(new JFrame(), "Select ids file", FileDialog.LOAD);
 			fd.setDirectory(System.getProperty("user.dir"));
-			fd.setVisible(true); // Display dialog and wait for response
-			if (fd.getFile() != null) {
-			    File idsFile = new File(fd.getDirectory(), fd.getFile());
+			
+			//fd.setVisible(true); // Display dialog and wait for response
+			//if (fd.getFile() != null) {
+			if (true) {
+			    //File idsFile = new File(fd.getDirectory(), fd.getFile());
+			    File idsFile = new File("/Users/kec/Documents/workspace/bdb/Export Files/uuids.jbin");
+			    System.out.println(idsFile);
 			    FileInputStream fis = new FileInputStream(idsFile);
 			    BufferedInputStream bis = new BufferedInputStream(fis);
 			    DataInputStream idsDis = new DataInputStream(bis);
@@ -57,7 +61,11 @@ public class Temp {
 			    	}
 			    	uuidsNidMap.uuidsToNidWithGeneration(uuids);
 			    	uuids.clear();
+	    			if (numIdsRead % 100000 == 0) {
+	    				System.out.print("\nids: " + numIdsRead);
+	    			}
 			    }
+	            System.out.println();
 	            idsDis.close();
 	            Runtime.getRuntime().gc();
 	            AceLog.getAppLog().info("\n\nFinished populateHashMap");
@@ -65,19 +73,24 @@ public class Temp {
 	            AceLog.getAppLog().info("maxMemory: " + Runtime.getRuntime().maxMemory());
 	            AceLog.getAppLog().info("totalMemory: " + Runtime.getRuntime().totalMemory());
 	            
+	            FileIO.recursiveDelete(new File("target/berkeley-db"));
 	            Bdb.setUuidsToNidMap(uuidsNidMap);
 	            
 	            
 			    fis = new FileInputStream(conceptsFile);
 			    bis = new BufferedInputStream(fis);
-			    ObjectInputStream cis = new ObjectInputStream(bis);
+			    DataInputStream in = new DataInputStream(bis);
 			    int conceptsRead = 0;
 	            while (fis.available() > 0) {
 	            	conceptsRead++;
-	            	EConcept eConcept = (EConcept) cis.readObject();
+	            	EConcept eConcept = new EConcept(in);
 			    	Concept newConcept = Concept.get(eConcept);
+	    			if (conceptsRead % 10000 == 0) {
+	    				System.out.print("\nconcepts: " + conceptsRead);
+	    			}
+	            		
 			    }
-
+	            System.out.println();
 	            AceLog.getAppLog().info("\n\nconceptsRead: " + conceptsRead);
 	            AceLog.getAppLog().info("\n\nFinished conceptRead");
 	            AceLog.getAppLog().info("freeMemory: " + Runtime.getRuntime().freeMemory());
