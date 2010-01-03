@@ -5,10 +5,14 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JFrame;
 
@@ -80,13 +84,19 @@ public class Temp {
 			    fis = new FileInputStream(conceptsFile);
 			    bis = new BufferedInputStream(fis);
 			    DataInputStream in = new DataInputStream(bis);
+			    
 			    int conceptsRead = 0;
 	            while (fis.available() > 0) {
 	            	conceptsRead++;
 	            	EConcept eConcept = new EConcept(in);
-			    	Concept newConcept = Concept.get(eConcept);
+	            	ConvertConcept conceptConverter = converters.take(); 
+	            	conceptConverter.setEConcept(eConcept);
+	            	executors.execute(conceptConverter);
+			    	//Concept newConcept = Concept.get(eConcept);
 	    			if (conceptsRead % 10000 == 0) {
-	    				System.out.print("\nconcepts: " + conceptsRead);
+	    				System.out.print("\nconcepts: " + conceptsRead + "\n");
+	    				StatusAtPositionBdb.reportStats();
+	    				System.out.println();
 	    			}
 	            		
 			    }
@@ -97,6 +107,7 @@ public class Temp {
 	            AceLog.getAppLog().info("maxMemory: " + Runtime.getRuntime().maxMemory());
 	            AceLog.getAppLog().info("totalMemory: " + Runtime.getRuntime().totalMemory());
 	            
+	            
 	            Bdb.sync();
 	            
 			}
@@ -104,5 +115,41 @@ public class Temp {
 			e.printStackTrace();
 		} 
         System.exit(0);
+	}
+	
+	static ExecutorService executors = Executors.newCachedThreadPool();
+    static LinkedBlockingQueue<ConvertConcept> converters = new LinkedBlockingQueue<ConvertConcept>();
+    static {
+        for (int i = 0; i < 32; i++) {
+        	try {
+				converters.put(new ConvertConcept());
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+        }
+    }
+
+	private static class ConvertConcept implements Runnable {
+
+		EConcept eConcept;
+		Concept newConcept;
+		@Override
+		public void run() {
+			try {
+				newConcept = Concept.get(eConcept);
+				converters.put(this);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		public void setEConcept(EConcept eConcept) {
+			this.eConcept = eConcept;
+		}
+		public Concept getNewConcept() {
+			return newConcept;
+		}
+		
 	}
 }

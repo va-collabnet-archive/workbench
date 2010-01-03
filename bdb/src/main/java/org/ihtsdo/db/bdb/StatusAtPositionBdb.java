@@ -41,6 +41,10 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		new HashMap<UncommittedStatusForPath, Integer>();
 	
 	private AtomicInteger sequence;
+	
+	private static AtomicInteger hits = new AtomicInteger(0);
+	
+	private static AtomicInteger misses = new AtomicInteger(0);
 
 	/**
 	 * TODO future optimization is to use a map that uses an index to the <code>PositionArrays</code>
@@ -318,10 +322,12 @@ public class StatusAtPositionBdb extends ComponentBdb {
 				readWriteArray.statusNids[getReadWriteIndex(statusAtPositionNid)] = statusNid;
 				readWriteArray.pathNids[getReadWriteIndex(statusAtPositionNid)] = pathNid;
 				uncomittedStatusPathEntries.put(usp, statusAtPositionNid);
+				hits.incrementAndGet();
 				return statusAtPositionNid;
 			}
 		}
 		if (sapToIntMap.containsKey(time, statusNid, pathNid)) {
+			hits.incrementAndGet();
 			return sapToIntMap.get(time, statusNid, pathNid);
 		}
 		boolean immediateAcquire = expandPermit.tryAcquire();
@@ -329,16 +335,19 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			expandPermit.acquireUninterruptibly();
 			// Try one last time...
 			if (sapToIntMap.containsKey(time, statusNid, pathNid)) {
+				hits.incrementAndGet();
 				return sapToIntMap.get(time, statusNid, pathNid);
 			}
 		}
 		int statusAtPositionNid = sequence.getAndIncrement();
+		sapToIntMap.put(time, statusNid, pathNid, statusAtPositionNid);
 		readWriteArray.setSize(getReadWriteIndex(statusAtPositionNid) + 1);
 		expandPermit.release();
 		readWriteArray.commitTimes[getReadWriteIndex(statusAtPositionNid)] = time;
 		readWriteArray.statusNids[getReadWriteIndex(statusAtPositionNid)] = statusNid;
 		readWriteArray.pathNids[getReadWriteIndex(statusAtPositionNid)] = pathNid;
 		
+		misses.incrementAndGet();
 		return statusAtPositionNid;
 	}
 	Semaphore expandPermit = new Semaphore(1);
@@ -347,4 +356,17 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		return getStatusAtPositionNid(tsp.getStatusNid(), tsp.getPathNid(), tsp.getTime());
 	}
 	
+	public static void reportStats() {
+		float hitStat = hits.get();
+		float misStat = misses.get();
+		float percent = hitStat / (misStat + hitStat);
+		System.out.println("hits: " + (int) hitStat + " misses: " + (int) misStat);
+		System.out.println("hit %: " + percent);
+	}
+	
+	public static void reset() {
+		hits.set(0);
+		misses.set(0);
+	}
+
 }
