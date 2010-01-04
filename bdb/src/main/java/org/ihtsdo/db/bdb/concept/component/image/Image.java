@@ -21,6 +21,7 @@ import org.dwfa.ace.utypes.UniversalAceImagePart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.EImage;
@@ -41,18 +42,19 @@ public class Image
 	private static ImageTupleComputer computer = new ImageTupleComputer();
 	private String format;
 	private byte[] image;
-	private int conceptNid;
 	
 	private String textDescription;
 	private int typeNid;
 
-	protected Image(int nid, int listSize, boolean editable) {
-		super(nid, listSize, editable);
+	protected Image(int nid, int listSize, Concept enclosingConcept, 
+			UUID primordialUuid) {
+		super(nid, listSize, enclosingConcept, 
+				primordialUuid);
 	}
 
-	public Image(EImage eImage, boolean editable) {
-		super(Bdb.uuidsToNid(eImage.getUuids()), eImage.getVersionCount(), editable);
-		conceptNid = Bdb.uuidToNid(eImage.getConceptUuid());
+	public Image(EImage eImage, Concept enclosingConcept) {
+		super(Bdb.uuidsToNid(eImage.getUuids()), eImage.getVersionCount(), 
+				enclosingConcept, eImage.primordialComponentUuid);
 		image = eImage.getImage();
 		format = eImage.getFormat();
 		primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(eImage);
@@ -65,9 +67,7 @@ public class Image
 	}
 
 	@Override
-	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize) {
-		this.conceptNid = conceptNid;
-		
+	public void readComponentFromBdb(TupleInput input, int listSize) {		
 		// nid, list size, and conceptNid are read already by the binder...
 		this.format = input.readString();
 		int imageBytes = input.readInt();
@@ -88,6 +88,8 @@ public class Image
 		}
 		// Start writing
 		output.writeInt(nid);
+		output.writeLong(primordialUuidMsb);
+		output.writeLong(primordialUuidLsb);
 		output.writeShort(partsToWrite.size());
 		// conceptNid is the enclosing concept, does not need to be written. 
 		output.writeString(format);
@@ -132,7 +134,7 @@ public class Image
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getConceptId()
 	 */
 	public int getConceptId() {
-		return conceptNid;
+		return enclosingConcept.getNid();
 	}
 
 	/*
@@ -185,7 +187,7 @@ public class Image
 			TerminologyException {
 		UniversalAceImage universal = new UniversalAceImage(getUids(nid),
 				getImage(), new ArrayList<UniversalAceImagePart>(additionalVersions
-						.size()), getFormat(), getUids(conceptNid));
+						.size()), getFormat(), enclosingConcept.getUids());
 		for (ImageVersion part : additionalVersions) {
 			UniversalAceImagePart universalPart = new UniversalAceImagePart();
 			universalPart.setPathId(getUids(part.getPathId()));

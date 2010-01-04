@@ -48,4 +48,9 @@ public class ConceptBdb extends ComponentBdb {
 		binder.objectToEntry(concept, value);
 		readWrite.put(null, key, value);
 	}
+
+	public long getCount() {
+		long count  = readOnly.count() + readWrite.count();
+		return count;
+	}
 }

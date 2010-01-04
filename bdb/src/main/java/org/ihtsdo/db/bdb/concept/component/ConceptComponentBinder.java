@@ -3,8 +3,11 @@ package org.ihtsdo.db.bdb.concept.component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.I_BindConceptComponents;
 
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -18,14 +21,19 @@ public class ConceptComponentBinder<V extends Version<V, C>,
 
 
     private static int maxReadOnlyStatusAtPositionId = Bdb.getStatusAtPositionDb().getReadOnlyMax();
-	private int conceptNid;
-	private boolean editable;
+	private Concept enclosingConcept;
 	private ArrayList<C> readOnlyConceptComponentList;
 	private ComponentFactory<V, C> factory;
+	private AtomicInteger componentsEncountered;
+	private AtomicInteger componentsWritten;
 
-	public ConceptComponentBinder(ComponentFactory<V, C> factory) {
+	public ConceptComponentBinder(ComponentFactory<V, C> factory, 
+								  AtomicInteger componentsEncountered, 
+								  AtomicInteger componentsWritten) {
 		super();
 		this.factory = factory;
+		this.componentsEncountered = componentsEncountered;
+		this.componentsWritten = componentsWritten;
 	}
 
 	@Override
@@ -47,6 +55,7 @@ public class ConceptComponentBinder<V extends Version<V, C>,
 		}
 		for (int index = 0; index < listSize; index++) {
 			int nid = input.readInt();
+			UUID primordialUuid = new UUID(input.readLong(), input.readLong());
 			int partCount = input.readShort();
 			C conceptComponent;
 			if (nidToConceptComponentMap != null && nidToConceptComponentMap.containsKey(nid)) {
@@ -54,10 +63,10 @@ public class ConceptComponentBinder<V extends Version<V, C>,
 				int totalSize = conceptComponent.additionalVersions.size() + partCount;
 				conceptComponent.additionalVersions.ensureCapacity(totalSize);
 			} else {
-				conceptComponent = factory.create(nid, partCount, editable, input);
+				conceptComponent = factory.create(nid, partCount, enclosingConcept, input, primordialUuid);
 				newConceptComponentList.add(conceptComponent);
 			}
-			conceptComponent.readComponentFromBdb(input, conceptNid, partCount);
+			conceptComponent.readComponentFromBdb(input, partCount);
 		}
 		newConceptComponentList.trimToSize();
 		return newConceptComponentList;
@@ -67,33 +76,40 @@ public class ConceptComponentBinder<V extends Version<V, C>,
 	public void objectToEntry(ArrayList<C> conceptComponentList, TupleOutput output) {
 		List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
 		for (C conceptComponent: conceptComponentList) {
-			for (V part: conceptComponent.additionalVersions) {
-				if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
-					componentListToWrite.add(conceptComponent);
-					break;
+			componentsEncountered.incrementAndGet();
+			if (conceptComponent.primordialStatusAtPositionNid > maxReadOnlyStatusAtPositionId) {
+				componentListToWrite.add(conceptComponent);
+			} else {
+				if (conceptComponent.additionalVersions != null) {
+					for (V part: conceptComponent.additionalVersions) {
+						assert part.getStatusAtPositionNid() != Integer.MAX_VALUE;
+						if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
+							componentListToWrite.add(conceptComponent);
+							break;
+						} else {
+							int max = maxReadOnlyStatusAtPositionId;
+							int partSapNid = part.getStatusAtPositionNid();
+							boolean include = partSapNid > max;
+						}
+					}
 				}
 			}
 		}
 		output.writeInt(componentListToWrite.size()); // List size
 		for (C conceptComponent: componentListToWrite) {
+			componentsWritten.incrementAndGet();
 			conceptComponent.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
 		}
 	}
 
 	@Override
-	public int getConceptNid() {
-		return conceptNid;
+	public Concept getEnclosingConcept() {
+		return enclosingConcept;
 	}
 
 	@Override
-	public boolean isEditable() {
-		return editable;
-	}
-
-	@Override
-	public void setupBinder(int conceptNid, boolean editable) {
-		this.conceptNid = conceptNid;
-		this.editable = editable;
+	public void setupBinder(Concept enclosingConcept) {
+		this.enclosingConcept = enclosingConcept;
 		this.readOnlyConceptComponentList = null;
 	}
 

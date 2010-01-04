@@ -34,7 +34,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	private static PositionArrayBinder positionArrayBinder = new PositionArrayBinder();
 	private static LinkedList<PositionMapper> mapperCache = new LinkedList<PositionMapper>();
 	
-	private static final int FIRST_ID = Integer.MIN_VALUE + 1;
+	private static final int FIRST_ID = 0;
 
 	
 	private static HashMap<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries = 
@@ -222,7 +222,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 
 	public int getReadOnlyMax() {
-		return readOnlyArray.size;
+		return readOnlyArray.size -1;
 	}
 	
 	public int getVersion(int index) {
@@ -330,27 +330,34 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			hits.incrementAndGet();
 			return sapToIntMap.get(time, statusNid, pathNid);
 		}
-		boolean immediateAcquire = expandPermit.tryAcquire();
-		if (immediateAcquire == false) {
-			expandPermit.acquireUninterruptibly();
-			// Try one last time...
-			if (sapToIntMap.containsKey(time, statusNid, pathNid)) {
-				hits.incrementAndGet();
-				return sapToIntMap.get(time, statusNid, pathNid);
+		try {
+			boolean immediateAcquire = expandPermit.tryAcquire();
+			if (immediateAcquire == false) {
+				expandPermit.acquireUninterruptibly();
+				// Try one last time...
+				if (sapToIntMap.containsKey(time, statusNid, pathNid)) {
+					hits.incrementAndGet();
+					expandPermit.release();
+					return sapToIntMap.get(time, statusNid, pathNid);
+				}
 			}
+			int statusAtPositionNid = sequence.getAndIncrement();
+			sapToIntMap.put(time, statusNid, pathNid, statusAtPositionNid);
+			readWriteArray.setSize(getReadWriteIndex(statusAtPositionNid) + 1);
+			expandPermit.release();
+			readWriteArray.commitTimes[getReadWriteIndex(statusAtPositionNid)] = time;
+			readWriteArray.statusNids[getReadWriteIndex(statusAtPositionNid)] = statusNid;
+			readWriteArray.pathNids[getReadWriteIndex(statusAtPositionNid)] = pathNid;
+			
+			misses.incrementAndGet();
+			return statusAtPositionNid;
+		} catch (Throwable e) {
+			expandPermit.release();
+			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		int statusAtPositionNid = sequence.getAndIncrement();
-		sapToIntMap.put(time, statusNid, pathNid, statusAtPositionNid);
-		readWriteArray.setSize(getReadWriteIndex(statusAtPositionNid) + 1);
-		expandPermit.release();
-		readWriteArray.commitTimes[getReadWriteIndex(statusAtPositionNid)] = time;
-		readWriteArray.statusNids[getReadWriteIndex(statusAtPositionNid)] = statusNid;
-		readWriteArray.pathNids[getReadWriteIndex(statusAtPositionNid)] = pathNid;
-		
-		misses.incrementAndGet();
-		return statusAtPositionNid;
 	}
-	Semaphore expandPermit = new Semaphore(1);
+	private Semaphore expandPermit = new Semaphore(1);
 
 	public int getStatusAtPositionNid(TimeStatusPosition tsp) {
 		return getStatusAtPositionNid(tsp.getStatusNid(), tsp.getPathNid(), tsp.getTime());

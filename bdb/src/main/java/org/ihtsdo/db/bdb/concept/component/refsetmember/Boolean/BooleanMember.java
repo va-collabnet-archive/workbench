@@ -1,7 +1,10 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.Boolean;
 
+import java.util.UUID;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 
@@ -11,12 +14,15 @@ public class BooleanMember extends RefsetMember<BooleanVersion, BooleanMember> {
 
 	private boolean booleanValue;
 	
-	public BooleanMember(int nid, int partCount, boolean editable, int refsetNid) {
-		super(nid, partCount, editable, refsetNid);
+	public BooleanMember(int nid, int partCount, 
+			Concept enclosingConcept, 
+			UUID primordialUuid) {
+		super(nid, partCount, enclosingConcept, 
+				primordialUuid);
 	}
 
-	public BooleanMember(ERefsetBooleanMember refsetMember) {
-		super(refsetMember);
+	public BooleanMember(ERefsetBooleanMember refsetMember, Concept enclosingConcept) {
+		super(refsetMember, enclosingConcept);
 		booleanValue = refsetMember.getBooleanValue();
 	}
 

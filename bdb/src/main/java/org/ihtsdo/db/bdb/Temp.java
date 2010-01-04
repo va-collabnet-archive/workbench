@@ -12,12 +12,17 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JFrame;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesBinder;
+import org.ihtsdo.db.bdb.concept.component.description.DescriptionBinder;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberBinder;
+import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.etypes.EConcept;
 
 public class Temp {
@@ -85,37 +90,54 @@ public class Temp {
 			    bis = new BufferedInputStream(fis);
 			    DataInputStream in = new DataInputStream(bis);
 			    
-			    int conceptsRead = 0;
 	            while (fis.available() > 0) {
-	            	conceptsRead++;
+	            	conceptsRead.incrementAndGet();
 	            	EConcept eConcept = new EConcept(in);
 	            	ConvertConcept conceptConverter = converters.take(); 
 	            	conceptConverter.setEConcept(eConcept);
 	            	executors.execute(conceptConverter);
 			    	//Concept newConcept = Concept.get(eConcept);
-	    			if (conceptsRead % 10000 == 0) {
-	    				System.out.print("\nconcepts: " + conceptsRead + "\n");
-	    				StatusAtPositionBdb.reportStats();
-	    				System.out.println();
+	    			if (conceptsRead.get() % 10000 == 0) {
+	    				System.out.println("concepts: " + conceptsRead);
 	    			}
 	            		
 			    }
 	            // See if any exceptions in the last converters;
 	            while (converters.isEmpty() == false) {
-	            	ConvertConcept conceptConverter = converters.take(); 
+	            	ConvertConcept conceptConverter = converters.take();
 	            	conceptConverter.setEConcept(null);
+	            }
+	            
+	            while (conceptsProcessed.get() < conceptsRead.get()) {
+	            	Thread.currentThread().sleep(1000);
 	            }
 	            
 	            System.out.println();
 	            AceLog.getAppLog().info("\n\nconceptsRead: " + conceptsRead);
+	            AceLog.getAppLog().info("\n\nconceptsProcessed: " + conceptsProcessed);
 	            AceLog.getAppLog().info("\n\nFinished conceptRead");
 	            AceLog.getAppLog().info("freeMemory: " + Runtime.getRuntime().freeMemory());
 	            AceLog.getAppLog().info("maxMemory: " + Runtime.getRuntime().maxMemory());
 	            AceLog.getAppLog().info("totalMemory: " + Runtime.getRuntime().totalMemory());
 	            
 	            AceLog.getAppLog().info("finished load, start sync");    
+	            AceLog.getAppLog().info("finished load, start sync");    
 	            Bdb.sync();
+	            
+	            AceLog.getAppLog().info("Concept count: " + Bdb.getConceptDb().getCount());    
+	            AceLog.getAppLog().info("Concept attributes encountered: " + ConceptAttributesBinder.encountered +
+	            		" written: " + ConceptAttributesBinder.written);    
+	            AceLog.getAppLog().info("Descriptions encountered: " + DescriptionBinder.encountered +
+	            		" written: " + DescriptionBinder.written);    
+	            AceLog.getAppLog().info("Relationships encountered: " + RelationshipBinder.encountered +
+	            		" written: " + RelationshipBinder.written);    
+	            AceLog.getAppLog().info("Reset members encountered: " + RefsetMemberBinder.encountered +
+	            		" written: " + RefsetMemberBinder.written);    
+	            
+	            
+	            Bdb.close();
 	            AceLog.getAppLog().info("finished sync");
+	            
 	            
 			}
 		} catch (Throwable e) {
@@ -124,10 +146,13 @@ public class Temp {
         System.exit(0);
 	}
 	
+	static AtomicInteger conceptsRead = new AtomicInteger();
+	static AtomicInteger conceptsProcessed = new AtomicInteger();
+	
 	static ExecutorService executors = Executors.newCachedThreadPool();
     static LinkedBlockingQueue<ConvertConcept> converters = new LinkedBlockingQueue<ConvertConcept>();
     static {
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < 8; i++) {
         	try {
 				converters.put(new ConvertConcept());
 			} catch (InterruptedException e) {
@@ -136,6 +161,7 @@ public class Temp {
         }
     }
 
+    
 	private static class ConvertConcept implements Runnable {
 		Throwable exception;
 		EConcept eConcept;
@@ -145,6 +171,7 @@ public class Temp {
 			try {
 				newConcept = Concept.get(eConcept);
 				Bdb.getConceptDb().writeConcept(newConcept);
+				conceptsProcessed.incrementAndGet();
 			} catch (Throwable e) {
 				exception = e;
 			}

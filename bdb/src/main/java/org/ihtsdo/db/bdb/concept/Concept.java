@@ -76,7 +76,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 		
 		EConceptAttributes eAttr = eConcept.getConceptAttributes();
 		
-		ConceptAttributes attr = new ConceptAttributes(c.nid, eAttr.getVersionCount(), true);
+		ConceptAttributes attr = new ConceptAttributes(c.nid, eAttr.getVersionCount(), c,
+				eConcept.getConceptAttributes().primordialComponentUuid);
 		c.data.set(attr);
 		attr.addVersion(new ConceptAttributesVersion(eAttr));
 		if (eAttr.getExtraVersionsList() != null) {
@@ -86,25 +87,25 @@ public class Concept implements I_Transact, I_GetConceptData {
 		}
 		if (eConcept.getDescriptions() != null) {
 			for (EDescription eDesc: eConcept.getDescriptions()) {
-				Description desc = new Description(eDesc, c.editable);
+				Description desc = new Description(eDesc, c);
 				c.data.add(desc);
 			}
 		}
 		if (eConcept.getRelationships() != null) {
 			for (ERelationship eRel: eConcept.getRelationships()) {
-				Relationship rel = new Relationship(eRel, c.editable);
+				Relationship rel = new Relationship(eRel, c);
 				c.data.add(rel);
 			}
 		}
 		if (eConcept.getImages() != null) {
 			for (EImage eImage: eConcept.getImages()) {
-				Image img = new Image(eImage, c.editable);
+				Image img = new Image(eImage, c);
 				c.data.add(img);
 			}
 		}
 		if (eConcept.getRefsetMembers() != null) {
 			for (ERefset eRefsetMember: eConcept.getRefsetMembers()) {
-				RefsetMember<?,?> refsetMember = RefsetMemberFactory.create(eRefsetMember);
+				RefsetMember<?,?> refsetMember = RefsetMemberFactory.create(eRefsetMember, c);
 				c.data.add(refsetMember);
 			}
 		}
@@ -125,7 +126,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		super();
 		this.nid = nid;
 		this.editable = editable;
-		data = new ConceptData(nid, editable);
+		data = new ConceptData(this);
 	}
 
 	public int getNid() {

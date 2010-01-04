@@ -23,6 +23,19 @@ public abstract class ComponentBdb {
 	
 	protected abstract void init() throws IOException;
 	protected abstract String getDbName();
+	
+	public void close() {
+		readOnly.close();
+		readWrite.sync();
+		readWrite.close();
+	}
+
+	public void sync() {
+		if (readOnly.getConfig().getReadOnly() == false) {
+			readOnly.sync();
+		}
+		readWrite.sync();
+	}
 
 	public Database getReadOnly() {
 		return readOnly;

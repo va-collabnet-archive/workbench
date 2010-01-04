@@ -1,7 +1,10 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.str;
 
+import java.util.UUID;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetStrMember;
 
@@ -11,12 +14,14 @@ public class StrMember extends RefsetMember<StrVersion, StrMember> {
 
 	private String stringValue;
 
-	public StrMember(int nid, int partCount, boolean editable, int refsetNid) {
-		super(nid, partCount, editable, refsetNid);
+	public StrMember(int nid, int partCount, Concept enclosingConcept, 
+			UUID primordialUuid) {
+		super(nid, partCount, enclosingConcept, 
+				primordialUuid);
 	}
 
-	public StrMember(ERefsetStrMember refsetMember) {
-		super(refsetMember);
+	public StrMember(ERefsetStrMember refsetMember, Concept enclosingConcept) {
+		super(refsetMember, enclosingConcept);
 		stringValue = refsetMember.getStrValue();
 	}
 

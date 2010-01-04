@@ -3,8 +3,11 @@ package org.ihtsdo.db.bdb.concept.component.refset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.I_BindConceptComponents;
 
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -15,7 +18,10 @@ import com.sleepycat.bind.tuple.TupleOutput;
 public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?>>> 
 	implements I_BindConceptComponents {
 
-    private static int maxReadOnlyStatusAtPositionId = Bdb.getStatusAtPositionDb().getReadOnlyMax();
+	public static AtomicInteger encountered = new AtomicInteger();
+	public static AtomicInteger written = new AtomicInteger();
+
+	private static int maxReadOnlyStatusAtPositionId = Bdb.getStatusAtPositionDb().getReadOnlyMax();
 	
 	private static ThreadLocal<RefsetMemberBinder>  binders = 
 		new ThreadLocal<RefsetMemberBinder>() {
@@ -32,11 +38,11 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 	RefsetMemberFactory factory = new RefsetMemberFactory();
 
 	private ArrayList<RefsetMember<?, ?>> refsetMemberList;
-	private int conceptNid; 
-	private boolean editable;
+	private Concept enclosingConcept; 
 
 	@Override
 	public ArrayList<RefsetMember<?, ?>> entryToObject(TupleInput input) {
+		assert enclosingConcept != null;
 		int listSize = input.readInt();
 		if (refsetMemberList != null) {
 			refsetMemberList.ensureCapacity(listSize + refsetMemberList.size());
@@ -54,6 +60,7 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 		}
 		for (int index = 0; index < listSize; index++) {
 			int nid = input.readInt();
+			UUID primoridalUuid = new UUID(input.readLong(), input.readLong());
 			int partCount = input.readShort();
 			RefsetMember<?, ?> refsetMember;
 			if (nidToRefsetMemberMap != null && nidToRefsetMemberMap.containsKey(nid)) {
@@ -61,10 +68,11 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 				int totalSize = refsetMember.additionalVersions.size() + partCount;
 				refsetMember.additionalVersions.ensureCapacity(totalSize);
 			} else {
-				refsetMember = factory.create(nid, partCount, editable, input, conceptNid);
+				refsetMember = factory.create(nid, partCount, enclosingConcept, 
+						input, primoridalUuid);
 				newRefsetMemberList.add(refsetMember);
 			}
-			refsetMember.readComponentFromBdb(input, conceptNid, partCount);
+			refsetMember.readComponentFromBdb(input, partCount);
 		}
 		newRefsetMemberList.trimToSize();
 		return newRefsetMemberList;
@@ -74,37 +82,33 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 	public void objectToEntry(ArrayList<RefsetMember<?, ?>> refsetMemberList,
 			TupleOutput output) {
 		List<RefsetMember<?, ?>> refsetMembersToWrite = new ArrayList<RefsetMember<?, ?>>(refsetMemberList.size());
-		for (RefsetMember<?, ?> conceptComponent: refsetMemberList) {
-			for (RefsetVersion<?, ?> version: conceptComponent.additionalVersions) {
-				if (version.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
-					refsetMembersToWrite.add(conceptComponent);
-					break;
+		for (RefsetMember<?, ?> refsetMember: refsetMemberList) {
+			encountered.incrementAndGet();
+			assert refsetMember.primordialStatusAtPositionNid != Integer.MAX_VALUE;
+			if (refsetMember.primordialStatusAtPositionNid > maxReadOnlyStatusAtPositionId) {
+				refsetMembersToWrite.add(refsetMember);
+			} else {
+				if (refsetMember.additionalVersions != null) {
+					for (RefsetVersion<?, ?> extraVersions: refsetMember.additionalVersions) {
+						if (extraVersions.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
+							refsetMembersToWrite.add(refsetMember);
+							break;
+						}
+					}
 				}
 			}
 		}
 		output.writeInt(refsetMembersToWrite.size()); // List size
 		for (RefsetMember<?, ?> refsetMember: refsetMembersToWrite) {
+			written.incrementAndGet();
 			refsetMember.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
 		}
 	}
 
 
 	@Override
-	public int getConceptNid() {
-		return conceptNid;
-	}
-
-
-	@Override
-	public boolean isEditable() {
-		return editable;
-	}
-
-
-	@Override
-	public void setupBinder(int conceptNid, boolean editable) {
-		this.conceptNid = conceptNid;
-		this.editable = editable;
+	public void setupBinder(Concept enclosingConcept) {
+		this.enclosingConcept = enclosingConcept;
 	}
 
 
@@ -112,6 +116,14 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 			ArrayList<RefsetMember<?, ?>> componentList) {
 		this.refsetMemberList = componentList;
 		
+	}
+
+	public Concept getEnclosingConcept() {
+		return enclosingConcept;
+	}
+
+	public void setEnclosingConcept(Concept enclosingConcept) {
+		this.enclosingConcept = enclosingConcept;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -13,6 +14,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.etypes.ERefset;
 
@@ -24,30 +26,34 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 			extends ConceptComponent<V, C> 
 			implements I_ThinExtByRefVersioned {
 
-	private int refsetNid;
 	private int memberTypeNid; 
 	private int referencedComponentNid;
 
 
-	public RefsetMember(int nid, int partCount, boolean editable, int refsetNid) {
-		super(nid, partCount, editable);
-		this.refsetNid = refsetNid;
+	public RefsetMember(int nid, int partCount, Concept enclosingConcept, 
+			UUID primordialUuid) {
+		super(nid, partCount, enclosingConcept, 
+				primordialUuid);
 	}
 	
-	public RefsetMember(ERefset refsetMember) {
-		super(Bdb.uuidsToNid(refsetMember.getUuids()), refsetMember.getVersionCount(), true);
-		refsetNid = Bdb.uuidToNid(refsetMember.getRefsetUuid());
+	public RefsetMember(ERefset refsetMember, Concept enclosingConcept) {
+		super(Bdb.uuidsToNid(refsetMember.getUuids()), 
+				refsetMember.getVersionCount(), enclosingConcept,
+				refsetMember.primordialComponentUuid);
 		memberTypeNid = refsetMember.getType().getTypeNid();
 		referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());
-		
+		primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(refsetMember);
+		assert primordialStatusAtPositionNid != Integer.MAX_VALUE;
 	}
 	
 
-	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize)  {
-		refsetNid = input.readInt();
+	public void readComponentFromBdb(TupleInput input, int listSize)  {
+		// TODO make sure below is correct...
+		nid = input.readInt();
 		memberTypeNid = input.readInt();
 		referencedComponentNid = input.readInt();
 		readMemberParts(input);
+		throw new UnsupportedOperationException();
 	}
 
 	protected abstract void readMemberParts(TupleInput input);
@@ -63,6 +69,8 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 		}
 		// Start writing
 		output.writeInt(nid);
+		output.writeLong(primordialUuidMsb);
+		output.writeLong(primordialUuidLsb);
 		output.writeShort(partsToWrite.size());
 		// refsetNid is the enclosing concept, does not need to be written. 
 		output.writeInt(referencedComponentNid);
@@ -105,7 +113,7 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 
 	@Override
 	public int getRefsetId() {
-		return refsetNid;
+		return enclosingConcept.getNid();
 	}
 
 

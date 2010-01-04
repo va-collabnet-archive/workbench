@@ -1,8 +1,11 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidFloat;
 
+import java.util.UUID;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetCidFloatMember;
 
@@ -13,12 +16,15 @@ public class CidFloatMember extends RefsetMember<CidFloatVersion, CidFloatMember
 	private int c1Nid;
 	private float floatValue;
 
-	public CidFloatMember(int nid, int partCount, boolean editable, int refsetNid) {
-		super(nid, partCount, editable, refsetNid);
+	public CidFloatMember(int nid, int partCount, 
+			Concept enclosingConcept, 
+			UUID primordialUuid) {
+		super(nid, partCount, enclosingConcept, 
+				primordialUuid);
 	}
 
-	public CidFloatMember(ERefsetCidFloatMember refsetMember) {
-		super(refsetMember);
+	public CidFloatMember(ERefsetCidFloatMember refsetMember, Concept enclosingConcept) {
+		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		floatValue = refsetMember.getFloatValue();
 	}

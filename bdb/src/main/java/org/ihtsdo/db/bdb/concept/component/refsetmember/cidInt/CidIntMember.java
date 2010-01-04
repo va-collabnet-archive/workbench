@@ -1,8 +1,11 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidInt;
 
+import java.util.UUID;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetCidIntMember;
 
@@ -13,12 +16,15 @@ public class CidIntMember extends RefsetMember<CidIntVersion, CidIntMember> {
 	private int c1Nid;
 	private int intValue;
 
-	public CidIntMember(int nid, int partCount, boolean editable, int refsetNid) {
-		super(nid, partCount, editable, refsetNid);
+	public CidIntMember(int nid, int partCount, 
+			Concept enclosingConcept, 
+			UUID primordialUuid) {
+		super(nid, partCount, enclosingConcept, 
+				primordialUuid);
 	}
 
-	public CidIntMember(ERefsetCidIntMember refsetMember) {
-		super(refsetMember);
+	public CidIntMember(ERefsetCidIntMember refsetMember, Concept enclosingConcept) {
+		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		intValue = refsetMember.getIntValue();
 	}

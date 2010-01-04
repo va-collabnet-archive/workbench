@@ -30,6 +30,7 @@ import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.EDescription;
@@ -47,7 +48,6 @@ public class Description
 	}
 
 	private static DescTupleComputer computer = new DescTupleComputer();
-	private int conceptNid;
 	
 	private String text;
 	private boolean initialCaseSignificant;
@@ -56,21 +56,22 @@ public class Description
 
 	
 	public Description(int nid,
-			int versionCount, boolean editable) {
-		super(nid, versionCount, editable);
+			int versionCount, Concept enclosingConcept, 
+			UUID primordialUuid) {
+		super(nid, versionCount, enclosingConcept, primordialUuid);
 	}
 	
-	public Description(UniversalAceDescription uDesc, boolean editable) {
-		super(Bdb.uuidsToNid(uDesc.getDescId()), uDesc.getVersions().size(), editable);
-		setConceptNid(Bdb.uuidsToNid(uDesc.getConceptId()));
+	public Description(UniversalAceDescription uDesc, Concept enclosingConcept) {
+		super(Bdb.uuidsToNid(uDesc.getDescId()), uDesc.getVersions().size(), 
+				enclosingConcept, uDesc.getDescId().iterator().next());
 		for (UniversalAceDescriptionPart umPart: uDesc.getMutableParts()) {
 			additionalVersions.add(new DescriptionVersion(umPart));
 		}
 	}
 
-	public Description(EDescription eDesc, boolean editable) {
-		super(Bdb.uuidsToNid(eDesc.getUuids()), eDesc.getVersionCount(), editable);
-		setConceptNid(Bdb.uuidToNid(eDesc.getConceptUuid()));
+	public Description(EDescription eDesc, Concept enclosingConcept) {
+		super(Bdb.uuidsToNid(eDesc.getUuids()), eDesc.getVersionCount(), 
+				enclosingConcept, eDesc.primordialComponentUuid);
 		initialCaseSignificant = eDesc.isInitialCaseSignificant();
 		lang = eDesc.getLang();
 		text = eDesc.getText();
@@ -85,9 +86,8 @@ public class Description
 	}
 
 	@Override
-	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize) {
+	public void readComponentFromBdb(TupleInput input, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
-		this.conceptNid = conceptNid;
 		for (int i = 0; i < listSize; i++) {
 			additionalVersions.add(new DescriptionVersion(input));
 		}
@@ -103,6 +103,8 @@ public class Description
 		}
 		// Start writing
 		output.writeInt(nid);
+		output.writeLong(primordialUuidMsb);
+		output.writeLong(primordialUuidLsb);
 		output.writeShort(partsToWrite.size());
 		// conceptNid is the enclosing concept, does not need to be written. 
 		for (DescriptionVersion p: partsToWrite) {
@@ -118,7 +120,7 @@ public class Description
 
 	@Override
 	public int getConceptId() {
-		return conceptNid;
+		return enclosingConcept.getNid();
 	}
 
 	@Override
@@ -152,7 +154,7 @@ public class Description
 	public UniversalAceDescription getUniversal() throws IOException,
 			TerminologyException {
 		UniversalAceDescription universal = new UniversalAceDescription(
-				getUids(nid), getUids(conceptNid), this.versionCount());
+				getUids(nid), enclosingConcept.getUids(), this.versionCount());
 		for (DescriptionVersion part : additionalVersions) {
 			UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
 			universalPart.setInitialCaseSignificant(part
@@ -234,11 +236,7 @@ public class Description
 	}
 
 	public int getConceptNid() {
-		return conceptNid;
-	}
-
-	public void setConceptNid(int conceptNid) {
-		this.conceptNid = conceptNid;
+		return enclosingConcept.getNid();
 	}
 
 	/*

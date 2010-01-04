@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -22,6 +23,7 @@ import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.ERelationship;
@@ -39,7 +41,6 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 
 	private static RelTupleComputer computer = new RelTupleComputer();
 
-	private int c1Nid;
 	private int c2Nid;
 
 	private int characteristicNid;
@@ -48,14 +49,16 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	private int typeNid;
 
 	public Relationship(int nid, int parts,
-			boolean editable) {
-		super(nid, parts, editable);
+			Concept enclosingConcept, 
+			UUID primordialUuid) {
+		super(nid, parts, enclosingConcept, 
+				primordialUuid);
 	}
 	
 
-	public Relationship(ERelationship eRel, boolean editable) {
-		super(Bdb.uuidsToNid(eRel.getUuids()), eRel.getVersionCount(), editable);
-		c1Nid = Bdb.uuidToNid(eRel.getC1Uuid());
+	public Relationship(ERelationship eRel, Concept enclosingConcept) {
+		super(Bdb.uuidsToNid(eRel.getUuids()), eRel.getVersionCount(), 
+				enclosingConcept, eRel.primordialComponentUuid);
 		c2Nid = Bdb.uuidToNid(eRel.getC2Uuid());
 		characteristicNid = Bdb.uuidToNid(eRel.getCharacteristicUuid());
 		group = eRel.getRelGroup();
@@ -72,9 +75,8 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 
 
 	@Override
-	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize) {
+	public void readComponentFromBdb(TupleInput input, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
-		this.c1Nid = conceptNid;
 		this.c2Nid = input.readInt();
 		for (int i = 0; i < listSize; i++) {
 			additionalVersions.add(new RelationshipVersion(input));
@@ -92,6 +94,8 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 		}
 		// Start writing
 		output.writeInt(nid);
+		output.writeLong(primordialUuidMsb);
+		output.writeLong(primordialUuidLsb);
 		output.writeShort(partsToWrite.size());
 		// c1Nid is the enclosing concept, does not need to be written. 
 		output.writeInt(c2Nid);
@@ -112,7 +116,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 
 	@Override
 	public int hashCode() {
-		return HashFunction.hashCode(new int[] { nid, c2Nid, c1Nid });
+		return HashFunction.hashCode(new int[] { nid, c2Nid, enclosingConcept.getNid() });
 	}
 
 
@@ -152,7 +156,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 
 	@Override
 	public int getC1Id() {
-		return c1Nid;
+		return enclosingConcept.getNid();
 	}
 
 	@Override
@@ -198,8 +202,8 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	public UniversalAceRelationship getUniversal() throws IOException,
 			TerminologyException {
 		UniversalAceRelationship universal = new UniversalAceRelationship(
-				Bdb.getConceptDb().getConcept(c1Nid).getUidsForComponent(nid), 
-				Bdb.getConceptDb().getConcept(c1Nid).getUids(), 
+				getEnclosingConcept().getUidsForComponent(nid), 
+				enclosingConcept.getUids(), 
 				Bdb.getConceptDb().getConcept(c2Nid).getUids(),
 				additionalVersions.size());
 		for (RelationshipVersion part : additionalVersions) {
@@ -329,7 +333,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	@Override
 	public ArrayIntList getVariableVersionNids() {
 		ArrayIntList nidList = new ArrayIntList(7);
-		nidList.add(c1Nid);
+		nidList.add(enclosingConcept.getNid());
 		nidList.add(c2Nid);
 		nidList.add(characteristicNid);
 		nidList.add(refinabilityNid);

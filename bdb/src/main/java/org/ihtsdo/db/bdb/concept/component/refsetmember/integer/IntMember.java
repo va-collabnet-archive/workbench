@@ -1,7 +1,10 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.integer;
 
+import java.util.UUID;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetIntMember;
 
@@ -10,12 +13,15 @@ import com.sleepycat.bind.tuple.TupleInput;
 public class IntMember extends RefsetMember<IntVersion, IntMember> {
 	private int intValue;
 
-	public IntMember(int nid, int partCount, boolean editable, int refsetNid) {
-		super(nid, partCount, editable, refsetNid);
+	public IntMember(int nid, int partCount, Concept enclosingConcept, 
+			UUID primordialUuid) {
+		super(nid, partCount, enclosingConcept, 
+				primordialUuid);
 	}
 
-	public IntMember(ERefsetIntMember refsetMember) {
-		super(refsetMember);
+	public IntMember(ERefsetIntMember refsetMember, 
+			Concept enclosingConcept) {
+		super(refsetMember, enclosingConcept);
 		intValue =refsetMember.getIntValue();
 	}
 

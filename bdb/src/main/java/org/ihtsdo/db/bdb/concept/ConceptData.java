@@ -39,7 +39,7 @@ import com.sleepycat.bind.tuple.TupleInput;
  */
 public class ConceptData {
 
-	private int nid;
+	private Concept enclosingConcept;
 	protected NidData nidData;
 
 	protected SoftReference<ConceptAttributes> attributesRef;
@@ -48,20 +48,18 @@ public class ConceptData {
 	protected SoftReference<ArrayList<Image>> imagesRef;
 	protected SoftReference<ArrayList<RefsetMember<?, ?>>> refsetMembersRef;
 	private ArrayList<Object> strongReferences;
-	private boolean editable;
 
-	ConceptData(int nid, boolean editable) throws IOException {
-		this.nid = nid;
-		this.editable = editable;
-		if (editable) {
+	ConceptData(Concept enclosingConcept) throws IOException {
+		this.enclosingConcept = enclosingConcept;
+		if (enclosingConcept.isEditable()) {
 			strongReferences = new ArrayList<Object>();
 		}
-		nidData = new NidData(nid, Bdb.getConceptDb().getReadOnly(), Bdb
+		nidData = new NidData(enclosingConcept.getNid(), Bdb.getConceptDb().getReadOnly(), Bdb
 				.getConceptDb().getReadWrite());
 	}
 
 	public int getNid() {
-		return nid;
+		return enclosingConcept.getNid();
 	}
 
 	public int getReadWriteDataVersion() throws InterruptedException,
@@ -79,8 +77,10 @@ public class ConceptData {
 			}
 		}
 		try {
-			rels = getList(RelationshipBinder.getBinder(), OFFSETS.SOURCE_RELS);
-			if (editable && rels != null) {
+			rels = getList(RelationshipBinder.getBinder(), 
+					OFFSETS.SOURCE_RELS, 
+					enclosingConcept);
+			if (enclosingConcept.isEditable() && rels != null) {
 				strongReferences.add(rels);
 				srcRelsRef = new SoftReference<ArrayList<Relationship>>(rels);
 			}
@@ -102,8 +102,9 @@ public class ConceptData {
 		}
 		try {
 			descList = getList(DescriptionBinder.getBinder(),
-					OFFSETS.DESCRIPTIONS);
-			if (editable) {
+					OFFSETS.DESCRIPTIONS,
+					enclosingConcept);
+			if (enclosingConcept.isEditable()) {
 				strongReferences.add(descList);
 				descriptionsRef = new SoftReference<ArrayList<Description>>(
 						descList);
@@ -116,10 +117,12 @@ public class ConceptData {
 		}
 	}
 
-	private <C extends ConceptComponent<V, C>, V extends Version<V, C>> ArrayList<C> getList(
-			ConceptComponentBinder<V, C> binder, OFFSETS offset)
+	private <C extends ConceptComponent<V, C>, 
+	         V extends Version<V, C>> ArrayList<C> 
+		getList(ConceptComponentBinder<V, C> binder, 
+				OFFSETS offset, Concept enclosingConcept)
 			throws InterruptedException, ExecutionException, IOException {
-		binder.setupBinder(nid, editable);
+		binder.setupBinder(enclosingConcept);
 		ArrayList<C> componentList;
 		TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
 		if (readOnlyInput.available() > 0) {
@@ -142,9 +145,9 @@ public class ConceptData {
 	}
 
 	private ArrayList<RefsetMember<?, ?>> getList(
-			RefsetMemberBinder binder, OFFSETS offset)
+			RefsetMemberBinder binder, OFFSETS offset, Concept enclosingConcept)
 			throws InterruptedException, ExecutionException, IOException {
-		binder.setupBinder(nid, editable);
+		binder.setupBinder(enclosingConcept);
 		ArrayList<RefsetMember<?, ?>> componentList;
 		TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
 		if (readOnlyInput.available() > 0) {
@@ -176,9 +179,11 @@ public class ConceptData {
 		}
 		try {
 			ArrayList<ConceptAttributes> components = getList(
-					ConceptAttributesBinder.getBinder(), OFFSETS.ATTRIBUTES);
+					ConceptAttributesBinder.getBinder(), 
+					OFFSETS.ATTRIBUTES, 
+					enclosingConcept);
 			if (components != null && components.size() == 1) {
-				if (editable) {
+				if (enclosingConcept.isEditable()) {
 					strongReferences.add(components.get(0));
 				}
 				return components.get(0);
@@ -245,8 +250,9 @@ public class ConceptData {
 		}
 		try {
 			refsetMemberList = getList(RefsetMemberBinder.getBinder(),
-					OFFSETS.REFSET_MEMBERS);
-			if (editable && refsetMemberList != null) {
+					OFFSETS.REFSET_MEMBERS, 
+					enclosingConcept);
+			if (enclosingConcept.isEditable() && refsetMemberList != null) {
 				strongReferences.add(refsetMemberList);
 				refsetMembersRef = new SoftReference<ArrayList<RefsetMember<?, ?>>>(
 						refsetMemberList);
@@ -268,8 +274,9 @@ public class ConceptData {
 			}
 		}
 		try {
-			imgList = getList(ImageBinder.getBinder(), OFFSETS.IMAGES);
-			if (editable && imgList != null) {
+			imgList = getList(ImageBinder.getBinder(), OFFSETS.IMAGES, 
+					enclosingConcept);
+			if (enclosingConcept.isEditable() && imgList != null) {
 				strongReferences.add(imgList);
 				imagesRef = new SoftReference<ArrayList<Image>>(imgList);
 			}
@@ -306,7 +313,7 @@ public class ConceptData {
 	}
 
 	public void set(ConceptAttributes attr) throws IOException {
-		if (editable == false) {
+		if (enclosingConcept.isEditable() == false) {
 			throw new IOException("Attempting to add to an uneditable concept");
 		}
 		if (attributesRef != null) {
@@ -318,28 +325,28 @@ public class ConceptData {
 	}
 
 	public void add(Description desc) throws IOException {
-		if (editable == false) {
+		if (enclosingConcept.isEditable() == false) {
 			throw new IOException("Attempting to add to an uneditable concept");
 		}
 		getDescriptions().add(desc);
 	}
 
 	public void add(Relationship rel) throws IOException {
-		if (editable == false) {
+		if (enclosingConcept.isEditable() == false) {
 			throw new IOException("Attempting to add to an uneditable concept");
 		}
 		getSourceRels().add(rel);
 	}
 
 	public void add(Image img) throws IOException {
-		if (editable == false) {
+		if (enclosingConcept.isEditable() == false) {
 			throw new IOException("Attempting to add to an uneditable concept");
 		}
 		getImages().add(img);
 	}
 
 	public void add(RefsetMember<?, ?> refsetMember) throws IOException {
-		if (editable == false) {
+		if (enclosingConcept.isEditable() == false) {
 			throw new IOException("Attempting to add to an uneditable concept");
 		}
 		getRefsetMembers().add(refsetMember);

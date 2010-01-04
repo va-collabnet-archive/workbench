@@ -27,6 +27,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.ConceptBdb;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersion;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionLong;
@@ -77,7 +78,9 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 	
 	public int nid;
-	public boolean editable;
+	
+	public Concept enclosingConcept;
+
 	/**
 	 * priámorádiáal:  first created or developed
 	 * 
@@ -87,27 +90,35 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	 * priámorádiáal:  first created or developed
 	 * 
 	 */
-	public long primordialUuidMsb;
+	public long primordialUuidMsb = 0;
 	/**
 	 * priámorádiáal:  first created or developed
 	 * 
 	 */
-	public long primordialUuidLsb;
+	public long primordialUuidLsb = 0;
 	
 	public ArrayList<V> additionalVersions;
 	private ArrayList<IdentifierVersion> identifierParts;
 	
-	protected ConceptComponent(int nid, int versionCount, boolean editable) {
+	protected ConceptComponent(int nid, int versionCount, 
+			Concept enclosingConcept, UUID primordialUuid) {
 		super();
+		assert nid != Integer.MAX_VALUE;
+		assert nid != Integer.MIN_VALUE;
+		assert enclosingConcept != null;
+		assert primordialUuid != null;
 		this.nid = nid;
-		this.editable = editable;
+		this.enclosingConcept = enclosingConcept;
 		this.additionalVersions = new ArrayList<V>(versionCount - 1);
+		this.primordialUuidMsb = primordialUuid.getMostSignificantBits();
+		this.primordialUuidLsb = primordialUuid.getLeastSignificantBits();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
 	 */
 	public boolean isSetup() {
+		assert primordialUuidMsb != 0 && primordialUuidLsb != 0;
 		return primordialStatusAtPositionNid != Integer.MAX_VALUE;
 	}
 
@@ -143,6 +154,7 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 	public void writeIdentifierToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
+		assert primordialStatusAtPositionNid != Integer.MAX_VALUE;
 		List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
 		if (identifierParts != null) {
 			for (IdentifierVersion p: identifierParts) {
@@ -224,6 +236,7 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	@Override
 	public final List<UUID> getUUIDs() {
 		List<UUID> returnValues = new ArrayList<UUID>();
+		returnValues.add(new UUID(primordialUuidMsb, primordialUuidLsb));
 		for (IdentifierVersion idv : identifierParts) {
 			if (IdentifierVersionUuid.class.isAssignableFrom(idv
 					.getClass())) {
@@ -283,7 +296,7 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	}
 
 	public final List<V> getMutableParts() {
-		if (editable) {
+		if (enclosingConcept.isEditable()) {
 			return additionalVersions;
 		}
 		return Collections.unmodifiableList(additionalVersions);
@@ -311,7 +324,7 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 		return nid;
 	}
 
-	public abstract void readComponentFromBdb(TupleInput input, int conceptNid, int listSize);
+	public abstract void readComponentFromBdb(TupleInput input, int listSize);
 	
 	public abstract void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid);
 
@@ -324,14 +337,14 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	}
 
 	public final boolean addVersion(V newPart) {
-		if (editable) {
+		if (enclosingConcept.isEditable()) {
 			return additionalVersions.add(newPart);
 		}
 		throw new RuntimeException("versions is not editable");
 	}
 	
 	public final boolean addVersionNoRedundancyCheck(V newPart) {
-		if (editable) {
+		if (enclosingConcept.isEditable()) {
 			return additionalVersions.add(newPart);
 		}
 		throw new RuntimeException("versions is not editable");
@@ -449,5 +462,13 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 	@Override
 	public I_AmPart duplicate() {
 		throw new UnsupportedOperationException();
+	}
+
+	protected int getPrimordialStatusAtPositionNid() {
+		return primordialStatusAtPositionNid;
+	}
+
+	protected Concept getEnclosingConcept() {
+		return enclosingConcept;
 	}
 }

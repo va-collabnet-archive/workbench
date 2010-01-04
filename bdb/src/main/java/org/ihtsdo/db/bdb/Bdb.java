@@ -59,6 +59,7 @@ public class Bdb {
 		DatabaseConfig dbConfig = new DatabaseConfig();
 		dbConfig.setReadOnly(readOnly);
 		dbConfig.setAllowCreate(!readOnly);
+		dbConfig.setDeferredWrite(!readOnly);
 		try {
 			return bdb.bdbEnv.openDatabase(null,
 					dbName,
@@ -85,16 +86,6 @@ public class Bdb {
 		}
 	}
 
-	// Close the environment
-	public void close() {
-		if (bdbEnv != null) {
-			try {
-				bdbEnv.close();
-			} catch (DatabaseException dbe) {
-				AceLog.getAppLog().alertAndLogException(dbe);
-			}
-		}
-	}
 	
 	public static int getStatusAtPositionNid(EVersion version) {
 		return statusAtPositionDb.getStatusAtPositionNid(
@@ -139,9 +130,25 @@ public class Bdb {
 	}
 
 	public static void sync() {
+		conceptDb.sync();
+		statusAtPositionDb.sync();
 		readWrite.bdbEnv.sync();
 		if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
 			readOnly.bdbEnv.sync();
 		}
 	}
+	
+	// Close the environment
+	public static void close() {
+		if (readWrite.bdbEnv != null) {
+			try {
+				conceptDb.close();
+				statusAtPositionDb.close();
+				readWrite.bdbEnv.close();
+			} catch (DatabaseException dbe) {
+				AceLog.getAppLog().alertAndLogException(dbe);
+			}
+		}
+	}
+
 }

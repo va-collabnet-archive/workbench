@@ -30,6 +30,7 @@ import org.dwfa.tapi.impl.LocalFixedConcept;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
 
@@ -44,12 +45,13 @@ public class ConceptAttributes
 
 	private boolean defined;
 	
-	public ConceptAttributes(int nid, int parts, boolean editable) {
-		super(nid, parts, editable);
+	public ConceptAttributes(int nid, int parts, Concept enclosingConcept, 
+			UUID primordialUuid) {
+		super(nid, parts, enclosingConcept, primordialUuid);
 	}
 
 	@Override
-	public void readComponentFromBdb(TupleInput input, int conceptNid, int listSize) {
+	public void readComponentFromBdb(TupleInput input, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
 		for (int i = 0; i < listSize; i++) {
 			additionalVersions.add(new ConceptAttributesVersion(input));
@@ -67,6 +69,8 @@ public class ConceptAttributes
 		}
 		// Start writing
 		output.writeInt(nid);
+		output.writeLong(primordialUuidMsb);
+		output.writeLong(primordialUuidLsb);
 		output.writeShort(partsToWrite.size());
 		for (ConceptAttributesVersion p : partsToWrite) {
 			p.writePartToBdb(output);
