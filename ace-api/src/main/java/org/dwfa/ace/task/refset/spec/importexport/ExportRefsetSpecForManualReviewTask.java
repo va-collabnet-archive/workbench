@@ -75,8 +75,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
     private static final int dataVersion = 1;
 
     private String outputFilePropName = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
-    private TermEntry descriptionTypeTermEntry = new TermEntry(
-        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+    private TermEntry descriptionTypeTermEntry =
+            new TermEntry(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
     private String refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
     private Integer maxLineCount = 10000;
     private boolean addUncommitted = true;
@@ -113,9 +113,11 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         returnCondition = Condition.ITEM_COMPLETE;
         delimiter = "\t";
         try {
-            activityPanel = LocalVersionedTerminology.get().newActivityPanel(true,
-                LocalVersionedTerminology.get().getActiveAceFrameConfig());
-            I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            activityPanel =
+                    LocalVersionedTerminology.get().newActivityPanel(true,
+                        LocalVersionedTerminology.get().getActiveAceFrameConfig());
+            I_ConfigAceFrame configFrame =
+                    (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             String outputFileName = (String) process.getProperty(outputFilePropName);
 
@@ -169,8 +171,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                 "No member spec found. Please put the refset to be exported in the refset spec panel.");
         }
 
-        List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getRefsetExtensionMembers(
-            memberRefset.getConceptId());
+        List<I_ThinExtByRefVersioned> extensions =
+                LocalVersionedTerminology.get().getRefsetExtensionMembers(memberRefset.getConceptId());
 
         writeHeader(exportFileWriter);
 
@@ -180,8 +182,9 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
 
         for (I_ThinExtByRefVersioned ext : extensions) {
 
-            List<I_ThinExtByRefTuple> tuples = ext.getTuples(helper.getCurrentStatusIntSet(), null, addUncommitted,
-                returnConflictResolvedLatestState);
+            List<I_ThinExtByRefTuple> tuples =
+                    ext.getTuples(helper.getCurrentStatusIntSet(), termFactory.getActiveAceFrameConfig()
+                        .getViewPositionSetReadOnly(), addUncommitted, returnConflictResolvedLatestState);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : tuples) {
                 if (thinExtByRefTuple.getMutablePart() instanceof I_ThinExtByRefPartConcept) {
@@ -200,8 +203,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                                 writeHeader(exportFileWriter);
                             }
                             // write to file
-                            String description = getDescription(descriptionTypeTermEntry,
-                                thinExtByRefTuple.getComponentId());
+                            String description =
+                                    getDescription(descriptionTypeTermEntry, thinExtByRefTuple.getComponentId());
                             if (description == null) {
                                 description = "UNKNOWN";
                             }
@@ -237,8 +240,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
     private String getSctId(int componentId) throws TerminologyException, IOException {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         I_Identify idVersioned = termFactory.getId(componentId);
-        int snomedIntegerId = termFactory.getId(
-            ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNid();
+        int snomedIntegerId =
+                termFactory.getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNid();
 
         List<? extends I_IdPart> parts = idVersioned.getMutableIdParts();
         I_IdPart latestPart = null;
@@ -269,8 +272,9 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         String latestDescription = null;
         int latestVersion = Integer.MIN_VALUE;
 
-        List<? extends I_DescriptionTuple> descriptionResults = concept.getDescriptionTuples(helper.getCurrentStatusIntSet(),
-            allowedTypes, null, true);
+        List<? extends I_DescriptionTuple> descriptionResults =
+                concept.getDescriptionTuples(helper.getCurrentStatusIntSet(), allowedTypes, termFactory
+                    .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
 
         // find the latest tuple, so that the latest edited version of the
         // description is always used
