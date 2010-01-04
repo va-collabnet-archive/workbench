@@ -16,8 +16,6 @@
  */
 package org.dwfa.vodb.process;
 
-import org.dwfa.ace.api.process.I_ProcessQueue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -26,6 +24,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.api.process.I_ProcessQueue;
+
+/**
+ * Thread pool implementation.
+ *
+ * Specify the number of threads in the pool then add work items.
+ */
 public class ProcessQueue implements I_ProcessQueue {
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private final int nThreads;
@@ -34,13 +39,19 @@ public class ProcessQueue implements I_ProcessQueue {
     private boolean acceptNoMore;
     private CountDownLatch latch;
     private String name;
-    private boolean isComplete;
     private List<Exception> errorsList = Collections.synchronizedList(new ArrayList<Exception>());
+    private boolean failFast = true;
 
     public ProcessQueue(int nThreadsToUse) {
         this(Integer.toHexString(System.identityHashCode(new String())), nThreadsToUse);
     }
 
+    /**
+     * Create the thread pool
+     *
+     * @param name String
+     * @param nThreadsToUse int
+     */
     public ProcessQueue(String name, int nThreadsToUse) {
         logger.info("Created new process queue '" + name + "' with " + nThreadsToUse + " threads");
         this.name = name;
@@ -54,9 +65,7 @@ public class ProcessQueue implements I_ProcessQueue {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
      * @see org.dwfa.vodb.process.I_ProcessQueue#execute(java.lang.Runnable)
      */
     public void execute(Runnable r) {
@@ -70,9 +79,7 @@ public class ProcessQueue implements I_ProcessQueue {
         logger.info("Added new task to the process queue " + r);
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
      * @see org.dwfa.vodb.process.I_ProcessQueue#isEmpty()
      */
     public boolean isEmpty() {
@@ -85,14 +92,18 @@ public class ProcessQueue implements I_ProcessQueue {
         return isEmpty;
     }
 
+    /**
+     * Pauses the calling thread until all items have been process.
+     *
+     * After this call completes you cannot use the this object to process any further items.
+     */
     public void awaitCompletion() {
         synchronized (queue) {
             acceptNoMore = true;
             int runningThreads = getRunningPoolWorkerCount();
             logger.info("Awaiting completion of process queue " + name + ", " + queue.size() + " queued items "
                 + runningThreads + " running jobs");
-            latch = new CountDownLatch(queue.size());
-            queue.notifyAll();
+            latch = new CountDownLatch(queue.size() + runningThreads);
         }
         try {
             latch.await();
@@ -101,21 +112,8 @@ public class ProcessQueue implements I_ProcessQueue {
         }
         logger.info("Finished latch process queue " + name);
         synchronized (queue) {
-            latch = null;
-            acceptNoMore = false;
-            isComplete = true;
             queue.notifyAll();
-            logger.info(getRunningPoolWorkerCount() + " remaining threads still alive on completion. Errors : " +
-                    errorsList.size());
         }
-
-        while(getRunningPoolWorkerCount() > 0) {
-            logger.info("Waiting for " + getRunningPoolWorkerCount() + " threads to complete.");
-            synchronized(queue) {
-                try { queue.wait(1000); } catch (InterruptedException e) { /*do nothing*/ }
-            }
-        }
-
         failIfErrors();
         logger.info("Finished awaiting completion of process queue " + name);
     }
@@ -141,6 +139,16 @@ public class ProcessQueue implements I_ProcessQueue {
         return count;
     }
 
+    /**
+     * Set to true to throw exceptions when processing and not store in the
+     * errors report.
+     *
+     * @param failFast boolean.
+     */
+    public void setFailFast(boolean failFast) {
+        this.failFast = failFast;
+    }
+
     private class PoolWorker extends Thread {
         private boolean running;
         private final int id;
@@ -150,48 +158,52 @@ public class ProcessQueue implements I_ProcessQueue {
         }
 
         public void run() {
-            Runnable r;
+            Runnable r = null;
 
             while (true) {
                 synchronized (queue) {
-                    if (isComplete) {
-                        logger.info("work is complete. " + getWorkerName() + " returning.");
-                        setRunning(false);
-                        return;
+                    if (latch != null) {
+                        logger.info("Worker thread " + name + "_" + System.identityHashCode(this)
+                            + " about to count down latch " + latch.getCount());
+                        latch.countDown();
                     }
-
                     while (queue.isEmpty()) {
-                        if (isComplete) {
-                            logger.info("Queue is empty but work is complete. " + getWorkerName() + " returning.");
-                            setRunning(false);
+                        setRunning(false);
+                        if (acceptNoMore) {
                             return;
                         }
-
-                        setRunning(false);
                         try {
-                            logger.info(getWorkerName() + " blocked and waiting for work.");
+                            logger.info("Worker thread " + name + "_" + System.identityHashCode(this)
+                                + " blocked waiting on queue for work");
                             queue.wait();
                         } catch (InterruptedException ignored) {
                         }
                     }
 
-                    if (latch != null) {
-                        logger.info(getWorkerName() + " about to count down latch from " + getLatchCount());
-                        latch.countDown();
-                    }
-
                     setRunning(true);
-                    r = queue.removeFirst();
-                    logger.info(getWorkerName() + " dequeued " + r +
-                            " for processing. Latch count: " + getLatchCount() + " Queue size: " + queue.size());
+                    if (!queue.isEmpty()) {
+                        r = (Runnable) queue.removeFirst();
+                        logger.info("Worker thread " + name + "_" + System.identityHashCode(this) + " dequeued " + r
+                            + " for processing, " + queue.size() + " remaining");
+                    }
                 }
 
-                try {
-                    r.run();
-                } catch (Exception e) {
-                    logger.severe("Error: Processing." + r + " on " + getWorkerName() + ". " +
-                            "Latch count : " + getLatchCount() + " Queue size : " + queue.size());
-                    errorsList.add(e);
+                if(r != null) {
+                    try {
+                        r.run();
+                    } catch (Exception e) {
+                        logger.severe("Error: Processing." + r + " on " + getWorkerName() + ". " + "Latch count : "
+                            + getLatchCount() + " Queue size : " + queue.size());
+                        errorsList.add(e);
+
+                        if (failFast) {
+                            for (; latch.getCount() > 0;) {
+                                latch.countDown();
+                            }
+                            throw new RuntimeException(e);
+                        }
+
+                    }
                 }
             }
         }
@@ -201,7 +213,7 @@ public class ProcessQueue implements I_ProcessQueue {
         }
 
         private String getLatchCount() {
-            return latch == null ?  "null" : String.valueOf(latch.getCount());
+            return latch == null ? "null" : String.valueOf(latch.getCount());
         }
 
         boolean isEmpty() {
