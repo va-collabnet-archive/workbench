@@ -37,7 +37,8 @@ public class EConcept  {
 		BOOLEAN(9, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION), 
 		CID_STR(10, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION), 
 		CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION),
-		CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION),
+		CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION), 
+		LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION),
 		;
 
 		private int externalizedToken;
