@@ -2,7 +2,9 @@ package org.ihtsdo.db.bdb.concept.component.refset;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.etypes.EVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -24,6 +26,14 @@ public abstract class RefsetVersion<V extends RefsetVersion<V, C>,
 
 	public RefsetVersion(TupleInput input, C primordialComponent) {
 		super(input, primordialComponent);
+	}
+
+	public RefsetVersion(EVersion eVersion,
+			C member) {
+		super(Bdb.uuidToNid(eVersion.getStatusUuid()), 
+				Bdb.uuidToNid(eVersion.getPathUuid()),
+				eVersion.getTime(),
+				member);
 	}
 
 	@Override

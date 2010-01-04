@@ -7,7 +7,9 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.etypes.ERefsetCidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -32,6 +34,12 @@ public class CidVersion extends RefsetVersion<CidVersion, CidMember>
 			CidMember primoridalMember) {
 		super(input, primoridalMember);
 		c1Nid = input.readInt();
+	}
+
+	public CidVersion(ERefsetCidVersion eVersion,
+			CidMember member) {
+		super(eVersion, member);
+		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
 	}
 
 	@Override

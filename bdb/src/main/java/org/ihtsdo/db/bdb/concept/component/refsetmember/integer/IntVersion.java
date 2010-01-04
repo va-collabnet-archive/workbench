@@ -8,6 +8,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.etypes.ERefsetIntVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -32,6 +33,12 @@ public class IntVersion extends RefsetVersion<IntVersion, IntMember>
 			IntMember primoridalMember) {
 		super(input, primoridalMember);
 		intValue = input.readInt();
+	}
+
+	public IntVersion(ERefsetIntVersion eVersion,
+			IntMember member) {
+		super(eVersion, member);
+		this.intValue = eVersion.getIntValue();
 	}
 
 	@Override

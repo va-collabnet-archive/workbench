@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.str;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -7,6 +8,7 @@ import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetStrMember;
+import org.ihtsdo.etypes.ERefsetStrVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -23,6 +25,12 @@ public class StrMember extends RefsetMember<StrVersion, StrMember> {
 	public StrMember(ERefsetStrMember refsetMember, Concept enclosingConcept) {
 		super(refsetMember, enclosingConcept);
 		stringValue = refsetMember.getStrValue();
+		if (refsetMember.getExtraVersionsList() != null) {
+			additionalVersions = new ArrayList<StrVersion>(refsetMember.getExtraVersionsList().size());
+			for (ERefsetStrVersion eVersion: refsetMember.getExtraVersionsList()) {
+				additionalVersions.add(new StrVersion(eVersion, this));
+			}
+		}
 	}
 
 	@Override

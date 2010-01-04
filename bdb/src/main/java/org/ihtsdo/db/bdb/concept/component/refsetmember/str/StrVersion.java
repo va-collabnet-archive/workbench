@@ -7,7 +7,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.membership.MembershipMember;
+import org.ihtsdo.etypes.ERefsetStrVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -34,6 +34,11 @@ public class StrVersion extends RefsetVersion<StrVersion, StrMember>
 		stringValue = input.readString();
 	}
 
+	public StrVersion(ERefsetStrVersion eVersion,
+			StrMember primoridalMember) {
+		super(eVersion, primoridalMember);
+		this.stringValue = eVersion.getStringValue();
+	}
 	
 	@Override
 	public UniversalAceExtByRefPart getUniversalPart()

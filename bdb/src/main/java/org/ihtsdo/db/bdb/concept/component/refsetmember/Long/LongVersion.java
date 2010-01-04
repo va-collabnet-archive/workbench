@@ -8,6 +8,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLong;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.etypes.ERefsetLongVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -31,6 +32,12 @@ public class LongVersion extends RefsetVersion<LongVersion, LongMember>
 			LongMember primoridalMember) {
 		super(input, primoridalMember);
 		longValue = input.readLong();
+	}
+
+	public LongVersion(ERefsetLongVersion eVersion,
+			LongMember member) {
+		super(eVersion, member);
+		this.longValue = eVersion.getLongValue();
 	}
 
 	@Override

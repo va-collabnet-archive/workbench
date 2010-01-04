@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidLong;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -8,6 +9,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetCidLongMember;
+import org.ihtsdo.etypes.ERefsetCidLongVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -28,6 +30,12 @@ public class CidLongMember
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		longValue = refsetMember.getLongValue();
+		if (refsetMember.getExtraVersionsList() != null) {
+			additionalVersions = new ArrayList<CidLongVersion>(refsetMember.getExtraVersionsList().size());
+			for (ERefsetCidLongVersion eVersion: refsetMember.getExtraVersionsList()) {
+				additionalVersions.add(new CidLongVersion(eVersion, this));
+			}
+		}
 	}
 
 	@Override

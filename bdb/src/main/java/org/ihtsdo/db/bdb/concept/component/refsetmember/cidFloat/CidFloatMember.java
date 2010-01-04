@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidFloat;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -8,6 +9,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetCidFloatMember;
+import org.ihtsdo.etypes.ERefsetCidFloatVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -27,6 +29,12 @@ public class CidFloatMember extends RefsetMember<CidFloatVersion, CidFloatMember
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		floatValue = refsetMember.getFloatValue();
+		if (refsetMember.getExtraVersionsList() != null) {
+			additionalVersions = new ArrayList<CidFloatVersion>(refsetMember.getExtraVersionsList().size());
+			for (ERefsetCidFloatVersion eVersion: refsetMember.getExtraVersionsList()) {
+				additionalVersions.add(new CidFloatVersion(eVersion, this));
+			}
+		}
 	}
 
 	@Override

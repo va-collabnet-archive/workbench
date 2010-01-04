@@ -30,6 +30,7 @@ import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetCidStrMember;
 import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetLongMember;
+import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
@@ -119,7 +120,7 @@ public class RefsetMemberFactory  {
 		case CID_FLOAT:
 			return new CidFloatMember((ERefsetCidFloatMember) refsetMember, enclosingConcept);
 		case MEMBER:
-			return new MembershipMember(refsetMember, enclosingConcept);
+			return new MembershipMember((ERefsetMember) refsetMember, enclosingConcept);
 		case STR:
 			return new StrMember((ERefsetStrMember) refsetMember, enclosingConcept);
 		case CID_LONG:

@@ -7,6 +7,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.etypes.ERefsetVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -27,6 +28,11 @@ public class MembershipVersion extends RefsetVersion<MembershipVersion, Membersh
 	public MembershipVersion(TupleInput input, 
 			MembershipMember primoridalMember) {
 		super(input, primoridalMember);
+	}
+
+	public MembershipVersion(ERefsetVersion eVersion,
+			MembershipMember member) {
+		super(eVersion, member);
 	}
 
 	@Override

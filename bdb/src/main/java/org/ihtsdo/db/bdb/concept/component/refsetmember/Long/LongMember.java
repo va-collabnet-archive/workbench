@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.Long;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -7,6 +8,7 @@ import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetLongMember;
+import org.ihtsdo.etypes.ERefsetLongVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -23,6 +25,12 @@ public class LongMember extends RefsetMember<LongVersion, LongMember> {
 	public LongMember(ERefsetLongMember refsetMember, Concept enclosingConcept) {
 		super(refsetMember, enclosingConcept);
 		longValue =refsetMember.getLongValue();
+		if (refsetMember.getExtraVersionsList() != null) {
+			additionalVersions = new ArrayList<LongVersion>(refsetMember.getExtraVersionsList().size());
+			for (ERefsetLongVersion eVersion: refsetMember.getExtraVersionsList()) {
+				additionalVersions.add(new LongVersion(eVersion, this));
+			}
+		}
 	}
 
 	@Override

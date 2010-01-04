@@ -9,6 +9,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.etypes.ERefsetBooleanVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -32,6 +33,12 @@ public class BooleanVersion extends RefsetVersion<BooleanVersion, BooleanMember>
 			BooleanMember primoridalMember) {
 		super(input, primoridalMember);
 		booleanValue = input.readBoolean();
+	}
+
+	public BooleanVersion(ERefsetBooleanVersion eVersion,
+			BooleanMember booleanMember) {
+		super(eVersion, booleanMember);
+		this.booleanValue = eVersion.isBooleanValue();
 	}
 
 	@Override

@@ -36,7 +36,8 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 				primordialUuid);
 	}
 	
-	public RefsetMember(ERefset refsetMember, Concept enclosingConcept) {
+	public RefsetMember(ERefset refsetMember, 
+			Concept enclosingConcept) {
 		super(Bdb.uuidsToNid(refsetMember.getUuids()), 
 				refsetMember.getVersionCount(), enclosingConcept,
 				refsetMember.primordialComponentUuid);
