@@ -222,7 +222,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 
 	public int getReadOnlyMax() {
-		throw new UnsupportedOperationException();
+		return readOnlyArray.size;
 	}
 	
 	public int getVersion(int index) {

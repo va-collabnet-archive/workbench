@@ -1,7 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refset;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.ihtsdo.db.bdb.concept.component.Version;
 

@@ -11,9 +11,8 @@ public class StrMember extends RefsetMember<StrVersion, StrMember> {
 
 	private String stringValue;
 
-	public StrMember(int nid, int partCount, boolean editable) {
-		super(nid, partCount, editable);
-		// TODO Auto-generated constructor stub
+	public StrMember(int nid, int partCount, boolean editable, int refsetNid) {
+		super(nid, partCount, editable, refsetNid);
 	}
 
 	public StrMember(ERefsetStrMember refsetMember) {

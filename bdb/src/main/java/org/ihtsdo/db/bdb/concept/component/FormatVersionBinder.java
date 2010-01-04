@@ -1,6 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component;
 
-import org.ihtsdo.db.bdb.concept.ConceptData;
+import org.ihtsdo.db.bdb.concept.OFFSETS;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
@@ -16,7 +16,7 @@ public class FormatVersionBinder extends TupleBinding<Integer> {
 
 	@Override
 	public Integer entryToObject(TupleInput ti) {
-		ti.skipFast(ConceptData.OFFSETS.FORMAT_VERSION.getOffset());
+		ti.skipFast(OFFSETS.FORMAT_VERSION.getOffset());
 		return ti.readInt();
 	}
 

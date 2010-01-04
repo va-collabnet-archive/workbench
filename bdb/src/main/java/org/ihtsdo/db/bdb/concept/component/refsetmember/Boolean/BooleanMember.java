@@ -11,9 +11,8 @@ public class BooleanMember extends RefsetMember<BooleanVersion, BooleanMember> {
 
 	private boolean booleanValue;
 	
-	public BooleanMember(int nid, int partCount, boolean editable) {
-		super(nid, partCount, editable);
-		// TODO Auto-generated constructor stub
+	public BooleanMember(int nid, int partCount, boolean editable, int refsetNid) {
+		super(nid, partCount, editable, refsetNid);
 	}
 
 	public BooleanMember(ERefsetBooleanMember refsetMember) {

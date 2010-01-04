@@ -14,7 +14,7 @@ public class ReadWriteDataVersion {
 	public static int get(int nid) throws IOException {
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry data = new DatabaseEntry();
-		data.setPartial(ConceptData.OFFSETS.DATA_VERSION.getOffset(), ConceptData.OFFSETS.DATA_VERSION.getBytes(), true);
+		data.setPartial(OFFSETS.DATA_VERSION.getOffset(), OFFSETS.DATA_VERSION.getBytes(), true);
 		IntegerBinding.intToEntry(nid, key);
 		try {
 			if (Bdb.getConceptDb().getReadWrite().get(null, key, data, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {

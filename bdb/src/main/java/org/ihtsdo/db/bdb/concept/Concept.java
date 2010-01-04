@@ -30,7 +30,6 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesVersion;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
@@ -78,8 +77,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		EConceptAttributes eAttr = eConcept.getConceptAttributes();
 		
 		ConceptAttributes attr = new ConceptAttributes(c.nid, eAttr.getVersionCount(), true);
-		c.unsubmittedComponents = new ArrayList<ConceptComponent<?,?>>();
-		c.unsubmittedComponents.add(attr);
+		c.data.set(attr);
 		attr.addVersion(new ConceptAttributesVersion(eAttr));
 		if (eAttr.getExtraVersionsList() != null) {
 			for (I_ConceptualizeExternally eav: eAttr.getExtraVersionsList()) {
@@ -89,25 +87,25 @@ public class Concept implements I_Transact, I_GetConceptData {
 		if (eConcept.getDescriptions() != null) {
 			for (EDescription eDesc: eConcept.getDescriptions()) {
 				Description desc = new Description(eDesc, c.editable);
-				c.unsubmittedComponents.add(desc);
+				c.data.add(desc);
 			}
 		}
 		if (eConcept.getRelationships() != null) {
 			for (ERelationship eRel: eConcept.getRelationships()) {
 				Relationship rel = new Relationship(eRel, c.editable);
-				c.unsubmittedComponents.add(rel);
+				c.data.add(rel);
 			}
 		}
 		if (eConcept.getImages() != null) {
 			for (EImage eImage: eConcept.getImages()) {
 				Image img = new Image(eImage, c.editable);
-				c.unsubmittedComponents.add(img);
+				c.data.add(img);
 			}
 		}
 		if (eConcept.getRefsetMembers() != null) {
 			for (ERefset eRefsetMember: eConcept.getRefsetMembers()) {
 				RefsetMember<?,?> refsetMember = RefsetMemberFactory.create(eRefsetMember);
-				c.unsubmittedComponents.add(refsetMember);
+				c.data.add(refsetMember);
 			}
 		}
 		return c;
@@ -122,8 +120,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 	private int nid;
 	private boolean editable;
 	private ConceptData data;
-
-	private List<ConceptComponent<?, ?>> unsubmittedComponents;
 
 	protected Concept(int nid, boolean editable) throws IOException {
 		super();
@@ -321,9 +317,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return data.getDestRels();
 	}
 
-	public List<RefsetMember> getExtensions() throws IOException,
-			TerminologyException {
-		return data.getExtensions();
+	public List<RefsetMember<?, ?>> getExtensions() throws IOException {
+		return data.getRefsetMembers();
 	}
 
 	public List<ImageVersion> getImageTuples(I_IntSet allowedStatus,
@@ -699,5 +694,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 	public I_Identify getIdentifier() throws IOException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
+	}
+
+	public ConceptData getData() {
+		return data;
 	}	
 }

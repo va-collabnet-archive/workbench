@@ -6,9 +6,12 @@ import java.util.UUID;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
 
+import com.sleepycat.bind.tuple.IntegerBinding;
+import com.sleepycat.je.DatabaseEntry;
+
 
 public class ConceptBdb extends ComponentBdb {
-		
+	
 	public ConceptBdb(Bdb readOnlyBdbEnv, Bdb readWriteBdbEnv)
 			throws IOException {
 		super(readOnlyBdbEnv, readWriteBdbEnv);
@@ -35,5 +38,14 @@ public class ConceptBdb extends ComponentBdb {
 
 	public Concept getWritableConcept(int nid) throws IOException {
 		return Concept.get(nid, true);
+	}
+
+	public void writeConcept(Concept concept) {
+		ConceptBinder binder = ConceptBinder.getBinder();
+		DatabaseEntry key = new DatabaseEntry();
+		IntegerBinding.intToEntry(concept.getNid(), key);
+		DatabaseEntry value = new DatabaseEntry();
+		binder.objectToEntry(concept, value);
+		readWrite.put(null, key, value);
 	}
 }

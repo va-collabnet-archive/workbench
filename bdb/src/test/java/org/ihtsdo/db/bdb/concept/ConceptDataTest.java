@@ -41,11 +41,11 @@ public class ConceptDataTest {
 	@Before
 	public void setUp() throws Exception {
 		TupleOutput to = new TupleOutput();
-		for (ConceptData.OFFSETS off: ConceptData.OFFSETS.values()) {
+		for (OFFSETS off: OFFSETS.values()) {
 			to.writeInt(0);
 		}
 		TupleOutput offsetOutput = new TupleOutput(to.getBufferBytes());
-		for (ConceptData.OFFSETS off: ConceptData.OFFSETS.values()) {
+		for (OFFSETS off: OFFSETS.values()) {
 			offsetOutput.writeInt(to.size());
 			to.writeInt(off.ordinal());
 		}
@@ -59,7 +59,7 @@ public class ConceptDataTest {
 	public void testGetDescriptions() {
 		TupleInput dataInput = new TupleInput(readOnlyData);
 		int i = 0;
-		for (ConceptData.OFFSETS off: ConceptData.OFFSETS.values()) {
+		for (OFFSETS off: OFFSETS.values()) {
 			int offset = off.getOffset(readOnlyData);
 			dataInput.reset();
 			dataInput.skipFast(offset);

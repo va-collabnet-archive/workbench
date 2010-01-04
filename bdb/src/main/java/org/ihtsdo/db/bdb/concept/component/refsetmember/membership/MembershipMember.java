@@ -9,8 +9,8 @@ import com.sleepycat.bind.tuple.TupleInput;
 
 public class MembershipMember extends RefsetMember<MembershipVersion, MembershipMember> {
 
-	public MembershipMember(int nid, int partCount, boolean editable) {
-		super(nid, partCount, editable);
+	public MembershipMember(int nid, int partCount, boolean editable, int refsetNid) {
+		super(nid, partCount, editable, refsetNid);
 	}
 
 	public MembershipMember(ERefset refsetMember) {

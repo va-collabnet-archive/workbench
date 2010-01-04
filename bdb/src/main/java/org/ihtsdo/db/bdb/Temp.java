@@ -5,7 +5,6 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
@@ -79,6 +78,7 @@ public class Temp {
 	            
 	            FileIO.recursiveDelete(new File("target/berkeley-db"));
 	            Bdb.setUuidsToNidMap(uuidsNidMap);
+	        	//ConceptComponentBinder binder = new ConceptComponentBinder(null);
 	            
 	            
 			    fis = new FileInputStream(conceptsFile);
@@ -100,6 +100,12 @@ public class Temp {
 	    			}
 	            		
 			    }
+	            // See if any exceptions in the last converters;
+	            while (converters.isEmpty() == false) {
+	            	ConvertConcept conceptConverter = converters.take(); 
+	            	conceptConverter.setEConcept(null);
+	            }
+	            
 	            System.out.println();
 	            AceLog.getAppLog().info("\n\nconceptsRead: " + conceptsRead);
 	            AceLog.getAppLog().info("\n\nFinished conceptRead");
@@ -107,8 +113,9 @@ public class Temp {
 	            AceLog.getAppLog().info("maxMemory: " + Runtime.getRuntime().maxMemory());
 	            AceLog.getAppLog().info("totalMemory: " + Runtime.getRuntime().totalMemory());
 	            
-	            
+	            AceLog.getAppLog().info("finished load, start sync");    
 	            Bdb.sync();
+	            AceLog.getAppLog().info("finished sync");
 	            
 			}
 		} catch (Throwable e) {
@@ -130,26 +137,28 @@ public class Temp {
     }
 
 	private static class ConvertConcept implements Runnable {
-
+		Throwable exception;
 		EConcept eConcept;
 		Concept newConcept;
 		@Override
 		public void run() {
 			try {
 				newConcept = Concept.get(eConcept);
+				Bdb.getConceptDb().writeConcept(newConcept);
+			} catch (Throwable e) {
+				exception = e;
+			}
+			try {
 				converters.put(this);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
 		}
-		public void setEConcept(EConcept eConcept) {
+		public void setEConcept(EConcept eConcept) throws Throwable {
+			if (exception != null) {
+				throw exception;
+			}
 			this.eConcept = eConcept;
 		}
-		public Concept getNewConcept() {
-			return newConcept;
-		}
-		
 	}
 }

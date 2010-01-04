@@ -13,9 +13,8 @@ public class CidIntMember extends RefsetMember<CidIntVersion, CidIntMember> {
 	private int c1Nid;
 	private int intValue;
 
-	public CidIntMember(int nid, int partCount, boolean editable) {
-		super(nid, partCount, editable);
-		// TODO Auto-generated constructor stub
+	public CidIntMember(int nid, int partCount, boolean editable, int refsetNid) {
+		super(nid, partCount, editable, refsetNid);
 	}
 
 	public CidIntMember(ERefsetCidIntMember refsetMember) {

@@ -13,9 +13,8 @@ public class CidFloatMember extends RefsetMember<CidFloatVersion, CidFloatMember
 	private int c1Nid;
 	private float floatValue;
 
-	public CidFloatMember(int nid, int partCount, boolean editable) {
-		super(nid, partCount, editable);
-		// TODO Auto-generated constructor stub
+	public CidFloatMember(int nid, int partCount, boolean editable, int refsetNid) {
+		super(nid, partCount, editable, refsetNid);
 	}
 
 	public CidFloatMember(ERefsetCidFloatMember refsetMember) {

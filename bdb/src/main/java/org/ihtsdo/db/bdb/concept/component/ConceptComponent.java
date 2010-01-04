@@ -23,7 +23,7 @@ import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
-import org.dwfa.cement.PrimordialId;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.db.bdb.Bdb;
@@ -189,7 +189,13 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 	@Override
 	public final int getAuthorityNid() {
-		return PrimordialId.PRIMORDIAL_UUID.getNativeId(Integer.MIN_VALUE);
+		try {
+			return ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (TerminologyException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 

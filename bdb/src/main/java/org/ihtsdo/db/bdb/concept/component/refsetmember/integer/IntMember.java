@@ -10,9 +10,8 @@ import com.sleepycat.bind.tuple.TupleInput;
 public class IntMember extends RefsetMember<IntVersion, IntMember> {
 	private int intValue;
 
-	public IntMember(int nid, int partCount, boolean editable) {
-		super(nid, partCount, editable);
-		throw new UnsupportedOperationException();
+	public IntMember(int nid, int partCount, boolean editable, int refsetNid) {
+		super(nid, partCount, editable, refsetNid);
 	}
 
 	public IntMember(ERefsetIntMember refsetMember) {

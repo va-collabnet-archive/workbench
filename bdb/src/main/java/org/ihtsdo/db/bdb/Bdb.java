@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.ConceptBdb;
-import org.ihtsdo.db.bdb.concept.component.I_HandleFutureStatusAtPositionSetup;
 import org.ihtsdo.etypes.EVersion;
 
 import com.sleepycat.je.Database;

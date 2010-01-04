@@ -3,7 +3,6 @@ package org.ihtsdo.db.bdb.concept.component.refset;
 import java.io.IOException;
 
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.ComponentFactory;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.Boolean.BooleanMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidMember;
@@ -32,14 +31,11 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class RefsetMemberFactory
-	extends
-		ComponentFactory {
+public class RefsetMemberFactory  {
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public RefsetMember create(int nid, int partCount, boolean editable,
-			TupleInput input) {
+			TupleInput input, int refsetNid) {
 		int typeNid = input.readInt();
 		REFSET_TYPES memberType;
 		try {
@@ -51,29 +47,29 @@ public class RefsetMemberFactory
 		}
 		switch (memberType) {
 		case BOOLEAN:
-			return new BooleanMember(nid, partCount, editable);
+			return new BooleanMember(nid, partCount, editable, refsetNid);
 		case CID:
-			return new CidMember(nid, partCount, editable);
+			return new CidMember(nid, partCount, editable, refsetNid);
 		case CID_CID:
-			return new CidCidMember(nid, partCount, editable);
+			return new CidCidMember(nid, partCount, editable, refsetNid);
 		case CID_CID_CID:
-			return new CidCidCidMember(nid, partCount, editable);
+			return new CidCidCidMember(nid, partCount, editable, refsetNid);
 		case CID_CID_STR:
-			return new CidCidStrMember(nid, partCount, editable);
+			return new CidCidStrMember(nid, partCount, editable, refsetNid);
 		case CID_INT:
-			return new CidIntMember(nid, partCount, editable);
+			return new CidIntMember(nid, partCount, editable, refsetNid);
 		case CID_STR:
-			return new CidStrMember(nid, partCount, editable);
+			return new CidStrMember(nid, partCount, editable, refsetNid);
 		case INT:
-			return new IntMember(nid, partCount, editable);
+			return new IntMember(nid, partCount, editable, refsetNid);
 		case CID_FLOAT:
-			return new CidFloatMember(nid, partCount, editable);
+			return new CidFloatMember(nid, partCount, editable, refsetNid);
 		case MEMBER:
-			return new MembershipMember(nid, partCount, editable);
+			return new MembershipMember(nid, partCount, editable, refsetNid);
 		case STR:
-			return new StrMember(nid, partCount, editable);
+			return new StrMember(nid, partCount, editable, refsetNid);
 		case CID_LONG:
-			return new CidLongMember(nid, partCount, editable);
+			return new CidLongMember(nid, partCount, editable, refsetNid);
 
 		default:
 			throw new UnsupportedOperationException(

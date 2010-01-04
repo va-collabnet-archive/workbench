@@ -29,8 +29,9 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 	private int referencedComponentNid;
 
 
-	public RefsetMember(int nid, int partCount, boolean editable) {
+	public RefsetMember(int nid, int partCount, boolean editable, int refsetNid) {
 		super(nid, partCount, editable);
+		this.refsetNid = refsetNid;
 	}
 	
 	public RefsetMember(ERefset refsetMember) {
