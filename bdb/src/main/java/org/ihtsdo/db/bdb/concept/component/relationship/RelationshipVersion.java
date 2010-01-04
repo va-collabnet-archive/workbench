@@ -22,12 +22,14 @@ public class RelationshipVersion
 	private int refinabilityNid;
 	private int typeNid;
 
-	public RelationshipVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	public RelationshipVersion(int statusAtPositionNid, 
+			Relationship primordialRel) {
+		super(statusAtPositionNid, primordialRel);
 	}
 
-	public RelationshipVersion(RelationshipVersion another) {
-		super(another.statusAtPositionNid);
+	public RelationshipVersion(RelationshipVersion another, 
+			Relationship primordialRel) {
+		super(another.statusAtPositionNid, primordialRel);
 		this.characteristicNid = another.characteristicNid;
 		this.group = another.group;
 		this.refinabilityNid = another.refinabilityNid;
@@ -35,25 +37,29 @@ public class RelationshipVersion
 	}
 
 	public RelationshipVersion(I_RelPart another, int statusNid,
-			int pathNid, long time) {
-		super(statusNid, pathNid, time);
+			int pathNid, long time, 
+			Relationship primordialRel) {
+		super(statusNid, pathNid, time, primordialRel);
 		this.characteristicNid = another.getCharacteristicId();
 		this.group = another.getGroup();
 		this.refinabilityNid = another.getRefinabilityId();
 		this.typeNid = another.getTypeId();
 	}
 
-	public RelationshipVersion(TupleInput input) {
-		super(input.readInt());
+	public RelationshipVersion(TupleInput input, 
+			Relationship primordialRel) {
+		super(input.readInt(), primordialRel);
 		this.characteristicNid = input.readInt();
 		this.group = input.readInt();
 		this.refinabilityNid = input.readInt();
 		this.typeNid = input.readInt();
 	}
 
-	public RelationshipVersion(ERelationshipVersion erv) {
+	public RelationshipVersion(ERelationshipVersion erv, 
+			Relationship primordialRel) {
 		super(Bdb.uuidToNid(erv.getStatusUuid()), 
-				Bdb.uuidToNid(erv.getPathUuid()), erv.getTime());
+				Bdb.uuidToNid(erv.getPathUuid()), erv.getTime(), 
+				primordialRel);
 		this.characteristicNid = Bdb.uuidToNid(erv.getCharacteristicUuid());
 		this.group = erv.getGroup();
 		this.refinabilityNid = Bdb.uuidToNid(erv.getRefinabilityUuid());
@@ -108,12 +114,13 @@ public class RelationshipVersion
 
 	@Override
 	public RelationshipVersion duplicate() {
-		return new RelationshipVersion(this);
+		return new RelationshipVersion(this, primordialComponent);
 	}
 	
 	@Override
 	public RelationshipVersion makeAnalog(int statusNid, int pathNid, long time) {
-		return new RelationshipVersion(this, statusNid, pathNid, time);
+		return new RelationshipVersion(this, statusNid, pathNid, time,
+				primordialComponent);
 	}
 
 	@Override

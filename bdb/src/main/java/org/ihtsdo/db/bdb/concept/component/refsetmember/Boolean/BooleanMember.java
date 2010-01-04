@@ -31,7 +31,7 @@ public class BooleanMember extends RefsetMember<BooleanVersion, BooleanMember> {
 		booleanValue = input.readBoolean();
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new BooleanVersion(input));
+				additionalVersions.add(new BooleanVersion(input, this));
 			}
 		}
 	}

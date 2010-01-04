@@ -7,6 +7,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membership.MembershipMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -16,16 +17,20 @@ public class StrVersion extends RefsetVersion<StrVersion, StrMember>
 
 	private String stringValue;
 	
-	public StrVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	public StrVersion(int statusNid, int pathNid, long time, 
+			StrMember primoridalMember) {
+		super(statusNid, pathNid, time, 
+				 primoridalMember);
 	}
 
-	public StrVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	public StrVersion(int statusAtPositionNid, 
+			StrMember primoridalMember) {
+		super(statusAtPositionNid, primoridalMember);
 	}
 
-	public StrVersion(TupleInput input) {
-		super(input);
+	public StrVersion(TupleInput input, 
+			StrMember primoridalMember) {
+		super(input, primoridalMember);
 		stringValue = input.readString();
 	}
 

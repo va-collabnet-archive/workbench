@@ -79,10 +79,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 		ConceptAttributes attr = new ConceptAttributes(c.nid, eAttr.getVersionCount(), c,
 				eConcept.getConceptAttributes().primordialComponentUuid);
 		c.data.set(attr);
-		attr.addVersion(new ConceptAttributesVersion(eAttr));
 		if (eAttr.getExtraVersionsList() != null) {
 			for (I_ConceptualizeExternally eav: eAttr.getExtraVersionsList()) {
-				attr.addVersion(new ConceptAttributesVersion(eav));
+				attr.addVersion(new ConceptAttributesVersion(eav, attr));
 			}
 		}
 		if (eConcept.getDescriptions() != null) {

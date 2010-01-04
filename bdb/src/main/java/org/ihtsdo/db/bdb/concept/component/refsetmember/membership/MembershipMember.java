@@ -26,7 +26,7 @@ public class MembershipMember extends RefsetMember<MembershipVersion, Membership
 	protected final void readMemberParts(TupleInput input) {
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new MembershipVersion(input));
+				additionalVersions.add(new MembershipVersion(input, this));
 			}
 		}
 	}

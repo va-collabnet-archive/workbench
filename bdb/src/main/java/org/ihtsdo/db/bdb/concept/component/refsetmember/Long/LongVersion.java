@@ -16,16 +16,20 @@ public class LongVersion extends RefsetVersion<LongVersion, LongMember>
 
 	private long longValue;
 	
-	public LongVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	public LongVersion(int statusNid, int pathNid, long time, 
+			LongMember primoridalMember) {
+		super(statusNid, pathNid, time, 
+				primoridalMember);
 	}
 
-	public LongVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	public LongVersion(int statusAtPositionNid, 
+			LongMember primoridalMember) {
+		super(statusAtPositionNid, primoridalMember);
 	}
 
-	public LongVersion(TupleInput input) {
-		super(input);
+	public LongVersion(TupleInput input, 
+			LongMember primoridalMember) {
+		super(input, primoridalMember);
 		longValue = input.readLong();
 	}
 

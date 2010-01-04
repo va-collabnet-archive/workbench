@@ -18,18 +18,21 @@ public class CidCidVersion extends RefsetVersion<CidCidVersion, CidCidMember>
 	private int c1Nid;
 	private int c2Nid;
 	
-	public CidCidVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
-		// TODO Auto-generated constructor stub
+	public CidCidVersion(int statusNid, int pathNid, long time, 
+			CidCidMember primoridalMember) {
+		super(statusNid, pathNid, time, 
+				primoridalMember);
 	}
 
-	public CidCidVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
-		// TODO Auto-generated constructor stub
+	public CidCidVersion(int statusAtPositionNid, 
+			CidCidMember primoridalMember) {
+		super(statusAtPositionNid, 
+				primoridalMember);
 	}
 
-	public CidCidVersion(TupleInput input) {
-		super(input);
+	public CidCidVersion(TupleInput input, 
+			CidCidMember primoridalMember) {
+		super(input, primoridalMember);
 		c1Nid = input.readInt();
 		c2Nid = input.readInt();
 	}

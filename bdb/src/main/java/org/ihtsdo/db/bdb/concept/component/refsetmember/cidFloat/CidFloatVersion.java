@@ -7,6 +7,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr.CidCidStrMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -15,16 +16,21 @@ public class CidFloatVersion extends RefsetVersion<CidFloatVersion, CidFloatMemb
 	private int c1Nid;
 	private float floatValue;
 
-	public CidFloatVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	public CidFloatVersion(int statusNid, int pathNid, long time, 
+			CidFloatMember primoridalMember) {
+		super(statusNid, pathNid, time, 
+				primoridalMember);
 	}
 
-	public CidFloatVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	public CidFloatVersion(int statusAtPositionNid, 
+			CidFloatMember primoridalMember) {
+		super(statusAtPositionNid, 
+				primoridalMember);
 	}
 
-	public CidFloatVersion(TupleInput input) {
-		super(input);
+	public CidFloatVersion(TupleInput input, 
+			CidFloatMember primoridalMember) {
+		super(input, primoridalMember);
 		c1Nid = input.readInt();
 		floatValue = input.readFloat();
 	}

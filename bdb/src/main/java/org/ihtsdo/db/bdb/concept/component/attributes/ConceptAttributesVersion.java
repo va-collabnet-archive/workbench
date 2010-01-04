@@ -18,40 +18,48 @@ public class ConceptAttributesVersion
 	
 	private boolean defined = false;
 	
-	public ConceptAttributesVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	public ConceptAttributesVersion(int statusAtPositionNid, 
+			ConceptAttributes primoridalMember) {
+		super(statusAtPositionNid, primoridalMember);
 	}
 
-	public ConceptAttributesVersion(I_ConceptualizeExternally another) {
+	public ConceptAttributesVersion(I_ConceptualizeExternally another, 
+			ConceptAttributes primoridalMember) {
 		super(Bdb.uuidToNid(another.getStatusUuid()), 
 				Bdb.uuidToNid(another.getPathUuid()),
-				another.getTime());
+				another.getTime(), primoridalMember);
 		defined = isDefined();
 	}
 	public ConceptAttributesVersion(I_ConceptAttributePart another,
-			int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+			int statusNid, int pathNid, long time, 
+			ConceptAttributes primoridalMember) {
+		super(statusNid, pathNid, time, primoridalMember);
 		this.defined = another.isDefined();
 	}
 
-	public ConceptAttributesVersion(I_ConceptAttributePart another) {
-		super(another.getStatusId(), another.getPathId(), another.getTime());
+	public ConceptAttributesVersion(I_ConceptAttributePart another, 
+			ConceptAttributes primoridalMember) {
+		super(another.getStatusId(), another.getPathId(), another.getTime(), 
+				primoridalMember);
 		this.defined = another.isDefined();
 	}
 
-	public ConceptAttributesVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	public ConceptAttributesVersion(int statusNid, int pathNid, long time, 
+			ConceptAttributes primoridalMember) {
+		super(statusNid, pathNid, time, 
+				primoridalMember);
 	}
 
-	public ConceptAttributesVersion(TupleInput input) {
-		super(input.readInt());
+	public ConceptAttributesVersion(TupleInput input, 
+			ConceptAttributes primoridalMember) {
+		super(input.readInt(), primoridalMember);
 		defined = input.readBoolean();
 	}
 
 
 	@Override
 	public ConceptAttributesVersion makeAnalog(int statusNid, int pathNid, long time) {
-		return new ConceptAttributesVersion(this, statusNid, pathNid, time);
+		return new ConceptAttributesVersion(this, statusNid, pathNid, time, this.primordialComponent);
 	}
 
 	@Override
@@ -71,7 +79,7 @@ public class ConceptAttributesVersion
 
 	@Override
 	public ConceptAttributesVersion duplicate() {
-		return new ConceptAttributesVersion(this);
+		return new ConceptAttributesVersion(this, this.primordialComponent);
 	}
 
 	@Override

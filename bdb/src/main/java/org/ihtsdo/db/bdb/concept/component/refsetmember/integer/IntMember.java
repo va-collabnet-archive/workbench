@@ -30,7 +30,7 @@ public class IntMember extends RefsetMember<IntVersion, IntMember> {
 		intValue = input.readInt();
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new IntVersion(input));
+				additionalVersions.add(new IntVersion(input, this));
 			}
 		}
 	}

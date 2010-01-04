@@ -28,48 +28,55 @@ public class DescriptionVersion
 	private int typeNid; 
 	private String lang;
 
-	public DescriptionVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	public DescriptionVersion(int statusAtPositionNid, 
+			Description primoridalMember) {
+		super(statusAtPositionNid, primoridalMember);
 	}
 	
-	protected DescriptionVersion(DescriptionVersion another) {
-		super(another.getStatusAtPositionNid());
+	protected DescriptionVersion(DescriptionVersion another, 
+			Description primoridalMember) {
+		super(another.getStatusAtPositionNid(), primoridalMember);
 		this.text = another.text;
 		this.typeNid = another.typeNid;
 		this.lang = another.lang;
 		this.initialCaseSignificant = another.initialCaseSignificant;
 	}
 
-	protected DescriptionVersion(I_DescriptionPart another, int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	protected DescriptionVersion(I_DescriptionPart another, 
+			int statusNid, int pathNid, long time, 
+			Description primoridalMember) {
+		super(statusNid, pathNid, time, primoridalMember);
 		this.text = another.getText();
 		this.typeNid = another.getTypeId();
 		this.lang = another.getLang();
 		this.initialCaseSignificant = another.isInitialCaseSignificant();
 	}
 
-	protected DescriptionVersion(TupleInput input) {
-		super(input.readInt());
+	protected DescriptionVersion(TupleInput input, 
+			Description primoridalMember) {
+		super(input.readInt(), primoridalMember);
 		text = input.readString();
 		lang = input.readString();
 		initialCaseSignificant = input.readBoolean();
 		typeNid = input.readInt();
 	}
 
-	public DescriptionVersion(UniversalAceDescriptionPart umPart) {
+	public DescriptionVersion(UniversalAceDescriptionPart umPart, 
+			Description primoridalMember) {
 		super(Bdb.uuidsToNid(umPart.getStatusId()),
 				Bdb.uuidsToNid(umPart.getPathId()),
-				umPart.getTime());
+				umPart.getTime(), primoridalMember);
 		text = umPart.getText();
 		lang = umPart.getLang();
 		initialCaseSignificant = umPart.getInitialCaseSignificant();
 		typeNid = Bdb.uuidsToNid(umPart.getTypeId());
 	}
 
-	public DescriptionVersion(EDescriptionVersion edv) {
+	public DescriptionVersion(EDescriptionVersion edv, 
+			Description primoridalMember) {
 		super(Bdb.uuidToNid(edv.getStatusUuid()),
 				Bdb.uuidToNid(edv.getPathUuid()),
-				edv.getTime());
+				edv.getTime(), primoridalMember);
 		initialCaseSignificant = edv.isInitialCaseSignificant();
 		lang = edv.getLang();
 		text = edv.getText();
@@ -132,12 +139,14 @@ public class DescriptionVersion
 
 	@Override
 	public DescriptionVersion duplicate() {
-		return new DescriptionVersion(this);
+		return new DescriptionVersion(this, this.primordialComponent);
 	}
 
 	@Override
-	public DescriptionVersion makeAnalog(int statusNid, int pathNid, long time) {
-		return new DescriptionVersion(this, statusNid, pathNid, time);
+	public DescriptionVersion makeAnalog(int statusNid, int pathNid, 
+			long time) {
+		return new DescriptionVersion(this, statusNid, 
+				pathNid, time, this.primordialComponent);
 	}
 
 	@Override

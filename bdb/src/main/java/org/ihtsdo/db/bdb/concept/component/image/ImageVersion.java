@@ -24,27 +24,32 @@ public class ImageVersion extends Version<ImageVersion, Image>
 		return partComponentNids;
 	}
 
-	protected ImageVersion(TupleInput input) {
-		super(input.readInt());
+	protected ImageVersion(TupleInput input, 
+			Image primoridalMember) {
+		super(input.readInt(), primoridalMember);
 		this.textDescription = input.readString();
 		this.typeNid = input.readInt();
 	}
 
-	private ImageVersion(ImageVersion another) {
-		super(another.statusAtPositionNid);
+	private ImageVersion(ImageVersion another, 
+			Image primoridalMember) {
+		super(another.statusAtPositionNid, 
+				primoridalMember);
 		this.textDescription = another.textDescription;
 		this.typeNid = another.typeNid;
 	}
 
-	protected ImageVersion(I_ImagePart another, int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	protected ImageVersion(I_ImagePart another, int statusNid, 
+			int pathNid, long time, 
+			Image primoridalMember) {
+		super(statusNid, pathNid, time, primoridalMember);
 		this.textDescription = another.getTextDescription();
 		this.typeNid = another.getTypeId();
 	}
 
 	@Override
 	public ImageVersion makeAnalog(int statusNid, int pathNid, long time) {
-		return new ImageVersion(this, statusNid, pathNid, time);
+		return new ImageVersion(this, statusNid, pathNid, time, this.primordialComponent);
 	}
 
 	@Override
@@ -53,16 +58,17 @@ public class ImageVersion extends Version<ImageVersion, Image>
 		output.writeInt(typeNid);
 	}
 
-	private ImageVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
-		// TODO Auto-generated constructor stub
+	private ImageVersion(int statusAtPositionNid, 
+			Image primoridalMember) {
+		super(statusAtPositionNid, primoridalMember);
 	}
 
 
-	public ImageVersion(EImageVersion eiv) {
+	public ImageVersion(EImageVersion eiv, 
+			Image primoridalMember) {
 		super(Bdb.uuidToNid(eiv.getStatusUuid()), 
 			  Bdb.uuidToNid(eiv.getPathUuid()), 
-			  eiv.getTime());
+			  eiv.getTime(), primoridalMember);
 		this.textDescription = eiv.getTextDescription();
 		this.typeNid = Bdb.uuidToNid(eiv.getTypeUuid());
 	}

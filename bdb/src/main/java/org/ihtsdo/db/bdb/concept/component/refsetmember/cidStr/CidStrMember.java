@@ -35,7 +35,7 @@ public class CidStrMember extends RefsetMember<CidStrVersion, CidStrMember> {
 		strValue = input.readString();
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new CidStrVersion(input));
+				additionalVersions.add(new CidStrVersion(input, this));
 			}
 		}
 	}

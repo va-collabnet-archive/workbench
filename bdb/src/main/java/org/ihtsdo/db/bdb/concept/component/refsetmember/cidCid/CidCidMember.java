@@ -35,7 +35,7 @@ public class CidCidMember extends RefsetMember<CidCidVersion, CidCidMember> {
 		c2Nid = input.readInt();
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new CidCidVersion(input));
+				additionalVersions.add(new CidCidVersion(input, this));
 			}
 		}
 	}

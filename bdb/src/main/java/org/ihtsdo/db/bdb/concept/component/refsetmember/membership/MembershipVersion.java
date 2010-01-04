@@ -13,16 +13,20 @@ import com.sleepycat.bind.tuple.TupleInput;
 public class MembershipVersion extends RefsetVersion<MembershipVersion, MembershipMember> {
 
 	
-	public MembershipVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	public MembershipVersion(int statusNid, int pathNid, long time, 
+			MembershipMember primoridalMember) {
+		super(statusNid, pathNid, time, 
+				primoridalMember);
 	}
 
-	public MembershipVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	public MembershipVersion(int statusAtPositionNid, 
+			MembershipMember primoridalMember) {
+		super(statusAtPositionNid, primoridalMember);
 	}
 
-	public MembershipVersion(TupleInput input) {
-		super(input);
+	public MembershipVersion(TupleInput input, 
+			MembershipMember primoridalMember) {
+		super(input, primoridalMember);
 	}
 
 	@Override

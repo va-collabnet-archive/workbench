@@ -65,7 +65,7 @@ public class Description
 		super(Bdb.uuidsToNid(uDesc.getDescId()), uDesc.getVersions().size(), 
 				enclosingConcept, uDesc.getDescId().iterator().next());
 		for (UniversalAceDescriptionPart umPart: uDesc.getMutableParts()) {
-			additionalVersions.add(new DescriptionVersion(umPart));
+			additionalVersions.add(new DescriptionVersion(umPart, this));
 		}
 	}
 
@@ -80,7 +80,7 @@ public class Description
 		if (eDesc.getExtraVersionsList() != null) {
 			additionalVersions = new ArrayList<DescriptionVersion>(eDesc.getExtraVersionsList().size());
 			for (EDescriptionVersion edv: eDesc.getExtraVersionsList()) {
-				additionalVersions.add(new DescriptionVersion(edv));
+				additionalVersions.add(new DescriptionVersion(edv, this));
 			}
 		}
 	}
@@ -89,7 +89,7 @@ public class Description
 	public void readComponentFromBdb(TupleInput input, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
 		for (int i = 0; i < listSize; i++) {
-			additionalVersions.add(new DescriptionVersion(input));
+			additionalVersions.add(new DescriptionVersion(input, this));
 		}
 	}
 
@@ -356,7 +356,7 @@ public class Description
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new DescriptionVersion(this, statusNid, pathNid, time);
+		return new DescriptionVersion(this, statusNid, pathNid, time, this);
 	}
 
 	@Override

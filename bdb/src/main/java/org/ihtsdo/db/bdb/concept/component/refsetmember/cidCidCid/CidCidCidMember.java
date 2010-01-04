@@ -24,7 +24,8 @@ public class CidCidCidMember extends RefsetMember<CidCidCidVersion, CidCidCidMem
 				primordialUuid);
 	}
 
-	public CidCidCidMember(ERefsetCidCidCidMember refsetMember, Concept enclosingConcept) {
+	public CidCidCidMember(ERefsetCidCidCidMember refsetMember, 
+			Concept enclosingConcept) {
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
@@ -38,7 +39,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidVersion, CidCidCidMem
 		c3Nid = input.readInt();
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new CidCidCidVersion(input));
+				additionalVersions.add(new CidCidCidVersion(input, this));
 			}
 		}
 	}

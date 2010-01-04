@@ -30,7 +30,7 @@ public class LongMember extends RefsetMember<LongVersion, LongMember> {
 		longValue = input.readLong();
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new LongVersion(input));
+				additionalVersions.add(new LongVersion(input, this));
 			}
 		}
 	}

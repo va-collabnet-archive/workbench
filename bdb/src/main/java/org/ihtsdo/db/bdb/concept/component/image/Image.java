@@ -61,7 +61,7 @@ public class Image
 		if (eImage.getExtraVersionsList() != null) {
 			additionalVersions = new ArrayList<ImageVersion>(eImage.getExtraVersionsList().size());
 			for (EImageVersion eiv: eImage.getExtraVersionsList()) {
-				additionalVersions.add(new ImageVersion(eiv));
+				additionalVersions.add(new ImageVersion(eiv, this));
 			}
 		}
 	}
@@ -74,7 +74,7 @@ public class Image
 		image = new byte[imageBytes];
 		input.read(image, 0, imageBytes);
 		for (int i = 0; i < listSize; i++) {
-			additionalVersions.add(new ImageVersion(input));
+			additionalVersions.add(new ImageVersion(input, this));
 		}
 	}
 
@@ -260,7 +260,7 @@ public class Image
 
 	@Override
 	public ImageVersion makeAnalog(int statusNid, int pathNid, long time) {
-		return new ImageVersion(this, statusNid, pathNid, time);
+		return new ImageVersion(this, statusNid, pathNid, time, this);
 	}
 
 	@Override

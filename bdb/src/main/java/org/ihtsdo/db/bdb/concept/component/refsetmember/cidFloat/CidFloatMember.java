@@ -35,7 +35,7 @@ public class CidFloatMember extends RefsetMember<CidFloatVersion, CidFloatMember
 		floatValue = input.readFloat();
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new CidFloatVersion(input));
+				additionalVersions.add(new CidFloatVersion(input, this));
 			}
 		}
 	}

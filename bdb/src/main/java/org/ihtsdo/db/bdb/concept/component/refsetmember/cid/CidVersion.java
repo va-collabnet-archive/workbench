@@ -16,16 +16,21 @@ public class CidVersion extends RefsetVersion<CidVersion, CidMember>
 	
 	private int c1Nid;
 
-	protected CidVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	protected CidVersion(int statusNid, int pathNid, long time, 
+			CidMember primoridalMember) {
+		super(statusNid, pathNid, time, 
+				primoridalMember);
 	}
 
-	protected CidVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	protected CidVersion(int statusAtPositionNid, 
+			CidMember primoridalMember) {
+		super(statusAtPositionNid, 
+				primoridalMember);
 	}
 
-	public CidVersion(TupleInput input) {
-		super(input);
+	public CidVersion(TupleInput input, 
+			CidMember primoridalMember) {
+		super(input, primoridalMember);
 		c1Nid = input.readInt();
 	}
 

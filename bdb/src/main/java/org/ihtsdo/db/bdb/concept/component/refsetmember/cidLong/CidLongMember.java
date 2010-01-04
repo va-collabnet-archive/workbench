@@ -36,7 +36,7 @@ public class CidLongMember
 		longValue = input.readLong();
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new CidLongVersion(input));
+				additionalVersions.add(new CidLongVersion(input, this));
 			}
 		}
 	}

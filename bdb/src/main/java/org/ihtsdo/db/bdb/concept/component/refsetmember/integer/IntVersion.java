@@ -16,16 +16,21 @@ public class IntVersion extends RefsetVersion<IntVersion, IntMember>
 
 	private int intValue;
 	
-	public IntVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	public IntVersion(int statusNid, int pathNid, long time, 
+			IntMember primoridalMember) {
+		super(statusNid, pathNid, time, 
+				primoridalMember);
 	}
 
-	public IntVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	public IntVersion(int statusAtPositionNid, 
+			IntMember primoridalMember) {
+		super(statusAtPositionNid, 
+				primoridalMember);
 	}
 
-	public IntVersion(TupleInput input) {
-		super(input);
+	public IntVersion(TupleInput input, 
+			IntMember primoridalMember) {
+		super(input, primoridalMember);
 		intValue = input.readInt();
 	}
 

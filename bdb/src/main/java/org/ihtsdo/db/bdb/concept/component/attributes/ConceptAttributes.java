@@ -54,7 +54,7 @@ public class ConceptAttributes
 	public void readComponentFromBdb(TupleInput input, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
 		for (int i = 0; i < listSize; i++) {
-			additionalVersions.add(new ConceptAttributesVersion(input));
+			additionalVersions.add(new ConceptAttributesVersion(input, this));
 		}
 	}
 
@@ -282,7 +282,7 @@ public class ConceptAttributes
 
 	@Override
 	public boolean addVersion(I_ConceptAttributePart part) {
-		return additionalVersions.add(new ConceptAttributesVersion(part));
+		return additionalVersions.add(new ConceptAttributesVersion(part, this));
 	}
 
 	@Override
@@ -332,7 +332,7 @@ public class ConceptAttributes
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new ConceptAttributesVersion(this, statusNid, pathNid, time);
+		return new ConceptAttributesVersion(this, statusNid, pathNid, time, this);
 	}
 
 	

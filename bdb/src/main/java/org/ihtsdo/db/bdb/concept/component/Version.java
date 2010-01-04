@@ -21,19 +21,25 @@ public abstract class Version<V extends Version<V, C>,
 	private static StatusAtPositionBdb sapBdb = Bdb.getStatusAtPositionDb();
 	
 	public int statusAtPositionNid = Integer.MAX_VALUE;
-	public C conceptComponent;
+	public C primordialComponent;
 
-	public Version(int statusAtPositionNid) {
+	public Version(int statusAtPositionNid, C primordialComponent) {
 		super();
 		this.statusAtPositionNid = statusAtPositionNid;
+		this.primordialComponent = primordialComponent;
+		assert primordialComponent != null;
+		assert statusAtPositionNid != Integer.MAX_VALUE;
 	}
 
-	public Version(int statusNid, int pathNid, long time) {
+	public Version(int statusNid, int pathNid, long time, C primordialComponent) {
 		this.statusAtPositionNid = sapBdb.getStatusAtPositionNid(statusNid, pathNid, time);
+		this.primordialComponent = primordialComponent;
+		assert primordialComponent != null;
+		assert statusAtPositionNid != Integer.MAX_VALUE;
 	}
 	
-	public Version(TupleInput input) {
-		this(input.readInt());
+	public Version(TupleInput input, C conceptComponent) {
+		this(input.readInt(), conceptComponent);
 	}
 
 	
@@ -59,30 +65,30 @@ public abstract class Version<V extends Version<V, C>,
 	protected abstract void writeFieldsToBdb(TupleOutput output);
 	
 	public final C getVersioned() {
-		return conceptComponent;
+		return primordialComponent;
 	}
 
 	@Override
 	public final C getFixedPart() {
-		return conceptComponent;
+		return primordialComponent;
 	}
 
 	@Override
 	public final int getNid() {
-		return conceptComponent.getNid();
+		return primordialComponent.getNid();
 	}
 
 	public final Set<TimePathId> getTimePathSet() {
-		return conceptComponent.getTimePathSet();
+		return primordialComponent.getTimePathSet();
 	}
 	
 	public List<V> getVersions() {
-		return conceptComponent.additionalVersions;
+		return primordialComponent.additionalVersions;
 	}
 
 	@Override
 	public final int hashCode() {
-		return HashFunction.hashCode( new int[] { conceptComponent.nid });
+		return HashFunction.hashCode( new int[] { primordialComponent.nid });
 	}
 
 

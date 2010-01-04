@@ -30,7 +30,7 @@ public class StrMember extends RefsetMember<StrVersion, StrMember> {
 		stringValue = input.readString();
 		if (additionalVersions != null) {
 			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new StrVersion(input));
+				additionalVersions.add(new StrVersion(input, this));
 			}
 		}
 	}

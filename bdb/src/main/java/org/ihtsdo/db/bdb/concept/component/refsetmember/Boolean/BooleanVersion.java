@@ -17,16 +17,20 @@ public class BooleanVersion extends RefsetVersion<BooleanVersion, BooleanMember>
 	
 	private boolean booleanValue;
 
-	protected BooleanVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	protected BooleanVersion(int statusNid, int pathNid, long time, 
+			BooleanMember primoridalMember) {
+		super(statusNid, pathNid, time, primoridalMember);
 	}
 
-	protected BooleanVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	protected BooleanVersion(int statusAtPositionNid, 
+			BooleanMember primoridalMember) {
+		super(statusAtPositionNid, 
+				primoridalMember);
 	}
 
-	public BooleanVersion(TupleInput input) {
-		super(input);
+	public BooleanVersion(TupleInput input, 
+			BooleanMember primoridalMember) {
+		super(input, primoridalMember);
 		booleanValue = input.readBoolean();
 	}
 

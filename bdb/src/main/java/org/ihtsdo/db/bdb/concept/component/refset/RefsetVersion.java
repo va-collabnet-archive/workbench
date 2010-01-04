@@ -13,16 +13,17 @@ public abstract class RefsetVersion<V extends RefsetVersion<V, C>,
 	implements I_ThinExtByRefPart {
 
 
-	public RefsetVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
+	public RefsetVersion(int statusNid, int pathNid, long time, 
+			C primordialComponent) {
+		super(statusNid, pathNid, time, primordialComponent);
 	}
 
-	public RefsetVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	public RefsetVersion(int statusAtPositionNid, C primordialComponent) {
+		super(statusAtPositionNid, primordialComponent);
 	}
 
-	public RefsetVersion(TupleInput input) {
-		super(input);
+	public RefsetVersion(TupleInput input, C primordialComponent) {
+		super(input, primordialComponent);
 	}
 
 	@Override

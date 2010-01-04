@@ -9,6 +9,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidFloat.CidFloatMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -19,18 +20,21 @@ public class CidIntVersion
 	private int c1Nid;
 	private int intValue;
 	
-	protected CidIntVersion(int statusNid, int pathNid, long time) {
-		super(statusNid, pathNid, time);
-		// TODO Auto-generated constructor stub
+	protected CidIntVersion(int statusNid, int pathNid, long time, 
+			CidIntMember primoridalMember) {
+		super(statusNid, pathNid, time, 
+				primoridalMember);
 	}
 
-	protected CidIntVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
-		// TODO Auto-generated constructor stub
+	protected CidIntVersion(int statusAtPositionNid, 
+			CidIntMember primoridalMember) {
+		super(statusAtPositionNid, 
+				primoridalMember);
 	}
 
-	public CidIntVersion(TupleInput input) {
-		super(input);
+	public CidIntVersion(TupleInput input, 
+			CidIntMember primoridalMember) {
+		super(input, primoridalMember);
 		c1Nid = input.readInt();
 		intValue = input.readInt();
 	}

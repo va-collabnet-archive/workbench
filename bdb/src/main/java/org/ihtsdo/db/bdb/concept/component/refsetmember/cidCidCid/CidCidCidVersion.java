@@ -20,17 +20,21 @@ public class CidCidCidVersion extends RefsetVersion<CidCidCidVersion, CidCidCidM
 	private int c3Nid;
 	
 	public CidCidCidVersion(int statusNid, int pathNid,
-			long time) {
-		super(statusNid, pathNid, time);
+			long time, 
+			CidCidCidMember primoridalMember) {
+		super(statusNid, pathNid, time, 
+				primoridalMember);
 	}
 
-	public CidCidCidVersion(int statusAtPositionNid) {
-		super(statusAtPositionNid);
+	public CidCidCidVersion(int statusAtPositionNid, 
+			CidCidCidMember primoridalMember) {
+		super(statusAtPositionNid, 
+				primoridalMember);
 	}
 
-	public CidCidCidVersion(TupleInput input) {
-		super(input);
-		// TODO Auto-generated constructor stub
+	public CidCidCidVersion(TupleInput input, 
+			CidCidCidMember primoridalMember) {
+		super(input, primoridalMember);
 	}
 
 	@Override

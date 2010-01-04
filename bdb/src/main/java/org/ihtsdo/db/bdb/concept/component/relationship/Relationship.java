@@ -68,7 +68,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 		if (eRel.getExtraVersionsList() != null) {
 			additionalVersions = new ArrayList<RelationshipVersion>(eRel.getExtraVersionsList().size());
 			for (ERelationshipVersion erv: eRel.getExtraVersionsList()) {
-				additionalVersions.add(new RelationshipVersion(erv));
+				additionalVersions.add(new RelationshipVersion(erv, this));
 			}
 		}
 	}
@@ -79,7 +79,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 		// nid, list size, and conceptNid are read already by the binder...
 		this.c2Nid = input.readInt();
 		for (int i = 0; i < listSize; i++) {
-			additionalVersions.add(new RelationshipVersion(input));
+			additionalVersions.add(new RelationshipVersion(input, this));
 		}
 	}
 
@@ -344,7 +344,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new RelationshipVersion(this, statusNid, pathNid, time);
+		return new RelationshipVersion(this, statusNid, pathNid, time, this);
 	}
 
 	@Override
