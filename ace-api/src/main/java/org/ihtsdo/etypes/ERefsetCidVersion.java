@@ -41,4 +41,12 @@ public class ERefsetCidVersion extends EVersion {
 		out.writeLong(c1Uuid.getLeastSignificantBits());
 	}
 
+	public UUID getC1Uuid() {
+		return c1Uuid;
+	}
+
+	public void setC1Uuid(UUID c1Uuid) {
+		this.c1Uuid = c1Uuid;
+	}
+
 }

@@ -40,4 +40,12 @@ public class ERefsetLongVersion extends EVersion {
 		out.writeLong(longValue);
 	}
 
+	public long getLongValue() {
+		return longValue;
+	}
+
+	public void setLongValue(long longValue) {
+		this.longValue = longValue;
+	}
+
 }

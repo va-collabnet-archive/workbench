@@ -49,4 +49,20 @@ public class ERefsetCidIntVersion extends EVersion {
 		out.writeInt(intValue);
 	}
 
+	public UUID getC1Uuid() {
+		return c1Uuid;
+	}
+
+	public void setC1Uuid(UUID c1Uuid) {
+		this.c1Uuid = c1Uuid;
+	}
+
+	public int getIntValue() {
+		return intValue;
+	}
+
+	public void setIntValue(int intValue) {
+		this.intValue = intValue;
+	}
+
 }
