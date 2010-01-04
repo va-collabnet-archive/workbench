@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dwfa.mojo.epicexport;
 
 import java.text.SimpleDateFormat;
@@ -18,6 +34,15 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
+/**
+ * Class to mine a concept and its descriptions for extensions that are used to indicate the concept is
+ * used for terms that are term records in an external system.  In this class's construct method, pass a factory
+ * that is used to get classes for interpreting the refset names and values.  This way multiple entities
+ * can share this class.
+ * 
+ * @author Steven Neiner
+ *
+ */
 public class ExternalTermPublisher {
 	private I_ExportFactory exportFactory;
 	private EpicExportManager exportManager;
@@ -50,20 +75,36 @@ public class ExternalTermPublisher {
 		this.exportManager.close();
 	}
 	
+	/**
+	 * Only concepts with these positions will be returned
+	 * 
+	 * @param positions
+	 */
 	public void setPositions(HashSet<I_Position> positions) {
 		this.positions = positions;
 	}
 
+	/**
+	 * Only concepts with these statuses will be returned
+	 * 
+	 * @param statusValues
+	 */
 	public void setStatusValues(I_IntSet statusValues) {
 		this.statusValues = statusValues;
 	}
 	
-	public void setStartingDate(String d) {
+	/**
+	 * Set the starting date, in the format yyyymmssThhmmssZ+8.  This will cause the previous values to
+	 * be populated with values as they were on this date.
+	 * 
+	 * @param date - The date string  in the format yyyymmssThhmmssZ+8
+	 */
+	public void setStartingDate(String date) {
 		Date parsedDate = new Date();
 		try {
-			parsedDate = dateFormat.parse(d);
+			parsedDate = dateFormat.parse(date);
 		} catch (java.text.ParseException e) {
-			AceLog.getAppLog().warning("Invalid date: " + d + " - use format yyyymmssThhmmssZ+8");
+			AceLog.getAppLog().warning("Invalid date: " + date + " - use format yyyymmssThhmmssZ+8");
 			e.printStackTrace();
 		}
     	
@@ -71,6 +112,14 @@ public class ExternalTermPublisher {
     	this.converter = this.exportFactory.getValueConverter(startingVersion);
 	}
 
+	/**
+	 * Given a concept, looks for any extensions in that concept, or its descriptions, that indicate the 
+	 * concept has terms that are used as term master file records in an external system, such as Epic.
+	 * 
+	 * @param concept - The concept to look through for extensions attached to it and its descriptions
+	 * @return List of ExternalTermRecords that are associated with the concept
+	 * @throws Exception
+	 */
 	public List<ExternalTermRecord> getExternalTermRecordsForConcept(I_GetConceptData concept) throws Exception {
 		masterFilesImpacted = new ArrayList<String>();
 		displayNames = new ArrayList<DisplayName>();
@@ -97,6 +146,7 @@ public class ExternalTermPublisher {
 		processDescriptionConcept(concept, null);
         writeWildcardValues();
         saveAndCloseRecordQueue(concept, standAloneRecords, commonItemRecords);
+        //Add all of the common items to each stand-alone record
         for (ExternalTermRecord r : standAloneRecords) {
         	for (ExternalTermRecord c : commonItemRecords) {
         		if (c.getMasterFileName().equals(r.getMasterFileName())) {
@@ -113,6 +163,7 @@ public class ExternalTermPublisher {
 	private void saveAndCloseRecordQueue(I_GetConceptData concept, List<ExternalTermRecord> standAloneRecords, 
 			List<ExternalTermRecord> commonItemRecords) throws Exception {
 		for (ExternalTermRecord r: this.recordQueue) {
+			//If the description is a stand-alone term, usually meaning the term has a display name
 			if (this.converter.recordIsStandAloneTerm(r)) {
 				if (this.idTuple != null)
 					this.converter.addRecordIds(this.idTuple, concept, r);
@@ -275,7 +326,7 @@ public class ExternalTermPublisher {
     	return ret;
     }
     
-    public List<String> getRegions(String masterFile) {
+    private List<String> getRegions(String masterFile) {
     	ArrayList<String> ret = new ArrayList<String>();
     	for (DisplayName d:  this.displayNames) {
     		if (d.getMasterFile().equals(masterFile))

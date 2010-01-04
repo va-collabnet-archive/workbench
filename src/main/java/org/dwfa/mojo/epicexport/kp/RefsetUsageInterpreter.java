@@ -21,8 +21,21 @@ import java.util.List;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
 
+/**
+ * Class to determine what master file and items that a refset is used for.
+ * 
+ * @author Steven Neiner
+ *
+ */
 public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
 
+	/**
+	 * Given the name of a refset, determines what that refset is used for.  
+	 * 
+	 * @param refsetName - The name of the refset
+	 * @return List of I_RefsetApplication, which is a masterfile name, and item number(or name) that
+	 * the refset is used for.
+	 */
 	public List<I_RefsetApplication> getApplications(String refsetName) {
 		List<I_RefsetApplication> applications = new ArrayList<I_RefsetApplication>();
 		List<String> nameComponents;

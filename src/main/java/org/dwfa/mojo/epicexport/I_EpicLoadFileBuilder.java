@@ -46,8 +46,6 @@ public interface I_EpicLoadFileBuilder {
 	 */
 	public void clearRecordContents();
 	
-	public abstract String getEpicItemNumber(int refsetNumber);
-	
 	/** 
 	 * Abstract method to determine which items export and how.
 	 * 

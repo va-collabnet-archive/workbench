@@ -16,7 +16,6 @@
  */
 package org.dwfa.mojo.epicexport.kp;
 
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.sql.Connection;
@@ -30,13 +29,10 @@ import java.util.List;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 
-
 /** 
  * Class used to build a data warehouse of terms used as master files in the Epic system.
  * Also, associated values that are used to populate master file items from a refset are 
  * passed to this class.
- * When the saveRecord() method is called, the stored values are written to the load
- * file in the format 'n,"value"'.
  * 
  * @author Steven Neiner
  *
