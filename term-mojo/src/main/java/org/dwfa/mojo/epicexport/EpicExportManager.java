@@ -16,6 +16,7 @@
  */
 package org.dwfa.mojo.epicexport;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,13 +25,12 @@ import com.mysql.jdbc.Connection;
 
 /**
  * Class used to manage a list of export writers, and export builders. Used to
- * determine
- * where to place an export. If a particular writer or builder is not present,
+ * determine where to place an export. If a particular writer or builder is not present,
  * will create a new instance and place it on the list.
  * 
  * @author Steven Neiner
- * @parameter baseDir - The location of the exported files
- * @parameter exportFactory - The factory to produce new writers and builders
+ * @param baseDir - The location of the exported files
+ * @param exportFactory - The factory to produce new writers and builders
  */
 public class EpicExportManager {
     // private List<EpicExportWriter> writers;
@@ -97,13 +97,20 @@ public class EpicExportManager {
     	}
     }
     
-    public void close() throws IOException {
+    public void close(BufferedWriter bw) throws IOException {
 
         for (Iterator<I_EpicExportRecordWriter> i = writers.values().iterator(); i.hasNext();) {
             I_EpicExportRecordWriter w = i.next();
-            System.out.println(w.getSummary());
+            String text = w.getSummary();
+            AceLog.getAppLog().info(text);
+            if (bw != null)
+            	bw.write(text.concat("\r\n"));
             w.close();
         }
+    }
+    
+    public void close() throws IOException {
+    	close(null);
     }
 
     public boolean isEqualOrBothNull(String c1, String c2) {
@@ -131,5 +138,11 @@ public class EpicExportManager {
 				b.clearRecordContents();
 		}
 	}
+
+	public String getBaseDir() {
+		return baseDir;
+	}
+	
+	
     
 }

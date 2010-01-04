@@ -40,11 +40,6 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 		this.setExportIfTheseItemsChanged(INTERESTED_ITEMS);
 	}
 
-	public String getEpicItemNumber(int refsetNumber) {
-		// TODO just for now return the same number
-		return new Integer(refsetNumber).toString();
-	}
-	
 	public void writeRecord(String version, List<String> regions) throws Exception {
 		
 		if (this.isChangedRecord()) {

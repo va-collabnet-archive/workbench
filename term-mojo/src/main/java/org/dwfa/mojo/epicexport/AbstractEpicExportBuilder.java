@@ -32,8 +32,8 @@ import org.dwfa.ace.log.AceLog;
  * are needed for a single master file, which export file will be written to.
  * 
  * @author Steven Neiner
- * @parameter exportFactory - The factory to produce new writers
- * @parameter exportManager - The export manager
+ * @param exportFactory - The factory to produce new writers
+ * @param exportManager - The export manager
  */
 public abstract class AbstractEpicExportBuilder {
 	I_ExportFactory exportFactory;
@@ -103,8 +103,7 @@ public abstract class AbstractEpicExportBuilder {
 		errors = new ArrayList<String>();
 		this.hasErrors = false;
 	}
-	public abstract String getEpicItemNumber(int refsetNumber);
-	
+		
 	/** 
 	 * Abstract method to determine which items export and how.
 	 * 
@@ -114,7 +113,7 @@ public abstract class AbstractEpicExportBuilder {
 	public abstract void writeRecord(String version, List<String> regions) throws Exception;
 	
 	/**
-	 * Writes an item to the Epic load file
+	 * Writes an item to the export target
 	 * 
 	 * @param @param epicItemNumber - The item number of the value to write to the load file
 	 * @param aliasItemNumber - The item number to use in the load file
@@ -127,19 +126,27 @@ public abstract class AbstractEpicExportBuilder {
 		}
 	}
 	
+	/** 
+	 * Writes all items to the export
+	 */
 	public void writeAll() {
 		for (Iterator<EpicItem> i = epicItems.iterator(); i.hasNext();) {
 			EpicItem ei = (EpicItem) i.next();
 			writer.addItemValue(ei.itemNumber, ei.value);
 		}
 	}
-	
+
+	/** 
+	 * Plural of writeItem, writes a list of items to the export target
+	 * 
+	 * @param items
+	 */
 	public void writeItems(String... items) {
 		for (String i: items)
 			writeItem(i, i);
 	}
 	/**
-	 * Writes an item to the Epic load file
+	 * Writes an item to the export target
 	 * 
 	 * @param epicItemNumber - The item number to write to the load file
 	 */
@@ -255,36 +262,65 @@ public abstract class AbstractEpicExportBuilder {
 		return ret;
 	}
 
-	
+	/**
+	 * exportIfTheseItemsChanged is a String list of items that if any of them have changes, will
+	 * indicate the record has changes. See isChangedRecord().
+	 * 
+	 * @param exportIfTheseItemsChanged
+	 */
 	public void setExportIfTheseItemsChanged(String[] exportIfTheseItemsChanged) {
 		this.exportIfTheseItemsChanged = exportIfTheseItemsChanged;
 	}
 
+	/**
+	 * Returns true if there are any items with supplied name
+	 * 
+	 * @param epicItemNumber
+	 * @return
+	 */
 	public boolean itemIsPopulated(String epicItemNumber) {
 		return !(getFirstItem(epicItemNumber) == null);
 	}
 	
+	/**
+	 * Returns true if all items in the list have values.  If any item in the list is not present,
+	 * will add an error.  Used for validation.
+	 * 
+	 * @param epicItemNumber
+	 * @return boolean true if all populated
+	 */	
 	public boolean allItemsArePopulated(String[] itemList) {
 		boolean ret = true;
 		for (String i: itemList) {
 			boolean found = this.itemIsPopulated(i);
 			ret = ret && found;
 			if (!found)
-				AceLog.getAppLog().warning("Missing item " + i);
+				this.addError("Missing item " + i);
 		}
 		return ret;
 	}
 
+	/**
+	 * Returns true if any item in the list has a change, meaning a current value differing from the previous value
+	 * 
+	 * @param itemList - List of item names to look for changes
+	 * @return boolean - true if there are any changes
+	 */
 	public boolean anyItemsHaveChanges(String[] itemList) {
 		boolean ret = false;
 		for (String i: itemList) {
-			ret = ret |this.itemHasChanges(i);
+			ret = ret || this.itemHasChanges(i);
 			if (ret)
 				break;
 		}
 		return ret;
 	}
 	
+	/**
+	 * Returns true if any item has changes, meaning a current value differing from the previous value
+	 * 
+	 * @return boolean - true if there are any changes
+	 */
 	public boolean anyItemsHaveChanges() {
 		boolean ret = false;
 		for (EpicItem e: this.epicItems) {
@@ -293,6 +329,12 @@ public abstract class AbstractEpicExportBuilder {
 		return ret;
 	}
 	
+	/**
+	 * Returns true if any item in the list exportIfTheseItemsChanged 
+	 * has changes, meaning a current value differing from the previous value
+	 * 
+	 * @return boolean - true if there are any changes
+	 */
 	public boolean isChangedRecord() {
 		return this.anyItemsHaveChanges(this.exportIfTheseItemsChanged);
 	}
@@ -323,6 +365,13 @@ public abstract class AbstractEpicExportBuilder {
 	}
 	
 	
+	/**
+	 * Returns true if there is at least one change in the supplied list, and no changes in items outside of the
+	 * supplied list.
+	 * 
+	 * @param itemList
+	 * @return
+	 */
 	public boolean onlyHasChangesIn(String[] itemList) {
 		boolean ret = anyItemsHaveChanges(itemList);
 		List<String> checkFor = new ArrayList<String>();

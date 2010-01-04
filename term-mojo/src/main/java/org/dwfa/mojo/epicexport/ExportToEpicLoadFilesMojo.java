@@ -16,7 +16,9 @@
  */
 package org.dwfa.mojo.epicexport;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -262,7 +264,10 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
     	 }
     	 
  		public void close() throws Exception {
-			this.exportManager.close();
+ 			File f = new File(this.exportManager.getBaseDir() + "_export-results.txt");
+ 			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+			this.exportManager.close(bw);
+			bw.close();
 		}
     	 
      }
