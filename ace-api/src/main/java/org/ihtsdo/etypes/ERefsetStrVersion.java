@@ -7,19 +7,19 @@ import java.io.DataOutput;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.tapi.TerminologyException;
 
-public class ERefsetStrMemberVersion extends EVersion {
+public class ERefsetStrVersion extends EVersion {
 
 	public static final long serialVersionUID = 1;
 
 	protected String stringValue;
 
-	public ERefsetStrMemberVersion(DataInput in) throws IOException,
+	public ERefsetStrVersion(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super();
 		readExternal(in);
 	}
 
-	public ERefsetStrMemberVersion(
+	public ERefsetStrVersion(
 			I_ThinExtByRefPartString part) throws TerminologyException, IOException {
 		stringValue = part.getStringValue();
 		pathUuid = nidToUuid(part.getPathId());
