@@ -21,17 +21,17 @@ import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 /**
- * Bean info for SaveFileAttachmentsTask class.
+ * Bean info for HasFileAttachmentsTask class.
  * 
  * @author Christine Hill
  * 
  */
-public class SaveFileAttachmentsTaskBeanInfo extends SimpleBeanInfo {
+public class HasFileAttachmentsTaskBeanInfo extends SimpleBeanInfo {
 
     /**
      *
      */
-    public SaveFileAttachmentsTaskBeanInfo() {
+    public HasFileAttachmentsTaskBeanInfo() {
         super();
     }
 
@@ -46,7 +46,7 @@ public class SaveFileAttachmentsTaskBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(SaveFileAttachmentsTask.class);
-        bd.setDisplayName("<html><font color='green'><center>Prompt to save<br>file attachments");
+        bd.setDisplayName("<html><font color='green'><center>BP has<br>file attachments?");
         return bd;
     }
 
