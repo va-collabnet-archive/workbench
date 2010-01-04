@@ -1,14 +1,13 @@
 package org.ihtsdo.etypes;
 
-import java.io.IOException;
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartCidLong;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -20,7 +19,7 @@ public class ERefsetCidLongMember extends ERefset {
 	protected UUID c1Uuid;
 	protected long longValue;
 	
-	protected List<ERefsetCidIntVersion> extraVersions;
+	protected List<ERefsetCidLongVersion> extraVersions;
 	
 	public ERefsetCidLongMember(DataInput in) throws IOException,
 			ClassNotFoundException {
@@ -42,9 +41,9 @@ public class ERefsetCidLongMember extends ERefset {
 		statusUuid = nidToUuid(part.getStatusId());
 		time = part.getTime();
 		if (partCount > 1) {
-			extraVersions = new ArrayList<ERefsetCidIntVersion>(partCount -1);
+			extraVersions = new ArrayList<ERefsetCidLongVersion>(partCount -1);
 			for (int i = 1; i < partCount; i++) {
-				extraVersions.add(new ERefsetCidIntVersion((I_ThinExtByRefPartConceptInt) m.getMutableParts().get(i)));
+				extraVersions.add(new ERefsetCidLongVersion((I_ThinExtByRefPartCidLong) m.getMutableParts().get(i)));
 			}
 		} 
 	}
@@ -58,9 +57,9 @@ public class ERefsetCidLongMember extends ERefset {
 		longValue = in.readLong();
 		int versionSize = in.readInt();
 		if (versionSize > 0) {
-			extraVersions = new ArrayList<ERefsetCidIntVersion>(versionSize);
+			extraVersions = new ArrayList<ERefsetCidLongVersion>(versionSize);
 			for (int i = 0; i < versionSize; i++) {
-				extraVersions.add(new ERefsetCidIntVersion(in));
+				extraVersions.add(new ERefsetCidLongVersion(in));
 			}
 		}
 	}
@@ -75,7 +74,7 @@ public class ERefsetCidLongMember extends ERefset {
 			out.writeInt(0);
 		} else {
 			out.writeInt(extraVersions.size());
-			for (ERefsetCidIntVersion rmv: extraVersions) {
+			for (ERefsetCidLongVersion rmv: extraVersions) {
 				rmv.writeExternal(out);
 			}
 		}
@@ -86,7 +85,7 @@ public class ERefsetCidLongMember extends ERefset {
 		return REFSET_TYPES.CID_LONG;
 	}
 
-	public List<ERefsetCidIntVersion> getExtraVersionsList() {
+	public List<ERefsetCidLongVersion> getExtraVersionsList() {
 		return extraVersions;
 	}
 
@@ -111,7 +110,7 @@ public class ERefsetCidLongMember extends ERefset {
 	}
 
 
-	public List<ERefsetCidIntVersion> getExtraVersions() {
+	public List<ERefsetCidLongVersion> getExtraVersions() {
 		return extraVersions;
 	}
 

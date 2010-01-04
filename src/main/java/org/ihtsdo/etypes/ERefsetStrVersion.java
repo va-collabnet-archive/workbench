@@ -40,4 +40,12 @@ public class ERefsetStrVersion extends EVersion {
 		out.writeUTF(stringValue);
 	}
 
+	public String getStringValue() {
+		return stringValue;
+	}
+
+	public void setStringValue(String stringValue) {
+		this.stringValue = stringValue;
+	}
+
 }

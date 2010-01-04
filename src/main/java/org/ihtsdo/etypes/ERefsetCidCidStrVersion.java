@@ -51,4 +51,28 @@ public class ERefsetCidCidStrVersion extends EVersion {
 		out.writeUTF(stringValue);
 	}
 
+	public UUID getC1Uuid() {
+		return c1Uuid;
+	}
+
+	public void setC1Uuid(UUID c1Uuid) {
+		this.c1Uuid = c1Uuid;
+	}
+
+	public UUID getC2Uuid() {
+		return c2Uuid;
+	}
+
+	public void setC2Uuid(UUID c2Uuid) {
+		this.c2Uuid = c2Uuid;
+	}
+
+	public String getStringValue() {
+		return stringValue;
+	}
+
+	public void setStringValue(String stringValue) {
+		this.stringValue = stringValue;
+	}
+
 }
