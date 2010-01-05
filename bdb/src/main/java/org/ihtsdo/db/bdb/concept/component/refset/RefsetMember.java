@@ -48,9 +48,7 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 	}
 	
 
-	public void readComponentFromBdb(TupleInput input, int listSize)  {
-		// TODO make sure below is correct...
-		nid = input.readInt();
+	public void readFromBdb(TupleInput input, int listSize)  {
 		memberTypeNid = input.readInt();
 		referencedComponentNid = input.readInt();
 		readMemberParts(input);
@@ -61,19 +59,14 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 
 
 	@Override
-	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<RefsetVersion<V, C>> partsToWrite = new ArrayList<RefsetVersion<V, C>>();
 		for (RefsetVersion<V, C> p: additionalVersions) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
 		}
-		// Start writing
-		output.writeInt(nid);
-		output.writeLong(primordialUuidMsb);
-		output.writeLong(primordialUuidLsb);
 		output.writeShort(partsToWrite.size());
-		// refsetNid is the enclosing concept, does not need to be written. 
 		output.writeInt(referencedComponentNid);
 		output.writeInt(memberTypeNid);
 

@@ -98,7 +98,7 @@ public class RefsetMemberFactory  {
 		}
 	}
 	
-	public static RefsetMember<?,?> create(ERefset refsetMember, Concept enclosingConcept) {
+	public static RefsetMember<?,?> create(ERefset<?> refsetMember, Concept enclosingConcept) {
 		assert enclosingConcept != null;
 		switch (refsetMember.getType()) {
 		case BOOLEAN:

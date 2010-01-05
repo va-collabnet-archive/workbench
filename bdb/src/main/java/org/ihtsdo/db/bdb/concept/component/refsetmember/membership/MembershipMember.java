@@ -7,9 +7,6 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.Boolean.BooleanVersion;
-import org.ihtsdo.etypes.ERefset;
-import org.ihtsdo.etypes.ERefsetBooleanVersion;
 import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERefsetVersion;
 

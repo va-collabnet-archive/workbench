@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb.concept.component.identifier;
 import java.util.UUID;
 
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
+import org.ihtsdo.etypes.EIdentifierVersionUuid;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -15,6 +16,12 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 		super(input.readInt());
 		mostSigBits = input.readLong();
 		leastSigBits = input.readLong();
+	}
+
+	public IdentifierVersionUuid(EIdentifierVersionUuid idv) {
+		super(idv);
+		mostSigBits = idv.getDenotation().getMostSignificantBits();
+		leastSigBits = idv.getDenotation().getLeastSignificantBits();
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package org.ihtsdo.db.bdb.concept.component.identifier;
 
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
+import org.ihtsdo.etypes.EIdentifierVersionString;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -12,6 +13,11 @@ public class IdentifierVersionString extends IdentifierVersion {
 	public IdentifierVersionString(TupleInput input) {
 		super(input.readInt());
 		stringDenotation = input.readString();
+	}
+
+	public IdentifierVersionString(EIdentifierVersionString idv) {
+		super(idv);
+		stringDenotation = idv.getDenotation();
 	}
 
 	@Override

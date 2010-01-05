@@ -14,6 +14,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.StatusAtPositionBdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.I_HandleFutureStatusAtPositionSetup;
+import org.ihtsdo.etypes.EIdentifierVersion;
 
 import com.sleepycat.bind.tuple.TupleOutput;
 
@@ -32,6 +33,13 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 	protected IdentifierVersion(int statusAtPositionNid) {
 		super();
 		this.statusAtPositionNid = statusAtPositionNid;
+	}
+	
+	protected IdentifierVersion(EIdentifierVersion idv) {
+		super();
+		this.statusAtPositionNid = sapBdb.getStatusAtPositionNid(Bdb.uuidToNid(idv.getStatusUuid()), 
+				Bdb.uuidToNid(idv.getPathUuid()), idv.getTime());
+		this.authorityNid = Bdb.uuidToNid(idv.getAuthorityUuid());
 	}
 	
 	/* (non-Javadoc)

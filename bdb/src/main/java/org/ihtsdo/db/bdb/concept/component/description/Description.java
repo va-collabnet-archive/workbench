@@ -70,8 +70,7 @@ public class Description
 	}
 
 	public Description(EDescription eDesc, Concept enclosingConcept) {
-		super(Bdb.uuidsToNid(eDesc.getUuids()), eDesc.getVersionCount(), 
-				enclosingConcept, eDesc.primordialComponentUuid);
+		super(eDesc, enclosingConcept);
 		initialCaseSignificant = eDesc.isInitialCaseSignificant();
 		lang = eDesc.getLang();
 		text = eDesc.getText();
@@ -86,7 +85,7 @@ public class Description
 	}
 
 	@Override
-	public void readComponentFromBdb(TupleInput input, int listSize) {
+	public void readFromBdb(TupleInput input, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
 		for (int i = 0; i < listSize; i++) {
 			additionalVersions.add(new DescriptionVersion(input, this));
@@ -94,17 +93,13 @@ public class Description
 	}
 
 	@Override
-	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<DescriptionVersion> partsToWrite = new ArrayList<DescriptionVersion>();
 		for (DescriptionVersion p: additionalVersions) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 				partsToWrite.add(p);
 			}
 		}
-		// Start writing
-		output.writeInt(nid);
-		output.writeLong(primordialUuidMsb);
-		output.writeLong(primordialUuidLsb);
 		output.writeShort(partsToWrite.size());
 		// conceptNid is the enclosing concept, does not need to be written. 
 		for (DescriptionVersion p: partsToWrite) {

@@ -57,8 +57,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	
 
 	public Relationship(ERelationship eRel, Concept enclosingConcept) {
-		super(Bdb.uuidsToNid(eRel.getUuids()), eRel.getVersionCount(), 
-				enclosingConcept, eRel.primordialComponentUuid);
+		super(eRel, enclosingConcept);
 		c2Nid = Bdb.uuidToNid(eRel.getC2Uuid());
 		characteristicNid = Bdb.uuidToNid(eRel.getCharacteristicUuid());
 		group = eRel.getRelGroup();
@@ -75,7 +74,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 
 
 	@Override
-	public void readComponentFromBdb(TupleInput input, int listSize) {
+	public void readFromBdb(TupleInput input, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
 		this.c2Nid = input.readInt();
 		for (int i = 0; i < listSize; i++) {
@@ -84,7 +83,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	}
 
 	@Override
-	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		//
 		List<RelationshipVersion> partsToWrite = new ArrayList<RelationshipVersion>();
 		for (RelationshipVersion p : additionalVersions) {
@@ -93,9 +92,6 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 			}
 		}
 		// Start writing
-		output.writeInt(nid);
-		output.writeLong(primordialUuidMsb);
-		output.writeLong(primordialUuidLsb);
 		output.writeShort(partsToWrite.size());
 		// c1Nid is the enclosing concept, does not need to be written. 
 		output.writeInt(c2Nid);

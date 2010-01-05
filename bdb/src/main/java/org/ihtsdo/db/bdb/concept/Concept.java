@@ -72,12 +72,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 		
 		Concept c = get(conceptNid, true);
 		
-		eConcept.getConceptAttributes().getEIdentifiers(); // TODO
-		
 		EConceptAttributes eAttr = eConcept.getConceptAttributes();
 		
-		ConceptAttributes attr = new ConceptAttributes(c.nid, eAttr.getVersionCount(), c,
-				eConcept.getConceptAttributes().primordialComponentUuid);
+		ConceptAttributes attr = new ConceptAttributes(eAttr, c);
 		c.data.set(attr);
 		if (eAttr.getExtraVersionsList() != null) {
 			for (I_ConceptualizeExternally eav: eAttr.getExtraVersionsList()) {
@@ -103,7 +100,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 			}
 		}
 		if (eConcept.getRefsetMembers() != null) {
-			for (ERefset eRefsetMember: eConcept.getRefsetMembers()) {
+			for (ERefset<?> eRefsetMember: eConcept.getRefsetMembers()) {
 				RefsetMember<?,?> refsetMember = RefsetMemberFactory.create(eRefsetMember, c);
 				c.data.add(refsetMember);
 			}

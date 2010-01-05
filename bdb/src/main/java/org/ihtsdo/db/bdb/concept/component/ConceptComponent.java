@@ -33,11 +33,17 @@ import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersion;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionLong;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionString;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionUuid;
+import org.ihtsdo.etypes.EComponent;
+import org.ihtsdo.etypes.EIdentifierVersion;
+import org.ihtsdo.etypes.EIdentifierVersionLong;
+import org.ihtsdo.etypes.EIdentifierVersionString;
+import org.ihtsdo.etypes.EIdentifierVersionUuid;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class ConceptComponent<V extends Version<V, C>, C extends ConceptComponent<V, C>> 
+public abstract class ConceptComponent<V extends Version<V, C>, 
+									   C extends ConceptComponent<V, C>> 
 	implements I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion,
 	I_HandleFutureStatusAtPositionSetup {
 	
@@ -58,6 +64,17 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 
 		public void writeType(TupleOutput output) {
 			output.writeByte(partTypeId);
+		}
+		
+		public static IDENTIFIER_PART_TYPES getType(Object denotation) {
+			if (UUID.class.isAssignableFrom(denotation.getClass())) {
+				return UUID;
+			} else if (Long.class.isAssignableFrom(denotation.getClass())) {
+				return LONG;
+			} if (String.class.isAssignableFrom(denotation.getClass())) {
+				return STRING;
+			} 
+			throw new UnsupportedOperationException(denotation.toString());
 		}
 
 		public static IDENTIFIER_PART_TYPES readType(TupleInput input) {
@@ -114,6 +131,47 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 		this.primordialUuidLsb = primordialUuid.getLeastSignificantBits();
 	}
 	
+	protected ConceptComponent(EComponent<?> eComponent,
+			Concept enclosingConcept) {
+		super();
+		assert nid != Integer.MAX_VALUE;
+		assert nid != Integer.MIN_VALUE;
+		assert enclosingConcept != null;
+		this.nid = Bdb.uuidToNid(eComponent.primordialComponentUuid);
+		this.enclosingConcept = enclosingConcept;
+		this.primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(eComponent);
+		if (eComponent.getVersionCount() > 1) {
+			this.additionalVersions = new ArrayList<V>(eComponent.getVersionCount() - 1);
+		}
+		this.primordialUuidMsb = eComponent.getPrimordialComponentUuid().getMostSignificantBits();
+		this.primordialUuidLsb = eComponent.getPrimordialComponentUuid().getLeastSignificantBits();
+		convertId(eComponent.additionalIdComponents);
+	}
+	
+	public void convertId(List<EIdentifierVersion> list)  {
+		if (list == null || list.size() == 0) {
+			return;
+		}
+		identifierParts = new ArrayList<IdentifierVersion>(list.size());
+		for (EIdentifierVersion idv: list) {
+			Object denotation = idv.getDenotation();
+			switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
+			case LONG:
+				identifierParts.add(new IdentifierVersionLong((EIdentifierVersionLong)idv));
+				break;
+			case STRING:
+				identifierParts.add(new IdentifierVersionString((EIdentifierVersionString)idv));
+				break;
+			case UUID:
+				identifierParts.add(new IdentifierVersionUuid((EIdentifierVersionUuid)idv));
+				
+				break;
+			default:
+				throw new UnsupportedOperationException();
+			}
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
 	 */
@@ -129,7 +187,7 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 		this.primordialStatusAtPositionNid = sapNid;
 	}
 	
-	public void readIdentifierFromBdb(TupleInput input, int conceptNid, int listSize) {
+	private void readIdentifierFromBdb(TupleInput input, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
 		for (int i = 0; i < listSize; i++) {
 			switch (IDENTIFIER_PART_TYPES.readType(input)) {
@@ -152,7 +210,7 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 		}
 	}
 
-	public void writeIdentifierToBdb(TupleOutput output,
+	private final void writeIdentifierToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
 		assert primordialStatusAtPositionNid != Integer.MAX_VALUE;
 		List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
@@ -324,10 +382,21 @@ public abstract class ConceptComponent<V extends Version<V, C>, C extends Concep
 		return nid;
 	}
 
-	public abstract void readComponentFromBdb(TupleInput input, int listSize);
+	public final void readComponentFromBdb(TupleInput input, int listSize) {
+		nid = input.readInt();
+		readIdentifierFromBdb(input, listSize);
+		readFromBdb(input, listSize);
+	}
 	
-	public abstract void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid);
+	public final void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+		output.writeInt(nid);
+		writeIdentifierToBdb(output, maxReadOnlyStatusAtPositionNid);
+		writeToBdb(output, maxReadOnlyStatusAtPositionNid);
+	}
 
+	public abstract void readFromBdb(TupleInput input, int listSize);
+	
+	public abstract void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid);
 	
 	/*
 	 * Below methods have confusing naming, and should be considered for deprecation...

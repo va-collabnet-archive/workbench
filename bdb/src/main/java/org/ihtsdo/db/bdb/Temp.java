@@ -109,7 +109,7 @@ public class Temp {
 	            }
 	            
 	            while (conceptsProcessed.get() < conceptsRead.get()) {
-	            	Thread.currentThread().sleep(1000);
+					Thread.sleep(1000);
 	            }
 	            
 	            System.out.println();

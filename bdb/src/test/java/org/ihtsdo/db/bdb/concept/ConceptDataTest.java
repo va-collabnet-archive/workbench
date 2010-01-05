@@ -41,7 +41,7 @@ public class ConceptDataTest {
 	@Before
 	public void setUp() throws Exception {
 		TupleOutput to = new TupleOutput();
-		for (OFFSETS off: OFFSETS.values()) {
+		for (@SuppressWarnings("unused") OFFSETS off: OFFSETS.values()) {
 			to.writeInt(0);
 		}
 		TupleOutput offsetOutput = new TupleOutput(to.getBufferBytes());

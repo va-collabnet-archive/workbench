@@ -1,6 +1,7 @@
 package org.ihtsdo.db.bdb.concept.component.identifier;
 
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
+import org.ihtsdo.etypes.EIdentifierVersionLong;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -11,6 +12,11 @@ public class IdentifierVersionLong extends IdentifierVersion {
 	public IdentifierVersionLong(TupleInput input) {
 		super(input.readInt());
 		longDenotation = input.readLong();
+	}
+
+	public IdentifierVersionLong(EIdentifierVersionLong idv) {
+		super(idv);
+		longDenotation = idv.getDenotation();
 	}
 
 	@Override

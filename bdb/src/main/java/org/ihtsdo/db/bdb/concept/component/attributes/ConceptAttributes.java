@@ -33,6 +33,7 @@ import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
+import org.ihtsdo.etypes.EConceptAttributes;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -50,8 +51,12 @@ public class ConceptAttributes
 		super(nid, parts, enclosingConcept, primordialUuid);
 	}
 
+	public ConceptAttributes(EConceptAttributes eAttr, Concept c) {
+		super(eAttr, c);
+	}
+
 	@Override
-	public void readComponentFromBdb(TupleInput input, int listSize) {
+	public void readFromBdb(TupleInput input, int listSize) {
 		// nid, list size, and conceptNid are read already by the binder...
 		for (int i = 0; i < listSize; i++) {
 			additionalVersions.add(new ConceptAttributesVersion(input, this));
@@ -59,7 +64,7 @@ public class ConceptAttributes
 	}
 
 	@Override
-	public void writeComponentToBdb(TupleOutput output,
+	public void writeToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
 		List<ConceptAttributesVersion> partsToWrite = new ArrayList<ConceptAttributesVersion>();
 		for (ConceptAttributesVersion p : additionalVersions) {
@@ -68,9 +73,6 @@ public class ConceptAttributes
 			}
 		}
 		// Start writing
-		output.writeInt(nid);
-		output.writeLong(primordialUuidMsb);
-		output.writeLong(primordialUuidLsb);
 		output.writeShort(partsToWrite.size());
 		for (ConceptAttributesVersion p : partsToWrite) {
 			p.writePartToBdb(output);

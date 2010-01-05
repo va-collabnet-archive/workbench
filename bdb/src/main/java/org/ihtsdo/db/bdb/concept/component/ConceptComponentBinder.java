@@ -86,10 +86,6 @@ public class ConceptComponentBinder<V extends Version<V, C>,
 						if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
 							componentListToWrite.add(conceptComponent);
 							break;
-						} else {
-							int max = maxReadOnlyStatusAtPositionId;
-							int partSapNid = part.getStatusAtPositionNid();
-							boolean include = partSapNid > max;
 						}
 					}
 				}

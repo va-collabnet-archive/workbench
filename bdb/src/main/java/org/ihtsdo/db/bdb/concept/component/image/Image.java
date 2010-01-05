@@ -53,8 +53,7 @@ public class Image
 	}
 
 	public Image(EImage eImage, Concept enclosingConcept) {
-		super(Bdb.uuidsToNid(eImage.getUuids()), eImage.getVersionCount(), 
-				enclosingConcept, eImage.primordialComponentUuid);
+		super(eImage, enclosingConcept);
 		image = eImage.getImage();
 		format = eImage.getFormat();
 		primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(eImage);
@@ -67,7 +66,7 @@ public class Image
 	}
 
 	@Override
-	public void readComponentFromBdb(TupleInput input, int listSize) {		
+	public void readFromBdb(TupleInput input, int listSize) {		
 		// nid, list size, and conceptNid are read already by the binder...
 		this.format = input.readString();
 		int imageBytes = input.readInt();
@@ -79,7 +78,7 @@ public class Image
 	}
 
 	@Override
-	public void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<ImageVersion> partsToWrite = new ArrayList<ImageVersion>();
 		for (ImageVersion p: additionalVersions) {
 			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
@@ -87,9 +86,6 @@ public class Image
 			}
 		}
 		// Start writing
-		output.writeInt(nid);
-		output.writeLong(primordialUuidMsb);
-		output.writeLong(primordialUuidLsb);
 		output.writeShort(partsToWrite.size());
 		// conceptNid is the enclosing concept, does not need to be written. 
 		output.writeString(format);
