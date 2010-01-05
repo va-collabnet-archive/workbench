@@ -11,7 +11,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.tapi.TerminologyException;
 
-public class ERelationship extends EComponent {
+public class ERelationship extends EComponent<ERelationshipVersion> {
 
 	public static final long serialVersionUID = 1;
 
@@ -22,8 +22,6 @@ public class ERelationship extends EComponent {
 	protected int relGroup; 
 	protected UUID typeUuid;
 	
-	protected List<ERelationshipVersion> extraVersions;
-
 	public ERelationship(DataInput in) throws IOException, ClassNotFoundException {
 		super();
 		readExternal(in);

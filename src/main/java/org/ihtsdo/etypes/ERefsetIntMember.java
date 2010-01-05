@@ -1,8 +1,8 @@
 package org.ihtsdo.etypes;
 
-import java.io.IOException;
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +11,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
-public class ERefsetIntMember extends ERefset {
+public class ERefsetIntMember extends ERefset<ERefsetIntVersion> {
 
 	public static final long serialVersionUID = 1;
 

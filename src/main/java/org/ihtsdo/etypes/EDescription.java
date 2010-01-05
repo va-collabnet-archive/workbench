@@ -11,7 +11,7 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.tapi.TerminologyException;
 
-public class EDescription extends EComponent 
+public class EDescription extends EComponent<EDescriptionVersion> 
 	implements I_DescribeExternally {
 	public static final long serialVersionUID = 1;
 
@@ -24,9 +24,7 @@ public class EDescription extends EComponent
 	protected String text;
 	
 	protected UUID typeUuid;
-	
-	protected List<EDescriptionVersion> extraVersions;
-	
+		
 	public EDescription(DataInput in) throws IOException, ClassNotFoundException {
 		super();
 		readExternal(in);

@@ -106,7 +106,7 @@ public class EConcept  {
 	protected List<EDescription> descriptions;
 	protected List<ERelationship> relationships;
 	protected List<EImage> images;
-	protected List<ERefset> refsetMembers;
+	protected List<ERefset<?>> refsetMembers;
 
 	public EConcept(DataInput in) throws IOException, ClassNotFoundException {
 		super();
@@ -143,7 +143,7 @@ public class EConcept  {
 		}
 		int refsetMemberCount = in.readInt();
 		if (refsetMemberCount > 0) {
-			refsetMembers = new ArrayList<ERefset>(refsetMemberCount);
+			refsetMembers = new ArrayList<ERefset<?>>(refsetMemberCount);
 			for (int i = 0; i < refsetMemberCount; i++) {
 				REFSET_TYPES type = REFSET_TYPES.readType(in);
 				switch (type) {
@@ -221,7 +221,7 @@ public class EConcept  {
 			out.writeInt(0);
 		} else {
 			out.writeInt(refsetMembers.size());
-			for (ERefset r: refsetMembers) {
+			for (ERefset<?> r: refsetMembers) {
 				r.getType().writeType(out);
 				r.writeExternal(out);
 			}
@@ -236,7 +236,7 @@ public class EConcept  {
 		return relationships;
 	}
 
-	public List<ERefset> getRefsetMembers() {
+	public List<ERefset<?>> getRefsetMembers() {
 		return refsetMembers;
 	}
 	
@@ -267,9 +267,9 @@ public class EConcept  {
 		}
 		Collection<I_ThinExtByRefVersioned> members = EComponent.getRefsetMembers(c.getNid());
 		if (members != null) {
-			refsetMembers = new ArrayList<ERefset>(members.size());
+			refsetMembers = new ArrayList<ERefset<?>>(members.size());
 			for (I_ThinExtByRefVersioned m: members) {
-				ERefset member = ERefset.convert(m);
+				ERefset<?> member = ERefset.convert(m);
 				if (member != null) {
 					refsetMembers.add(member);
 				} else {

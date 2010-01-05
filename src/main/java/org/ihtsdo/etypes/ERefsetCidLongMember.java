@@ -12,7 +12,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
-public class ERefsetCidLongMember extends ERefset {
+public class ERefsetCidLongMember extends ERefset<ERefsetCidLongVersion> {
 
 	public static final long serialVersionUID = 1;
 

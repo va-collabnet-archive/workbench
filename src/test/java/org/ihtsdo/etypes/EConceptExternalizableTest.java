@@ -51,7 +51,7 @@ public class EConceptExternalizableTest {
 		testConcept.conceptAttributes.primordialComponentUuid = new UUID(2, 3);
 		testConcept.conceptAttributes.defined = false;
 		testConcept.conceptAttributes.extraVersions = null;
-		testConcept.conceptAttributes.idComponents = null;
+		testConcept.conceptAttributes.additionalIdComponents = null;
 		testConcept.conceptAttributes.pathUuid = new UUID(4, 5);
 		testConcept.conceptAttributes.statusUuid = new UUID(8, 9);
 		testConcept.conceptAttributes.time = System.currentTimeMillis();
@@ -125,7 +125,7 @@ public class EConceptExternalizableTest {
 		iv.time = testConcept.conceptAttributes.time;
 		img.extraVersions.add(iv);
 		
-		testConcept.refsetMembers = new ArrayList<ERefset>();
+		testConcept.refsetMembers = new ArrayList<ERefset<?>>();
 		ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
 		cidIntMember.c1Uuid = new UUID(4386, 5497);
 		cidIntMember.intValue = 33;

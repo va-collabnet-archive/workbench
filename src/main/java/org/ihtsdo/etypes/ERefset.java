@@ -10,7 +10,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
-public abstract class ERefset extends EComponent {
+public abstract class ERefset<V extends EVersion> extends EComponent<V> {
 
 	public static final long serialVersionUID = 1;
 
@@ -61,7 +61,7 @@ public abstract class ERefset extends EComponent {
 	
 	public abstract REFSET_TYPES getType();
 
-	public static ERefset convert(I_ThinExtByRefVersioned m) throws TerminologyException, IOException {
+	public static ERefset<?> convert(I_ThinExtByRefVersioned m) throws TerminologyException, IOException {
 		REFSET_TYPES type = REFSET_TYPES.nidToType(m.getTypeId());
 		if (type != null) {
 			switch (type) {

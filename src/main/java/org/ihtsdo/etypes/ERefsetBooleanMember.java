@@ -11,13 +11,11 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
-public class ERefsetBooleanMember extends ERefset {
+public class ERefsetBooleanMember extends ERefset<ERefsetBooleanVersion> {
 
 	public static final long serialVersionUID = 1;
 
 	protected boolean booleanValue;
-	
-	protected List<ERefsetBooleanVersion> extraVersions;
 	
 	public ERefsetBooleanMember(DataInput in) throws IOException,
 			ClassNotFoundException {
