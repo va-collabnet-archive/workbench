@@ -438,6 +438,10 @@ public class SnoTable {
         return returnSnoRels;
     }
 
+    /**
+     * Does starting at C2 ever end up at C1?<br>
+     * If yes, then adding C1-ISA-C2 to C1 will create a cycle.<br>
+     */
     public static boolean findIsaCycle(int c1, int type, int c2) throws TerminologyException, IOException {
 
         if (cStatedPath == null)
@@ -469,6 +473,63 @@ public class SnoTable {
                 } else if (theNid == testNid) {
 
                     return true; // circled back on self
+                } else {
+                    isaCBNext.add(isaCB); // add to next level search
+                }
+            }
+
+            // GET ALL NEXT LEVEL RELS FOR NON_PRIMITIVE CONCEPTS
+            isaSnoRelProx = new ArrayList<SnoRel>();
+            for (I_GetConceptData cbNext : isaCBNext) {
+                List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList);
+                if (nextSnoRelList.size() > 0)
+                    isaSnoRelProx.addAll(nextSnoRelList);
+            }
+
+            // RESET NEXT LEVEL SEARCH LIST
+            isaCBNext = new ArrayList<I_GetConceptData>(); // new "next" list
+        }
+        return false;
+    }
+
+    /**
+     * Determine test if concept "is-a" child of given concepts.<br>
+     * Does starting at C2 ever end up at C1?<br>
+     * If yes, then C2 is a child of at least one of the provided C1.<br>
+     */    
+    public static boolean testIsaChildOf(int[] parents, int type, int c1) throws TerminologyException, IOException {
+
+        if (cStatedPath == null)
+            updatePrefs();
+        if (cStatedPath == null)
+            return false;
+        if (type != isaNid)
+            return false;
+
+        // Does starting at C1 ever end up as child of a PARENT[]?
+        int startNid = c1;
+        int[] testNids = parents;
+
+        I_GetConceptData cBean = tf.getConcept(startNid);
+        List<I_Position> posList = cStatedPath;
+
+        //
+        List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
+
+        List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList);
+        while (isaSnoRelProx.size() > 0) {
+            // TEST LIST FOR PRIMITIVE OR NOT
+            for (SnoRel isaSnoRel : isaSnoRelProx) {
+                int theNid = isaSnoRel.c2Id;
+                I_GetConceptData isaCB = tf.getConcept(theNid);
+                boolean isChildOf = false;
+                for (int nid : testNids)
+                    if (theNid == nid)
+                        isChildOf = true;
+                if (theNid == rootNid) { // i.e. not primitive
+                    // search no more on this branch
+                } else if (isChildOf) {
+                    return true; // is a child of
                 } else {
                     isaCBNext.add(isaCB); // add to next level search
                 }
