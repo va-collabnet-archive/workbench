@@ -136,10 +136,6 @@ public class VodbExportJbinUuids extends AbstractMojo implements I_ProcessIds, I
 			EConcept eC = new EConcept(concept);
 			eC.writeExternal(eConceptDOS);
 			conceptCount++;
-			if (conceptCount % 100 == 0) {
-				System.out.print("\b\b\b\b\b\b\b\b");
-				System.out.print(conceptCount);
-			}
 		}
 	}
 
