@@ -66,15 +66,15 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 			output.writeByte(partTypeId);
 		}
 		
-		public static IDENTIFIER_PART_TYPES getType(Object denotation) {
-			if (UUID.class.isAssignableFrom(denotation.getClass())) {
+		public static IDENTIFIER_PART_TYPES getType(Class<?> denotationClass) {
+			if (UUID.class.isAssignableFrom(denotationClass)) {
 				return UUID;
-			} else if (Long.class.isAssignableFrom(denotation.getClass())) {
+			} else if (Long.class.isAssignableFrom(denotationClass)) {
 				return LONG;
-			} if (String.class.isAssignableFrom(denotation.getClass())) {
+			} else if (String.class.isAssignableFrom(denotationClass)) {
 				return STRING;
 			} 
-			throw new UnsupportedOperationException(denotation.toString());
+			throw new UnsupportedOperationException(denotationClass.toString());
 		}
 
 		public static IDENTIFIER_PART_TYPES readType(TupleInput input) {

@@ -86,9 +86,11 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		//
 		List<RelationshipVersion> partsToWrite = new ArrayList<RelationshipVersion>();
-		for (RelationshipVersion p : additionalVersions) {
-			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
-				partsToWrite.add(p);
+		if (additionalVersions != null) {
+			for (RelationshipVersion p : additionalVersions) {
+				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
+					partsToWrite.add(p);
+				}
 			}
 		}
 		// Start writing

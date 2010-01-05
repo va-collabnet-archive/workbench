@@ -36,7 +36,7 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 				primordialUuid);
 	}
 	
-	public RefsetMember(ERefset refsetMember, 
+	public RefsetMember(ERefset<?> refsetMember, 
 			Concept enclosingConcept) {
 		super(Bdb.uuidsToNid(refsetMember.getUuids()), 
 				refsetMember.getVersionCount(), enclosingConcept,
@@ -61,9 +61,11 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<RefsetVersion<V, C>> partsToWrite = new ArrayList<RefsetVersion<V, C>>();
-		for (RefsetVersion<V, C> p: additionalVersions) {
-			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
-				partsToWrite.add(p);
+		if (additionalVersions != null) {
+			for (RefsetVersion<V, C> p: additionalVersions) {
+				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
+					partsToWrite.add(p);
+				}
 			}
 		}
 		output.writeShort(partsToWrite.size());

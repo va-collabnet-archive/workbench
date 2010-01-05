@@ -67,9 +67,11 @@ public class ConceptAttributes
 	public void writeToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
 		List<ConceptAttributesVersion> partsToWrite = new ArrayList<ConceptAttributesVersion>();
-		for (ConceptAttributesVersion p : additionalVersions) {
-			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
-				partsToWrite.add(p);
+		if (additionalVersions != null) {
+			for (ConceptAttributesVersion p : additionalVersions) {
+				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
+					partsToWrite.add(p);
+				}
 			}
 		}
 		// Start writing

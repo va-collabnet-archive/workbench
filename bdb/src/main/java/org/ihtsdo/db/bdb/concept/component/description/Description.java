@@ -95,9 +95,11 @@ public class Description
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<DescriptionVersion> partsToWrite = new ArrayList<DescriptionVersion>();
-		for (DescriptionVersion p: additionalVersions) {
-			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
-				partsToWrite.add(p);
+		if (additionalVersions != null) {
+			for (DescriptionVersion p: additionalVersions) {
+				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
+					partsToWrite.add(p);
+				}
 			}
 		}
 		output.writeShort(partsToWrite.size());

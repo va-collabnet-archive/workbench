@@ -80,9 +80,11 @@ public class Image
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<ImageVersion> partsToWrite = new ArrayList<ImageVersion>();
-		for (ImageVersion p: additionalVersions) {
-			if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
-				partsToWrite.add(p);
+		if (additionalVersions != null) {
+			for (ImageVersion p: additionalVersions) {
+				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
+					partsToWrite.add(p);
+				}
 			}
 		}
 		// Start writing
