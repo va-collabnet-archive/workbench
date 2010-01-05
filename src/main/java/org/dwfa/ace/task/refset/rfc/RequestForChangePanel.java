@@ -16,35 +16,39 @@
  */
 package org.dwfa.ace.task.refset.rfc;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.Box;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
 import org.dwfa.ace.task.commit.TestForReviewRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
+import org.dwfa.bpa.data.ArrayListModel;
 
 /**
  * The request for change panel that allows user to input:
@@ -74,7 +78,6 @@ public class RequestForChangePanel extends JPanel {
     private JLabel commentsLabel;
     private JLabel deadlineLabel;
     private JLabel priorityLabel;
-    private JLabel fileAttachmentLabel;
     private JLabel reviewerLabel;
     private JButton openFileChooserButton;
     private JComboBox refsetNameComboBox;
@@ -87,15 +90,18 @@ public class RequestForChangePanel extends JPanel {
     private JScrollPane originalRequestScrollPane;
     private JScrollPane commentsScrollPane;
 
-    private HashSet<File> attachments = new HashSet<File>();
+    // File Attachments
+    private JList attachmentList;
+    private HashSet<File> attachmentSet = new HashSet<File>();
+    private ArrayListModel<File> attachmentListModel;
+
     private Set<I_GetConceptData> refsets;
-    private JPanel wfPanel;
     private Set<? extends I_GetConceptData> allValidUsers;
 
-    public RequestForChangePanel(Set<I_GetConceptData> refsets, JPanel wfPanel,
-            Set<? extends I_GetConceptData> allValidUsers) {
+    private String noReviewText = "no reviewer assigned";
+
+    public RequestForChangePanel(Set<I_GetConceptData> refsets, Set<? extends I_GetConceptData> allValidUsers) {
         super();
-        this.wfPanel = wfPanel;
         this.refsets = refsets;
         this.allValidUsers = allValidUsers;
         init();
@@ -104,6 +110,7 @@ public class RequestForChangePanel extends JPanel {
     private void init() {
         setDefaultValues();
         addListeners();
+        setUpComboBoxes();
         layoutComponents();
     }
 
@@ -116,11 +123,10 @@ public class RequestForChangePanel extends JPanel {
         commentsLabel = new JLabel("Comments (optional):");
         deadlineLabel = new JLabel("Deadline (required):");
         priorityLabel = new JLabel("Priority (required):");
-        fileAttachmentLabel = new JLabel("Request attachment(s) (optional):");
         reviewerLabel = new JLabel("Reviewer (optional):");
 
         // buttons and boxes
-        openFileChooserButton = new JButton("Attach a file");
+        openFileChooserButton = new JButton("Attach a file...");
         refsetNameComboBox = new JComboBox(refsets.toArray());
         priorityComboBox = new JComboBox(new String[] { "Highest", "High", "Normal", "Low", "Lowest" });
 
@@ -141,8 +147,37 @@ public class RequestForChangePanel extends JPanel {
         commentsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     }
 
+    private void setUpComboBoxes() {
+
+        Set<I_GetConceptData> editors = getValidEditors();
+        Set<Object> reviewers = getValidReviewers();
+
+        if (editorComboBox != null) {
+            I_GetConceptData previousEditor = (I_GetConceptData) editorComboBox.getSelectedItem();
+            editorComboBox = new JComboBox(editors.toArray());
+            if (previousEditor != null || editors.size() == 0) {
+                editorComboBox.setSelectedItem(previousEditor);
+            }
+        } else {
+            editorComboBox = new JComboBox(editors.toArray());
+        }
+
+        if (reviewerComboBox != null) {
+            Object previousReviewer = reviewerComboBox.getSelectedItem();
+            reviewerComboBox = new JComboBox(reviewers.toArray());
+            if (previousReviewer != null || reviewers.size() == 0) {
+                reviewerComboBox.setSelectedItem(previousReviewer);
+            } else {
+                reviewerComboBox.setSelectedItem(noReviewText);
+            }
+        } else {
+            reviewerComboBox = new JComboBox(reviewers.toArray());
+            reviewerComboBox.setSelectedItem(noReviewText);
+        }
+    }
+
     private void addListeners() {
-        openFileChooserButton.addActionListener(new ButtonListener());
+        openFileChooserButton.addActionListener(new AddAttachmentActionLister());
         refsetNameComboBox.addActionListener(new RefsetListener());
     }
 
@@ -192,14 +227,6 @@ public class RequestForChangePanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 0, 5);
-        if (editorComboBox == null) {
-            try {
-                editorComboBox = new JComboBox(getValidEditors().toArray());
-            } catch (Exception e) {
-                editorComboBox = new JComboBox();
-                AceLog.getAppLog().alertAndLogException(e);
-            }
-        }
         this.add(editorComboBox, gbc);
 
         // reviewer
@@ -219,14 +246,6 @@ public class RequestForChangePanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 0, 5);
-        if (reviewerComboBox == null) {
-            try {
-                reviewerComboBox = new JComboBox(getValidReviewers().toArray());
-            } catch (Exception e) {
-                reviewerComboBox = new JComboBox();
-                AceLog.getAppLog().alertAndLogException(e);
-            }
-        }
         this.add(reviewerComboBox, gbc);
 
         // original request
@@ -308,79 +327,59 @@ public class RequestForChangePanel extends JPanel {
         // file attachments
         gbc.gridx = 0;
         gbc.gridy = 7;
-        gbc.weighty = 0.0;
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = new Insets(5, 5, 0, 5);
-        this.add(fileAttachmentLabel, gbc);
-
-        gbc.gridx = 2;
-        gbc.gridy = 7;
-        gbc.weighty = 0.0;
-        gbc.weightx = 0.0;
+        gbc.insets = new Insets(15, 5, 0, 5); // padding (top, left, bottom, right)
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 0, 5);
         this.add(openFileChooserButton, gbc);
 
-        int fileCount = 0;
-        for (File attachment : attachments) {
-
-            JCheckBox checkBox = new JCheckBox();
-            checkBox.setSelected(true);
-            checkBox.addItemListener(new CheckBoxListener(attachment));
-            gbc = new GridBagConstraints();
-            gbc.gridx = 1;
-            gbc.gridy = 8 + fileCount;
-            gbc.weighty = 0.0;
-            gbc.weightx = 0.0;
-            gbc.anchor = GridBagConstraints.LINE_END;
-            gbc.insets = new Insets(5, 5, 0, 5);
-            this.add(checkBox, gbc);
-
-            JLabel attachmentLabel = new JLabel(attachment.getName());
-            gbc = new GridBagConstraints();
-            gbc.gridx = 2;
-            gbc.gridy = 8 + fileCount;
-            gbc.weighty = 0.0;
-            gbc.weightx = 0.0;
-            gbc.anchor = GridBagConstraints.LINE_START;
-            this.add(attachmentLabel, gbc);
-
-            fileCount++;
-        }
-
-        // column filler
-        gbc.gridx = 5;
-        gbc.gridy = 9 + fileCount;
-        gbc.weighty = 1.0;
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
-        gbc.anchor = GridBagConstraints.LINE_END;
-        this.add(Box.createGlue(), gbc);
+        gbc.weighty = 1;
+        gbc.insets = new Insets(15, 10, 10, 10); // padding (top, left, bottom, right)
 
-        this.revalidate();
-        this.repaint();
-        wfPanel.repaint();
+        attachmentListModel = new ArrayListModel<File>();
+        attachmentList = new JList(attachmentListModel);
+        attachmentList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
+        attachmentList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
+        attachmentList.getActionMap().put("deleteTask", new DeleteAction());
 
+        JScrollPane attachmentScroller = new JScrollPane(attachmentList);
+        attachmentScroller.setMinimumSize(new Dimension(100, 100));
+        attachmentScroller.setMaximumSize(new Dimension(500, 300));
+        attachmentScroller.setPreferredSize(new Dimension(150, 150));
+        attachmentScroller.setBorder(BorderFactory.createTitledBorder("Attachments (optional):"));
+        this.add(attachmentScroller, gbc);
+
+        this.validate();
     }
 
     class RefsetListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
+            setUpComboBoxes();
             layoutComponents();
         }
 
     }
 
-    private Set<I_GetConceptData> getValidEditors() throws Exception {
+    private Set<I_GetConceptData> getValidEditors() {
         I_GetConceptData selectedRefset = getRefset();
         Set<I_GetConceptData> editors = new HashSet<I_GetConceptData>();
-        if (selectedRefset != null) {
-            for (I_GetConceptData user : allValidUsers) {
-                if (hasEditPermission(user, selectedRefset)) {
-                    editors.add(user);
+        try {
+            if (selectedRefset != null) {
+                for (I_GetConceptData user : allValidUsers) {
+                    if (hasEditPermission(user, selectedRefset)) {
+                        editors.add(user);
+                    }
                 }
             }
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            editors.addAll(allValidUsers);
+            return editors;
         }
 
         return editors;
@@ -403,7 +402,7 @@ public class RequestForChangePanel extends JPanel {
     private Set<Object> getValidReviewers() {
         I_GetConceptData selectedRefset = getRefset();
         Set<Object> permissibleReviewers = new HashSet<Object>();
-        permissibleReviewers.add("no reviewer assigned");
+        permissibleReviewers.add(noReviewText);
         try {
             if (selectedRefset == null) {
                 permissibleReviewers.addAll(allValidUsers);
@@ -438,41 +437,6 @@ public class RequestForChangePanel extends JPanel {
         return false;
     }
 
-    class CheckBoxListener implements ItemListener {
-        File file;
-
-        public CheckBoxListener(File file) {
-            this.file = file;
-        }
-
-        public void itemStateChanged(ItemEvent e) {
-            if (e.getStateChange() == ItemEvent.DESELECTED) {
-                attachments.remove(file);
-                layoutComponents();
-            }
-        }
-    }
-
-    class ButtonListener implements ActionListener {
-
-        public ButtonListener() {
-        }
-
-        public void actionPerformed(ActionEvent e) {
-
-            if (e.getActionCommand().equals("Attach a file")) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fileChooser.setDialogTitle("Attach a file");
-                int returnValue = fileChooser.showDialog(new Frame(), "Attach file");
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    attachments.add(fileChooser.getSelectedFile());
-                    layoutComponents();
-                }
-            }
-        }
-    }
-
     public String getComments() {
         String result = commentsTextField.getText();
         if (result == null) {
@@ -493,10 +457,6 @@ public class RequestForChangePanel extends JPanel {
         } else {
             return result;
         }
-    }
-
-    public HashSet<File> getAttachments() {
-        return attachments;
     }
 
     public I_GetConceptData getRefset() {
@@ -526,5 +486,58 @@ public class RequestForChangePanel extends JPanel {
 
     public String getPriority() {
         return (String) priorityComboBox.getSelectedItem();
+    }
+
+    private class AddAttachmentActionLister implements ActionListener {
+        public AddAttachmentActionLister() {
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (e.getActionCommand().equals(openFileChooserButton.getText())) {
+                    JFileChooser fileChooser = new JFileChooser();
+                    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                    fileChooser.setDialogTitle("Attach a File");
+                    int returnValue = fileChooser.showDialog(new Frame(), "Attach file");
+                    if (returnValue == JFileChooser.APPROVE_OPTION) {
+                        File selectedFile = fileChooser.getSelectedFile();
+                        if (attachmentSet.contains(selectedFile)) {
+                            // Warn the user that the file is already attached
+                            JOptionPane.showMessageDialog(null, "The file '" + selectedFile.getName() + "' "
+                                + " is already an attachment. \nPlease select a different file. ",
+                                "Attachment Already Exists Warning", JOptionPane.WARNING_MESSAGE);
+                        } else {
+                            // Add the attachment
+                            attachmentSet.add(selectedFile);
+                            attachmentListModel.add(selectedFile);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+
+    }
+
+    public class DeleteAction extends AbstractAction {
+        private static final long serialVersionUID = 1L;
+
+        public void actionPerformed(ActionEvent e) {
+            File selectedFile = (File) attachmentList.getSelectedValue();
+            attachmentListModel.remove(selectedFile);
+            attachmentSet.remove(selectedFile);
+        }
+    }
+
+    public HashSet<File> getAttachments() {
+        return attachmentSet;
+    }
+
+    public void setAttachments(HashSet<File> files) {
+        attachmentSet.clear();
+        attachmentSet.addAll(files);
+        attachmentListModel.clear();
+        attachmentListModel.addAll(files);
     }
 }
