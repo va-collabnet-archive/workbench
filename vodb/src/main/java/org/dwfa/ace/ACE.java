@@ -1596,7 +1596,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             SecurityException, ConfigurationException, IOException, PrivilegedActionException, IntrospectionException,
             InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException,
             NoSuchMethodException {
-        this.frame = frame;
+        this.frame = aceFrame;
         addFileMenu(menuBar, aceFrame);
         addEditMenu(menuBar, editMenu, aceFrame);
         ProcessPopupUtil.addProcessMenus(menuBar, pluginRoot, menuWorker);
@@ -1618,7 +1618,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     private void addEditMenu(JMenuBar menuBar, JMenu editMenu, JFrame aceFrame) {
-        this.frame = frame;
+        this.frame = aceFrame;
         editMenu.removeAll();
         JMenuItem menuItem;
         editMenu.setMnemonic(KeyEvent.VK_E);
@@ -1670,7 +1670,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             IOException, PrivilegedActionException, SecurityException, IntrospectionException,
             InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException,
             NoSuchMethodException {
-        this.frame = frame;
+        this.frame = aceFrame;
         if (editMode) {
             JMenuItem menuItem = null;
             /*
