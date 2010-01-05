@@ -138,7 +138,6 @@ public class Temp {
 	            Bdb.close();
 	            AceLog.getAppLog().info("finished sync");
 	            
-	            
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -152,7 +151,8 @@ public class Temp {
 	static ExecutorService executors = Executors.newCachedThreadPool();
     static LinkedBlockingQueue<ConvertConcept> converters = new LinkedBlockingQueue<ConvertConcept>();
     static {
-        for (int i = 0; i < 8; i++) {
+    	int converterSize = Runtime.getRuntime().availableProcessors() * 2;
+        for (int i = 0; i < converterSize; i++) {
         	try {
 				converters.put(new ConvertConcept());
 			} catch (InterruptedException e) {
