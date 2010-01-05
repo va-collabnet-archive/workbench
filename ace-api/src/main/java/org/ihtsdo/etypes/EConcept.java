@@ -55,8 +55,12 @@ public class EConcept  {
 			if (nidTypeMap == null) {
 				nidTypeMap = new HashMap<Integer, REFSET_TYPES>();
 				for (REFSET_TYPES type: REFSET_TYPES.values()) {
-					type.typeNid = EComponent.uuidToNid(type.typeConcept.getUids());
-					nidTypeMap.put(type.typeNid, type);
+					try {
+						type.typeNid = EComponent.uuidToNid(type.typeConcept.getUids());
+						nidTypeMap.put(type.typeNid, type);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 			return nidTypeMap.get(nid);
