@@ -10,14 +10,11 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.tapi.TerminologyException;
 
-public class EConceptAttributes extends EComponent 
+public class EConceptAttributes extends EComponent<EConceptAttributesVersion> 
 	implements I_ConceptualizeExternally {
 	public static final long serialVersionUID = 1;
 
 	protected boolean defined;
-
-	protected List<EConceptAttributesVersion> extraVersions;
-
 	
 	public EConceptAttributes() {
 		super();

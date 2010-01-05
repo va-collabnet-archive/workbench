@@ -11,14 +11,12 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
-public class ERefsetStrMember extends ERefset {
+public class ERefsetStrMember extends ERefset<ERefsetStrVersion> {
 
 	public static final long serialVersionUID = 1;
 
 	protected String strValue;
-	
-	protected List<ERefsetStrVersion> extraVersions;
-	
+		
 	public ERefsetStrMember(DataInput in) throws IOException,
 			ClassNotFoundException {
 		super();

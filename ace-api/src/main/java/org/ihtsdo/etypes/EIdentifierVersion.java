@@ -43,4 +43,12 @@ public abstract class EIdentifierVersion extends EVersion {
 	
 	public abstract IDENTIFIER_PART_TYPES getIdType();
 
+	public UUID getAuthorityUuid() {
+		return authorityUuid;
+	}
+
+	public void setAuthorityUuid(UUID authorityUuid) {
+		this.authorityUuid = authorityUuid;
+	}
+
 }

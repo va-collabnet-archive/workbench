@@ -11,7 +11,7 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.tapi.TerminologyException;
 
-public abstract class EComponent extends EVersion {
+public abstract class EComponent<V extends EVersion> extends EVersion {
 
 	public static final long serialVersionUID = 1;
 		
@@ -58,7 +58,10 @@ public abstract class EComponent extends EVersion {
 
 	public UUID primordialComponentUuid;
 
-	public List<EIdentifierVersion> idComponents;
+	public List<EIdentifierVersion> additionalIdComponents;
+	
+	public List<V> extraVersions;
+
 
 	public EComponent() {
 		super();
@@ -81,17 +84,17 @@ public abstract class EComponent extends EVersion {
 		primordialComponentUuid = new UUID(in.readLong(), in.readLong());
 		short idVersionCount = in.readShort();
 		if (idVersionCount > 0) {
-			idComponents = new ArrayList<EIdentifierVersion>(idVersionCount);
+			additionalIdComponents = new ArrayList<EIdentifierVersion>(idVersionCount);
 			for (int i = 0; i < idVersionCount; i++) {
 				switch (IDENTIFIER_PART_TYPES.readType(in)) {
 				case LONG:
-					idComponents.add(new EIdentifierVersionLong(in));
+					additionalIdComponents.add(new EIdentifierVersionLong(in));
 					break;
 				case STRING:
-					idComponents.add(new EIdentifierVersionString(in));
+					additionalIdComponents.add(new EIdentifierVersionString(in));
 					break;
 				case UUID:
-					idComponents.add(new EIdentifierVersionUuid(in));
+					additionalIdComponents.add(new EIdentifierVersionUuid(in));
 					break;
 				default:
 					throw new UnsupportedOperationException();
@@ -106,11 +109,11 @@ public abstract class EComponent extends EVersion {
 		out.writeInt(dataVersion);
 		out.writeLong(primordialComponentUuid.getMostSignificantBits());
 		out.writeLong(primordialComponentUuid.getLeastSignificantBits());
-		if (idComponents == null) {
+		if (additionalIdComponents == null) {
 			out.writeShort(0);
 		} else {
-			out.writeShort(idComponents.size());
-			for (EIdentifierVersion idv : idComponents) {
+			out.writeShort(additionalIdComponents.size());
+			for (EIdentifierVersion idv : additionalIdComponents) {
 				idv.getIdType().writeType(out);
 				idv.writeExternal(out);
 			}
@@ -121,19 +124,19 @@ public abstract class EComponent extends EVersion {
 		boolean primordialWritten = false;
 		int partCount = id.getMutableIdParts().size() - 1;
 		if (partCount > 0) {
-			idComponents = new ArrayList<EIdentifierVersion>(partCount);
+			additionalIdComponents = new ArrayList<EIdentifierVersion>(partCount);
 			for (I_IdPart idp : id.getMutableIdParts()) {
 				Object denotation = idp.getDenotation();
 				switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
 				case LONG:
-					idComponents.add(new EIdentifierVersionLong(idp));
+					additionalIdComponents.add(new EIdentifierVersionLong(idp));
 					break;
 				case STRING:
-					idComponents.add(new EIdentifierVersionString(idp));
+					additionalIdComponents.add(new EIdentifierVersionString(idp));
 					break;
 				case UUID:
 					if (primordialWritten) {
-						idComponents.add(new EIdentifierVersionUuid(idp));
+						additionalIdComponents.add(new EIdentifierVersionUuid(idp));
 					} else {
 						primordialComponentUuid = (UUID) idp.getDenotation();
 						primordialWritten = true;
@@ -150,17 +153,17 @@ public abstract class EComponent extends EVersion {
 	}
 	
 	public int getIdComponentCount() {
-		if (idComponents == null) {
+		if (additionalIdComponents == null) {
 			return 1;
 		}
-		return idComponents.size() + 1;
+		return additionalIdComponents.size() + 1;
 	}
 
 	public List<EIdentifierVersion> getEIdentifiers() {
 		List<EIdentifierVersion> ids;
-		if (idComponents != null) {
-			ids = new ArrayList<EIdentifierVersion>(idComponents.size() + 1);
-			ids.addAll(idComponents);
+		if (additionalIdComponents != null) {
+			ids = new ArrayList<EIdentifierVersion>(additionalIdComponents.size() + 1);
+			ids.addAll(additionalIdComponents);
 		} else {
 			ids = new ArrayList<EIdentifierVersion>(1);
 		}
@@ -171,8 +174,8 @@ public abstract class EComponent extends EVersion {
 	public List<UUID> getUuids() {
 		List<UUID> uuids = new ArrayList<UUID>();
 		uuids.add(primordialComponentUuid);
-		if (idComponents != null) {
-			for (EIdentifierVersion idv: idComponents) {
+		if (additionalIdComponents != null) {
+			for (EIdentifierVersion idv: additionalIdComponents) {
 				if (EIdentifierVersionUuid.class.isAssignableFrom(idv.getClass())) {
 					uuids.add((UUID) idv.getDenotation());
 				}
@@ -190,4 +193,8 @@ public abstract class EComponent extends EVersion {
 	}
 	
 	public abstract List<? extends EVersion> getExtraVersionsList();
+
+	public UUID getPrimordialComponentUuid() {
+		return primordialComponentUuid;
+	}
 }

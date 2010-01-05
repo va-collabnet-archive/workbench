@@ -1,13 +1,12 @@
 package org.ihtsdo.etypes;
 
-import java.io.IOException;
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.IOException;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.PrimordialId;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EComponent.IDENTIFIER_PART_TYPES;
 
@@ -32,7 +31,7 @@ public class EIdentifierVersionUuid extends EIdentifierVersion {
 		time = idp.getTime();
 	}
 
-	public EIdentifierVersionUuid(EComponent eComponent) {
+	public EIdentifierVersionUuid(EComponent<?> eComponent) {
 		denotation = eComponent.primordialComponentUuid;
 		if (primordialAuthority == null) {
 			primordialAuthority = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next();

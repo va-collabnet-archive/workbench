@@ -11,7 +11,7 @@ import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.tapi.TerminologyException;
 
-public class EImage extends EComponent {
+public class EImage extends EComponent<EImageVersion> {
 
 	public static final long serialVersionUID = 1;
 
@@ -24,8 +24,6 @@ public class EImage extends EComponent {
 	protected String textDescription;
     
 	protected UUID typeUuid;
-
-	protected List<EImageVersion> extraVersions;
 	
 	public EImage(DataInput in) throws IOException, ClassNotFoundException {
 		super();

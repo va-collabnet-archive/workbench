@@ -12,14 +12,12 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
-public class ERefsetCidIntMember extends ERefset {
+public class ERefsetCidIntMember extends ERefset<ERefsetCidIntVersion> {
 
 	public static final long serialVersionUID = 1;
 
 	protected UUID c1Uuid;
 	protected int intValue;
-	
-	protected List<ERefsetCidIntVersion> extraVersions;
 	
 	public ERefsetCidIntMember(DataInput in) throws IOException,
 			ClassNotFoundException {
