@@ -123,6 +123,34 @@ public class TestDescGt256Bytes extends AbstractConceptTest {
                 }
             }
         }
+        
+        // TEST IF Preferred or Synonym DESCRIPTION EXCEEDS 80 CHARACTERS
+        // :NOTE:MEC: Global restriction added per Kaiser Pilot requirement.
+        typesToCheck.clear();
+        typesToCheck.add(pt_type.getConceptId());
+        typesToCheck.add(syn_type.getConceptId());
+        for (I_DescriptionVersioned desc : descriptions) {
+            for (I_DescriptionPart part : desc.getMutableParts()) {
+                if (part.getVersion() == Integer.MAX_VALUE) {
+                    if (typesToCheck.contains(part.getTypeId())) {
+                        int len = part.getText().length();
+                        if (len > 80) {
+                            I_GetConceptData typeBean = termFactory.getConcept(part.getTypeId());
+                            I_DescriptionTuple typeDesc = typeBean.getDescTuple(termFactory.getActiveAceFrameConfig()
+                                .getTableDescPreferenceList(), termFactory.getActiveAceFrameConfig());
+                            alertList.add(new AlertToDataConstraintFailure(
+                                (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+                                          : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>"
+                                    + typeDesc.getText() + ":&nbsp;&nbsp;<font color=blue>"
+                                    + part.getText().substring(0, 40) + "</font>..."
+                                    + "<br>exceeds the 80 character limit by  " + (len - 80) + " characters.",
+                                concept));
+                        }
+                    }
+                }
+            }
+        }
+        
         return alertList;
     }
 

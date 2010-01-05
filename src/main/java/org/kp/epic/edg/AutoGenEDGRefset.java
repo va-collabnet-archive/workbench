@@ -18,12 +18,16 @@ package org.kp.epic.edg;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -117,6 +121,10 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     private UUID uuidTypeString;
     private UUID uuidTypeInt;
 
+    private UUID uuidSnoConClinicalFinding;
+    private UUID uuidSnoConEvent;
+    private UUID uuidSnoConSituation;
+
     // NIDs
     private int nidICD9CMGroups;
     private int nidICD9CodeMappings;
@@ -149,6 +157,10 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
 
     private int nidUnspecifiedUuid;
 
+    private int nidSnoConClinicalFinding;
+    private int nidSnoConEvent;
+    private int nidSnoConSituation;
+
     // MASTER DATA SETS
     List<SnoCon> editSnoCons; // "Edit Path" Relationships
     private Icd9CmGroups icd9Groups;
@@ -166,8 +178,12 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     private boolean continueThisAction = true;
     private boolean queryConceptViaRefset;
 
-    // :DEBUG:
+    // :LOG: For detailed logging.
     private boolean debug;
+    private boolean useLogFile;
+    private boolean verboseLogFile;
+    BufferedWriter logFile;
+    int logCount;
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -652,9 +668,27 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         debug = true;
+        useLogFile = true;
+        verboseLogFile = true;
+        logCount = 0;
+
         tf = LocalVersionedTerminology.get();
         logger = worker.getLogger();
         logger.info("\r\n::: [AutoGenEDGRefset] evaluate() -- begin");
+
+        if (useLogFile) {
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
+                String dateStr = formatter.format(new Date());
+                FileWriter fw = new FileWriter("AutogenEDGReport-" + dateStr + ".txt");
+                logFile = new BufferedWriter(fw);
+            } catch (IOException e) {
+                useLogFile = false;
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
 
         setupUUIDs();
         if (setupCoreNids().equals(Condition.STOP))
@@ -710,6 +744,16 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         // 5. AUTO GENERATE REFSET MEMBERS
         createEDGClinicalItems(editSnoCons);
 
+        if (useLogFile) {
+            try {
+                logFile.flush();
+                logFile.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
         return Condition.CONTINUE;
     }
 
@@ -741,12 +785,29 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     private void createEDGClinicalItems(List<SnoCon> scl) {
         for (SnoCon concept : scl) {
             /**** Handle ICD9 Codes ****/
-            // Get the ICD9 Code values for this concept.
+            // Get the ICD9 Code Mapping values for this concept.
             ArrayList<String> icd9CodeValues = findICD9Values(concept.id);
 
             // Process the Type 2 descriptions for this process
             try {
                 String friendlyName = findDescrFriendly(concept.id);
+
+                if (useLogFile) {
+                    if (icd9CodeValues.size() < 1) {
+                        logFile.write((logCount++) + "\tERROR!\tICD9 MAP NO!\t"
+                            + toLogStr(concept.id) + "!!!\r\n");
+                    } else if (verboseLogFile) {
+                        logFile.write((logCount++) + "\t--OK--\tICD9 MAP YES\t"
+                            + toLogStr(concept.id) + icd9CodeValues.size() + "\r\n");
+                    }
+                    if (friendlyName == null) {
+                        logFile.write((logCount++) + "\tERROR!\tPFN NO!     \t"
+                            + toLogStr(concept.id) + "!!!\r\n");
+                    } else if (verboseLogFile) {
+                        logFile.write((logCount++) + "\t--OK--\tPFN YES     \t"
+                            + toLogStr(concept.id) + "\r\n");
+                    }
+                }
 
                 List<I_DescriptionVersioned> descList = findDescription_Type2(concept.id);
                 for (I_DescriptionVersioned desc : descList) {
@@ -1282,6 +1343,9 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         newExt.addVersion(newExtPart);
 
         tf.addUncommitted(newExt);
+
+        if (useLogFile && verboseLogFile)
+            writeExtLog((logCount++) + "\tCREATE\t" + toLogStr(newExt) + value + "\r\n");
     }
 
     private void memberCreate_String(int nidRefSet, int nidConcept, String value)
@@ -1313,6 +1377,9 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         newExt.addVersion(newExtPart);
 
         tf.addUncommitted(newExt);
+
+        if (useLogFile && verboseLogFile)
+            writeExtLog((logCount++) + "\tCREATE\t" + toLogStr(newExt) + value + "\r\n");
     }
 
     private FoundMember memberFind(int nidConcept, int nidClinicalItem_Num) throws IOException {
@@ -1352,6 +1419,9 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         dupl.setVersion(nidVersion);
         ext.addVersion(dupl);
         tf.addUncommitted(ext);
+
+        if (useLogFile && verboseLogFile)
+            writeExtLog((logCount++) + "\tRETIRE\t" + toLogStr(ext) + "\r\n");
     }
 
     // 
@@ -1366,7 +1436,11 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             duplInt.setIntValue(value);
             ext.addVersion(dupl);
             tf.addUncommitted(ext);
+
+            if (useLogFile && verboseLogFile)
+                writeExtLog((logCount++) + "\tUPDATE\t" + toLogStr(ext) + value + "\r\n");
         }
+
     }
 
     // 
@@ -1382,6 +1456,8 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             duplStr.setStringValue(str);
             ext.addVersion(dupl);
             tf.addUncommitted(ext);
+            if (useLogFile && verboseLogFile)
+                writeExtLog((logCount++) + "\tUPDATE\t" + toLogStr(ext) + str + "\r\n");
             return true;
         }
         return false;
@@ -1452,8 +1528,8 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     // :@@@: can not find
     private List<SnoCon> findConceptsFromRefSet() throws TerminologyException, ParseException,
             IOException {
-        // :TODO: the path REFSET -> MEMBER -> DESCRIPTION -> CONCEPT needs to
-        // be revisited
+        // :TODO: REFSET -> MEMBER -> DESCRIPTION -> CONCEPT needs to be
+        // revisited
         List<SnoCon> result = new ArrayList<SnoCon>();
         List<I_GetConceptData> refsetList = findRefSets_Type2();
         for (I_GetConceptData refset : refsetList) {
@@ -1463,15 +1539,13 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             for (I_ThinExtByRefVersioned member : memberList) {
                 // DETERMINE IF THIS IS A
                 int descNid = member.getComponentId();
-                // :TODO:MEC:NOTE: revisit getDescription() API when newer DB
-                // structure in place
+                // :TODO:MEC:NOTE: revisit getDescription() API when newer DB structure in place
                 I_DescriptionVersioned desc = tf.getDescription(descNid, descNid);
-                int conNid = desc.getConceptId(); // :MEC:NOTE: get concept
-                // which encloses the
-                // description
+                
+                // :MEC:NOTE: get concept which encloses description
+                int conNid = desc.getConceptId();
                 I_GetConceptData conBean = tf.getConcept(conNid);
-                // :TODO: check if current part is active, on path, then get if
-                // idDefined.
+                // :TODO: check if current part is active, on path, then get if idDefined.
 
                 result.add(new SnoCon(conNid, false)); // is defined field will
                 // be ignored in this
@@ -1711,6 +1785,10 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         uuidTypeString = UUID.fromString("4a5d2768-e2ae-3bc1-be2d-8d733cd4abdb");
         uuidTypeInt = UUID.fromString("bf91e36c-ff77-35cf-ad92-890518d0f5f2");
 
+        uuidSnoConClinicalFinding = UUID.fromString("bd83b1dd-5a82-34fa-bb52-06f666420a1c");
+        uuidSnoConEvent = UUID.fromString("c7243365-510d-3e5f-82b3-7286b27d7698");
+        uuidSnoConSituation = UUID.fromString("27d03723-07c3-3de9-828b-76aa05a23438");
+
         try {
             nidICD9CMGroups = tf.getConcept(uuidICD9CMGroups).getConceptId();
             nidICD9CodeMappings = tf.getConcept(uuidICD9CodeMappings).getConceptId();
@@ -1747,6 +1825,10 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             for (int i = 0; i < size; i++)
                 nidsEDGClinicalItem_2[i] = type2CBList.get(i).getNid();
 
+            nidSnoConClinicalFinding = tf.getConcept(uuidSnoConClinicalFinding).getConceptId();
+            nidSnoConEvent = tf.getConcept(uuidSnoConEvent).getConceptId();
+            nidSnoConSituation = tf.getConcept(uuidSnoConSituation).getConceptId();
+
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -1754,6 +1836,72 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private String toLogStr(int cNid) {
+        StringBuilder s = new StringBuilder();
+        try {
+            I_GetConceptData concept = tf.getConcept(cNid);
+            s.append(concept.getUids().iterator().next() + "\t");
+            s.append(concept.getInitialText() + "\t");
+        } catch (TerminologyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return s.toString();
+    }
+
+    private String toLogStr(I_ThinExtByRefVersioned ext) {
+        StringBuilder s = new StringBuilder();
+
+        try {
+            I_GetConceptData concept = tf.getConcept(ext.getComponentId());
+            s.append("\t" + concept.getUids().iterator().next() + "\t");
+        } catch (TerminologyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        int rfNid = ext.getRefsetId();
+        if (rfNid == nidEDGClinicalItem_100)
+            s.append("|EDGClinicalItem_100\t");
+        else if (rfNid == nidEDGClinicalItem_200)
+            s.append("|EDGClinicalItem_200\t");
+        else if (rfNid == nidEDGClinicalItem_2000)
+            s.append("|EDGClinicalItem_2000\t");
+        else if (rfNid == nidEDGClinicalItem_207)
+            s.append("|EDGClinicalItem_207\t");
+        else if (rfNid == nidEDGClinicalItem_40)
+            s.append("|EDGClinicalItem_40\t");
+        else if (rfNid == nidEDGClinicalItem_50)
+            s.append("|EDGClinicalItem_50\t");
+        else if (rfNid == nidEDGClinicalItem_7000)
+            s.append("|EDGClinicalItem_7000\t");
+        else if (rfNid == nidEDGClinicalItem_7010)
+            s.append("|EDGClinicalItem_7010\t");
+        else if (rfNid == nidEDGClinicalItem_80)
+            s.append("|EDGClinicalItem_80\t");
+        else if (rfNid == nidEDGClinicalItem_91)
+            s.append("|EDGClinicalItem_91\t");
+        else
+            s.append("|unknown\t");
+
+        return s.toString();
+    }
+
+    private void writeExtLog(String s) {
+        try {
+            logFile.write(s);
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
