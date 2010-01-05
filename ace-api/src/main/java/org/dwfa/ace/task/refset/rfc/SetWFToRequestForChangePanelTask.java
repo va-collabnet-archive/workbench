@@ -132,7 +132,7 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
             SpecRefsetHelper helper = new SpecRefsetHelper();
             Set<? extends I_GetConceptData> allValidUsers = helper.getAllValidUsers();
 
-            wfSheet.add(new RequestForChangePanel(refsets, wfSheet, allValidUsers));
+            wfSheet.add(new RequestForChangePanel(refsets, allValidUsers));
             wfSheet.repaint();
         } catch (Exception e) {
             ex = e;
