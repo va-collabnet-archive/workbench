@@ -17,6 +17,7 @@
 package org.dwfa.ace.task.wfpanel;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.IntrospectionException;
@@ -26,13 +27,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -82,10 +87,10 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
     private JComboBox refsetSelectionComboBox;
     private I_GetConceptData selectedPurposeConcept;
     private transient TermEntry relType = new TermEntry(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
-    private transient TermEntry relCharacteristic = new TermEntry(
-        ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-    private transient TermEntry relRefinability = new TermEntry(
-        ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+    private transient TermEntry relCharacteristic =
+            new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+    private transient TermEntry relRefinability =
+            new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
     private transient TermEntry relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
 
     /*
@@ -177,12 +182,6 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
                  * ---------
                  * Add relationship to the concept that identifies the current
                  * Refset Spec
-                 * 
-                 * 
-                 * 
-                 * 
-                 * 
-                 * 
                  * --------------------------------------------------------------
                  * ---------
                  */
@@ -196,7 +195,8 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
                 I_GetConceptData refsetConcept = termFactory.getConcept(new UUID[] { refsetUuid });
 
                 // Get the config from the worker
-                I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+                I_ConfigAceFrame config =
+                        (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
                 if (config.getEditingPathSet().size() == 0) {
                     throw new TaskFailedException("You must select at least one editing path. ");
                 }
@@ -300,26 +300,29 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
                 // LocalVersionedTerminology.get().getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
 
                 // Fetch purpose concepts... and place them in an array
-                purposeList[0] = LocalVersionedTerminology.get().getConcept(
-                    RefsetAuxiliary.Concept.SIMPLE_COMPONENT.getUids());
-                purposeList[1] = LocalVersionedTerminology.get().getConcept(
-                    RefsetAuxiliary.Concept.NAVIGATION.getUids());
+                purposeList[0] =
+                        LocalVersionedTerminology.get().getConcept(RefsetAuxiliary.Concept.SIMPLE_COMPONENT.getUids());
+                purposeList[1] =
+                        LocalVersionedTerminology.get().getConcept(RefsetAuxiliary.Concept.NAVIGATION.getUids());
                 // Missing: Reference set descriptor
-                purposeList[2] = LocalVersionedTerminology.get().getConcept(
-                    RefsetAuxiliary.Concept.ATTRIBUTE_VALUE.getUids());
+                purposeList[2] =
+                        LocalVersionedTerminology.get().getConcept(RefsetAuxiliary.Concept.ATTRIBUTE_VALUE.getUids());
                 // Missing: Simple Map
-                purposeList[3] = LocalVersionedTerminology.get().getConcept(
-                    RefsetAuxiliary.Concept.ALTERNATIVE_MAP_STATUS.getUids());
+                purposeList[3] =
+                        LocalVersionedTerminology.get().getConcept(
+                            RefsetAuxiliary.Concept.ALTERNATIVE_MAP_STATUS.getUids());
                 // Missing: Language dialect
-                purposeList[4] = LocalVersionedTerminology.get().getConcept(
-                    RefsetAuxiliary.Concept.QUERY_SPECIFICATION.getUids());
-                purposeList[5] = LocalVersionedTerminology.get().getConcept(
-                    RefsetAuxiliary.Concept.ANNOTATION_PURPOSE.getUids());
+                purposeList[4] =
+                        LocalVersionedTerminology.get().getConcept(
+                            RefsetAuxiliary.Concept.QUERY_SPECIFICATION.getUids());
+                purposeList[5] =
+                        LocalVersionedTerminology.get()
+                            .getConcept(RefsetAuxiliary.Concept.ANNOTATION_PURPOSE.getUids());
                 // Missing: Association
-                purposeList[6] = LocalVersionedTerminology.get().getConcept(
-                    RefsetAuxiliary.Concept.MODULE_DEPENDENCY.getUids());
-                purposeList[7] = LocalVersionedTerminology.get().getConcept(
-                    RefsetAuxiliary.Concept.DESC_TYPE_IS.getUids());
+                purposeList[6] =
+                        LocalVersionedTerminology.get().getConcept(RefsetAuxiliary.Concept.MODULE_DEPENDENCY.getUids());
+                purposeList[7] =
+                        LocalVersionedTerminology.get().getConcept(RefsetAuxiliary.Concept.DESC_TYPE_IS.getUids());
             } catch (TerminologyException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -330,10 +333,42 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 
             // Add the processing buttons
             c.weightx = 0.0;
-            setupPreviousNextOrCancelButtons(workflowPanel, c);
+            setUpButtons(workflowPanel, c);
             workflowPanel.setVisible(true);
         }
 
+    }
+
+    protected static String getToDoImage() {
+        return "/24x24/plain/inbox_into.png";
+    }
+
+    protected void setUpButtons(final JPanel workflowPanel, GridBagConstraints c) {
+        c.gridx++;
+        workflowPanel.add(new JLabel("  "), c);
+        c.gridx++;
+        c.anchor = GridBagConstraints.SOUTHWEST;
+
+        JButton continueButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getContinueImage())));
+        continueButton.setToolTipText("continue");
+        workflowPanel.add(continueButton, c);
+        continueButton.addActionListener(new ContinueActionListener());
+        c.gridx++;
+
+        JButton saveButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getToDoImage())));
+        saveButton.setToolTipText("save to TODO queue");
+        workflowPanel.add(saveButton, c);
+        saveButton.addActionListener(new StopActionListener());
+        c.gridx++;
+        workflowPanel.add(new JLabel("     "), c);
+        workflowPanel.validate();
+        Container cont = workflowPanel;
+        while (cont != null) {
+            cont.validate();
+            cont = cont.getParent();
+        }
+        continueButton.requestFocusInWindow();
+        workflowPanel.repaint();
     }
 
     /**
