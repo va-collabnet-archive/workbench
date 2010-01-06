@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -44,6 +45,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.spec.SpecRefsetHelper;
+import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -122,13 +124,12 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
         public void actionPerformed(ActionEvent e) {
             returnCondition = Condition.ITEM_CANCELED;
             try {
-                process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(),
-                    new UUID[] { config.getDbConfig().getUserConcept().getUids().iterator().next() });
+                process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { config
+                    .getDbConfig().getUserConcept().getUids().iterator().next() });
                 I_GetConceptData refsetConcept = config.getRefsetInSpecEditor();
                 if (refsetConcept != null) {
                     process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), refsetConcept.getUids()
-                        .iterator()
-                        .next());
+                        .iterator().next());
                 }
                 done = true;
             } catch (Exception e1) {
@@ -178,19 +179,23 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
         c.anchor = GridBagConstraints.SOUTHWEST;
 
         JButton reviewButton = new JButton("Review selected list");
-        reviewButton.setToolTipText("Review selected list - opens up the list view and lets you approve or disapprove of specific refset members");
+        reviewButton
+            .setToolTipText("Review selected list - opens up the list view and lets you approve or disapprove of specific refset members");
         workflowPanel.add(reviewButton, c);
         reviewButton.addActionListener(new ReviewActionListener());
         c.gridx++;
 
-        JButton saveButton = new JButton("Save");
-        saveButton.setToolTipText("Save to TODO queue - choose this option if you want to finish this work at a later date");
+        JButton saveButton =
+                new JButton(new ImageIcon(InstructAndWait.class.getResource("/24x24/plain/inbox_into.png")));
+        saveButton
+            .setToolTipText("Save to TODO queue - choose this option if you want to finish this work at a later date");
         workflowPanel.add(saveButton, c);
         saveButton.addActionListener(new SaveActionListener());
         c.gridx++;
 
         JButton doneButton = new JButton("Done");
-        doneButton.setToolTipText("Done - choose this option if you've finished checking the promotion status of the refset");
+        doneButton
+            .setToolTipText("Done - choose this option if you've finished checking the promotion status of the refset");
         workflowPanel.add(doneButton, c);
         doneButton.addActionListener(new DoneActionListener());
         c.gridx++;
@@ -224,14 +229,18 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
     private boolean allPromotionStatusesReviewed() throws Exception {
         UUID memberRefsetUuid = (UUID) process.readProperty(ProcessAttachmentKeys.PROMOTION_UUID.getAttachmentKey());
         I_GetConceptData memberRefsetConcept = termFactory.getConcept(new UUID[] { memberRefsetUuid });
-        I_GetConceptData unreviewedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids());
-        I_GetConceptData unreviewedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
+        I_GetConceptData unreviewedAdditionStatus =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids());
+        I_GetConceptData unreviewedDeletionStatus =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
 
         SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
-        List<I_GetConceptData> newAdditions = refsetHelper.filterListByConceptType(
-            termFactory.getRefsetExtensionMembers(memberRefsetConcept.getConceptId()), unreviewedAdditionStatus);
-        List<I_GetConceptData> newDeletions = refsetHelper.filterListByConceptType(
-            termFactory.getRefsetExtensionMembers(memberRefsetConcept.getConceptId()), unreviewedDeletionStatus);
+        List<I_GetConceptData> newAdditions =
+                refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(memberRefsetConcept
+                    .getConceptId()), unreviewedAdditionStatus);
+        List<I_GetConceptData> newDeletions =
+                refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(memberRefsetConcept
+                    .getConceptId()), unreviewedDeletionStatus);
 
         if (newAdditions.size() != 0) {
             return false;

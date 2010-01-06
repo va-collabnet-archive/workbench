@@ -143,13 +143,13 @@ public class InstructWithDoneAndTodo extends AbstractTask {
         c.gridx++;
         c.anchor = GridBagConstraints.SOUTHWEST;
 
-//        JButton doneButton = new JButton("Done");
+        // JButton doneButton = new JButton("Done");
         JButton doneButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getStepForwardImage())));
         doneButton.setToolTipText("Done");
         workflowPanel.add(doneButton, c);
         doneButton.addActionListener(new DoneActionListener());
         c.gridx++;
-//        JButton saveButton = new JButton("Save");
+        // JButton saveButton = new JButton("Save");
         JButton saveButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getToDoImage())));
         saveButton.setToolTipText("Save in todo queue");
         workflowPanel.add(saveButton, c);
@@ -286,13 +286,12 @@ public class InstructWithDoneAndTodo extends AbstractTask {
         }
         return returnCondition;
     }
-    
-    
+
     protected static String getDoneImage() {
         return "/24x24/plain/navigate_check.png";
     }
 
-    protected static String getToDoImage() {
+    public static String getToDoImage() {
         return "/24x24/plain/inbox_into.png";
     }
 

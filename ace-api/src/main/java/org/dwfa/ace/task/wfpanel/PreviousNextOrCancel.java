@@ -89,7 +89,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
         }
     }
 
-    private class ContinueActionListener implements ActionListener {
+    public class ContinueActionListener implements ActionListener {
 
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
@@ -103,7 +103,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
         }
     }
 
-    private class StopActionListener implements ActionListener {
+    public class StopActionListener implements ActionListener {
 
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
@@ -148,6 +148,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
         workflowPanel.add(continueButton, c);
         continueButton.addActionListener(new ContinueActionListener());
         c.gridx++;
+
         JButton cancelButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getCancelImage())));
         cancelButton.setToolTipText("cancel");
         workflowPanel.add(cancelButton, c);
