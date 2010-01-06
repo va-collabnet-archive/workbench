@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Map.Entry;
 
@@ -53,6 +54,8 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -124,15 +127,22 @@ public class RefsetListing extends AbstractMojo {
 		refset_con = tf.getConcept(Arrays.asList(UUID
 				.fromString(this.refset_con_uuid)));
 		out.println("<html>");
+		out.println("<head>");
+		out.println("<style type=\"text/css\">");
+		out.println("BODY {font:10pt sans-serif}");
+		out.println("TABLE {font:10pt sans-serif; border-collapse:collapse}");
+		out.println("TD {border: 1px solid; padding:5px}");
+		out.println("</style>");
+		out.println("</head>");
 		out.println("<body>");
 		out.println("<h2>");
 		out.println("Refset Report");
 		out.println("</h2>");
 		out.println("<p>");
-		out.println(DateFormat.getDateTimeInstance(DateFormat.LONG,
-				DateFormat.LONG).format(new Date()));
-		ArrayList<Integer> refsets = getDescendants(refset_con.getConceptId(),
-				this.path, Integer.MAX_VALUE);
+		out.println(escapeString(DateFormat.getDateTimeInstance(
+				DateFormat.LONG, DateFormat.LONG).format(new Date())));
+		ArrayList<Integer> refsets = getCoreDescendants(refset_con
+				.getConceptId(), getActiveStatus(), this.path);
 		if (this.sort_by_name) {
 			Collections.sort(refsets, new Comparator<Integer>() {
 				public int compare(Integer obj1, Integer obj2) {
@@ -149,7 +159,7 @@ public class RefsetListing extends AbstractMojo {
 		for (Integer con_id : refsets) {
 			I_GetConceptData con = tf.getConcept(con_id);
 			out.println("<h3>");
-			out.println(con.getInitialText());
+			out.println(escapeString(con.getInitialText()));
 			out.println("</h3>");
 			out.println("<table border=\"1\">");
 			for (UUID id : con.getUids()) {
@@ -157,42 +167,99 @@ public class RefsetListing extends AbstractMojo {
 				out.println("<td>");
 				out.println("ID");
 				out.println("<td>");
-				out.println(id);
+				out.println(escapeString(String.valueOf(id)));
 			}
 			for (String r : Arrays.asList(
 					"dd413e49-c124-3b05-8c25-0da5922379d3",
 					"7a981930-621f-3935-b26c-47f54413a59d",
-					"41fbef7f-7210-3288-97cb-c860dfc90601")) {
+					"41fbef7f-7210-3288-97cb-c860dfc90601",
+					"f60922c9-cb3d-3099-8960-1097d2c5afdc")) {
 				I_GetConceptData r_con = tf.getConcept(Arrays.asList(UUID
 						.fromString(r)));
-				boolean found = false;
 				if (r_con != null) {
-					for (int val_id : getRelationship(con.getConceptId(), r_con
-							.getConceptId(), null, Integer.MAX_VALUE)) {
-						I_GetConceptData val_con = tf.getConcept(val_id);
+					boolean found = false;
+					String head = r_con.getInitialText().replace(" rel", "");
+					I_IntSet r_set = tf.newIntSet();
+					r_set.add(r_con.getConceptId());
+					for (I_GetConceptData val_con : con.getSourceRelTargets(
+							getActiveStatus(), r_set, null, true, true)) {
+						// for (int val_id : getRelationship(con.getConceptId(),
+						// r_con.getConceptId(), null, Integer.MAX_VALUE)) {
+						// I_GetConceptData val_con = tf.getConcept(val_id);
 						if (val_con != null) {
 							found = true;
 							out.println("<tr>");
 							out.println("<td>");
-							out.println(r_con.getInitialText());
+							out.println(escapeString(head));
 							out.println("<td>");
-							out.println(val_con.getInitialText());
+							out.println(escapeString(val_con.getInitialText()));
 						}
 					}
-				}
-				if (!found) {
-					out.println("<tr>");
-					out.println("<td>");
-					out.println(r_con.getInitialText());
-					out.println("<td>");
+					if (!found) {
+						out.println("<tr>");
+						out.println("<td>");
+						out.println(escapeString(head));
+						out.println("<td>");
+					}
 				}
 			}
 			// comments rel "ff1b55d3-2b7b-382c-ae42-eceffcc47c71"
 			// promotion rel "9a801240-b3b0-3475-8a7b-07111d3ff564"
+			for (String r : Arrays.asList(
+					"ff1b55d3-2b7b-382c-ae42-eceffcc47c71",
+					"9a801240-b3b0-3475-8a7b-07111d3ff564")) {
+				I_GetConceptData r_con = tf.getConcept(Arrays.asList(UUID
+						.fromString(r)));
+				if (r_con != null) {
+					boolean found = false;
+					String head = r_con.getInitialText().replace(" rel", "");
+					I_IntSet r_set = tf.newIntSet();
+					r_set.add(r_con.getConceptId());
+					for (I_GetConceptData val_con : con.getSourceRelTargets(
+							getActiveStatus(), r_set, null, true, true)) {
+						if (val_con != null) {
+							found = true;
+							out.println("<tr>");
+							out.println("<td>");
+							out.println(escapeString(head));
+							out.println("<td>");
+							// out.println(val_con.getInitialText());
+							//
+							for (I_ThinExtByRefVersioned mem : tf
+									.getRefsetExtensionMembers(val_con
+											.getConceptId())) {
+								I_GetConceptData mem_con = tf.getConcept(mem
+										.getComponentId());
+								I_ThinExtByRefPart p = mem.getMutableParts()
+										.get(0);
+								if (p instanceof I_ThinExtByRefPartString) {
+									I_ThinExtByRefPartString pccs = (I_ThinExtByRefPartString) p;
+									out.println("<tr>");
+									out.println("<td>");
+									out.println("<td>");
+									out.println(escapeString(pccs
+											.getStringValue()));
+								} else {
+									getLog().info(
+											"Wrong type: " + p.getClass() + " "
+													+ mem_con.getInitialText());
+								}
+							}
+							//
+						}
+					}
+					if (!found) {
+						out.println("<tr>");
+						out.println("<td>");
+						out.println(escapeString(head));
+						out.println("<td>");
+					}
+				}
+			}
 			out.println("</table>");
 		}
-		out.println("</html>");
 		out.println("</body>");
+		out.println("</html>");
 		out.close();
 	}
 
@@ -234,13 +301,13 @@ public class RefsetListing extends AbstractMojo {
 						&& (dm == null || dm.getVersion() < dd.getVersion()))
 					dm = dd;
 			}
-			// if (dm != null)
-			// System.out.println("Status: "
-			// + dm.getStatusId()
-			// + " "
-			// + tf.getConcept(
-			// ArchitectonicAuxiliary.Concept.CURRENT
-			// .getUids()).getConceptId());
+			if (dm != null)
+				System.out.println("Status: "
+						+ dm.getStatusId()
+						+ " "
+						+ tf.getConcept(
+								ArchitectonicAuxiliary.Concept.CURRENT
+										.getUids()).getConceptId());
 			if (dm != null
 					&& dm.getStatusId() == tf.getConcept(
 							ArchitectonicAuxiliary.Concept.CURRENT.getUids())
@@ -286,6 +353,75 @@ public class RefsetListing extends AbstractMojo {
 				ret.add(d.getC2Id());
 		}
 		return ret;
+	}
+
+	// active status "32dc7b19-95cc-365e-99c9-5095124ebe72"
+
+	// Set<? extends I_GetConceptData> childStatuses =
+	// status.getDestRelOrigins(null, allowedTypes, null, true, true);
+
+	private I_IntSet getActiveStatus() throws Exception {
+		final I_TermFactory tf = LocalVersionedTerminology.get();
+		I_IntSet ret = tf.newIntSet();
+		for (Integer s : getCoreDescendants(
+				ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid(),
+				null, null)) {
+			ret.add(s);
+		}
+		return ret;
+	}
+
+	private ArrayList<Integer> getCoreDescendants(int concept_id,
+			I_IntSet allowed_status, I_Path path) throws Exception {
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		getCoreDescendants1(concept_id, allowed_status, path, ret);
+		return ret;
+	}
+
+	private void getCoreDescendants1(int concept_id, I_IntSet allowed_status,
+			I_Path path, ArrayList<Integer> ret) throws Exception {
+		if (ret.contains(concept_id))
+			return;
+		ret.add(concept_id);
+		for (int ch : getCoreChildren(concept_id, allowed_status, path)) {
+			getCoreDescendants1(ch, allowed_status, path, ret);
+		}
+	}
+
+	private ArrayList<Integer> getCoreChildren(int concept_id,
+			I_IntSet allowed_status, I_Path path) throws Exception {
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		final I_TermFactory tf = LocalVersionedTerminology.get();
+		I_GetConceptData c = tf.getConcept(concept_id);
+		I_IntSet isa_rels = tf.newIntSet();
+		isa_rels.add(SNOMED.Concept.IS_A.localize().getNid());
+		isa_rels.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize()
+				.getNid());
+		for (I_GetConceptData d : c.getDestRelOrigins(allowed_status, isa_rels,
+				null, true, true)) {
+			ret.add(d.getConceptId());
+		}
+		Collections.sort(ret, new Comparator<Integer>() {
+			public int compare(Integer obj1, Integer obj2) {
+				try {
+					String s1 = tf.getConcept(obj1).getInitialText();
+					String s2 = tf.getConcept(obj2).getInitialText();
+					return s1.compareTo(s2);
+				} catch (Exception e) {
+				}
+				return obj1.compareTo(obj2);
+			}
+		});
+		return ret;
+	}
+
+	private String escapeString(String str) {
+		str = str.replaceAll("\\&", "&amp;");
+		str = str.replaceAll("\\\"", "&quot;");
+		str = str.replaceAll("\\'", "&apos;");
+		str = str.replaceAll("\\<", "&lt;");
+		str = str.replaceAll("\\>", "&gt;");
+		return str;
 	}
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
