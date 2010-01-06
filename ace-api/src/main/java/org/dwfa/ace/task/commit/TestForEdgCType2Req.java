@@ -156,10 +156,17 @@ public class TestForEdgCType2Req extends AbstractConceptTest {
         }
 
         // STEP 3. TEST CONCEPT AS CHILD-OF
-        List<? extends I_RelVersioned> usrl = concept.getUncommittedSourceRels();
+        List<I_RelVersioned> combList = new ArrayList<I_RelVersioned>();
+        try {
+            combList.addAll(concept.getSourceRels());
+            combList.addAll(concept.getUncommittedSourceRels());
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
         boolean isChildOf = false;
-        for (I_RelVersioned rv : usrl) {
+        for (I_RelVersioned rv : combList) {
             List<I_RelTuple> rvtl = rv.getTuples();
             for (I_RelTuple rt : rvtl) {
                 try {
