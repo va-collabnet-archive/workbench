@@ -162,7 +162,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     private int nidSnoConSituation;
 
     // MASTER DATA SETS
-    List<SnoCon> editSnoCons; // "Edit Path" Relationships
+    List<SnoCon> editSnoCons; // "Edit Path" Concepts
     private Icd9CmGroups icd9Groups;
     private Item40CodeGen item40Generator;
 
@@ -794,17 +794,17 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
 
                 if (useLogFile) {
                     if (icd9CodeValues.size() < 1) {
-                        logFile.write((logCount++) + "\tERROR!\tICD9 MAP NO!\t"
-                            + toLogStr(concept.id) + "!!!\r\n");
+                        logFile.write((logCount++) + "\t-WARN-\tICD9 MAP NO!\t"
+                            + toLogStr(concept.id) + "\r\n");
                     } else if (verboseLogFile) {
-                        logFile.write((logCount++) + "\t--OK--\tICD9 MAP YES\t"
-                            + toLogStr(concept.id) + icd9CodeValues.size() + "\r\n");
+                        logFile.write((logCount++) + "\t--OK--\tICD9 MAP [" + icd9CodeValues.size()
+                            + "]\t" + toLogStr(concept.id) + "\r\n");
                     }
                     if (friendlyName == null) {
-                        logFile.write((logCount++) + "\tERROR!\tPFN NO!     \t"
-                            + toLogStr(concept.id) + "!!!\r\n");
+                        logFile.write((logCount++) + "\t-WARN-\tP.F.Name NO!\t"
+                            + toLogStr(concept.id) + "\r\n");
                     } else if (verboseLogFile) {
-                        logFile.write((logCount++) + "\t--OK--\tPFN YES     \t"
+                        logFile.write((logCount++) + "\t--OK--\tP.F.Name YES\t"
                             + toLogStr(concept.id) + "\r\n");
                     }
                 }
@@ -863,7 +863,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             else if (oldMember != null && part != null)
                 memberUpdate_String(oldMember.getExt(), oldMember.getExtPart(), part.getText());
             else if (oldMember != null && part == null)
-                memberRetire_String(oldMember.getExt(), oldMember.getExtPart());
+                ; // DO NOTHING
 
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
@@ -953,15 +953,6 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                 icd9CodeStr = icd9Codes.get(0);
             } else if (totalCodes == 0)
                 icd9CodeStr = "";
-
-            if (debug) {
-                if (ext200part != null)
-                    logger.info("\r\n::: Clinical Item 200 : IDC9=\t" + icd9CodeStr + "\t"
-                        + tf.getConcept(nidConcept).getInitialText());
-                if (ext2000part != null)
-                    logger.info("\r\n::: Clinical Item 2000: IDC9=\t" + icd9CodeStr + "\t"
-                        + tf.getConcept(nidConcept).getInitialText());
-            }
 
             boolean item200 = true;
             boolean item2000 = false;
@@ -1117,60 +1108,98 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     }
 
     private void doEDGClinicalItem_40_Setup(List<SnoCon> scl) {
-        for (SnoCon concept : scl) {
-            // Check for existing Item 200 or Item 2000 RefSet member.
-            List<I_ThinExtByRefVersioned> extList = null;
+        for (SnoCon sc : scl) {
+
+            List<I_DescriptionVersioned> descList;
             try {
-                extList = tf.getAllExtensionsForComponent(concept.id);
-            } catch (IOException e) {
+                descList = findDescription_Type2(sc.id);
+            } catch (TerminologyException e1) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                e1.printStackTrace();
+                continue;
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
                 continue;
             }
-            I_ThinExtByRefVersioned ext200 = null;
-            I_ThinExtByRefPart ext200part = null;
-            I_ThinExtByRefVersioned ext2000 = null;
-            I_ThinExtByRefPart ext2000part = null;
-            for (I_ThinExtByRefVersioned ext : extList) {
-                if (ext.getRefsetId() == nidEDGClinicalItem_200) {
-                    if (ext200 == null) {
-                        ext200 = ext;
-                        List<? extends I_ThinExtByRefPart> partList = ext.getMutableParts();
-                        int lastVersion = Integer.MIN_VALUE;
-                        for (I_ThinExtByRefPart part : partList) {
-                            if (part.getVersion() > lastVersion) {
-                                lastVersion = part.getVersion();
-                                ext200part = part;
-                            }
-                        }
-                    } else
-                        logger.info("\r\n::: !!! DUPLICATE ITEM 200 ERROR");
-                } else if (ext.getRefsetId() == nidEDGClinicalItem_2000) {
-                    if (ext2000 == null) {
-                        ext2000 = ext;
-                        List<? extends I_ThinExtByRefPart> partList = ext.getMutableParts();
-                        int lastVersion = Integer.MIN_VALUE;
-                        for (I_ThinExtByRefPart part : partList) {
-                            if (part.getVersion() > lastVersion) {
-                                lastVersion = part.getVersion();
-                                ext2000part = part;
 
-                            }
-                        }
-                    } else
-                        logger.info("\r\n::: !!! DUPLICATE ITEM 2000 ERROR");
+            for (I_DescriptionVersioned desc : descList) {
+                int dNid = desc.getNid();
+
+                // Check for existing Item 200 or Item 2000 RefSet member.
+                List<I_ThinExtByRefVersioned> extList = null;
+                try {
+                    extList = tf.getAllExtensionsForComponent(dNid);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    continue;
                 }
-            }
+                I_ThinExtByRefVersioned ext200 = null;
+                I_ThinExtByRefPart ext200part = null;
+                I_ThinExtByRefVersioned ext2000 = null;
+                I_ThinExtByRefPart ext2000part = null;
+                I_ThinExtByRefVersioned ext40 = null;
+                I_ThinExtByRefPart ext40part = null;
+                for (I_ThinExtByRefVersioned ext : extList) {
+                    if (ext.getRefsetId() == nidEDGClinicalItem_200) {
+                        if (ext200 == null) {
+                            ext200 = ext;
+                            List<? extends I_ThinExtByRefPart> partList = ext.getMutableParts();
+                            int lastVersion = Integer.MIN_VALUE;
+                            for (I_ThinExtByRefPart part : partList) {
+                                if (part.getVersion() > lastVersion) {
+                                    lastVersion = part.getVersion();
+                                    ext200part = part;
+                                }
+                            }
+                        } else {
+                            logger.info("\r\n::: !!! DUPLICATE ITEM 200 ERROR");
+                        }
+                    } else if (ext.getRefsetId() == nidEDGClinicalItem_2000) {
+                        if (ext2000 == null) {
+                            ext2000 = ext;
+                            List<? extends I_ThinExtByRefPart> partList = ext.getMutableParts();
+                            int lastVersion = Integer.MIN_VALUE;
+                            for (I_ThinExtByRefPart part : partList) {
+                                if (part.getVersion() > lastVersion) {
+                                    lastVersion = part.getVersion();
+                                    ext2000part = part;
+                                }
+                            }
+                        } else {
+                            logger.info("\r\n::: !!! DUPLICATE ITEM 2000 ERROR");
+                        }
+                    } else if (ext.getRefsetId() == nidEDGClinicalItem_40) {
+                        if (ext40 == null) {
+                            ext40 = ext;
+                            List<? extends I_ThinExtByRefPart> partList = ext.getMutableParts();
+                            int lastVersion = Integer.MIN_VALUE;
+                            for (I_ThinExtByRefPart part : partList) {
+                                if (part.getVersion() > lastVersion) {
+                                    lastVersion = part.getVersion();
+                                    ext40part = part;
+                                }
+                            }
+                        } else {
+                            logger.info("\r\n::: !!! DUPLICATE ITEM 40 ERROR");
+                        }
+                    }
 
-            if (ext200part != null) {
-                I_ThinExtByRefPartString tmp = (I_ThinExtByRefPartString) ext200part;
-                item40Generator.add(tmp.getStringValue());
-            }
-            if (ext2000part != null) {
-                I_ThinExtByRefPartString tmp = (I_ThinExtByRefPartString) ext2000part;
-                item40Generator.add(tmp.getStringValue());
-            }
+                }
 
+                if (ext200part != null) {
+                    I_ThinExtByRefPartString tmp = (I_ThinExtByRefPartString) ext40part;
+                    item40Generator.add(tmp.getStringValue());
+
+                }
+                if (ext2000part != null) {
+                    I_ThinExtByRefPartString tmp = (I_ThinExtByRefPartString) ext40part;
+                    item40Generator.add(tmp.getStringValue());
+
+                }
+
+            }
         }
         item40Generator.sort();
     }
@@ -1200,6 +1229,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
      * @param nid
      */
     private void doEDGClinicalItem_7010(I_DescriptionVersioned desc, String name) {
+        // NOTE: name is null if no patient friendly name exists.
         try {
             FoundMember oldMember = memberFind(desc.getNid(), nidEDGClinicalItem_7010);
             if (name == null && oldMember == null)
@@ -1209,7 +1239,9 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             else if (name != null && oldMember != null)
                 memberUpdate_String(oldMember.getExt(), oldMember.getExtPart(), name);
             else
-                memberRetire_String(oldMember.getExt(), oldMember.getExtPart());
+                // name == null && oldMember != null
+                ; // memberRetire_String(oldMember.getExt(),
+            // oldMember.getExtPart());
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -1223,7 +1255,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
      * doEDGClinicalItem_80()<br>
      * TYPE: Concept<br>
      * USE: EDC Dot1, Diagnostic Group Concept ID, Section E<br>
-     * EDC Dot1 '66' meaning "Other diagnosis"<br>
+     * NOTE: EDC Dot1 '66' meaning "Other diagnosis"<br>
      * <br>
      * <code>
      * IF (EDCItem_2000 .EXISTS.)<br>
@@ -1243,7 +1275,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
      * &nbsp;&nbsp;SET refset_member value of ICD9_CM_Vol_1_Group Dot1<br>
      * <br>
      * ELSE<br>
-     * &nbsp;&nbsp;CREATE EDGClinicalItem_207 refset_member<br>
+     * &nbsp;&nbsp;CREATE EDGClinicalItem_80 refset_member<br>
      * &nbsp;&nbsp;SET refset_member value to 66<br></code>
      * 
      * @param concept
@@ -1345,7 +1377,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         tf.addUncommitted(newExt);
 
         if (useLogFile && verboseLogFile)
-            writeExtLog((logCount++) + "\tCREATE\t" + toLogStr(newExt) + value + "\r\n");
+            writeExtLog((logCount++) + "\tCREATE\t" + value + toLogStr(newExt) + "\r\n");
     }
 
     private void memberCreate_String(int nidRefSet, int nidConcept, String value)
@@ -1379,7 +1411,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         tf.addUncommitted(newExt);
 
         if (useLogFile && verboseLogFile)
-            writeExtLog((logCount++) + "\tCREATE\t" + toLogStr(newExt) + value + "\r\n");
+            writeExtLog((logCount++) + "\tCREATE\t" + value + toLogStr(newExt) + "\r\n");
     }
 
     private FoundMember memberFind(int nidConcept, int nidClinicalItem_Num) throws IOException {
@@ -1421,7 +1453,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         tf.addUncommitted(ext);
 
         if (useLogFile && verboseLogFile)
-            writeExtLog((logCount++) + "\tRETIRE\t" + toLogStr(ext) + "\r\n");
+            writeExtLog((logCount++) + "\tRETIRE\t" + "*****" + toLogStr(ext) + "\r\n");
     }
 
     // 
@@ -1438,7 +1470,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             tf.addUncommitted(ext);
 
             if (useLogFile && verboseLogFile)
-                writeExtLog((logCount++) + "\tUPDATE\t" + toLogStr(ext) + value + "\r\n");
+                writeExtLog((logCount++) + "\tUPDATE\t" + value + toLogStr(ext) + "\r\n");
         }
 
     }
@@ -1457,7 +1489,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             ext.addVersion(dupl);
             tf.addUncommitted(ext);
             if (useLogFile && verboseLogFile)
-                writeExtLog((logCount++) + "\tUPDATE\t" + toLogStr(ext) + str + "\r\n");
+                writeExtLog((logCount++) + "\tUPDATE\t" + str + toLogStr(ext) + "\r\n");
             return true;
         }
         return false;
@@ -1539,13 +1571,15 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             for (I_ThinExtByRefVersioned member : memberList) {
                 // DETERMINE IF THIS IS A
                 int descNid = member.getComponentId();
-                // :TODO:MEC:NOTE: revisit getDescription() API when newer DB structure in place
+                // :TODO:MEC:NOTE: revisit getDescription() API when newer DB
+                // structure in place
                 I_DescriptionVersioned desc = tf.getDescription(descNid, descNid);
-                
+
                 // :MEC:NOTE: get concept which encloses description
                 int conNid = desc.getConceptId();
                 I_GetConceptData conBean = tf.getConcept(conNid);
-                // :TODO: check if current part is active, on path, then get if idDefined.
+                // :TODO: check if current part is active, on path, then get if
+                // idDefined.
 
                 result.add(new SnoCon(conNid, false)); // is defined field will
                 // be ignored in this
@@ -1642,10 +1676,14 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     }
 
     private boolean isOnAPath(int pNid, int vNid) {
-        for (I_Position pos : editPathPos) {
+        // :@@@: for Workbench Auxiliary Path
+        if (pNid == workbenchAuxPath)
+            return true;
+        
+        for (I_Position pos : editPathPos) 
             if ((pos.getPath().getConceptId() == pNid) && (vNid <= pos.getVersion()))
                 return true;
-        }
+
         return false;
     }
 
@@ -1678,7 +1716,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             if (config.getClassifierIsaType() != null) {
                 int checkIsaNid = tf.uuidToNative(config.getClassifierIsaType().getUids());
                 if (checkIsaNid != isaNid) {
-                    logger.severe("\r\n::: SERVERE ERROR isaNid MISMACTH ****");
+                    logger.severe("\r\n::: SERVERE ERROR isaNid MISMATCH ****");
                 }
             } else {
                 String errStr = "Classifier Is-a not set! Found: "
@@ -1842,11 +1880,12 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     }
 
     private String toLogStr(int cNid) {
+        String pad = "                     ";
         StringBuilder s = new StringBuilder();
         try {
             I_GetConceptData concept = tf.getConcept(cNid);
-            s.append(concept.getUids().iterator().next() + "\t");
             s.append(concept.getInitialText() + "\t");
+            s.append(concept.getUids().iterator().next());
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -1860,9 +1899,33 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     private String toLogStr(I_ThinExtByRefVersioned ext) {
         StringBuilder s = new StringBuilder();
 
+        int rfNid = ext.getRefsetId();
+        if (rfNid == nidEDGClinicalItem_100)
+            s.append("\t|EDGClinicalItem_100 \t");
+        else if (rfNid == nidEDGClinicalItem_200)
+            s.append("\t|EDGClinicalItem_200 \t");
+        else if (rfNid == nidEDGClinicalItem_2000)
+            s.append("\t|EDGClinicalItem_2000\t");
+        else if (rfNid == nidEDGClinicalItem_207)
+            s.append("\t|EDGClinicalItem_207 \t");
+        else if (rfNid == nidEDGClinicalItem_40)
+            s.append("\t|EDGClinicalItem_40  \t");
+        else if (rfNid == nidEDGClinicalItem_50)
+            s.append("\t|EDGClinicalItem_50  \t");
+        else if (rfNid == nidEDGClinicalItem_7000)
+            s.append("\t|EDGClinicalItem_7000\t");
+        else if (rfNid == nidEDGClinicalItem_7010)
+            s.append("\t|EDGClinicalItem_7010\t");
+        else if (rfNid == nidEDGClinicalItem_80)
+            s.append("\t|EDGClinicalItem_80  \t");
+        else if (rfNid == nidEDGClinicalItem_91)
+            s.append("\t|EDGClinicalItem_91  \t");
+        else
+            s.append("\t|unknown\t");
+
         try {
             I_GetConceptData concept = tf.getConcept(ext.getComponentId());
-            s.append("\t" + concept.getUids().iterator().next() + "\t");
+            s.append(concept.getUids().iterator().next());
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -1870,30 +1933,6 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-        int rfNid = ext.getRefsetId();
-        if (rfNid == nidEDGClinicalItem_100)
-            s.append("|EDGClinicalItem_100\t");
-        else if (rfNid == nidEDGClinicalItem_200)
-            s.append("|EDGClinicalItem_200\t");
-        else if (rfNid == nidEDGClinicalItem_2000)
-            s.append("|EDGClinicalItem_2000\t");
-        else if (rfNid == nidEDGClinicalItem_207)
-            s.append("|EDGClinicalItem_207\t");
-        else if (rfNid == nidEDGClinicalItem_40)
-            s.append("|EDGClinicalItem_40\t");
-        else if (rfNid == nidEDGClinicalItem_50)
-            s.append("|EDGClinicalItem_50\t");
-        else if (rfNid == nidEDGClinicalItem_7000)
-            s.append("|EDGClinicalItem_7000\t");
-        else if (rfNid == nidEDGClinicalItem_7010)
-            s.append("|EDGClinicalItem_7010\t");
-        else if (rfNid == nidEDGClinicalItem_80)
-            s.append("|EDGClinicalItem_80\t");
-        else if (rfNid == nidEDGClinicalItem_91)
-            s.append("|EDGClinicalItem_91\t");
-        else
-            s.append("|unknown\t");
 
         return s.toString();
     }
