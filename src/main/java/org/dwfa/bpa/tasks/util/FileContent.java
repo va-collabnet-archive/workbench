@@ -42,16 +42,18 @@ public class FileContent implements Serializable {
      * Create a new FileContent object.
      * 
      * @param file The file to read in.
-     * @throws IOException 
+     * @throws IOException
      */
     public FileContent(File file) throws IOException {
-            filename = file.getName();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            InputStream is = new BufferedInputStream(new FileInputStream(file));
-            FileIO.copyFile(is, baos, true);
-            // set content
-            contents = baos.toByteArray();
-            baos.close();
+        filename = file.getName();
+        System.out.println("********* FILE NAME: " + file.getName());
+        System.out.println("********* FILE PATH: " + file.getPath());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        InputStream is = new BufferedInputStream(new FileInputStream(file));
+        FileIO.copyFile(is, baos, true);
+        // set content
+        contents = baos.toByteArray();
+        baos.close();
     }
 
     /**
