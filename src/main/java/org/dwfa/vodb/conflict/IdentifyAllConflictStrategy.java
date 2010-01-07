@@ -83,15 +83,11 @@ public class IdentifyAllConflictStrategy extends ConflictManagementStrategy impl
                 Iterator<T> tupleIterator = map.values().iterator();
                 T first = tupleIterator.next();
 
-                I_AmPart firstDuplicate = first.duplicate();
-                firstDuplicate.setPathId(0);
-                firstDuplicate.setVersion(0);
+                I_AmPart firstDuplicate = first.makeAnalog(1, 0, 0);
 
                 while (tupleIterator.hasNext()) {
                     T tuple = (T) tupleIterator.next();
-                    I_AmPart tupleDuplicate = tuple.duplicate();
-                    tupleDuplicate.setPathId(0);
-                    tupleDuplicate.setVersion(0);
+                    I_AmPart tupleDuplicate = tuple.makeAnalog(1, 0, 0);
 
                     if (tupleDuplicate.equals(firstDuplicate)) {
                         continue; // identical, no conflict with this one, check

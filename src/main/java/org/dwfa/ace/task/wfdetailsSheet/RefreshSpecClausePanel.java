@@ -691,9 +691,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 			PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
 			for (I_Path p : config.getEditingPathSet()) {
 				for (I_ThinExtByRefTuple tuple : tuples) {
-					I_ThinExtByRefPart newPart = tuple.getMutablePart().duplicate();
-					newPart.setVersion(Integer.MAX_VALUE);
-					newPart.setStatusId(retiredNid);
+					I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) tuple.getMutablePart().makeAnalog(retiredNid, p.getConceptId(), Long.MAX_VALUE);
 					tuple.getCore().addVersion(newPart);
 					tf.addUncommitted(tuple.getCore());
 				}

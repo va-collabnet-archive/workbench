@@ -133,14 +133,14 @@ public class LastCommitWinsConflictResolutionStrategy extends ConflictManagement
         Iterator<T> copyIterator = copy.iterator();
         I_AmPart firstPart = copyIterator.next();
 
-        I_AmPart firstPartDuplicate = firstPart.duplicate();
-        firstPartDuplicate.setPathId(0);
+        I_AmPart firstPartDuplicate = firstPart.makeAnalog(firstPart.getStatusId(), 0, Long.MAX_VALUE);
+ 
 
         while (copyIterator.hasNext()) {
             T amPart = (T) copyIterator.next();
             if (amPart.getVersion() == firstPart.getVersion()) {
-                I_AmPart amPartDuplicate = amPart.duplicate();
-                amPartDuplicate.setPathId(0);
+                I_AmPart amPartDuplicate = amPart.makeAnalog(amPart.getStatusId(), 0, Long.MAX_VALUE);
+
 
                 if (amPartDuplicate.equals(firstPartDuplicate)) {
                     continue; // identical, no conflict with this one, check for

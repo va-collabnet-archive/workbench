@@ -432,9 +432,7 @@ public class ThinRelVersioned implements I_RelVersioned {
         for (I_Path promotionPath : pomotionPaths) {
             for (I_RelTuple rt : matchingTuples) {
                 if (rt.getPathId() == viewPathId) {
-                    I_RelPart promotionPart = rt.getMutablePart().duplicate();
-                    promotionPart.setVersion(Integer.MAX_VALUE);
-                    promotionPart.setPathId(promotionPath.getConceptId());
+                    I_RelPart promotionPart = (I_RelPart) rt.getMutablePart().makeAnalog(rt.getStatusId(), promotionPath.getConceptId(), Long.MAX_VALUE);
                     rt.getRelVersioned().addVersion(promotionPart);
                     promotedAnything = true;
                 }

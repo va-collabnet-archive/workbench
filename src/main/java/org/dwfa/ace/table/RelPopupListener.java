@@ -62,9 +62,8 @@ public class RelPopupListener extends MouseAdapter {
                 ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getC1Id());
                 ConceptBean destBean = ConceptBean.get(selectedObject.getTuple().getC2Id());
                 for (I_Path p : config.getEditingPathSet()) {
-                    I_RelPart newPart = selectedObject.getTuple().duplicate();
-                    newPart.setPathId(p.getConceptId());
-                    newPart.setVersion(Integer.MAX_VALUE);
+                	I_RelPart currentPart = (I_RelPart) selectedObject.getTuple();
+                    I_RelPart newPart = (I_RelPart) selectedObject.getTuple().makeAnalog(currentPart.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
                     selectedObject.getTuple().getRelVersioned().addVersion(newPart);
 
                     I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
@@ -122,8 +121,9 @@ public class RelPopupListener extends MouseAdapter {
                 I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
                 for (I_Path p : config.getEditingPathSet()) {
                     I_RelPart newPart = selectedObject.getTuple().getMutablePart();
-                    if (selectedObject.getTuple().getVersion() != Integer.MAX_VALUE) {
-                        newPart = selectedObject.getTuple().duplicate();
+                    if (selectedObject.getTuple().getVersion() != Long.MAX_VALUE) {
+                    	I_RelPart currentPart = (I_RelPart) selectedObject.getTuple();
+                        newPart = (I_RelPart) selectedObject.getTuple().makeAnalog(currentPart.getStatusId(), currentPart.getPathId(), Long.MAX_VALUE);
                         srcRel.addVersion(newPart);
                     }
                     newPart.setPathId(p.getConceptId());

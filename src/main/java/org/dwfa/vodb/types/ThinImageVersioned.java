@@ -242,9 +242,7 @@ public class ThinImageVersioned implements I_ImageVersioned {
         for (I_Path promotionPath : pomotionPaths) {
             for (I_ImageTuple it : matchingTuples) {
                 if (it.getPathId() == viewPathId) {
-                    I_ImagePart promotionPart = it.getMutablePart().duplicate();
-                    promotionPart.setVersion(Integer.MAX_VALUE);
-                    promotionPart.setPathId(promotionPath.getConceptId());
+                    I_ImagePart promotionPart = (I_ImagePart) it.getMutablePart().makeAnalog(it.getStatusId(), promotionPath.getConceptId(), Long.MAX_VALUE);
                     it.getVersioned().addVersion(promotionPart);
                     promotedAnything = true;
                 }
