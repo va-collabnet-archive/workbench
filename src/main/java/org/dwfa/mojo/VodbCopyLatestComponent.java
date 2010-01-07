@@ -117,9 +117,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             List<? extends I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(positions));
             // copy latest attributes to new path/version
             for (I_ConceptAttributeTuple tuple : conceptAttributeTuples) {
-                I_ConceptAttributePart newPart = tuple.duplicate();
-                newPart.setVersion(Integer.MAX_VALUE);
-                newPart.setPathId(copyToPath.getConceptId());
+                I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptId(), Long.MAX_VALUE);
                 concept.getConceptAttributes().addVersion(newPart);
             }
 
@@ -127,9 +125,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(positions));
             // copy latest descriptions to new path/version
             for (I_DescriptionTuple tuple : descriptionTuples) {
-                I_DescriptionPart newPart = tuple.duplicate();
-                newPart.setVersion(Integer.MAX_VALUE);
-                newPart.setPathId(copyToPath.getConceptId());
+                I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptId(), Long.MAX_VALUE);
                 tuple.getDescVersioned().addVersion(newPart);
             }
 
@@ -137,9 +133,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             List<? extends I_RelTuple> relationshipTuples = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(positions), false);
             // copy latest relationships to new path/version
             for (I_RelTuple tuple : relationshipTuples) {
-                I_RelPart newPart = tuple.duplicate();
-                newPart.setVersion(Integer.MAX_VALUE);
-                newPart.setPathId(copyToPath.getConceptId());
+                I_RelPart newPart = (I_RelPart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptId(), Long.MAX_VALUE);
                 tuple.getRelVersioned().addVersion(newPart);
             }
 

@@ -71,10 +71,9 @@ public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
         sortedVersions.addAll(member.getMutableParts());
 
         // Get the latest version.
-        I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) sortedVersions.last().duplicate();
-        newPart.setStatus(retiredStatusId);
-        newPart.setVersion(Integer.MAX_VALUE);
-        member.addVersion(newPart);
+        I_ThinExtByRefPartConcept oldPart = (I_ThinExtByRefPartConcept) sortedVersions.last();
+        I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) oldPart.makeAnalog(retiredStatusId, oldPart.getPathId(), Long.MAX_VALUE);
+         member.addVersion(newPart);
         termFactory.addUncommitted(member);
     }
 }

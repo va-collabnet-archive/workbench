@@ -305,11 +305,8 @@ public class VodbExecuteTallMan extends AbstractMojo {
                         modifiedUuids.add(uuids);
 
                         // update the description with the tall man alternative
-                        I_DescriptionPart newPart = tuple.duplicate();
+                        I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(currentUnreviewedId, copyToPath.getConceptId(), Long.MAX_VALUE);
                         newPart.setText(updatedCurrentDescription);
-                        newPart.setStatusId(currentUnreviewedId);
-                        newPart.setVersion(Integer.MAX_VALUE);
-                        newPart.setPathId(copyToPath.getConceptId());
                         tuple.getDescVersioned().addVersion(newPart);
                         // termFactory.addUncommitted(concept);
 
@@ -319,10 +316,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
                             new PositionSetReadOnly(positionsToCheck));
                         // copy latest attributes and set status to unreviewed
                         for (I_ConceptAttributeTuple attribute : conceptAttributeTuples) {
-                            I_ConceptAttributePart newAttributePart = attribute.duplicate();
-                            newAttributePart.setStatusId(currentUnreviewedId);
-                            newAttributePart.setVersion(Integer.MAX_VALUE);
-                            newAttributePart.setPathId(copyToPath.getConceptId());
+                            I_ConceptAttributePart newAttributePart = (I_ConceptAttributePart) attribute.makeAnalog(currentUnreviewedId, copyToPath.getConceptId(), Long.MAX_VALUE);
                             concept.getConceptAttributes().addVersion(newAttributePart);
                         }
                         termFactory.addUncommitted(concept);

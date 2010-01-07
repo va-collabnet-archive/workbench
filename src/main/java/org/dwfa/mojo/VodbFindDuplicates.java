@@ -549,10 +549,8 @@ public class VodbFindDuplicates extends AbstractMojo {
         List<? extends I_ConceptAttributeTuple> attributeTuples = potDupConcept.getConceptAttributeTuples(allowedStatus,
             new PositionSetReadOnly(positions));
         for (I_Position pos : positions) {
-            I_ConceptAttributePart attributePart = attributeTuples.get(0).duplicate();
-            attributePart.setStatusId(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid());
-            attributePart.setVersion(Integer.MAX_VALUE);
-            attributePart.setPathId(pos.getPath().getConceptId());
+            I_ConceptAttributePart attributePart = (I_ConceptAttributePart) attributeTuples.get(0).makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid(),
+            		pos.getPath().getConceptId(), Long.MAX_VALUE);
             potDupConcept.getConceptAttributes().addVersion(attributePart);
         }
         return attributeTuples;

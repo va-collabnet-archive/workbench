@@ -257,7 +257,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
     }
 
     private void duplicateConceptAttributeTuple(I_ConceptAttributeTuple latestPart) {
-        I_ConceptAttributePart newPart = latestPart.duplicate();
+        I_ConceptAttributePart newPart = (I_ConceptAttributePart) latestPart.makeAnalog(latestPart.getStatusId(), toPathId, latestPart.getVersion());
         newPart.setPathId(toPathId);
         latestPart.getConVersioned().addVersion(newPart);
         getLog().info("concept attribute part copied " + latestPart);
@@ -301,7 +301,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
     }
 
     private void duplicateDescriptionTuple(I_DescriptionTuple t) {
-        I_DescriptionPart newPart = t.duplicate();
+        I_DescriptionPart newPart = (I_DescriptionPart) t.makeAnalog(t.getStatusId(), toPathId, t.getVersion());
         newPart.setPathId(toPathId);
         t.getDescVersioned().addVersion(newPart);
 
@@ -338,7 +338,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
     }
 
     private void duplicateExtensionTuple(I_ThinExtByRefTuple t) {
-        I_ThinExtByRefPart newPart = t.duplicate();
+        I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) t.makeAnalog(t.getStatusId(), toPathId, t.getVersion());
         newPart.setPathId(toPathId);
         t.getCore().addVersion(newPart);
 
@@ -418,7 +418,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
     }
 
     private void duplicateImageTuple(I_ImageTuple t) {
-        I_ImagePart newPart = t.duplicate();
+        I_ImagePart newPart = (I_ImagePart) t.makeAnalog(t.getStatusId(), toPathId, t.getVersion());
         newPart.setPathId(toPathId);
         t.getVersioned().addVersion(newPart);
 
@@ -461,7 +461,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
     }
 
     private void duplicateRelationshipTuple(I_RelTuple t) {
-        I_RelPart newPart = t.duplicate();
+        I_RelPart newPart = (I_RelPart) t.makeAnalog(t.getStatusId(), toPathId, t.getVersion());
         newPart.setPathId(toPathId);
         t.getRelVersioned().addVersion(newPart);
 

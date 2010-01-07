@@ -108,9 +108,7 @@ public class MemberSpecScrubber implements ConceptExtHandler {
         // Retire remaining current parts on the same path
         for (I_ThinExtByRefPartConcept subjectPart : subjects) {
 
-            I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) subjectPart.duplicate();
-            newPart.setStatus(retiredStatusId);
-            newPart.setVersion(Integer.MAX_VALUE);
+            I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) subjectPart.makeAnalog(retiredStatusId, subjectPart.getPathId(), Long.MAX_VALUE);
             conceptExtension.addVersion(newPart);
             termFactory.addUncommitted(conceptExtension);
         }

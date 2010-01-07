@@ -68,9 +68,8 @@ public class VodbExampleChange extends AbstractMojo {
             I_GetConceptData flaggedStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids());
 
             for (I_ConceptAttributeTuple tuple : architectonicRoot.getConceptAttributeTuples(null, new PositionSetReadOnly(positions))) {
-                I_ConceptAttributePart part = tuple.duplicate();
-                part.setVersion(Integer.MAX_VALUE);
-                part.setStatusId(flaggedStatus.getConceptId());
+                I_ConceptAttributePart part = (I_ConceptAttributePart) tuple.makeAnalog(flaggedStatus.getConceptId(), tuple.getPathId(), Long.MAX_VALUE);
+
                 conceptAttributes.addVersion(part);
                 termFactory.addUncommitted(architectonicRoot);
             }
