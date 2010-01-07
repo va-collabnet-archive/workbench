@@ -51,6 +51,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.ThinExtByRefPartProperty;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoCon;
 import org.dwfa.bpa.process.Condition;
@@ -1446,9 +1447,8 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
 
     // 
     private void memberRetire_String(I_ThinExtByRefVersioned ext, I_ThinExtByRefPart extPart) {
-        I_ThinExtByRefPart dupl = extPart.duplicate();
-        dupl.setStatusId(nidRETIRED);
-        dupl.setVersion(nidVersion);
+        I_ThinExtByRefPart dupl = (I_ThinExtByRefPart) extPart.makeAnalog(nidRETIRED, extPart.getPathId(), 
+        		LocalVersionedTerminology.get().convertToThickVersion(nidVersion));
         ext.addVersion(dupl);
         tf.addUncommitted(ext);
 
@@ -1461,9 +1461,9 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         I_ThinExtByRefPartInteger extPartStr = (I_ThinExtByRefPartInteger) extPart;
 
         if (extPartStr.getIntValue() != value) {
-            I_ThinExtByRefPart dupl = extPart.duplicate();
+            I_ThinExtByRefPart dupl = (I_ThinExtByRefPart) extPart.makeAnalog(extPart.getStatusId(), extPart.getPathId(), nidVersion);
             // dupl.setStatusId(:!!!:@@@:); default status of update???
-            dupl.setVersion(nidVersion);
+
             I_ThinExtByRefPartInteger duplInt = (I_ThinExtByRefPartInteger) dupl;
             duplInt.setIntValue(value);
             ext.addVersion(dupl);
@@ -1481,9 +1481,9 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         I_ThinExtByRefPartString extPartStr = (I_ThinExtByRefPartString) extPart;
 
         if (!extPartStr.getStringValue().equalsIgnoreCase(str)) {
-            I_ThinExtByRefPart dupl = extPart.duplicate();
+            I_ThinExtByRefPart dupl = (I_ThinExtByRefPart) extPart.makeAnalog(extPart.getStatusId(), extPart.getPathId(), nidVersion);
             // dupl.setStatusId(:!!!:@@@:); default status of update???
-            dupl.setVersion(nidVersion);
+ 
             I_ThinExtByRefPartString duplStr = (I_ThinExtByRefPartString) dupl;
             duplStr.setStringValue(str);
             ext.addVersion(dupl);
