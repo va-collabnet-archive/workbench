@@ -82,9 +82,7 @@ public class RetireAllMarkedParents extends AbstractTask {
                     if (part.getC1id() == concepts.get("PARENT_MARKER").getConceptId()
                         && part.getStatusId() == concepts.get("CURRENT").getConceptId()) {
 
-                        I_ThinExtByRefPart clone = part.duplicate();
-                        clone.setStatusId(concepts.get("RETIRED").getConceptId());
-                        clone.setVersion(Integer.MAX_VALUE);
+                        I_ThinExtByRefPart clone = (I_ThinExtByRefPart) part.makeAnalog(concepts.get("RETIRED").getConceptId(), part.getPathId(), Long.MAX_VALUE);
                         thinExtByRefVersioned.addVersion(clone);
 
                         String subject = termFactory.getConcept(thinExtByRefTuple.getComponentId()).getInitialText();

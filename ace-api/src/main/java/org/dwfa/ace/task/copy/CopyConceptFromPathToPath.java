@@ -131,9 +131,7 @@ public class CopyConceptFromPathToPath extends AbstractTask {
             TerminologyException {
         copyId(toPath, concept.getIdentifier(), copyStatus);
         for (I_ConceptAttributeTuple t : concept.getConceptAttributeTuples(null, fromSet)) {
-            I_ConceptAttributePart newPart = t.duplicate();
-            newPart.setPathId(toPath.getConceptId());
-            newPart.setVersion(Integer.MAX_VALUE);
+            I_ConceptAttributePart newPart = (I_ConceptAttributePart) t.makeAnalog(t.getStatusId(), toPath.getConceptId(), Long.MAX_VALUE);
             if (conceptStatus != null) {
                 newPart.setStatusId(conceptStatus.getConceptId());
             }
@@ -143,9 +141,7 @@ public class CopyConceptFromPathToPath extends AbstractTask {
 
         for (I_DescriptionTuple t : concept.getDescriptionTuples(null, null, fromSet)) {
             idsToCopy.add(t.getDescId());
-            I_DescriptionPart newPart = t.duplicate();
-            newPart.setPathId(toPath.getConceptId());
-            newPart.setVersion(Integer.MAX_VALUE);
+            I_DescriptionPart newPart = (I_DescriptionPart) t.makeAnalog(t.getStatusId(), toPath.getConceptId(), Long.MAX_VALUE);
             if (copyStatus != null) {
                 newPart.setStatusId(copyStatus.getConceptId());
             }
@@ -153,9 +149,7 @@ public class CopyConceptFromPathToPath extends AbstractTask {
         }
         for (I_RelTuple t : concept.getSourceRelTuples(null, null, fromSet, false)) {
             idsToCopy.add(t.getRelId());
-            I_RelPart newPart = t.duplicate();
-            newPart.setPathId(toPath.getConceptId());
-            newPart.setVersion(Integer.MAX_VALUE);
+            I_RelPart newPart = (I_RelPart) t.makeAnalog(t.getStatusId(), toPath.getConceptId(), Long.MAX_VALUE);
             if (copyStatus != null) {
                 newPart.setStatusId(copyStatus.getConceptId());
             }
@@ -163,9 +157,7 @@ public class CopyConceptFromPathToPath extends AbstractTask {
         }
         for (I_ImageTuple t : concept.getImageTuples(null, null, fromSet)) {
             idsToCopy.add(t.getImageId());
-            I_ImagePart newPart = t.duplicate();
-            newPart.setPathId(toPath.getConceptId());
-            newPart.setVersion(Integer.MAX_VALUE);
+            I_ImagePart newPart = (I_ImagePart) t.makeAnalog(t.getStatusId(), toPath.getConceptId(), Long.MAX_VALUE);
             if (copyStatus != null) {
                 newPart.setStatusId(copyStatus.getConceptId());
             }

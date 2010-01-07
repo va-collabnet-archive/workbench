@@ -114,10 +114,7 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
                     Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
                     for (I_RelTuple t : editTuples) {
                         if (t.getStatusId() != newStatusConcept.getConceptId()) {
-                            I_RelPart newPart = t.duplicate();
-                            newPart.setPathId(editPath.getConceptId());
-                            newPart.setVersion(Integer.MAX_VALUE);
-                            newPart.setStatusId(newStatusConcept.getConceptId());
+                            I_RelPart newPart = (I_RelPart) t.makeAnalog(newStatusConcept.getConceptId(), editPath.getConceptId(), Long.MAX_VALUE);
                             partsToAdd.add(newPart);
                         }
                     }

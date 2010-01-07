@@ -179,12 +179,12 @@ public class InstructAndWaitDo extends AbstractTask {
                 I_DescriptionPart newLastPart = newDescr.getLastTuple().getMutablePart();
                 for (I_Path path : paths) {
                     if (newLastPart == null) {
-                        newLastPart = newDescr.getLastTuple().getMutablePart().duplicate();
+                    	
+                        newLastPart = (I_DescriptionPart) newDescr.getLastTuple().getMutablePart().makeAnalog(newLastPart.getStatusId(), path.getConceptId(), Long.MAX_VALUE);
                     }
                     // printDescriptionPart(newLastPart);
                     // System.out.println(">>> language: " + language);
-                    newLastPart.setPathId(path.getConceptId());
-                    newLastPart.setVersion(Integer.MAX_VALUE);
+     
                     termFactory.addUncommitted(con);
                     newLastPart = null;
                 }

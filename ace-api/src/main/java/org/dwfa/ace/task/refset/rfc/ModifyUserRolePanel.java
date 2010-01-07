@@ -446,11 +446,9 @@ public class ModifyUserRolePanel extends JPanel {
                             I_RelVersioned relVersioned = roleRel.getFixedPart();
 
                             for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                                I_RelPart newPart = relVersioned.getLastTuple().getMutablePart().duplicate();
+                                I_RelPart newPart = (I_RelPart) relVersioned.getLastTuple().getMutablePart().makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+                                								editPath.getConceptId(), Long.MAX_VALUE);
                                 if (newPart.getStatusId() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
-                                    newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-                                    newPart.setVersion(Integer.MAX_VALUE);
-                                    newPart.setPathId(editPath.getConceptId());
                                     relVersioned.addVersion(newPart);
                                 }
                             }

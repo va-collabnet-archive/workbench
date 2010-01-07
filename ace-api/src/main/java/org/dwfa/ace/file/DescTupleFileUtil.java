@@ -202,14 +202,13 @@ public class DescTupleFileUtil {
                 v.addVersion(newLastPart);
                 termFactory.addUncommittedNoChecks(concept);
             } else {
-                I_DescriptionPart newLastPart = latestTuple.getDescVersioned().getLastTuple().getMutablePart().duplicate();
+                I_DescriptionPart newLastPart = (I_DescriptionPart) latestTuple.getDescVersioned().getLastTuple().getMutablePart().makeAnalog(termFactory.getId(statusUuid).getNid(), 
+                		termFactory.getId(pathUuid).getNid(), effectiveDate);
                 newLastPart.setLang(lang);
                 newLastPart.setText(text);
                 newLastPart.setInitialCaseSignificant(initialCapSignificant);
                 newLastPart.setTypeId(termFactory.getId(typeUuid).getNid());
-                newLastPart.setStatusId(termFactory.getId(statusUuid).getNid());
-                newLastPart.setPathId(termFactory.getId(pathUuid).getNid());
-                newLastPart.setVersion(effectiveDate);
+  
 
                 latestTuple.getDescVersioned().addVersion(newLastPart);
                 termFactory.addUncommittedNoChecks(concept);

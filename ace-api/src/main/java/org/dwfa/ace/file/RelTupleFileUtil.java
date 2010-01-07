@@ -227,14 +227,13 @@ public class RelTupleFileUtil {
                 termFactory.addUncommittedNoChecks(concept);
             } else {
 
-                I_RelPart newPart = latestTuple.getMutablePart().duplicate();
+                I_RelPart newPart = (I_RelPart) latestTuple.getMutablePart().makeAnalog(termFactory.getId(statusUuid).getNid(), termFactory.getId(pathUuid).getNid(), effectiveDate);
                 newPart.setCharacteristicId(termFactory.getId(charUuid).getNid());
                 newPart.setGroup(group);
-                newPart.setPathId(termFactory.getId(pathUuid).getNid());
+              
                 newPart.setRefinabilityId(termFactory.getId(refUuid).getNid());
                 newPart.setTypeId(termFactory.getId(relTypeUuid).getNid());
-                newPart.setStatusId(termFactory.getId(statusUuid).getNid());
-                newPart.setVersion(effectiveDate);
+ 
 
                 latestTuple.getRelVersioned().addVersion(newPart);
                 termFactory.addUncommittedNoChecks(concept);
