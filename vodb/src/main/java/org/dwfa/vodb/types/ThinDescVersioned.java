@@ -365,9 +365,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
         for (I_Path promotionPath : pomotionPaths) {
             for (I_DescriptionTuple dt : matchingTuples) {
                 if (dt.getPathId() == viewPathId) {
-                    I_DescriptionPart promotionPart = dt.getMutablePart().duplicate();
-                    promotionPart.setVersion(Integer.MAX_VALUE);
-                    promotionPart.setPathId(promotionPath.getConceptId());
+                    I_DescriptionPart promotionPart = (I_DescriptionPart) dt.getMutablePart().makeAnalog(dt.getStatusId(), promotionPath.getConceptId(), Long.MAX_VALUE);
                     dt.getDescVersioned().addVersion(promotionPart);
                     promotedAnything = true;
                 }

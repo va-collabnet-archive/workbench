@@ -251,16 +251,15 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            I_ThinExtByRefPart newPart = thinExtByRefTuple.getMutablePart().duplicate();
-            newPart.setVersion(Integer.MAX_VALUE);
             try {
-                newPart.setStatusId(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+            	I_ThinExtByRefPart currentPart = thinExtByRefTuple.getMutablePart();
+                I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) currentPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), currentPart.getPathId(), Long.MAX_VALUE);
+                thinExtByRefTuple.getCore().addVersion(newPart);
             } catch (IOException e) {
                 throw new RuntimeException();
             } catch (TerminologyException e) {
                 throw new RuntimeException();
             }
-            thinExtByRefTuple.getCore().addVersion(newPart);
             LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
             specEditor.updateSpecTree(false);
         }
@@ -308,8 +307,10 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            I_ThinExtByRefPart newPart = thinExtByRefTuple.getMutablePart().duplicate();
-            newPart.setVersion(Integer.MAX_VALUE);
+        	
+        	I_ThinExtByRefPart current = thinExtByRefTuple.getMutablePart();
+            I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) current.makeAnalog(current.getStatusId(), current.getPathId(), Long.MAX_VALUE);
+       
             thinExtByRefTuple.getCore().addVersion(newPart);
             LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
             specEditor.updateSpecTree(false);

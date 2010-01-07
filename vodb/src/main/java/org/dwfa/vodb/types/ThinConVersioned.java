@@ -287,9 +287,8 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
         for (I_Path promotionPath : promotionPaths) {
             for (I_ConceptAttributeTuple tuple : getTuples(allowedStatus, viewPositionSet)) {
                 if (tuple.getMutablePart().getPathId() == viewPathId) {
-                    I_ConceptAttributePart promotionPart = tuple.getMutablePart().duplicate();
-                    promotionPart.setVersion(Integer.MAX_VALUE);
-                    promotionPart.setPathId(promotionPath.getConceptId());
+                    I_ConceptAttributePart promotionPart = (I_ConceptAttributePart) tuple.getMutablePart().makeAnalog(tuple.getStatusId(), promotionPath.getConceptId(),
+                    		Long.MAX_VALUE);
                     addVersion(promotionPart);
                     promotedAnything = true;
                 }

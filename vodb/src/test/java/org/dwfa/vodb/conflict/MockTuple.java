@@ -34,6 +34,7 @@ public class MockTuple implements I_AmTuple {
     int version;
     int id;
     private int pathId;
+    private int statusId = 0;
     private final String value;
 
     public MockTuple(int id, int pathId, int version, String value) {
@@ -75,7 +76,7 @@ public class MockTuple implements I_AmTuple {
     }
 
     public int getStatusId() {
-        throw new UnsupportedOperationException();
+        return this.statusId;
     }
 
     public int getVersion() {
@@ -87,7 +88,7 @@ public class MockTuple implements I_AmTuple {
     }
 
     public void setStatusId(int idStatus) {
-        throw new UnsupportedOperationException();
+        this.statusId = idStatus;
     }
 
     public void setVersion(int version) {

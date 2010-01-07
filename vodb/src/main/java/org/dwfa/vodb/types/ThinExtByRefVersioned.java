@@ -423,9 +423,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
         for (I_Path promotionPath : pomotionPaths) {
             for (I_ThinExtByRefTuple it : matchingTuples) {
                 if (it.getPathId() == viewPathId) {
-                    I_ThinExtByRefPart promotionPart = it.getMutablePart().duplicate();
-                    promotionPart.setVersion(Integer.MAX_VALUE);
-                    promotionPart.setPathId(promotionPath.getConceptId());
+                    I_ThinExtByRefPart promotionPart = (I_ThinExtByRefPart) it.getMutablePart().makeAnalog(it.getStatusId(), promotionPath.getConceptId(), Long.MAX_VALUE);
                     it.addVersion(promotionPart);
                     promotedAnything = true;
                 }
