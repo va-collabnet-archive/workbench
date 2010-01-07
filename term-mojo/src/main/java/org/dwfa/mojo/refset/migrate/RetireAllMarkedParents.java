@@ -109,9 +109,7 @@ public class RetireAllMarkedParents extends AbstractMojo {
                     if (part.getConceptId() == concepts.get("PARENT_MARKER").getConceptId()
                         && part.getStatusId() == concepts.get("CURRENT").getConceptId()) {
 
-                        I_ThinExtByRefPart clone = part.duplicate();
-                        clone.setStatusId(concepts.get("RETIRED").getConceptId());
-                        clone.setVersion(Integer.MAX_VALUE);
+                        I_ThinExtByRefPart clone = (I_ThinExtByRefPart) part.makeAnalog(concepts.get("RETIRED").getConceptId(), part.getPathId(), Long.MAX_VALUE);
                         thinExtByRefVersioned.addVersion(clone);
 
                         termFactory.addUncommitted(thinExtByRefVersioned);

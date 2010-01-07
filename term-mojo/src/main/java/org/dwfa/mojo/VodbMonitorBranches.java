@@ -237,26 +237,17 @@ public class VodbMonitorBranches extends AbstractMojo {
                 agreedChanges++;
                 // copy latest attributes to new path/version
                 for (I_ConceptAttributeTuple tuple : allConceptAttributeTuples) {
-                    I_ConceptAttributePart newPart = tuple.duplicate();
-                    newPart.setVersion(Integer.MAX_VALUE);
-                    newPart.setPathId(copyToPath.getConceptId());
-                    newPart.setStatusId(updatedStatusId);
+                    I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptId(), Long.MAX_VALUE);
                     tuple.getConVersioned().addVersion(newPart);
                 }
                 // copy latest descriptions to new path/version
                 for (I_DescriptionTuple tuple : allDescriptionTuples) {
-                    I_DescriptionPart newPart = tuple.duplicate();
-                    newPart.setVersion(Integer.MAX_VALUE);
-                    newPart.setPathId(copyToPath.getConceptId());
-                    newPart.setStatusId(updatedStatusId);
+                    I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptId(), Long.MAX_VALUE);
                     tuple.getDescVersioned().addVersion(newPart);
                 }
                 // copy latest relationships to new path/version
                 for (I_RelTuple tuple : allRelationshipTuples) {
-                    I_RelPart newPart = tuple.duplicate();
-                    newPart.setVersion(Integer.MAX_VALUE);
-                    newPart.setPathId(copyToPath.getConceptId());
-                    newPart.setStatusId(updatedStatusId);
+                    I_RelPart newPart = (I_RelPart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptId(), Long.MAX_VALUE);
                     tuple.getRelVersioned().addVersion(newPart);
                 }
             } else {

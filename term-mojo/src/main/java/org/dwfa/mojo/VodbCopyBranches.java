@@ -194,34 +194,27 @@ public class VodbCopyBranches extends AbstractMojo implements I_ProcessConcepts,
             matchRelationshipTuples.addAll(match.matchRelationshipTuples);
 
             for (I_ConceptAttributeTuple tuple : matchConceptAttributeTuples) {
-                I_ConceptAttributePart newPartOnNewPath = tuple.duplicate();
+                I_ConceptAttributePart newPartOnNewPath = (I_ConceptAttributePart) tuple;
 
                 if ((rejectedStatus == null || (rejectedStatus != null && !rejectedStatusIds.contains(newPartOnNewPath.getStatusId())))
                     && (acceptedStatus == null || (acceptedStatus != null && acceptedStatusIds.contains(newPartOnNewPath.getStatusId())))) {
                     changed = true;
-                    newPartOnNewPath.setVersion(Integer.MAX_VALUE);
-                    newPartOnNewPath.setPathId(copyToPath.getConceptId());
-                    newPartOnNewPath.setStatusId(updatedStatusOnNewPathId);
+                    tuple.makeAnalog(updatedStatusOnNewPathId, copyToPath.getConceptId(), Integer.MAX_VALUE);
                     tuple.getConVersioned().addVersion(newPartOnNewPath);
                     for (I_GetConceptData cd : totalBranches) {
-                        I_ConceptAttributePart newPart = tuple.duplicate();
-                        newPart.setVersion(Integer.MAX_VALUE);
-                        newPart.setPathId(cd.getConceptId());
-                        newPart.setStatusId(updatedStatusId);
+                        I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(updatedStatusId, cd.getConceptId(), Long.MAX_VALUE);
                         tuple.getConVersioned().addVersion(newPart);
                     }
                 }
             }
             // copy latest descriptions to new path/version
             for (I_DescriptionTuple tuple : matchDescriptionTuples) {
-                I_DescriptionPart newPartOnNewPath = tuple.duplicate();
                 descriptionCount++;
-                if ((rejectedStatus == null || (rejectedStatus != null && !rejectedStatusIds.contains(newPartOnNewPath.getStatusId())))
-                    && (acceptedStatus == null || (acceptedStatus != null && acceptedStatusIds.contains(newPartOnNewPath.getStatusId())))) {
+                if ((rejectedStatus == null || (rejectedStatus != null && !rejectedStatusIds.contains(tuple.getStatusId())))
+                    && (acceptedStatus == null || (acceptedStatus != null && acceptedStatusIds.contains(tuple.getStatusId())))) {
                     changed = true;
-                    newPartOnNewPath.setVersion(Integer.MAX_VALUE);
-                    newPartOnNewPath.setPathId(copyToPath.getConceptId());
-                    newPartOnNewPath.setStatusId(updatedStatusOnNewPathId);
+                	I_DescriptionPart newPartOnNewPath = (I_DescriptionPart) tuple.makeAnalog(updatedStatusOnNewPathId, copyToPath.getConceptId(), Long.MAX_VALUE);
+
                     newPartOnNewPath.setText(tuple.getText());
                     tuple.getDescVersioned().addVersion(newPartOnNewPath);
                     for (I_GetConceptData cd : totalBranches) {

@@ -54,6 +54,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 /**
  * Copies from all the specified paths and their children to the new path. Note
@@ -322,11 +323,15 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateConceptAttributeTuple(I_ConceptAttributeTuple latestPart) {
-        I_ConceptAttributePart newPart = latestPart.duplicate();
-        newPart.setPathId(toPathId);
-        newPart.setVersion(versionTime);
+       // I_ConceptAttributePart newPart = latestPart.duplicate();
+     //   newPart.setPathId(toPathId);
+     //   newPart.setVersion(versionTime);
+        I_ConceptAttributePart newPart = (I_ConceptAttributePart) latestPart;
         if (statusId != 0) {
-            newPart.setStatusId(statusId);
+        	latestPart.makeAnalog(statusId, toPathId, versionTime);
+        //    newPart.setStatusId(statusId);
+        } else {
+        	latestPart.makeAnalog(latestPart.getStatusId(), toPathId, versionTime);
         }
         latestPart.getConVersioned().addVersion(newPart);
     }
@@ -429,11 +434,12 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateDescriptionTuple(I_DescriptionTuple t) {
-        I_DescriptionPart newPart = t.duplicate();
-        newPart.setPathId(toPathId);
-        newPart.setVersion(versionTime);
+        I_DescriptionPart newPart = (I_DescriptionPart) t;
+ 
         if (statusId != 0) {
-            newPart.setStatusId(statusId);
+        	t.makeAnalog(statusId, toPathId, versionTime);    
+        } else {
+        	t.makeAnalog(t.getStatusId(), toPathId,versionTime);
         }
         t.getDescVersioned().addVersion(newPart);
     }
@@ -490,11 +496,14 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateExtensionTuple(I_ThinExtByRefTuple t) {
-        I_ThinExtByRefPart newPart = t.duplicate();
+        I_ThinExtByRefPart newPart = t;
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
         if (statusId != 0) {
+        	t.makeAnalog(statusId, toPathId, versionTime);
             newPart.setStatus(statusId);
+        } else {
+        	t.makeAnalog(t.getStatusId(), toPathId, versionTime);
         }
         t.getCore().addVersion(newPart);
     }
@@ -620,11 +629,13 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateImageTuple(I_ImageTuple t) {
-        I_ImagePart newPart = t.duplicate();
-        newPart.setPathId(toPathId);
-        newPart.setVersion(versionTime);
+        I_ImagePart newPart = (I_ImagePart) t;
+ 
         if (statusId != 0) {
+        	t.makeAnalog(statusId, toPathId, versionTime);
             newPart.setStatusId(statusId);
+        } else {
+        	t.makeAnalog(t.getStatusId(), toPathId, versionTime);
         }
         t.getVersioned().addVersion(newPart);
     }
@@ -726,11 +737,12 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     }
 
     private void duplicateRelationshipTuple(I_RelTuple t) {
-        I_RelPart newPart = t.duplicate();
-        newPart.setPathId(toPathId);
-        newPart.setVersion(versionTime);
+           I_RelPart newPart;
+
         if (statusId != 0) {
-            newPart.setStatusId(statusId);
+        	newPart = (I_RelPart) t.makeAnalog(statusId, toPathId, ThinVersionHelper.convert(versionTime));
+         } else {
+        	newPart = (I_RelPart) t.makeAnalog(t.getStatusId(), toPathId, ThinVersionHelper.convert(versionTime));
         }
         t.getRelVersioned().addVersion(newPart);
     }
