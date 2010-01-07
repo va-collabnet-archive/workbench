@@ -197,4 +197,25 @@ public abstract class EComponent<V extends EVersion> extends EVersion {
 	public UUID getPrimordialComponentUuid() {
 		return primordialComponentUuid;
 	}
+
+	public List<EIdentifierVersion> getAdditionalIdComponents() {
+		return additionalIdComponents;
+	}
+
+	public void setAdditionalIdComponents(
+			List<EIdentifierVersion> additionalIdComponents) {
+		this.additionalIdComponents = additionalIdComponents;
+	}
+
+	public List<V> getExtraVersions() {
+		return extraVersions;
+	}
+
+	public void setExtraVersions(List<V> extraVersions) {
+		this.extraVersions = extraVersions;
+	}
+
+	public void setPrimordialComponentUuid(UUID primordialComponentUuid) {
+		this.primordialComponentUuid = primordialComponentUuid;
+	}
 }

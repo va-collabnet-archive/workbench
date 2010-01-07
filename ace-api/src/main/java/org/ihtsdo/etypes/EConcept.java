@@ -292,4 +292,8 @@ public class EConcept  {
 		return null;
 	}
 
+	public void setConceptAttributes(EConceptAttributes conceptAttributes) {
+		this.conceptAttributes = conceptAttributes;
+	}
+
 }
