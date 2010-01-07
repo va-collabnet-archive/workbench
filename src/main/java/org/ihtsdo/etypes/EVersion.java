@@ -84,4 +84,16 @@ public class EVersion implements I_VersionExternally {
 	public long getTime() {
 		return time;
 	}
+
+	public void setPathUuid(UUID pathUuid) {
+		this.pathUuid = pathUuid;
+	}
+
+	public void setStatusUuid(UUID statusUuid) {
+		this.statusUuid = statusUuid;
+	}
+
+	public void setTime(long time) {
+		this.time = time;
+	}
 }
