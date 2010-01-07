@@ -116,7 +116,6 @@ public class TestForEdgCType2Req extends AbstractConceptTest {
             setupUUIDs();
         }
         if (isInitialized == false) {
-            // :!!!: does this need a non-initialization alert :???:
             return alertList;
         }
 
@@ -322,14 +321,11 @@ public class TestForEdgCType2Req extends AbstractConceptTest {
 
             isInitialized = true;
         } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            isInitialized = false;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            isInitialized = false;
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            isInitialized = false;
         }
     }
 
