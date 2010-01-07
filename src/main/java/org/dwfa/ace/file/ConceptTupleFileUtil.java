@@ -165,12 +165,8 @@ public class ConceptTupleFileUtil {
                 if (latestTuple == null) {
                     throw new Exception("Concept UUID exists but has no tuples.");
                 } else {
-                    I_ConceptAttributePart newPart = latestTuple.getMutablePart().duplicate();
-                    newPart.setStatusId(termFactory.getId(statusUuid).getNid());
+                    I_ConceptAttributePart newPart = (I_ConceptAttributePart) latestTuple.getMutablePart().makeAnalog(termFactory.getId(statusUuid).getNid(), termFactory.getId(pathUuid).getNid(), Long.MAX_VALUE);
                     newPart.setDefined(isDefined);
-                    newPart.setPathId(termFactory.getId(pathUuid).getNid());
-                    newPart.setVersion(Integer.MAX_VALUE);
-
                     latestTuple.getConVersioned().addVersion(newPart);
                     termFactory.addUncommittedNoChecks(concept);
                 }

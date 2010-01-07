@@ -987,10 +987,7 @@ public class SpecRefsetHelper {
                                 for (I_Path editPath : getEditPaths()) {
 
                                     I_ThinExtByRefPartConcept clone =
-                                            (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                                    clone.setStatusId(retiredStatusId);
-                                    clone.setPathId(editPath.getConceptId());
-                                    clone.setVersion(Integer.MAX_VALUE);
+                                            (I_ThinExtByRefPartConcept) latestPart.makeAnalog(retiredStatusId, editPath.getConceptId(), Long.MAX_VALUE);
                                     extension.addVersion(clone);
                                     termFactory.addUncommittedNoChecks(extension);
 
@@ -1212,11 +1209,8 @@ public class SpecRefsetHelper {
                     if (latestPart instanceof I_ThinExtByRefPartConcept) {
                         // found a member to retire
                         for (I_Path editPath : getEditPaths()) {
-                            I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                            clone.setStatusId(statusId);
-                            clone.setVersion(Integer.MAX_VALUE);
+                            I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.makeAnalog(statusId, editPath.getConceptId(), Long.MAX_VALUE);
                             clone.setC1id(c1Id);
-                            clone.setPathId(editPath.getConceptId());
                             extension.addVersion(clone);
                             termFactory.addUncommittedNoChecks(extension);
                         }
@@ -1257,10 +1251,7 @@ public class SpecRefsetHelper {
                                 // found a member to retire
                                 for (I_Path editPath : getEditPaths()) {
                                     I_ThinExtByRefPartConcept clone =
-                                            (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                                    clone.setStatusId(retiredStatusId);
-                                    clone.setVersion(Integer.MAX_VALUE);
-                                    clone.setPathId(editPath.getConceptId());
+                                            (I_ThinExtByRefPartConcept) latestPart.makeAnalog(retiredStatusId, editPath.getConceptId(), Long.MAX_VALUE);
                                     extension.addVersion(clone);
                                     termFactory.addUncommittedNoChecks(extension);
                                 }

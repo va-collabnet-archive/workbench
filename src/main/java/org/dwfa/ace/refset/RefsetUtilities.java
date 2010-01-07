@@ -302,9 +302,7 @@ public abstract class RefsetUtilities {
         if (extensionPart != null) {
             I_ThinExtByRefPart latestVersion = getLatestVersion(extensionPart);
 
-            I_ThinExtByRefPart clone = latestVersion.duplicate();
-            clone.setStatus(retiredConceptId);
-            clone.setVersion(Integer.MAX_VALUE);
+            I_ThinExtByRefPart clone = (I_ThinExtByRefPart) latestVersion.makeAnalog(retiredConceptId, latestVersion.getPathId(), Long.MAX_VALUE);
             extensionPart.addVersion(clone);
 
             termFactory.addUncommitted(extensionPart);
@@ -354,12 +352,11 @@ public abstract class RefsetUtilities {
         I_ThinExtByRefVersioned ext = getExtensionForComponent(conceptId, memberSetId);
         if (ext != null) {
 
-            I_ThinExtByRefPart clone = getLatestVersion(ext).duplicate();
+            I_ThinExtByRefPart clone = (I_ThinExtByRefPart) getLatestVersion(ext).makeAnalog(currentStatusId, pathConcept.getConceptId(), Long.MAX_VALUE);
             I_ThinExtByRefPartConcept conceptClone = (I_ThinExtByRefPartConcept) clone;
-            conceptClone.setPathId(pathConcept.getConceptId());
+          
             conceptClone.setConceptId(getMembershipType(includeTypeConceptId));
-            conceptClone.setStatus(currentStatusId);
-            conceptClone.setVersion(Integer.MAX_VALUE);
+           
             ext.addVersion(conceptClone);
             termFactory.addUncommitted(ext);
 
@@ -396,12 +393,11 @@ public abstract class RefsetUtilities {
         I_ThinExtByRefVersioned ext = getExtensionForComponent(conceptId, memberSetId);
         if (ext != null) {
 
-            I_ThinExtByRefPart clone = getLatestVersion(ext).duplicate();
+            I_ThinExtByRefPart clone = (I_ThinExtByRefPart) getLatestVersion(ext).makeAnalog(currentStatusId, pathConcept.getConceptId(), Long.MAX_VALUE);
             I_ThinExtByRefPartConcept conceptClone = (I_ThinExtByRefPartConcept) clone;
-            conceptClone.setPathId(pathConcept.getConceptId());
+         
             conceptClone.setConceptId(ConceptConstants.PARENT_MARKER.localize().getNid());
-            conceptClone.setStatus(currentStatusId);
-            conceptClone.setVersion(Integer.MAX_VALUE);
+           
             ext.addVersion(conceptClone);
             termFactory.addUncommitted(ext);
 

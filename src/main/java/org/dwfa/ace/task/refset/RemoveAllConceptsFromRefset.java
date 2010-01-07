@@ -97,10 +97,7 @@ public class RemoveAllConceptsFromRefset extends AbstractTask {
                 for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                     if (thinExtByRefTuple.getRefsetId() == refsetId) {
                         I_ThinExtByRefPart part = thinExtByRefTuple.getMutablePart();
-                        I_ThinExtByRefPart clone = part.duplicate();
-
-                        clone.setStatus(retiredConceptId);
-                        clone.setVersion(Integer.MAX_VALUE);
+                        I_ThinExtByRefPart clone = (I_ThinExtByRefPart) part.makeAnalog(retiredConceptId, part.getPathId(), Long.MAX_VALUE);
                         thinExtByRefVersioned.addVersion(clone);
 
                         termFactory.addUncommitted(thinExtByRefVersioned);

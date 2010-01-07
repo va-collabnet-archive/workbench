@@ -152,9 +152,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
             Map<Integer, Integer> elementStatusNidMap) throws IOException, TerminologyException {
         copyId(toPath, concept.getIdentifier(), elementStatusNidMap);
         for (I_ConceptAttributeTuple t : concept.getConceptAttributeTuples(null, fromSet)) {
-            I_ConceptAttributePart newPart = t.duplicate();
-            newPart.setPathId(toPath.getConceptId());
-            newPart.setVersion(Integer.MAX_VALUE);
+            I_ConceptAttributePart newPart = (I_ConceptAttributePart) t.makeAnalog(t.getStatusId(), toPath.getConceptId(), Long.MAX_VALUE);
             if (conceptStatusNidMap != null) {
                 if (conceptStatusNidMap.get(newPart.getStatusId()) != null) {
                     newPart.setStatusId(conceptStatusNidMap.get(newPart.getStatusId()));
@@ -166,9 +164,8 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
 
         for (I_DescriptionTuple t : concept.getDescriptionTuples(null, null, fromSet)) {
             idsToCopy.add(t.getDescId());
-            I_DescriptionPart newPart = t.duplicate();
-            newPart.setPathId(toPath.getConceptId());
-            newPart.setVersion(Integer.MAX_VALUE);
+            I_DescriptionPart newPart = (I_DescriptionPart) t.makeAnalog(t.getStatusId(), toPath.getConceptId(), Long.MAX_VALUE);
+
             if (elementStatusNidMap != null) {
                 if (elementStatusNidMap.get(newPart.getStatusId()) != null) {
                     newPart.setStatusId(elementStatusNidMap.get(newPart.getStatusId()));
@@ -178,9 +175,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
         }
         for (I_RelTuple t : concept.getSourceRelTuples(null, null, fromSet, false)) {
             idsToCopy.add(t.getRelId());
-            I_RelPart newPart = t.duplicate();
-            newPart.setPathId(toPath.getConceptId());
-            newPart.setVersion(Integer.MAX_VALUE);
+            I_RelPart newPart = (I_RelPart) t.makeAnalog(t.getStatusId(), toPath.getConceptId(), Long.MAX_VALUE);
             if (elementStatusNidMap != null) {
                 if (elementStatusNidMap.get(newPart.getStatusId()) != null) {
                     newPart.setStatusId(elementStatusNidMap.get(newPart.getStatusId()));
@@ -190,9 +185,7 @@ public class CopyPathToPathWithStatusMaps extends AbstractTask {
         }
         for (I_ImageTuple t : concept.getImageTuples(null, null, fromSet)) {
             idsToCopy.add(t.getImageId());
-            I_ImagePart newPart = t.duplicate();
-            newPart.setPathId(toPath.getConceptId());
-            newPart.setVersion(Integer.MAX_VALUE);
+            I_ImagePart newPart = (I_ImagePart) t.makeAnalog(t.getStatusId(), toPath.getConceptId(), Long.MAX_VALUE);
             if (elementStatusNidMap != null) {
                 if (elementStatusNidMap.get(newPart.getStatusId()) != null) {
                     newPart.setStatusId(elementStatusNidMap.get(newPart.getStatusId()));

@@ -302,9 +302,7 @@ public class RefsetHelper extends LineageHelper {
 
                     // found a member to retire
 
-                    I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                    clone.setStatusId(retiredStatusId);
-                    clone.setVersion(Integer.MAX_VALUE);
+                    I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.makeAnalog(retiredStatusId, latestPart.getPathId(), Long.MAX_VALUE);
                     extension.addVersion(clone);
                     termFactory.addUncommittedNoChecks(extension);
                     return true;

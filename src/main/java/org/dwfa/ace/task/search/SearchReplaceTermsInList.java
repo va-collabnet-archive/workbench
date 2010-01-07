@@ -223,28 +223,17 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                     description.getLang(), finalDesc, termFactory.getConcept(description.getTypeId()),
                                     config);
 
-                                I_DescriptionPart newLastPart = newDesc.getLastTuple().getMutablePart();
                                 for (I_Path path : paths) {
                                     // retire the existing description
-                                    I_DescriptionPart newRetiredPart = description.duplicate();
-                                    newRetiredPart.setPathId(path.getConceptId());
-                                    newRetiredPart.setVersion(Integer.MAX_VALUE);
+                                    I_DescriptionPart newRetiredPart;
+                                    
                                     if (retireAsStatus != -1) {
-                                        newRetiredPart.setStatusId(retireAsStatus);
+                                    	newRetiredPart = (I_DescriptionPart) description.makeAnalog(retireAsStatus, path.getConceptId(), Long.MAX_VALUE);
                                     } else {
-                                        newRetiredPart.setStatusId(retiredConceptId);
+                                    	newRetiredPart = (I_DescriptionPart) description.makeAnalog(retiredConceptId, path.getConceptId(), Long.MAX_VALUE);
                                     }
                                     description.getDescVersioned().addVersion(newRetiredPart);
-                                    // Set the status to that of the original,
-                                    // and path to the current
-                                    if (newLastPart == null) {
-                                        newLastPart = newDesc.getLastTuple().getMutablePart().duplicate();
-                                    }
-                                    newLastPart.setStatusId(description.getStatusId());
-                                    newLastPart.setInitialCaseSignificant(description.isInitialCaseSignificant());
-                                    newLastPart.setPathId(path.getConceptId());
                                     termFactory.addUncommitted(child);
-                                    newLastPart = null;
                                 }
                             }
                             processedDescriptions += ":" + description.getDescId() + ":";
