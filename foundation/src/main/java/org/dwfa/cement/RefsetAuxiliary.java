@@ -395,7 +395,15 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), REFSET_PATH_ORIGINS(new String[] {
             "Path origin reference set", "Path origin reference set" }, new I_ConceptualizeUniversally[] {
             REFSET_IDENTITY, REFSET_PURPOSE_POSITION, CONCEPT_INT_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), ;
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), 
+            
+        // Issue Repository Auxiliary root;
+        ISSUE_MANAGER_ROOT(new String[] { "Issue Manager Auxiliary Concept", "Issue Manager Auxiliary Concept" }, 
+        		new I_ConceptualizeUniversally[] {}),
+		ISSUE_REPOSITORY(new String[] { "Issue repository", "Issue repository" }, 
+	    		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),
+		ISSUE_REPOSITORY_METADATA_REFSET(new String[] { "Issue repository metadata refset", "Issue repository metadata refset" }, 
+        		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),;		
 
         private Collection<UUID> conceptUids = new ArrayList<UUID>();
 
