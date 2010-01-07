@@ -118,7 +118,6 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
             setupUUIDs();
         }
         if (isInitialized == false) {
-            // :!!!: does this need a non-initialization alert :???:
             return alertList;
         }
 
@@ -361,14 +360,11 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
 
             isInitialized = true;
         } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            isInitialized = false;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            isInitialized = false;
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            isInitialized = false;
         }
     }
 
