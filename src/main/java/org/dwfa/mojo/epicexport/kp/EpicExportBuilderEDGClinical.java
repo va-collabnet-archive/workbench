@@ -19,7 +19,6 @@ package org.dwfa.mojo.epicexport.kp;
 
 import java.util.List;
 
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.AbstractEpicExportBuilder;
 import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;

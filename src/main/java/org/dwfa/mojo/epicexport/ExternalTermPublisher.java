@@ -57,9 +57,8 @@ public class ExternalTermPublisher {
 	private I_IntSet statusValues;
 	private List<ExternalTermRecord> recordQueue;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
+	@SuppressWarnings("unused")
 	private I_GetConceptData rootConcept;
-	private String currentItem;
-	private String currentMasterFile;
 	private I_ExportValueConverter converter;
 
 	
@@ -132,7 +131,6 @@ public class ExternalTermPublisher {
 		this.idTuple = null;
 		List<? extends I_DescriptionVersioned> descs = concept.getDescriptions();
 
-		this.setCurrentItem(null, null);
 		this.rootConcept = concept;
 		int extensionsProcessed = 0;
 		for (I_DescriptionVersioned desc : descs) {
@@ -228,7 +226,7 @@ public class ExternalTermPublisher {
     private void mineRefsetsForItems(I_GetConceptData refsetConcept, 
     		I_ThinExtByRefTuple extensionTuple, I_GetConceptData conceptForDescription,
     		I_DescriptionVersioned description, I_ThinExtByRefPart previousPart) throws Exception {
-    	this.currentItem = null;
+    	// this.currentItem = null;
     	String refsetName = refsetConcept.getInitialText();
     	
     	// System.out.println("Processing refset " + refsetName);
@@ -296,10 +294,6 @@ public class ExternalTermPublisher {
     	}
     	this.wildcardItems.clear();
     }
-    private void setCurrentItem(String masterFile, String item) {
-    	this.currentMasterFile = masterFile;
-    	this.currentItem = item;
-    }
     
 
     private boolean isNewDisplayNameApplication(String masterFile, String region) {
@@ -325,16 +319,7 @@ public class ExternalTermPublisher {
     		this.displayNames.add(new DisplayName(masterFile, region));
     	return ret;
     }
-    
-    private List<String> getRegions(String masterFile) {
-    	ArrayList<String> ret = new ArrayList<String>();
-    	for (DisplayName d:  this.displayNames) {
-    		if (d.getMasterFile().equals(masterFile))
-    			ret.add(d.getRegion());
-    	}
-    	return ret;
-    }
-    
+  
     
     private class DisplayName {
     	public String masterFile;

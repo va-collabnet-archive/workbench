@@ -45,6 +45,11 @@ public abstract class AbstractEpicExportBuilder {
 	private String[] exportIfTheseItemsChanged;
 	private boolean hasErrors = false;
 	List<String> errors = new ArrayList<String>();
+	private String[] mandatoryItems;
+	private String[] alwaysWriteTheseItemsForNewRecord;
+	private String[] alwaysWriteTheseItemsForExistingRecord;
+	private String[] itemsToWriteIfChanged;
+
 	
 	public AbstractEpicExportBuilder(I_ExportFactory exportFactory, EpicExportManager em) {
 		this.exportFactory = exportFactory;
@@ -261,6 +266,23 @@ public abstract class AbstractEpicExportBuilder {
 		}
 		return ret;
 	}
+	/**
+	 * Looks for the first occurrence of the item in the exported items cache, and returns true if found.
+	 * 
+	 * @param epicItemNumber
+	 * @return true if found
+	 */
+	public boolean hasItem(String epicItemNumber) {
+		boolean ret = false;
+		
+		for (EpicItem i: epicItems) {
+			if (i.itemNumber.equalsIgnoreCase(epicItemNumber) ) {
+				ret = true;
+				break;
+			}
+		}
+		return ret;
+	}
 
 	/**
 	 * exportIfTheseItemsChanged is a String list of items that if any of them have changes, will
@@ -268,8 +290,13 @@ public abstract class AbstractEpicExportBuilder {
 	 * 
 	 * @param exportIfTheseItemsChanged
 	 */
-	public void setExportIfTheseItemsChanged(String[] exportIfTheseItemsChanged) {
+	public void setExportIfTheseItemsChanged(String... exportIfTheseItemsChanged) {
 		this.exportIfTheseItemsChanged = exportIfTheseItemsChanged;
+	}
+
+	
+	public String[] getExportIfTheseItemsChanged() {
+		return exportIfTheseItemsChanged;
 	}
 
 	/**
@@ -363,7 +390,42 @@ public abstract class AbstractEpicExportBuilder {
 	public boolean hasErrors() {
 		return this.hasErrors;
 	}
+
+	public String[] getMandatoryItems() {
+		return mandatoryItems;
+	}
+
+	public void setMandatoryItems(String... mandatoryItems) {
+		this.mandatoryItems = mandatoryItems;
+	}
+
+	public String[] getAlwaysWriteTheseItemsForNewRecord() {
+		return alwaysWriteTheseItemsForNewRecord;
+	}
+
+	public void setAlwaysWriteTheseItemsForNewRecord(
+			String... alwaysWriteTheseItemsForNewRecord) {
+		this.alwaysWriteTheseItemsForNewRecord = alwaysWriteTheseItemsForNewRecord;
+	}
+
+	public String[] getAlwaysWriteTheseItemsForExistingRecord() {
+		return alwaysWriteTheseItemsForExistingRecord;
+	}
+
+	public void setAlwaysWriteTheseItemsForExistingRecord(
+			String... alwaysWriteTheseItemsForExistingRecord) {
+		this.alwaysWriteTheseItemsForExistingRecord = alwaysWriteTheseItemsForExistingRecord;
+	}
+
+	public String[] getItemsToWriteIfChanged() {
+		return itemsToWriteIfChanged;
+	}
+
+	public void setItemsToWriteIfChanged(String... itemsToWriteIfChanged) {
+		this.itemsToWriteIfChanged = itemsToWriteIfChanged;
+	}
 	
+
 	
 	/**
 	 * Returns true if there is at least one change in the supplied list, and no changes in items outside of the

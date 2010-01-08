@@ -51,9 +51,19 @@ public class EpicLoadFileFactory implements I_ExportFactory {
     public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile, EpicExportManager em) throws Exception {
         I_EpicLoadFileBuilder ret;
         if (masterfile.equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_CLINICAL))
-            ret = new EpicExportBuilderEDGClinical(this, em);
+            ret = new EpicExportBuilderEDGClinical(this, em); 
         else if (masterfile.equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_BILLING))
             ret = new EpicExportBuilderEDGBilling(this, em);
+        /* Sample usage of generic builder, used to limit need of separate classes for simple master files
+        else if (masterfile.equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
+        	ret = new EpicExportBuilderGeneric(this, em, "edgclinical");
+        	ret.setExportIfTheseItemsChanged("2", "100", "50", "80", "91", "207", "7000", "7010");
+        	ret.setAlwaysWriteTheseItemsForNewRecord("200", "40");
+        	ret.setAlwaysWriteTheseItemsForExistingRecord("200", "40");
+        	ret.setItemsToWriteIfChanged("2", "100", "50", "80", "91", "207", "200", "2000", "7000", "7010");
+        	ret.setMandatoryItems("2", "40", "7000", "7010", "91", "80", "100", "207");
+        }
+        */
         else {
         	AceLog.getAppLog().warning("Using generic loadfile builder for unknown master file: " + masterfile);
         	ret = new EpicExportBuilderWritesAll(this, em);

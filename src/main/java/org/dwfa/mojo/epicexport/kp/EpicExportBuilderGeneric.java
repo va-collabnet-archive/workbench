@@ -13,10 +13,6 @@ public class EpicExportBuilderGeneric extends AbstractEpicExportBuilder implemen
 	public static final int ITEM_11 = 11;
 	
 	public String masterfile;
-	private String[] mandatoryItems;
-	private String[] alwaysWriteTheseItemsForNewRecord;
-	private String[] alwaysWriteTheseItemsForExistingRecord;
-	private String[] itemsToWriteIfChanged;
 	
 	public EpicExportBuilderGeneric(I_ExportFactory factory, EpicExportManager em, String masterfile) {
 		super(factory, em);
@@ -26,40 +22,37 @@ public class EpicExportBuilderGeneric extends AbstractEpicExportBuilder implemen
 	public void writeRecord(String version, List<String> regions) throws Exception {
 		
 		if (this.isChangedRecord()) {
-			if (getFirstItem("11") == null) {
-				//"NRNC" Its a new record
-				addErrorIfTrue(! this.allItemsArePopulated(this.mandatoryItems),
+			if (!hasItem("11")) {
+				// It's a new record
+				addErrorIfTrue(! this.allItemsArePopulated(getMandatoryItems()),
 						"One or more mandatory items are missing");
 				
-				I_EpicExportRecordWriter writer = getExportManager().getWriter(getWriterName(masterfile, version, "nrnc"));
+				I_EpicExportRecordWriter writer = getExportManager().getWriter(getWriterName(masterfile, version));
 				this.setWriter(writer);
 				writer.newRecord();
 				writeAnyErrors();
 				writeLiteralItem("1", "");
-				writeItems(this.alwaysWriteTheseItemsForNewRecord);
-				writeItemsIfChanged(this.itemsToWriteIfChanged);
+				writeItems(getAlwaysWriteTheseItemsForNewRecord());
+				writeItemsIfChanged(getItemsToWriteIfChanged());
 				writer.saveRecord();
 			}
 			else {
-				I_EpicExportRecordWriter writer = getExportManager().getWriter(getWriterName(masterfile, version, "erec"));
+				I_EpicExportRecordWriter writer = getExportManager().getWriter(getWriterName(masterfile, version));
 				this.setWriter(writer);
 				writer.newRecord();
-				this.writeItems(this.alwaysWriteTheseItemsForExistingRecord);
-				this.writeItemsIfChanged(this.itemsToWriteIfChanged);
+				writeItem("11", "1");
+				this.writeItems(this.getAlwaysWriteTheseItemsForExistingRecord());
+				this.writeItemsIfChanged(this.getItemsToWriteIfChanged());
 				writer.saveRecord();
 			}
 		}
 	}
 	
-	private String getWriterName(String masterfile, String version, String contact) {
+	private String getWriterName(String masterfile, String version) {
 		StringBuffer ret = new StringBuffer(masterfile);
 		if (version != null) {
 			ret.append('_');
 			ret.append(version);
-		}
-		if (contact != null) {
-			ret.append('_');
-			ret.append(contact);
 		}
 		if (this.hasErrors()) {
 			ret.append(".error");
@@ -67,40 +60,6 @@ public class EpicExportBuilderGeneric extends AbstractEpicExportBuilder implemen
 		return ret.toString();
 	}
 
-	public String[] getMandatoryItems() {
-		return mandatoryItems;
-	}
-
-	public void setMandatoryItems(String[] mandatoryItems) {
-		this.mandatoryItems = mandatoryItems;
-	}
-
-	public String[] getAlwaysWriteTheseItemsForNewRecord() {
-		return alwaysWriteTheseItemsForNewRecord;
-	}
-
-	public void setAlwaysWriteTheseItemsForNewRecord(
-			String[] alwaysWriteTheseItemsForNewRecord) {
-		this.alwaysWriteTheseItemsForNewRecord = alwaysWriteTheseItemsForNewRecord;
-	}
-
-	public String[] getAlwaysWriteTheseItemsForExistingRecord() {
-		return alwaysWriteTheseItemsForExistingRecord;
-	}
-
-	public void setAlwaysWriteTheseItemsForExistingRecord(
-			String[] alwaysWriteTheseItemsForExistingRecord) {
-		this.alwaysWriteTheseItemsForExistingRecord = alwaysWriteTheseItemsForExistingRecord;
-	}
-
-	public String[] getItemsToWriteIfChanged() {
-		return itemsToWriteIfChanged;
-	}
-
-	public void setItemsToWriteIfChanged(String[] itemsToWriteIfChanged) {
-		this.itemsToWriteIfChanged = itemsToWriteIfChanged;
-	}
-	
 	
 
 }
