@@ -267,7 +267,12 @@ public class EConcept  {
 		}
 		images = new ArrayList<EImage>(c.getImages().size());
 		for (I_ImageVersioned img: c.getImages()) {
-			images.add(new EImage(img));
+			EImage eImage = new EImage(img);
+			if (eImage.time == Long.MIN_VALUE) {
+				eImage.time = this.conceptAttributes.time;
+				// Fixup for a data issue.
+			}
+			images.add(eImage);
 		}
 		Collection<I_ThinExtByRefVersioned> members = EComponent.getRefsetMembers(c.getNid());
 		if (members != null) {
