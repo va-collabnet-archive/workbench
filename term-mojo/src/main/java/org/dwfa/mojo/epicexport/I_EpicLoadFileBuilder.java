@@ -127,5 +127,28 @@ public interface I_EpicLoadFileBuilder {
 	 * @return the first item found
 	 */
 	public EpicItem getFirstItem(String epicItemNumber);
+	
+	public String[] getMandatoryItems();
+
+	public void setMandatoryItems(String... mandatoryItems);
+
+	public String[] getAlwaysWriteTheseItemsForNewRecord();
+
+
+	public void setAlwaysWriteTheseItemsForNewRecord(
+			String... alwaysWriteTheseItemsForNewRecord);
+
+	public String[] getAlwaysWriteTheseItemsForExistingRecord();
+	
+	public void setAlwaysWriteTheseItemsForExistingRecord(
+			String... alwaysWriteTheseItemsForExistingRecord);
+
+	public String[] getItemsToWriteIfChanged();
+
+	public void setItemsToWriteIfChanged(String... itemsToWriteIfChanged);
+	
+	public void setExportIfTheseItemsChanged(String... exportIfTheseItemsChanged);
+	
+	public String[] getExportIfTheseItemsChanged();
 
 }
