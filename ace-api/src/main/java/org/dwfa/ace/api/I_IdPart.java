@@ -28,6 +28,7 @@ public interface I_IdPart {
 
     public void setDenotation(Object sourceId);
 
+    @Deprecated
     public I_IdPart duplicateIdPart();
     
 	public int getPathId();
