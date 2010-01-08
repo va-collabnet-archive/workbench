@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -1004,7 +1004,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.impl.I_StoreConceptAttributes#writeConceptAttributes(org
      * .dwfa.ace.api.I_ConceptAttributeVersioned)
@@ -1045,7 +1045,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.impl.I_StoreConceptAttributes#hasConcept(int)
      */
     public boolean hasConcept(int conceptId) throws DatabaseException {
@@ -1060,7 +1060,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.impl.I_StoreConceptAttributes#getConceptAttributes(int)
      */
@@ -1071,23 +1071,24 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.impl.I_StoreConceptAttributes#getConceptIterator()
      */
     public Iterator<I_GetConceptData> getConceptIterator() throws IOException {
-        // return new ConceptIterator();
-        try {
-            return new ConceptIdArrayIterator();
-        } catch (DatabaseException e) {
-            throw new IOException(e);
-        }
+        return new ConceptIterator();
+
+//        try {
+//            return new ConceptIdArrayIterator();
+//        } catch (DatabaseException e) {
+//            throw new IOException(e);
+//        }
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * 
+     *
      * org.dwfa.vodb.impl.I_StoreConceptAttributes#iterateConceptAttributeEntries
      * (org.dwfa.vodb.types.I_ProcessConceptAttributeEntries)
      */
