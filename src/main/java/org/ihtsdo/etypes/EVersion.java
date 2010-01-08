@@ -38,7 +38,7 @@ public class EVersion implements I_VersionExternally {
 
 	protected UUID pathUuid;
 	protected UUID statusUuid;
-	protected long time;
+	protected long time = Long.MIN_VALUE;
 	
 	public EVersion(DataInput in) throws IOException, ClassNotFoundException {
 		super();

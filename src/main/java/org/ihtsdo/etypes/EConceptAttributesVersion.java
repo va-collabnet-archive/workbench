@@ -26,6 +26,11 @@ public class EConceptAttributesVersion extends EVersion
 		time = part.getTime();
 	}
 
+	
+	public EConceptAttributesVersion() {
+		super();
+	}
+
 	@Override
 	public void readExternal(DataInput in) throws IOException,
 			ClassNotFoundException {

@@ -22,6 +22,7 @@ public interface I_ImagePart extends I_AmTypedPart {
 
     public void setTextDescription(String name);
 
+    @Deprecated
     public I_ImagePart duplicate();
 
 }
