@@ -54,9 +54,11 @@ public class EVersion implements I_VersionExternally {
 		pathUuid = new UUID(in.readLong(), in.readLong());
 		statusUuid = new UUID(in.readLong(), in.readLong());
 		time = in.readLong();
+		assert time != Long.MIN_VALUE: "Time is Long.MIN_VALUE. Was it initialized?";
 	}
 
 	public void writeExternal(DataOutput out) throws IOException {
+		assert time != Long.MIN_VALUE: "Time is Long.MIN_VALUE. Was it initialized?";
 		out.writeLong(pathUuid.getMostSignificantBits());
 		out.writeLong(pathUuid.getLeastSignificantBits());
 		out.writeLong(statusUuid.getMostSignificantBits());
