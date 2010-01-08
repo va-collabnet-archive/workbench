@@ -9,43 +9,55 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERefsetIntVersion extends EVersion {
 
-	public static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 1;
 
-	protected int intValue;
+    protected int intValue;
 
-	public ERefsetIntVersion(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super();
-		readExternal(in);
-	}
+    public ERefsetIntVersion(DataInput in) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in);
+    }
 
-	public ERefsetIntVersion(
-			I_ThinExtByRefPartInteger part) throws TerminologyException, IOException {
-		intValue = part.getIntValue();
-		pathUuid = nidToUuid(part.getPathId());
-		statusUuid = nidToUuid(part.getStatusId());
-		time = part.getTime();
-	}
+    public ERefsetIntVersion(I_ThinExtByRefPartInteger part) throws TerminologyException, IOException {
+        intValue = part.getIntValue();
+        pathUuid = nidToUuid(part.getPathId());
+        statusUuid = nidToUuid(part.getStatusId());
+        time = part.getTime();
+    }
 
-	@Override
-	public void readExternal(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super.readExternal(in);
-		intValue = in.readInt();
-	}
+    @Override
+    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        intValue = in.readInt();
+    }
 
-	@Override
-	public void writeExternal(DataOutput out) throws IOException {
-		super.writeExternal(out);
-		out.writeInt(intValue);
-	}
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeInt(intValue);
+    }
 
-	public int getIntValue() {
-		return intValue;
-	}
+    public int getIntValue() {
+        return intValue;
+    }
 
-	public void setIntValue(int intValue) {
-		this.intValue = intValue;
-	}
+    public void setIntValue(int intValue) {
+        this.intValue = intValue;
+    }
 
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(super.toString());
+
+        buff.append(", intValue:");
+        buff.append(this.intValue);
+        buff.append("; ");
+
+        return buff.toString();
+    }
 }

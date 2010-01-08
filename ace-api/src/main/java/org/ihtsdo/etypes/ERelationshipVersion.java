@@ -10,83 +10,103 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERelationshipVersion extends EVersion {
 
-	public static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 1;
 
-	protected UUID characteristicUuid;
-	protected UUID refinabilityUuid;
-	protected int group; 
-	protected UUID typeUuid;
+    protected UUID characteristicUuid;
+    protected UUID refinabilityUuid;
+    protected int group;
+    protected UUID typeUuid;
 
-	public ERelationshipVersion(DataInput in) throws IOException, ClassNotFoundException {
-		super();
-		readExternal(in);
-	}
+    public ERelationshipVersion(DataInput in) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in);
+    }
 
-	public ERelationshipVersion(I_RelPart part) throws TerminologyException, IOException {
-		characteristicUuid = nidToUuid(part.getCharacteristicId());
-		refinabilityUuid = nidToUuid(part.getRefinabilityId());
-		group = part.getGroup();
-		typeUuid = nidToUuid(part.getTypeId());
-		pathUuid = nidToUuid(part.getPathId());
-		statusUuid = nidToUuid(part.getStatusId());
-		time = part.getTime();
-	}
+    public ERelationshipVersion(I_RelPart part) throws TerminologyException, IOException {
+        characteristicUuid = nidToUuid(part.getCharacteristicId());
+        refinabilityUuid = nidToUuid(part.getRefinabilityId());
+        group = part.getGroup();
+        typeUuid = nidToUuid(part.getTypeId());
+        pathUuid = nidToUuid(part.getPathId());
+        statusUuid = nidToUuid(part.getStatusId());
+        time = part.getTime();
+    }
 
-	public ERelationshipVersion() {
-	}
+    public ERelationshipVersion() {
+    }
 
-	@Override
-	public void readExternal(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super.readExternal(in);
-		characteristicUuid = new UUID(in.readLong(), in.readLong());
-		refinabilityUuid = new UUID(in.readLong(), in.readLong());
-		group = in.readInt();
-		typeUuid = new UUID(in.readLong(), in.readLong());
-	}
+    @Override
+    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        characteristicUuid = new UUID(in.readLong(), in.readLong());
+        refinabilityUuid = new UUID(in.readLong(), in.readLong());
+        group = in.readInt();
+        typeUuid = new UUID(in.readLong(), in.readLong());
+    }
 
-	@Override
-	public void writeExternal(DataOutput out) throws IOException {
-		super.writeExternal(out);
-		out.writeLong(characteristicUuid.getMostSignificantBits());
-		out.writeLong(characteristicUuid.getLeastSignificantBits());
-		out.writeLong(refinabilityUuid.getMostSignificantBits());
-		out.writeLong(refinabilityUuid.getLeastSignificantBits());
-		out.writeInt(group);
-		out.writeLong(typeUuid.getMostSignificantBits());
-		out.writeLong(typeUuid.getLeastSignificantBits());
-	}
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeLong(characteristicUuid.getMostSignificantBits());
+        out.writeLong(characteristicUuid.getLeastSignificantBits());
+        out.writeLong(refinabilityUuid.getMostSignificantBits());
+        out.writeLong(refinabilityUuid.getLeastSignificantBits());
+        out.writeInt(group);
+        out.writeLong(typeUuid.getMostSignificantBits());
+        out.writeLong(typeUuid.getLeastSignificantBits());
+    }
 
-	public UUID getCharacteristicUuid() {
-		return characteristicUuid;
-	}
+    public UUID getCharacteristicUuid() {
+        return characteristicUuid;
+    }
 
-	public void setCharacteristicUuid(UUID characteristicUuid) {
-		this.characteristicUuid = characteristicUuid;
-	}
+    public void setCharacteristicUuid(UUID characteristicUuid) {
+        this.characteristicUuid = characteristicUuid;
+    }
 
-	public UUID getRefinabilityUuid() {
-		return refinabilityUuid;
-	}
+    public UUID getRefinabilityUuid() {
+        return refinabilityUuid;
+    }
 
-	public void setRefinabilityUuid(UUID refinabilityUuid) {
-		this.refinabilityUuid = refinabilityUuid;
-	}
+    public void setRefinabilityUuid(UUID refinabilityUuid) {
+        this.refinabilityUuid = refinabilityUuid;
+    }
 
-	public int getGroup() {
-		return group;
-	}
+    public int getGroup() {
+        return group;
+    }
 
-	public void setRelGroup(int relGroup) {
-		this.group = relGroup;
-	}
+    public void setRelGroup(int relGroup) {
+        this.group = relGroup;
+    }
 
-	public UUID getTypeUuid() {
-		return typeUuid;
-	}
+    public UUID getTypeUuid() {
+        return typeUuid;
+    }
 
-	public void setTypeUuid(UUID typeUuid) {
-		this.typeUuid = typeUuid;
-	}
+    public void setTypeUuid(UUID typeUuid) {
+        this.typeUuid = typeUuid;
+    }
 
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(super.toString());
+
+        buff.append(", characteristicUuid:");
+        buff.append(this.characteristicUuid);
+        buff.append(", refinabilityUuid:");
+        buff.append(this.refinabilityUuid);
+        buff.append(", group:");
+        buff.append(this.group);
+        buff.append(", typeUuid:");
+        buff.append(this.typeUuid);
+        buff.append("; ");
+
+        return buff.toString();
+    }
 }

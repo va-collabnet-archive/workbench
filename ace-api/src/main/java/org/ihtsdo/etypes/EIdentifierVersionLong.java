@@ -10,37 +10,52 @@ import org.ihtsdo.etypes.EComponent.IDENTIFIER_PART_TYPES;
 
 public class EIdentifierVersionLong extends EIdentifierVersion {
 
-	public static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 1;
 
-	protected long denotation;
-	
-	public EIdentifierVersionLong(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super(in);
-		denotation = in.readLong();
-	}
+    protected long denotation;
 
-	public EIdentifierVersionLong(I_IdPart idp) throws TerminologyException, IOException {
-		super();
-		denotation = (Long) idp.getDenotation();
-		authorityUuid = nidToUuid(idp.getAuthorityNid());
-		pathUuid = nidToUuid(idp.getPathId());
-		statusUuid = nidToUuid(idp.getStatusId());
-		time = idp.getTime();
-	}
+    public EIdentifierVersionLong(DataInput in) throws IOException, ClassNotFoundException {
+        super(in);
+        denotation = in.readLong();
+    }
 
-	@Override
-	public void writeDenotation(DataOutput out) throws IOException {
-		out.writeLong(denotation);
-	}
+    public EIdentifierVersionLong(I_IdPart idp) throws TerminologyException, IOException {
+        super();
+        denotation = (Long) idp.getDenotation();
+        authorityUuid = nidToUuid(idp.getAuthorityNid());
+        pathUuid = nidToUuid(idp.getPathId());
+        statusUuid = nidToUuid(idp.getStatusId());
+        time = idp.getTime();
+    }
 
-	@Override
-	public Long getDenotation() {
-		return denotation;
-	}
+    @Override
+    public void writeDenotation(DataOutput out) throws IOException {
+        out.writeLong(denotation);
+    }
 
-	@Override
-	public IDENTIFIER_PART_TYPES getIdType() {
-		return IDENTIFIER_PART_TYPES.LONG;
-	}
+    @Override
+    public Long getDenotation() {
+        return denotation;
+    }
+
+    @Override
+    public IDENTIFIER_PART_TYPES getIdType() {
+        return IDENTIFIER_PART_TYPES.LONG;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(super.toString());
+
+        buff.append(", denotation:");
+        buff.append(this.denotation);
+        buff.append("; ");
+
+        return buff.toString();
+    }
 }

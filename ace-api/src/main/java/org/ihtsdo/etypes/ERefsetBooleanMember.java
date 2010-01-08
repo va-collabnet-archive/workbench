@@ -13,82 +13,92 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public class ERefsetBooleanMember extends ERefset<ERefsetBooleanVersion> {
 
-	public static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 1;
 
-	protected boolean booleanValue;
-	
-	public ERefsetBooleanMember(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super();
-		readExternal(in);
-	}
+    protected boolean booleanValue;
 
+    public ERefsetBooleanMember(DataInput in) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in);
+    }
 
-	public ERefsetBooleanMember(I_ThinExtByRefVersioned m) throws TerminologyException, IOException {
-		convert(nidToIdentifier(m.getMemberId()));
-		int partCount = m.getMutableParts().size();
-		refsetUuid = nidToUuid(m.getRefsetId());
-		componentUuid = nidToUuid(m.getComponentId());
-		
-		I_ThinExtByRefPartBoolean part = (I_ThinExtByRefPartBoolean) m.getMutableParts().get(0);
-		booleanValue = part.getBooleanValue();
-		pathUuid = nidToUuid(part.getPathId());
-		statusUuid = nidToUuid(part.getStatusId());
-		time = part.getTime();
-		if (partCount > 1) {
-			extraVersions = new ArrayList<ERefsetBooleanVersion>(partCount -1);
-			for (int i = 1; i < partCount; i++) {
-				extraVersions.add(new ERefsetBooleanVersion((I_ThinExtByRefPartBoolean) m.getMutableParts().get(i)));
-			}
-		} 
-	}
+    public ERefsetBooleanMember(I_ThinExtByRefVersioned m) throws TerminologyException, IOException {
+        convert(nidToIdentifier(m.getMemberId()));
+        int partCount = m.getMutableParts().size();
+        refsetUuid = nidToUuid(m.getRefsetId());
+        componentUuid = nidToUuid(m.getComponentId());
 
+        I_ThinExtByRefPartBoolean part = (I_ThinExtByRefPartBoolean) m.getMutableParts().get(0);
+        booleanValue = part.getBooleanValue();
+        pathUuid = nidToUuid(part.getPathId());
+        statusUuid = nidToUuid(part.getStatusId());
+        time = part.getTime();
+        if (partCount > 1) {
+            extraVersions = new ArrayList<ERefsetBooleanVersion>(partCount - 1);
+            for (int i = 1; i < partCount; i++) {
+                extraVersions.add(new ERefsetBooleanVersion((I_ThinExtByRefPartBoolean) m.getMutableParts().get(i)));
+            }
+        }
+    }
 
-	@Override
-	public void readExternal(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super.readExternal(in);
-		booleanValue = in.readBoolean();
-		int versionSize = in.readInt();
-		if (versionSize > 0) {
-			extraVersions = new ArrayList<ERefsetBooleanVersion>(versionSize);
-			for (int i = 0; i < versionSize; i++) {
-				extraVersions.add(new ERefsetBooleanVersion(in));
-			}
-		}
-	}
+    @Override
+    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        booleanValue = in.readBoolean();
+        int versionSize = in.readInt();
+        if (versionSize > 0) {
+            extraVersions = new ArrayList<ERefsetBooleanVersion>(versionSize);
+            for (int i = 0; i < versionSize; i++) {
+                extraVersions.add(new ERefsetBooleanVersion(in));
+            }
+        }
+    }
 
-	@Override
-	public void writeExternal(DataOutput out) throws IOException {
-		super.writeExternal(out);
-		out.writeBoolean(booleanValue);
-		if (extraVersions == null) {
-			out.writeInt(0);
-		} else {
-			out.writeInt(extraVersions.size());
-			for (ERefsetBooleanVersion rmv: extraVersions) {
-				rmv.writeExternal(out);
-			}
-		}
-	}
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeBoolean(booleanValue);
+        if (extraVersions == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(extraVersions.size());
+            for (ERefsetBooleanVersion rmv : extraVersions) {
+                rmv.writeExternal(out);
+            }
+        }
+    }
 
-	@Override
-	public REFSET_TYPES getType() {
-		return REFSET_TYPES.BOOLEAN;
-	}
+    @Override
+    public REFSET_TYPES getType() {
+        return REFSET_TYPES.BOOLEAN;
+    }
 
-	public List<ERefsetBooleanVersion> getExtraVersionsList() {
-		return extraVersions;
-	}
+    public List<ERefsetBooleanVersion> getExtraVersionsList() {
+        return extraVersions;
+    }
 
+    public boolean getBooleanValue() {
+        return booleanValue;
+    }
 
-	public boolean getBooleanValue() {
-		return booleanValue;
-	}
+    public void setBooleanValue(boolean booleanValue) {
+        this.booleanValue = booleanValue;
+    }
 
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
 
-	public void setBooleanValue(boolean booleanValue) {
-		this.booleanValue = booleanValue;
-	}
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(super.toString());
+
+        buff.append(", booleanValue:");
+        buff.append(this.booleanValue);
+        buff.append("; ");
+
+        return buff.toString();
+    }
 
 }

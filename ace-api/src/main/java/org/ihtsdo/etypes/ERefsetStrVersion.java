@@ -9,43 +9,55 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERefsetStrVersion extends EVersion {
 
-	public static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 1;
 
-	protected String stringValue;
+    protected String stringValue;
 
-	public ERefsetStrVersion(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super();
-		readExternal(in);
-	}
+    public ERefsetStrVersion(DataInput in) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in);
+    }
 
-	public ERefsetStrVersion(
-			I_ThinExtByRefPartString part) throws TerminologyException, IOException {
-		stringValue = part.getStringValue();
-		pathUuid = nidToUuid(part.getPathId());
-		statusUuid = nidToUuid(part.getStatusId());
-		time = part.getTime();
-	}
+    public ERefsetStrVersion(I_ThinExtByRefPartString part) throws TerminologyException, IOException {
+        stringValue = part.getStringValue();
+        pathUuid = nidToUuid(part.getPathId());
+        statusUuid = nidToUuid(part.getStatusId());
+        time = part.getTime();
+    }
 
-	@Override
-	public void readExternal(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super.readExternal(in);
-		stringValue = in.readUTF();
-	}
+    @Override
+    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        stringValue = in.readUTF();
+    }
 
-	@Override
-	public void writeExternal(DataOutput out) throws IOException {
-		super.writeExternal(out);
-		out.writeUTF(stringValue);
-	}
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeUTF(stringValue);
+    }
 
-	public String getStringValue() {
-		return stringValue;
-	}
+    public String getStringValue() {
+        return stringValue;
+    }
 
-	public void setStringValue(String stringValue) {
-		this.stringValue = stringValue;
-	}
+    public void setStringValue(String stringValue) {
+        this.stringValue = stringValue;
+    }
 
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(super.toString());
+
+        buff.append(", stringValue:");
+        buff.append(this.stringValue);
+        buff.append("; ");
+
+        return buff.toString();
+    }
 }

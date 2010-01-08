@@ -10,91 +10,118 @@ import org.dwfa.tapi.TerminologyException;
 
 public class EDescriptionVersion extends EVersion implements I_DescribeExternally {
 
-	public static final long serialVersionUID = 1;
-	protected boolean initialCaseSignificant;
-	
-	protected String lang;
-	
-	protected String text;
+    public static final long serialVersionUID = 1;
+    protected boolean initialCaseSignificant;
 
-	protected UUID typeUuid;
+    protected String lang;
 
-	public EDescriptionVersion(DataInput in) throws IOException, ClassNotFoundException {
-		super();
-		readExternal(in);
-	}
+    protected String text;
 
-	public EDescriptionVersion(I_DescriptionPart part) throws TerminologyException, IOException {
-		initialCaseSignificant = part.isInitialCaseSignificant();
-		lang = part.getLang();
-		text = part.getText();
-		typeUuid = nidToUuid(part.getTypeId());
-		pathUuid = nidToUuid(part.getPathId());
-		statusUuid = nidToUuid(part.getStatusId());
-		time = part.getTime();
-	}
+    protected UUID typeUuid;
 
-	protected EDescriptionVersion() {
-	}
+    public EDescriptionVersion(DataInput in) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in);
+    }
 
-	@Override
-	public void readExternal(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super.readExternal(in);
-		initialCaseSignificant = in.readBoolean();
-		lang = in.readUTF();
-		text = in.readUTF();
-		typeUuid = new UUID(in.readLong(), in.readLong());
-	}
+    public EDescriptionVersion(I_DescriptionPart part) throws TerminologyException, IOException {
+        initialCaseSignificant = part.isInitialCaseSignificant();
+        lang = part.getLang();
+        text = part.getText();
+        typeUuid = nidToUuid(part.getTypeId());
+        pathUuid = nidToUuid(part.getPathId());
+        statusUuid = nidToUuid(part.getStatusId());
+        time = part.getTime();
+    }
 
-	@Override
-	public void writeExternal(DataOutput out) throws IOException {
-		super.writeExternal(out);
-		out.writeBoolean(initialCaseSignificant);
-		out.writeUTF(lang);
-		out.writeUTF(text);
-		out.writeLong(typeUuid.getMostSignificantBits());
-		out.writeLong(typeUuid.getLeastSignificantBits());
-	}
+    protected EDescriptionVersion() {
+    }
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.etypes.I_DescribeExternally#isInitialCaseSignificant()
-	 */
-	public boolean isInitialCaseSignificant() {
-		return initialCaseSignificant;
-	}
+    @Override
+    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        initialCaseSignificant = in.readBoolean();
+        lang = in.readUTF();
+        text = in.readUTF();
+        typeUuid = new UUID(in.readLong(), in.readLong());
+    }
 
-	public void setInitialCaseSignificant(boolean initialCaseSignificant) {
-		this.initialCaseSignificant = initialCaseSignificant;
-	}
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeBoolean(initialCaseSignificant);
+        out.writeUTF(lang);
+        out.writeUTF(text);
+        out.writeLong(typeUuid.getMostSignificantBits());
+        out.writeLong(typeUuid.getLeastSignificantBits());
+    }
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.etypes.I_DescribeExternally#getLang()
-	 */
-	public String getLang() {
-		return lang;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ihtsdo.etypes.I_DescribeExternally#isInitialCaseSignificant()
+     */
+    public boolean isInitialCaseSignificant() {
+        return initialCaseSignificant;
+    }
 
-	public void setLang(String lang) {
-		this.lang = lang;
-	}
+    public void setInitialCaseSignificant(boolean initialCaseSignificant) {
+        this.initialCaseSignificant = initialCaseSignificant;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.etypes.I_DescribeExternally#getText()
-	 */
-	public String getText() {
-		return text;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ihtsdo.etypes.I_DescribeExternally#getLang()
+     */
+    public String getLang() {
+        return lang;
+    }
 
-	public void setText(String text) {
-		this.text = text;
-	}
+    public void setLang(String lang) {
+        this.lang = lang;
+    }
 
-	public UUID getTypeUuid() {
-		return typeUuid;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ihtsdo.etypes.I_DescribeExternally#getText()
+     */
+    public String getText() {
+        return text;
+    }
 
-	public void setTypeUuid(UUID typeUuid) {
-		this.typeUuid = typeUuid;
-	}
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public UUID getTypeUuid() {
+        return typeUuid;
+    }
+
+    public void setTypeUuid(UUID typeUuid) {
+        this.typeUuid = typeUuid;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(super.toString());
+
+        buff.append(", initialCaseSignificant:");
+        buff.append(this.initialCaseSignificant);
+        buff.append(", lang:");
+        buff.append(this.lang);
+        buff.append(", text:");
+        buff.append(this.text);
+        buff.append(", typeUuid:");
+        buff.append(this.typeUuid);
+        buff.append("; ");
+
+        return buff.toString();
+    }
 }
