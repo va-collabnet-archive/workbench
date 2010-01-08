@@ -10,57 +10,71 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERefsetCidCidVersion extends EVersion {
 
-	public static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 1;
 
-	protected UUID c1Uuid;
-	protected UUID c2Uuid;
+    protected UUID c1Uuid;
+    protected UUID c2Uuid;
 
-	public ERefsetCidCidVersion(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super();
-		readExternal(in);
-	}
+    public ERefsetCidCidVersion(DataInput in) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in);
+    }
 
-	public ERefsetCidCidVersion(
-			I_ThinExtByRefPartConceptConcept part) throws TerminologyException, IOException {
-		c1Uuid = nidToUuid(part.getC1id());
-		c2Uuid = nidToUuid(part.getC2id());
-		pathUuid = nidToUuid(part.getPathId());
-		statusUuid = nidToUuid(part.getStatusId());
-		time = part.getTime();
-	}
+    public ERefsetCidCidVersion(I_ThinExtByRefPartConceptConcept part) throws TerminologyException, IOException {
+        c1Uuid = nidToUuid(part.getC1id());
+        c2Uuid = nidToUuid(part.getC2id());
+        pathUuid = nidToUuid(part.getPathId());
+        statusUuid = nidToUuid(part.getStatusId());
+        time = part.getTime();
+    }
 
-	@Override
-	public void readExternal(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super.readExternal(in);
-		c1Uuid = new UUID(in.readLong(), in.readLong());
-		c2Uuid = new UUID(in.readLong(), in.readLong());
-	}
+    @Override
+    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        c1Uuid = new UUID(in.readLong(), in.readLong());
+        c2Uuid = new UUID(in.readLong(), in.readLong());
+    }
 
-	@Override
-	public void writeExternal(DataOutput out) throws IOException {
-		super.writeExternal(out);
-		out.writeLong(c1Uuid.getMostSignificantBits());
-		out.writeLong(c1Uuid.getLeastSignificantBits());
-		out.writeLong(c2Uuid.getMostSignificantBits());
-		out.writeLong(c2Uuid.getLeastSignificantBits());
-	}
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeLong(c1Uuid.getMostSignificantBits());
+        out.writeLong(c1Uuid.getLeastSignificantBits());
+        out.writeLong(c2Uuid.getMostSignificantBits());
+        out.writeLong(c2Uuid.getLeastSignificantBits());
+    }
 
-	public UUID getC1Uuid() {
-		return c1Uuid;
-	}
+    public UUID getC1Uuid() {
+        return c1Uuid;
+    }
 
-	public void setC1Uuid(UUID c1Uuid) {
-		this.c1Uuid = c1Uuid;
-	}
+    public void setC1Uuid(UUID c1Uuid) {
+        this.c1Uuid = c1Uuid;
+    }
 
-	public UUID getC2Uuid() {
-		return c2Uuid;
-	}
+    public UUID getC2Uuid() {
+        return c2Uuid;
+    }
 
-	public void setC2Uuid(UUID c2Uuid) {
-		this.c2Uuid = c2Uuid;
-	}
+    public void setC2Uuid(UUID c2Uuid) {
+        this.c2Uuid = c2Uuid;
+    }
 
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(super.toString());
+
+        buff.append(", c1Uuid:");
+        buff.append(this.c1Uuid);
+        buff.append(", c2Uuid:");
+        buff.append(this.c2Uuid);
+        buff.append("; ");
+
+        return buff.toString();
+    }
 }

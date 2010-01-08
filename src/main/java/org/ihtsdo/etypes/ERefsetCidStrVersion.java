@@ -10,56 +10,70 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERefsetCidStrVersion extends EVersion {
 
-	public static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 1;
 
-	protected UUID c1Uuid;
-	protected String strValue;
+    protected UUID c1Uuid;
+    protected String strValue;
 
-	public ERefsetCidStrVersion(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super();
-		readExternal(in);
-	}
+    public ERefsetCidStrVersion(DataInput in) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in);
+    }
 
-	public ERefsetCidStrVersion(
-			I_ThinExtByRefPartConceptString part) throws TerminologyException, IOException {
-		c1Uuid = nidToUuid(part.getC1id());
-		strValue = part.getStr();
-		pathUuid = nidToUuid(part.getPathId());
-		statusUuid = nidToUuid(part.getStatusId());
-		time = part.getTime();
-	}
+    public ERefsetCidStrVersion(I_ThinExtByRefPartConceptString part) throws TerminologyException, IOException {
+        c1Uuid = nidToUuid(part.getC1id());
+        strValue = part.getStr();
+        pathUuid = nidToUuid(part.getPathId());
+        statusUuid = nidToUuid(part.getStatusId());
+        time = part.getTime();
+    }
 
-	@Override
-	public void readExternal(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super.readExternal(in);
-		c1Uuid = new UUID(in.readLong(), in.readLong());
-		strValue = in.readUTF();
-	}
+    @Override
+    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        c1Uuid = new UUID(in.readLong(), in.readLong());
+        strValue = in.readUTF();
+    }
 
-	@Override
-	public void writeExternal(DataOutput out) throws IOException {
-		super.writeExternal(out);
-		out.writeLong(c1Uuid.getMostSignificantBits());
-		out.writeLong(c1Uuid.getLeastSignificantBits());
-		out.writeUTF(strValue);
-	}
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeLong(c1Uuid.getMostSignificantBits());
+        out.writeLong(c1Uuid.getLeastSignificantBits());
+        out.writeUTF(strValue);
+    }
 
-	public UUID getC1Uuid() {
-		return c1Uuid;
-	}
+    public UUID getC1Uuid() {
+        return c1Uuid;
+    }
 
-	public void setC1Uuid(UUID c1Uuid) {
-		this.c1Uuid = c1Uuid;
-	}
+    public void setC1Uuid(UUID c1Uuid) {
+        this.c1Uuid = c1Uuid;
+    }
 
-	public String getStrValue() {
-		return strValue;
-	}
+    public String getStrValue() {
+        return strValue;
+    }
 
-	public void setStrValue(String strValue) {
-		this.strValue = strValue;
-	}
+    public void setStrValue(String strValue) {
+        this.strValue = strValue;
+    }
 
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(super.toString());
+
+        buff.append(", c1Uuid:");
+        buff.append(this.c1Uuid);
+        buff.append(", strValue:");
+        buff.append(this.strValue);
+        buff.append("; ");
+
+        return buff.toString();
+    }
 }

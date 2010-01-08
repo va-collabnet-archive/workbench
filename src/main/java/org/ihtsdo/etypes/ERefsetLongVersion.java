@@ -9,43 +9,55 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ERefsetLongVersion extends EVersion {
 
-	public static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 1;
 
-	protected long longValue;
+    protected long longValue;
 
-	public ERefsetLongVersion(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super();
-		readExternal(in);
-	}
+    public ERefsetLongVersion(DataInput in) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in);
+    }
 
-	public ERefsetLongVersion(
-			I_ThinExtByRefPartLong part) throws TerminologyException, IOException {
-		longValue = part.getLongValue();
-		pathUuid = nidToUuid(part.getPathId());
-		statusUuid = nidToUuid(part.getStatusId());
-		time = part.getTime();
-	}
+    public ERefsetLongVersion(I_ThinExtByRefPartLong part) throws TerminologyException, IOException {
+        longValue = part.getLongValue();
+        pathUuid = nidToUuid(part.getPathId());
+        statusUuid = nidToUuid(part.getStatusId());
+        time = part.getTime();
+    }
 
-	@Override
-	public void readExternal(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super.readExternal(in);
-		longValue = in.readLong();
-	}
+    @Override
+    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        longValue = in.readLong();
+    }
 
-	@Override
-	public void writeExternal(DataOutput out) throws IOException {
-		super.writeExternal(out);
-		out.writeLong(longValue);
-	}
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeLong(longValue);
+    }
 
-	public long getLongValue() {
-		return longValue;
-	}
+    public long getLongValue() {
+        return longValue;
+    }
 
-	public void setLongValue(long longValue) {
-		this.longValue = longValue;
-	}
+    public void setLongValue(long longValue) {
+        this.longValue = longValue;
+    }
 
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(super.toString());
+
+        buff.append(", longValue:");
+        buff.append(this.longValue);
+        buff.append("; ");
+
+        return buff.toString();
+    }
 }

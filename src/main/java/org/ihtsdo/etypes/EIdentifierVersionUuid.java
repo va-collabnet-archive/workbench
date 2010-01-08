@@ -12,50 +12,66 @@ import org.ihtsdo.etypes.EComponent.IDENTIFIER_PART_TYPES;
 
 public class EIdentifierVersionUuid extends EIdentifierVersion {
 
-	public static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 1;
 
-	protected static UUID primordialAuthority;
-	protected UUID denotation;
-	
-	public EIdentifierVersionUuid(DataInput in) throws IOException,
-			ClassNotFoundException {
-		super(in);
-		denotation = new UUID(in.readLong(), in.readLong());
-	}
+    protected static UUID primordialAuthority;
+    protected UUID denotation;
 
-	public EIdentifierVersionUuid(I_IdPart idp) throws TerminologyException, IOException {
-		denotation = (UUID) idp.getDenotation();
-		authorityUuid = nidToUuid(idp.getAuthorityNid());
-		pathUuid = nidToUuid(idp.getPathId());
-		statusUuid = nidToUuid(idp.getStatusId());
-		time = idp.getTime();
-	}
+    public EIdentifierVersionUuid(DataInput in) throws IOException, ClassNotFoundException {
+        super(in);
+        denotation = new UUID(in.readLong(), in.readLong());
+    }
 
-	public EIdentifierVersionUuid(EComponent<?> eComponent) {
-		denotation = eComponent.primordialComponentUuid;
-		if (primordialAuthority == null) {
-			primordialAuthority = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next();
-		}
-		authorityUuid = primordialAuthority;
-		pathUuid = eComponent.pathUuid;
-		statusUuid = eComponent.statusUuid;
-		time = eComponent.time;
-	}
+    public EIdentifierVersionUuid(I_IdPart idp) throws TerminologyException, IOException {
+        denotation = (UUID) idp.getDenotation();
+        authorityUuid = nidToUuid(idp.getAuthorityNid());
+        pathUuid = nidToUuid(idp.getPathId());
+        statusUuid = nidToUuid(idp.getStatusId());
+        time = idp.getTime();
+    }
 
-	@Override
-	public void writeDenotation(DataOutput out) throws IOException {
-		out.writeLong(denotation.getMostSignificantBits());
-		out.writeLong(denotation.getLeastSignificantBits());
-	}
+    public EIdentifierVersionUuid(EComponent<?> eComponent) {
+        denotation = eComponent.primordialComponentUuid;
+        if (primordialAuthority == null) {
+            primordialAuthority = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next();
+        }
+        authorityUuid = primordialAuthority;
+        pathUuid = eComponent.pathUuid;
+        statusUuid = eComponent.statusUuid;
+        time = eComponent.time;
+    }
 
-	@Override
-	public UUID getDenotation() {
-		return denotation;
-	}
-	
-	@Override
-	public IDENTIFIER_PART_TYPES getIdType() {
-		return IDENTIFIER_PART_TYPES.UUID;
-	}
+    @Override
+    public void writeDenotation(DataOutput out) throws IOException {
+        out.writeLong(denotation.getMostSignificantBits());
+        out.writeLong(denotation.getLeastSignificantBits());
+    }
 
+    @Override
+    public UUID getDenotation() {
+        return denotation;
+    }
+
+    @Override
+    public IDENTIFIER_PART_TYPES getIdType() {
+        return IDENTIFIER_PART_TYPES.UUID;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append(super.toString());
+
+        buff.append(", primordialAuthority:");
+        buff.append(primordialAuthority);
+        buff.append(", denotation:");
+        buff.append(this.denotation);
+        buff.append("; ");
+
+        return buff.toString();
+    }
 }
