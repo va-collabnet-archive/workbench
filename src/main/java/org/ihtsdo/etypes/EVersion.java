@@ -36,6 +36,10 @@ public class EVersion implements I_VersionExternally {
         return tf.getRefsetExtensionMembers(nid);
     }
 
+    protected static List<I_ThinExtByRefVersioned> getRefsetMembersForComponent(int nid) throws TerminologyException, IOException {
+        return tf.getAllExtensionsForComponent(nid);
+    }
+
     protected UUID pathUuid;
     protected UUID statusUuid;
     protected long time = Long.MIN_VALUE;
