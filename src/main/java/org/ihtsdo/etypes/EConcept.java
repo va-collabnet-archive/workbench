@@ -437,4 +437,39 @@ public class EConcept {
         buff.append(this.images);
         return buff.toString();
     }
+
+	public List<UUID> getDestRelOriginUuidTypeUuids() {
+		return destRelOriginUuidTypeUuids;
+	}
+
+	public void setDestRelOriginUuidTypeUuids(List<UUID> destRelOriginUuidTypeUuids) {
+		this.destRelOriginUuidTypeUuids = destRelOriginUuidTypeUuids;
+	}
+
+	public List<UUID> getRefsetUuidMemberUuidForConcept() {
+		return refsetUuidMemberUuidForConcept;
+	}
+
+	public void setRefsetUuidMemberUuidForConcept(
+			List<UUID> refsetUuidMemberUuidForConcept) {
+		this.refsetUuidMemberUuidForConcept = refsetUuidMemberUuidForConcept;
+	}
+
+	public List<UUID> getRefsetUuidMemberUuidForDescriptions() {
+		return refsetUuidMemberUuidForDescriptions;
+	}
+
+	public void setRefsetUuidMemberUuidForDescriptions(
+			List<UUID> refsetUuidMemberUuidForDescriptions) {
+		this.refsetUuidMemberUuidForDescriptions = refsetUuidMemberUuidForDescriptions;
+	}
+
+	public List<UUID> getRefsetUuidMemberUuidForRels() {
+		return refsetUuidMemberUuidForRels;
+	}
+
+	public void setRefsetUuidMemberUuidForRels(
+			List<UUID> refsetUuidMemberUuidForRels) {
+		this.refsetUuidMemberUuidForRels = refsetUuidMemberUuidForRels;
+	}
 }
