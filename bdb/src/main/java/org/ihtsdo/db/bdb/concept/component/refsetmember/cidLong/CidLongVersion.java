@@ -20,6 +20,25 @@ public class CidLongVersion extends RefsetVersion<CidLongVersion, CidLongMember>
 	private int c1Nid;
 	private long longValue;
 	
+	public String toString() {
+		return " c1Nid: " + c1Nid + " longValue: " + longValue + " " +super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (CidLongVersion.class.isAssignableFrom(obj.getClass())) {
+			CidLongVersion another = (CidLongVersion) obj;
+			if (this.c1Nid != another.c1Nid) {
+				return false;
+			}
+			if (this.longValue != another.longValue) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
+
 	protected CidLongVersion(int statusNid, int pathNid, long time, 
 			CidLongMember primoridalMember) {
 		super(statusNid, pathNid, time, 

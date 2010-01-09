@@ -1,6 +1,7 @@
 package org.ihtsdo.db.bdb;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import com.sleepycat.bind.tuple.IntegerBinding;
@@ -28,7 +29,9 @@ public class GetNidData implements Callable<byte[]> {
 		IntegerBinding.intToEntry(nid, key);
 		try {
 			if (db.get(null, key, data, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
-				nidData = data.getData();					
+				nidData = data.getData().clone();
+				assert nidData != data.getData();
+				assert Arrays.equals(nidData, data.getData());
 			} else {
 				nidData = new byte[0];
 			}

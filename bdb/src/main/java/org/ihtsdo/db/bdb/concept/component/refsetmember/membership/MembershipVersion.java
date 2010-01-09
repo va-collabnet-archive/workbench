@@ -14,6 +14,19 @@ import com.sleepycat.bind.tuple.TupleInput;
 public class MembershipVersion extends RefsetVersion<MembershipVersion, MembershipMember> {
 
 	
+	
+	public String toString() {
+		return " MembershipVersion: " +super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (MembershipVersion.class.isAssignableFrom(obj.getClass())) {
+			return super.equals(obj);
+		}
+		return false;
+	}
+
 	public MembershipVersion(int statusNid, int pathNid, long time, 
 			MembershipMember primoridalMember) {
 		super(statusNid, pathNid, time, 

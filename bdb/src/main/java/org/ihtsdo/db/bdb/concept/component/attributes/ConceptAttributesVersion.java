@@ -106,5 +106,19 @@ public class ConceptAttributesVersion
 	public ConceptAttributesVersion getMutablePart() {
 		return this;
 	}
+	public String toString() {
+		return " defined: " + defined + " " + super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (ConceptAttributesVersion.class.isAssignableFrom(obj.getClass())) {
+			ConceptAttributesVersion another = (ConceptAttributesVersion) obj;
+			if (this.defined == another.defined) {
+				return super.equals(obj);
+			}
+		}
+		return false;
+	}
 
 }

@@ -46,20 +46,31 @@ public class ConceptAttributes
 
 	private boolean defined;
 	
-	public ConceptAttributes(int nid, int parts, Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, parts, enclosingConcept, primordialUuid);
+	public ConceptAttributes(Concept enclosingConcept, TupleInput input) {
+		super(enclosingConcept, input);
 	}
 
 	public ConceptAttributes(EConceptAttributes eAttr, Concept c) {
 		super(eAttr, c);
+		defined = eAttr.isDefined();
 	}
 
 	@Override
-	public void readFromBdb(TupleInput input, int listSize) {
-		// nid, list size, and conceptNid are read already by the binder...
-		for (int i = 0; i < listSize; i++) {
-			additionalVersions.add(new ConceptAttributesVersion(input, this));
+	public void readFromBdb(TupleInput input) {
+		try {
+			// nid, list size, and conceptNid are read already by the binder...
+			defined = input.readBoolean();
+			int additionalVersionCount = input.readShort();
+			if (additionalVersions == null) {
+				additionalVersions = new ArrayList<ConceptAttributesVersion>(additionalVersionCount);
+			} else {
+				additionalVersions.ensureCapacity(additionalVersions.size() + additionalVersionCount);
+			}
+			for (int i = 0; i < additionalVersionCount; i++) {
+				additionalVersions.add(new ConceptAttributesVersion(input, this));
+			}
+		} catch (Throwable e) {
+			throw new RuntimeException(" Processing nid: " + this.enclosingConcept.getNid(), e);
 		}
 	}
 
@@ -75,6 +86,7 @@ public class ConceptAttributes
 			}
 		}
 		// Start writing
+		output.writeBoolean(defined);
 		output.writeShort(partsToWrite.size());
 		for (ConceptAttributesVersion p : partsToWrite) {
 			p.writePartToBdb(output);
@@ -218,13 +230,10 @@ public class ConceptAttributes
 		StringBuffer buf = new StringBuffer();
 		buf.append("NativeId: ");
 		buf.append(nid);
-		buf.append(" parts: ");
-		buf.append(additionalVersions.size());
-		buf.append("\n  ");
-		for (ConceptAttributesVersion p : additionalVersions) {
-			buf.append(p);
-			buf.append("\n  ");
-		}
+		buf.append(" def: ");
+		buf.append(defined);
+		buf.append(" ");
+		buf.append(super.toString());
 		return buf.toString();
 	}
 
@@ -363,6 +372,17 @@ public class ConceptAttributes
 	@Override
 	public ConceptAttributes getMutablePart() {
 		return this;
+	}
+
+	@Override
+	public boolean fieldsEqual(ConceptComponent<ConceptAttributesVersion, ConceptAttributes> obj) {
+		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
+			ConceptAttributes another = (ConceptAttributes) obj;
+			if (this.defined == another.defined) {
+				return conceptComponentFieldsEqual(another);
+			}
+		}
+		return false;
 	}
 	
 }

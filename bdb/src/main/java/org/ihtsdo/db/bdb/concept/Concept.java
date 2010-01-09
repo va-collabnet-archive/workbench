@@ -48,6 +48,8 @@ import org.ihtsdo.etypes.ERefset;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.I_ConceptualizeExternally;
 
+import com.sleepycat.je.DatabaseEntry;
+
 public class Concept implements I_Transact, I_GetConceptData {
 
 	private static class TransactionHandler implements I_Transact {
@@ -69,7 +71,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public static Concept get(EConcept eConcept) throws IOException {
 		int conceptNid = Bdb.uuidsToNid(eConcept.getConceptAttributes().getUuids());
-		
+		assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
 		Concept c = get(conceptNid, true);
 		
 		EConceptAttributes eAttr = eConcept.getConceptAttributes();
@@ -112,6 +114,10 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return new Concept(nid, editable);
 	}
 
+	public static Concept get(int nid, boolean editable, DatabaseEntry data) throws IOException {
+		return new Concept(nid, editable, data);
+	}
+
 	private static I_Transact transactionHandler = new TransactionHandler();
 
 	private int nid;
@@ -123,6 +129,13 @@ public class Concept implements I_Transact, I_GetConceptData {
 		this.nid = nid;
 		this.editable = editable;
 		data = new ConceptData(this);
+	}
+
+	public Concept(int nid, boolean editable, DatabaseEntry data) throws IOException {
+		super();
+		this.nid = nid;
+		this.editable = editable;
+		this.data = new ConceptData(this, data);
 	}
 
 	public int getNid() {
@@ -224,6 +237,11 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public ConceptAttributes getConceptAttributes() throws IOException {
 		return data.getConceptAttributes();
+	}
+	public ArrayList<ConceptAttributes> getConceptAttributesList() throws IOException {
+		ArrayList<ConceptAttributes> returnList = new ArrayList<ConceptAttributes>(1);
+		returnList.add(getConceptAttributes());
+		return returnList;
 	}
 
 	public int getConceptId() {
@@ -695,5 +713,35 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public ConceptData getData() {
 		return data;
+	}
+
+	public int[] getAllNids() throws IOException {
+		return data.getAllNids();
+	}
+
+	/**
+	 * Test method to check to see if two concepts are equal in all respects. 
+	 * @param another
+	 * @return either a zero length String, or a String containing a description of the
+	 * validation failures. 
+	 * @throws IOException 
+	 */
+	public String validate(Concept another) throws IOException {
+		assert another != null;
+		StringBuffer buff = new StringBuffer();
+		if (nid != another.nid) {
+			buff.append("Nids not equal: " + nid + " " + another.nid + "\n");
+		}
+		ConceptAttributes attributes = getConceptAttributes();
+		assert attributes != null: "validating: " + nid;
+		ConceptAttributes anotherAttributes = another.getConceptAttributes();
+		assert anotherAttributes != null: "validating: " + nid;
+		if (attributes.equals(anotherAttributes) == false) {
+			buff.append("Concept attributes are not equal:\n" + 
+					getConceptAttributes() + "\n" + 
+					another.getConceptAttributes() + "\n");
+		}
+		
+		return buff.toString();
 	}	
 }

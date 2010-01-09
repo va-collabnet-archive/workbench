@@ -9,9 +9,29 @@ import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
 import org.ihtsdo.db.uuidmap.UuidUtil;
 
 public class UuidsToNidMap {
-	AtomicInteger sequence = new AtomicInteger(Integer.MIN_VALUE + 1);
+	private class IdSequence {
+		
+		private AtomicInteger sequence;
+		public IdSequence(int max) {
+			super();
+			sequence = new AtomicInteger(max + 1);
+		}
+
+		public final int get() {
+			return sequence.get();
+		}
+
+		public final int getAndIncrement() {
+			int next = sequence.getAndIncrement();
+			nidCNidMap.ensureCapacity(next);
+			return next;
+		}
+	}
+	
 	UuidToIntHashMap readOnlyUuidsToNidMap = new UuidToIntHashMap();
 	UuidToIntHashMap mutableUuidsToNidMap = new UuidToIntHashMap();
+	IdSequence sequence;
+	NidCNidMap nidCNidMap;
 
 	protected UuidsToNidMap(int readOnlySize, int mutableSize) {
 		super();
@@ -25,7 +45,8 @@ public class UuidsToNidMap {
              	max = Math.max(max, pid.getNativeId(Integer.MIN_VALUE));
             }
         }
-        sequence = new AtomicInteger(max + 1);
+        sequence = new IdSequence(max);
+        nidCNidMap = new NidCNidMap(max);
 	}
 
 	public int uuidToNidWithGeneration(UUID uuid)  {
@@ -82,6 +103,10 @@ public class UuidsToNidMap {
 			}
 		}
 		return Integer.MAX_VALUE;
+	}
+
+	public NidCNidMap getNidCidMap() {
+		return nidCNidMap;
 	}
 
 }

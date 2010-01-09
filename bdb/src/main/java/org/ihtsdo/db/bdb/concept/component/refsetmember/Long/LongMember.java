@@ -1,25 +1,23 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.Long;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetLongVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class LongMember extends RefsetMember<LongVersion, LongMember> {
 	private long longValue;
 
-	public LongMember(int nid, int partCount, 
-			Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, partCount, enclosingConcept, 
-				primordialUuid);
+	public LongMember(Concept enclosingConcept, TupleInput input) {
+		super(enclosingConcept, input);
 	}
 
 	public LongMember(ERefsetLongMember refsetMember, Concept enclosingConcept) {
@@ -34,13 +32,35 @@ public class LongMember extends RefsetMember<LongVersion, LongMember> {
 	}
 
 	@Override
-	protected final void readMemberParts(TupleInput input) {
-		longValue = input.readLong();
-		if (additionalVersions != null) {
-			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new LongVersion(input, this));
-			}
+	protected boolean membersEqual(
+			ConceptComponent<LongVersion, LongMember> obj) {
+		if (LongMember.class.isAssignableFrom(obj.getClass())) {
+			LongMember another = (LongMember) obj;
+			return this.longValue == another.longValue;
 		}
+		return false;
+	}
+	@Override
+	protected final void readMemberParts(TupleInput input,
+			int additionalVersionCount) {
+		if (additionalVersions == null) {
+			additionalVersions = new ArrayList<LongVersion>(
+					additionalVersionCount);
+		} else {
+			additionalVersions.ensureCapacity(additionalVersions.size()
+					+ additionalVersionCount);
+		}
+		for (int i = 0; i < additionalVersionCount; i++) {
+			additionalVersions.add(new LongVersion(input, this));
+		}
+	}
+	@Override
+	protected void readMember(TupleInput input) {
+		longValue = input.readLong();
+	}
+	@Override
+	protected void writeMember(TupleOutput output) {
+		output.writeLong(longValue);
 	}
 
 	@Override

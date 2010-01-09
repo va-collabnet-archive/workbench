@@ -32,6 +32,7 @@ import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EDescriptionVersion;
@@ -55,20 +56,10 @@ public class Description
 	private String lang;
 
 	
-	public Description(int nid,
-			int versionCount, Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, versionCount, enclosingConcept, primordialUuid);
+	public Description(Concept enclosingConcept, TupleInput input) {
+		super(enclosingConcept, input);
 	}
 	
-	public Description(UniversalAceDescription uDesc, Concept enclosingConcept) {
-		super(Bdb.uuidsToNid(uDesc.getDescId()), uDesc.getVersions().size(), 
-				enclosingConcept, uDesc.getDescId().iterator().next());
-		for (UniversalAceDescriptionPart umPart: uDesc.getMutableParts()) {
-			additionalVersions.add(new DescriptionVersion(umPart, this));
-		}
-	}
-
 	public Description(EDescription eDesc, Concept enclosingConcept) {
 		super(eDesc, enclosingConcept);
 		initialCaseSignificant = eDesc.isInitialCaseSignificant();
@@ -84,10 +75,37 @@ public class Description
 		}
 	}
 
+
 	@Override
-	public void readFromBdb(TupleInput input, int listSize) {
+	public boolean fieldsEqual(ConceptComponent<DescriptionVersion, Description> obj) {
+		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
+			Description another = (Description) obj;
+			if (this.initialCaseSignificant != another.initialCaseSignificant) {
+				return false;
+			}
+			if (!this.text.equals(another.text)) {
+				return false;
+			}
+			if (!this.lang.equals(another.lang)) {
+				return false;
+			}
+			if (this.typeNid != another.typeNid) {
+				return false;
+			}
+			return conceptComponentFieldsEqual(another);
+		}
+		return false;
+	}
+
+	@Override
+	public void readFromBdb(TupleInput input) {
+		initialCaseSignificant = input.readBoolean();
+		lang = input.readString();
+		text = input.readString();
+		typeNid = input.readInt();
 		// nid, list size, and conceptNid are read already by the binder...
-		for (int i = 0; i < listSize; i++) {
+		int additionalVersionCount = input.readShort();
+		for (int i = 0; i < additionalVersionCount; i++) {
 			additionalVersions.add(new DescriptionVersion(input, this));
 		}
 	}
@@ -102,6 +120,11 @@ public class Description
 				}
 			}
 		}
+		
+		output.writeBoolean(initialCaseSignificant);
+		output.writeString(lang);
+		output.writeString(text);
+		output.writeInt(typeNid);
 		output.writeShort(partsToWrite.size());
 		// conceptNid is the enclosing concept, does not need to be written. 
 		for (DescriptionVersion p: partsToWrite) {

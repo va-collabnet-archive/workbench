@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -25,6 +24,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipVersion;
@@ -48,11 +48,10 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	private int refinabilityNid;
 	private int typeNid;
 
-	public Relationship(int nid, int parts,
-			Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, parts, enclosingConcept, 
-				primordialUuid);
+	public Relationship(Concept enclosingConcept, 
+			TupleInput input) {
+		super(enclosingConcept, 
+				input);
 	}
 	
 
@@ -74,10 +73,40 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 
 
 	@Override
-	public void readFromBdb(TupleInput input, int listSize) {
+	public boolean fieldsEqual(ConceptComponent<RelationshipVersion, Relationship> obj) {
+		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
+			Relationship another = (Relationship) obj;
+			if (this.c2Nid != another.c2Nid) {
+				return false;
+			}
+			if (this.characteristicNid != another.characteristicNid) {
+				return false;
+			}
+			if (this.group != another.group) {
+				return false;
+			}
+			if (this.refinabilityNid != another.refinabilityNid) {
+				return false;
+			}
+			if (this.typeNid != another.typeNid) {
+				return false;
+			}
+			return conceptComponentFieldsEqual(another);
+		}
+		return false;
+	}
+
+
+	@Override
+	public void readFromBdb(TupleInput input) {
 		// nid, list size, and conceptNid are read already by the binder...
-		this.c2Nid = input.readInt();
-		for (int i = 0; i < listSize; i++) {
+		c2Nid = input.readInt();
+		characteristicNid = input.readInt();
+		group = input.readInt();
+		refinabilityNid = input.readInt();
+		typeNid = input.readInt();
+		int additionalVersionCount = input.readShort();
+		for (int i = 0; i < additionalVersionCount; i++) {
 			additionalVersions.add(new RelationshipVersion(input, this));
 		}
 	}
@@ -94,9 +123,13 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 			}
 		}
 		// Start writing
-		output.writeShort(partsToWrite.size());
 		// c1Nid is the enclosing concept, does not need to be written. 
 		output.writeInt(c2Nid);
+		output.writeInt(characteristicNid);
+		output.writeInt(group);
+		output.writeInt(refinabilityNid);
+		output.writeInt(typeNid);
+		output.writeShort(partsToWrite.size());
 		for (RelationshipVersion p : partsToWrite) {
 			p.writePartToBdb(output);
 		}

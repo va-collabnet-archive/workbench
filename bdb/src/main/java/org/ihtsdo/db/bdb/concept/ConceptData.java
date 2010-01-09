@@ -4,13 +4,17 @@
 package org.ihtsdo.db.bdb.concept;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.NidData;
+import org.ihtsdo.db.bdb.I_GetNidData;
+import org.ihtsdo.db.bdb.NidDataFromBdb;
+import org.ihtsdo.db.bdb.NidDataInMemory;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 import org.ihtsdo.db.bdb.concept.component.DataVersionBinder;
@@ -30,6 +34,7 @@ import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
 import cern.colt.map.OpenIntIntHashMap;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.je.DatabaseEntry;
 
 /**
  * File format:<br>
@@ -40,7 +45,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 public class ConceptData {
 
 	private Concept enclosingConcept;
-	protected NidData nidData;
+	protected I_GetNidData nidData;
 
 	protected SoftReference<ConceptAttributes> attributesRef;
 	protected SoftReference<ArrayList<Relationship>> srcRelsRef;
@@ -50,12 +55,22 @@ public class ConceptData {
 	private ArrayList<Object> strongReferences;
 
 	ConceptData(Concept enclosingConcept) throws IOException {
+		assert enclosingConcept != null : "enclosing concept cannot be null.";
 		this.enclosingConcept = enclosingConcept;
 		if (enclosingConcept.isEditable()) {
 			strongReferences = new ArrayList<Object>();
 		}
-		nidData = new NidData(enclosingConcept.getNid(), Bdb.getConceptDb().getReadOnly(), Bdb
+		nidData = new NidDataFromBdb(enclosingConcept.getNid(), Bdb.getConceptDb().getReadOnly(), Bdb
 				.getConceptDb().getReadWrite());
+	}
+
+	ConceptData(Concept enclosingConcept, DatabaseEntry data) throws IOException {
+		assert enclosingConcept != null : "enclosing concept cannot be null.";
+		this.enclosingConcept = enclosingConcept;
+		if (enclosingConcept.isEditable()) {
+			strongReferences = new ArrayList<Object>();
+		}
+		nidData = new NidDataInMemory(new byte[] {}, data.getData());
 	}
 
 	public int getNid() {
@@ -63,7 +78,7 @@ public class ConceptData {
 	}
 
 	public int getReadWriteDataVersion() throws InterruptedException,
-			ExecutionException {
+			ExecutionException, IOException {
 		DataVersionBinder binder = DataVersionBinder.getBinder();
 		return binder.entryToObject(nidData.getReadWriteTupleInput());
 	}
@@ -77,7 +92,7 @@ public class ConceptData {
 			}
 		}
 		try {
-			rels = getList(RelationshipBinder.getBinder(), 
+			rels = getList(new RelationshipBinder(), 
 					OFFSETS.SOURCE_RELS, 
 					enclosingConcept);
 			if (enclosingConcept.isEditable() && rels != null) {
@@ -101,7 +116,7 @@ public class ConceptData {
 			}
 		}
 		try {
-			descList = getList(DescriptionBinder.getBinder(),
+			descList = getList(new DescriptionBinder(),
 					OFFSETS.DESCRIPTIONS,
 					enclosingConcept);
 			if (enclosingConcept.isEditable()) {
@@ -126,22 +141,43 @@ public class ConceptData {
 		ArrayList<C> componentList;
 		TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
 		if (readOnlyInput.available() > 0) {
+			checkFormatAndVersion(readOnlyInput);
+			readOnlyInput.mark(128);
 			readOnlyInput.skipFast(offset.offset);
+			int listStart = readOnlyInput.readInt();
+			readOnlyInput.reset();
+			readOnlyInput.skipFast(listStart);			
 			componentList = binder.entryToObject(readOnlyInput);
 		} else {
 			componentList = new ArrayList<C>();
 		}
-
+		assert componentList != null;
+		binder.setTermComponentList(componentList);
 		TupleInput readWriteInput = nidData.getReadWriteTupleInput();
 		if (readWriteInput.available() > 0) {
+			checkFormatAndVersion(readWriteInput);
+			readWriteInput.mark(128);
 			readWriteInput.skipFast(offset.offset);
-			binder.setTermComponentList(componentList);
+			int listStart = readWriteInput.readInt();
+			readWriteInput.reset();
+			readWriteInput.skipFast(listStart);			
 			componentList = binder.entryToObject(readWriteInput);
 		}
-		if (componentList == null) {
-			componentList = new ArrayList<C>();
-		}
 		return componentList;
+	}
+
+	private void checkFormatAndVersion(TupleInput input)
+			throws UnsupportedEncodingException {
+		input.mark(128);
+		int formatVersion = input.readInt();
+		int dataVersion = input.readInt();
+		if (formatVersion != OFFSETS.CURRENT_FORMAT_VERSION) {
+			throw new UnsupportedEncodingException("No support for format version: " + formatVersion);
+		}
+		if (dataVersion != OFFSETS.CURRENT_DATA_VERSION) {
+			throw new UnsupportedEncodingException("No support for data version: " + dataVersion);
+		}
+		input.reset();
 	}
 
 	private ArrayList<RefsetMember<?, ?>> getList(
@@ -151,20 +187,28 @@ public class ConceptData {
 		ArrayList<RefsetMember<?, ?>> componentList;
 		TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
 		if (readOnlyInput.available() > 0) {
+			checkFormatAndVersion(readOnlyInput);
+			readOnlyInput.mark(128);
 			readOnlyInput.skipFast(offset.offset);
+			int listStart = readOnlyInput.readInt();
+			readOnlyInput.reset();
+			readOnlyInput.skipFast(listStart);			
 			componentList = binder.entryToObject(readOnlyInput);
 		} else {
 			componentList = new ArrayList<RefsetMember<?, ?>>();
 		}
-
+		assert componentList != null;
+		binder.setTermComponentList(componentList);
 		TupleInput readWriteInput = nidData.getReadWriteTupleInput();
 		if (readWriteInput.available() > 0) {
+			readWriteInput.mark(128);
+			checkFormatAndVersion(readWriteInput);
+			readWriteInput.reset();
 			readWriteInput.skipFast(offset.offset);
-			binder.setTermComponentList(componentList);
+			int listStart = readWriteInput.readInt();
+			readWriteInput.reset();
+			readWriteInput.skipFast(listStart);			
 			componentList = binder.entryToObject(readWriteInput);
-		}
-		if (componentList == null) {
-			componentList = new ArrayList<RefsetMember<?, ?>>();
 		}
 		return componentList;
 	}
@@ -179,7 +223,7 @@ public class ConceptData {
 		}
 		try {
 			ArrayList<ConceptAttributes> components = getList(
-					ConceptAttributesBinder.getBinder(), 
+					new ConceptAttributesBinder(), 
 					OFFSETS.ATTRIBUTES, 
 					enclosingConcept);
 			if (components != null && components.size() == 1) {
@@ -249,7 +293,7 @@ public class ConceptData {
 			}
 		}
 		try {
-			refsetMemberList = getList(RefsetMemberBinder.getBinder(),
+			refsetMemberList = getList(new RefsetMemberBinder(),
 					OFFSETS.REFSET_MEMBERS, 
 					enclosingConcept);
 			if (enclosingConcept.isEditable() && refsetMemberList != null) {
@@ -274,7 +318,7 @@ public class ConceptData {
 			}
 		}
 		try {
-			imgList = getList(ImageBinder.getBinder(), OFFSETS.IMAGES, 
+			imgList = getList(new ImageBinder(), OFFSETS.IMAGES, 
 					enclosingConcept);
 			if (enclosingConcept.isEditable() && imgList != null) {
 				strongReferences.add(imgList);
@@ -308,7 +352,7 @@ public class ConceptData {
 		return refsetMembersRef;
 	}
 
-	protected NidData getNidData() {
+	protected I_GetNidData getNidData() {
 		return nidData;
 	}
 
@@ -350,5 +394,23 @@ public class ConceptData {
 			throw new IOException("Attempting to add to an uneditable concept");
 		}
 		getRefsetMembers().add(refsetMember);
+	}
+
+	public int[] getAllNids() throws IOException {
+		ArrayIntList allContainedNids = new ArrayIntList();
+		allContainedNids.add(enclosingConcept.getNid());
+		for (Description d: getDescriptions()) {
+			allContainedNids.add(d.nid);
+		}
+		for (Relationship r: getSourceRels()) {
+			allContainedNids.add(r.nid);
+		}
+		for (Image i: getImages()) {
+			allContainedNids.add(i.nid);
+		}
+		for (RefsetMember<?, ?> r: getRefsetMembers()) {
+			allContainedNids.add(r.nid);
+		}
+		return allContainedNids.toArray();
 	}
 }

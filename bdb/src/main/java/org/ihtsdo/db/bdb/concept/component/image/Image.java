@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb.concept.component.image;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,7 @@ import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.EImageVersion;
@@ -46,10 +48,8 @@ public class Image
 	private String textDescription;
 	private int typeNid;
 
-	protected Image(int nid, int listSize, Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, listSize, enclosingConcept, 
-				primordialUuid);
+	protected Image(Concept enclosingConcept, TupleInput input) {
+		super(enclosingConcept, input);
 	}
 
 	public Image(EImage eImage, Concept enclosingConcept) {
@@ -65,14 +65,34 @@ public class Image
 		}
 	}
 
+
 	@Override
-	public void readFromBdb(TupleInput input, int listSize) {		
+	public boolean fieldsEqual(ConceptComponent<ImageVersion, Image> obj) {
+		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
+			Image another = (Image) obj;
+			if (!this.format.equals(another.format)) {
+				return false;
+			}
+			if (!Arrays.equals(this.image, another.image)) {
+				return false;
+			}
+			if (this.typeNid != another.typeNid) {
+				return false;
+			}
+			return conceptComponentFieldsEqual(another);
+		}
+		return false;
+	}
+
+	@Override
+	public void readFromBdb(TupleInput input) {		
 		// nid, list size, and conceptNid are read already by the binder...
 		this.format = input.readString();
 		int imageBytes = input.readInt();
 		image = new byte[imageBytes];
 		input.read(image, 0, imageBytes);
-		for (int i = 0; i < listSize; i++) {
+		int additionalVersionCount = input.readShort();
+		for (int i = 0; i < additionalVersionCount; i++) {
 			additionalVersions.add(new ImageVersion(input, this));
 		}
 	}
@@ -88,11 +108,11 @@ public class Image
 			}
 		}
 		// Start writing
-		output.writeShort(partsToWrite.size());
 		// conceptNid is the enclosing concept, does not need to be written. 
 		output.writeString(format);
 		output.writeInt(image.length);
 		output.write(image);
+		output.writeShort(partsToWrite.size());
 		for (ImageVersion p: partsToWrite) {
 			p.writePartToBdb(output);
 		}

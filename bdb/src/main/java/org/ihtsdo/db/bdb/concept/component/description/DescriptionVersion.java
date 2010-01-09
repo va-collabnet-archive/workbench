@@ -28,6 +28,32 @@ public class DescriptionVersion
 	private int typeNid; 
 	private String lang;
 
+	public String toString() {
+		return " text: " + text + " cs: " + initialCaseSignificant 
+		+ " typeNid: " + typeNid + " lang: " + lang + " " + super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (DescriptionVersion.class.isAssignableFrom(obj.getClass())) {
+			DescriptionVersion another = (DescriptionVersion) obj;
+			if (this.initialCaseSignificant != another.initialCaseSignificant) {
+				return false;
+			}
+			if (this.typeNid != another.typeNid) {
+				return false;
+			}
+			if (!this.text.equals(another.text)) {
+				return false;
+			}
+			if (!this.lang.equals(another.lang)) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
+
 	public DescriptionVersion(int statusAtPositionNid, 
 			Description primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
@@ -56,7 +82,13 @@ public class DescriptionVersion
 			Description primoridalMember) {
 		super(input.readInt(), primoridalMember);
 		text = input.readString();
+		if (text == null) {
+			text = primoridalMember.getText();
+		}
 		lang = input.readString();
+		if (lang == null) {
+			lang = primoridalMember.getLang();
+		}
 		initialCaseSignificant = input.readBoolean();
 		typeNid = input.readInt();
 	}
@@ -86,8 +118,16 @@ public class DescriptionVersion
 
 	@Override
 	protected void writeFieldsToBdb(TupleOutput output) {
-		output.writeString(text);
-		output.writeString(lang);
+		if (text.equals(primordialComponent.getText())) {
+			output.writeString((String) null);
+		} else {
+			output.writeString(text);
+		}
+		if (lang.equals(primordialComponent.getLang())) {
+			output.writeString((String) null);
+		} else {
+			output.writeString(lang);
+		}
 		output.writeBoolean(initialCaseSignificant);
 		output.writeInt(typeNid);
 	}

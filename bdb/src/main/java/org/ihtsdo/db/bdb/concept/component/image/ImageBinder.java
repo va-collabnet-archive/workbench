@@ -4,24 +4,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 
-public class ImageBinder {
+public class ImageBinder extends ConceptComponentBinder<ImageVersion, Image> {
 
 	public static AtomicInteger encountered = new AtomicInteger();
 	public static AtomicInteger written = new AtomicInteger();
 
-	private static final ThreadLocal<ConceptComponentBinder<ImageVersion, Image>> binders = 
-		new ThreadLocal<ConceptComponentBinder<ImageVersion, Image>>() {
-
-
-		@Override
-		protected ConceptComponentBinder<ImageVersion, Image> initialValue() {
-			ImageFactory factory = new ImageFactory();
-			return new ConceptComponentBinder<ImageVersion, Image>(factory, encountered, written);
-		}
-	};
-
-	public static ConceptComponentBinder<ImageVersion, Image> getBinder() {
-		return binders.get();
+	public ImageBinder() {
+		super(new ImageFactory(), encountered, written);
 	}
-
 }

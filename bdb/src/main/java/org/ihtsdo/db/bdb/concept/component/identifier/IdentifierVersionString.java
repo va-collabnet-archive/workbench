@@ -11,7 +11,7 @@ public class IdentifierVersionString extends IdentifierVersion {
 	private String stringDenotation;
 
 	public IdentifierVersionString(TupleInput input) {
-		super(input.readInt());
+		super(input);
 		stringDenotation = input.readString();
 	}
 
@@ -38,6 +38,21 @@ public class IdentifierVersionString extends IdentifierVersion {
 	@Override
 	public void setDenotation(Object sourceDenotation) {
 		stringDenotation = (String) sourceDenotation;
+	}
+
+	@Override
+	public String toString() {
+		return "denotation: " + stringDenotation + " " + super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (IdentifierVersionString.class.isAssignableFrom(obj.getClass())) {
+			IdentifierVersionString another = (IdentifierVersionString) obj;
+			return this.stringDenotation.equals(another.stringDenotation) && 
+				super.equals(another);
+		}
+		return false;
 	}
 
 }

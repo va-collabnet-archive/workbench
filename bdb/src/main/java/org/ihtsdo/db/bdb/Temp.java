@@ -19,15 +19,20 @@ import javax.swing.JFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.concept.ConceptBinder;
+import org.ihtsdo.db.bdb.concept.I_ProcessConceptData;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesBinder;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionBinder;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberBinder;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.etypes.EConcept;
 
+import com.sleepycat.je.DatabaseEntry;
+
 public class Temp {
 	public static void main(String[] args) {
         try {
+        	
 			FileDialog fd = new FileDialog(new JFrame(), "Select ids file", FileDialog.LOAD);
 			fd.setDirectory(System.getProperty("user.dir"));
 			
@@ -80,8 +85,10 @@ public class Temp {
 	            AceLog.getAppLog().info("freeMemory: " + Runtime.getRuntime().freeMemory());
 	            AceLog.getAppLog().info("maxMemory: " + Runtime.getRuntime().maxMemory());
 	            AceLog.getAppLog().info("totalMemory: " + Runtime.getRuntime().totalMemory());
-	            
+	            AceLog.getAppLog().info("\nconverterSize: " + converterSize);
+	                        
 	            FileIO.recursiveDelete(new File("target/berkeley-db"));
+	        	Bdb.setup();
 	            Bdb.setUuidsToNidMap(uuidsNidMap);
 	        	//ConceptComponentBinder binder = new ConceptComponentBinder(null);
 	            
@@ -93,7 +100,7 @@ public class Temp {
 	            while (fis.available() > 0) {
 	            	conceptsRead.incrementAndGet();
 	            	EConcept eConcept = new EConcept(in);
-	            	ConvertConcept conceptConverter = converters.take(); 
+	            	I_ProcessEConcept conceptConverter = converters.take(); 
 	            	conceptConverter.setEConcept(eConcept);
 	            	executors.execute(conceptConverter);
 			    	//Concept newConcept = Concept.get(eConcept);
@@ -104,7 +111,7 @@ public class Temp {
 			    }
 	            // See if any exceptions in the last converters;
 	            while (converters.isEmpty() == false) {
-	            	ConvertConcept conceptConverter = converters.take();
+	            	I_ProcessEConcept conceptConverter = converters.take();
 	            	conceptConverter.setEConcept(null);
 	            }
 	            
@@ -121,9 +128,6 @@ public class Temp {
 	            AceLog.getAppLog().info("totalMemory: " + Runtime.getRuntime().totalMemory());
 	            
 	            AceLog.getAppLog().info("finished load, start sync");    
-	            AceLog.getAppLog().info("finished load, start sync");    
-	            Bdb.sync();
-	            
 	            AceLog.getAppLog().info("Concept count: " + Bdb.getConceptDb().getCount());    
 	            AceLog.getAppLog().info("Concept attributes encountered: " + ConceptAttributesBinder.encountered +
 	            		" written: " + ConceptAttributesBinder.written);    
@@ -134,13 +138,27 @@ public class Temp {
 	            AceLog.getAppLog().info("Reset members encountered: " + RefsetMemberBinder.encountered +
 	            		" written: " + RefsetMemberBinder.written);    
 	            
+	            // Generate NID->CID map
 	            
+	            
+	            AceLog.getAppLog().info("Starting PopulateNidCidMap");
+	            
+	            Bdb.getConceptDb().iterateConceptData(new PopulateNidCidMap());
+	            AceLog.getAppLog().info("Finished PopulateNidCidMap");
+	            AceLog.getAppLog().info("Starting ValidateNidCidMap");
+	            
+	            Bdb.getConceptDb().iterateConceptData(new ValidateNidCidMap());
+	            AceLog.getAppLog().info("Finished ValidateNidCidMap");
+	            AceLog.getAppLog().info("Starting db sync.");
+	            Bdb.sync();
+	            AceLog.getAppLog().info("Finishing db sync.");
 	            Bdb.close();
-	            AceLog.getAppLog().info("finished sync");
+	            AceLog.getAppLog().info("db closed");
 	            
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
+            AceLog.getAppLog().info("Concept count: " + Bdb.getConceptDb().getCount());    
 		} 
         System.exit(0);
 	}
@@ -149,28 +167,89 @@ public class Temp {
 	static AtomicInteger conceptsProcessed = new AtomicInteger();
 	
 	static ExecutorService executors = Executors.newCachedThreadPool();
-    static LinkedBlockingQueue<ConvertConcept> converters = new LinkedBlockingQueue<ConvertConcept>();
+    static LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
+    private static int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;;
+    private static int converterSize = runtimeConverterSize;
     static {
-    	int converterSize = Runtime.getRuntime().availableProcessors() * 2;
         for (int i = 0; i < converterSize; i++) {
         	try {
-				converters.put(new ConvertConcept());
+				converters.put(new ConvertConceptNoWrite());
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
         }
     }
 
+    private static class ValidateNidCidMap implements I_ProcessConceptData {
+    	
+    	NidCNidMap nidCnidMap = Bdb.getNidCNidMap();
+		@Override
+		public void processConceptData(Concept concept) throws Exception {
+			
+			int cNid = concept.getNid();
+			int[] nids = concept.getAllNids();
+			for (int nid: nids) {
+				int testCNid = nidCnidMap.getCNid(nid);
+				if (testCNid != cNid) {
+					AceLog.getAppLog().severe("Failure in nid cid map");
+				}
+			}
+		}
+    }
     
-	private static class ConvertConcept implements Runnable {
-		Throwable exception;
-		EConcept eConcept;
-		Concept newConcept;
+    private static class PopulateNidCidMap implements I_ProcessConceptData {
+    	
+    	NidCNidMap nidCnidMap = Bdb.getNidCNidMap();
+		@Override
+		public void processConceptData(Concept concept) throws Exception {
+			
+			int cNid = concept.getNid();
+			int[] nids = concept.getAllNids();
+			nidCnidMap.setCidForNid(cNid, cNid);
+			for (int nid: nids) {
+				nidCnidMap.setCidForNid(cNid, nid);
+			}
+		}
+    }
+    
+    private static class ConvertConceptNoWrite implements Runnable, I_ProcessEConcept {
+		private Throwable exception = null;
+		private EConcept eConcept = null;
+		private Concept newConcept = null;
+
 		@Override
 		public void run() {
 			try {
 				newConcept = Concept.get(eConcept);
-				Bdb.getConceptDb().writeConcept(newConcept);
+				Concept newConcept = Concept.get(eConcept);
+				Concept newConcept1 = Concept.get(eConcept);
+				assert newConcept.getConceptAttributes().
+					conceptComponentFieldsEqual(newConcept1.getConceptAttributes()):
+						"\nattr1: " + newConcept.getConceptAttributes() + 
+						"\nattr2: " + newConcept1.getConceptAttributes();
+				Concept newConcept2 = Concept.get(eConcept);
+				assert newConcept.getConceptAttributes().
+					conceptComponentFieldsEqual(newConcept2.getConceptAttributes());
+				Concept newConcept3 = Concept.get(eConcept);
+				assert newConcept.getConceptAttributes().
+					conceptComponentFieldsEqual(newConcept3.getConceptAttributes());
+				
+				int nid = newConcept.getNid();
+				ConceptBinder binder = new ConceptBinder();
+	    		DatabaseEntry value = new DatabaseEntry();
+	    		binder.objectToEntry(newConcept, value);
+
+	    		Concept clone = Concept.get(nid, false, value);
+	    		clone.getConceptAttributes();
+	    		Concept clone2 = Concept.get(nid, false, value);
+	    		clone2.getConceptAttributes();
+	    		Concept clone3 = Concept.get(nid, false, value);
+	    		clone3.getConceptAttributes();
+	    		
+				String validationReport = clone.validate(newConcept);
+				if (validationReport.length() > 0) {
+					System.out.println(validationReport);
+				}
 				conceptsProcessed.incrementAndGet();
 			} catch (Throwable e) {
 				exception = e;
@@ -181,6 +260,43 @@ public class Temp {
 				throw new RuntimeException(e);
 			}
 		}
+		public void setEConcept(EConcept eConcept) throws Throwable {
+			if (exception != null) {
+				throw exception;
+			}
+			this.eConcept = eConcept;
+		}
+    	
+    }
+
+    
+	private static class ConvertConcept implements I_ProcessEConcept {
+		Throwable exception = null;
+		EConcept eConcept = null;
+		Concept newConcept = null;
+		@Override
+		public void run() {
+			try {
+				newConcept = Concept.get(eConcept);
+				Bdb.getConceptDb().writeConcept(newConcept);
+				Concept clone = Bdb.getConceptDb().getConcept(newConcept.getNid());
+				String validationReport = clone.validate(newConcept);
+				if (validationReport.length() > 0) {
+					System.out.println(validationReport);
+				}
+				conceptsProcessed.incrementAndGet();
+			} catch (Throwable e) {
+				exception = e;
+			}
+			try {
+				converters.put(this);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.db.bdb.I_ProcessEConcept#setEConcept(org.ihtsdo.etypes.EConcept)
+		 */
 		public void setEConcept(EConcept eConcept) throws Throwable {
 			if (exception != null) {
 				throw exception;

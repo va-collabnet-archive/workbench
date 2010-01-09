@@ -1,5 +1,7 @@
 package org.ihtsdo.db.bdb.concept.component.image;
 
+import java.util.Arrays;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
@@ -18,6 +20,28 @@ public class ImageVersion extends Version<ImageVersion, Image>
 	private String textDescription;
 	private int typeNid;
 	
+	public String toString() {
+		return " textDescription: " + textDescription + " typeNid: " + typeNid + " " + super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (ImageVersion.class.isAssignableFrom(obj.getClass())) {
+			ImageVersion another = (ImageVersion) obj;
+			if (this.typeNid != another.typeNid) {
+				return false;
+			}
+			if (!this.textDescription.equals(another.textDescription)) {
+				return false;
+			}
+			if (!Arrays.equals(this.getImage(), another.getImage())) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
+
 	protected ArrayIntList getVariableVersionNids() {
 		ArrayIntList partComponentNids = new ArrayIntList(3);
 		partComponentNids.add(typeNid);
@@ -112,15 +136,6 @@ public class ImageVersion extends Version<ImageVersion, Image>
 	 */
 	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 		throw new UnsupportedOperationException();
-	}
-	@Override
-	public boolean equals(Object obj) {
-		ImageVersion another = (ImageVersion) obj;
-		return ((getPathId() == another.getPathId()) &&
-				(getStatusId() == another.getStatusId()) && 
-				(textDescription.equals(another.textDescription)) &&
-				(typeNid == another.typeNid) &&
-				(getTime() == another.getTime()));
 	}
 	
 	public ImageVersion duplicate() {

@@ -161,5 +161,21 @@ public abstract class Version<V extends Version<V, C>,
 		throw new UnsupportedOperationException();
 	}
 	
+	
+	
+	public String toString() {
+		return " sapNid: " + statusAtPositionNid;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (Version.class.isAssignableFrom(obj.getClass())) {
+			Version<V, C> another = (Version<V, C>) obj;
+			if (this.statusAtPositionNid == another.statusAtPositionNid) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 }

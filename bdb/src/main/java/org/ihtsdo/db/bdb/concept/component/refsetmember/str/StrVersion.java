@@ -17,6 +17,22 @@ public class StrVersion extends RefsetVersion<StrVersion, StrMember>
 
 	private String stringValue;
 	
+	public String toString() {
+		return " stringValue: " + stringValue + " " +super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (StrVersion.class.isAssignableFrom(obj.getClass())) {
+			StrVersion another = (StrVersion) obj;
+			if (this.stringValue.equals(another.stringValue)) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
+
 	public StrVersion(int statusNid, int pathNid, long time, 
 			StrMember primoridalMember) {
 		super(statusNid, pathNid, time, 

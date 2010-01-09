@@ -18,6 +18,22 @@ public class BooleanVersion extends RefsetVersion<BooleanVersion, BooleanMember>
 	
 	private boolean booleanValue;
 
+	public String toString() {
+		return " booleanValue: " + booleanValue + " " + super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (BooleanVersion.class.isAssignableFrom(obj.getClass())) {
+			BooleanVersion another = (BooleanVersion) obj;
+			if (this.booleanValue != another.booleanValue) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
+
 	protected BooleanVersion(int statusNid, int pathNid, long time, 
 			BooleanMember primoridalMember) {
 		super(statusNid, pathNid, time, primoridalMember);

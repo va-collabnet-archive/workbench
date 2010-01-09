@@ -1,6 +1,9 @@
 package org.ihtsdo.db.bdb;
 
 import java.io.IOException;
+import java.util.logging.Level;
+
+import org.dwfa.ace.log.AceLog;
 
 import com.sleepycat.je.Database;
 
@@ -25,9 +28,21 @@ public abstract class ComponentBdb {
 	protected abstract String getDbName();
 	
 	public void close() {
-		readOnly.close();
-		readWrite.sync();
-		readWrite.close();
+		sync();
+		try {
+			readOnly.close();
+		} catch (IllegalStateException ex) {
+			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+				AceLog.getAppLog().warning(ex.toString());
+			}
+		}
+		try {
+			readWrite.close();
+		} catch (IllegalStateException ex) {
+			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+				AceLog.getAppLog().warning(ex.toString());
+			}
+		}
 	}
 
 	public void sync() {

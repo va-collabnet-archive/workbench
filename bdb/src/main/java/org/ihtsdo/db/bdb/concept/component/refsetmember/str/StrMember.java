@@ -1,25 +1,24 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.str;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class StrMember extends RefsetMember<StrVersion, StrMember> {
 
 	private String stringValue;
 
-	public StrMember(int nid, int partCount, Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, partCount, enclosingConcept, 
-				primordialUuid);
+	public StrMember(Concept enclosingConcept, TupleInput input) {
+		super(enclosingConcept, input);
 	}
 
 	public StrMember(ERefsetStrMember refsetMember, Concept enclosingConcept) {
@@ -34,14 +33,38 @@ public class StrMember extends RefsetMember<StrVersion, StrMember> {
 	}
 
 	@Override
-	protected final void readMemberParts(TupleInput input) {
-		stringValue = input.readString();
-		if (additionalVersions != null) {
-			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new StrVersion(input, this));
-			}
+	protected boolean membersEqual(
+			ConceptComponent<StrVersion, StrMember> obj) {
+		if (StrMember.class.isAssignableFrom(obj.getClass())) {
+			StrMember another = (StrMember) obj;
+			return this.stringValue.equals(another.stringValue);
+		}
+		return false;
+	}
+
+	@Override
+	protected final void readMemberParts(TupleInput input,
+			int additionalVersionCount) {
+		if (additionalVersions == null) {
+			additionalVersions = new ArrayList<StrVersion>(
+					additionalVersionCount);
+		} else {
+			additionalVersions.ensureCapacity(additionalVersions.size()
+					+ additionalVersionCount);
+		}
+		for (int i = 0; i < additionalVersionCount; i++) {
+			additionalVersions.add(new StrVersion(input, this));
 		}
 	}
+	@Override
+	protected void readMember(TupleInput input) {
+		// nothing to read...
+	}
+	@Override
+	protected void writeMember(TupleOutput output) {
+		// nothing to write
+	}
+
 
 	@Override
 	protected ArrayIntList getVariableVersionNids() {

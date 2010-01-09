@@ -1,23 +1,22 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.membership;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERefsetVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class MembershipMember extends RefsetMember<MembershipVersion, MembershipMember> {
 
-	public MembershipMember(int nid, int partCount, Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, partCount, enclosingConcept, 
-				primordialUuid);
+	public MembershipMember(Concept enclosingConcept, TupleInput input) {
+		super(enclosingConcept, input);
 	}
 
 	public MembershipMember(ERefsetMember refsetMember, Concept enclosingConcept) {
@@ -31,12 +30,35 @@ public class MembershipMember extends RefsetMember<MembershipVersion, Membership
 	}
 
 	@Override
-	protected final void readMemberParts(TupleInput input) {
-		if (additionalVersions != null) {
-			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new MembershipVersion(input, this));
-			}
+	protected boolean membersEqual(
+			ConceptComponent<MembershipVersion, MembershipMember> obj) {
+		if (MembershipMember.class.isAssignableFrom(obj.getClass())) {
+			return true;
 		}
+		return false;
+	}
+
+	@Override
+	protected final void readMemberParts(TupleInput input,
+			int additionalVersionCount) {
+		if (additionalVersions == null) {
+			additionalVersions = new ArrayList<MembershipVersion>(
+					additionalVersionCount);
+		} else {
+			additionalVersions.ensureCapacity(additionalVersions.size()
+					+ additionalVersionCount);
+		}
+		for (int i = 0; i < additionalVersionCount; i++) {
+			additionalVersions.add(new MembershipVersion(input, this));
+		}
+	}
+	@Override
+	protected void readMember(TupleInput input) {
+		// nothing to read...
+	}
+	@Override
+	protected void writeMember(TupleOutput output) {
+		// nothing to write
 	}
 
 

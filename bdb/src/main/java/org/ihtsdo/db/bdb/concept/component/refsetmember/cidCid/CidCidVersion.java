@@ -19,7 +19,26 @@ public class CidCidVersion extends RefsetVersion<CidCidVersion, CidCidMember>
 
 	private int c1Nid;
 	private int c2Nid;
-	
+
+	public String toString() {
+		return " c1Nid: " + c1Nid + " c2Nid: " + c2Nid + " " +super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (CidCidVersion.class.isAssignableFrom(obj.getClass())) {
+			CidCidVersion another = (CidCidVersion) obj;
+			if (this.c1Nid != another.c1Nid) {
+				return false;
+			}
+			if (this.c2Nid != another.c2Nid) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
+
 	public CidCidVersion(int statusNid, int pathNid, long time, 
 			CidCidMember primoridalMember) {
 		super(statusNid, pathNid, time, 

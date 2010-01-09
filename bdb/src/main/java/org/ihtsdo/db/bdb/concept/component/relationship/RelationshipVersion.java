@@ -22,6 +22,32 @@ public class RelationshipVersion
 	private int refinabilityNid;
 	private int typeNid;
 
+	
+	public String toString() {
+		return " characteristicNid: " + characteristicNid + " group: " + group + 
+		" refinabilityNid: " + refinabilityNid + " typeNid: " + typeNid+ " " +super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (RelationshipVersion.class.isAssignableFrom(obj.getClass())) {
+			RelationshipVersion another = (RelationshipVersion) obj;
+			if (this.characteristicNid != another.characteristicNid) {
+				return false;
+			}
+			if (this.group != another.group) {
+				return false;
+			}
+			if (this.refinabilityNid != another.refinabilityNid) {
+				return false;
+			}
+			if (this.typeNid != another.typeNid) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
 	public RelationshipVersion(int statusAtPositionNid, 
 			Relationship primordialRel) {
 		super(statusAtPositionNid, primordialRel);

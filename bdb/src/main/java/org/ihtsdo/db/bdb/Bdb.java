@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.concept.Concept;
@@ -29,18 +32,20 @@ public class Bdb {
 	
 	private static ExecutorService executorPool;
 	
-	static {
-		Bdb.setup();
-	}
-	
 	public static void commit() throws IOException {
 		long commitTime = System.currentTimeMillis();
 		statusAtPositionDb.commit(commitTime);
 	}
 	
 	public static void setup() {
+		setup("target");
+	}
+
+	
+	public static void setup(String dbRoot) {
 		try {
-			File buildDirectory = new File("target");
+			File buildDirectory = new File(dbRoot);
+			buildDirectory.mkdirs();
 			File bdbDirectory = new File(buildDirectory, "berkeley-db");
 			bdbDirectory.mkdirs();
 			readWrite = new Bdb(false, new File(bdbDirectory, "read-write"));
@@ -50,6 +55,7 @@ public class Bdb {
 			statusAtPositionDb = new StatusAtPositionBdb(readOnly, readWrite);
 			conceptDb = new ConceptBdb(readOnly, readWrite);
 			executorPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+			uuidsToNidMap = new UuidsToNidMap(0, 100);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -88,6 +94,10 @@ public class Bdb {
 
 	
 	public static int getStatusAtPositionNid(EVersion version) {
+		assert version.getTime() != 0: "Time is 0; was it initialized?";
+		assert version.getTime() != Long.MIN_VALUE: "Time is Long.MIN_VALUE; was it initialized?";
+		assert version.getStatusUuid() != null: "Status is null; was it initialized?";
+		assert version.getPathUuid() != null: "Path is null; was it initialized?";
 		return statusAtPositionDb.getStatusAtPositionNid(
 				uuidToNid(version.getStatusUuid()), 
 				uuidToNid(version.getPathUuid()), 
@@ -95,10 +105,12 @@ public class Bdb {
 	}
 
 	public static StatusAtPositionBdb getStatusAtPositionDb() {
+		assert statusAtPositionDb != null;
 		return statusAtPositionDb;
 	}
 	
 	public static ConceptBdb getConceptDb() {
+		assert conceptDb != null;
 		return conceptDb;
 	}
 
@@ -113,14 +125,6 @@ public class Bdb {
 		throw new UnsupportedOperationException();
 	}
 	
-	public static int uuidToNid(UUID uuid) {
-		return uuidsToNidMap.uuidToNid(uuid);
-	}
-	
-	public static int uuidsToNid(Collection<UUID> uuids) {
-		return uuidsToNidMap.uuidsToNid(uuids);
-	}
-
 	public static UuidsToNidMap getUuidsToNidMap() {
 		return uuidsToNidMap;
 	}
@@ -129,19 +133,39 @@ public class Bdb {
 		Bdb.uuidsToNidMap = uuidsToNidMap;
 	}
 
-	public static void sync() {
-		conceptDb.sync();
-		statusAtPositionDb.sync();
-		readWrite.bdbEnv.sync();
-		if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
-			readOnly.bdbEnv.sync();
+	private static Future<Boolean> syncFuture;
+	public static Future<Boolean> sync() throws InterruptedException, ExecutionException {
+		if (syncFuture != null) {
+			if (syncFuture.isDone() != true) {
+				syncFuture.get();
+			}
 		}
+		syncFuture = executorPool.submit(new Sync());
+		return syncFuture;
 	}
 	
+	private static class Sync implements Callable<Boolean> {
+
+		@Override
+		public Boolean call() throws Exception {
+			conceptDb.sync();
+			statusAtPositionDb.sync();
+			readWrite.bdbEnv.sync();
+			if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
+				readOnly.bdbEnv.sync();
+			}
+			return Boolean.TRUE;
+		}
+		
+	}
 	// Close the environment
-	public static void close() {
+	public static void close() throws InterruptedException, ExecutionException {
 		if (readWrite.bdbEnv != null) {
 			try {
+				if (syncFuture != null  &&
+						syncFuture.isDone() != true) {
+					syncFuture.get();
+				}
 				conceptDb.close();
 				statusAtPositionDb.close();
 				readWrite.bdbEnv.close();
@@ -150,5 +174,18 @@ public class Bdb {
 			}
 		}
 	}
+
+	public static NidCNidMap getNidCNidMap() {
+		return uuidsToNidMap.getNidCidMap();
+	}
+
+	public static int uuidsToNid(Collection<UUID> uuids) {
+		return uuidsToNidMap.uuidsToNidWithGeneration(uuids);
+	}
+
+	public static int uuidToNid(UUID uuid) {
+		return uuidsToNidMap.uuidToNidWithGeneration(uuid);
+	}
+
 
 }

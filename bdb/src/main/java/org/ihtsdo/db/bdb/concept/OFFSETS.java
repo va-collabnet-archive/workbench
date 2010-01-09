@@ -18,9 +18,15 @@ public enum OFFSETS {
 	REFSETNID_MEMBERNID_COMPONENTNID_FOR_COMPONENTS(4, REFSETNID_MEMBERNID_FOR_CONCEPT), // Binder done
 	;
 	
+	public static int CURRENT_FORMAT_VERSION = 1;
+	public static int CURRENT_DATA_VERSION = 1;
+
+	
 	protected int offset;
 	protected int bytes;
 	protected OFFSETS prev;
+	
+	
 	
 	OFFSETS(int bytes, OFFSETS prev) {
 		this.bytes = bytes;

@@ -3,7 +3,6 @@ package org.ihtsdo.db.bdb.concept.component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ihtsdo.db.bdb.Bdb;
@@ -20,7 +19,7 @@ public class ConceptComponentBinder<V extends Version<V, C>,
 	implements I_BindConceptComponents {
 
 
-    private static int maxReadOnlyStatusAtPositionId = Bdb.getStatusAtPositionDb().getReadOnlyMax();
+    private static final int maxReadOnlyStatusAtPositionId = Bdb.getStatusAtPositionDb().getReadOnlyMax();
 	private Concept enclosingConcept;
 	private ArrayList<C> readOnlyConceptComponentList;
 	private ComponentFactory<V, C> factory;
@@ -38,7 +37,10 @@ public class ConceptComponentBinder<V extends Version<V, C>,
 
 	@Override
 	public ArrayList<C> entryToObject(TupleInput input) {
+		assert enclosingConcept != null: "enclosing concept cannot be null.";
 		int listSize = input.readInt();
+		assert listSize >= 0: "Processing nid: " + enclosingConcept.getNid();
+		assert listSize < 1000000: "Processing nid: " + enclosingConcept.getNid();
 		if (readOnlyConceptComponentList != null) {
 			readOnlyConceptComponentList.ensureCapacity(listSize + readOnlyConceptComponentList.size());
 		}
@@ -54,19 +56,19 @@ public class ConceptComponentBinder<V extends Version<V, C>,
 			newConceptComponentList = new ArrayList<C>(listSize);
 		}
 		for (int index = 0; index < listSize; index++) {
+			// All components must write the nid first...
+			input.mark(16);
 			int nid = input.readInt();
-			UUID primordialUuid = new UUID(input.readLong(), input.readLong());
-			int partCount = input.readShort();
+			// we have to put it back so the component can read it again...
+			input.reset();
 			C conceptComponent;
 			if (nidToConceptComponentMap != null && nidToConceptComponentMap.containsKey(nid)) {
 				conceptComponent = nidToConceptComponentMap.get(nid);
-				int totalSize = conceptComponent.additionalVersions.size() + partCount;
-				conceptComponent.additionalVersions.ensureCapacity(totalSize);
+				conceptComponent.readComponentFromBdb(input);
 			} else {
-				conceptComponent = factory.create(nid, partCount, enclosingConcept, input, primordialUuid);
+				conceptComponent = factory.create(enclosingConcept, input);
 				newConceptComponentList.add(conceptComponent);
 			}
-			conceptComponent.readComponentFromBdb(input, partCount);
 		}
 		newConceptComponentList.trimToSize();
 		return newConceptComponentList;

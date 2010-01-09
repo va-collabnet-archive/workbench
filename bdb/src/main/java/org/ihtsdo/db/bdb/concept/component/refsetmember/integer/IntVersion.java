@@ -17,6 +17,22 @@ public class IntVersion extends RefsetVersion<IntVersion, IntMember>
 
 	private int intValue;
 	
+	public String toString() {
+		return " intValue: " + intValue + " " +super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (IntVersion.class.isAssignableFrom(obj.getClass())) {
+			IntVersion another = (IntVersion) obj;
+			if (this.intValue != another.intValue) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
+
 	public IntVersion(int statusNid, int pathNid, long time, 
 			IntMember primoridalMember) {
 		super(statusNid, pathNid, time, 

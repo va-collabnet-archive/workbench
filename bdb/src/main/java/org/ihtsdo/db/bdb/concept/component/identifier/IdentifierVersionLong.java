@@ -10,7 +10,7 @@ public class IdentifierVersionLong extends IdentifierVersion {
 	private long longDenotation;
 
 	public IdentifierVersionLong(TupleInput input) {
-		super(input.readInt());
+		super(input);
 		longDenotation = input.readLong();
 	}
 
@@ -39,5 +39,18 @@ public class IdentifierVersionLong extends IdentifierVersion {
 		longDenotation = (Long) sourceDenotation;
 	}
 
+	@Override
+	public String toString() {
+		return "denotation: " + longDenotation + " " + super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (IdentifierVersionLong.class.isAssignableFrom(obj.getClass())) {
+			IdentifierVersionLong another = (IdentifierVersionLong) obj;
+			return this.longDenotation == another.longDenotation && super.equals(another);
+		}
+		return false;
+	}
 
 }

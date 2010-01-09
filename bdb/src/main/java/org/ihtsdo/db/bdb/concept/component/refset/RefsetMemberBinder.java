@@ -3,7 +3,6 @@ package org.ihtsdo.db.bdb.concept.component.refset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ihtsdo.db.bdb.Bdb;
@@ -22,18 +21,6 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 	public static AtomicInteger written = new AtomicInteger();
 
 	private static int maxReadOnlyStatusAtPositionId = Bdb.getStatusAtPositionDb().getReadOnlyMax();
-	
-	private static ThreadLocal<RefsetMemberBinder>  binders = 
-		new ThreadLocal<RefsetMemberBinder>() {
-
-		@Override
-		protected RefsetMemberBinder initialValue() {
-			return new RefsetMemberBinder();
-		}
-	};
-	public static RefsetMemberBinder getBinder() {
-		return binders.get();
-	}
 
 	RefsetMemberFactory factory = new RefsetMemberFactory();
 
@@ -58,21 +45,17 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 		} else {
 			newRefsetMemberList = new ArrayList<RefsetMember<?, ?>>(listSize);
 		}
+		
 		for (int index = 0; index < listSize; index++) {
 			int nid = input.readInt();
-			UUID primoridalUuid = new UUID(input.readLong(), input.readLong());
-			int partCount = input.readShort();
 			RefsetMember<?, ?> refsetMember;
 			if (nidToRefsetMemberMap != null && nidToRefsetMemberMap.containsKey(nid)) {
 				refsetMember = nidToRefsetMemberMap.get(nid);
-				int totalSize = refsetMember.additionalVersions.size() + partCount;
-				refsetMember.additionalVersions.ensureCapacity(totalSize);
+				refsetMember.readComponentFromBdb(input);
 			} else {
-				refsetMember = factory.create(nid, partCount, enclosingConcept, 
-						input, primoridalUuid);
+				refsetMember = factory.create(nid, enclosingConcept, input);
 				newRefsetMemberList.add(refsetMember);
 			}
-			refsetMember.readComponentFromBdb(input, partCount);
 		}
 		newRefsetMemberList.trimToSize();
 		return newRefsetMemberList;
@@ -101,6 +84,7 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 		output.writeInt(refsetMembersToWrite.size()); // List size
 		for (RefsetMember<?, ?> refsetMember: refsetMembersToWrite) {
 			written.incrementAndGet();
+			output.writeInt(refsetMember.nid);
 			refsetMember.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
 		}
 	}

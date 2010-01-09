@@ -17,6 +17,22 @@ public class LongVersion extends RefsetVersion<LongVersion, LongMember>
 
 	private long longValue;
 	
+	public String toString() {
+		return " longValue: " + longValue + " " +super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (LongVersion.class.isAssignableFrom(obj.getClass())) {
+			LongVersion another = (LongVersion) obj;
+			if (this.longValue != another.longValue) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
+
 	public LongVersion(int statusNid, int pathNid, long time, 
 			LongMember primoridalMember) {
 		super(statusNid, pathNid, time, 

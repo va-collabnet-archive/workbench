@@ -1,28 +1,27 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidInt;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidFloat.CidFloatMember;
 import org.ihtsdo.etypes.ERefsetCidIntMember;
 import org.ihtsdo.etypes.ERefsetCidIntVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidIntMember extends RefsetMember<CidIntVersion, CidIntMember> {
 
 	private int c1Nid;
 	private int intValue;
 
-	public CidIntMember(int nid, int partCount, 
-			Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, partCount, enclosingConcept, 
-				primordialUuid);
+	public CidIntMember(Concept enclosingConcept, TupleInput input) {
+		super(enclosingConcept, input);
 	}
 
 	public CidIntMember(ERefsetCidIntMember refsetMember, Concept enclosingConcept) {
@@ -38,15 +37,40 @@ public class CidIntMember extends RefsetMember<CidIntVersion, CidIntMember> {
 	}
 
 	@Override
-	protected final void readMemberParts(TupleInput input) {
-		c1Nid = input.readInt();
-		intValue = input.readInt();
-		if (additionalVersions != null) {
-			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new CidIntVersion(input, this));
-			}
+	protected boolean membersEqual(
+			ConceptComponent<CidIntVersion, CidIntMember> obj) {
+		if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
+			CidIntMember another = (CidIntMember) obj;
+			return this.c1Nid == another.c1Nid && this.intValue == another.intValue;
+		}
+		return false;
+	}
+
+	@Override
+	protected final void readMemberParts(TupleInput input,
+			int additionalVersionCount) {
+		if (additionalVersions == null) {
+			additionalVersions = new ArrayList<CidIntVersion>(
+					additionalVersionCount);
+		} else {
+			additionalVersions.ensureCapacity(additionalVersions.size()
+					+ additionalVersionCount);
+		}
+		for (int i = 0; i < additionalVersionCount; i++) {
+			additionalVersions.add(new CidIntVersion(input, this));
 		}
 	}
+	@Override
+	protected void readMember(TupleInput input) {
+		c1Nid = input.readInt();
+		intValue = input.readInt();
+	}
+	@Override
+	protected void writeMember(TupleOutput output) {
+		output.writeInt(c1Nid);
+		output.writeInt(intValue);
+	}
+
 
 	@Override
 	protected ArrayIntList getVariableVersionNids() {

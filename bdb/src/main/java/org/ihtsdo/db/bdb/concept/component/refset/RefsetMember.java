@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
@@ -16,6 +15,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.etypes.ERefset;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -30,17 +30,13 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 	private int referencedComponentNid;
 
 
-	public RefsetMember(int nid, int partCount, Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, partCount, enclosingConcept, 
-				primordialUuid);
+	public RefsetMember(Concept enclosingConcept, TupleInput input) {
+		super(enclosingConcept, input);
 	}
 	
 	public RefsetMember(ERefset<?> refsetMember, 
 			Concept enclosingConcept) {
-		super(Bdb.uuidsToNid(refsetMember.getUuids()), 
-				refsetMember.getVersionCount(), enclosingConcept,
-				refsetMember.primordialComponentUuid);
+		super(refsetMember, enclosingConcept);
 		memberTypeNid = refsetMember.getType().getTypeNid();
 		referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());
 		primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(refsetMember);
@@ -48,36 +44,57 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 	}
 	
 
-	public void readFromBdb(TupleInput input, int listSize)  {
-		memberTypeNid = input.readInt();
-		referencedComponentNid = input.readInt();
-		readMemberParts(input);
-		throw new UnsupportedOperationException();
+	@Override
+	public boolean fieldsEqual(ConceptComponent<V, C> obj) {
+		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
+			RefsetMember<V,C> another = (RefsetMember<V,C>) obj;
+			if (this.memberTypeNid != another.memberTypeNid) {
+				return false;
+			}
+			if (membersEqual(obj)) {
+				return conceptComponentFieldsEqual(another);
+			}
+		}
+		return false;
 	}
 
-	protected abstract void readMemberParts(TupleInput input);
+	protected abstract boolean membersEqual(ConceptComponent<V, C> obj);
+
+	public void readFromBdb(TupleInput input)  {
+		memberTypeNid = input.readInt();
+		referencedComponentNid = input.readInt();
+		readMember(input);
+		int additionalVersionCount = input.readShort();
+		readMemberParts(input, additionalVersionCount);
+	}
+
+	protected abstract void readMember(TupleInput input);
+
+	protected abstract void readMemberParts(TupleInput input, int additionalVersionCount);
 
 
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-		List<RefsetVersion<V, C>> partsToWrite = new ArrayList<RefsetVersion<V, C>>();
+		List<RefsetVersion<V, C>> additionalVersionsToWrite = new ArrayList<RefsetVersion<V, C>>();
 		if (additionalVersions != null) {
 			for (RefsetVersion<V, C> p: additionalVersions) {
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
-					partsToWrite.add(p);
+					additionalVersionsToWrite.add(p);
 				}
 			}
 		}
-		output.writeShort(partsToWrite.size());
 		output.writeInt(referencedComponentNid);
 		output.writeInt(memberTypeNid);
-
-		for (RefsetVersion<V, C> p: partsToWrite) {
+		writeMember(output);
+		output.writeShort(additionalVersionsToWrite.size());
+		for (RefsetVersion<V, C> p: additionalVersionsToWrite) {
 			p.writePartToBdb(output);
 		}		
 	}
 
-
+	protected abstract void writeMember(TupleOutput output);
+	
+	
 	@Override
 	public boolean promote(I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)

@@ -1,17 +1,18 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetCidCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidCidStrVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidCidStrMember extends RefsetMember<CidCidStrVersion, CidCidStrMember> {
 
@@ -19,11 +20,8 @@ public class CidCidStrMember extends RefsetMember<CidCidStrVersion, CidCidStrMem
 	private int c2Nid;
 	private String strValue;
 
-	public CidCidStrMember(int nid, int partCount, 
-			Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, partCount, enclosingConcept, 
-				primordialUuid);
+	public CidCidStrMember(Concept enclosingConcept, TupleInput input) {
+		super(enclosingConcept, input);
 	}
 
 	public CidCidStrMember(ERefsetCidCidStrMember refsetMember, Concept enclosingConcept) {
@@ -39,16 +37,42 @@ public class CidCidStrMember extends RefsetMember<CidCidStrVersion, CidCidStrMem
 		}
 	}
 
+
 	@Override
-	protected final void readMemberParts(TupleInput input) {
+	protected boolean membersEqual(
+			ConceptComponent<CidCidStrVersion, CidCidStrMember> obj) {
+		if (CidCidStrMember.class.isAssignableFrom(obj.getClass())) {
+			CidCidStrMember another = (CidCidStrMember) obj;
+			return this.c1Nid == another.c1Nid && this.c2Nid == another.c2Nid && this.strValue.equals(another.strValue);
+		}
+		return false;
+	}
+
+	@Override
+	protected final void readMemberParts(TupleInput input,
+			int additionalVersionCount) {
+		if (additionalVersions == null) {
+			additionalVersions = new ArrayList<CidCidStrVersion>(
+					additionalVersionCount);
+		} else {
+			additionalVersions.ensureCapacity(additionalVersions.size()
+					+ additionalVersionCount);
+		}
+		for (int i = 0; i < additionalVersionCount; i++) {
+			additionalVersions.add(new CidCidStrVersion(input, this));
+		}
+	}
+	@Override
+	protected void readMember(TupleInput input) {
 		c1Nid = input.readInt();
 		c2Nid = input.readInt();
 		strValue = input.readString();
-		if (additionalVersions != null) {
-			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new CidCidStrVersion(input, this));
-			}
-		}
+	}
+	@Override
+	protected void writeMember(TupleOutput output) {
+		output.writeInt(c1Nid);
+		output.writeInt(c2Nid);
+		output.writeString(strValue);
 	}
 
 	@Override

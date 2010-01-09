@@ -1,7 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refset;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.Concept;
@@ -39,8 +38,8 @@ import com.sleepycat.bind.tuple.TupleInput;
 public class RefsetMemberFactory  {
 
 	@SuppressWarnings("unchecked")
-	public RefsetMember create(int nid, int partCount, Concept enclosingConcept,
-			TupleInput input, UUID primoridalUuid) {
+	public RefsetMember create(int nid, Concept enclosingConcept,
+			TupleInput input) {
 		assert enclosingConcept != null;
 		int typeNid = input.readInt();
 		REFSET_TYPES memberType;
@@ -53,44 +52,31 @@ public class RefsetMemberFactory  {
 		}
 		switch (memberType) {
 		case BOOLEAN:
-			return new BooleanMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new BooleanMember(enclosingConcept, input);
 		case CID:
-			return new CidMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new CidMember(enclosingConcept, input);
 		case CID_CID:
-			return new CidCidMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new CidCidMember(enclosingConcept, input);
 		case CID_CID_CID:
-			return new CidCidCidMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new CidCidCidMember(enclosingConcept, input);
 		case CID_CID_STR:
-			return new CidCidStrMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new CidCidStrMember(enclosingConcept, input);
 		case CID_INT:
-			return new CidIntMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new CidIntMember(enclosingConcept, input);
 		case CID_STR:
-			return new CidStrMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new CidStrMember(enclosingConcept, input);
 		case INT:
-			return new IntMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new IntMember(enclosingConcept, input);
 		case CID_FLOAT:
-			return new CidFloatMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new CidFloatMember(enclosingConcept, input);
 		case MEMBER:
-			return new MembershipMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new MembershipMember(enclosingConcept, input);
 		case STR:
-			return new StrMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new StrMember(enclosingConcept, input);
 		case CID_LONG:
-			return new CidLongMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new CidLongMember(enclosingConcept, input);
 		case LONG:
-			return new LongMember(nid, partCount, enclosingConcept,
-					primoridalUuid);
+			return new LongMember(enclosingConcept, input);
 
 		default:
 			throw new UnsupportedOperationException(

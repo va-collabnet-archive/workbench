@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.je.Database;
 
-public class NidData {
+public class NidDataFromBdb implements I_GetNidData {
 
 	public static enum REF_TYPE {SOFT, WEAK};
 	
@@ -24,7 +24,7 @@ public class NidData {
 	private Reference<byte[]> readOnlyBytes;
 	private byte[] readWriteBytes;
 
-	public NidData(int nid, Database readOnly, Database readWrite) {
+	public NidDataFromBdb(int nid, Database readOnly, Database readWrite) {
 		super();
 		this.nid = nid;
 		this.readOnly = readOnly;
@@ -32,7 +32,10 @@ public class NidData {
 		readWriteFuture = Bdb.getExecutorPool().submit(new GetNidData(nid, readWrite));
 	}
 
-	public byte[] getReadOnlyBytes() throws InterruptedException, ExecutionException, IOException {
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.I_GetNidData#getReadOnlyBytes()
+	 */
+	public synchronized byte[] getReadOnlyBytes() throws InterruptedException, ExecutionException, IOException {
 		if (readOnlyBytes == null) {
 			byte[] bytes = readOnlyFuture.get();
 			switch (refType) {
@@ -55,18 +58,27 @@ public class NidData {
 		return bytes;
 	}
 
-	public byte[] getReadWriteBytes() throws InterruptedException, ExecutionException {
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.I_GetNidData#getReadWriteBytes()
+	 */
+	public  synchronized byte[] getReadWriteBytes() throws InterruptedException, ExecutionException {
 		if (readWriteBytes == null) {
 			readWriteBytes = readWriteFuture.get();
 		}
 		return readWriteBytes;
 	}
 	
-	public TupleInput getReadOnlyTupleInput() throws InterruptedException, ExecutionException, IOException {
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.I_GetNidData#getReadOnlyTupleInput()
+	 */
+	public  synchronized TupleInput getReadOnlyTupleInput() throws InterruptedException, ExecutionException, IOException {
 		return new TupleInput(getReadOnlyBytes());
 	}
 
-	public TupleInput getReadWriteTupleInput() throws InterruptedException, ExecutionException {
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.db.bdb.I_GetNidData#getReadWriteTupleInput()
+	 */
+	public  synchronized TupleInput getReadWriteTupleInput() throws InterruptedException, ExecutionException {
 		return new TupleInput(getReadWriteBytes());
 	}
 

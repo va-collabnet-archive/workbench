@@ -54,7 +54,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	}
 
 	public enum IDENTIFIER_PART_TYPES {
-		LONG(1), STRING(2), UUID(3), PRIMORDIAL(4);
+		LONG(1), STRING(2), UUID(3);
 
 		private int partTypeId;
 
@@ -62,10 +62,6 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 			this.partTypeId = partTypeId;
 		}
 
-		public void writeType(TupleOutput output) {
-			output.writeByte(partTypeId);
-		}
-		
 		public static IDENTIFIER_PART_TYPES getType(Class<?> denotationClass) {
 			if (UUID.class.isAssignableFrom(denotationClass)) {
 				return UUID;
@@ -77,18 +73,21 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 			throw new UnsupportedOperationException(denotationClass.toString());
 		}
 
+		public void writeType(TupleOutput output) {
+			output.writeByte(partTypeId);
+		}
+		
 		public static IDENTIFIER_PART_TYPES readType(TupleInput input) {
-			switch (input.readByte()) {
+			int partTypeId = input.readByte();
+			switch (partTypeId) {
 			case 1:
 				return LONG;
 			case 2:
 				return STRING;
 			case 3:
 				return UUID;
-			case 4:
-				return PRIMORDIAL;
 			}
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException("partTypeId: " + partTypeId);
 		}
 	};
 
@@ -115,29 +114,42 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	public long primordialUuidLsb = 0;
 	
 	public ArrayList<V> additionalVersions;
-	private ArrayList<IdentifierVersion> identifierParts;
+	private ArrayList<IdentifierVersion> additionalIdentifierParts;
 	
-	protected ConceptComponent(int nid, int versionCount, 
-			Concept enclosingConcept, UUID primordialUuid) {
-		super();
-		assert nid != Integer.MAX_VALUE;
-		assert nid != Integer.MIN_VALUE;
-		assert enclosingConcept != null;
-		assert primordialUuid != null;
-		this.nid = nid;
-		this.enclosingConcept = enclosingConcept;
-		this.additionalVersions = new ArrayList<V>(versionCount - 1);
-		this.primordialUuidMsb = primordialUuid.getMostSignificantBits();
-		this.primordialUuidLsb = primordialUuid.getLeastSignificantBits();
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("primordialUuidMsb: ");
+		buf.append(primordialUuidMsb);
+		buf.append(" primordialUuidLsb: ");
+		buf.append(primordialUuidLsb);
+		buf.append(" additionalIdParts: " + additionalIdentifierParts);
+		buf.append(" additionalVersions: " + additionalVersions);
+		return buf.toString();
+		
 	}
 	
+	protected ConceptComponent(Concept enclosingConcept, TupleInput input) {
+		super();
+		assert enclosingConcept != null;
+		this.enclosingConcept = enclosingConcept;
+		readComponentFromBdb(input);
+		if (this.primordialUuidMsb == 0) {
+			System.out.println("bad id"); // TODO remove me...
+		}
+		assert this.primordialUuidMsb != 0 : "Processing nid: " + enclosingConcept.getNid();
+		assert this.primordialUuidLsb != 0: "Processing nid: " + enclosingConcept.getNid();
+		assert nid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
+		assert nid != Integer.MIN_VALUE: "Processing nid: " + enclosingConcept.getNid();
+	}
+	
+	//TODO move the EComponent constructors to a helper class or factory class...
+	// So that the size of this class is kept limited. 
 	protected ConceptComponent(EComponent<?> eComponent,
 			Concept enclosingConcept) {
 		super();
-		assert nid != Integer.MAX_VALUE;
-		assert nid != Integer.MIN_VALUE;
 		assert enclosingConcept != null;
 		this.nid = Bdb.uuidToNid(eComponent.primordialComponentUuid);
+		assert this.nid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
 		this.enclosingConcept = enclosingConcept;
 		this.primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(eComponent);
 		if (eComponent.getVersionCount() > 1) {
@@ -146,24 +158,28 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		this.primordialUuidMsb = eComponent.getPrimordialComponentUuid().getMostSignificantBits();
 		this.primordialUuidLsb = eComponent.getPrimordialComponentUuid().getLeastSignificantBits();
 		convertId(eComponent.additionalIdComponents);
+		assert this.primordialUuidMsb != 0: "Processing nid: " + enclosingConcept.getNid();
+		assert this.primordialUuidLsb != 0: "Processing nid: " + enclosingConcept.getNid();
+		assert nid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
+		assert nid != Integer.MIN_VALUE: "Processing nid: " + enclosingConcept.getNid();
 	}
 	
 	public void convertId(List<EIdentifierVersion> list)  {
 		if (list == null || list.size() == 0) {
 			return;
 		}
-		identifierParts = new ArrayList<IdentifierVersion>(list.size());
+		additionalIdentifierParts = new ArrayList<IdentifierVersion>(list.size());
 		for (EIdentifierVersion idv: list) {
 			Object denotation = idv.getDenotation();
 			switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
 			case LONG:
-				identifierParts.add(new IdentifierVersionLong((EIdentifierVersionLong)idv));
+				additionalIdentifierParts.add(new IdentifierVersionLong((EIdentifierVersionLong)idv));
 				break;
 			case STRING:
-				identifierParts.add(new IdentifierVersionString((EIdentifierVersionString)idv));
+				additionalIdentifierParts.add(new IdentifierVersionString((EIdentifierVersionString)idv));
 				break;
 			case UUID:
-				identifierParts.add(new IdentifierVersionUuid((EIdentifierVersionUuid)idv));
+				additionalIdentifierParts.add(new IdentifierVersionUuid((EIdentifierVersionUuid)idv));
 				
 				break;
 			default:
@@ -187,22 +203,25 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		this.primordialStatusAtPositionNid = sapNid;
 	}
 	
-	private void readIdentifierFromBdb(TupleInput input, int listSize) {
+	private void readIdentifierFromBdb(TupleInput input) {
 		// nid, list size, and conceptNid are read already by the binder...
+		primordialUuidMsb = input.readLong();
+		primordialUuidLsb = input.readLong();
+		int listSize = input.readShort();
+		if (listSize != 0) {
+			additionalIdentifierParts = new ArrayList<IdentifierVersion>(listSize);
+		}
 		for (int i = 0; i < listSize; i++) {
 			switch (IDENTIFIER_PART_TYPES.readType(input)) {
 			case LONG:
-				identifierParts.add(new IdentifierVersionLong(input));
+				additionalIdentifierParts.add(new IdentifierVersionLong(input));
 				break;
 			case STRING:
-				identifierParts.add(new IdentifierVersionString(input));
+				IdentifierVersionString idv = new IdentifierVersionString(input);
+				additionalIdentifierParts.add(idv);
 				break;
 			case UUID:
-				identifierParts.add(new IdentifierVersionUuid(input));
-				break;
-			case PRIMORDIAL:
-				primordialUuidMsb = input.readLong();
-				primordialUuidLsb = input.readLong();
+				additionalIdentifierParts.add(new IdentifierVersionUuid(input));
 				break;
 				default:
 					throw new UnsupportedOperationException();
@@ -212,25 +231,22 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	private final void writeIdentifierToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
-		assert primordialStatusAtPositionNid != Integer.MAX_VALUE;
+		assert primordialStatusAtPositionNid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
+		assert primordialUuidMsb != 0: "Processing nid: " + enclosingConcept.getNid();
+		assert primordialUuidLsb != 0: "Processing nid: " + enclosingConcept.getNid();
+		output.writeLong(primordialUuidMsb);
+		output.writeLong(primordialUuidLsb);
 		List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
-		if (identifierParts != null) {
-			for (IdentifierVersion p: identifierParts) {
+		if (additionalIdentifierParts != null) {
+			for (IdentifierVersion p: additionalIdentifierParts) {
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 					partsToWrite.add(p);
 				}
 			}
 		}
 		// Start writing
-		output.writeInt(nid);
-		if (primordialStatusAtPositionNid > maxReadOnlyStatusAtPositionNid) {
-			output.writeShort(partsToWrite.size() + 1);
-			IDENTIFIER_PART_TYPES.PRIMORDIAL.writeType(output);
-			output.writeLong(primordialUuidMsb);
-			output.writeLong(primordialUuidLsb);
-		} else {
-			output.writeShort(partsToWrite.size());
-		}
+		
+		output.writeShort(partsToWrite.size());
 		for (IdentifierVersion p: partsToWrite) {
 			p.getType().writeType(output);
 			p.writeIdPartToBdb(output);
@@ -242,16 +258,16 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		return addIdVersion((IdentifierVersion) srcId);
 	}
 	public boolean addIdVersion(IdentifierVersion srcId) {
-		if (identifierParts == null) {
-			identifierParts = new ArrayList<IdentifierVersion>();
+		if (additionalIdentifierParts == null) {
+			additionalIdentifierParts = new ArrayList<IdentifierVersion>();
 		}
-		return identifierParts.add(srcId);
+		return additionalIdentifierParts.add(srcId);
 	}
 
 	@Override
 	public final List<I_IdVersion> getIdVersions() {
 		List<I_IdVersion> returnValues = new ArrayList<I_IdVersion>();
-		returnValues.addAll(identifierParts);
+		returnValues.addAll(additionalIdentifierParts);
 		returnValues.add(this);
 		return Collections.unmodifiableList(returnValues);
 	}
@@ -295,7 +311,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	public final List<UUID> getUUIDs() {
 		List<UUID> returnValues = new ArrayList<UUID>();
 		returnValues.add(new UUID(primordialUuidMsb, primordialUuidLsb));
-		for (IdentifierVersion idv : identifierParts) {
+		for (IdentifierVersion idv : additionalIdentifierParts) {
 			if (IdentifierVersionUuid.class.isAssignableFrom(idv
 					.getClass())) {
 				IdentifierVersionUuid uuidPart = (IdentifierVersionUuid) idv;
@@ -309,10 +325,10 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	public UniversalAceIdentification getUniversalId() throws IOException,
 			TerminologyException {
         UniversalAceIdentification universal = new UniversalAceIdentification(1);
-		if (identifierParts == null) {
+		if (additionalIdentifierParts == null) {
 			universal = new UniversalAceIdentification(1);
 		} else {
-			universal = new UniversalAceIdentification(identifierParts.size() + 1);
+			universal = new UniversalAceIdentification(additionalIdentifierParts.size() + 1);
 		}
         UniversalAceIdentificationPart universalPart = new UniversalAceIdentificationPart();
         universalPart.setIdStatus(getUuids(getStatusId()));
@@ -321,8 +337,8 @@ public abstract class ConceptComponent<V extends Version<V, C>,
         universalPart.setSourceId(getDenotation());
         universalPart.setTime(getTime());
         universal.addVersion(universalPart);
-        if (identifierParts != null) {
-            for (IdentifierVersion part : identifierParts) {
+        if (additionalIdentifierParts != null) {
+            for (IdentifierVersion part : additionalIdentifierParts) {
                 universalPart = new UniversalAceIdentificationPart();
                 universalPart.setIdStatus(getUuids(part.getStatusId()));
                 universalPart.setPathId(getUuids(part.getPathId()));
@@ -345,7 +361,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	@Override
 	public boolean hasMutableIdPart(I_IdPart newPart) {
-		return identifierParts.contains(newPart);
+		return additionalIdentifierParts.contains(newPart);
 	}
 
 
@@ -382,19 +398,21 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		return nid;
 	}
 
-	public final void readComponentFromBdb(TupleInput input, int listSize) {
+	public final void readComponentFromBdb(TupleInput input) {
 		nid = input.readInt();
-		readIdentifierFromBdb(input, listSize);
-		readFromBdb(input, listSize);
+		primordialStatusAtPositionNid = input.readInt();
+		readIdentifierFromBdb(input);
+		readFromBdb(input);
 	}
 	
 	public final void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		output.writeInt(nid);
+		output.writeInt(primordialStatusAtPositionNid);
 		writeIdentifierToBdb(output, maxReadOnlyStatusAtPositionNid);
 		writeToBdb(output, maxReadOnlyStatusAtPositionNid);
 	}
 
-	public abstract void readFromBdb(TupleInput input, int listSize);
+	public abstract void readFromBdb(TupleInput input);
 	
 	public abstract void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid);
 	
@@ -402,7 +420,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	 * Below methods have confusing naming, and should be considered for deprecation...
 	 */
 	public final List<? extends I_IdVersion> getMutableIdParts() {
-		return identifierParts;
+		return additionalIdentifierParts;
 	}
 
 	public final boolean addVersion(V newPart) {
@@ -539,5 +557,47 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	protected Concept getEnclosingConcept() {
 		return enclosingConcept;
+	}
+	
+	public abstract boolean fieldsEqual(ConceptComponent<V, C> another);
+	
+	public boolean conceptComponentFieldsEqual(ConceptComponent<V, C> another) { 
+		if (this.nid != another.nid) {
+			return false;
+		}
+		if (this.primordialStatusAtPositionNid != another.primordialStatusAtPositionNid) {
+			return false;
+		}
+		if (this.primordialUuidLsb != another.primordialUuidLsb) {
+			return false;
+		}
+		if (this.primordialUuidMsb != another.primordialUuidMsb) {
+			return false;
+		}
+		if (this.additionalIdentifierParts != null && another.additionalIdentifierParts == null) {
+			return false;
+		}
+		if (this.additionalIdentifierParts == null && another.additionalIdentifierParts != null) {
+			return false;
+		}
+		if (this.additionalIdentifierParts != null) {
+			if (this.additionalIdentifierParts.equals(another.additionalIdentifierParts) == false) {
+				return false;
+			}
+		}
+		if (this.additionalVersions != null && another.additionalVersions == null) {
+			return false;
+		}
+		if (this.additionalVersions == null && another.additionalVersions != null) {
+			return false;
+		}
+		if (this.additionalVersions != null) {
+			if (this.additionalVersions.equals(another.additionalVersions) == false) {
+				return false;
+			}
+		}
+			
+		
+		return true;
 	}
 }

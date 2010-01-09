@@ -1,17 +1,18 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidLong;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetCidLongMember;
 import org.ihtsdo.etypes.ERefsetCidLongVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidLongMember 
 				extends RefsetMember<CidLongVersion, CidLongMember> {
@@ -19,11 +20,8 @@ public class CidLongMember
 	private int c1Nid;
 	private long longValue;
 
-	public CidLongMember(int nid, int partCount, 
-			Concept enclosingConcept, 
-			UUID primordialUuid) {
-		super(nid, partCount, enclosingConcept, 
-				primordialUuid);
+	public CidLongMember(Concept enclosingConcept, TupleInput input) {
+		super(enclosingConcept, input);
 	}
 
 	public CidLongMember(ERefsetCidLongMember refsetMember, Concept enclosingConcept) {
@@ -37,16 +35,39 @@ public class CidLongMember
 			}
 		}
 	}
+	@Override
+	protected boolean membersEqual(
+			ConceptComponent<CidLongVersion, CidLongMember> obj) {
+		if (CidLongMember.class.isAssignableFrom(obj.getClass())) {
+			CidLongMember another = (CidLongMember) obj;
+			return this.c1Nid == another.c1Nid && this.longValue == another.longValue;
+		}
+		return false;
+	}
 
 	@Override
-	protected final void readMemberParts(TupleInput input) {
+	protected final void readMemberParts(TupleInput input,
+			int additionalVersionCount) {
+		if (additionalVersions == null) {
+			additionalVersions = new ArrayList<CidLongVersion>(
+					additionalVersionCount);
+		} else {
+			additionalVersions.ensureCapacity(additionalVersions.size()
+					+ additionalVersionCount);
+		}
+		for (int i = 0; i < additionalVersionCount; i++) {
+			additionalVersions.add(new CidLongVersion(input, this));
+		}
+	}
+	@Override
+	protected void readMember(TupleInput input) {
 		c1Nid = input.readInt();
 		longValue = input.readLong();
-		if (additionalVersions != null) {
-			for (int i = 0; i < additionalVersions.size(); i++) {
-				additionalVersions.add(new CidLongVersion(input, this));
-			}
-		}
+	}
+	@Override
+	protected void writeMember(TupleOutput output) {
+		output.writeInt(c1Nid);
+		output.writeLong(longValue);
 	}
 
 	@Override

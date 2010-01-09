@@ -17,6 +17,25 @@ public class CidFloatVersion extends RefsetVersion<CidFloatVersion, CidFloatMemb
 	private int c1Nid;
 	private float floatValue;
 
+	public String toString() {
+		return " c1Nid: " + c1Nid + " floatValue: " + floatValue + " " +super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (CidFloatVersion.class.isAssignableFrom(obj.getClass())) {
+			CidFloatVersion another = (CidFloatVersion) obj;
+			if (this.c1Nid != another.c1Nid) {
+				return false;
+			}
+			if (this.floatValue != another.floatValue) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
+
 	public CidFloatVersion(int statusNid, int pathNid, long time, 
 			CidFloatMember primoridalMember) {
 		super(statusNid, pathNid, time, 

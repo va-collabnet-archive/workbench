@@ -21,6 +21,24 @@ public class CidIntVersion
 	private int c1Nid;
 	private int intValue;
 	
+	public String toString() {
+		return " c1Nid: " + c1Nid + " intValue: " + intValue + " " +super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (CidIntVersion.class.isAssignableFrom(obj.getClass())) {
+			CidIntVersion another = (CidIntVersion) obj;
+			if (this.c1Nid != another.intValue) {
+				return false;
+			}
+			if (this.intValue != another.intValue) {
+				return false;
+			}
+			return super.equals(obj);
+		}
+		return false;
+	}
 	protected CidIntVersion(int statusNid, int pathNid, long time, 
 			CidIntMember primoridalMember) {
 		super(statusNid, pathNid, time, 

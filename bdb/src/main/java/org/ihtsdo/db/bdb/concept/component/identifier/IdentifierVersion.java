@@ -9,6 +9,7 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.StatusAtPositionBdb;
@@ -16,6 +17,7 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.I_HandleFutureStatusAtPositionSetup;
 import org.ihtsdo.etypes.EIdentifierVersion;
 
+import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
@@ -30,9 +32,11 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 		this.statusAtPositionNid = sapBdb.getStatusAtPositionNid(statusNid, pathNid, time);
 	}
 
-	protected IdentifierVersion(int statusAtPositionNid) {
+	protected IdentifierVersion(TupleInput input) {
 		super();
-		this.statusAtPositionNid = statusAtPositionNid;
+		statusAtPositionNid = input.readInt();
+		authorityNid = input.readInt();
+		
 	}
 	
 	protected IdentifierVersion(EIdentifierVersion idv) {
@@ -171,5 +175,24 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 		return statusAtPositionNid;
 	}
 
+	
+	public String toString() {
+			return 	"statusAtPositionNid: " + statusAtPositionNid + " authorityNid: " + authorityNid;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (IdentifierVersion.class.isAssignableFrom(obj.getClass())) {
+			IdentifierVersion another = (IdentifierVersion) obj;
+			return this.statusAtPositionNid == another.statusAtPositionNid &&
+				this.authorityNid == another.authorityNid;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashFunction.hashCode(new int[] {statusAtPositionNid, authorityNid });
+	}
 
 }

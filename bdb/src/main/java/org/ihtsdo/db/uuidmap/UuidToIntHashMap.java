@@ -506,8 +506,15 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 
 		int j = 0;
 		for (int i = stat.length; i-- > 0;) {
-			if (stat[i] == FULL)
-				elements[j++] = tab[i];
+			if (stat[i] == FULL) {
+				int iMsb = i * 2;
+				int iLsb = iMsb + 1;
+				int jMsb = j * 2;
+				int jLsb = jMsb + 1;
+				elements[jMsb] = tab[iMsb];
+				elements[jLsb] = tab[iLsb];
+				j++;
+			}
 		}
 	}
 

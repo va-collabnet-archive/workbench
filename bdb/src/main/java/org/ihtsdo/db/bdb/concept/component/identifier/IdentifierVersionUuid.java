@@ -13,7 +13,7 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 	private long leastSigBits;
 	
 	public IdentifierVersionUuid(TupleInput input) {
-		super(input.readInt());
+		super(input);
 		mostSigBits = input.readLong();
 		leastSigBits = input.readLong();
 	}
@@ -49,6 +49,21 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 		UUID uuid = (UUID) sourceDenotation;
 		mostSigBits = uuid.getMostSignificantBits();
 		leastSigBits = uuid.getLeastSignificantBits();
+	}
+
+	@Override
+	public String toString() {
+		return "denotation: " + getUuid() + " " + super.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (IdentifierVersionUuid.class.isAssignableFrom(obj.getClass())) {
+			IdentifierVersionUuid another = (IdentifierVersionUuid) obj;
+			return this.mostSigBits == another.mostSigBits && 
+			this.leastSigBits == another.leastSigBits && super.equals(another);
+		}
+		return false;
 	}
 
 }
