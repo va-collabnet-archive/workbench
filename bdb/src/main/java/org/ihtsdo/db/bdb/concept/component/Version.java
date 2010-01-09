@@ -167,6 +167,7 @@ public abstract class Version<V extends Version<V, C>,
 		return " sapNid: " + statusAtPositionNid;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object obj) {
 		if (Version.class.isAssignableFrom(obj.getClass())) {

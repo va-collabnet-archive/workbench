@@ -25,6 +25,7 @@ import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
@@ -559,6 +560,8 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		return enclosingConcept;
 	}
 	
+	
+	
 	public abstract boolean fieldsEqual(ConceptComponent<V, C> another);
 	
 	public boolean conceptComponentFieldsEqual(ConceptComponent<V, C> another) { 
@@ -599,5 +602,16 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 			
 		
 		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean equals(Object obj) {
+		return fieldsEqual((ConceptComponent<V, C>) obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return HashFunction.hashCode(new int[] { nid, primordialStatusAtPositionNid });
 	}
 }

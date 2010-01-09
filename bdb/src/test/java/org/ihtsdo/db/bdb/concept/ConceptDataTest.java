@@ -53,7 +53,7 @@ public class ConceptDataTest {
 	}
 
 	/**
-	 * Test method for {@link org.ihtsdo.db.bdb.concept.ConceptData#getDescriptions()}.
+	 * Test method for {@link org.ihtsdo.db.bdb.concept.ConceptDataSoftReference#getDescriptions()}.
 	 */
 	@Test
 	public void testGetDescriptions() {

@@ -75,10 +75,28 @@ public class Description
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("NativeId: ");
+		buf.append(nid);
+		buf.append(" cs: ");
+		buf.append(initialCaseSignificant);
+		buf.append(" text: ");
+		buf.append(text);
+		buf.append(" lang: ");
+		buf.append(lang);
+		buf.append(" typeNid: ");
+		buf.append(typeNid);
+		buf.append(" ");
+		buf.append(super.toString());
+		return buf.toString();
+	}
+
 
 	@Override
 	public boolean fieldsEqual(ConceptComponent<DescriptionVersion, Description> obj) {
-		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
+		if (Description.class.isAssignableFrom(obj.getClass())) {
 			Description another = (Description) obj;
 			if (this.initialCaseSignificant != another.initialCaseSignificant) {
 				return false;

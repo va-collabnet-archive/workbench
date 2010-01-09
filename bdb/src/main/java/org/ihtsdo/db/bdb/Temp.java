@@ -173,7 +173,7 @@ public class Temp {
     static {
         for (int i = 0; i < converterSize; i++) {
         	try {
-				converters.put(new ConvertConceptNoWrite());
+				converters.put(new ConvertConcept());
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
@@ -223,16 +223,15 @@ public class Temp {
 				newConcept = Concept.get(eConcept);
 				Concept newConcept = Concept.get(eConcept);
 				Concept newConcept1 = Concept.get(eConcept);
-				assert newConcept.getConceptAttributes().
-					conceptComponentFieldsEqual(newConcept1.getConceptAttributes()):
-						"\nattr1: " + newConcept.getConceptAttributes() + 
-						"\nattr2: " + newConcept1.getConceptAttributes();
-				Concept newConcept2 = Concept.get(eConcept);
-				assert newConcept.getConceptAttributes().
-					conceptComponentFieldsEqual(newConcept2.getConceptAttributes());
-				Concept newConcept3 = Concept.get(eConcept);
-				assert newConcept.getConceptAttributes().
-					conceptComponentFieldsEqual(newConcept3.getConceptAttributes());
+				assert newConcept.getConceptAttributes().conceptComponentFieldsEqual(newConcept1.getConceptAttributes()):
+					"\nattr1: " + newConcept.getConceptAttributes() + 
+					"\nattr2: " + newConcept1.getConceptAttributes();
+				assert newConcept.getDescriptions().equals(newConcept1.getDescriptions()):
+					"\ndesc1: " + newConcept.getDescriptions() + 
+					"\ndesc2: " + newConcept1.getDescriptions();
+				assert newConcept.getSourceRels().equals(newConcept1.getSourceRels()):
+					"\nrel1: " + newConcept.getSourceRels() + 
+					"\nrel2: " + newConcept1.getSourceRels();
 				
 				int nid = newConcept.getNid();
 				ConceptBinder binder = new ConceptBinder();
@@ -240,7 +239,16 @@ public class Temp {
 	    		binder.objectToEntry(newConcept, value);
 
 	    		Concept clone = Concept.get(nid, false, value);
-	    		clone.getConceptAttributes();
+	    		try {
+					clone.getConceptAttributes();
+				} catch (RuntimeException e) {
+					System.out.println(e.getLocalizedMessage());
+					System.out.println(value.toString());
+		    		value = new DatabaseEntry();
+		    		binder.objectToEntry(newConcept, value);
+					System.out.println(value.toString());
+					throw e;
+				}
 	    		Concept clone2 = Concept.get(nid, false, value);
 	    		clone2.getConceptAttributes();
 	    		Concept clone3 = Concept.get(nid, false, value);
@@ -279,11 +287,6 @@ public class Temp {
 			try {
 				newConcept = Concept.get(eConcept);
 				Bdb.getConceptDb().writeConcept(newConcept);
-				Concept clone = Bdb.getConceptDb().getConcept(newConcept.getNid());
-				String validationReport = clone.validate(newConcept);
-				if (validationReport.length() > 0) {
-					System.out.println(validationReport);
-				}
 				conceptsProcessed.incrementAndGet();
 			} catch (Throwable e) {
 				exception = e;

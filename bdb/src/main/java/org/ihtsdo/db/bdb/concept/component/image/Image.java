@@ -65,6 +65,22 @@ public class Image
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("NativeId: ");
+		buf.append(nid);
+		buf.append(" format: ");
+		buf.append(format);
+		buf.append(" textDescription: ");
+		buf.append(textDescription);
+		buf.append(" typeNid: ");
+		buf.append(typeNid);
+		buf.append(" ");
+		buf.append(super.toString());
+		return buf.toString();
+	}
+
 
 	@Override
 	public boolean fieldsEqual(ConceptComponent<ImageVersion, Image> obj) {

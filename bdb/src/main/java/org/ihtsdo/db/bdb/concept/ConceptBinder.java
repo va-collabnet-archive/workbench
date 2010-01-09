@@ -44,9 +44,9 @@ public class ConceptBinder extends TupleBinding<Concept> {
 
 		try {
 
-			ConceptData conceptData = concept.getData();
-			boolean primordial = conceptData.nidData.getReadOnlyBytes().length == 0
-					&& conceptData.nidData.getReadWriteBytes().length == 0;
+			I_ManageConceptData conceptData = concept.getData();
+			boolean primordial = conceptData.getReadOnlyBytes().length == 0
+					&& conceptData.getReadWriteBytes().length == 0;
 
 			byte[] attrOutput = getAttributeBytes(conceptData, primordial,
 					OFFSETS.ATTRIBUTES, conceptData.getAttributesRef(),
@@ -105,7 +105,7 @@ public class ConceptBinder extends TupleBinding<Concept> {
 	}
 
 	private byte[] getAttributeBytes(
-			ConceptData conceptData,
+			I_ManageConceptData conceptData,
 			boolean primordial,
 			OFFSETS offset,
 			SoftReference<ConceptAttributes> reference,
@@ -129,17 +129,17 @@ public class ConceptBinder extends TupleBinding<Concept> {
 	}
 
 	private <C extends ConceptComponent<V, C>, V extends Version<V, C>> byte[] getComponentBytes(
-			ConceptData conceptData, boolean primordial, OFFSETS offset,
-			SoftReference<ArrayList<C>> reference,
+			I_ManageConceptData conceptData, boolean primordial, OFFSETS offset,
+			SoftReference<ArrayList<C>> softReference,
 			ConceptComponentBinder<V, C> binder) throws InterruptedException,
 			ExecutionException, IOException {
 		byte[] componentBytes;
-		if (!primordial && reference == null) {
+		if (!primordial && softReference == null) {
 			componentBytes = getPreviousData(conceptData, offset, offset.prev);
 		} else {
 			TupleOutput output = new TupleOutput();
-			if (reference != null) {
-				binder.objectToEntry(reference.get(), output);
+			if (softReference != null) {
+				binder.objectToEntry(softReference.get(), output);
 				componentBytes = output.toByteArray();
 			} else {
 				componentBytes = zeroOutputArray;
@@ -151,7 +151,7 @@ public class ConceptBinder extends TupleBinding<Concept> {
 		return componentBytes;
 	}
 
-	private byte[] getRefsetBytes(ConceptData conceptData, boolean primordial,
+	private byte[] getRefsetBytes(I_ManageConceptData conceptData, boolean primordial,
 			OFFSETS offset,
 			SoftReference<ArrayList<RefsetMember<?, ?>>> reference,
 			RefsetMemberBinder binder) throws InterruptedException,
@@ -174,11 +174,10 @@ public class ConceptBinder extends TupleBinding<Concept> {
 		return componentBytes;
 	}
 
-	private byte[] getPreviousData(ConceptData conceptData, OFFSETS start,
+	private byte[] getPreviousData(I_ManageConceptData conceptData, OFFSETS start,
 			OFFSETS end) throws InterruptedException, ExecutionException, IOException {
 		byte[] output;
-		TupleInput readWriteInput = conceptData.nidData
-				.getReadWriteTupleInput();
+		TupleInput readWriteInput = conceptData.getReadWriteTupleInput();
 		byte[] bufferBytes = readWriteInput.getBufferBytes();
 		int offset = start.getOffset(bufferBytes);
 		int byteCount = end.getOffset(bufferBytes) - offset;

@@ -12,11 +12,12 @@ public enum OFFSETS {
 	DESCRIPTIONS(4, ATTRIBUTES),
 	SOURCE_RELS(4, DESCRIPTIONS),
 	IMAGES(4, SOURCE_RELS),
-	REFSET_MEMBERS(4, IMAGES),
+	REFSET_MEMBERS(4, IMAGES), 
 	DEST_REL_ORIGIN_NID_TYPE_NIDS(4, REFSET_MEMBERS), // Binder done
 	REFSETNID_MEMBERNID_FOR_CONCEPT(4, DEST_REL_ORIGIN_NID_TYPE_NIDS), // Binder done
-	REFSETNID_MEMBERNID_COMPONENTNID_FOR_COMPONENTS(4, REFSETNID_MEMBERNID_FOR_CONCEPT), // Binder done
-	;
+	REFSETNID_MEMBERNID_FOR_DESCRIPTIONS(4, REFSETNID_MEMBERNID_FOR_CONCEPT), // Binder done
+	REFSETNID_MEMBERNID_FOR_RELATIONSHIPS(4, REFSETNID_MEMBERNID_FOR_DESCRIPTIONS), // Binder done
+	HEADER_SIZE(0, REFSETNID_MEMBERNID_FOR_RELATIONSHIPS);
 	
 	public static int CURRENT_FORMAT_VERSION = 1;
 	public static int CURRENT_DATA_VERSION = 1;
@@ -25,8 +26,6 @@ public enum OFFSETS {
 	protected int offset;
 	protected int bytes;
 	protected OFFSETS prev;
-	
-	
 	
 	OFFSETS(int bytes, OFFSETS prev) {
 		this.bytes = bytes;
@@ -51,15 +50,7 @@ public enum OFFSETS {
 		return bytes;
 	}
 	
-	private static int headerSize = - 1;
 	public static int getHeaderSize() {
-		if (headerSize == -1) {
-			headerSize = 0;
-			for (OFFSETS off: OFFSETS.values()) {
-				headerSize = headerSize + off.bytes;
-			}
-		}
-		
-		return headerSize;
+		return HEADER_SIZE.getOffset();
 	}
 }

@@ -45,6 +45,20 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 	
 
 	@Override
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("NativeId: ");
+		buf.append(nid);
+		buf.append(" memberTypeNid: ");
+		buf.append(memberTypeNid);
+		buf.append(" referencedComponentNid: ");
+		buf.append(referencedComponentNid);
+		buf.append(" ");
+		buf.append(super.toString());
+		return buf.toString();
+	}
+
+	@Override
 	public boolean fieldsEqual(ConceptComponent<V, C> obj) {
 		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
 			RefsetMember<V,C> another = (RefsetMember<V,C>) obj;

@@ -122,20 +122,20 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	private int nid;
 	private boolean editable;
-	private ConceptData data;
+	private I_ManageConceptData data;
 
 	protected Concept(int nid, boolean editable) throws IOException {
 		super();
 		this.nid = nid;
 		this.editable = editable;
-		data = new ConceptData(this);
+		data = new ConceptDataSoftReference(this);
 	}
 
 	public Concept(int nid, boolean editable, DatabaseEntry data) throws IOException {
 		super();
 		this.nid = nid;
 		this.editable = editable;
-		this.data = new ConceptData(this, data);
+		this.data = new ConceptDataByteArray(this, data);
 	}
 
 	public int getNid() {
@@ -711,7 +711,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public ConceptData getData() {
+	public I_ManageConceptData getData() {
 		return data;
 	}
 

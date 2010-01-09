@@ -71,6 +71,23 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("relid: ");
+		buf.append(nid);
+		buf.append(" c2Nid: ");
+		buf.append(c2Nid);
+		buf.append(" group: ");
+		buf.append(group);
+		buf.append(" refinabilityNid: ");
+		buf.append(refinabilityNid);
+		buf.append(" typeNid: ");
+		buf.append(typeNid);
+		buf.append(" ");
+		buf.append(super.toString());
+		return buf.toString();
+	}
 
 	@Override
 	public boolean fieldsEqual(ConceptComponent<RelationshipVersion, Relationship> obj) {
