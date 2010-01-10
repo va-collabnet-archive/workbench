@@ -55,7 +55,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
@@ -1161,12 +1160,7 @@ public class SpecRefsetHelper {
      *         the SNOMED and ArchitectonicAuxiliary IS_A concepts.
      */
     protected I_IntSet getIsARelTypes() throws Exception {
-        if (this.isARelTypes == null) {
-            this.isARelTypes = termFactory.newIntSet();
-            this.isARelTypes.add(SNOMED.Concept.IS_A.localize().getNid());
-            this.isARelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-        }
-        return this.isARelTypes;
+        return LocalVersionedTerminology.get().getActiveAceFrameConfig().getDestRelTypes();
     }
 
     /**
