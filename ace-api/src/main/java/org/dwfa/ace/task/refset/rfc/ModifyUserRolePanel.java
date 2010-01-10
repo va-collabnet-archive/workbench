@@ -258,9 +258,7 @@ public class ModifyUserRolePanel extends JPanel {
             I_GetConceptData userParent =
                     LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 
-            I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
-            allowedTypes.add(LocalVersionedTerminology.get().getConcept(
-                ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+            I_IntSet allowedTypes = LocalVersionedTerminology.get().getActiveAceFrameConfig().getDestRelTypes();
             SpecRefsetHelper helper = new SpecRefsetHelper();
             Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
@@ -446,8 +444,10 @@ public class ModifyUserRolePanel extends JPanel {
                             I_RelVersioned relVersioned = roleRel.getFixedPart();
 
                             for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                                I_RelPart newPart = (I_RelPart) relVersioned.getLastTuple().getMutablePart().makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-                                								editPath.getConceptId(), Long.MAX_VALUE);
+                                I_RelPart newPart =
+                                        (I_RelPart) relVersioned.getLastTuple().getMutablePart().makeAnalog(
+                                            ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+                                            editPath.getConceptId(), Long.MAX_VALUE);
                                 if (newPart.getStatusId() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
                                     relVersioned.addVersion(newPart);
                                 }
@@ -466,8 +466,7 @@ public class ModifyUserRolePanel extends JPanel {
                             + " promotionPaths: " + promotionPaths);
                 }
                 I_Position viewPosition = viewPositionSet.iterator().next();
-               currentUser.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-            		   config.getAllowedStatus());
+                currentUser.promote(viewPosition, config.getPromotionPathSetReadOnly(), config.getAllowedStatus());
                 termFactory.addUncommittedNoChecks(currentUser);
                 termFactory.commit();
 

@@ -47,7 +47,6 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -319,13 +318,10 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
             // create relationships
             newRelationship(memberRefset, markedParentRel, markedParent, aceConfig);
-            I_GetConceptData isADestination = null;
-            if (termFactory.hasId(SNOMED.Concept.IS_A.getUids())) {
-                isADestination = termFactory.getConcept(SNOMED.Concept.IS_A.getUids());
-            } else {
-                isADestination = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+            I_IntSet availableIsATypes = aceConfig.getDestRelTypes();
+            for (int isAType : availableIsATypes.getSetValues()) {
+                newRelationship(memberRefset, markedParentIsATypeRel, termFactory.getConcept(isAType), aceConfig);
             }
-            newRelationship(memberRefset, markedParentIsATypeRel, isADestination, aceConfig);
             newRelationship(refsetSpec, specifiesRefsetRel, memberRefset, aceConfig);
 
             newRelationship(memberRefset, isA, parent, aceConfig);

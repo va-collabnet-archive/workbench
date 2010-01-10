@@ -29,9 +29,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 
@@ -164,11 +162,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
      * the Terminology Auxiliary Is-a only. Others use the Snomed Is-a as well.
      */
     public I_IntSet getIsAIds() throws TerminologyException, IOException {
-        I_IntSet ids = termFactory.newIntSet();
-        ids.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
-        if (termFactory.hasId(SNOMED.Concept.IS_A.getUids())) {
-            ids.add(SNOMED.Concept.IS_A.localize().getNid());
-        }
+        I_IntSet ids = termFactory.getActiveAceFrameConfig().getDestRelTypes();
         return ids;
     }
 

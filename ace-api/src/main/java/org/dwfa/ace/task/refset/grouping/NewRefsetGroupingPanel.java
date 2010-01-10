@@ -34,7 +34,6 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.util.DynamicWidthComboBox;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
 /**
@@ -161,9 +160,7 @@ public class NewRefsetGroupingPanel extends JPanel {
             I_GetConceptData refset =
                     LocalVersionedTerminology.get().getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 
-            I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
-            allowedTypes.add(LocalVersionedTerminology.get().getConcept(
-                ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+            I_IntSet allowedTypes = LocalVersionedTerminology.get().getActiveAceFrameConfig().getDestRelTypes();
             SpecRefsetHelper helper = new SpecRefsetHelper();
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 

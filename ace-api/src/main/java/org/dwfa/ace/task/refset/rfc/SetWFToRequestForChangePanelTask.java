@@ -43,7 +43,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
@@ -148,8 +147,7 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(owner));
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(owner));
 
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+        I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
 
         for (I_GetConceptData parent : permissibleRefsetParents) {
             Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, true, true);
