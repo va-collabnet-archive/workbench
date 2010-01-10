@@ -120,7 +120,7 @@ public enum ProcessAttachmentKeys {
     REVIEWER_INBOX,
     REVIEWER_COMMENTS,
     ACTIVE_DESCRIPTION_UUID,
-    REFSET_COMPUTE_TYPE_UUID;
+    REFSET_COMPUTE_TYPE_UUID, ISSUE_REPO_CONCEPT, ISSUE_REPO_PROP_NAME, ISSUE_REPO_PROP_PASSWORD;
 
     public String getAttachmentKey() {
         return "A: " + this.name();
