@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -46,7 +47,7 @@ public class SetUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
         }
     }
 
-    protected void setupInput() {
+    protected void setupInput(I_EncodeBusinessProcess process) {
         instruction = new JLabel("Enter user info: ");
         fullName = new JTextField(config.getDbConfig().getFullName());
         fullName.selectAll();
@@ -57,7 +58,7 @@ public class SetUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
         fullName.selectAll();
     }
 
-    protected void readInput() {
+    protected void readInput(I_EncodeBusinessProcess process) {
         config.getDbConfig().setFullName(fullName.getText());
         config.setUsername(user.getText());
         config.setPassword(pwd.getText());

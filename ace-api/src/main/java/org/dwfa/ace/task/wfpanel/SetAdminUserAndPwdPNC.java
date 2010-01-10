@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -46,7 +47,7 @@ public class SetAdminUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
         }
     }
 
-    protected void setupInput() {
+    protected void setupInput(I_EncodeBusinessProcess process) {
         instruction = new JLabel("Enter admin info: ");
         user = new JTextField(config.getAdminUsername());
         pwd = new JPasswordField(config.getAdminPassword());
@@ -54,7 +55,7 @@ public class SetAdminUserAndPwdPNC extends AbstractSetUserAndPwdPNC {
         user.requestFocusInWindow();
     }
 
-    protected void readInput() {
+    protected void readInput(I_EncodeBusinessProcess process) {
         config.setAdminUsername(user.getText());
         config.setAdminPassword(pwd.getText());
     }
