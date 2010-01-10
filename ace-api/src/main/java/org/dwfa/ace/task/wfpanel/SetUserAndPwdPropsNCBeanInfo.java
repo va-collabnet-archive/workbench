@@ -3,11 +3,12 @@ package org.dwfa.ace.task.wfpanel;
 import java.beans.BeanDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.beans.SimpleBeanInfo;
 
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
-public class SetUserAndPwdPropsNCBeanInfo {
+public class SetUserAndPwdPropsNCBeanInfo extends SimpleBeanInfo {
 
 	public PropertyDescriptor[] getPropertyDescriptors() {
 		try {

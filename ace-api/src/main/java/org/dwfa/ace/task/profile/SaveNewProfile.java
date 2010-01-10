@@ -76,7 +76,7 @@ public class SaveNewProfile extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame profileToSave = (I_ConfigAceFrame) process.readProperty(profilePropName);
+            I_ConfigAceFrame profileToSave = (I_ConfigAceFrame) process.getProperty(profilePropName);
             if (profileToSave == null) {
                 profileToSave = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             }
