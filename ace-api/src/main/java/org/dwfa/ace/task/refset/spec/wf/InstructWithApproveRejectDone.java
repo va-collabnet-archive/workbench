@@ -28,6 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -42,6 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_TermFactory;
@@ -164,11 +166,25 @@ public class InstructWithApproveRejectDone extends AbstractTask {
 
                 for (I_GetConceptData concept : conceptsToCheck) {
 
-                    if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptId(), approveId)) {
-                        // nothing to do
+                    if (refsetHelper.hasConceptRefsetExtensionWithAnyPromotionStatus(refsetId, concept.getConceptId())) {
+                        if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptId(), approveId)) {
+                            // nothing to do
+                        } else {
+                            refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptId(), approveId);
+                            temporaryList.remove(concept);
+                        }
                     } else {
-                        refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptId(), approveId);
-                        temporaryList.remove(concept);
+                        // description extension
+
+                        List<? extends I_DescriptionVersioned> descriptions = concept.getDescriptions();
+                        for (I_DescriptionVersioned desc : descriptions) {
+                            if (refsetHelper.hasCurrentRefsetExtension(refsetId, desc.getDescId(), approveId)) {
+                                // nothing to do
+                            } else {
+                                refsetHelper.newConceptExtensionPart(refsetId, desc.getDescId(), approveId);
+                                temporaryList.remove(concept);
+                            }
+                        }
                     }
                 }
 
@@ -218,12 +234,24 @@ public class InstructWithApproveRejectDone extends AbstractTask {
                 }
 
                 for (I_GetConceptData concept : conceptsToCheck) {
-
-                    if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptId(), rejectId)) {
-                        // nothing to do
+                    if (refsetHelper.hasConceptRefsetExtensionWithAnyPromotionStatus(refsetId, concept.getConceptId())) {
+                        if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptId(), rejectId)) {
+                            // nothing to do
+                        } else {
+                            refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptId(), rejectId);
+                            temporaryList.remove(concept);
+                        }
                     } else {
-                        refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptId(), rejectId);
-                        temporaryList.remove(concept);
+                        // description refset
+                        List<? extends I_DescriptionVersioned> descriptions = concept.getDescriptions();
+                        for (I_DescriptionVersioned desc : descriptions) {
+                            if (refsetHelper.hasCurrentRefsetExtension(refsetId, desc.getDescId(), rejectId)) {
+                                // nothing to do
+                            } else {
+                                refsetHelper.newConceptExtensionPart(refsetId, desc.getDescId(), rejectId);
+                                temporaryList.remove(concept);
+                            }
+                        }
                     }
                 }
 
@@ -351,16 +379,23 @@ public class InstructWithApproveRejectDone extends AbstractTask {
         termFactory = LocalVersionedTerminology.get();
         this.done = false;
         config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
-        refsetId = termFactory.getConcept(new UUID[] { (UUID) process.readProperty(memberRefsetUuidPropName) })
-            .getConceptId();
+        refsetId =
+                termFactory.getConcept(new UUID[] { (UUID) process.readProperty(memberRefsetUuidPropName) })
+                    .getConceptId();
         initialPromotionStatus = termFactory.getConcept(new UUID[] { (UUID) process.readProperty(statusUuidPropName) });
 
-        unreviewedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids());
-        unreviewedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
-        reviewedApprovedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION.getUids());
-        reviewedApprovedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION.getUids());
-        reviewedRejectedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
-        reviewedRejectedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
+        unreviewedAdditionStatus =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids());
+        unreviewedDeletionStatus =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
+        reviewedApprovedAdditionStatus =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION.getUids());
+        reviewedApprovedDeletionStatus =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION.getUids());
+        reviewedRejectedAdditionStatus =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
+        reviewedRejectedDeletionStatus =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
 
         if (initialPromotionStatus.equals(unreviewedAdditionStatus)
             || initialPromotionStatus.equals(reviewedApprovedAdditionStatus)
