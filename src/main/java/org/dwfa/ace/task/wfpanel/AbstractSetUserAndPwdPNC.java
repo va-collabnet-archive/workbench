@@ -19,6 +19,7 @@ package org.dwfa.ace.task.wfpanel;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -68,7 +69,7 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
             synchronized (this) {
                 this.waitTillDone(worker.getLogger());
             }
-            readInput();
+            readInput(process);
             restore();
         } catch (InterruptedException e) {
             throw new TaskFailedException(e);
@@ -78,7 +79,11 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
             throw new TaskFailedException(e);
         } catch (ExecutionException e) {
             throw new TaskFailedException(e);
-        }
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+		} catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+		}
         return returnCondition;
     }
 
@@ -94,7 +99,7 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
         @Override
         protected Boolean construct() throws Exception {
             setup(process);
-            setupInput();
+            setupInput(process);
             return true;
         }
 
@@ -135,9 +140,9 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
 
     protected abstract void finalSetup();
 
-    protected abstract void readInput();
+    protected abstract void readInput(I_EncodeBusinessProcess process) throws IntrospectionException, IllegalAccessException, InvocationTargetException;
 
-    protected abstract void setupInput();
+    protected abstract void setupInput(I_EncodeBusinessProcess process) throws IllegalArgumentException, IntrospectionException, IllegalAccessException, InvocationTargetException;
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,

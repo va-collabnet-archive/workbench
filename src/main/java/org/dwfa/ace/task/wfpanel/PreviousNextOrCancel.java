@@ -185,7 +185,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
     protected void setup(I_EncodeBusinessProcess process) throws IntrospectionException, IllegalAccessException,
             InvocationTargetException {
         this.done = false;
-        config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+        config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
 
         builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
