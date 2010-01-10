@@ -103,7 +103,7 @@ public class EConcept {
     protected List<ERelationship> relationships;
     protected List<EImage> images;
     protected List<ERefset<?>> refsetMembers;
-    protected List<UUID> destRelOriginUuidTypeUuids;
+    protected List<UUID> destRelUuidTypeUuids;
     protected List<UUID> refsetUuidMemberUuidForConcept;
     protected List<UUID> refsetUuidMemberUuidForDescriptions;
     protected List<UUID> refsetUuidMemberUuidForRels;
@@ -187,11 +187,11 @@ public class EConcept {
                 }
             }
         }
-        int destRelOriginNidTypeNidsCount = in.readInt();
-        if (destRelOriginNidTypeNidsCount > 0) {
-        	destRelOriginUuidTypeUuids = new ArrayList<UUID>(destRelOriginNidTypeNidsCount);
-        	for (int i = 0; i < destRelOriginNidTypeNidsCount; i++) {
-        		destRelOriginUuidTypeUuids.add(new UUID(in.readLong(), in.readLong()));
+        int destRelNidTypeNidsCount = in.readInt();
+        if (destRelNidTypeNidsCount > 0) {
+        	destRelUuidTypeUuids = new ArrayList<UUID>(destRelNidTypeNidsCount);
+        	for (int i = 0; i < destRelNidTypeNidsCount; i++) {
+        		destRelUuidTypeUuids.add(new UUID(in.readLong(), in.readLong()));
         	}
         }
         int refsetUuidMemberUuidForConceptCount = in.readInt();
@@ -253,11 +253,11 @@ public class EConcept {
                 r.writeExternal(out);
             }
         }
-        if (destRelOriginUuidTypeUuids == null) {
+        if (destRelUuidTypeUuids == null) {
             out.writeInt(0);
         } else {
-            out.writeInt(destRelOriginUuidTypeUuids.size());
-            for (UUID uuid : destRelOriginUuidTypeUuids) {
+            out.writeInt(destRelUuidTypeUuids.size());
+            for (UUID uuid : destRelUuidTypeUuids) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
             }
@@ -390,15 +390,15 @@ public class EConcept {
             }
         }
         
-        destRelOriginUuidTypeUuids = new ArrayList<UUID>();
+        destRelUuidTypeUuids = new ArrayList<UUID>();
         for (I_RelVersioned r: c.getDestRels()) {
-            UUID originUuid = EVersion.nidToUuid(r.getC1Id());
-             HashSet<UUID> typesAdded = new HashSet<UUID>();
+            UUID relUuid = EVersion.nidToUuid(r.getNid());
+            HashSet<UUID> typesAdded = new HashSet<UUID>();
             for (I_RelPart p: r.getMutableParts()) {
                 UUID typeUuid = EVersion.nidToUuid(p.getTypeId());
                 if (!typesAdded.contains(typeUuid)) {
-                    destRelOriginUuidTypeUuids.add(originUuid);            	
-                    destRelOriginUuidTypeUuids.add(typeUuid);
+                    destRelUuidTypeUuids.add(relUuid);            	
+                    destRelUuidTypeUuids.add(typeUuid);
                     typesAdded.add(typeUuid);
                 }
             }
@@ -438,12 +438,12 @@ public class EConcept {
         return buff.toString();
     }
 
-	public List<UUID> getDestRelOriginUuidTypeUuids() {
-		return destRelOriginUuidTypeUuids;
+	public List<UUID> getDestRelUuidTypeUuids() {
+		return destRelUuidTypeUuids;
 	}
 
-	public void setDestRelOriginUuidTypeUuids(List<UUID> destRelOriginUuidTypeUuids) {
-		this.destRelOriginUuidTypeUuids = destRelOriginUuidTypeUuids;
+	public void setDestRelUuidTypeUuids(List<UUID> destRelOriginUuidTypeUuids) {
+		this.destRelUuidTypeUuids = destRelOriginUuidTypeUuids;
 	}
 
 	public List<UUID> getRefsetUuidMemberUuidForConcept() {
