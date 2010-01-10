@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -47,8 +48,6 @@ import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.ERefset;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.I_ConceptualizeExternally;
-
-import com.sleepycat.je.DatabaseEntry;
 
 public class Concept implements I_Transact, I_GetConceptData {
 
@@ -107,15 +106,45 @@ public class Concept implements I_Transact, I_GetConceptData {
 				c.data.add(refsetMember);
 			}
 		}
+		
+		if (eConcept.getDestRelUuidTypeUuids() != null) {
+			ArrayIntList destRelOriginNidTypeNidList = 
+				new ArrayIntList(eConcept.getDestRelUuidTypeUuids().size());
+			for (UUID uuid: eConcept.getDestRelUuidTypeUuids()) {
+				destRelOriginNidTypeNidList.add(Bdb.uuidToNid(uuid));
+				
+			}
+			c.data.setDestRelNidTypeNidList(destRelOriginNidTypeNidList);
+		}
+		if (eConcept.getRefsetUuidMemberUuidForConcept() != null) {
+			ArrayIntList refsetNidMemberNidForConceptList = 
+				new ArrayIntList(eConcept.getRefsetUuidMemberUuidForConcept().size());
+			for (UUID uuid: eConcept.getRefsetUuidMemberUuidForConcept()) {
+				refsetNidMemberNidForConceptList.add(Bdb.uuidToNid(uuid));
+			}
+			c.data.setRefsetNidMemberNidForConceptList(refsetNidMemberNidForConceptList);
+		}
+		if (eConcept.getRefsetUuidMemberUuidForDescriptions() != null) {
+			ArrayIntList refsetNidMemberNidForDescriptionsList = 
+				new ArrayIntList(eConcept.getRefsetUuidMemberUuidForDescriptions().size());
+			for (UUID uuid: eConcept.getRefsetUuidMemberUuidForDescriptions()) {
+				refsetNidMemberNidForDescriptionsList.add(Bdb.uuidToNid(uuid));
+			}
+			c.data.setRefsetNidMemberNidForDescriptionsList(refsetNidMemberNidForDescriptionsList);
+		}
+		if (eConcept.getRefsetUuidMemberUuidForRels() != null) {
+			ArrayIntList refsetNidMemberNidForRelsList = 
+				new ArrayIntList(eConcept.getRefsetUuidMemberUuidForRels().size());
+			for (UUID uuid: eConcept.getRefsetUuidMemberUuidForRels()) {
+				refsetNidMemberNidForRelsList.add(Bdb.uuidToNid(uuid));
+			}
+			c.data.setRefsetNidMemberNidForRelsList(refsetNidMemberNidForRelsList);
+		}
 		return c;
 	}	
 	
 	public static Concept get(int nid, boolean editable) throws IOException {
 		return new Concept(nid, editable);
-	}
-
-	public static Concept get(int nid, boolean editable, DatabaseEntry data) throws IOException {
-		return new Concept(nid, editable, data);
 	}
 
 	private static I_Transact transactionHandler = new TransactionHandler();
@@ -129,13 +158,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 		this.nid = nid;
 		this.editable = editable;
 		data = new ConceptDataSoftReference(this);
-	}
-
-	public Concept(int nid, boolean editable, DatabaseEntry data) throws IOException {
-		super();
-		this.nid = nid;
-		this.editable = editable;
-		this.data = new ConceptDataByteArray(this, data);
 	}
 
 	public int getNid() {

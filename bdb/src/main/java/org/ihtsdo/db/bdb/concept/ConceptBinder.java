@@ -62,12 +62,24 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			byte[] refsetOutput = getRefsetBytes(conceptData, primordial,
 					OFFSETS.REFSET_MEMBERS, conceptData.getRefsetMembersRef(),
 					new RefsetMemberBinder());
-			// TODO DEST_REL_ORIGIN_NID_TYPE_NIDS
-			byte[] destRelOriginOutput = zeroOutputArray;
-			// TODO REFSETNID_MEMBERNID_FOR_CONCEPT
-			byte[] refsetNidMemberNidOutput = zeroOutputArray;
-			// TODO REFSETNID_MEMBERNID_COMPONENTNID_FOR_COMPONENTS
-			byte[] refsetNidMemberNidComponentNid = zeroOutputArray;
+
+			IntListPairsBinder pairsBinder = new IntListPairsBinder();
+			
+			byte[] destRelOriginOutput = pairsBinder.getBytes(
+					conceptData.getDestRelNidTypeNidListReadOnly(),
+					conceptData.getDestRelNidTypeNidList());
+			
+			byte[] refsetNidMemberNidForConceptOutput = pairsBinder.getBytes(
+					conceptData.getRefsetNidMemberNidForConceptListReadOnly(),
+					conceptData.getRefsetNidMemberNidForConceptList());
+
+			byte[] refsetNidMemberNidForDescOutput = pairsBinder.getBytes(
+					conceptData.getRefsetNidMemberNidForDescriptionsListReadOnly(),
+					conceptData.getRefsetNidMemberNidForDescriptionsList());
+
+			byte[] refsetNidMemberNidForRelsOutput = pairsBinder.getBytes(
+					conceptData.getRefsetNidMemberNidForRelsListReadOnly(),
+					conceptData.getRefsetNidMemberNidForRelsList());
 
 			finalOutput.writeInt(1); // Format version
 			finalOutput.writeInt(1); // Data version
@@ -86,10 +98,13 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			nextDataLocation = nextDataLocation + destRelOriginOutput.length;
 			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_CONCEPT
 			nextDataLocation = nextDataLocation
-					+ refsetNidMemberNidOutput.length;
-			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_COMPONENTNID_FOR_COMPONENTS
+					+ refsetNidMemberNidForConceptOutput.length;
+			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_DESCRIPTIONS
 			nextDataLocation = nextDataLocation
-					+ refsetNidMemberNidComponentNid.length;
+					+ refsetNidMemberNidForDescOutput.length;
+			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_RELATIONSHIPS
+			nextDataLocation = nextDataLocation
+					+ refsetNidMemberNidForRelsOutput.length;
 			finalOutput.makeSpace(nextDataLocation);
 			finalOutput.writeFast(attrOutput); // ATTRIBUTES
 			finalOutput.writeFast(descOutput); // DESCRIPTIONS
@@ -97,8 +112,9 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			finalOutput.writeFast(imageOutput); // IMAGES
 			finalOutput.writeFast(refsetOutput); // REFSET_MEMBERS
 			finalOutput.writeFast(destRelOriginOutput); // DEST_REL_ORIGIN_NID_TYPE_NIDS
-			finalOutput.writeFast(refsetNidMemberNidOutput); // REFSETNID_MEMBERNID_FOR_CONCEPT
-			finalOutput.writeFast(refsetNidMemberNidComponentNid); // REFSETNID_MEMBERNID_COMPONENTNID_FOR_COMPONENTS
+			finalOutput.writeFast(refsetNidMemberNidForConceptOutput); // REFSETNID_MEMBERNID_FOR_CONCEPT
+			finalOutput.writeFast(refsetNidMemberNidForDescOutput); // REFSETNID_MEMBERNID_FOR_DESCRIPTIONS
+			finalOutput.writeFast(refsetNidMemberNidForRelsOutput); // REFSETNID_MEMBERNID_FOR_RELATIONSHIPS
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

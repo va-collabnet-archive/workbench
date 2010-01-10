@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
@@ -66,6 +67,30 @@ public interface I_ManageConceptData {
 	public SoftReference<ArrayList<RefsetMember<?, ?>>> getRefsetMembersRef();
 
 	public TupleInput getReadWriteTupleInput() throws InterruptedException, ExecutionException;
+
+	public void setDestRelNidTypeNidList(
+			ArrayIntList destRelNidTypeNidList) throws IOException;
+
+	public void setRefsetNidMemberNidForConceptList(
+			ArrayIntList refsetNidMemberNidForConceptList) throws IOException;
+
+	public void setRefsetNidMemberNidForDescriptionsList(
+			ArrayIntList refsetNidMemberNidForDescriptionsList) throws IOException;
+
+	public void setRefsetNidMemberNidForRelsList(
+			ArrayIntList refsetNidMemberNidForRelsList) throws IOException;
+
+	public ArrayIntList getDestRelNidTypeNidList() throws IOException;
+	public ArrayIntList getDestRelNidTypeNidListReadOnly() throws IOException;
+
+	public ArrayIntList getRefsetNidMemberNidForConceptList() throws IOException;
+	public ArrayIntList getRefsetNidMemberNidForConceptListReadOnly() throws IOException;
+
+	public ArrayIntList getRefsetNidMemberNidForDescriptionsList() throws IOException;
+	public ArrayIntList getRefsetNidMemberNidForDescriptionsListReadOnly() throws IOException;
+
+	public ArrayIntList getRefsetNidMemberNidForRelsList() throws IOException;
+	public ArrayIntList getRefsetNidMemberNidForRelsListReadOnly() throws IOException;
 
 
 }

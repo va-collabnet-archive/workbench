@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.ConceptBdb;
+import org.ihtsdo.db.bdb.concept.OFFSETS;
 import org.ihtsdo.etypes.EVersion;
 
 import com.sleepycat.je.Database;
@@ -44,6 +45,9 @@ public class Bdb {
 	
 	public static void setup(String dbRoot) {
 		try {
+			for (@SuppressWarnings("unused") OFFSETS o: OFFSETS.values()) {
+				// ensure all OFFSETS are initialized prior to multi-threading. 
+			}
 			File buildDirectory = new File(dbRoot);
 			buildDirectory.mkdirs();
 			File bdbDirectory = new File(buildDirectory, "berkeley-db");

@@ -12,6 +12,7 @@ import org.ihtsdo.db.bdb.concept.I_BindConceptComponents;
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import com.sleepycat.je.DatabaseEntry;
 
 public class ConceptComponentBinder<V extends Version<V, C>, 
 									C extends ConceptComponent<V, C>> 
@@ -39,8 +40,10 @@ public class ConceptComponentBinder<V extends Version<V, C>,
 	public ArrayList<C> entryToObject(TupleInput input) {
 		assert enclosingConcept != null: "enclosing concept cannot be null.";
 		int listSize = input.readInt();
-		assert listSize >= 0: "Processing nid: " + enclosingConcept.getNid();
-		assert listSize < 1000000: "Processing nid: " + enclosingConcept.getNid();
+		assert listSize >= 0: "Processing nid: " + enclosingConcept.getNid() + " listSize: " + listSize +
+			"\ndata: " + new DatabaseEntry(input.getBufferBytes()).toString();
+		assert listSize < 1000000: "Processing nid: " + enclosingConcept.getNid()  + " listSize: " + listSize +
+			"\ndata: " + new DatabaseEntry(input.getBufferBytes()).toString();
 		if (readOnlyConceptComponentList != null) {
 			readOnlyConceptComponentList.ensureCapacity(listSize + readOnlyConceptComponentList.size());
 		}

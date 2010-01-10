@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.apache.commons.collections.primitives.IntIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.bdb.NidDataFromBdb;
@@ -18,7 +19,6 @@ import org.ihtsdo.db.bdb.NidDataInMemory;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 import org.ihtsdo.db.bdb.concept.component.DataVersionBinder;
-import org.ihtsdo.db.bdb.concept.component.RelNidTypeNidBinder;
 import org.ihtsdo.db.bdb.concept.component.Version;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesBinder;
@@ -30,8 +30,6 @@ import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberBinder;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
-
-import cern.colt.map.OpenIntIntHashMap;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.je.DatabaseEntry;
@@ -52,6 +50,10 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	protected SoftReference<ArrayList<Description>> descriptionsRef;
 	protected SoftReference<ArrayList<Image>> imagesRef;
 	protected SoftReference<ArrayList<RefsetMember<?, ?>>> refsetMembersRef;
+	protected SoftReference<ArrayIntList> destRelNidTypeNidListRef;
+	protected SoftReference<ArrayIntList> refsetNidMemberNidForConceptListRef;
+	protected SoftReference<ArrayIntList> refsetNidMemberNidForDescriptionsListRef;
+	protected SoftReference<ArrayIntList> refsetNidMemberNidForRelsListRef;
 	private ArrayList<Object> strongReferences;
 
 	ConceptDataSoftReference(Concept enclosingConcept) throws IOException {
@@ -60,11 +62,13 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		if (enclosingConcept.isEditable()) {
 			strongReferences = new ArrayList<Object>();
 		}
-		nidData = new NidDataFromBdb(enclosingConcept.getNid(), Bdb.getConceptDb().getReadOnly(), Bdb
-				.getConceptDb().getReadWrite());
+		nidData = new NidDataFromBdb(enclosingConcept.getNid(), Bdb
+				.getConceptDb().getReadOnly(), Bdb.getConceptDb()
+				.getReadWrite());
 	}
 
-	ConceptDataSoftReference(Concept enclosingConcept, DatabaseEntry data) throws IOException {
+	ConceptDataSoftReference(Concept enclosingConcept, DatabaseEntry data)
+			throws IOException {
 		assert enclosingConcept != null : "enclosing concept cannot be null.";
 		this.enclosingConcept = enclosingConcept;
 		if (enclosingConcept.isEditable()) {
@@ -73,15 +77,20 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		nidData = new NidDataInMemory(new byte[] {}, data.getData());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getNid()
 	 */
 	public int getNid() {
 		return enclosingConcept.getNid();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getReadWriteDataVersion()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.db.bdb.concept.I_ManageConceptData#getReadWriteDataVersion()
 	 */
 	public int getReadWriteDataVersion() throws InterruptedException,
 			ExecutionException, IOException {
@@ -89,7 +98,9 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		return binder.entryToObject(nidData.getReadWriteTupleInput());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getSourceRels()
 	 */
 	public ArrayList<Relationship> getSourceRels() throws IOException {
@@ -101,8 +112,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			}
 		}
 		try {
-			rels = getList(new RelationshipBinder(), 
-					OFFSETS.SOURCE_RELS, 
+			rels = getList(new RelationshipBinder(), OFFSETS.SOURCE_RELS,
 					enclosingConcept);
 			if (enclosingConcept.isEditable() && rels != null) {
 				strongReferences.add(rels);
@@ -116,7 +126,9 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getDescriptions()
 	 */
 	public List<Description> getDescriptions() throws IOException {
@@ -128,8 +140,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			}
 		}
 		try {
-			descList = getList(new DescriptionBinder(),
-					OFFSETS.DESCRIPTIONS,
+			descList = getList(new DescriptionBinder(), OFFSETS.DESCRIPTIONS,
 					enclosingConcept);
 			if (enclosingConcept.isEditable()) {
 				strongReferences.add(descList);
@@ -144,11 +155,10 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		}
 	}
 
-	private <C extends ConceptComponent<V, C>, 
-	         V extends Version<V, C>> ArrayList<C> 
-		getList(ConceptComponentBinder<V, C> binder, 
-				OFFSETS offset, Concept enclosingConcept)
-			throws InterruptedException, ExecutionException, IOException {
+	private <C extends ConceptComponent<V, C>, V extends Version<V, C>> ArrayList<C> getList(
+			ConceptComponentBinder<V, C> binder, OFFSETS offset,
+			Concept enclosingConcept) throws InterruptedException,
+			ExecutionException, IOException {
 		binder.setupBinder(enclosingConcept);
 		ArrayList<C> componentList;
 		TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
@@ -158,7 +168,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			readOnlyInput.skipFast(offset.offset);
 			int listStart = readOnlyInput.readInt();
 			readOnlyInput.reset();
-			readOnlyInput.skipFast(listStart);			
+			readOnlyInput.skipFast(listStart);
 			componentList = binder.entryToObject(readOnlyInput);
 		} else {
 			componentList = new ArrayList<C>();
@@ -172,7 +182,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			readWriteInput.skipFast(offset.offset);
 			int listStart = readWriteInput.readInt();
 			readWriteInput.reset();
-			readWriteInput.skipFast(listStart);			
+			readWriteInput.skipFast(listStart);
 			componentList = binder.entryToObject(readWriteInput);
 		}
 		return componentList;
@@ -184,16 +194,18 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		int formatVersion = input.readInt();
 		int dataVersion = input.readInt();
 		if (formatVersion != OFFSETS.CURRENT_FORMAT_VERSION) {
-			throw new UnsupportedEncodingException("No support for format version: " + formatVersion);
+			throw new UnsupportedEncodingException(
+					"No support for format version: " + formatVersion);
 		}
 		if (dataVersion != OFFSETS.CURRENT_DATA_VERSION) {
-			throw new UnsupportedEncodingException("No support for data version: " + dataVersion);
+			throw new UnsupportedEncodingException(
+					"No support for data version: " + dataVersion);
 		}
 		input.reset();
 	}
 
-	private ArrayList<RefsetMember<?, ?>> getList(
-			RefsetMemberBinder binder, OFFSETS offset, Concept enclosingConcept)
+	private ArrayList<RefsetMember<?, ?>> getList(RefsetMemberBinder binder,
+			OFFSETS offset, Concept enclosingConcept)
 			throws InterruptedException, ExecutionException, IOException {
 		binder.setupBinder(enclosingConcept);
 		ArrayList<RefsetMember<?, ?>> componentList;
@@ -204,7 +216,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			readOnlyInput.skipFast(offset.offset);
 			int listStart = readOnlyInput.readInt();
 			readOnlyInput.reset();
-			readOnlyInput.skipFast(listStart);			
+			readOnlyInput.skipFast(listStart);
 			componentList = binder.entryToObject(readOnlyInput);
 		} else {
 			componentList = new ArrayList<RefsetMember<?, ?>>();
@@ -219,13 +231,15 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			readWriteInput.skipFast(offset.offset);
 			int listStart = readWriteInput.readInt();
 			readWriteInput.reset();
-			readWriteInput.skipFast(listStart);			
+			readWriteInput.skipFast(listStart);
 			componentList = binder.entryToObject(readWriteInput);
 		}
 		return componentList;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getConceptAttributes()
 	 */
 	public ConceptAttributes getConceptAttributes() throws IOException {
@@ -238,8 +252,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		}
 		try {
 			ArrayList<ConceptAttributes> components = getList(
-					new ConceptAttributesBinder(), 
-					OFFSETS.ATTRIBUTES, 
+					new ConceptAttributesBinder(), OFFSETS.ATTRIBUTES,
 					enclosingConcept);
 			if (components != null && components.size() == 1) {
 				if (enclosingConcept.isEditable()) {
@@ -255,48 +268,30 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getDestRels()
 	 */
 	public List<Relationship> getDestRels() throws IOException {
-		try {
-			TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
-			readOnlyInput
-					.skipFast(OFFSETS.DEST_REL_ORIGIN_NID_TYPE_NIDS.offset);
-			OpenIntIntHashMap roRelNidToTypeNidMap = RelNidTypeNidBinder
-					.getBinder().entryToObject(readOnlyInput);
+		ArrayIntList destRelNidTypeNidList = getDestRelNidTypeNidList();
 
-			TupleInput readWriteInput = nidData.getReadWriteTupleInput();
-			readWriteInput
-					.skipFast(OFFSETS.DEST_REL_ORIGIN_NID_TYPE_NIDS.offset);
-			OpenIntIntHashMap rwRelNidToTypeNidMap = RelNidTypeNidBinder
-					.getBinder().entryToObject(readWriteInput);
-			if (rwRelNidToTypeNidMap.size() > roRelNidToTypeNidMap.size()) {
-				for (int relNid : roRelNidToTypeNidMap.keys().elements()) {
-					rwRelNidToTypeNidMap.put(relNid, roRelNidToTypeNidMap
-							.get(relNid));
-				}
-			} else {
-				for (int relNid : rwRelNidToTypeNidMap.keys().elements()) {
-					roRelNidToTypeNidMap.put(relNid, rwRelNidToTypeNidMap
-							.get(relNid));
-				}
-				rwRelNidToTypeNidMap = roRelNidToTypeNidMap;
-			}
-			List<Relationship> destRels = new ArrayList<Relationship>();
-			for (int relNid : rwRelNidToTypeNidMap.keys().elements()) {
-				Concept c = Bdb.getConceptForComponent(relNid);
-				destRels.add(c.getRelationship(relNid));
-			}
-			return destRels;
-		} catch (InterruptedException e) {
-			throw new IOException(e);
-		} catch (ExecutionException e) {
-			throw new IOException(e);
+		List<Relationship> destRels = new ArrayList<Relationship>();
+		IntIterator itr = destRelNidTypeNidList.iterator();
+		while (itr.hasNext()) {
+			int relNid = itr.next();
+			@SuppressWarnings("unused")
+			int typeNid = itr.next();
+			int conceptNid = Bdb.getNidCNidMap().getCNid(relNid);
+			Concept c = Bdb.getConceptForComponent(conceptNid);
+			destRels.add(c.getRelationship(relNid));
 		}
+		return destRels;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getRefsetMembers()
 	 */
 	public List<RefsetMember<?, ?>> getRefsetMembers() throws IOException {
@@ -309,8 +304,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		}
 		try {
 			refsetMemberList = getList(new RefsetMemberBinder(),
-					OFFSETS.REFSET_MEMBERS, 
-					enclosingConcept);
+					OFFSETS.REFSET_MEMBERS, enclosingConcept);
 			if (enclosingConcept.isEditable() && refsetMemberList != null) {
 				strongReferences.add(refsetMemberList);
 				refsetMembersRef = new SoftReference<ArrayList<RefsetMember<?, ?>>>(
@@ -324,7 +318,9 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getImages()
 	 */
 	public List<Image> getImages() throws IOException {
@@ -336,7 +332,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			}
 		}
 		try {
-			imgList = getList(new ImageBinder(), OFFSETS.IMAGES, 
+			imgList = getList(new ImageBinder(), OFFSETS.IMAGES,
 					enclosingConcept);
 			if (enclosingConcept.isEditable() && imgList != null) {
 				strongReferences.add(imgList);
@@ -374,8 +370,12 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		return nidData;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#set(org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.db.bdb.concept.I_ManageConceptData#set(org.ihtsdo.db.bdb.concept
+	 * .component.attributes.ConceptAttributes)
 	 */
 	public void set(ConceptAttributes attr) throws IOException {
 		if (enclosingConcept.isEditable() == false) {
@@ -389,8 +389,12 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		strongReferences.add(attr);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept.component.description.Description)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept
+	 * .component.description.Description)
 	 */
 	public void add(Description desc) throws IOException {
 		if (enclosingConcept.isEditable() == false) {
@@ -399,8 +403,12 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		getDescriptions().add(desc);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept.component.relationship.Relationship)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept
+	 * .component.relationship.Relationship)
 	 */
 	public void add(Relationship rel) throws IOException {
 		if (enclosingConcept.isEditable() == false) {
@@ -409,8 +417,12 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		getSourceRels().add(rel);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept.component.image.Image)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept
+	 * .component.image.Image)
 	 */
 	public void add(Image img) throws IOException {
 		if (enclosingConcept.isEditable() == false) {
@@ -419,8 +431,12 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		getImages().add(img);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept.component.refset.RefsetMember)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept
+	 * .component.refset.RefsetMember)
 	 */
 	public void add(RefsetMember<?, ?> refsetMember) throws IOException {
 		if (enclosingConcept.isEditable() == false) {
@@ -429,40 +445,208 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		getRefsetMembers().add(refsetMember);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getAllNids()
 	 */
 	public int[] getAllNids() throws IOException {
 		ArrayIntList allContainedNids = new ArrayIntList();
 		allContainedNids.add(enclosingConcept.getNid());
-		for (Description d: getDescriptions()) {
+		for (Description d : getDescriptions()) {
 			allContainedNids.add(d.nid);
 		}
-		for (Relationship r: getSourceRels()) {
+		for (Relationship r : getSourceRels()) {
 			allContainedNids.add(r.nid);
 		}
-		for (Image i: getImages()) {
+		for (Image i : getImages()) {
 			allContainedNids.add(i.nid);
 		}
-		for (RefsetMember<?, ?> r: getRefsetMembers()) {
+		for (RefsetMember<?, ?> r : getRefsetMembers()) {
 			allContainedNids.add(r.nid);
 		}
 		return allContainedNids.toArray();
 	}
-	
+
 	@Override
-	public byte[] getReadOnlyBytes() throws InterruptedException, ExecutionException, IOException {
+	public byte[] getReadOnlyBytes() throws InterruptedException,
+			ExecutionException, IOException {
 		return nidData.getReadOnlyBytes();
 	}
 
 	@Override
-	public byte[] getReadWriteBytes() throws InterruptedException, ExecutionException {
+	public byte[] getReadWriteBytes() throws InterruptedException,
+			ExecutionException {
 		return nidData.getReadWriteBytes();
 	}
 
 	@Override
-	public TupleInput getReadWriteTupleInput() throws InterruptedException, ExecutionException {
+	public TupleInput getReadWriteTupleInput() throws InterruptedException,
+			ExecutionException {
 		return nidData.getReadWriteTupleInput();
+	}
+
+	@Override
+	public void setDestRelNidTypeNidList(ArrayIntList destRelNidTypeNidList)
+			throws IOException {
+		if (enclosingConcept.isEditable() == false) {
+			throw new IOException("Attempting to add to an uneditable concept");
+		}
+		destRelNidTypeNidListRef = new SoftReference<ArrayIntList>(
+				destRelNidTypeNidList);
+		strongReferences.add(destRelNidTypeNidList);
+	}
+
+	@Override
+	public void setRefsetNidMemberNidForConceptList(
+			ArrayIntList refsetNidMemberNidForConceptList) throws IOException {
+		if (enclosingConcept.isEditable() == false) {
+			throw new IOException("Attempting to add to an uneditable concept");
+		}
+		refsetNidMemberNidForConceptListRef = new SoftReference<ArrayIntList>(
+				refsetNidMemberNidForConceptList);
+		strongReferences.add(refsetNidMemberNidForConceptList);
+	}
+
+	@Override
+	public void setRefsetNidMemberNidForDescriptionsList(
+			ArrayIntList refsetNidMemberNidForDescriptionsList)
+			throws IOException {
+		if (enclosingConcept.isEditable() == false) {
+			throw new IOException("Attempting to add to an uneditable concept");
+		}
+		refsetNidMemberNidForDescriptionsListRef = new SoftReference<ArrayIntList>(
+				refsetNidMemberNidForDescriptionsList);
+		strongReferences.add(refsetNidMemberNidForDescriptionsList);
+	}
+
+	@Override
+	public void setRefsetNidMemberNidForRelsList(
+			ArrayIntList refsetNidMemberNidForRelsList) throws IOException {
+		if (enclosingConcept.isEditable() == false) {
+			throw new IOException("Attempting to add to an uneditable concept");
+		}
+		refsetNidMemberNidForRelsListRef = new SoftReference<ArrayIntList>(
+				refsetNidMemberNidForRelsList);
+		strongReferences.add(refsetNidMemberNidForRelsList);
+	}
+
+	@Override
+	public ArrayIntList getDestRelNidTypeNidList() throws IOException {
+		ArrayIntList returnList = refsetNidMemberNidForRelsListRef.get();
+		if (returnList != null) {
+			return returnList;
+		}
+		returnList = getArrayIntList(OFFSETS.DEST_REL_ORIGIN_NID_TYPE_NIDS);
+		refsetNidMemberNidForRelsListRef = new SoftReference<ArrayIntList>(
+				returnList);
+		if (enclosingConcept.isEditable()) {
+			strongReferences.add(returnList);
+		}
+		return returnList;
+	}
+
+	private ArrayIntList getArrayIntList(OFFSETS offset)
+			throws IOException {
+		try {
+			TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
+			readOnlyInput.skipFast(offset.offset);
+			IntListPairsBinder binder = new IntListPairsBinder();
+			ArrayIntList roList = binder.entryToObject(readOnlyInput);
+			binder.setReadOnlyList(roList);
+			TupleInput readWriteInput = nidData.getReadWriteTupleInput();
+			readWriteInput.skipFast(offset.offset);
+			return binder.entryToObject(readWriteInput);
+		} catch (InterruptedException e) {
+			throw new IOException(e);
+		} catch (ExecutionException e) {
+			throw new IOException(e);
+		}
+	}
+
+	private ArrayIntList getReadOnlyArrayIntList(OFFSETS offset)
+			throws IOException {
+		try {
+			TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
+			readOnlyInput.skipFast(offset.offset);
+			IntListPairsBinder binder = new IntListPairsBinder();
+			return binder.entryToObject(readOnlyInput);
+		} catch (InterruptedException e) {
+			throw new IOException(e);
+		} catch (ExecutionException e) {
+			throw new IOException(e);
+		}
+	}
+
+	@Override
+	public ArrayIntList getRefsetNidMemberNidForConceptList()
+			throws IOException {
+		ArrayIntList returnList = refsetNidMemberNidForConceptListRef.get();
+		if (returnList != null) {
+			return returnList;
+		}
+		returnList = getArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_CONCEPT);
+		refsetNidMemberNidForConceptListRef = new SoftReference<ArrayIntList>(
+				returnList);
+		if (enclosingConcept.isEditable()) {
+			strongReferences.add(returnList);
+		}
+		return returnList;
+	}
+
+	@Override
+	public ArrayIntList getRefsetNidMemberNidForDescriptionsList()
+			throws IOException {
+		ArrayIntList returnList = refsetNidMemberNidForDescriptionsListRef
+				.get();
+		if (returnList != null) {
+			return returnList;
+		}
+		returnList = getArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_DESCRIPTIONS);
+		refsetNidMemberNidForDescriptionsListRef = new SoftReference<ArrayIntList>(
+				returnList);
+		if (enclosingConcept.isEditable()) {
+			strongReferences.add(returnList);
+		}
+		return returnList;
+	}
+
+	@Override
+	public ArrayIntList getRefsetNidMemberNidForRelsList() throws IOException {
+		ArrayIntList returnList = refsetNidMemberNidForRelsListRef.get();
+		if (returnList != null) {
+			return returnList;
+		}
+		returnList = getArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_RELATIONSHIPS);
+		refsetNidMemberNidForRelsListRef = new SoftReference<ArrayIntList>(
+				returnList);
+		if (enclosingConcept.isEditable()) {
+			strongReferences.add(returnList);
+		}
+		return returnList;
+	}
+
+	@Override
+	public ArrayIntList getDestRelNidTypeNidListReadOnly() throws IOException {
+		return getReadOnlyArrayIntList(OFFSETS.DEST_REL_ORIGIN_NID_TYPE_NIDS);
+	}
+
+	@Override
+	public ArrayIntList getRefsetNidMemberNidForConceptListReadOnly()
+			throws IOException {
+		return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_CONCEPT);
+	}
+
+	@Override
+	public ArrayIntList getRefsetNidMemberNidForDescriptionsListReadOnly()
+			throws IOException {
+		return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_DESCRIPTIONS);
+	}
+
+	@Override
+	public ArrayIntList getRefsetNidMemberNidForRelsListReadOnly()
+			throws IOException {
+		return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_RELATIONSHIPS);
 	}
 
 }

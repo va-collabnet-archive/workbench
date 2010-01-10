@@ -19,15 +19,12 @@ import javax.swing.JFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.db.bdb.concept.Concept;
-import org.ihtsdo.db.bdb.concept.ConceptBinder;
 import org.ihtsdo.db.bdb.concept.I_ProcessConceptData;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesBinder;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionBinder;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberBinder;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.etypes.EConcept;
-
-import com.sleepycat.je.DatabaseEntry;
 
 public class Temp {
 	public static void main(String[] args) {
@@ -212,72 +209,7 @@ public class Temp {
 		}
     }
     
-    private static class ConvertConceptNoWrite implements Runnable, I_ProcessEConcept {
-		private Throwable exception = null;
-		private EConcept eConcept = null;
-		private Concept newConcept = null;
-
-		@Override
-		public void run() {
-			try {
-				newConcept = Concept.get(eConcept);
-				Concept newConcept = Concept.get(eConcept);
-				Concept newConcept1 = Concept.get(eConcept);
-				assert newConcept.getConceptAttributes().conceptComponentFieldsEqual(newConcept1.getConceptAttributes()):
-					"\nattr1: " + newConcept.getConceptAttributes() + 
-					"\nattr2: " + newConcept1.getConceptAttributes();
-				assert newConcept.getDescriptions().equals(newConcept1.getDescriptions()):
-					"\ndesc1: " + newConcept.getDescriptions() + 
-					"\ndesc2: " + newConcept1.getDescriptions();
-				assert newConcept.getSourceRels().equals(newConcept1.getSourceRels()):
-					"\nrel1: " + newConcept.getSourceRels() + 
-					"\nrel2: " + newConcept1.getSourceRels();
-				
-				int nid = newConcept.getNid();
-				ConceptBinder binder = new ConceptBinder();
-	    		DatabaseEntry value = new DatabaseEntry();
-	    		binder.objectToEntry(newConcept, value);
-
-	    		Concept clone = Concept.get(nid, false, value);
-	    		try {
-					clone.getConceptAttributes();
-				} catch (RuntimeException e) {
-					System.out.println(e.getLocalizedMessage());
-					System.out.println(value.toString());
-		    		value = new DatabaseEntry();
-		    		binder.objectToEntry(newConcept, value);
-					System.out.println(value.toString());
-					throw e;
-				}
-	    		Concept clone2 = Concept.get(nid, false, value);
-	    		clone2.getConceptAttributes();
-	    		Concept clone3 = Concept.get(nid, false, value);
-	    		clone3.getConceptAttributes();
-	    		
-				String validationReport = clone.validate(newConcept);
-				if (validationReport.length() > 0) {
-					System.out.println(validationReport);
-				}
-				conceptsProcessed.incrementAndGet();
-			} catch (Throwable e) {
-				exception = e;
-			}
-			try {
-				converters.put(this);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		public void setEConcept(EConcept eConcept) throws Throwable {
-			if (exception != null) {
-				throw exception;
-			}
-			this.eConcept = eConcept;
-		}
-    	
-    }
-
-    
+     
 	private static class ConvertConcept implements I_ProcessEConcept {
 		Throwable exception = null;
 		EConcept eConcept = null;
