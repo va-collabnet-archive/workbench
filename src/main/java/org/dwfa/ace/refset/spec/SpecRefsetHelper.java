@@ -1276,7 +1276,7 @@ public class SpecRefsetHelper {
             I_GetConceptData requiredPromotionStatusConcept) throws Exception {
 
         List<I_GetConceptData> filteredList = new ArrayList<I_GetConceptData>();
-
+        System.out.println("Number of extensions>>>>>>>>>>>>> " + allExtensions.size());
         for (I_ThinExtByRefVersioned extension : allExtensions) {
             I_ThinExtByRefPart latestMemberPart = getLatestCurrentPart(extension);
             if (latestMemberPart == null) {
@@ -1286,8 +1286,20 @@ public class SpecRefsetHelper {
             if (extension != null) {
                 promotionStatus = getPromotionStatus(extension);
             }
+            System.out.println(">>>>>>>> PROMOTION STATUS: " + promotionStatus.getInitialText());
             if (promotionStatus != null && promotionStatus.equals(requiredPromotionStatusConcept)) {
-                filteredList.add(termFactory.getConcept(extension.getComponentId()));
+                if (termFactory.hasConcept(extension.getComponentId())) {
+                    filteredList.add(termFactory.getConcept(extension.getComponentId()));
+                } else {
+                    UUID descUuid = termFactory.getId(extension.getComponentId()).getUUIDs().iterator().next();
+                    filteredList.add(termFactory.getConcept(termFactory.getDescription(descUuid.toString())
+                        .getConceptId()));
+                }
+                System.out.println("Adding to filtered list. "
+                    + termFactory.getConcept(extension.getComponentId()).getInitialText());
+            } else {
+                System.out.println("Not adding to filtered list."
+                    + termFactory.getConcept(extension.getComponentId()).getInitialText());
             }
         }
         return filteredList;
@@ -1449,5 +1461,32 @@ public class SpecRefsetHelper {
             }
         }
         return latestDescription;
+    }
+
+    public boolean hasConceptRefsetExtensionWithAnyPromotionStatus(int refsetId, int conceptId) throws IOException {
+        for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(conceptId, true)) {
+
+            if (extension.getRefsetId() == refsetId) {
+
+                // get the latest version
+                I_ThinExtByRefPart latestPart = null;
+                for (I_ThinExtByRefPart part : extension.getMutableParts()) {
+                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                        latestPart = part;
+                    }
+                }
+
+                // confirm its the right extension value and its status is
+                // current
+                for (Integer currentStatus : getCurrentStatusIds()) {
+                    if (latestPart.getStatusId() == currentStatus) {
+                        if (latestPart instanceof I_ThinExtByRefPartConcept) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

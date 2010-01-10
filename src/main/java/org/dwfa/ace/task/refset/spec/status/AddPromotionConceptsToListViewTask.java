@@ -115,17 +115,21 @@ public class AddPromotionConceptsToListViewTask extends AbstractTask {
 
             termFactory = LocalVersionedTerminology.get();
 
-            UUID memberRefsetUuid = (UUID) process.readProperty(memberRefsetUuidPropName);
+            UUID memberRefsetUuid = (UUID) process.getProperty(memberRefsetUuidPropName);
             I_GetConceptData memberRefsetConcept = termFactory.getConcept(new UUID[] { memberRefsetUuid });
 
-            UUID promotionStatusUuid = (UUID) process.readProperty(statusUuidPropName);
+            UUID promotionStatusUuid = (UUID) process.getProperty(statusUuidPropName);
             I_GetConceptData promotionStatusConcept = termFactory.getConcept(new UUID[] { promotionStatusUuid });
 
             SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
-            List<I_GetConceptData> filteredConcepts = refsetHelper.filterListByConceptType(
-                termFactory.getRefsetExtensionMembers(memberRefsetConcept.getConceptId()), promotionStatusConcept);
+            List<I_GetConceptData> filteredConcepts =
+                    refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(memberRefsetConcept
+                        .getConceptId()), promotionStatusConcept);
 
-            I_ConfigAceFrame config = (I_ConfigAceFrame) process.readProperty(getProfilePropName());
+            System.out.println("Filtered concepts of promotion status: " + promotionStatusConcept.getInitialText());
+            System.out.println(filteredConcepts.size());
+
+            I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
             JList conceptList = config.getBatchConceptList();
             I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
             model.clear();
