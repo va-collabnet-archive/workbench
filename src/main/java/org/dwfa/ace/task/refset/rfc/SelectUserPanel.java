@@ -136,9 +136,7 @@ public class SelectUserPanel extends JPanel {
             I_GetConceptData userParent =
                     LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 
-            I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
-            allowedTypes.add(LocalVersionedTerminology.get().getConcept(
-                ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+            I_IntSet allowedTypes = LocalVersionedTerminology.get().getActiveAceFrameConfig().getDestRelTypes();
             SpecRefsetHelper helper = new SpecRefsetHelper();
             Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 

@@ -25,6 +25,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.refset.RefsetUtilities;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
@@ -234,11 +235,21 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper {
                     // relationship exists so use the is-a specified by the
                     // marked-parent-is-a relationship
                     this.isARelTypes = termFactory.newIntSet();
-                    this.isARelTypes.add(requiredIsAType.iterator().next().getConceptId());
+                    for (I_GetConceptData concept : requiredIsAType) {
+                        this.isARelTypes.add(concept.getConceptId());
+                    }
+
+                    // Added for backwards compatability. All newly created refset specs will have one or more
+                    // relationships specifiying the relationship types to use. e.g. if in a database with Snomed IS-a
+                    // and the AA is-a, it will have 2 relationships... one to each. Previously only one relationship
+                    // would have been created (to the SNOMED is-a), so this step ensures that the AA is-a is also added
+                    // in SNOMED databases.
+                    if (!this.isARelTypes.contains(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid())) {
+                        isARelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+                    }
                 } else {
                     // no specified marked-parent-is-a relationship defined, so
-                    // first default to using
-                    // SNOMED or ArchitectonicAuxiliary is_a relationship type
+                    // first default to using SNOMED and ArchitectonicAuxiliary is_a relationship type
                     super.getIsARelTypes();
                 }
             } catch (NoMappingException ex) {

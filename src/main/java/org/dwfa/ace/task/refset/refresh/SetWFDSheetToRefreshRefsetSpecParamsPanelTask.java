@@ -43,7 +43,6 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.TestForCreateNewRefsetPermission;
-import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
 import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -51,7 +50,6 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.Priority;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
@@ -60,25 +58,26 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * This task prepares the Workflow Details Sheet to display the PanelRefsetAndParameters
- * panel where the user will be asked to enter a number of fields required to start the 
- * Refresh Refset process.   
+ * panel where the user will be asked to enter a number of fields required to start the
+ * Refresh Refset process.
  * 
  * @author Perry Reid
- * @version 1.0, November 2009 
+ * @version 1.0, November 2009
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/wf", type = BeanType.TASK_BEAN) })
 public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask {
 
-    /* -----------------------
-     * Properties 
+    /*
+     * -----------------------
+     * Properties
      * -----------------------
      */
-	// Serialization Properties 
+    // Serialization Properties
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 2;
 
-	// Task Attribute Properties     
-	private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();  
+    // Task Attribute Properties
+    private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
     private String editorInboxPropName = ProcessAttachmentKeys.EDITOR_INBOX.getAttachmentKey();
@@ -87,15 +86,14 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     private String fileAttachmentsPropName = ProcessAttachmentKeys.FILE_ATTACHMENTS.getAttachmentKey();
     private String ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
 
-           
-	// Other Properties 
+    // Other Properties
     private transient Exception ex = null;
     private I_TermFactory termFactory;
     private I_ConfigAceFrame config;
-    private I_GetConceptData owner; 
+    private I_GetConceptData owner;
 
-    
-    /* -----------------------
+    /*
+     * -----------------------
      * Serialization Methods
      * -----------------------
      */
@@ -110,62 +108,60 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         out.writeObject(fileAttachmentsPropName);
         out.writeObject(reviewerUuidPropName);
     }
+
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        
+
         if (objDataVersion <= dataVersion) {
-        	if (objDataVersion >= 1) {
+            if (objDataVersion >= 1) {
                 // Read version 1 data fields...
-            	profilePropName = (String) in.readObject();
-            	editorInboxPropName = (String) in.readObject();
+                profilePropName = (String) in.readObject();
+                editorInboxPropName = (String) in.readObject();
                 commentsPropName = (String) in.readObject();
                 refsetUuidPropName = (String) in.readObject();
-            	editorUuidPropName = (String) in.readObject();
-            	ownerUuidPropName = (String) in.readObject();
-            	fileAttachmentsPropName = (String) in.readObject();
-        	} 
+                editorUuidPropName = (String) in.readObject();
+                ownerUuidPropName = (String) in.readObject();
+                fileAttachmentsPropName = (String) in.readObject();
+            }
             if (objDataVersion >= 2) {
                 // Read version 2 data fields...
-             	reviewerUuidPropName = (String) in.readObject();
-            } 
+                reviewerUuidPropName = (String) in.readObject();
+            }
 
             // Initialize transient properties...
             ex = null;
-           
+
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
-    
 
-	/**
-	 * Handles actions required by the task after normal task completion (such as moving a 
-	 * process to another user's input queue).   
-	 * @return  	void
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#complete(
-	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
-	 */
+    /**
+     * Handles actions required by the task after normal task completion (such as moving a
+     * process to another user's input queue).
+     * 
+     * @return void
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
-
-    
-	/**
-	 * Performs the primary action of the task, which in this case is to gather and 
-	 * validate data that has been entered by the user on the Workflow Details Sheet.
-	 * @return  	The exit condition of the task
-	 * @param   	process	The currently executing Workflow process
-	 * @param 		worker	The worker currently executing this task 
-	 * @exception  	TaskFailedException Thrown if a task fails for any reason.
-	 * @see 		org.dwfa.bpa.process.I_DefineTask#evaluate(
-	 * 				org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      		org.dwfa.bpa.process.I_Work)
-	 */
+    /**
+     * Performs the primary action of the task, which in this case is to gather and
+     * validate data that has been entered by the user on the Workflow Details Sheet.
+     * 
+     * @return The exit condition of the task
+     * @param process The currently executing Workflow process
+     * @param worker The worker currently executing this task
+     * @exception TaskFailedException Thrown if a task fails for any reason.
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+     *      org.dwfa.bpa.process.I_Work)
+     */
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
 
         try {
@@ -192,172 +188,162 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         return Condition.CONTINUE;
     }
 
-
     private void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
 
-    	try {
- 
-    		// Initialize class variables
-    		this.config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-    		this.owner = this.config.getDbConfig().getUserConcept();
+        try {
+
+            // Initialize class variables
+            this.config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+            this.owner = this.config.getDbConfig().getUserConcept();
             this.termFactory = LocalVersionedTerminology.get();
 
-    		// Get a list of valid Refset Specs 
+            // Get a list of valid Refset Specs
             Set<I_GetConceptData> refsetSpecs = getValidRefsetSpecs();
-            
-			// Clear the Workflow Details Sheet 
-			ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
-			clear.setProfilePropName(getProfilePropName());
-			clear.evaluate(process, worker);
 
-			// Create a new panel to add to the Workflow Details Sheet
+            // Clear the Workflow Details Sheet
+            ClearWorkflowDetailsSheet clear = new ClearWorkflowDetailsSheet();
+            clear.setProfilePropName(getProfilePropName());
+            clear.evaluate(process, worker);
+
+            // Create a new panel to add to the Workflow Details Sheet
             JPanel workflowDetailsSheet = this.config.getWorkflowDetailsSheet();
-	        int width = 475;
-	        int height = 590;
-	        workflowDetailsSheet.setSize(width, height);
-	        workflowDetailsSheet.setLayout(new GridLayout(1, 1));
-	        PanelRefsetAndParameters newPanel = new PanelRefsetAndParameters(refsetSpecs); 
-	        
-	        // ----------------------------------------------------------------------------------
-	        // INITIALIZE DATA FIELDS
-	        // Initialize the fields on this panel with the previously entered values (if any).
-	        // ----------------------------------------------------------------------------------
-	        
-	                
+            int width = 475;
+            int height = 590;
+            workflowDetailsSheet.setSize(width, height);
+            workflowDetailsSheet.setLayout(new GridLayout(1, 1));
+            PanelRefsetAndParameters newPanel = new PanelRefsetAndParameters(refsetSpecs);
+
+            // ----------------------------------------------------------------------------------
+            // INITIALIZE DATA FIELDS
+            // Initialize the fields on this panel with the previously entered values (if any).
+            // ----------------------------------------------------------------------------------
+
             // -----------------------------------------
             // Refset - Field Initialization
             // -----------------------------------------
-			try {
-		        I_GetConceptData previousRefsetSpec = null;
-	        	UUID refsetSpecUUID = (UUID) process.getProperty(refsetUuidPropName);
-	        	previousRefsetSpec = (I_GetConceptData) AceTaskUtil.getConceptFromObject(refsetSpecUUID); 
+            try {
+                I_GetConceptData previousRefsetSpec = null;
+                UUID refsetSpecUUID = (UUID) process.getProperty(refsetUuidPropName);
+                previousRefsetSpec = (I_GetConceptData) AceTaskUtil.getConceptFromObject(refsetSpecUUID);
 
-		        if (previousRefsetSpec != null ) {
-		        	newPanel.setRefset(previousRefsetSpec); 
-		        }	      
-			} catch (NullPointerException e) {
-				//TODO  Just ignore the NPE for now - remove this when you add the 
-				//      isPropertyDefined class back in.  
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IntrospectionException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
-	        
-	        
+                if (previousRefsetSpec != null) {
+                    newPanel.setRefset(previousRefsetSpec);
+                }
+            } catch (NullPointerException e) {
+                // TODO Just ignore the NPE for now - remove this when you add the
+                // isPropertyDefined class back in.
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IntrospectionException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+
             // -----------------------------------------
-			// Editor - Field Initialization
-            // ----------------------------------------- 	        
-			try {
-		        I_GetConceptData previousEditor = null;
-
-		        // TODO: UUID[] CONVERT
-		        // UUID[] editorUUID = (UUID[]) process.getProperty(editorUuidPropName);
-	        	// previousEditor = (I_GetConceptData) AceTaskUtil.getConceptFromObject(editorUUID); 
-	        	previousEditor = termFactory.getConcept((UUID[]) process.getProperty(editorUuidPropName));
-
-		        if (previousEditor != null ) {
-		        	// set the ComboBox to point to the selected editor  
-		        	newPanel.setEditor(previousEditor); 
-		        }	      
-			} catch (NullPointerException e) {
-				//TODO  Just ignore the NPE for now - remove this when you add the 
-				//      isPropertyDefined class back in.  
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IntrospectionException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
-
-			
+            // Editor - Field Initialization
             // -----------------------------------------
-			// Reviewer - Field Initialization
-            // ----------------------------------------- 	        
-			try {
-		        I_GetConceptData previousReviewer = null;
+            try {
+                I_GetConceptData previousEditor = null;
 
-		        // TODO: UUID[] CONVERT
-	        	// Retrieve the UUID for the reviewer 
-	        	// UUID reviewerUUID = (UUID) process.getProperty(reviewerUuidPropName);
-	        	// previousReviewer = (I_GetConceptData) AceTaskUtil.getConceptFromObject(reviewerUUID); 
-		        previousReviewer = termFactory.getConcept((UUID[]) process.getProperty(reviewerUuidPropName));
+                // TODO: UUID[] CONVERT
+                // UUID[] editorUUID = (UUID[]) process.getProperty(editorUuidPropName);
+                // previousEditor = (I_GetConceptData) AceTaskUtil.getConceptFromObject(editorUUID);
+                previousEditor = termFactory.getConcept((UUID[]) process.getProperty(editorUuidPropName));
 
-		        
-		        if (previousReviewer != null ) {
-		        	// set the ComboBox to point to the selected reviewer  
-		        	newPanel.setReviewer(previousReviewer); 
-		        }	      
-			} catch (NullPointerException e) {
-				//TODO  Just ignore the NPE for now - remove this when you add the 
-				//      isPropertyDefined class back in.  
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IntrospectionException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
+                if (previousEditor != null) {
+                    // set the ComboBox to point to the selected editor
+                    newPanel.setEditor(previousEditor);
+                }
+            } catch (NullPointerException e) {
+                // TODO Just ignore the NPE for now - remove this when you add the
+                // isPropertyDefined class back in.
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IntrospectionException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
 
-			
-			// Priority - Field Initialization 	        
-	        Priority previousPriority = process.getPriority();
-	        if (previousPriority == Priority.HIGHEST) {
-        	    newPanel.setPriority("Highest"); 
-	        } else if (previousPriority == Priority.HIGH) {
-	        	newPanel.setPriority("High"); 
-	        } else if (previousPriority == Priority.NORMAL) {
-	        	newPanel.setPriority("Normal"); 
-	        } else if (previousPriority == Priority.LOW) {
-	        	newPanel.setPriority("Low"); 
-	        } else if (previousPriority == Priority.LOWEST) {
-	        	newPanel.setPriority("Lowest"); 
-	        } else {
-	        	// set priority to Normal by default 
-	        	newPanel.setPriority("Normal"); 
-	        }
+            // -----------------------------------------
+            // Reviewer - Field Initialization
+            // -----------------------------------------
+            try {
+                I_GetConceptData previousReviewer = null;
 
-	        
-	        // Deadline - Field Initialization 
-	        Date previousDeadlineDate = null; 
-	        previousDeadlineDate = (Date) process.getDeadline(); 
-	        if (previousDeadlineDate != null) {
-		        Calendar previousDeadline = Calendar.getInstance();
-		        previousDeadline.setTime(previousDeadlineDate);
-	 	        newPanel.setDeadline(previousDeadline);
-	        }
-	        
+                // TODO: UUID[] CONVERT
+                // Retrieve the UUID for the reviewer
+                // UUID reviewerUUID = (UUID) process.getProperty(reviewerUuidPropName);
+                // previousReviewer = (I_GetConceptData) AceTaskUtil.getConceptFromObject(reviewerUUID);
+                previousReviewer = termFactory.getConcept((UUID[]) process.getProperty(reviewerUuidPropName));
 
-	        // Comments - Field Initialization 	  
-	        String previousComments = null;
-			previousComments = (String) process.getProperty(commentsPropName);
-	        if (previousComments != null) {
-        	   newPanel.setComments(previousComments); 
-	        }
+                if (previousReviewer != null) {
+                    // set the ComboBox to point to the selected reviewer
+                    newPanel.setReviewer(previousReviewer);
+                }
+            } catch (NullPointerException e) {
+                // TODO Just ignore the NPE for now - remove this when you add the
+                // isPropertyDefined class back in.
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IntrospectionException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
 
-	        
-	        // File Attachments - Field Initialization 	        	        
-			HashSet<File> previousFileAttachments = null;
-        	previousFileAttachments = (HashSet<File>) process.getProperty(fileAttachmentsPropName);
-	        if (previousFileAttachments != null ) {
-	        	newPanel.setAttachments(previousFileAttachments); 
-	        }	      
-	        
-			
-	        /*----------------------------------------------------------------------------------
-	         *  Add the initialized panel to the Workflow Details Sheet
-	         * ----------------------------------------------------------------------------------
-	         */
-	        workflowDetailsSheet.add(newPanel);
+            // Priority - Field Initialization
+            Priority previousPriority = process.getPriority();
+            if (previousPriority == Priority.HIGHEST) {
+                newPanel.setPriority("Highest");
+            } else if (previousPriority == Priority.HIGH) {
+                newPanel.setPriority("High");
+            } else if (previousPriority == Priority.NORMAL) {
+                newPanel.setPriority("Normal");
+            } else if (previousPriority == Priority.LOW) {
+                newPanel.setPriority("Low");
+            } else if (previousPriority == Priority.LOWEST) {
+                newPanel.setPriority("Lowest");
+            } else {
+                // set priority to Normal by default
+                newPanel.setPriority("Normal");
+            }
+
+            // Deadline - Field Initialization
+            Date previousDeadlineDate = null;
+            previousDeadlineDate = (Date) process.getDeadline();
+            if (previousDeadlineDate != null) {
+                Calendar previousDeadline = Calendar.getInstance();
+                previousDeadline.setTime(previousDeadlineDate);
+                newPanel.setDeadline(previousDeadline);
+            }
+
+            // Comments - Field Initialization
+            String previousComments = null;
+            previousComments = (String) process.getProperty(commentsPropName);
+            if (previousComments != null) {
+                newPanel.setComments(previousComments);
+            }
+
+            // File Attachments - Field Initialization
+            HashSet<File> previousFileAttachments = null;
+            previousFileAttachments = (HashSet<File>) process.getProperty(fileAttachmentsPropName);
+            if (previousFileAttachments != null) {
+                newPanel.setAttachments(previousFileAttachments);
+            }
+
+            /*----------------------------------------------------------------------------------
+             *  Add the initialized panel to the Workflow Details Sheet
+             * ----------------------------------------------------------------------------------
+             */
+            workflowDetailsSheet.add(newPanel);
         } catch (Exception e) {
             ex = e;
         }
@@ -366,19 +352,18 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     private Set<I_GetConceptData> getValidRefsetSpecs() throws Exception {
         Set<I_GetConceptData> refsetSpecs = new HashSet<I_GetConceptData>();
 
-        TestForEditRefsetPermission permissionTest = new TestForEditRefsetPermission();
+        TestForCreateNewRefsetPermission permissionTest = new TestForCreateNewRefsetPermission();
         Set<I_GetConceptData> permissibleRefsetParents = new HashSet<I_GetConceptData>();
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(this.owner));
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(this.owner));
 
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+        I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
 
         for (I_GetConceptData parent : permissibleRefsetParents) {
             Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, true, true);
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
-                	refsetSpecs.add(child);
+                    refsetSpecs.add(child);
                 }
             }
         }
@@ -406,61 +391,73 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-    
+    /*
+     * ---------------------------------------------------------
+     * Getters and Setters for Property Names
+     * ---------------------------------------------------------
+     */
+    public String getProfilePropName() {
+        return profilePropName;
+    }
 
-	/* ---------------------------------------------------------
-	 * Getters and Setters for Property Names
-	 * ---------------------------------------------------------
-	 */
-	public String getProfilePropName() {
-		return profilePropName;
-	}
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
-	}
-	public String getEditorInboxPropName() {
-		return editorInboxPropName;
-	}
-	public void setEditorInboxPropName(String editorInboxPropName) {
-		this.editorInboxPropName = editorInboxPropName;
-	}
-	public String getRefsetUuidPropName() {
-		return refsetUuidPropName;
-	}
-	public void setRefsetUuidPropName(String refsetUuidPropName) {
-		this.refsetUuidPropName = refsetUuidPropName;
-	}
-	public String getCommentsPropName() {
-		return commentsPropName;
-	}
-	public void setCommentsPropName(String commentsPropName) {
-		this.commentsPropName = commentsPropName;
-	}
-	public String getEditorUuidPropName() {
-		return editorUuidPropName;
-	}
-	public void setEditorUuidPropName(String editorUuidPropName) {
-		this.editorUuidPropName = editorUuidPropName;
-	}
-	public String getOwnerUuidPropName() {
-		return ownerUuidPropName;
-	}
-	public void setOwnerUuidPropName(String ownerUuidPropName) {
-		this.ownerUuidPropName = ownerUuidPropName;
-	}
-	public String getFileAttachmentsPropName() {
-		return fileAttachmentsPropName;
-	}
-	public void setFileAttachmentsPropName(String fileAttachmentsPropName) {
-		this.fileAttachmentsPropName = fileAttachmentsPropName;
-	}
-	public String getReviewerUuidPropName() {
-		return reviewerUuidPropName;
-	}
-	public void setReviewerUuidPropName(String reviewerUuidPropName) {
-		this.reviewerUuidPropName = reviewerUuidPropName;
-	}
+    public void setProfilePropName(String profilePropName) {
+        this.profilePropName = profilePropName;
+    }
 
+    public String getEditorInboxPropName() {
+        return editorInboxPropName;
+    }
 
+    public void setEditorInboxPropName(String editorInboxPropName) {
+        this.editorInboxPropName = editorInboxPropName;
+    }
+
+    public String getRefsetUuidPropName() {
+        return refsetUuidPropName;
+    }
+
+    public void setRefsetUuidPropName(String refsetUuidPropName) {
+        this.refsetUuidPropName = refsetUuidPropName;
+    }
+
+    public String getCommentsPropName() {
+        return commentsPropName;
+    }
+
+    public void setCommentsPropName(String commentsPropName) {
+        this.commentsPropName = commentsPropName;
+    }
+
+    public String getEditorUuidPropName() {
+        return editorUuidPropName;
+    }
+
+    public void setEditorUuidPropName(String editorUuidPropName) {
+        this.editorUuidPropName = editorUuidPropName;
+    }
+
+    public String getOwnerUuidPropName() {
+        return ownerUuidPropName;
+    }
+
+    public void setOwnerUuidPropName(String ownerUuidPropName) {
+        this.ownerUuidPropName = ownerUuidPropName;
+    }
+
+    public String getFileAttachmentsPropName() {
+        return fileAttachmentsPropName;
+    }
+
+    public void setFileAttachmentsPropName(String fileAttachmentsPropName) {
+        this.fileAttachmentsPropName = fileAttachmentsPropName;
+    }
+
+    public String getReviewerUuidPropName() {
+        return reviewerUuidPropName;
+    }
+
+    public void setReviewerUuidPropName(String reviewerUuidPropName) {
+        this.reviewerUuidPropName = reviewerUuidPropName;
+    }
 
 }
