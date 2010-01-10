@@ -50,7 +50,7 @@ public class SetUserAndPwdPropsPNC extends AbstractSetUserAndPwdPNC {
         user.selectAll();
         pwd = new JPasswordField((String) process.getProperty(passwordPropName));
         pwd.selectAll();
-        fullName.selectAll();
+        user.selectAll();
     }
 
     protected void readInput(I_EncodeBusinessProcess process) throws IntrospectionException, IllegalAccessException, InvocationTargetException {
