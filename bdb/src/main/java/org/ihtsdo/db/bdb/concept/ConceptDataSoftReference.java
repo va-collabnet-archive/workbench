@@ -533,11 +533,14 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 
 	@Override
 	public ArrayIntList getDestRelNidTypeNidList() throws IOException {
-		ArrayIntList returnList = refsetNidMemberNidForRelsListRef.get();
+		ArrayIntList returnList = null;
+		if (refsetNidMemberNidForRelsListRef != null) {
+			returnList = refsetNidMemberNidForRelsListRef.get();
+		}
 		if (returnList != null) {
 			return returnList;
 		}
-		returnList = getArrayIntList(OFFSETS.DEST_REL_ORIGIN_NID_TYPE_NIDS);
+		returnList = getArrayIntList(OFFSETS.DEST_REL_NID_TYPE_NIDS);
 		refsetNidMemberNidForRelsListRef = new SoftReference<ArrayIntList>(
 				returnList);
 		if (enclosingConcept.isEditable()) {
@@ -549,13 +552,18 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	private ArrayIntList getArrayIntList(OFFSETS offset)
 			throws IOException {
 		try {
-			TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
-			readOnlyInput.skipFast(offset.offset);
+			ArrayIntList roList = getReadOnlyArrayIntList(offset);
 			IntListPairsBinder binder = new IntListPairsBinder();
-			ArrayIntList roList = binder.entryToObject(readOnlyInput);
 			binder.setReadOnlyList(roList);
 			TupleInput readWriteInput = nidData.getReadWriteTupleInput();
+			if (readWriteInput.available() < 4) {
+				return new ArrayIntList();
+			}
+			readWriteInput.mark(128);
 			readWriteInput.skipFast(offset.offset);
+			int dataOffset = readWriteInput.readInt();
+			readWriteInput.reset();
+			readWriteInput.skipFast(dataOffset);
 			return binder.entryToObject(readWriteInput);
 		} catch (InterruptedException e) {
 			throw new IOException(e);
@@ -568,7 +576,14 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			throws IOException {
 		try {
 			TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
+			if (readOnlyInput.available() < 4) {
+				return new ArrayIntList();
+			}
+			readOnlyInput.mark(128);
 			readOnlyInput.skipFast(offset.offset);
+			int dataOffset = readOnlyInput.readInt();
+			readOnlyInput.reset();
+			readOnlyInput.skipFast(dataOffset);
 			IntListPairsBinder binder = new IntListPairsBinder();
 			return binder.entryToObject(readOnlyInput);
 		} catch (InterruptedException e) {
@@ -581,7 +596,10 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	@Override
 	public ArrayIntList getRefsetNidMemberNidForConceptList()
 			throws IOException {
-		ArrayIntList returnList = refsetNidMemberNidForConceptListRef.get();
+		ArrayIntList returnList = null;
+		if (refsetNidMemberNidForConceptListRef != null) {
+			returnList = refsetNidMemberNidForConceptListRef.get();
+		}
 		if (returnList != null) {
 			return returnList;
 		}
@@ -597,8 +615,10 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	@Override
 	public ArrayIntList getRefsetNidMemberNidForDescriptionsList()
 			throws IOException {
-		ArrayIntList returnList = refsetNidMemberNidForDescriptionsListRef
-				.get();
+		ArrayIntList returnList = null;
+		if (refsetNidMemberNidForDescriptionsListRef != null) {
+			returnList = refsetNidMemberNidForDescriptionsListRef.get();
+		}
 		if (returnList != null) {
 			return returnList;
 		}
@@ -613,7 +633,10 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 
 	@Override
 	public ArrayIntList getRefsetNidMemberNidForRelsList() throws IOException {
-		ArrayIntList returnList = refsetNidMemberNidForRelsListRef.get();
+		ArrayIntList returnList = null;
+		if (refsetNidMemberNidForRelsListRef != null) {
+			returnList = refsetNidMemberNidForRelsListRef.get();
+		}
 		if (returnList != null) {
 			return returnList;
 		}
@@ -628,7 +651,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 
 	@Override
 	public ArrayIntList getDestRelNidTypeNidListReadOnly() throws IOException {
-		return getReadOnlyArrayIntList(OFFSETS.DEST_REL_ORIGIN_NID_TYPE_NIDS);
+		return getReadOnlyArrayIntList(OFFSETS.DEST_REL_NID_TYPE_NIDS);
 	}
 
 	@Override

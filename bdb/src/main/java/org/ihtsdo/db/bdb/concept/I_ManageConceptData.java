@@ -91,6 +91,4 @@ public interface I_ManageConceptData {
 
 	public ArrayIntList getRefsetNidMemberNidForRelsList() throws IOException;
 	public ArrayIntList getRefsetNidMemberNidForRelsListReadOnly() throws IOException;
-
-
 }
