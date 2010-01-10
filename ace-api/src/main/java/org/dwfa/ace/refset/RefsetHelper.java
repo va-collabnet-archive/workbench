@@ -172,6 +172,16 @@ public class RefsetHelper extends LineageHelper {
         return false;
     }
 
+    public I_ThinExtByRefVersioned getRefsetExtension(int refsetId, int conceptId, final BeanPropertyMap extProps) throws Exception {
+        for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(conceptId, true)) {
+
+            if (extension.getRefsetId() == refsetId) {
+                return extension;
+            }
+        }
+        return null;
+    }
+
     public boolean hasCurrentRefsetExtension(int refsetId, int conceptId, final BeanPropertyMap extProps)
             throws Exception {
         if (!extProps.hasProperty("statusId")) {
@@ -221,6 +231,40 @@ public class RefsetHelper extends LineageHelper {
 
         termFactory.addUncommittedNoChecks(newExtension);
         return true;
+    }
+
+    public <T extends I_ThinExtByRefPart> I_ThinExtByRefVersioned getOrCreateRefsetExtension(int refsetId, int conceptId, Class<T> type,
+            final BeanPropertyMap extProps) throws Exception {
+    	I_ThinExtByRefVersioned extension = getRefsetExtension(refsetId, conceptId, extProps);
+    	
+        // check subject is not already a member
+        if (extension != null) {
+            return extension;
+        }
+
+        // create a new extension (with a part for each path the user is
+        // editing)
+
+        int newMemberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedUuid, getEditPaths(),
+            Integer.MAX_VALUE);
+
+        extension = termFactory.newExtension(refsetId, newMemberId, conceptId, type);
+
+        for (I_Path editPath : getEditPaths()) {
+
+            I_ThinExtByRefPart newPart = termFactory.newExtensionPart(type);
+
+            newPart.setPathId(editPath.getConceptId());
+            newPart.setStatusId(currentStatusId);
+            newPart.setVersion(Integer.MAX_VALUE);
+
+            extProps.writeTo(newPart);
+
+            extension.addVersion(newPart);
+        }
+
+        termFactory.addUncommittedNoChecks(extension);
+        return extension;
     }
 
     /**
