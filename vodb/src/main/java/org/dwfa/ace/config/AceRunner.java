@@ -122,6 +122,20 @@ public class AceRunner {
                 jiniConfig = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
             }
 
+        	System.setProperty("javax.net.ssl.trustStore", "config/cacerts");
+            String trustStore = System.getProperty("javax.net.ssl.trustStore");
+
+        	if (trustStore == null) {
+            	AceLog.getAppLog().info("javax.net.ssl.trustStore is not defined");
+            	System.setProperty("javax.net.ssl.trustStore", "config/cacerts");
+            	System.setProperty("javax.net.ssl.keyStorePassword","visit.bend");
+            } else {
+            	AceLog.getAppLog().info("javax.net.ssl.trustStore = " + trustStore);
+            	AceLog.getAppLog().info("javax.net.ssl.keyStorePassword = " + 
+            			System.getProperty("javax.net.ssl.keyStorePassword"));
+            }
+            
+            
             setupLookAndFeel();
             setupSwingExpansionTimerLogging();
             setupIpChangeListener();
