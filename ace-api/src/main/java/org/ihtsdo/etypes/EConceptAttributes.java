@@ -9,7 +9,6 @@ import java.util.List;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.etypes.EComponent.IDENTIFIER_PART_TYPES;
 
 public class EConceptAttributes extends EComponent<EConceptAttributesVersion> implements I_ConceptualizeExternally {
     public static final long serialVersionUID = 1;
@@ -46,8 +45,8 @@ public class EConceptAttributes extends EComponent<EConceptAttributesVersion> im
         super.readExternal(in);
         defined = in.readBoolean();
         int versionCount = in.readInt();
-        extraVersions = new ArrayList<EConceptAttributesVersion>();
         if (versionCount > 0) {
+            extraVersions = new ArrayList<EConceptAttributesVersion>(versionCount);
             for (int i = 0; i < versionCount; i++) {
                 extraVersions.add(new EConceptAttributesVersion(in));
             }
