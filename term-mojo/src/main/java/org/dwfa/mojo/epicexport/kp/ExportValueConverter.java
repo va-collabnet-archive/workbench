@@ -32,12 +32,17 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.ExportToEpicLoadFilesMojo;
 import org.dwfa.mojo.epicexport.ExternalTermRecord;
-import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 import org.dwfa.mojo.epicexport.I_ExportValueConverter;
 import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter.I_RefsetApplication;
+
+/**
+ * A value converter is a class that mines a refset, it's parent concept, or it's description concept, for values
+ * used to populate an external terminology system.
+ * 
+ *  @author Steven Neiner
+ */
 
 public class ExportValueConverter implements I_ExportValueConverter{
 	private int startingVersion;
@@ -193,36 +198,6 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	return ret;
     }
     
-    public void writeRecordIds(I_ThinExtByRefTuple extensionTuple, List<String> masterFilesImpacted,
-    		EpicExportManager exportManager) throws Exception {
-		/* Special post handling, such writing id when we encounter a display name */
-    	String dot11 = null;
-    	String dot1 = null;
-    	String uuid = null;
-    	
-    	I_GetConceptData idConcept = LocalVersionedTerminology.get().getConcept(extensionTuple.getComponentId());
-    	
-    	for (String masterfile: masterFilesImpacted) {
-	    	I_EpicLoadFileBuilder exportWriter = exportManager.getLoadFileBuilder(masterfile);
-    		
-    		exportWriter.setIdConcept(idConcept);
-    		uuid = getIdForConcept(idConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
-    		
-    		if(masterfile.equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_CLINICAL)) {
-				dot11 = getIdForConcept(idConcept, "e3dadc2a-196d-5525-879a-3037af99607d");
-				dot1 = getIdForConcept(idConcept, "e49a55a7-319d-5744-b8a9-9b7cc86fd1c6");
-    		}
-    		else if(masterfile.equals(EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_BILLING)) {
-				dot11 = getIdForConcept(idConcept, "bf3e7556-38cb-5395-970d-f11851c9f41e");
-				dot1 = getIdForConcept(idConcept, "af8be384-dc60-5b56-9ad8-bc1e4b5dfbae");
-    		}
-    		if (dot11 != null)
-    			exportWriter.addItemForExport("11", dot11, dot11);
-    		if (dot1 != null)
-   				exportWriter.addItemForExport("1", dot1, dot1);
-   			exportWriter.addItemForExport("35", uuid, uuid);
-    	}
-    }
 
     public void addRecordIds(I_ThinExtByRefTuple extensionTuple, I_GetConceptData rootConcept,
     		ExternalTermRecord record) 

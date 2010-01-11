@@ -148,7 +148,7 @@ public class ExternalTermPublisher {
         for (ExternalTermRecord r : standAloneRecords) {
         	for (ExternalTermRecord c : commonItemRecords) {
         		if (c.getMasterFileName().equals(r.getMasterFileName())) {
-        			for (ExternalTermRecord.Item i : c.items)
+        			for (ExternalTermRecord.Item i : c.getAllItems())
         				r.addItem(i);
         		}
         	}

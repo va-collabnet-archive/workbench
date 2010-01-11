@@ -26,7 +26,10 @@ import com.mysql.jdbc.Connection;
 /**
  * Class used to manage a list of export writers, and export builders. Used to
  * determine where to place an export. If a particular writer or builder is not present,
- * will create a new instance and place it on the list.
+ * will create a new instance and place it on the list. A builder is a controlling object that queues
+ * up data to export, then uses business logic to determine what to export.  The builder directly
+ * controls one or more writers, which is a class that directly does the grunt work of writing to an 
+ * export source.
  * 
  * @author Steven Neiner
  * @param baseDir - The location of the exported files
@@ -58,12 +61,11 @@ public class EpicExportManager {
     
     /**
      * Looks for an existing load file writer that handles the named record
-     * type,
-     * and creates a new writer if not present.
+     * type, and creates a new writer if not present.
      * 
      * @param writerName - The name of the writer to look for
      * @return The writer that handles the requested record type
-     * @throws IOException
+     * @throws Exception
      */
     public I_EpicExportRecordWriter getWriter(String writerName) throws Exception {
         I_EpicExportRecordWriter ret = null;
@@ -75,6 +77,14 @@ public class EpicExportManager {
         return ret;
     }
 
+    /**
+     * Looks for an existing export builder that handles the named record
+     * type, and creates a new writer if not present.
+     * 
+     * @param masterfile - The name of the builder to look for
+     * @return The builder that handles the requested record type
+     * @throws Exception
+     */
     public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile) throws Exception {
         I_EpicLoadFileBuilder ret = builders.get(masterfile);
         if (ret == null) {
@@ -86,25 +96,42 @@ public class EpicExportManager {
         return ret;
     }
 
+    /**
+     * Exports a record to an export target.  Will do this by finding an appropriate builder for the
+     * records masterfile, wrting all of the record contents to that builder's queue, then calling
+     * the builder's writerecord method.
+     * 
+     * @param term - The class used to describe an external term record.
+     * @throws Exception
+     */
     public void exportExternalTermRecord(ExternalTermRecord term) throws Exception {
     	I_EpicLoadFileBuilder builder = getLoadFileBuilder(term.getMasterFileName());
     	if (builder != null) {
     		builder.clearRecordContents();
-    		for (ExternalTermRecord.Item i: term.items) {
+    		for (ExternalTermRecord.Item i: term.getAllItems()) {
     			builder.addItemForExport(i.getName(), i.getValue(), i.getPreviousValue());
     		}
     		builder.writeRecord(term.getVersion(), term.getRegions());
     	}
     }
     
-    public void close(BufferedWriter bw) throws IOException {
+    /**
+     * Used to close files, database connections (if you want) for any export writers.  Optionally
+     * pass the buffered writer of a file, and the summary text, a description of work done, will be
+     * written to that file.
+     * 
+     * @param summaryFileBufferedWriter (optional) A description of work done will be
+     * written to that file.
+     * @throws IOException
+     */
+    public void close(BufferedWriter summaryFileBufferedWriter) throws IOException {
 
         for (Iterator<I_EpicExportRecordWriter> i = writers.values().iterator(); i.hasNext();) {
             I_EpicExportRecordWriter w = i.next();
             String text = w.getSummary();
             AceLog.getAppLog().info(text);
-            if (bw != null)
-            	bw.write(text.concat("\r\n"));
+            if (summaryFileBufferedWriter != null)
+            	summaryFileBufferedWriter.write(text.concat("\r\n"));
             w.close();
         }
     }

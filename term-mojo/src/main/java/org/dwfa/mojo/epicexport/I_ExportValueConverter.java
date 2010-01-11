@@ -16,7 +16,12 @@
  */
 package org.dwfa.mojo.epicexport;
 
-import java.util.List;
+/**
+ * A value converter is a class that mines a refset, it's parent concept, or it's description concept, for values
+ * used to populate an external terminology system.
+ * 
+ *  @author Steven Neiner
+ */
 
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -40,9 +45,6 @@ public interface I_ExportValueConverter {
 
 	public String getRegion();
 	
-	public void writeRecordIds(I_ThinExtByRefTuple extensionTuple, List<String> masterFilesImpacted,
-    		EpicExportManager exportManager) throws Exception;
-
 	public void addRecordIds(I_ThinExtByRefTuple extensionTuple, I_GetConceptData rootConcept,
 			ExternalTermRecord record) throws Exception;
 	
