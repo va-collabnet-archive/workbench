@@ -159,6 +159,11 @@ public abstract class AbstractEpicExportBuilder {
 		writeItem(epicItemNumber, epicItemNumber);
 	}
 	
+	/**
+	 * Returns the  master file that this builder is for
+	 * 
+	 * @return
+	 */
 	public String getMasterfile() {
 		return masterfile;
 	}
@@ -202,6 +207,12 @@ public abstract class AbstractEpicExportBuilder {
 		}
 	}
 	
+	/**
+	 * Plural of writeItemIfChanged, If an item has changed value since the last version, 
+	 * will populate the load file, otherwise will leave it out of the load file.
+	 * 
+	 * @param items List of items to write
+	 */
 	public void writeItemsIfChanged(String... items) {
 		for (String i: items)
 			writeItemIfChanged(i);
@@ -225,6 +236,16 @@ public abstract class AbstractEpicExportBuilder {
 	 */
 	public void writeLiteralItem(String epicItemNumber, String literal) {
 		writer.addItemValue(epicItemNumber, literal);
+	}
+	
+	/**
+	 * Writes a literal line of text to the output
+	 * 
+	 * @param text
+	 * @throws IOException
+	 */
+	public void writeLine(String text) throws IOException {
+		writer.writeLine(text);
 	}
 	
 	/**
@@ -311,7 +332,7 @@ public abstract class AbstractEpicExportBuilder {
 	
 	/**
 	 * Returns true if all items in the list have values.  If any item in the list is not present,
-	 * will add an error.  Used for validation.
+	 * will add an error.  Used for validation.  Will also add an error for missing items.
 	 * 
 	 * @param epicItemNumber
 	 * @return boolean true if all populated
@@ -366,31 +387,60 @@ public abstract class AbstractEpicExportBuilder {
 		return this.anyItemsHaveChanges(this.exportIfTheseItemsChanged);
 	}
 	
+	/**
+	 * Adds an error message to this builder for later retrieval.
+	 * 
+	 * @param message
+	 */
 	public void addError(String message) {
 		this.hasErrors = true;
 		this.errors.add(message);
 		AceLog.getAppLog().warning(message + ": " + toString());
 	}
 	
+	/**
+	 * Will add an error if <i>condition</i> is true.
+	 * 
+	 * @param condition - boolean condition
+	 * @param message - the error message to add if ture
+	 */
 	public void addErrorIfTrue(boolean condition, String message) {
 		if (condition)
 			addError(message);
 	}
 	
+	/**
+	 * Gets all errors for this builder
+	 * @return List<String> of error messages
+	 */
 	public List<String> getErrors() {
 		return this.errors;
 	}
 	
+	/**
+	 * Writes any errors to this builders writer.
+	 *  
+	 * @throws IOException
+	 */
 	public void writeAnyErrors() throws IOException {
 		for (String e: this.errors) {
 			this.writer.writeLine("ERROR: " + e);
 		}
 	}
 	
+	/**
+	 * Returns true if there were any error messages added in addError.
+	 * @return true if there are errors
+	 */
 	public boolean hasErrors() {
 		return this.hasErrors;
 	}
 
+	/**
+	 * List of items to test for complete record 
+	 * 
+	 * @return
+	 */
 	public String[] getMandatoryItems() {
 		return mandatoryItems;
 	}
@@ -399,6 +449,11 @@ public abstract class AbstractEpicExportBuilder {
 		this.mandatoryItems = mandatoryItems;
 	}
 
+	/**
+	 * List of items to write for new record
+	 * 
+	 * @return
+	 */
 	public String[] getAlwaysWriteTheseItemsForNewRecord() {
 		return alwaysWriteTheseItemsForNewRecord;
 	}
@@ -408,6 +463,11 @@ public abstract class AbstractEpicExportBuilder {
 		this.alwaysWriteTheseItemsForNewRecord = alwaysWriteTheseItemsForNewRecord;
 	}
 
+	/**
+	 * List of items to write for existing record
+	 * 
+	 * @return
+	 */
 	public String[] getAlwaysWriteTheseItemsForExistingRecord() {
 		return alwaysWriteTheseItemsForExistingRecord;
 	}
@@ -417,6 +477,11 @@ public abstract class AbstractEpicExportBuilder {
 		this.alwaysWriteTheseItemsForExistingRecord = alwaysWriteTheseItemsForExistingRecord;
 	}
 
+	/**
+	 * List of items to write if their values have changed
+	 * 
+	 * @return
+	 */
 	public String[] getItemsToWriteIfChanged() {
 		return itemsToWriteIfChanged;
 	}

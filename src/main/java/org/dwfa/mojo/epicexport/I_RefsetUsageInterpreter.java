@@ -18,10 +18,26 @@ package org.dwfa.mojo.epicexport;
 
 import java.util.List;
 
+/**
+ * A class that implements this method is a plugin which identifies the usage for a refset.  The getApplications
+ * method will return a list of "RefsetApplications", which is the masterfile and item name/number, as well as 
+ * any regions, that contains data for external systems.  This is used to map concepts to records 
+ * for an external system.
+ * 
+ * @author Steven Neiner
+ *
+ */
 public interface I_RefsetUsageInterpreter {
 
 	public List<I_RefsetApplication> getApplications(String refsetName);
 	
+	/**
+	 * Class used to describe a usage for a refset.  This is a masterfile, item name or number, and an optional
+	 * region or locality.
+	 * 
+	 * @author Steven Neiner
+	 *
+	 */
 	public interface I_RefsetApplication {
 		public String getMasterfile();
 		

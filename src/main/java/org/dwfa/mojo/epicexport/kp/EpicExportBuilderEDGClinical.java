@@ -53,6 +53,8 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 				this.setWriter(writer);
 				writer.newRecord();
 				writeAnyErrors();
+				if (writer.getRecordsWrittenCount() == 0)
+					writeHeader();
 				writeLiteralItem("1", "");
 				writeItems("2", "35", "40");
 				// writeLiteralItem("35x", this.getParentUUID());
@@ -94,6 +96,8 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					I_EpicExportRecordWriter writer = getExportManager().getWriter(getWriterName(masterfile, version, "ernc"));
 					this.setWriter(writer);
 					writer.newRecord();
+					if (writer.getRecordsWrittenCount() == 0)
+						writeHeader();
 					writeItem("2");
 					writeItem("11", "1");
 					if (this.itemIsPopulated("2000"))
@@ -131,5 +135,10 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 			ret.append(".error");
 		}
 		return ret.toString();
+	}
+	
+	public void writeHeader() throws Exception {
+		this.writeLine("##INI=EDG");
+		this.writeLine("##VAR=TRACK_EXTID^TRACK_EDG200");
 	}
 }

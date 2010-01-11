@@ -16,6 +16,7 @@
  */
 package org.dwfa.mojo.epicexport;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -68,6 +69,8 @@ public interface I_EpicLoadFileBuilder {
 	 * @param epicItemNumber - The item number to write to the load file
 	 */
 	public void writeItem(String epicItemNumber);
+	
+	public void writeLine(String text) throws IOException;
 	
 	public String getMasterfile();
 
