@@ -1426,6 +1426,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                                     (I_IdPart) p.makeIdAnalog(p.getStatusId(), p.getPathId(), ThinVersionHelper
                                         .convert(version));
                             partsToAdd.add(newPart);
+                            partsToRemove.add(p);
                         }
                         values.add(new TimePathId(version, p.getPathId()));
                         for (I_DescriptionVersioned desc : bean.getDescriptions()) {

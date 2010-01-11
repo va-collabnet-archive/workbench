@@ -582,8 +582,11 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 	public void performRefreshAction(I_ConfigAceFrame config) throws Exception {
 		I_TermFactory tf = LocalVersionedTerminology.get();
 		int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+		int retiredNid = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
 		IntSet currentSet = new IntSet();
 		currentSet.add(currentNid);
+		IntSet retiredSet = new IntSet();
+		retiredSet.add(retiredNid);
 		boolean writeComment = editorComments.getText().length() > 3;
 		I_ThinExtByRefVersioned comment = null;
 		I_Identify commentId = null;
@@ -607,13 +610,30 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 				member.addTuples(config.getAllowedStatus(), config
 						.getViewPositionSet(), tuples, false);
 				PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
+				int newMemberNid = tf.uuidToNativeWithGeneration(UUID.randomUUID(), 
+						ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), 
+						config.getEditingPathSet().iterator().next(), 
+						Integer.MAX_VALUE);
+				I_Identify newMemberId = tf.getId(newMemberNid);
+				I_ThinExtByRefVersioned newMember = tf.newExtensionNoChecks(member.getRefsetId(), newMemberNid, 
+						member.getComponentId(), member.getTypeId());
+
 				for (I_Path p : config.getEditingPathSet()) {
+
 					for (I_ThinExtByRefTuple tuple : tuples) {
-						I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) tuple.getMutablePart().makeAnalog(currentNid, p.getConceptId(), Long.MAX_VALUE);
+						
+						I_ThinExtByRefPart newRetiredPart = (I_ThinExtByRefPart) 
+							tuple.getMutablePart().makeAnalog(retiredNid, p.getConceptId(), Long.MAX_VALUE);
+						tuple.addVersion(newRetiredPart);
+						tf.addUncommitted(tuple.getCore());
+						
 						if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
-							I_ThinExtByRefPartConceptConcept newCCPart = (I_ThinExtByRefPartConceptConcept) newPart;
-							tuple.addVersion(newCCPart);
-							tf.addUncommitted(tuple.getCore());
+							
+							I_ThinExtByRefPartConceptConcept newCCPart = (I_ThinExtByRefPartConceptConcept) 
+									tuple.getMutablePart().makeAnalog(currentNid, p.getConceptId(), Long.MAX_VALUE);
+							newMember.addVersion(newCCPart);
+							tf.addUncommitted(newMember);
+							
 							if (newCCPart.getC1id() == conceptUnderReview.getConceptId()) {
 								newCCPart.setC1id(replacementConceptLabel.getTermComponent().getNid());
 								tf.addUncommitted(comment);
@@ -623,9 +643,10 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 							}
 						} else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION
 								.localize().getNid()) {
-							I_ThinExtByRefPartConceptConceptConcept newCCCPart = (I_ThinExtByRefPartConceptConceptConcept) newPart;
-							tuple.getCore().addVersion(newCCCPart);
-							tf.addUncommitted(tuple.getCore());
+							I_ThinExtByRefPartConceptConceptConcept newCCCPart = (I_ThinExtByRefPartConceptConceptConcept) 
+									tuple.getMutablePart().makeAnalog(currentNid, p.getConceptId(), Long.MAX_VALUE);
+							newMember.addVersion(newCCCPart);
+							tf.addUncommitted(newMember);
 							if (newCCCPart.getC1id() == conceptUnderReview.getConceptId()) {
 								newCCCPart.setC1id(replacementConceptLabel.getTermComponent().getNid());
 							}
@@ -637,6 +658,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 							}
 						}
 					}
+					
 					if (writeComment) {
 						UUID memberUuid = UUID.randomUUID();
 						Collection<UUID> memberUuids = new ArrayList<UUID>();
@@ -648,7 +670,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 						commentId = tf.getId(commentNid);
 						if (commentRefset != null && commentId != null) {
 							commentRefset.getUncommittedIdVersioned().add(commentId);
-							comment = tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, member.getMemberId(), 
+							comment = tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, newMember.getMemberId(), 
 									RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
 							I_ThinExtByRefPartString commentExtPart = tf.newExtensionPart(I_ThinExtByRefPartString.class);
 							commentExtPart.setStringValue(editorComments.getText());
@@ -662,7 +684,11 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 						//
 					}
 					tf.commit();
-					member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
+					member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, retiredSet);
+					tf.addUncommitted(member);
+					newMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
+					tf.addUncommitted(newMember);
+					newMemberId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
 					if (comment != null) {
 						comment.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
 						tf.addUncommitted(comment);
@@ -678,10 +704,6 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 			
 		} else if (updateOptions.getSelectedItem().equals(RETIRE_OPTION)) {
 			// Do retire here...
-			int retiredNid = ArchitectonicAuxiliary.Concept.RETIRED.localize()
-					.getNid();
-			IntSet retiredSet = new IntSet();
-			retiredSet.add(retiredNid);
 			Collection<UUID> clauseIds = clausesToUpdate.remove(0);
 			I_ThinExtByRefVersioned member = tf.getExtension(tf
 					.uuidToNative(clauseIds));
@@ -691,7 +713,8 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 			PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
 			for (I_Path p : config.getEditingPathSet()) {
 				for (I_ThinExtByRefTuple tuple : tuples) {
-					I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) tuple.getMutablePart().makeAnalog(retiredNid, p.getConceptId(), Long.MAX_VALUE);
+					I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) tuple.getMutablePart().makeAnalog(retiredNid, 
+							p.getConceptId(), Long.MAX_VALUE);
 					tuple.getCore().addVersion(newPart);
 					tf.addUncommitted(tuple.getCore());
 				}
@@ -718,7 +741,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 					//
 				}
 				tf.commit();
-				member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
+				member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, retiredSet);
 				if (comment != null) {
 					comment.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
 					tf.addUncommitted(comment);
