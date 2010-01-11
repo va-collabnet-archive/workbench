@@ -472,4 +472,78 @@ public class EConcept {
 			List<UUID> refsetUuidMemberUuidForRels) {
 		this.refsetUuidMemberUuidForRels = refsetUuidMemberUuidForRels;
 	}
+	
+    /**
+     * Returns a hash code for this <code>EConcept</code>.
+     * 
+     * @return a hash code value for this <tt>EConcept</tt>.
+     */
+    public int hashCode() {
+        return this.conceptAttributes.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EConcept</tt> object, and contains the same values, field by field, 
+     * as this <tt>EConcept</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (EConcept.class.isAssignableFrom(obj.getClass())) {
+            EConcept another = (EConcept) obj;
+            
+            // Compare ConceptAttributes
+            if (this.conceptAttributes == null) {
+                if (this.conceptAttributes != another.conceptAttributes)
+                    return false;
+            } else if (!this.conceptAttributes.equals(another.conceptAttributes)) {
+                return false;
+            }
+            // Compare Descriptions
+            if (this.descriptions == null) {
+                if (another.descriptions == null) { // Equal!
+                } else if (another.descriptions.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.descriptions.equals(another.descriptions)) {
+                return false;
+            }
+            // Compare Relationships
+            if (this.relationships == null) {
+                if (another.relationships == null) { // Equal!
+                } else if (another.relationships.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.relationships.equals(another.relationships)) {
+                return false;
+            }
+            // Compare Images
+            if (this.images == null) {
+                if (another.images == null) { // Equal!
+                } else if (another.images.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.images.equals(another.images)) {
+                return false;
+            }
+            // Compare Refset Members
+            if (this.refsetMembers == null) {
+                if (another.refsetMembers == null) { // Equal!
+                } else if (another.refsetMembers.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.refsetMembers.equals(another.refsetMembers)) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
 }

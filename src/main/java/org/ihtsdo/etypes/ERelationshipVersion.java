@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 
 public class ERelationshipVersion extends EVersion {
 
@@ -108,5 +109,56 @@ public class ERelationshipVersion extends EVersion {
         buff.append("; ");
 
         return buff.toString();
+    }
+
+    /**
+     * Returns a hash code for this <code>ERelationshipVersion</code>.
+     * 
+     * @return a hash code value for this <tt>ERelationshipVersion</tt>.
+     */
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { statusUuid.hashCode(), pathUuid.hashCode(), (int) time });
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERelationshipVersion</tt> object, and contains the same values, 
+     * field by field, as this <tt>ERelationshipVersion</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (ERelationshipVersion.class.isAssignableFrom(obj.getClass())) {
+            ERelationshipVersion another = (ERelationshipVersion) obj;
+
+            // Compare characteristicUuid
+            if (!this.characteristicUuid.equals(another.characteristicUuid)) {
+                return false;
+            }
+            // Compare refinabilityUuid
+            if (!this.refinabilityUuid.equals(another.refinabilityUuid)) {
+                return false;
+            }
+            // Compare group
+            if (this.group != another.group) {
+                return false;
+            }
+            // Compare refinabilityUuid
+            if (!this.refinabilityUuid.equals(another.refinabilityUuid)) {
+                return false;
+            }
+            // Compare typeUuid
+            if (!this.typeUuid.equals(another.typeUuid)) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
     }
 }

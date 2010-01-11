@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
 import org.dwfa.tapi.TerminologyException;
 
 public class EImage extends EComponent<EImageVersion> {
@@ -159,6 +160,58 @@ public class EImage extends EComponent<EImageVersion> {
         buff.append("; ");
 
         return buff.toString();
+    }
+
+    /**
+     * Returns a hash code for this <code>EImage</code>.
+     * 
+     * @return a hash code value for this <tt>EImage</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EImage</tt> object, and contains the same values, field by field, 
+     * as this <tt>EImage</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (EImage.class.isAssignableFrom(obj.getClass())) {
+            EImage another = (EImage) obj;
+
+            // Compare conceptUuid
+            if (!this.conceptUuid.equals(another.conceptUuid)) {
+                return false;
+            }
+            // Compare format
+            if (!this.format.equals(another.format)) {
+                return false;
+            }
+            // Compare image (had to loop through the array)
+            for (int i = 0; i < this.image.length; i++) {
+                if (this.image[i] != another.image[i])
+                    return false;
+            }
+            // Compare textDescription
+            if (!this.textDescription.equals(another.textDescription)) {
+                return false;
+            }
+            // Compare typeUuid
+            if (!this.typeUuid.equals(another.typeUuid)) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
     }
 
 }

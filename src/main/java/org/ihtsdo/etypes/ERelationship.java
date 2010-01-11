@@ -170,4 +170,59 @@ public class ERelationship extends EComponent<ERelationshipVersion> {
 
         return buff.toString();
     }
+
+    /**
+     * Returns a hash code for this <code>ERelationship</code>.
+     * 
+     * @return a hash code value for this <tt>ERelationship</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERelationship</tt> object, and contains the same values, 
+     * field by field, as this <tt>ERelationship</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (ERelationship.class.isAssignableFrom(obj.getClass())) {
+            ERelationship another = (ERelationship) obj;
+
+            // Compare c1Uuid
+            if (!this.c1Uuid.equals(another.c1Uuid)) {
+                return false;
+            }
+            // Compare c2Uuid
+            if (!this.c2Uuid.equals(another.c2Uuid)) {
+                return false;
+            }
+            // Compare characteristicUuid
+            if (!this.characteristicUuid.equals(another.characteristicUuid)) {
+                return false;
+            }
+            // Compare refinabilityUuid
+            if (!this.refinabilityUuid.equals(another.refinabilityUuid)) {
+                return false;
+            }
+            // Compare relGroup
+            if (this.relGroup != another.relGroup) {
+                return false;
+            }
+            // Compare typeUuid
+            if (!this.typeUuid.equals(another.typeUuid)) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
+    }
 }

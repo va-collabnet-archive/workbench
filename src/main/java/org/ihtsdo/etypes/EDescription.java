@@ -153,4 +153,54 @@ public class EDescription extends EComponent<EDescriptionVersion> implements I_D
         return buff.toString();
     }
 
+    /**
+     * Returns a hash code for this <code>EDescription</code>.
+     * 
+     * @return a hash code value for this <tt>EDescription</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EDescription</tt> object, and contains the same values, field by field, 
+     * as this <tt>EDescription</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (EDescription.class.isAssignableFrom(obj.getClass())) {
+            EDescription another = (EDescription) obj;
+
+            // Compare conceptUuid
+            if (!this.conceptUuid.equals(another.conceptUuid)) {
+                return false;
+            }
+            // Compare initialCaseSignificant
+            if (this.initialCaseSignificant != another.initialCaseSignificant) {
+                return false;
+            }
+            // Compare lang
+            if (!this.lang.equals(another.lang)) {
+                return false;
+            }
+            // Compare text
+            if (!this.text.equals(another.text)) {
+                return false;
+            }
+            // Compare typeUuid
+            if (!this.typeUuid.equals(another.typeUuid)) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
+    }
 }

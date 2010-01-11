@@ -120,4 +120,42 @@ public class ERefsetCidIntMember extends ERefset<ERefsetCidIntVersion> {
         return buff.toString();
     }
 
+    /**
+     * Returns a hash code for this <code>ERefsetCidIntMember</code>.
+     *
+     * @return  a hash code value for this <tt>ERefsetCidIntMember</tt>. 
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode(); 
+    }
+    
+    
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetCidIntMember</tt> object, and contains the same values, 
+     * field by field, as this <tt>ERefsetCidIntMember</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null) return false; 
+        if (ERefsetCidIntMember.class.isAssignableFrom(obj.getClass())) {
+            ERefsetCidIntMember another = (ERefsetCidIntMember) obj; 
+            
+            // Compare c1Uuid
+            if (!this.c1Uuid.equals(another.c1Uuid)) {
+                return false; 
+            }
+            // Compare intValue
+            if (this.intValue != another.intValue) {
+                return false; 
+            } 
+            // Compare their parents 
+            return super.equals(obj);
+        }
+        return false;
+    }
 }
