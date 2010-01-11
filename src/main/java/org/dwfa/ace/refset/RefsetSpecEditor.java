@@ -1148,8 +1148,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             }
             if (childrenExpandedNodes.contains(getId(node))) {
                 specTree.expandPath(new TreePath(node.getPath()));
-                for (RefsetSpecTreeNode childNode : node.getChildren()) {
-                    expandNodes(childNode);
+                if (node.getChildren() != null) {
+                    for (RefsetSpecTreeNode childNode : node.getChildren()) {
+                        expandNodes(childNode);
+                    }
                 }
             }
         }
