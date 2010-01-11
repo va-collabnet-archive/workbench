@@ -95,4 +95,38 @@ public class EConceptAttributes extends EComponent<EConceptAttributesVersion> im
         return buff.toString();
     }
 
+    /**
+     * Returns a hash code for this <code>EConceptAttributes</code>.
+     * 
+     * @return a hash code value for this <tt>EConceptAttributes</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EConceptAttributes</tt> object, and contains the same values, field by field, 
+     * as this <tt>EConceptAttributes</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (EConceptAttributes.class.isAssignableFrom(obj.getClass())) {
+            EConceptAttributes another = (EConceptAttributes) obj;
+
+            // Compare defined
+            if (this.defined != another.defined) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
+    }
 }

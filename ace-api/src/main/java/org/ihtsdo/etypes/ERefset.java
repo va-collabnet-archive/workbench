@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public abstract class ERefset<V extends EVersion> extends EComponent<V> {
@@ -106,4 +107,42 @@ public abstract class ERefset<V extends EVersion> extends EComponent<V> {
         return buff.toString();
     }
 
+    /**
+     * Returns a hash code for this <code>ERefset</code>.
+     * 
+     * @return a hash code value for this <tt>ERefset</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefset</tt> object, and contains the same values, field by field, 
+     * as this <tt>ERefset</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (ERefset.class.isAssignableFrom(obj.getClass())) {
+            ERefset<?> another = (ERefset<?>) obj;
+
+            // Compare refsetUuid
+            if (!this.refsetUuid.equals(another.refsetUuid)) {
+                return false;
+            }
+            // Compare componentUuid
+            if (!this.componentUuid.equals(another.componentUuid)) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
+    }
 }

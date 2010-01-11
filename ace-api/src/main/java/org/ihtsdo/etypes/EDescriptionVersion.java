@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 
 public class EDescriptionVersion extends EVersion implements I_DescribeExternally {
 
@@ -123,5 +124,52 @@ public class EDescriptionVersion extends EVersion implements I_DescribeExternall
         buff.append("; ");
 
         return buff.toString();
+    }
+
+    /**
+     * Returns a hash code for this <code>EDescriptionVersion</code>.
+     * 
+     * @return a hash code value for this <tt>EDescriptionVersion</tt>.
+     */
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { statusUuid.hashCode(), pathUuid.hashCode(), (int) time });
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EDescriptionVersion</tt> object, and contains the same values, field by field, 
+     * as this <tt>EDescriptionVersion</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (EDescriptionVersion.class.isAssignableFrom(obj.getClass())) {
+            EDescriptionVersion another = (EDescriptionVersion) obj;
+
+            // Compare initialCaseSignificant
+            if (this.initialCaseSignificant != another.initialCaseSignificant) {
+                return false;
+            }
+            // Compare lang
+            if (!this.lang.equals(another.lang)) {
+                return false;
+            }
+            // Compare text
+            if (!this.text.equals(another.text)) {
+                return false;
+            }
+            // Compare typeUuid
+            if (!this.typeUuid.equals(another.typeUuid)) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
     }
 }

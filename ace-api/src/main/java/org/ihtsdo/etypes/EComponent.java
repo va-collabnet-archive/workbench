@@ -232,4 +232,59 @@ public abstract class EComponent<V extends EVersion> extends EVersion {
         return buff.toString();
     }
 
+    /**
+     * Returns a hash code for this <code>EComponent</code>.
+     * 
+     * @return a hash code value for this <tt>EComponent</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EComponent</tt> object, and contains the same values, field by field, 
+     * as this <tt>EComponent</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (EComponent.class.isAssignableFrom(obj.getClass())) {
+            EComponent<?> another = (EComponent<?>) obj;
+
+            // Compare primordialComponentUuid
+            if (!this.primordialComponentUuid.equals(another.primordialComponentUuid)) {
+                return false;
+            }
+            // Compare additionalIdComponents
+            if (this.additionalIdComponents == null) {
+                if (another.additionalIdComponents == null) { // Equal!
+                } else if (another.additionalIdComponents.size() == 0) { // Equal!
+                } else {
+                    return false;
+                }
+            } else if (!this.additionalIdComponents.equals(another.additionalIdComponents)) {
+                return false;
+            }
+            // Compare extraVersions
+            if (this.extraVersions == null) {
+                if (another.extraVersions == null) { // Equal!
+                } else if (another.extraVersions.size() == 0) { // Equal!
+                } else {
+                    return false;
+                }
+            } else if (!this.extraVersions.equals(another.extraVersions)) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
+    }
+
 }

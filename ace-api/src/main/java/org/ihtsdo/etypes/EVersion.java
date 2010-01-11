@@ -5,14 +5,17 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_Identify;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 
 public class EVersion implements I_VersionExternally {
 
@@ -123,4 +126,48 @@ public class EVersion implements I_VersionExternally {
 
         return buff.toString();
     }
+
+    /**
+     * Returns a hash code for this <code>EVersion</code>.
+     * 
+     * @return a hash code value for this <tt>EVersion</tt>.
+     */
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { statusUuid.hashCode(), pathUuid.hashCode(), (int) time });
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EVersion</tt> object, and contains the same values, 
+     * field by field, as this <tt>EVersion</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (EVersion.class.isAssignableFrom(obj.getClass())) {
+            EVersion another = (EVersion) obj;
+
+            // Compare pathUuid
+            if (!this.pathUuid.equals(another.pathUuid)) {
+                return false;
+            }
+            // Compare statusUuid
+            if (!this.statusUuid.equals(another.statusUuid)) {
+                return false;
+            }
+            // Compare time
+            if (this.time != another.time) {
+                return false;
+            }
+            // Objects are equal! (Don't climb any higher in the hierarchy)
+            return true;
+        }
+        return false;
+    }
+
 }
