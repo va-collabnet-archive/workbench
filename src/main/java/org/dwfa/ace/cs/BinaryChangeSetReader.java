@@ -346,18 +346,29 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             if (getVodb().hasExtension(memberId)) {
                 extension = getVodb().getExtension(memberId);
             } else {
-                int refsetId = getVodb().getId(bean.getRefsetUid()).getNid();
-                I_Identify componentUuid = getVodb().getId(bean.getComponentUid());
+            	if (bean.getRefsetUid() != null) {
+            		I_Identify identifier = getVodb().getId(bean.getRefsetUid());
+            		if (identifier != null) {
+                        int refsetId = identifier.getNid();
+                        I_Identify componentUuid = getVodb().getId(bean.getComponentUid());
 
-                if (componentUuid == null) {
+                        if (componentUuid == null) {
+                            AceLog.getAppLog().severe(
+                                " Error importing extension... Component with id does not exist: " + bean.getComponentUid());
+                        } else {
+                            int componentId = componentUuid.getNid();
+                            int typeId = getVodb().getId(bean.getTypeUid()).getNid();
+                            int partCount = bean.getVersions().size();
+                            extension = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId, partCount);
+                        }
+            		} else {
+                        AceLog.getAppLog().severe(
+                                " Error importing extension... No identifier for Refset UUID exists: " + bean.getRefsetUid());
+            		}
+            	} else {
                     AceLog.getAppLog().severe(
-                        " Error importing extension... Component with id does not exist: " + bean.getComponentUid());
-                } else {
-                    int componentId = componentUuid.getNid();
-                    int typeId = getVodb().getId(bean.getTypeUid()).getNid();
-                    int partCount = bean.getVersions().size();
-                    extension = new ThinExtByRefVersioned(refsetId, memberId, componentId, typeId, partCount);
-                }
+                            " Error importing extension... No Refset UUID is null for bean: " + bean);
+        		}
             }
             if (extension != null) {
                 boolean changed = false;
