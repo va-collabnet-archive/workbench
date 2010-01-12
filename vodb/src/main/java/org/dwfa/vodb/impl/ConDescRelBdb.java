@@ -961,7 +961,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     private I_BindConDescRel conDescRelBinding;
 
-    private TupleBinding intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
+    private TupleBinding<Integer> intBinder = TupleBinding.getPrimitiveBinding(Integer.class);
 
     private Database conDescRelDb;
 
