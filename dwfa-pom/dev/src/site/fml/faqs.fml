@@ -1,0 +1,66 @@
+<?xml version="1.0"?> 
+<faqs title="About the Distributed Workflow Architecture Project"> 
+
+  <part id="about"> 
+    <faq id="what"> 
+      <question>What does DWFA stand for?</question> 
+      <answer> 
+        <p> 
+          Distributed Workflow Architecture
+        </p> 
+      </answer> 
+    </faq> 
+
+    <faq id="why"> 
+      <question>Why didn't you use dwa.org instead of dwfa.org?</question> 
+      <answer> 
+        <p> 
+          The Desert Water Association registered the URL before we could...
+        </p> 
+      </answer> 
+    </faq> 
+    <faq id="out_of_mem"> 
+      <question>Sometimes I get an out of memory exception when building databases with maven. How do I prevent this?</question> 
+      <answer> 
+        <p>On unix, add the following to your .bash_profile:</p> 
+        <p>export MAVEN_OPTS="-Xmx2048m "</p>
+        <p></p>
+        <p>On windows, add the following as an environmental variable (The windows VM cannot handle a heapspace > 1.5 GB):</p>
+        <p>MAVEN_OPTS -Xmx1024m</p>
+       </answer> 
+    </faq> 
+    <faq id="runtimePermission"> 
+      <question>Why do I get a access denied for the RuntimePermission createSecurityManger?</question> 
+      <answer> 
+        <p> 
+          You need to install the file "jsk-policy-2.1.jar" into your jre's extension folder. The jsk-policy-2.1.jar
+          file can be found in the lib-ext directory of your bundle. 
+          On windows, this install location is in the \lib\ext of your jre's extension folder. For example C:\Program Files\Java\jre1.6.0_02\lib\ext
+        </p> 
+      </answer> 
+    </faq> 
+    <faq id="UnsatisfiedLinkError"> 
+      <question>Why do I get an UnsatisfiedLinkError: no svnjavahl in java.library.path?</question> 
+      <answer> 
+        <p> 
+          On windows, you need to install the collabnet subversion client on your computer. After successful installation, 
+          you additionally need to copy the files in the svn folder of your bundle to the collabnet subversion client installation
+          folder (typically "C:\Program Files\CollabNet Subversion") to enable the Java native binding.
+        </p> 
+      </answer> 
+    </faq> 
+    <faq id="SSL_NegotiationFailed"> 
+      <question>Why do I get an "SSL negotiation failed: SSL disabled due to library version mismatch" error?</question> 
+      <answer> 
+        <p> 
+          Check to see if other versions of the above files are on your computer. If so, make sure that any entry in 
+          the system path that points to them is later in the path than the entry for the Subversion files. If they 
+          are earlier in the path, Subversion will attempt to use them and, if they are incompatible, an error will 
+          occur. For example, if an incompatible version of the file ssleay32.dll is used, you will see the message 
+          "SSL negotiation failed: SSL disabled due to library version mismatch".
+          (source: http://www.oracle.com/technology/products/jdev/htdocs/partners/addins/exchange/subversion/subversion.html)
+        </p> 
+      </answer> 
+    </faq> 
+  </part> 
+</faqs> 

@@ -1,0 +1,56 @@
+<document>
+  <properties>
+    <author email="castillo@informatics.com">Susan Castillo</author>
+    <title>Building and Installing an ACE Bundle</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head> </head>
+  <body>
+    <!--First Section - Description Business Processes -->
+    <section name="Introduction">
+      <p>The instructions below describe how to install and build an ACE Bundle. There are two .zip files:
+      </p>
+      <ul>
+        <li>snomed-ct-bundle.zip - contains 1 version of SNOMED</li>
+        <li>bundle-ace.zip - contains 8 versions of SNOMED</li>
+      </ul>
+      <h3>Assumptions</h3>
+        <p>These instructions assume that you are able to build at least one ACE Workspace project. 
+          That maven 2.06 and java 1.6 are installed, that you have at least 2gig of RAM,
+        and at least 7 gig of harddisk space.</p>   
+      <h3>Instructions for snomed-ct-bundle - one version of SNOMED</h3>
+ 
+      <ol>
+        <li>Unzip snomed-ct-bundle.zip where you would like to store it. </li>
+        <li>A directory called "snomed-ct-bundle" will be created. This directory will contain a "pom.xml" file, and a "src" directory. </li>
+        <li>Launch a terminal window and change directory to snomed-ct-bundle directory.</li>
+        <li>Enter: mvn --version - this will ensure that maven is installed.</li>
+        <li>Enter: mvn clean install - this step might take a while to download everything depending upon your network speed.</li>
+        <li>Upon successful completion of the previous step a "target" directory is created.</li>
+        <li>Before launching ace you will need to install the "jsk-policy-2.1.jar into your jre's extension folder. 
+          The jsk-policy-2.1.jar file can be found in the "lib-ext" directory of your bundle. On windows, this is located in the \lib\ext of your folder. 
+          For example C:\Program Files\Java\jre1.6.0_02\lib\ext.</li>
+        <li>Change directory to the "target\snomed-ct-bundle.dir" depending on your operating system execute one of the following: startAce.bat, 
+          startAceOsX.sh, startAceLinux.sh</li>
+        <li>You will be asked to login - Select the user profile for "bootstrap.ace". There is no password - hit "ok".</li>
+      </ol>
+      <h3>Instructions for bundle-ace - 8 versions of SNOMED</h3>
+   
+      <ol>
+        <li>Unzip bundle-ace.zip where you would like to store it. </li>
+        <li>A directory called "bundle-ace" will be created. This directory will contain a "pom.xml" file, and a "src" directory. </li>
+        <li>Launch a terminal window and change directory to bundle-ace directory.</li>
+        <li>Enter: mvn --version - this will ensure that maven is installed.</li>
+        <li>Enter: mvn clean install - this step might take several hours to download everything depending upon your network speed.</li>
+        <li>Upon successful completion of the previous step a "target" directory is created.</li>
+        <li>Before launching ace you will need to install the "jsk-policy-2.1.jar into your jre's extension folder. 
+          The jsk-policy-2.1.jar file can be found in the "lib-ext" directory of your bundle. On windows, this is located in the \lib\ext of your folder. 
+          For example C:\Program Files\Java\jre1.6.0_02\lib\ext.</li>
+        <li>Change directory to the "target\bundle-ace.dir" depending on your operating system execute one of the following: 
+          startAce.bat, startAceOsX.sh, startAceLinux.sh</li>
+        <li>You will be asked to login - Select the user profile for "bootstrap.ace". There is no password - hit "ok".</li>
+      </ol>
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>
