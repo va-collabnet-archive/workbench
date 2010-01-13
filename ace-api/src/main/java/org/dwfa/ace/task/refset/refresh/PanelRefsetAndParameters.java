@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -53,7 +52,6 @@ import org.dwfa.ace.task.commit.TestForReviewRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
 import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 
 /**
  * The Refresh Refset panel that allows user to input:
@@ -98,9 +96,11 @@ public class PanelRefsetAndParameters extends JPanel {
     private HashSet<File> attachmentSet = new HashSet<File>();
     private ArrayListModel<File> attachmentListModel;
 
-    private Set<I_GetConceptData> refsets;
-    private Set<I_GetConceptData> editors;
-    private Set<I_GetConceptData> reviewers;
+    private Set<? extends I_GetConceptData> refsets;
+    private Set<? extends I_GetConceptData> editors;
+    private Set<Object> reviewers;
+
+    private String noReviewText = "no reviewer assigned";
 
     /**
      * 
@@ -145,12 +145,43 @@ public class PanelRefsetAndParameters extends JPanel {
         openFileChooserButton.addActionListener(new AddAttachmentActionLister());
         refsetSpecComboBox.addActionListener(new RefsetListener());
 
+        setUpComboBoxes();
+        layoutComponents();
+    }
+
+    private void setUpComboBoxes() {
         /*
          * -------------------------------------------------
-         * Layout the components
+         * Initialize all the ComboBoxes
          * -------------------------------------------------
          */
-        layoutComponents();
+        I_GetConceptData refsetParent = getRefset();
+
+        if (refsetParent == null) {
+            editors = getAllUsers();
+            reviewers = new HashSet<Object>(getAllUsers());
+        } else {
+            editors = getValidEditors();
+            reviewers = getValidReviewers();
+        }
+
+        if (editorComboBox != null) {
+            I_GetConceptData previousEditor = (I_GetConceptData) editorComboBox.getSelectedItem();
+            editorComboBox = new JComboBox(editors.toArray());
+            if (previousEditor != null || editors.size() == 0) {
+                editorComboBox.setSelectedItem(previousEditor);
+            }
+        }
+
+        if (reviewerComboBox != null) {
+            Object previousReviewer = reviewerComboBox.getSelectedItem();
+            reviewerComboBox = new JComboBox(reviewers.toArray());
+            if (previousReviewer != null || reviewers.size() == 0) {
+                reviewerComboBox.setSelectedItem(previousReviewer);
+            } else {
+                reviewerComboBox.setSelectedItem(noReviewText);
+            }
+        }
     }
 
     private void layoutComponents() {
@@ -197,17 +228,9 @@ public class PanelRefsetAndParameters extends JPanel {
         gbc.weighty = 0.0;
         gbc.anchor = GridBagConstraints.LINE_START;
 
-        editors = null;
-        try {
-            editors = getValidEditors();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         if (editors == null || editors.size() == 0) {
             this.add(new JLabel("No available editors."), gbc);
         } else {
-            // Populate the editorComboBox with the list of valid editors
-            editorComboBox = new JComboBox(editors.toArray());
             this.add(editorComboBox, gbc);
         }
 
@@ -228,17 +251,9 @@ public class PanelRefsetAndParameters extends JPanel {
         gbc.weighty = 0.0;
         gbc.anchor = GridBagConstraints.LINE_START;
 
-        reviewers = null;
-        try {
-            reviewers = getValidReviewers();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         if (reviewers == null || reviewers.size() == 0) {
             this.add(new JLabel("No available reviewers."), gbc);
         } else {
-            // Populate the reviewerComboBox with the list of valid reviewers
-            reviewerComboBox = new JComboBox(reviewers.toArray());
             this.add(reviewerComboBox, gbc);
         }
 
@@ -335,37 +350,58 @@ public class PanelRefsetAndParameters extends JPanel {
 
     }
 
-    private Set<? extends I_GetConceptData> getAllUsers() throws IOException, TerminologyException {
-        I_GetConceptData userParent =
-                LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
-        I_IntSet allowedTypes = LocalVersionedTerminology.get().getActiveAceFrameConfig().getDestRelTypes();
-        return userParent.getDestRelOrigins(allowedTypes, true, true);
+    private Set<? extends I_GetConceptData> getAllUsers() {
+        try {
+            I_GetConceptData userParent =
+                    LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+            I_IntSet allowedTypes = LocalVersionedTerminology.get().getActiveAceFrameConfig().getDestRelTypes();
+            return userParent.getDestRelOrigins(allowedTypes, true, true);
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            return getAllUsers();
+        }
     }
 
-    private Set<I_GetConceptData> getValidEditors() throws Exception {
-        I_GetConceptData selectedRefset = getRefset();
-        Set<I_GetConceptData> validEditors = new HashSet<I_GetConceptData>();
-        if (selectedRefset != null) {
-            for (I_GetConceptData user : getAllUsers()) {
-                if (hasEditorPermission(user, selectedRefset)) {
-                    validEditors.add(user);
+    private Set<? extends I_GetConceptData> getValidEditors() {
+        try {
+            I_GetConceptData selectedRefset = getRefset();
+            Set<I_GetConceptData> validEditors = new HashSet<I_GetConceptData>();
+            if (selectedRefset != null) {
+                for (I_GetConceptData user : getAllUsers()) {
+                    if (hasEditorPermission(user, selectedRefset)) {
+                        validEditors.add(user);
+                    }
                 }
             }
+            return validEditors;
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            return getAllUsers();
         }
-        return validEditors;
     }
 
-    private Set<I_GetConceptData> getValidReviewers() throws Exception {
+    private Set<Object> getValidReviewers() {
         I_GetConceptData selectedRefset = getRefset();
-        Set<I_GetConceptData> validReviewers = new HashSet<I_GetConceptData>();
-        if (selectedRefset != null) {
+        Set<Object> permissibleReviewers = new HashSet<Object>();
+        permissibleReviewers.add(noReviewText);
+        try {
+            if (selectedRefset == null) {
+                permissibleReviewers.addAll(getAllUsers());
+                return permissibleReviewers;
+            }
+
             for (I_GetConceptData user : getAllUsers()) {
                 if (hasReviewerPermission(user, selectedRefset)) {
-                    validReviewers.add(user);
+                    permissibleReviewers.add(user);
                 }
             }
+
+            return permissibleReviewers;
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            permissibleReviewers.addAll(getAllUsers());
+            return permissibleReviewers;
         }
-        return validReviewers;
     }
 
     private boolean hasEditorPermission(I_GetConceptData user, I_GetConceptData selectedRefset) throws Exception {
@@ -398,7 +434,7 @@ public class PanelRefsetAndParameters extends JPanel {
 
     class RefsetListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-
+            setUpComboBoxes();
             layoutComponents();
         }
     }
@@ -476,8 +512,12 @@ public class PanelRefsetAndParameters extends JPanel {
     // Reviewer
     // -----------------------
     public I_GetConceptData getReviewer() {
-        I_GetConceptData selectedReviewer = (I_GetConceptData) reviewerComboBox.getSelectedItem();
-        return selectedReviewer;
+        Object selectedObject = reviewerComboBox.getSelectedItem();
+        if (selectedObject == null || I_GetConceptData.class.isAssignableFrom(selectedObject.getClass())) {
+            return (I_GetConceptData) selectedObject;
+        } else {
+            return null;
+        }
     }
 
     public void setReviewer(I_GetConceptData newReviewer) {
