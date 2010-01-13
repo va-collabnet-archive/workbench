@@ -185,39 +185,48 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
             List<I_ThinExtByRefTuple> tuples =
                     ext.getTuples(helper.getCurrentStatusIntSet(), termFactory.getActiveAceFrameConfig()
                         .getViewPositionSetReadOnly(), addUncommitted, returnConflictResolvedLatestState);
+            I_ThinExtByRefTuple latestTuple = null;
 
-            for (I_ThinExtByRefTuple thinExtByRefTuple : tuples) {
-                if (thinExtByRefTuple.getMutablePart() instanceof I_ThinExtByRefPartConcept) {
-                    if (thinExtByRefTuple.getRefsetId() == memberRefset.getConceptId()) {
-                        I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutablePart();
-                        if (part.getC1id() == termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids())
-                            .getConceptId()) {
-                            lineCount++;
-                            if (lineCount > maxLineCount) {
-                                fileNumber++;
-                                lineCount = 2; // header + this record
-                                outputFile = new File(fileNameNoTxt + "-" + fileNumber + ".txt");
-                                exportFileWriter.flush();
-                                exportFileWriter.close();
-                                exportFileWriter = new BufferedWriter(new FileWriter(outputFile, false));
-                                writeHeader(exportFileWriter);
-                            }
-                            // write to file
-                            String description =
-                                    getDescription(descriptionTypeTermEntry, thinExtByRefTuple.getComponentId());
-                            if (description == null) {
-                                description = "UNKNOWN";
-                            }
-                            String sctId = getSctId(thinExtByRefTuple.getComponentId());
-                            if (sctId == null) {
-                                sctId = "";
-                            }
+            for (I_ThinExtByRefTuple currentTuple : tuples) {
+                if (latestTuple == null || latestTuple.getVersion() > currentTuple.getVersion()) {
+                    latestTuple = currentTuple;
+                }
+            }
 
-                            exportFileWriter.write(description);
-                            exportFileWriter.write(delimiter);
-                            exportFileWriter.write(sctId);
-                            exportFileWriter.write(delimiter);
-                            exportFileWriter.newLine();
+            if (latestTuple != null) {
+                if (latestTuple.getMutablePart() instanceof I_ThinExtByRefPartConcept) {
+                    if (latestTuple.getRefsetId() == memberRefset.getConceptId()) {
+                        if (helper.getCurrentStatusIntSet().contains(latestTuple.getStatusId())) {
+                            I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) latestTuple.getMutablePart();
+                            if (part.getC1id() == termFactory.getConcept(
+                                RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptId()) {
+                                lineCount++;
+                                if (lineCount > maxLineCount) {
+                                    fileNumber++;
+                                    lineCount = 2; // header + this record
+                                    outputFile = new File(fileNameNoTxt + "-" + fileNumber + ".txt");
+                                    exportFileWriter.flush();
+                                    exportFileWriter.close();
+                                    exportFileWriter = new BufferedWriter(new FileWriter(outputFile, false));
+                                    writeHeader(exportFileWriter);
+                                }
+                                // write to file
+                                String description =
+                                        getDescription(descriptionTypeTermEntry, latestTuple.getComponentId());
+                                if (description == null) {
+                                    description = "UNKNOWN";
+                                }
+                                String sctId = getSctId(latestTuple.getComponentId());
+                                if (sctId == null) {
+                                    sctId = "";
+                                }
+
+                                exportFileWriter.write(description);
+                                exportFileWriter.write(delimiter);
+                                exportFileWriter.write(sctId);
+                                exportFileWriter.write(delimiter);
+                                exportFileWriter.newLine();
+                            }
                         }
                     }
                 }
