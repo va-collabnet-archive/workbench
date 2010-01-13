@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="DWFA Master Project">
+  <bannerLeft>
+    <name></name>
+  </bannerLeft>
+  <bannerRight>
+    <name></name>
+  </bannerRight>
+  <publishDate position="left" format="dd-MMM-yy HH:mm:ss Z"/>
+  <body>
+    <links>
+      <item name="Informatics, Inc." href="http://www.informatics.com/"/>
+      <item name="Jini" href="http://www.jini.org/"/>
+      <item name="Apache" href="http://www.apache.org/"/>
+      <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
+    </links>
+    <menu name="Distributed Workflow Architecture">
+      <item name="Vision" href="vision-statement.html"/>
+      <item name="Licenses" href="component-licenses.html"/>
+      <item name="FAQs" href="faqs.html"/>
+    </menu>
+    <menu name="Developers Guide">
+      <item name="JavaDoc location" href="javadoc-loc.html"/>
+      <item name="Eclipse integration" href="eclipse.html"/>
+      <item name="Maven Reporitory" href="dwfa-maven-repository.html"/>
+    </menu> 
+    <menu ref="reports"/> 
+    <menu name="DWFA Modules">
+      <item name="DWFA foundation" href="../../foundation/site/index.html"/>
+      <item name="DWFA mojo" href="../../dwfa-mojo/site/index.html"/>
+      <item name="DWFA core" href="../../core/site/index.html"/>
+    </menu>
+    <menu name="Agile Collaboration Environment">
+      <item name="How to build and run an ACE bundle" href="bundle_Instructions.html"/>
+    </menu>
+    <menu name="ACE Modules">
+      <item name="ACE api" href="../../ace-api/site/index.html"/>
+      <item name="ACE mojo" href="../../ace-mojo/site/index.html"/>
+      <item name="ACE editor and database" href="../../vodb/site/index.html"/>
+    </menu>
+    <menu name="Miscellaneous" img="images/module.jpg">
+      <item name="about the pictures" href="pictures.html" />
+    </menu>
+  </body>
+  <poweredBy>
+    <logo name="Maven" href="http://maven.apache.org/"
+      img="http://maven.apache.org/images/logos/maven-feather.png"/>
+    <logo name="Module Home" href="http://mgr.servers.aceworkspace.net/pbl/cubitci/pub/dwfa/site/index.html"
+      img="http://mgr.servers.aceworkspace.net/pbl/cubitci/pub/dwfa/site/images/module.jpg"/>
+  </poweredBy>
+</project>
