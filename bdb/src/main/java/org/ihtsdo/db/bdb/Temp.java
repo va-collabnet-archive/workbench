@@ -5,6 +5,8 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
@@ -29,7 +31,7 @@ import org.ihtsdo.etypes.EConcept;
 public class Temp {
 	public static void main(String[] args) {
         try {
-        	
+        	long startTime = System.currentTimeMillis();
 			FileDialog fd = new FileDialog(new JFrame(), "Select ids file", FileDialog.LOAD);
 			fd.setDirectory(System.getProperty("user.dir"));
 			
@@ -56,38 +58,13 @@ public class Temp {
 	            AceLog.getAppLog().info("maxMemory: " + Runtime.getRuntime().maxMemory());
 	            AceLog.getAppLog().info("totalMemory: " + Runtime.getRuntime().totalMemory());
 
-			    fis = new FileInputStream(idsFile);
-			    bis = new BufferedInputStream(fis);
-			    idsDis = new DataInputStream(bis);
-
-	            UuidsToNidMap uuidsNidMap = new UuidsToNidMap(0, numUuidsRead);
-	            Collection<UUID> uuids = new ArrayList<UUID>(5);
-	            while (idsDis.available() > 0) {
-			    	numIdsRead++;
-			    	int uuidCount = idsDis.readInt();
-			    	for (int i = 0; i < uuidCount; i++) {
-			    		uuids.add(new UUID(idsDis.readLong(), idsDis.readLong()));
-			    		numUuidsRead++;
-			    	}
-			    	uuidsNidMap.uuidsToNidWithGeneration(uuids);
-			    	uuids.clear();
-	    			if (numIdsRead % 100000 == 0) {
-	    				System.out.print("\nids: " + numIdsRead);
-	    			}
-			    }
-	            System.out.println();
-	            idsDis.close();
-	            Runtime.getRuntime().gc();
-	            AceLog.getAppLog().info("\n\nFinished populateHashMap");
-	            AceLog.getAppLog().info("freeMemory: " + Runtime.getRuntime().freeMemory());
-	            AceLog.getAppLog().info("maxMemory: " + Runtime.getRuntime().maxMemory());
-	            AceLog.getAppLog().info("totalMemory: " + Runtime.getRuntime().totalMemory());
-	            AceLog.getAppLog().info("\nconverterSize: " + converterSize);
-	                        
 	            FileIO.recursiveDelete(new File("target/berkeley-db"));
 	        	Bdb.setup();
-	            Bdb.setUuidsToNidMap(uuidsNidMap);
-	        	//ConceptComponentBinder binder = new ConceptComponentBinder(null);
+
+	        	boolean preload = false;
+	        	if (preload) {
+		        	preloadIdentifiers(idsFile, numIdsRead, numUuidsRead);
+	        	}
 	            
 	            
 			    fis = new FileInputStream(conceptsFile);
@@ -100,7 +77,6 @@ public class Temp {
 	            	I_ProcessEConcept conceptConverter = converters.take(); 
 	            	conceptConverter.setEConcept(eConcept);
 	            	executors.execute(conceptConverter);
-			    	//Concept newConcept = Concept.get(eConcept);
 	    			if (conceptsRead.get() % 10000 == 0) {
 	    				System.out.println("concepts: " + conceptsRead);
 	    			}
@@ -135,15 +111,7 @@ public class Temp {
 	            AceLog.getAppLog().info("Reset members encountered: " + RefsetMemberBinder.encountered +
 	            		" written: " + RefsetMemberBinder.written);    
 	            
-	            // Generate NID->CID map
-	            
-	            
-	            AceLog.getAppLog().info("Starting PopulateNidCidMap");
-	            
-	            Bdb.getConceptDb().iterateConceptData(new PopulateNidCidMap());
-	            AceLog.getAppLog().info("Finished PopulateNidCidMap");
-	            AceLog.getAppLog().info("Starting ValidateNidCidMap");
-	            
+	            AceLog.getAppLog().info("Starting ValidateNidCidMap");	            
 	            Bdb.getConceptDb().iterateConceptData(new ValidateNidCidMap());
 	            AceLog.getAppLog().info("Finished ValidateNidCidMap");
 	            AceLog.getAppLog().info("Starting db sync.");
@@ -151,6 +119,10 @@ public class Temp {
 	            AceLog.getAppLog().info("Finishing db sync.");
 	            Bdb.close();
 	            AceLog.getAppLog().info("db closed");
+	            AceLog.getAppLog().info("elapsed time: " + (System.currentTimeMillis() - startTime));
+	            
+	            
+	            
 	            
 			}
 		} catch (Throwable e) {
@@ -158,6 +130,42 @@ public class Temp {
             AceLog.getAppLog().info("Concept count: " + Bdb.getConceptDb().getCount());    
 		} 
         System.exit(0);
+	}
+
+
+	private static void preloadIdentifiers(File idsFile, int numIdsRead,
+			int numUuidsRead) throws FileNotFoundException, IOException {
+		FileInputStream fis;
+		BufferedInputStream bis;
+		DataInputStream idsDis;
+		fis = new FileInputStream(idsFile);
+		bis = new BufferedInputStream(fis);
+		idsDis = new DataInputStream(bis);
+
+		
+
+		Collection<UUID> uuids = new ArrayList<UUID>(5);
+		while (idsDis.available() > 0) {
+			numIdsRead++;
+			int uuidCount = idsDis.readInt();
+			for (int i = 0; i < uuidCount; i++) {
+				uuids.add(new UUID(idsDis.readLong(), idsDis.readLong()));
+				numUuidsRead++;
+			}
+			Bdb.uuidsToNid(uuids);
+			uuids.clear();
+			if (numIdsRead % 100000 == 0) {
+				System.out.print("\nids: " + numIdsRead);
+			}
+		}
+		System.out.println();
+		idsDis.close();
+		Runtime.getRuntime().gc();
+		AceLog.getAppLog().info("\n\nFinished populateHashMap");
+		AceLog.getAppLog().info("freeMemory: " + Runtime.getRuntime().freeMemory());
+		AceLog.getAppLog().info("maxMemory: " + Runtime.getRuntime().maxMemory());
+		AceLog.getAppLog().info("totalMemory: " + Runtime.getRuntime().totalMemory());
+		AceLog.getAppLog().info("\nconverterSize: " + converterSize);
 	}
 	
 	static AtomicInteger conceptsRead = new AtomicInteger();
@@ -179,7 +187,7 @@ public class Temp {
 
     private static class ValidateNidCidMap implements I_ProcessConceptData {
     	
-    	NidCNidMap nidCnidMap = Bdb.getNidCNidMap();
+    	NidCNidMapBdb nidCnidMap = Bdb.getNidCNidMap();
 		@Override
 		public void processConceptData(Concept concept) throws Exception {
 			
@@ -194,28 +202,17 @@ public class Temp {
 		}
     }
     
-    private static class PopulateNidCidMap implements I_ProcessConceptData {
-    	
-    	NidCNidMap nidCnidMap = Bdb.getNidCNidMap();
-		@Override
-		public void processConceptData(Concept concept) throws Exception {
-			
-			int cNid = concept.getNid();
-			int[] nids = concept.getAllNids();
-			nidCnidMap.setCidForNid(cNid, cNid);
-			for (int nid: nids) {
-				nidCnidMap.setCidForNid(cNid, nid);
-			}
-		}
-    }
-    
      
 	private static class ConvertConcept implements I_ProcessEConcept {
 		Throwable exception = null;
 		EConcept eConcept = null;
 		Concept newConcept = null;
+    	NidCNidMapBdb nidCnidMap;
 		@Override
 		public void run() {
+			if (nidCnidMap == null) {
+				nidCnidMap = Bdb.getNidCNidMap();
+			}
 			try {
 				newConcept = Concept.get(eConcept);
 				Bdb.getConceptDb().writeConcept(newConcept);

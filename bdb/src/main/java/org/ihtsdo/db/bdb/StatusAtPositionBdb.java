@@ -157,7 +157,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			} else {
 				readOnlyArray = new PositionArrays();
 			}
-			if (readWrite.get(null, theKey, theData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (mutable.get(null, theKey, theData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				readWriteArray = positionArrayBinder.entryToObject(theData);
 			} else {
 				readWriteArray = new PositionArrays();
@@ -257,7 +257,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		DatabaseEntry theData = new DatabaseEntry();
 		positionArrayBinder.objectToEntry(readWriteArray, theData);
 		try {
-			if (readWrite.put(null, theKey, theData) == OperationStatus.SUCCESS) {
+			if (mutable.put(null, theKey, theData) == OperationStatus.SUCCESS) {
 				readWriteArray = positionArrayBinder.entryToObject(theData);
 			}
 			mapperCache.clear();
@@ -277,7 +277,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		DatabaseEntry theData = new DatabaseEntry();
 		positionArrayBinder.objectToEntry(readWriteArray, theData);
 		try {
-			if (readWrite.put(null, theKey, theData) == OperationStatus.SUCCESS) {
+			if (mutable.put(null, theKey, theData) == OperationStatus.SUCCESS) {
 				readWriteArray = positionArrayBinder.entryToObject(theData);
 			}
 			mapperCache.clear();

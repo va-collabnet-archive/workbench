@@ -26,10 +26,11 @@ import com.sleepycat.je.EnvironmentLockedException;
 public class Bdb {
 
 	private static Bdb readOnly;
-	private static Bdb readWrite;
+	private static Bdb mutable;
 	private static StatusAtPositionBdb statusAtPositionDb;
 	private static ConceptBdb conceptDb;
-	private static UuidsToNidMap uuidsToNidMap;
+	private static UuidsToNidMapBdb uuidsToNidMapDb;
+	private static NidCNidMapBdb nidCidMapDb;
 	
 	private static ExecutorService executorPool;
 	
@@ -48,18 +49,19 @@ public class Bdb {
 			for (@SuppressWarnings("unused") OFFSETS o: OFFSETS.values()) {
 				// ensure all OFFSETS are initialized prior to multi-threading. 
 			}
+			executorPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 			File buildDirectory = new File(dbRoot);
 			buildDirectory.mkdirs();
 			File bdbDirectory = new File(buildDirectory, "berkeley-db");
 			bdbDirectory.mkdirs();
-			readWrite = new Bdb(false, new File(bdbDirectory, "read-write"));
+			mutable = new Bdb(false, new File(bdbDirectory, "mutable"));
 			File readOnlyDir = new File(bdbDirectory, "read-only");
 			boolean readOnlyExists = readOnlyDir.exists();
 			readOnly = new Bdb(readOnlyExists, readOnlyDir);
-			statusAtPositionDb = new StatusAtPositionBdb(readOnly, readWrite);
-			conceptDb = new ConceptBdb(readOnly, readWrite);
-			executorPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
-			uuidsToNidMap = new UuidsToNidMap(0, 100);
+			statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
+			conceptDb = new ConceptBdb(readOnly, mutable);
+			uuidsToNidMapDb = new UuidsToNidMapBdb(readOnly, mutable);
+			nidCidMapDb = new NidCNidMapBdb(readOnly, mutable);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -129,12 +131,8 @@ public class Bdb {
 		throw new UnsupportedOperationException();
 	}
 	
-	public static UuidsToNidMap getUuidsToNidMap() {
-		return uuidsToNidMap;
-	}
-
-	public static void setUuidsToNidMap(UuidsToNidMap uuidsToNidMap) {
-		Bdb.uuidsToNidMap = uuidsToNidMap;
+	public static UuidsToNidMapBdb getUuidsToNidMap() {
+		return uuidsToNidMapDb;
 	}
 
 	private static Future<Boolean> syncFuture;
@@ -152,9 +150,11 @@ public class Bdb {
 
 		@Override
 		public Boolean call() throws Exception {
+			nidCidMapDb.sync();
 			conceptDb.sync();
 			statusAtPositionDb.sync();
-			readWrite.bdbEnv.sync();
+			uuidsToNidMapDb.sync();
+			mutable.bdbEnv.sync();
 			if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
 				readOnly.bdbEnv.sync();
 			}
@@ -164,31 +164,33 @@ public class Bdb {
 	}
 	// Close the environment
 	public static void close() throws InterruptedException, ExecutionException {
-		if (readWrite.bdbEnv != null) {
+		if (mutable.bdbEnv != null) {
 			try {
 				if (syncFuture != null  &&
 						syncFuture.isDone() != true) {
 					syncFuture.get();
 				}
+				nidCidMapDb.close();
 				conceptDb.close();
 				statusAtPositionDb.close();
-				readWrite.bdbEnv.close();
+				uuidsToNidMapDb.close();
+				mutable.bdbEnv.close();
 			} catch (DatabaseException dbe) {
 				AceLog.getAppLog().alertAndLogException(dbe);
 			}
 		}
 	}
 
-	public static NidCNidMap getNidCNidMap() {
-		return uuidsToNidMap.getNidCidMap();
+	public static NidCNidMapBdb getNidCNidMap() {
+		return nidCidMapDb;
 	}
 
 	public static int uuidsToNid(Collection<UUID> uuids) {
-		return uuidsToNidMap.uuidsToNidWithGeneration(uuids);
+		return uuidsToNidMapDb.uuidsToNid(uuids);
 	}
 
 	public static int uuidToNid(UUID uuid) {
-		return uuidsToNidMap.uuidToNidWithGeneration(uuid);
+		return uuidsToNidMapDb.uuidToNid(uuid);
 	}
 
 

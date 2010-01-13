@@ -11,53 +11,8 @@ import cern.colt.list.IntArrayList;
 import cern.colt.map.HashFunctions;
 import cern.colt.map.PrimeFinder;
 
-import com.sleepycat.bind.tuple.TupleBinding;
-import com.sleepycat.bind.tuple.TupleInput;
-import com.sleepycat.bind.tuple.TupleOutput;
-
 public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	
-	public static class UuidNidMapBinder extends TupleBinding<UuidToIntHashMap> {
-
-		private static UuidNidMapBinder binder = new UuidNidMapBinder();
-		
-	    public static UuidNidMapBinder getBinder() {
-	        return binder;
-	    }
-
-		@Override
-		public UuidToIntHashMap entryToObject(TupleInput ti) {
-			int size = ti.readInt();
-			double minLoadFactor = ti.readDouble();
-			double maxLoadFactor = ti.readDouble();
-			UuidToIntHashMap map = new UuidToIntHashMap(size, minLoadFactor, maxLoadFactor);
-			ti.read(map.state);
-			for (int i = 0; i < size; i++) {
-				map.values[i] = ti.readInt();
-				int msb = i * 2;
-				map.table[msb] = ti.readLong();
-				map.table[msb + 1] = ti.readLong();
-			}
-			return map;
-		}
-
-		@Override
-		public void objectToEntry(UuidToIntHashMap map, TupleOutput to) {
-			int size = map.state.length;
-			to.writeInt(size);
-			to.writeDouble(map.minLoadFactor);
-			to.writeDouble(map.maxLoadFactor);		
-			to.write(map.state);
-			for (int i = 0; i < size; i++) {
-				to.writeInt(map.values[i]);
-				int msb = i * 2;
-				to.writeLong(map.table[msb]);
-				to.writeLong(map.table[msb + 1]);
-			}
-		}
-	}
-
-
 	/**
 	 * 
 	 */
@@ -175,24 +130,17 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * @return <tt>true</tt> if the receiver contains the specified key.
 	 */
 	public boolean containsKey(long[] key) {
-		return indexOfKey(key) >= 0;
-	}
-	public boolean containsKey(UUID key) {
-		return indexOfKey(key) >= 0;
-	}
-
-	public boolean unlockedContainsKey(long[] key) {
 		r.lock();
 		try {
-		return indexOfKey(key) >= 0;
+			return indexOfKey(key) >= 0;
 		} finally {
 			r.unlock();
 		}
 	}
-	public boolean unlockedContainsKey(UUID key) {
+	public boolean containsKey(UUID key) {
 		r.lock();
 		try {
-		return indexOfKey(key) >= 0;
+			return indexOfKey(key) >= 0;
 		} finally {
 			r.unlock();
 		}
@@ -228,30 +176,6 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		}
 	}
 
-	/**
-	 * Applies a procedure to each key of the receiver, if any. Note: Iterates
-	 * over the keys in no particular order. Subclasses can define a particular
-	 * order, for example, "sorted by key". All methods which <i>can</i> be
-	 * expressed in terms of this method (most methods can) <i>must
-	 * guarantee</i> to use the <i>same</i> order defined by this method, even
-	 * if it is no particular order. This is necessary so that, for example,
-	 * methods <tt>keys</tt> and <tt>values</tt> will yield association pairs,
-	 * not two uncorrelated lists.
-	 * 
-	 * @param procedure
-	 *            the procedure to be applied. Stops iteration if the procedure
-	 *            returns <tt>false</tt>, otherwise continues.
-	 * @return <tt>false</tt> if the procedure stopped before all keys where
-	 *         iterated over, <tt>true</tt> otherwise.
-	 */
-	public boolean forEachKey(DoubleProcedure procedure) {
-		for (int i = state.length; i-- > 0;) {
-			if (state[i] == FULL)
-				if (!procedure.apply(table[i]))
-					return false;
-		}
-		return true;
-	}
 
 	/**
 	 * Applies a procedure to each (key,value) pair of the receiver, if any.
@@ -309,18 +233,6 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		} finally {
 			r.unlock();
 		}
-	}
-	public int unlockedGet(long[] key) {
-		int i = indexOfKey(key);
-		if (i < 0)
-			return Integer.MAX_VALUE; // not contained
-		return values[i];
-	}
-	public int unlockedGet(UUID key) {
-		int i = indexOfKey(key);
-		if (i < 0)
-			return Integer.MAX_VALUE; // not contained
-		return values[i];
 	}
 
 	/**
@@ -615,43 +527,6 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		return true;
 	}
 
-	public boolean unlockedPut(long[] key, int value) {
-	int i = indexOfInsertion(key);
-	if (i < 0) { // already contained
-		i = -i - 1;
-		this.values[i] = value;
-		return false;
-	}
-	if (this.distinct > this.highWaterMark) {
-		int newCapacity = chooseGrowCapacity(this.distinct + 1,
-				this.minLoadFactor, this.maxLoadFactor);
-		/*
-		 * System.out.print("grow rehashing ");
-		 * System.out.println("at distinct="
-		 * +distinct+", capacity="+state.length
-		 * +" to newCapacity="+newCapacity+" ...");
-		 */
-		rehash(newCapacity);
-		return put(key, value);
-	}
-
-	int msb = i * 2;
-	this.table[msb] = key[0];
-	this.table[msb + 1] = key[1];
-	this.values[i] = value;
-	if (this.state[i] == FREE)
-		this.freeEntries--;
-	this.state[i] = FULL;
-	this.distinct++;
-
-	if (this.freeEntries < 1) { // delta
-		int newCapacity = chooseGrowCapacity(this.distinct + 1,
-				this.minLoadFactor, this.maxLoadFactor);
-		rehash(newCapacity);
-	}
-	return true;
-}
-
 	/**
 	 * Rehashes the contents of the receiver into a new table with a smaller or
 	 * larger capacity. This method is called automatically when the number of
@@ -660,8 +535,10 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 */
 	protected void rehash(int newCapacity) {
 		int oldCapacity = state.length;
-		// if (oldCapacity == newCapacity) return;
-
+		if (oldCapacity == newCapacity) {
+			return;
+		}
+		
 		long oldTable[] = table;
 		int oldValues[] = values;
 		byte oldState[] = state;
@@ -680,8 +557,8 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		this.freeEntries = newCapacity - this.distinct; // delta
 
 		for (int i = oldCapacity; i-- > 0;) {
+			long[] element = new long[2];
 			if (oldState[i] == FULL) {
-				long[] element = new long[2];
 				element[0] = oldTable[i * 2];
 				element[1] = oldTable[i * 2 + 1];
 				int index = indexOfInsertion(element);
@@ -796,7 +673,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * the list, starting at index 0. After this call returns the specified list
 	 * has a new size that equals <tt>this.size()</tt>. Iteration order is
 	 * guaranteed to be <i>identical</i> to the order used by method
-	 * {@link #forEachKey(DoubleProcedure)}.
+	 * {@link #forEachKey(UuidProcedure)}.
 	 * <p>
 	 * This method can be used to iterate over the values of the receiver.
 	 * 
@@ -819,7 +696,15 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 
 	@Override
 	public boolean forEachKey(UuidProcedure procedure) {
-		// TODO Auto-generated method stub
-		return false;
+		for (int i = state.length; i-- > 0;) {
+			if (state[i] == FULL) {
+				long[] key = new long[2];
+				key[0] = table[i*2];
+				key[1] = table[i*2+1];
+				if (!procedure.apply(key));
+					return false;
+			}
+		}
+		return true;
 	}
 }

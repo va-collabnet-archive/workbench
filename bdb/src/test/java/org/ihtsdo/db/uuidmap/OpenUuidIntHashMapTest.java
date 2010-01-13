@@ -42,11 +42,11 @@ public class OpenUuidIntHashMapTest {
 			list = new UuidArrayList(testSize);
 			for (int i = 0; i < testSize; i++) {
 				UUID key = UUID.randomUUID();
-				nativeMap.unlockedPut(UuidUtil.convert(key), i);
+				nativeMap.put(UuidUtil.convert(key), i);
 				list.add(UuidUtil.convert(key));
 			}
 			for (int i = 0; i < testSize; i++) {
-				int value = nativeMap.unlockedGet(list.get(i));
+				int value = nativeMap.get(list.get(i));
 				assertTrue(value == i);
 			}
 			testResults.add(System.currentTimeMillis() - start);

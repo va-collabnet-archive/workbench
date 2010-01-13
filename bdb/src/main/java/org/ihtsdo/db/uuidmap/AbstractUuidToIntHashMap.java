@@ -115,6 +115,11 @@ public abstract class AbstractUuidToIntHashMap extends AbstractMap {
 				}
 				return !found;
 			}
+
+			@Override
+			public void close() {
+				// nothing to do...
+			}
 		});
 		if (notFound)
 			return null;
@@ -214,6 +219,11 @@ public abstract class AbstractUuidToIntHashMap extends AbstractMap {
 					valueList.add(value);
 				}
 				return true;
+			}
+
+			@Override
+			public void close() {
+				// nothing to do...
 			}
 		});
 	}

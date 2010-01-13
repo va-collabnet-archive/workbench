@@ -14,13 +14,13 @@ import com.sleepycat.je.Database;
  */
 public abstract class ComponentBdb {
 	protected Database readOnly;
-	protected Database readWrite;
+	protected Database mutable;
 
 	public ComponentBdb(Bdb readOnlyBdbEnv, Bdb readWriteBdbEnv)
 			throws IOException {
 		readOnly = Bdb.setupDatabase(readOnlyBdbEnv.bdbEnv.getConfig().getReadOnly(), 
 				getDbName(), readOnlyBdbEnv);
-		readWrite = Bdb.setupDatabase(false, getDbName(), readWriteBdbEnv);
+		mutable = Bdb.setupDatabase(false, getDbName(), readWriteBdbEnv);
 		init();
 	}
 	
@@ -28,28 +28,26 @@ public abstract class ComponentBdb {
 	protected abstract String getDbName();
 	
 	public void close() {
-		sync();
 		try {
+			sync();
 			readOnly.close();
+			mutable.close();
 		} catch (IllegalStateException ex) {
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 				AceLog.getAppLog().warning(ex.toString());
 			}
-		}
-		try {
-			readWrite.close();
-		} catch (IllegalStateException ex) {
+		} catch (IOException e) {
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-				AceLog.getAppLog().warning(ex.toString());
+				AceLog.getAppLog().severe(e.toString());
 			}
 		}
 	}
 
-	public void sync() {
+	public void sync() throws IOException {
 		if (readOnly.getConfig().getReadOnly() == false) {
 			readOnly.sync();
 		}
-		readWrite.sync();
+		mutable.sync();
 	}
 
 	public Database getReadOnly() {
@@ -57,6 +55,6 @@ public abstract class ComponentBdb {
 	}
 
 	public Database getReadWrite() {
-		return readWrite;
+		return mutable;
 	}
 }

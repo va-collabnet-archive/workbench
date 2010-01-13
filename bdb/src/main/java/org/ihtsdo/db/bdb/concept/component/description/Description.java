@@ -32,7 +32,6 @@ import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EDescriptionVersion;

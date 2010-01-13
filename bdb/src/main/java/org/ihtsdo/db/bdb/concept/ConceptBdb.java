@@ -8,6 +8,7 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
+import org.ihtsdo.db.bdb.NidCNidMapBdb;
 
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.je.Cursor;
@@ -45,17 +46,24 @@ public class ConceptBdb extends ComponentBdb {
 		return Concept.get(cNid, true);
 	}
 
-	public void writeConcept(Concept concept) {
+	public void writeConcept(Concept concept) throws IOException {
 		ConceptBinder binder = new ConceptBinder();
 		DatabaseEntry key = new DatabaseEntry();
-		IntegerBinding.intToEntry(concept.getNid(), key);
+		int cNid = concept.getNid();
+		IntegerBinding.intToEntry(cNid, key);
 		DatabaseEntry value = new DatabaseEntry();
 		binder.objectToEntry(concept, value);
-		readWrite.put(null, key, value);
+		mutable.put(null, key, value);
+		int[] nids = concept.getAllNids();
+		NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();
+		nidCidMap.setCidForNid(cNid, cNid);
+		for (int nid: nids) {
+			nidCidMap.setCidForNid(cNid, nid);
+		}
 	}
 
 	public long getCount() {
-		long count = readOnly.count() + readWrite.count();
+		long count = readOnly.count() + mutable.count();
 		return count;
 	}
 
@@ -91,7 +99,7 @@ public class ConceptBdb extends ComponentBdb {
 		CursorConfig cursorConfig = new CursorConfig();
 		cursorConfig.setReadUncommitted(true);
 		Cursor roCursor = readOnly.openCursor(null, cursorConfig);
-		Cursor rwCursor = readWrite.openCursor(null, cursorConfig);
+		Cursor rwCursor = mutable.openCursor(null, cursorConfig);
 		try {
 			DatabaseEntry roFoundKey = new DatabaseEntry();
 			DatabaseEntry rwFoundKey = new DatabaseEntry();
