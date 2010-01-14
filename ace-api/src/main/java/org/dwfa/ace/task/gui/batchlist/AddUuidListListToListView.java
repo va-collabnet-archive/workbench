@@ -27,6 +27,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.util.MultiMap;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -46,287 +47,206 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 @BeanList(specs = {@Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN)})
 public class AddUuidListListToListView extends AbstractTask {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 1;
+	private static final int dataVersion = 1;
 
-    /**
-     * Property name for a list of uuid lists, typically used to represent a
-     * list of concepts in a transportable way.
-     */
-    private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST
-            .getAttachmentKey();
+	/**
+	 * Property name for a list of uuid lists, typically used to represent a
+	 * list of concepts in a transportable way.
+	 */
+	private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST
+			.getAttachmentKey();
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(dataVersion);
-        out.writeObject(uuidListListPropName);
-    }
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+		out.writeObject(uuidListListPropName);
+	}
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
-        int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
-            uuidListListPropName = (String) in.readObject();
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
-        }
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == dataVersion) {
+			uuidListListPropName = (String) in.readObject();
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
 
-    }
+	}
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
-        // Nothing to do...
+	public void complete(I_EncodeBusinessProcess process, I_Work worker)
+			throws TaskFailedException {
+		// Nothing to do...
 
-    }
+	}
 
-    @SuppressWarnings("unchecked")
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-            throws TaskFailedException {
-        try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-                    .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-                            .name());
-            final I_TermFactory tf = LocalVersionedTerminology.get();
+	@SuppressWarnings("unchecked")
+	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+			throws TaskFailedException {
+		try {
+			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
+					.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
+							.name());
+			final I_TermFactory tf = LocalVersionedTerminology.get();
 
-            JList conceptList = config.getBatchConceptList();
-            final I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList
-                    .getModel();
+			JList conceptList = config.getBatchConceptList();
+			final I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList
+					.getModel();
 
-            final List<List<UUID>> idListList = (ArrayList<List<UUID>>) process
-                    .readProperty(uuidListListPropName);
-            AceLog.getAppLog()
-                    .info("Adding list of size: " + idListList.size());
+			final List<List<UUID>> idListList = (ArrayList<List<UUID>>) process
+					.readProperty(uuidListListPropName);
+			AceLog.getAppLog()
+					.info("Adding list of size: " + idListList.size());
 
-            SwingUtilities.invokeAndWait(new Runnable() {
+			SwingUtilities.invokeAndWait(new Runnable() {
 
-                public void run() {
+				public void run() {
 
-                    I_GetConceptData[] elements = getConceptsForList(
-                            idListList, tf);
+					I_GetConceptData[] elements = getConceptsForList(
+							idListList, tf);
 
-                    for (I_GetConceptData concept : elements) {
-                        model.addElement(concept);
-                    }
-                }
-            });
+					for (I_GetConceptData concept : elements) {
+						model.addElement(concept);
+					}
+				}
+			});
 
-            return Condition.CONTINUE;
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
-        } catch (InterruptedException e) {
-            throw new TaskFailedException(e);
-        }
-    }
+			return Condition.CONTINUE;
+		} catch (IntrospectionException e) {
+			throw new TaskFailedException(e);
+		} catch (IllegalAccessException e) {
+			throw new TaskFailedException(e);
+		} catch (InvocationTargetException e) {
+			throw new TaskFailedException(e);
+		} catch (InterruptedException e) {
+			throw new TaskFailedException(e);
+		}
+	}
 
-    private I_GetConceptData[] getConceptsForList(List<List<UUID>> idListList,
-            I_TermFactory tf) {
+	private I_GetConceptData[] getConceptsForList(List<List<UUID>> idListList,
+			I_TermFactory tf) {
 
-        I_GetConceptData[] elements = new I_GetConceptData[idListList.size()];
-        Map idPositions = new AddUuidListListToListView.MultiMap();
-        int inc = -1;
+		I_GetConceptData[] elements = new I_GetConceptData[idListList.size()];
+		Map idPositions = new MultiMap();
+		int inc = -1;
 
-        for (List<UUID> idList : idListList) {
+		for (List<UUID> idList : idListList) {
 
-            inc++;
+			inc++;
 
-            try {
-                try {
-                    // Concept
-                    elements[inc] = getConcept(idList);
-                } catch (TerminologyException e) {
+			try {
+				try {
+					// Concept
+					elements[inc] = getConcept(idList);
+				} catch (TerminologyException e) {
 
-                    // Not a concept... try a description or
-                    // relationship
-                    final int nid = tf.uuidToNative(idList);
-                    List<UUID> uuids = tf.getId(nid).getUIDs();
+					// Not a concept... try a description or
+					// relationship
+					final int nid = tf.uuidToNative(idList);
+					List<UUID> uuids = tf.getId(nid).getUIDs();
 
-                    if (uuids != null && !uuids.isEmpty()) {
-                        try {
-                            // Description
-                            elements[inc] = getDescriptionParent(tf, uuids);
-                        } catch (Exception e1) {
-                            // Relationship
-                            idPositions.put(nid, inc);
-                        }
-                    }
-                }
-            } catch (TerminologyException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-                return new I_GetConceptData[0];
-            } catch (IOException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-                return new I_GetConceptData[0];
-            }
-        }
+					if (uuids != null && !uuids.isEmpty()) {
+						try {
+							// Description
+							elements[inc] = getDescriptionParent(tf, uuids);
+						} catch (Exception e1) {
+							// Relationship
+							idPositions.put(nid, inc);
+						}
+					}
+				}
+			} catch (TerminologyException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+				return new I_GetConceptData[0];
+			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+				return new I_GetConceptData[0];
+			}
+		}
 
-        if (!idPositions.isEmpty()) {
-            getRelationshipSources(tf, idPositions, elements);
-        }
+		if (!idPositions.isEmpty()) {
+			getRelationshipSources(tf, idPositions, elements);
+		}
 
-        return elements;
-    }
+		return elements;
+	}
 
-    private void getRelationshipSources(I_TermFactory tf,
-            final Map idPositions, final I_GetConceptData[] elements) {
-        try {
-            tf.iterateConcepts(new I_ProcessConcepts() {
-                public void processConcept(I_GetConceptData concept)
-                        throws Exception {
+	private void getRelationshipSources(I_TermFactory tf,
+			final Map idPositions, final I_GetConceptData[] elements) {
+		try {
+			tf.iterateConcepts(new I_ProcessConcepts() {
+				public void processConcept(I_GetConceptData concept)
+						throws Exception {
 
-                    if (idPositions.isEmpty()) {
-                        return;
-                    }
+					if (idPositions.isEmpty()) {
+						return;
+					}
 
-                    List<I_RelVersioned> rels = concept.getSourceRels();
-                    for (I_RelVersioned rel : rels) {
+					List<I_RelVersioned> rels = concept.getSourceRels();
+					for (I_RelVersioned rel : rels) {
 
-                        if (idPositions.containsKey(rel.getRelId())) {
+						if (idPositions.containsKey(rel.getRelId())) {
 
-                            ArrayList<Integer> positions = (ArrayList<Integer>) idPositions
-                                    .remove(rel.getRelId());
-                            for (Integer position : positions) {
-                                elements[position.intValue()] = concept;
-                            }
-                        }
-                    }
-                }
-            });
-        } catch (Exception e) {
-            String logMessage = "An error occurred. An id exists that cannot be resolved as a concept, "
-                    + "description or relationship";
-            AceLog.getAppLog().severe(logMessage, e);
-            AceLog.getAppLog().alertAndLogException(
-                    new TaskFailedException(logMessage));
-        }
-    }
+							ArrayList<Integer> positions = (ArrayList<Integer>) idPositions
+									.remove(rel.getRelId());
+							for (Integer position : positions) {
+								elements[position.intValue()] = concept;
+							}
+						}
+					}
+				}
+			});
+		} catch (Exception e) {
+			String logMessage = "An error occurred. An id exists that cannot be resolved as a concept, "
+					+ "description or relationship";
+			AceLog.getAppLog().severe(logMessage, e);
+			AceLog.getAppLog().alertAndLogException(
+					new TaskFailedException(logMessage));
+		}
+	}
 
-    private I_GetConceptData getDescriptionParent(I_TermFactory tf,
-            List<UUID> uuids) throws Exception {
-        I_GetConceptData conceptInList;
-        I_DescriptionVersioned desc = tf
-                .getDescription(uuids.get(0).toString());
-        conceptInList = tf.getConcept(desc.getConceptId());
-        return conceptInList;
-    }
+	private I_GetConceptData getDescriptionParent(I_TermFactory tf,
+			List<UUID> uuids) throws Exception {
+		I_GetConceptData conceptInList;
+		I_DescriptionVersioned desc = tf
+				.getDescription(uuids.get(0).toString());
+		conceptInList = tf.getConcept(desc.getConceptId());
+		return conceptInList;
+	}
 
-    private I_GetConceptData getConcept(List<UUID> idList)
-            throws TerminologyException, IOException {
-        I_GetConceptData conceptInList = null;
-        conceptInList = AceTaskUtil.getConceptFromObject(idList);
+	private I_GetConceptData getConcept(List<UUID> idList)
+			throws TerminologyException, IOException {
+		I_GetConceptData conceptInList = null;
+		conceptInList = AceTaskUtil.getConceptFromObject(idList);
 
-        // TODO - Review: Is there a better way to confirm it is not a concept?
-        // We need to test as it could be a desc
-        if (conceptInList.getConceptAttributes() == null) {
-            throw new TerminologyException("No concept attributes found");
-        }
-        return conceptInList;
-    }
+		// TODO - Review: Is there a better way to confirm it is not a concept?
+		// We need to test as it could be a desc
+		if (conceptInList.getConceptAttributes() == null) {
+			throw new TerminologyException("No concept attributes found");
+		}
+		return conceptInList;
+	}
 
-    public Collection<Condition> getConditions() {
-        return CONTINUE_CONDITION;
-    }
+	public Collection<Condition> getConditions() {
+		return CONTINUE_CONDITION;
+	}
 
-    public int[] getDataContainerIds() {
-        return new int[]{};
-    }
+	public int[] getDataContainerIds() {
+		return new int[]{};
+	}
 
-    public String getUuidListListPropName() {
-        return uuidListListPropName;
-    }
+	public String getUuidListListPropName() {
+		return uuidListListPropName;
+	}
 
-    public void setUuidListListPropName(String uuidListListPropName) {
-        this.uuidListListPropName = uuidListListPropName;
-    }
-
-    public class MultiMap implements Map {
-
-        private Map map = new HashMap();
-
-        @Override
-        public int size() {
-            return this.values().size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return map.isEmpty();
-        }
-
-        @Override
-        public boolean containsKey(Object key) {
-            return map.containsKey(key);
-        }
-
-        @Override
-        public boolean containsValue(Object value) {
-            return this.values().contains(value);
-        }
-
-        @Override
-        public Object get(Object key) {
-            return map.get(key);
-        }
-
-        @Override
-        public Object put(Object key, Object value) {
-
-            List values = null;
-            if (this.containsKey(key)) {
-                values = (List) this.get(key);
-            } else {
-                values = new ArrayList();
-            }
-            values.add(value);
-            map.put(key, values);
-            return value;
-        }
-
-        @Override
-        public Object remove(Object key) {
-            return map.remove(key);
-        }
-
-        @Override
-        public void putAll(Map map) {
-            map.putAll(map);
-        }
-
-        @Override
-        public void clear() {
-            map.clear();
-        }
-
-        @Override
-        public Set keySet() {
-            return map.keySet();
-        }
-
-        @Override
-        public Collection values() {
-            List values = new ArrayList();
-            Collection<List> valueList = map.values();
-            for (List vals : valueList) {
-                values.addAll(vals);
-            }
-            return values;
-        }
-
-        @Override
-        public Set entrySet() {
-            return map.entrySet();
-        }
-    }
+	public void setUuidListListPropName(String uuidListListPropName) {
+		this.uuidListListPropName = uuidListListPropName;
+	}
 }
