@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -70,7 +70,10 @@ public class UuidSctidMapDb {
     private PreparedStatement getTypeRow;
     /** Prepared Statement to get a NAMESPACE row. */
     private PreparedStatement getNamespaceRow;
-    /** Prepared Statement to get the current max sequence number of a NAMESPACE and TYPE. */
+    /**
+     * Prepared Statement to get the current max sequence number of a NAMESPACE
+     * and TYPE.
+     */
     private PreparedStatement getMaxSctIdForNamespaceAndType;
     /** Validate UUIDs when adding to the DB */
     private boolean validate = false;
@@ -88,7 +91,7 @@ public class UuidSctidMapDb {
      * @return UuidSctidMapDb
      */
     public static UuidSctidMapDb getInstance() {
-        if(instance == null){
+        if (instance == null) {
             instance = new UuidSctidMapDb();
         }
         return instance;
@@ -134,8 +137,8 @@ public class UuidSctidMapDb {
      * @throws SQLException creating the DB
      * @throws ClassNotFoundException
      */
-    public void openDb(File databaseFile, File fixedMapDirectory, File idMapDirectory, boolean validate, boolean appendToDb)
-            throws IOException, SQLException, ClassNotFoundException {
+    public void openDb(File databaseFile, File fixedMapDirectory, File idMapDirectory, boolean validate,
+            boolean appendToDb) throws IOException, SQLException, ClassNotFoundException {
         this.validate = validate;
         if (databaseFile.exists() && databaseFile.canRead()) {
             openExistingDb(databaseFile);
@@ -161,8 +164,7 @@ public class UuidSctidMapDb {
     private void openExistingDb(File databaseDirectory) throws IOException, SQLException, ClassNotFoundException {
         logger.info("Opening existing DB " + databaseDirectory.getName());
 
-        if (conn == null
-                || !this.databaseDirectory.getCanonicalFile().equals(databaseDirectory.getCanonicalFile())) {
+        if (conn == null || !this.databaseDirectory.getCanonicalFile().equals(databaseDirectory.getCanonicalFile())) {
             close();
             this.databaseDirectory = new File(databaseDirectory.getCanonicalFile().toString());
 
@@ -204,7 +206,8 @@ public class UuidSctidMapDb {
     }
 
     /**
-     * Creates a new database using the files in the fixed map directory and read write map directory.
+     * Creates a new database using the files in the fixed map directory and
+     * read write map directory.
      *
      * @param databaseFile File
      * @param fixedMapDirectory File
@@ -213,7 +216,8 @@ public class UuidSctidMapDb {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    private void createDb(File databaseFile, File fixedMapDirectory, File idMapDirectory) throws IOException, SQLException, ClassNotFoundException {
+    private void createDb(File databaseFile, File fixedMapDirectory, File idMapDirectory) throws IOException,
+            SQLException, ClassNotFoundException {
         connectToDataBase(databaseFile, false);
         createTables();
         createStatements();
@@ -249,6 +253,37 @@ public class UuidSctidMapDb {
                     updateDbFromSctMapFile(idMapFile);
                 }
             }
+        }
+    }
+
+    /**
+     * Updated the DB using a rf2 id file
+     *
+     * @param rf2IdFile File rf2 ids
+     * @throws SQLException DB error
+     * @throws IOException File error
+     */
+    public void updateDbFromRf2IdFile(File rf2IdFile) throws SQLException, IOException {
+        BufferedReader br = new BufferedReader(new FileReader(rf2IdFile));
+        int insertCount = 0;
+
+        try {
+            br.readLine();
+            String lineStr;
+            while ((lineStr = br.readLine()) != null) {
+                String[] columns = lineStr.split("\t");
+                UUID uuid = UUID.fromString(columns[1]);
+                Long sctId = Long.parseLong(columns[5]);
+
+                if (!validate || validateFileUuid(uuid, sctId, rf2IdFile)) {
+                    addUUIDSctIdEntry(uuid, sctId, false);
+                    insertCount++;
+                    commitBatch(insertCount);
+                }
+            }
+        } finally {
+            br.close();
+            conn.commit();
         }
     }
 
@@ -346,8 +381,8 @@ public class UuidSctidMapDb {
         Long sctIdCurrent = getSctId(uuid);
 
         if (sctIdCurrent != null && !sctIdCurrent.equals(sctId)) {
-            logger.severe("Duplicate UUID: " + uuid + " in file " + mapFile.getAbsoluteFile()
-                + uuid + " mapped to " + sctIdCurrent + " not " + sctId);
+            logger.severe("Duplicate UUID: " + uuid + " in file " + mapFile.getAbsoluteFile() + uuid + " mapped to "
+                + sctIdCurrent + " not " + sctId);
         }
 
         return sctIdCurrent == null;
@@ -356,7 +391,8 @@ public class UuidSctidMapDb {
     /**
      * Get the TYPE from the sctid string
      *
-     * Type for our purposes is the second last number ie 0=concept 1=description etc.
+     * Type for our purposes is the second last number ie 0=concept
+     * 1=description etc.
      *
      * @param sctId String
      * @return TYPE
@@ -376,7 +412,7 @@ public class UuidSctidMapDb {
      * @return int primary key
      * @throws SQLException cannot find the TYPE in the DB
      */
-    private int getTypeId(TYPE type) throws SQLException{
+    private int getTypeId(TYPE type) throws SQLException {
         int typeId;
         ResultSet results = null;
         try {
@@ -401,7 +437,7 @@ public class UuidSctidMapDb {
      * @throws NoSuchElementException cannot find the NAMESPACE
      * @throws SQLException
      */
-    private int getSctIdNamespace(String sctId) throws NoSuchElementException, SQLException{
+    private int getSctIdNamespace(String sctId) throws NoSuchElementException, SQLException {
         int namespace = 0;
 
         if (!sctId.substring(sctId.length() - 3, sctId.length() - 2).equals(NAMESPACE.SNOMED_META_DATA.getDigits())) {
@@ -579,6 +615,19 @@ public class UuidSctidMapDb {
     }
 
     /**
+     * Runs the sql against the DB.
+     *
+     * Commits the current connection.
+     *
+     * @param sql String SQL
+     * @throws SQLException
+     */
+    public void runAndCommitSql(String sql) throws SQLException {
+        runSql(sql);
+        conn.commit();
+    }
+
+    /**
      * Creates the prepare statements for this DB.
      *
      * @throws SQLException creating the prepare statements
@@ -623,12 +672,14 @@ public class UuidSctidMapDb {
      * @throws IOException reading the DB.
      * @throws ClassNotFoundException
      */
-    private void connectToDataBase(File databaseDirectory, boolean autoCommit) throws SQLException, IOException, ClassNotFoundException {
+    private void connectToDataBase(File databaseDirectory, boolean autoCommit) throws SQLException, IOException,
+            ClassNotFoundException {
         this.databaseDirectory = new File(databaseDirectory.getCanonicalFile().toString());
 
         Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
 
-        conn = DriverManager.getConnection("jdbc:derby:directory:" + databaseDirectory.getCanonicalPath() + ";create=true;");
+        conn = DriverManager.getConnection("jdbc:derby:directory:" + databaseDirectory.getCanonicalPath()
+            + ";create=true;");
 
         conn.setAutoCommit(autoCommit);
     }
@@ -718,6 +769,7 @@ public class UuidSctidMapDb {
 
     /**
      * Removes a UUID from the DB
+     *
      * @param uuid UUID
      * @throws SQLException deleting the UUID
      */
@@ -741,7 +793,7 @@ public class UuidSctidMapDb {
      * @throws SQLException adding new mapping row.
      */
     private void addUUIDSctIdEntry(UUID uuid, Long sctId, boolean commit) throws SQLException {
-        if (!validate || validateFileUuid(uuid, sctId, databaseDirectory)){
+        if (!validate || validateFileUuid(uuid, sctId, databaseDirectory)) {
             insertIdMapRow.setLong(1, uuid.getMostSignificantBits());
             insertIdMapRow.setLong(2, uuid.getLeastSignificantBits());
             insertIdMapRow.setLong(3, sctId);
@@ -775,7 +827,7 @@ public class UuidSctidMapDb {
      * @param entryList Map of UUID,Long
      * @throws SQLException adding new mapping row.
      */
-    public void addUUIDSctIdEntryList(Map<UUID,Long> entryList) throws SQLException {
+    public void addUUIDSctIdEntryList(Map<UUID, Long> entryList) throws SQLException {
         for (UUID uuid : entryList.keySet()) {
             addUUIDSctIdEntry(uuid, entryList.get(uuid), false);
         }
@@ -864,12 +916,12 @@ public class UuidSctidMapDb {
      */
     private void deleteLockFiles() {
         File lockFile = new File(databaseDirectory, "db.lck");
-        if(lockFile.exists()){
+        if (lockFile.exists()) {
             lockFile.delete();
         }
 
         lockFile = new File(databaseDirectory, "dbex.lck");
-        if(lockFile.exists()){
+        if (lockFile.exists()) {
             lockFile.delete();
         }
     }
@@ -895,9 +947,8 @@ public class UuidSctidMapDb {
             if (results.next()) {
                 String maxSctId = results.getLong(1) + "";
                 if (maxSctId.length() > (type.getDigits().length() + namespace.getDigits().length())) {
-                    sequenceId =
-                            Long.valueOf(maxSctId.substring(0, maxSctId.length()
-                                - (type.getDigits().length() + namespace.getDigits().length() + 1)));
+                    sequenceId = Long.valueOf(maxSctId.substring(0, maxSctId.length()
+                        - (type.getDigits().length() + namespace.getDigits().length() + 1)));
                 }
             }
         } finally {
