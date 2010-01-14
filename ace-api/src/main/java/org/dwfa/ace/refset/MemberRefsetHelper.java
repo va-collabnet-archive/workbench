@@ -335,7 +335,8 @@ public class MemberRefsetHelper extends RefsetHelper {
         // Load references
         
         I_GetConceptData isARel = 
-            termFactory.getConcept(SNOMED.Concept.IS_A.localize().getNid());
+            //termFactory.getConcept(SNOMED.Concept.IS_A.localize().getNid());
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
         I_GetConceptData refsetIdentity = 
             termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
         I_GetConceptData definingCharacteristic = 
