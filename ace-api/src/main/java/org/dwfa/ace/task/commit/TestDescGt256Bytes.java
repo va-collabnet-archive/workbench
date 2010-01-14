@@ -126,7 +126,7 @@ public class TestDescGt256Bytes extends AbstractConceptTest {
         
         // TEST IF Preferred or Synonym DESCRIPTION EXCEEDS 80 CHARACTERS
         // :NOTE:MEC: Global restriction added per Kaiser Pilot requirement.
-        typesToCheck.clear();
+        /* typesToCheck.clear();
         typesToCheck.add(pt_type.getConceptId());
         typesToCheck.add(syn_type.getConceptId());
         for (I_DescriptionVersioned desc : descriptions) {
@@ -150,7 +150,7 @@ public class TestDescGt256Bytes extends AbstractConceptTest {
                 }
             }
         }
-        
+        */
         return alertList;
     }
 
