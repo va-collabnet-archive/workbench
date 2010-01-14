@@ -98,6 +98,13 @@
             <artifactId>svnkit-javahl</artifactId>
             <version>1.2.1.5297</version>
         </dependency>
+        <dependency>
+        	<groupId>au.csiro</groupId>
+        	<artifactId>snorocket</artifactId>
+        	<version>1.1.11-SNAPSHOT</version>
+        	<type>jar</type>
+        	<scope>compile</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
