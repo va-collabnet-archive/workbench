@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -16,20 +16,6 @@
  */
 package org.dwfa.cement;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.UUID;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.I_DescribeConceptLocally;
@@ -45,6 +31,21 @@ import org.dwfa.tapi.impl.MemoryTermServer;
 import org.dwfa.tapi.impl.UniversalFixedDescription;
 import org.dwfa.tapi.impl.UniversalFixedRel;
 import org.dwfa.util.id.Type3UuidFactory;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 
 public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
@@ -522,11 +523,11 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
                     OPTIONAL("optional (active status type)",
                              new I_ConceptualizeUniversally[] { ACTIVE }),
-                    DEVELOPMENTAL("optional (active status type)",
+                    DEVELOPMENTAL("optional developmental (active status type)",
                                      new I_ConceptualizeUniversally[] { ACTIVE }),
-                    EXPERIMENTAL("optional (active status type)",
+                    EXPERIMENTAL("optional experimental (active status type)",
                                              new I_ConceptualizeUniversally[] { ACTIVE }),
-                    FROM_SNOMED("optional (active status type)",
+                    FROM_SNOMED("optional from SNOMED (active status type)",
                                                      new I_ConceptualizeUniversally[] { ACTIVE }),
 
 
