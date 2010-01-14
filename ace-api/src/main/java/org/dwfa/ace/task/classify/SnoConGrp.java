@@ -41,6 +41,15 @@ public class SnoConGrp extends ArrayList<SnoCon> {
         Collections.sort(this);
     }
 
+    public SnoConGrp(ArrayList<Integer> concepts) {
+        super();
+        // :NYI: defined or not_defined is indeterminate coming from classifier
+        // callback.
+        for (Integer c : concepts)
+            this.add(new SnoCon(c.intValue(), false));
+        Collections.sort(this);
+    }
+
     public SnoConGrp(SnoCon o) {
         super();
         this.add(o); // 

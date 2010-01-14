@@ -85,8 +85,9 @@ public class SnoPathProcess implements I_ProcessConcepts {
     // GUI
     I_ShowActivity gui = null;
 
-    public SnoPathProcess(Logger logger, I_SnorocketFactory rocket, List<SnoCon> snocons, List<SnoRel> snorels,
-            List<I_Position> fromPathPos, I_ShowActivity gui) throws TerminologyException, IOException {
+    public SnoPathProcess(Logger logger, I_SnorocketFactory rocket, List<SnoCon> snocons,
+            List<SnoRel> snorels, List<I_Position> fromPathPos, I_ShowActivity gui)
+            throws TerminologyException, IOException {
         this.logger = logger;
         this.rocket = rocket;
         this.snocons = snocons;
@@ -104,6 +105,8 @@ public class SnoPathProcess implements I_ProcessConcepts {
         if (concept.getConceptId() == rootNid) {
             if (rocket != null)
                 rocket.addConcept(concept.getConceptId(), false); // @@@
+            if (snocons != null)
+                snocons.add(new SnoCon(concept.getConceptId(), false));
 
             countConAdded++;
             countConRoot++;
@@ -274,15 +277,24 @@ public class SnoPathProcess implements I_ProcessConcepts {
             isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
             // NOT_REFINABLE | OPTIONAL_REFINABILITY | MANDATORY_REFINABILITY
-            isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-            isMANDATORY_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
+            isOPTIONAL_REFINABILITY = tf
+                    .uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
+                    .getUids());
+            isMANDATORY_REFINABILITY = tf
+                    .uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
 
             // Characteristic
-            isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
-            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
+            isCh_STATED_RELATIONSHIP = tf
+                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+            isCh_DEFINING_CHARACTERISTIC = tf
+                    .uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf
+                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP
+                            .getUids());
+            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf
+                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP
+                            .getUids());
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -298,8 +310,8 @@ public class SnoPathProcess implements I_ProcessConcepts {
         s.append("\r\n::: [SnoPathProcess] ProcessPath()");
         if (startTime > 0) {
             long lapseTime = System.currentTimeMillis() - startTime;
-            s.append("\r\n::: [Time] get vodb data: \t" + lapseTime + "\t(mS)\t" + (((float) lapseTime / 1000) / 60)
-                + "\t(min)");
+            s.append("\r\n::: [Time] get vodb data: \t" + lapseTime + "\t(mS)\t"
+                    + (((float) lapseTime / 1000) / 60) + "\t(min)");
             s.append("\r\n:::");
         }
 
@@ -319,7 +331,8 @@ public class SnoPathProcess implements I_ProcessConcepts {
         s.append("\r\n::: Stated:           \t" + countRelCharStated);
         s.append("\r\n::: Stated & Inferred:\t" + countRelCharStatedInferred);
         s.append("\r\n::: Stated & Subsumed:\t" + countRelCharStatedSubsumed);
-        int total = countRelCharStated + countRelCharDefining + countRelCharStatedInferred + countRelCharStatedSubsumed;
+        int total = countRelCharStated + countRelCharDefining + countRelCharStatedInferred
+                + countRelCharStatedSubsumed;
         s.append("\r\n:::            TOTAL=\t" + total);
         s.append("\r\n::: ");
         s.append("\r\n::: Optional Refinability: \t" + countRelRefOpt);
