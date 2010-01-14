@@ -176,12 +176,12 @@ public class VodbVerifyFSNUniqueness extends AbstractMojo {
             return termFactory.getConcept(partId).getUids().iterator().next();
         }
 
-        private boolean isValidFSNAndStatusIgnored(final boolean uuidsEqual) {
-            return (!shouldCheckStatus && uuidsEqual);
+        private boolean isValidFSNAndStatusIgnored(final boolean isFSN) {
+            return (!shouldCheckStatus && isFSN);
         }
 
-        private boolean isValidStatusAndFSN(final boolean uuidsEqual, final boolean isSpecifiedStatus) {
-            return shouldCheckStatus && isSpecifiedStatus && uuidsEqual;
+        private boolean isValidStatusAndFSN(final boolean isFSN, final boolean isSpecifiedStatus) {
+            return shouldCheckStatus && isSpecifiedStatus && isFSN;
         }
 
         private boolean logOnErrors() {
