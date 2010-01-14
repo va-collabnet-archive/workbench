@@ -389,6 +389,13 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "Clinical Terms Version 2 and 3 Released ", "CTV2-3 released flag", "ORG_DWFA_CTV3_RELEASED_BOOL" }, new I_ConceptualizeUniversally[] {
             REFSET_IDENTITY, SUBJECT_TYPE, BOOLEAN_EXTENSION }, new I_ConceptualizeUniversally[] {
             ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+            
+        SNOMED_RELEASED_FLAG(new String[] { "Snomed Released Flag","Snomed Released Flag", "ORG_DWFA_SNCT_RELEASED" },new I_ConceptualizeUniversally[] { 
+    		REFSET_IDENTITY,ANCILLARY_DATA, CROSS_MAP_EXTENSION },new I_ConceptualizeUniversally[] {
+			ArchitectonicAuxiliary.Concept.IS_A_REL,REFSET_PURPOSE_REL, REFSET_TYPE_REL }), SNCT_RELEASED_BOOL(
+					new String[] { "SNOMED Released ","SNOMED released flag", "ORG_DWFA_SNCT_RELEASED_BOOL" },
+					new I_ConceptualizeUniversally[] { REFSET_IDENTITY,SUBJECT_TYPE, BOOLEAN_EXTENSION },
+					new I_ConceptualizeUniversally[] {ArchitectonicAuxiliary.Concept.IS_A_REL,REFSET_PURPOSE_REL, REFSET_TYPE_REL }),    
 
         REFSET_PATHS(new String[] { "Path reference set", "Path reference set" }, new I_ConceptualizeUniversally[] {
             REFSET_IDENTITY, REFSET_PURPOSE_PATH, CONCEPT_EXTENSION }, new I_ConceptualizeUniversally[] {
