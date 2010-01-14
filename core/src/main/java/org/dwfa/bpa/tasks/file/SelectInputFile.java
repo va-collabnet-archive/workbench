@@ -47,6 +47,7 @@ public class SelectInputFile extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     private static final int dataVersion = 1;
+    private static final String USER_CANCELED_OPERATION = "User canceled operation";
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -102,7 +103,7 @@ public class SelectInputFile extends AbstractTask {
                     });
                     dialog.setVisible(true);
                     if (dialog.getFile() == null) {
-                        ex = new TaskFailedException("User canceled operation");
+                        ex = new TaskFailedException(USER_CANCELED_OPERATION);
                     } else {
                         try {
                             File f = new File(dialog.getDirectory(), dialog.getFile());
@@ -124,6 +125,9 @@ public class SelectInputFile extends AbstractTask {
         }
 
         if (ex != null) {
+            if (ex.getMessage().equals(USER_CANCELED_OPERATION)) {
+                return Condition.ITEM_CANCELED;
+            }
             throw new TaskFailedException(ex);
         }
         return Condition.CONTINUE;
@@ -135,7 +139,7 @@ public class SelectInputFile extends AbstractTask {
     }
 
     public Collection<Condition> getConditions() {
-        return CONTINUE_CONDITION;
+        return AbstractTask.CONTINUE_CANCEL;        
     }
 
     public String getPrompt() {
