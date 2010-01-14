@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,9 +38,9 @@ import java.util.UUID;
 
 /**
  * Goal which ensures latest FSNs are unique for the given VODB.
- * 
+ *
  * @goal vodb-verify-fsn-uniqueness
- * 
+ *
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -48,36 +48,29 @@ public class VodbVerifyFSNUniqueness extends AbstractMojo {
 
     /**
      * The output file location.
-     * 
+     *
      * @parameter expression="${project.build.directory}/reports"
      */
     private File outputDirectory;
 
     /**
      * The output file name.
-     * 
+     *
      * @parameter
      */
     private String outputFileName = "release_fsn_uniqueness_report.txt";
 
     /**
-     * Any exceptions to the uniqueness test.
-     * 
-     * @parameter
-     */
-    private ArrayList<String> exceptions = new ArrayList<String>();
-
-    /**
      * Whether to continue on, if a non-unique FSN is found.
      * Default is to not continue - the build will fail.
-     * 
+     *
      * @parameter
      */
     private boolean failBuildOnException = false;
 
     /**
      * Statuses to consider when checking FSNs
-     * 
+     *
      * @parameter
      */
     private ConceptDescriptor[] statuses;
@@ -101,12 +94,11 @@ public class VodbVerifyFSNUniqueness extends AbstractMojo {
         HashSet<String> uniqueFsns;
         List<UUID> statusUuids;
         UUID fsnUuid;
-        boolean isCheckStatus;
+        boolean shouldCheckStatus;
 
         public FindUniqueFSNs() throws Exception {
             outputDirectory.mkdirs();
-            outputWriter = new BufferedWriter(new BufferedWriter(new FileWriter(outputDirectory + File.separator
-                + outputFileName)));
+            outputWriter = new BufferedWriter(new BufferedWriter(new FileWriter(getReportFile())));
             termFactory = LocalVersionedTerminology.get();
             uniqueFsns = new HashSet<String>();
             statusUuids = new ArrayList<UUID>();
@@ -114,8 +106,8 @@ public class VodbVerifyFSNUniqueness extends AbstractMojo {
 
             // Only check the status if there is more than one status in the
             // list
-            isCheckStatus = statuses.length > 0;
-            getLog().info("isCheckStatus: " + isCheckStatus);
+            shouldCheckStatus = statuses.length > 0;
+            getLog().info("shouldCheckStatus: " + shouldCheckStatus);
 
             for (ConceptDescriptor status : statuses) {
                 statusUuids.add(UUID.fromString(status.getUuid()));
@@ -126,6 +118,11 @@ public class VodbVerifyFSNUniqueness extends AbstractMojo {
             for (I_DescriptionVersioned descriptionVersioned : concept.getDescriptions()) {
                 processDescription(concept, descriptionVersioned);
             }
+        }
+
+        private String getReportFile() {
+            return outputDirectory + File.separator
+                    + outputFileName;
         }
 
         private void processDescription(final I_GetConceptData concept, final I_DescriptionVersioned description)
@@ -142,49 +139,57 @@ public class VodbVerifyFSNUniqueness extends AbstractMojo {
                 return;
             }
 
-            // check if it's a FSN
-            UUID currentDescriptionTypeUuid = termFactory.getConcept(latestDescription.getTypeId())
-                .getUids()
-                .iterator()
-                .next();
+            //get type
+            UUID currentDescriptionTypeUuid = getConceptType(latestDescription.getTypeId());
 
-            // check if it's an active status
-            UUID currentDescriptionStatusUuid = termFactory.getConcept(latestDescription.getStatusId())
-                .getUids()
-                .iterator()
-                .next();
+            // get status
+            UUID currentDescriptionStatusUuid = getConceptType(latestDescription.getStatusId());
 
-            // Check the Uuids are equal
-            boolean isUuidsEqual = currentDescriptionTypeUuid.equals(fsnUuid);
+            boolean isFSN = currentDescriptionTypeUuid.equals(fsnUuid);
+            boolean isSpecifiedStatus = false;
 
-            // Is the status defined in the list of statuses to check?
-            boolean isStatusListed = false;
-
-            if (isCheckStatus) {
-                isStatusListed = statusUuids.contains(currentDescriptionStatusUuid);
+            if (shouldCheckStatus) {
+                isSpecifiedStatus = statusUuids.contains(currentDescriptionStatusUuid);
             }
 
-            if ((!isCheckStatus && isUuidsEqual) || (isCheckStatus && isStatusListed && isUuidsEqual)) {
+            if (isValidFSNAndStatusIgnored(isFSN) || isValidStatusAndFSN(isFSN, isSpecifiedStatus)) {
 
                 String descriptionText = latestDescription.getText();
 
-                if (uniqueFsns.contains(descriptionText)) {
-                    if (exceptions.contains(descriptionText)) {
-                        // don't report as ie t's an exception
+                if (isDuplicateFSN(descriptionText)) {
+                    if (logOnErrors()) {
+                        getLog().warn("Duplicate FSN: " + descriptionText +
+                                "\nSee " +  getReportFile() + "for details.");
+                        outputWriter.write("Duplicate FSN: " + descriptionText);
+                        outputWriter.newLine();
                     } else {
-                        if (!failBuildOnException) {
-                            getLog().info("Duplicate FSN: " + descriptionText);
-                            outputWriter.write("Duplicate FSN: " + descriptionText);
-                            outputWriter.newLine();
-                        } else {
-                            throw new MojoFailureException("Duplicate FSN: " + descriptionText);
-                        }
+                        throw new MojoFailureException("Duplicate FSN: " + descriptionText);
                     }
                 } else {
                     uniqueFsns.add(descriptionText);
                 }
             }
 
+        }
+
+        private UUID getConceptType(int partId) throws Exception {
+            return termFactory.getConcept(partId).getUids().iterator().next();
+        }
+
+        private boolean isValidFSNAndStatusIgnored(final boolean uuidsEqual) {
+            return (!shouldCheckStatus && uuidsEqual);
+        }
+
+        private boolean isValidStatusAndFSN(final boolean uuidsEqual, final boolean isSpecifiedStatus) {
+            return shouldCheckStatus && isSpecifiedStatus && uuidsEqual;
+        }
+
+        private boolean logOnErrors() {
+            return !failBuildOnException;
+        }
+
+        private boolean isDuplicateFSN(final String descriptionText) {
+            return uniqueFsns.contains(descriptionText);
         }
 
         public BufferedWriter getWriter() {

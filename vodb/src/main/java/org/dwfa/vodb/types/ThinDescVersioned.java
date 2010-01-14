@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,16 +15,6 @@
  * limitations under the License.
  */
 package org.dwfa.vodb.types;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.dwfa.ace.api.DescriptionHasNoVersionsException;
 import org.dwfa.ace.api.I_AmPart;
@@ -49,23 +39,35 @@ import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class ThinDescVersioned implements I_DescriptionVersioned {
     private int descId;
 
     private int conceptId;
 
     private List<I_DescriptionPart> versions;
+    private DescriptionPartSorter descriptionPartSorter;
 
     public ThinDescVersioned(int descId, int conceptId, int count) {
         super();
         this.descId = descId;
         this.conceptId = conceptId;
         this.versions = new ArrayList<I_DescriptionPart>(count);
+        descriptionPartSorter = new DescriptionPartSorter(new DescriptionPartComparator());
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_DescriptionVersioned#addVersion(org.dwfa.vodb.types
      * .I_DescriptionPart)
@@ -76,7 +78,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#getVersions()
      */
     public List<I_DescriptionPart> getVersions() {
@@ -98,7 +100,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#versionCount()
      */
     public int versionCount() {
@@ -107,7 +109,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_DescriptionVersioned#matches(java.util.regex.Pattern
      * )
@@ -144,7 +146,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#getConceptId()
      */
     public int getConceptId() {
@@ -153,7 +155,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#getDescId()
      */
     public int getDescId() {
@@ -166,7 +168,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#getTuples()
      */
     public List<I_DescriptionTuple> getTuples() {
@@ -190,7 +192,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#getFirstTuple()
      */
     public I_DescriptionTuple getFirstTuple() {
@@ -199,7 +201,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#getLastTuple()
      */
     public I_DescriptionTuple getLastTuple() {
@@ -207,7 +209,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
             throw new DescriptionHasNoVersionsException();
         }
 
-        return new ThinDescTuple(this, versions.get(versions.size() - 1));
+        return new ThinDescTuple(this, descriptionPartSorter.sort(versions));
     }
 
     private class DescTupleAdder extends TupleAdder<I_DescriptionTuple, ThinDescVersioned> {
@@ -260,7 +262,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_DescriptionVersioned#convertIds(org.dwfa.vodb.jar
      * .I_MapNativeToNative)
@@ -276,7 +278,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_DescriptionVersioned#merge(org.dwfa.vodb.types.
      * ThinDescVersioned)
@@ -296,7 +298,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#getTimePathSet()
      */
     public Set<TimePathId> getTimePathSet() {
@@ -320,7 +322,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionVersioned#toLocalFixedDesc()
      */
     public I_DescribeConceptLocally toLocalFixedDesc() {
