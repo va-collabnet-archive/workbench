@@ -41,6 +41,7 @@ import org.dwfa.ace.api.ebr.ThinExtByRefPartProperty;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
+import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.TerminologyRuntimeException;
@@ -441,4 +442,73 @@ public class RefsetHelper extends LineageHelper {
         return matchingConcepts;
     }
 
+    /**
+     * Create a new refset.
+     *  
+     * @param refsetType
+     *          The refset type will be determined by the type of extension to be added (eg I_ThinExtByRefPartConcept.class). 
+     *          This should be the same type intended for use in {@link #newRefsetExtension(int, int, Class, BeanPropertyMap)}.
+     *               
+     * @param purpose 
+     *          The destination concept for the refset purpose relationship. 
+     *          Should be a descendant of {@link RefsetAuxiliary.Concept.REFSET_PURPOSE} 
+     *          (eg {@link RefsetAuxiliary.Concept.REFSET_MEMBER_PURPOSE}).
+     *            
+     * @param description
+     *          The name for the new refset             
+     *             
+     * @return The concept defining the new refset
+     */
+    public static <T extends I_ThinExtByRefPart> I_GetConceptData newRefset(Class<T> refsetType, String description, I_ConceptualizeUniversally purpose) 
+            throws Exception {
+        
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+
+        // Load references
+
+        I_ConceptualizeLocally fullySpecifiedName = 
+            ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize();
+        I_ConceptualizeLocally preferredTerm = 
+            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize();
+        
+        I_GetConceptData isARel = 
+            //termFactory.getConcept(SNOMED.Concept.IS_A.localize().getNid());
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+        I_GetConceptData refsetIdentity = 
+            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
+        I_GetConceptData definingCharacteristic = 
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid());
+        I_GetConceptData optionalRefinability = 
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid());
+        I_GetConceptData currentStatus = 
+            termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+        I_GetConceptData refsetTypeRel = 
+            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.localize().getNid());
+        I_GetConceptData refsetPurposeRel = 
+            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE.localize().getNid());
+
+        I_GetConceptData conceptExtType =
+            termFactory.getConcept(termFactory.getRefsetTypeIdByExtensionType(refsetType));
+        I_GetConceptData refsetPurpose =
+            termFactory.getConcept(purpose.localize().getNid());
+        
+        I_GetConceptData newRefsetConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
+        termFactory.newDescription(
+            UUID.randomUUID(), newRefsetConcept, "en", description.concat(" (refset)"), fullySpecifiedName, config);
+        termFactory.newDescription(
+            UUID.randomUUID(), newRefsetConcept, "en", description, preferredTerm, config);
+        termFactory.newRelationship(
+            UUID.randomUUID(), newRefsetConcept, isARel, refsetIdentity, 
+            definingCharacteristic, optionalRefinability, currentStatus, 0, config);
+        termFactory.newRelationship(
+            UUID.randomUUID(), newRefsetConcept, refsetTypeRel, conceptExtType, 
+            definingCharacteristic, optionalRefinability, currentStatus, 0, config);
+        termFactory.newRelationship(
+            UUID.randomUUID(), newRefsetConcept, refsetPurposeRel, refsetPurpose, 
+            definingCharacteristic, optionalRefinability, currentStatus, 0, config);        
+        
+        return newRefsetConcept;
+    }
+    
 }

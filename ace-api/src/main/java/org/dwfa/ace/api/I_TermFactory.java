@@ -667,4 +667,6 @@ public interface I_TermFactory {
      * @return a new process queue configured with the specified thread count
      */
     I_ProcessQueue newProcessQueue(String name, int threadCount);
+    
+    public <T extends I_ThinExtByRefPart> int getRefsetTypeIdByExtensionType(Class<T> extType);
 }

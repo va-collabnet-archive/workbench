@@ -1970,4 +1970,8 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
 	public I_ProcessQueue newProcessQueue(String name, int threadCount) {
 		return new ProcessQueue(name, threadCount);
 	}
+
+    public <T extends I_ThinExtByRefPart> int getRefsetTypeIdByExtensionType(Class<T> extType) {
+        return ThinExtBinder.getExtensionTypeNid(ThinExtBinder.getExtensionType(extType));
+    }
 }

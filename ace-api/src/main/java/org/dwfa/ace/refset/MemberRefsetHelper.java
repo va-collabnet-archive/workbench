@@ -317,16 +317,15 @@ public class MemberRefsetHelper extends RefsetHelper {
     /**
      * Create a new member reference set.
      * This will create a concept extension (attribute) type reference set.
-     * If specified, it will also create a separate, associated marked parent refset. 
+     * It will also create a separate, associated marked parent refset. 
      * 
-     * @param parentConceptId The native id of the concept to become the "Is_a" parent of this new refset concept
-     * @param description The name/term for the new refset. This is be post-fixed accordingly.
-     * @param hasMarkedParents If true, an associated separate refset will be created to contain marked parent members
+     * @param description 
+     *          The name/term for the new refset. This is be post-fixed accordingly.
+     *          
      * @return An initialised instance of this helper class ready to work with the new refset.
-     * @throws Exception If unable to complete
      */
     @SuppressDataChecks
-    public static MemberRefsetHelper createNewRefset(String description, boolean hasMarkedParents) 
+    public static MemberRefsetHelper createNewRefset(String description) 
             throws Exception {
         
         I_TermFactory termFactory = LocalVersionedTerminology.get();
@@ -334,34 +333,14 @@ public class MemberRefsetHelper extends RefsetHelper {
         
         // Load references
         
-        I_GetConceptData isARel = 
-            //termFactory.getConcept(SNOMED.Concept.IS_A.localize().getNid());
-            termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-        I_GetConceptData refsetIdentity = 
-            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
         I_GetConceptData definingCharacteristic = 
             termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid());
         I_GetConceptData optionalRefinability = 
             termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid());
         I_GetConceptData currentStatus = 
             termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-        I_GetConceptData refsetTypeRel = 
-            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.localize().getNid());
-        I_GetConceptData refsetPurpose = 
-            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE.localize().getNid());
-        I_GetConceptData conceptExtType = 
-            termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid());
-        I_GetConceptData refsetMemberPurpose = 
-            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_MEMBER_PURPOSE.localize().getNid());
-        I_GetConceptData refsetParentMemberPurpose = 
-            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PARENT_MEMBER_PURPOSE.localize().getNid());
         I_GetConceptData markedParentRefsetRel = 
             termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());   
-        
-        I_ConceptualizeLocally fullySpecifiedName = 
-            ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize();
-        I_ConceptualizeLocally preferredTerm = 
-            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize();
         
         // Remove any (common) refset qualifications (if present) from the description  
         
@@ -375,49 +354,23 @@ public class MemberRefsetHelper extends RefsetHelper {
             description = description.substring(0, description.length() - 7);
         }
         String refsetName = description.concat(" member reference set");
+        String parentRefsetName = description.concat(" marked parent member reference set");
 
-        // Create the concept for the new refset
-        
-        I_GetConceptData newRefsetConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
-        termFactory.newDescription(
-            UUID.randomUUID(), newRefsetConcept, "en", refsetName.concat(" (refset)"), fullySpecifiedName, config);
-        termFactory.newDescription(
-            UUID.randomUUID(), newRefsetConcept, "en", refsetName, preferredTerm, config);
-        termFactory.newRelationship(
-            UUID.randomUUID(), newRefsetConcept, isARel, refsetIdentity, 
-            definingCharacteristic, optionalRefinability, currentStatus, 0, config);
-        termFactory.newRelationship(
-            UUID.randomUUID(), newRefsetConcept, refsetTypeRel, conceptExtType, 
-            definingCharacteristic, optionalRefinability, currentStatus, 0, config);
-        termFactory.newRelationship(
-            UUID.randomUUID(), newRefsetConcept, refsetPurpose, refsetMemberPurpose, 
-            definingCharacteristic, optionalRefinability, currentStatus, 0, config);
+        // Create the refset
 
-        // Create and link marked parent refset (if applicable)
+        I_GetConceptData newMemberRefsetConcept = 
+            newRefset(I_ThinExtByRefPartConcept.class, refsetName, RefsetAuxiliary.Concept.REFSET_MEMBER_PURPOSE);
         
-        if (hasMarkedParents) {
-            
-            String parentRefsetName = description.concat(" marked parent member reference set");
-            I_GetConceptData newParentRefsetConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
-            termFactory.newDescription(
-                UUID.randomUUID(), newParentRefsetConcept, "en", parentRefsetName.concat(" (refset)"), fullySpecifiedName, config);
-            termFactory.newDescription(
-                UUID.randomUUID(), newParentRefsetConcept, "en", parentRefsetName, preferredTerm, config);
-            termFactory.newRelationship(
-                UUID.randomUUID(), newParentRefsetConcept, isARel, refsetIdentity, 
-                definingCharacteristic, optionalRefinability, currentStatus, 0, config);
-            termFactory.newRelationship(
-                UUID.randomUUID(), newParentRefsetConcept, refsetTypeRel, conceptExtType, 
-                definingCharacteristic, optionalRefinability, currentStatus, 0, config);
-            termFactory.newRelationship(
-                UUID.randomUUID(), newParentRefsetConcept, refsetPurpose, refsetParentMemberPurpose, 
-                definingCharacteristic, optionalRefinability, currentStatus, 0, config);
-            termFactory.newRelationship(
-                UUID.randomUUID(), newRefsetConcept, markedParentRefsetRel, newParentRefsetConcept, 
-                definingCharacteristic, optionalRefinability, currentStatus, 0, config);        
-        }
+        I_GetConceptData newMarkedParentRefsetConcept =
+            newRefset(I_ThinExtByRefPartConcept.class, parentRefsetName, RefsetAuxiliary.Concept.REFSET_PARENT_MEMBER_PURPOSE);
+
+        // Link them together
         
-        return new MemberRefsetHelper(newRefsetConcept.getNid());
+        termFactory.newRelationship(
+            UUID.randomUUID(), newMemberRefsetConcept, markedParentRefsetRel, newMarkedParentRefsetConcept, 
+            definingCharacteristic, optionalRefinability, currentStatus, 0, config);
+        
+        return new MemberRefsetHelper(newMemberRefsetConcept.getNid());
     }
     
 }

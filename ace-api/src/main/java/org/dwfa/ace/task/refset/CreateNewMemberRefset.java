@@ -20,28 +20,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -76,8 +62,7 @@ public class CreateNewMemberRefset extends AbstractTask {
         try {
             
             String refsetName = getProperty(process, String.class, getRefsetNameProp());
-            MemberRefsetHelper.createNewRefset(refsetName, true);
-            
+            MemberRefsetHelper.createNewRefset(refsetName);            
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
