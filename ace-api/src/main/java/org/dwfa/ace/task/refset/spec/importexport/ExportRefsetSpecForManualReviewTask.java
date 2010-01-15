@@ -174,10 +174,11 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         List<I_ThinExtByRefVersioned> extensions =
                 LocalVersionedTerminology.get().getRefsetExtensionMembers(memberRefset.getConceptId());
 
+        writeRefsetName(exportFileWriter, memberRefset);
         writeHeader(exportFileWriter);
 
         SpecRefsetHelper helper = new SpecRefsetHelper();
-        int lineCount = 1; // header
+        int lineCount = 2; // refset name, header
         int fileNumber = 0;
 
         for (I_ThinExtByRefVersioned ext : extensions) {
@@ -203,11 +204,12 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                                 lineCount++;
                                 if (lineCount > maxLineCount) {
                                     fileNumber++;
-                                    lineCount = 2; // header + this record
+                                    lineCount = 3; // refset name + header + this record
                                     outputFile = new File(fileNameNoTxt + "-" + fileNumber + ".txt");
                                     exportFileWriter.flush();
                                     exportFileWriter.close();
                                     exportFileWriter = new BufferedWriter(new FileWriter(outputFile, false));
+                                    writeRefsetName(exportFileWriter, memberRefset);
                                     writeHeader(exportFileWriter);
                                 }
                                 // write to file
@@ -246,6 +248,13 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         exportFileWriter.newLine();
     }
 
+    private void writeRefsetName(BufferedWriter exportFileWriter, I_GetConceptData memberRefset)
+            throws TerminologyException, Exception {
+        exportFileWriter.write(getDescription(LocalVersionedTerminology.get().getConcept(
+            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), memberRefset.getConceptId()));
+        exportFileWriter.newLine();
+    }
+
     private String getSctId(int componentId) throws TerminologyException, IOException {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         I_Identify idVersioned = termFactory.getId(componentId);
@@ -269,9 +278,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         }
     }
 
-    private String getDescription(TermEntry descriptionTypeTermEntry, int conceptId) throws Exception {
+    private String getDescription(I_GetConceptData descType, int conceptId) throws Exception {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
-        I_GetConceptData descType = termFactory.getConcept(descriptionTypeTermEntry.getIds());
         I_GetConceptData concept = termFactory.getConcept(conceptId);
         SpecRefsetHelper helper = new SpecRefsetHelper();
 
@@ -295,6 +303,12 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         }
 
         return latestDescription;
+    }
+
+    private String getDescription(TermEntry descriptionTypeTermEntry, int conceptId) throws Exception {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_GetConceptData descType = termFactory.getConcept(descriptionTypeTermEntry.getIds());
+        return getDescription(descType, conceptId);
     }
 
     public int[] getDataContainerIds() {
