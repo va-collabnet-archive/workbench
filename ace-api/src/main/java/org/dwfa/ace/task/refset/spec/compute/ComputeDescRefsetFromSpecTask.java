@@ -138,8 +138,9 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 computeRefsetActivityPanel.setProgressInfoLower("Refset is null.");
             }
 
-            getLogger().info("Refset is null.");
-            throw new TaskFailedException("Refset is null.");
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "No refset to compute.", "",
+                JOptionPane.ERROR_MESSAGE);
+            return Condition.ITEM_CANCELED;
         }
 
         RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true);
@@ -153,8 +154,12 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 computeRefsetActivityPanel.setProgressInfoLower("Refset spec is null.");
             }
 
-            getLogger().info("Refset spec is null.");
-            throw new TaskFailedException("Refset spec is null.");
+            getLogger().info(
+                "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.", "",
+                JOptionPane.ERROR_MESSAGE);
+            return Condition.ITEM_CANCELED;
         }
 
         if (showActivityPanel) {
@@ -193,7 +198,9 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
             }
 
             getLogger().info("Refset spec is empty - skipping execution.");
-            throw new TaskFailedException("Refset spec is empty - skipping execution.");
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                "Refset spec is empty - skipping execution.", "", JOptionPane.ERROR_MESSAGE);
+            return Condition.ITEM_CANCELED;
         }
         if (!query.isValidQuery()) {
             if (showActivityPanel) {
@@ -203,7 +210,9 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                     .setProgressInfoLower("Refset spec has dangling AND/OR. These must have sub-statements.");
             }
             getLogger().info("Refset spec has dangling AND/OR. These must have sub-statements.");
-            throw new TaskFailedException("Refset spec has dangling AND/OR. These must have sub-statements.");
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                "Refset spec has dangling AND/OR. These must have sub-statements.", "", JOptionPane.ERROR_MESSAGE);
+            return Condition.ITEM_CANCELED;
         }
 
         // compute any nested refsets (e.g. if this spec uses
@@ -214,7 +223,14 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
         for (Integer nestedRefsetId : nestedRefsets) {
             if (!excludedRefsets.contains(nestedRefsetId)) {
                 try {
-                    computeRefset(configFrame, termFactory.getConcept(nestedRefsetId), showActivityPanel);
+                    Condition condition =
+                            computeRefset(configFrame, termFactory.getConcept(nestedRefsetId), showActivityPanel);
+                    if (condition == Condition.ITEM_CANCELED) {
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "Error computing dependant refset: "
+                                + termFactory.getConcept(nestedRefsetId).getInitialText() + ". Re-run separately.", "",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
                     getNestedRefsets().addAll(nestedRefsets);
                 } catch (TaskFailedException e) {
                     e.printStackTrace();
@@ -309,7 +325,9 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 computeRefsetActivityPanel.complete();
                 computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
             }
-            throw new TaskFailedException("User cancelled refset computation.");
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "User cancelled. ", "",
+                JOptionPane.ERROR_MESSAGE);
+            return Condition.ITEM_CANCELED;
         }
 
         // Step 3 : create new member refsets
@@ -411,7 +429,10 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 progressReportHtmlGenerator.setComplete(true);
                 computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
             }
-            throw new TaskFailedException("User cancelled refset computation.");
+
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "User cancelled. ", "",
+                JOptionPane.ERROR_MESSAGE);
+            return Condition.ITEM_CANCELED;
         }
 
         return Condition.CONTINUE;
@@ -425,11 +446,12 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
             boolean showActivityPanel = true;
             excludedRefsets = new HashSet<Integer>(); // no excluded refsets when running as part of task
             nestedRefsets = new HashSet<Integer>();
-            computeRefset(configFrame, refset, showActivityPanel);
-            return Condition.CONTINUE;
+            return computeRefset(configFrame, refset, showActivityPanel);
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new TaskFailedException(ex);
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Unable to complete refset compute: "
+                + ex.getMessage(), "", JOptionPane.ERROR_MESSAGE);
+            return Condition.ITEM_CANCELED;
         }
     }
 
@@ -438,7 +460,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
     }
 
     public Collection<Condition> getConditions() {
-        return AbstractTask.CONTINUE_CONDITION;
+        return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
     }
 
     public boolean isCancelComputation() {
