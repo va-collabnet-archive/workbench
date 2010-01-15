@@ -496,12 +496,9 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 			w.lock();
 			int newCapacity = chooseGrowCapacity(this.distinct + 1,
 					this.minLoadFactor, this.maxLoadFactor);
-			/*
-			 * System.out.print("grow rehashing ");
-			 * System.out.println("at distinct="
-			 * +distinct+", capacity="+state.length
-			 * +" to newCapacity="+newCapacity+" ...");
-			 */
+			if (newCapacity > 4503061) {
+				System.out.println(" new hashmap capacity: " + newCapacity);
+			}
 			rehash(newCapacity);
 			w.unlock();
 			return put(key, value);
@@ -624,10 +621,10 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		int capacity = initialCapacity;
 		super.setUp(capacity, minLoadFactor, maxLoadFactor);
 		capacity = nextPrime(capacity);
-		if (capacity == 0)
-			capacity = 1; // open addressing needs at least one FREE slot at any
-							// time.
-
+		if (capacity == 0) {
+			capacity = 1; // open addressing needs at least one FREE slot at any time.
+		}
+			
 		this.table = new long[capacity * 2 + 1];
 		this.values = new int[capacity];
 		this.state = new byte[capacity];
@@ -694,6 +691,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		}
 	}
 
+	
 	@Override
 	public boolean forEachKey(UuidProcedure procedure) {
 		for (int i = state.length; i-- > 0;) {
@@ -707,4 +705,5 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		}
 		return true;
 	}
+
 }

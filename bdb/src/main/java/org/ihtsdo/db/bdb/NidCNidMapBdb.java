@@ -20,7 +20,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 	
 	private static final int NID_CNID_MAP_SIZE = 50000;
 	private int[][] nidCNidMaps;
-	private int maxId = Integer.MIN_VALUE;
+	private int maxId;
 	private int readOnlyRecords;
 	
 	
@@ -30,7 +30,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 
 	@Override
 	protected void init() throws IOException {
-		maxId = Integer.MIN_VALUE;
+		maxId = Bdb.getUuidsToNidMap().getCurrentMaxNid();
 		readOnlyRecords = (int) readOnly.count();
 		int mutableRecords = (int) mutable.count();
         int nidCidMapCount = ((maxId - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE) + 1;
@@ -116,7 +116,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 			output.writeInt(nidCNidMaps[nidCNidMaps.length - 1][i]);
 		}
 		DatabaseEntry valueEntry = new DatabaseEntry(output.toByteArray());
-		OperationStatus status = readOnly.put(null, keyEntry, valueEntry);
+		OperationStatus status = mutable.put(null, keyEntry, valueEntry);
 		if (status != OperationStatus.SUCCESS) {
 			throw new IOException("Unsuccessful operation: " + status);
 		}

@@ -122,8 +122,11 @@ public class Description
 		typeNid = input.readInt();
 		// nid, list size, and conceptNid are read already by the binder...
 		int additionalVersionCount = input.readShort();
-		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new DescriptionVersion(input, this));
+		if (additionalVersionCount > 0) {
+			additionalVersions = new ArrayList<DescriptionVersion>(additionalVersionCount);
+			for (int i = 0; i < additionalVersionCount; i++) {
+				additionalVersions.add(new DescriptionVersion(input, this));
+			}
 		}
 	}
 

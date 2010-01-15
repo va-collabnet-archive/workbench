@@ -58,10 +58,10 @@ public class Bdb {
 			File readOnlyDir = new File(bdbDirectory, "read-only");
 			boolean readOnlyExists = readOnlyDir.exists();
 			readOnly = new Bdb(readOnlyExists, readOnlyDir);
-			statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
-			conceptDb = new ConceptBdb(readOnly, mutable);
 			uuidsToNidMapDb = new UuidsToNidMapBdb(readOnly, mutable);
 			nidCidMapDb = new NidCNidMapBdb(readOnly, mutable);
+			statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
+			conceptDb = new ConceptBdb(readOnly, mutable);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -168,7 +168,9 @@ public class Bdb {
 			try {
 				if (syncFuture != null  &&
 						syncFuture.isDone() != true) {
+					AceLog.getAppLog().info("Waiting for syncFuture to finish.");
 					syncFuture.get();
+					AceLog.getAppLog().info("SyncFuture finished.");
 				}
 				nidCidMapDb.close();
 				conceptDb.close();
@@ -179,6 +181,17 @@ public class Bdb {
 				AceLog.getAppLog().alertAndLogException(dbe);
 			}
 		}
+		if (readOnly.bdbEnv != null) {
+			readOnly.bdbEnv.close();
+		}
+		conceptDb = null;
+		executorPool.shutdown();
+		executorPool = null;
+		mutable = null;
+		nidCidMapDb = null;
+		readOnly = null;
+		statusAtPositionDb = null;
+		uuidsToNidMapDb = null;
 	}
 
 	public static NidCNidMapBdb getNidCNidMap() {

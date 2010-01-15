@@ -116,18 +116,52 @@ public class Temp {
 	            AceLog.getAppLog().info("Finished ValidateNidCidMap");
 	            AceLog.getAppLog().info("Starting db sync.");
 	            Bdb.sync();
-	            AceLog.getAppLog().info("Finishing db sync.");
+	            AceLog.getAppLog().info("Finished db sync, starting close.");
 	            Bdb.close();
 	            AceLog.getAppLog().info("db closed");
 	            AceLog.getAppLog().info("elapsed time: " + (System.currentTimeMillis() - startTime));
 	            
+	            FileIO.recursiveDelete(new File("target/berkeley-db/read-only"));
+	            File dirToMove = new File("target/berkeley-db/mutable");
+	            dirToMove.renameTo(new File("target/berkeley-db/read-only"));
+	        	Bdb.setup();
 	            
+			    fis = new FileInputStream(conceptsFile);
+			    bis = new BufferedInputStream(fis);
+			    in = new DataInputStream(bis);
+			    
+			    int conceptsReread = 0;
+	            while (fis.available() > 0) {
+	            	conceptsReread++;
+	            	EConcept eConcept = new EConcept(in);
+	            	Concept newConcept = Concept.get(eConcept);
+
+	            	Bdb.getConceptDb().getConcept(newConcept.getConceptId());
+	            
+	    			if (conceptsReread % 10000 == 0) {
+	    				System.out.println("concepts re-read: " + conceptsReread);
+	    			}
+			    }
+	            // See if any exceptions in the last converters;
+	            while (converters.isEmpty() == false) {
+	            	I_ProcessEConcept conceptConverter = converters.take();
+	            	conceptConverter.setEConcept(null);
+	            }
+	            
+	            while (conceptsProcessed.get() < conceptsRead.get()) {
+					Thread.sleep(1000);
+	            }
+	            
+	            AceLog.getAppLog().info(" Finished re-read, starting close. Elapsed time: " + 
+	            		(System.currentTimeMillis() - startTime));
+	            Bdb.close();
+	            AceLog.getAppLog().info("Closed. Elapsed time: " + 
+	            		(System.currentTimeMillis() - startTime));
 	            
 	            
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
-            AceLog.getAppLog().info("Concept count: " + Bdb.getConceptDb().getCount());    
 		} 
         System.exit(0);
 	}

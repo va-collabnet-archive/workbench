@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.PathManager;
@@ -51,6 +52,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	 * rather than duplicating the key data. 
 	 */
 	private StatusAtPositionToIntHashMap sapToIntMap;
+	private boolean changedSinceSync = false;
 	private static class PositionArrayBinder extends
 			TupleBinding<PositionArrays> {
 
@@ -131,7 +133,6 @@ public class StatusAtPositionBdb extends ComponentBdb {
 				System.arraycopy(commitTimes, 0, tempCommitTimes, 0, commitTimes.length);
 				commitTimes = tempCommitTimes;
 			}
-			
 		}
 	}
 
@@ -342,13 +343,13 @@ public class StatusAtPositionBdb extends ComponentBdb {
 				}
 			}
 			int statusAtPositionNid = sequence.getAndIncrement();
+			changedSinceSync  = true;
 			sapToIntMap.put(time, statusNid, pathNid, statusAtPositionNid);
 			readWriteArray.setSize(getReadWriteIndex(statusAtPositionNid) + 1);
 			expandPermit.release();
 			readWriteArray.commitTimes[getReadWriteIndex(statusAtPositionNid)] = time;
 			readWriteArray.statusNids[getReadWriteIndex(statusAtPositionNid)] = statusNid;
 			readWriteArray.pathNids[getReadWriteIndex(statusAtPositionNid)] = pathNid;
-			
 			misses.incrementAndGet();
 			return statusAtPositionNid;
 		} catch (Throwable e) {
@@ -374,6 +375,28 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	public static void reset() {
 		hits.set(0);
 		misses.set(0);
+	}
+
+	@Override
+	public void close() {
+		try {
+			this.sync();
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		super.close();
+	}
+
+	@Override
+	public void sync() throws IOException {
+		if (changedSinceSync) {
+			DatabaseEntry valueEntry = new DatabaseEntry();
+			expandPermit.acquireUninterruptibly();
+			positionArrayBinder.objectToEntry(readWriteArray, valueEntry);
+			changedSinceSync = false;
+			expandPermit.release();
+		}
+		super.sync();
 	}
 
 }

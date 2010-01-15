@@ -123,8 +123,11 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 		refinabilityNid = input.readInt();
 		typeNid = input.readInt();
 		int additionalVersionCount = input.readShort();
-		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new RelationshipVersion(input, this));
+		if (additionalVersionCount > 0) {
+			additionalVersions = new ArrayList<RelationshipVersion>(additionalVersionCount);
+			for (int i = 0; i < additionalVersionCount; i++) {
+				additionalVersions.add(new RelationshipVersion(input, this));
+			}
 		}
 	}
 

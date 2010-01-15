@@ -16,6 +16,7 @@ import org.ihtsdo.db.uuidmap.UuidUtil;
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
@@ -39,14 +40,23 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 			}
 			return next;
 		}
+
+		public int get() {
+			return sequence.get();
+		}
+
+		public void set(int next) {
+			sequence.set(next);
+		}
 	}
 
 	private static final int RECORD_SIZE = 10000;
 	private static final int UUID_INT_BYTES = 20;
 	
-	private UuidToIntHashMap readOnlyUuidsToNidMap = new UuidToIntHashMap(RECORD_SIZE);
-	private UuidToIntHashMap mutableUuidsToNidMap = new UuidToIntHashMap(RECORD_SIZE);
+	private UuidToIntHashMap readOnlyUuidsToNidMap;
+	private UuidToIntHashMap mutableUuidsToNidMap;
 	private IdSequence sequence;
+	private int mutableKeyIndex;
 
 	
     private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
@@ -56,26 +66,34 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 
 	protected UuidsToNidMapBdb(Bdb readOnlyBdbEnv, Bdb readWriteBdbEnv) throws IOException {
 		super(readOnlyBdbEnv, readWriteBdbEnv);
-		int max = Integer.MIN_VALUE;
+	}
+
+
+	@Override
+	protected void init() throws IOException {
+		int readOnlyRecords = (int) readOnly.count() * RECORD_SIZE;
+		AceLog.getAppLog().info("UuidIntHashMap readOnlyRecords: " + readOnlyRecords);
+		int mutableRecords = (int) mutable.count() * RECORD_SIZE;
+		AceLog.getAppLog().info("UuidIntHashMap mutableRecords: " + mutableRecords);
+		mutableKeyIndex = mutableRecords;
+		readOnlyUuidsToNidMap = new UuidToIntHashMap(readOnlyRecords + mutableRecords, .2, .7);
+		mutableUuidsToNidMap = new UuidToIntHashMap(RECORD_SIZE, .2, .7);
+		if (sequence == null) {
+			int max = Integer.MIN_VALUE;
+	        sequence = new IdSequence(max);
+		}
         for (PrimordialId pid : PrimordialId.values()) {
             for (UUID uid : pid.getUids()) {
             	readOnlyUuidsToNidMap.put(UuidUtil.convert(uid), 
             			pid.getNativeId(Integer.MIN_VALUE));
             	mutableUuidsToNidMap.put(UuidUtil.convert(uid), 
             			pid.getNativeId(Integer.MIN_VALUE));
-             	max = Math.max(max, pid.getNativeId(Integer.MIN_VALUE));
+             	int max = Math.max(sequence.get(), pid.getNativeId(Integer.MIN_VALUE));
+             	if (max > sequence.get()) {
+             		sequence.set(max);
+             	}
             }
         }
-        sequence = new IdSequence(max);
-	}
-
-
-	@Override
-	protected void init() throws IOException {
-		int readOnlyRecords = (int) readOnly.count();
-		int mutableRecords = (int) mutable.count();
-		readOnlyUuidsToNidMap = new UuidToIntHashMap(readOnlyRecords + mutableRecords);
-		mutableUuidsToNidMap = new UuidToIntHashMap(RECORD_SIZE);
 		putDataInMap(readOnly, false);
 		putDataInMap(mutable, true);
 	}
@@ -98,6 +116,8 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
 		UuidToIntHashMap mapToAddTo = readOnlyUuidsToNidMap;
+		long[] uuidData = new long[2];
+		int max = Integer.MIN_VALUE;
 		for (int i = 0; i < records; i++) {
 			if (mutable && (i == (records - 1))) {
 				mapToAddTo = mutableUuidsToNidMap;
@@ -105,16 +125,23 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 			IntegerBinding.intToEntry(i, key);
 			OperationStatus status = db.get(null, key, value, LockMode.READ_UNCOMMITTED);
 			if (status != OperationStatus.SUCCESS) {
-				throw new IOException("Operation failed with status: " + status);
+				Cursor c = db.openCursor(null, null);
+				while (c.getNext(key, value, null) == OperationStatus.SUCCESS) {
+					System.out.println(" key: " + IntegerBinding.entryToInt(key));
+				}
+				throw new IOException("Operation failed with status: " + status + " retrieving: " + i);
 			}
 			TupleInput ti = new TupleInput(value.getData());
-			long[] uuidData = new long[2];
 			while (ti.available() > 0) {
 				uuidData[0] = ti.readLong();
 				uuidData[1] = ti.readLong();
 				int nid = ti.readInt();
+				max = Math.max(nid, max);
 				mapToAddTo.put(uuidData, nid);
 			}
+		}
+		if (sequence.get() <= max) {
+			sequence.set(max + 1);
 		}
 	}
 	
@@ -122,7 +149,6 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 
 		DatabaseEntry keyEntry = new DatabaseEntry();
 		DatabaseEntry valueEntry = new DatabaseEntry();
-		private int keyIndex = 0;
 		private int count = 0;
 		private TupleOutput data;
 		
@@ -130,7 +156,6 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 			super();
 			byte[] outputBytes = new byte[UUID_INT_BYTES * RECORD_SIZE + UUID_INT_BYTES];
 			data = new TupleOutput(outputBytes);
-			keyIndex = (int) mutable.count() - 1;
 		}
 
 		@Override
@@ -140,18 +165,20 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 			data.writeInt(value);
 			count++;
 			if (count == RECORD_SIZE) {
-				IntegerBinding.intToEntry(keyIndex, keyEntry);
+				IntegerBinding.intToEntry(mutableKeyIndex, keyEntry);
+				//AceLog.getAppLog().info("Writing index: " + mutableKeyIndex);
 				valueEntry.setData(data.toByteArray());
 				mutable.put(null, keyEntry, valueEntry);
 				count = 0;
 				data.reset();
+				mutableKeyIndex++;
 			} 
 			return true;
 		}
 		
 		public void close() {
 			if (count != 0) {
-				IntegerBinding.intToEntry(keyIndex, keyEntry);
+				IntegerBinding.intToEntry(mutableKeyIndex, keyEntry);
 				valueEntry.setData(data.toByteArray());
 				mutable.put(null, keyEntry, valueEntry);				
 			}
@@ -227,7 +254,7 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 			mutableUuidsToNidMap.ensureCapacity(RECORD_SIZE + 1);
 		}
 		int newNid = sequence.getAndIncrement();
-		readOnlyUuidsToNidMap.put(UuidUtil.convert(uuid), newNid);
+		mutableUuidsToNidMap.put(UuidUtil.convert(uuid), newNid);
 		w.unlock();
 		return newNid;
 	}
@@ -263,6 +290,11 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 	@Override
 	protected String getDbName() {
 		return "UuidsToNidMap";
+	}
+
+
+	public int getCurrentMaxNid() {
+		return sequence.get() - 1;
 	}
 
 }
