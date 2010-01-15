@@ -16,10 +16,19 @@
  */
 package org.dwfa.mojo.epicexport.kp;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.id.Type5UuidFactory;
 
 /**
  * Class to determine what master file and items that a refset is used for.
@@ -121,6 +130,39 @@ public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
 		return (wildcards == found) ? arguments : null;
 	}
 
+	/**
+	 * Works the other way too!  Given a master file, item name/number combo, will return a refset if
+	 * it can find one.
+	 * 
+	 * @param masterfile
+	 * @param item
+	 * @return
+	 */
+	public I_GetConceptData getRefsetForItem(String masterfile, String item) throws TerminologyException {
+		I_GetConceptData ret = null;
+		StringBuffer name = new StringBuffer("org.kp.refset.");
+		name.append(masterfile.substring(0, 3).toUpperCase());
+		if (masterfile.length() > 3) {
+			name.append(' ');
+			name.append(masterfile.substring(3, 4).toUpperCase());
+			name.append(masterfile.substring(4).toLowerCase());
+		}
+		name.append(" Item ");
+		name.append(item);
+		
+		UUID refsetId;
+		try {
+			refsetId = Type5UuidFactory.get(name.toString());
+			ret = LocalVersionedTerminology.get().getConcept(refsetId);
+		} catch (NoSuchAlgorithmException e) {
+			throw new TerminologyException(e);
+		} catch (UnsupportedEncodingException e) {
+			throw new TerminologyException(e);
+		} catch (IOException e) {
+			throw new TerminologyException(e);
+		}
+		return ret;
+	}
 	public class RefsetApplication implements I_RefsetUsageInterpreter.I_RefsetApplication {
 	
 		String masterfile;
