@@ -10,7 +10,7 @@
     <artifactId>ace-modules</artifactId>
     <name>ACE modules multi-module build</name>
     <packaging>pom</packaging>
-    <description>multi-module build for the ACE modules (foundation, dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
+    <description>multi-module build for the ACE modules (dwfa-pom, foundation, dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
     <version>1.3-SNAPSHOT</version>
     <scm>
         <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk</connection>
@@ -36,6 +36,12 @@
     <dependencyManagement>
         <dependencies>
             <!-- Subprojects -->
+            <dependency>
+                <groupId>org.dwfa</groupId>
+                <artifactId>dwfa-pom</artifactId>
+                <scope>compile</scope>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.dwfa</groupId>
                 <artifactId>foundation</artifactId>
@@ -228,6 +234,7 @@
         </plugins>
     </reporting>
     <modules>
+        <module>dwfa-pom</module>
         <module>foundation</module>
         <module>core</module>
         <module>ace-api</module>
