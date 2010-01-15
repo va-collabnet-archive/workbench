@@ -59,6 +59,7 @@ public class ExternalTermPublisher {
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
 	@SuppressWarnings("unused")
 	private I_GetConceptData rootConcept;
+	private I_GetConceptData descConcept;
 	private I_ExportValueConverter converter;
 
 	
@@ -177,6 +178,7 @@ public class ExternalTermPublisher {
 
     private int processDescriptionConcept(I_GetConceptData concept, I_DescriptionVersioned description) throws TerminologyException, Exception {
     	List<I_ThinExtByRefVersioned> extensions;
+    	this.descConcept = concept;
     	if (description != null)
     		extensions = termFactory.getAllExtensionsForComponent(description.getDescId());
     	else
@@ -228,7 +230,6 @@ public class ExternalTermPublisher {
     		I_DescriptionVersioned description, I_ThinExtByRefPart previousPart) throws Exception {
     	// this.currentItem = null;
     	String refsetName = refsetConcept.getInitialText();
-    	
     	// System.out.println("Processing refset " + refsetName);
     	List<I_RefsetUsageInterpreter.I_RefsetApplication> applications = 
     		this.interpreter.getApplications(refsetName);
@@ -238,20 +239,23 @@ public class ExternalTermPublisher {
     		
     		if (app.getMasterfile().equals(ExportToEpicLoadFilesMojo.EPIC_MASTERFILE_NAME_WILDCARD)) {
     			this.wildcardItems.add(new ValuePair(app.getItemNumber(), 
-    					this.converter.getItemValue(), this.converter.getPreviousItemValue()));
+    					this.converter.getItemValue(), this.converter.getPreviousItemValue(),
+    					extensionTuple));
     		}
     		else {
 	    		if (app.itemIsTermName()) {
 	    			if (isNewDisplayNameApplication(app.getMasterfile(), this.converter.getRegion())) {
 	    				this.idTuple = extensionTuple;
 	    				addItem(app.getMasterfile(), app.getItemNumber(), 
-	    						this.converter.getItemValue(), this.converter.getPreviousItemValue());
+	    						this.converter.getItemValue(), this.converter.getPreviousItemValue(),
+	    						extensionTuple);
 	    				addRegion(app.getMasterfile(), app.getRegion());
 	    			}
 	    		}
 	    		else {
     				addItem(app.getMasterfile(), app.getItemNumber(), 
-    						this.converter.getItemValue(), this.converter.getPreviousItemValue());
+    						this.converter.getItemValue(), this.converter.getPreviousItemValue(),
+    						extensionTuple);
 	    		}
     		}
     	}
@@ -263,9 +267,10 @@ public class ExternalTermPublisher {
 
     }
     
-    private void addItem(String masterFile, String item, Object value, Object previousValue) {
+    private void addItem(String masterFile, String item, Object value, Object previousValue,
+    		I_ThinExtByRefTuple extensionTuple) {
     	ExternalTermRecord record = getExternalRecordForMasterfile(masterFile);
-    	record.addItem(item, value, previousValue);
+    	record.addItem(item, value, previousValue, extensionTuple);
     }
     
     private ExternalTermRecord getExternalRecordForMasterfile(String masterFile) {
@@ -279,6 +284,9 @@ public class ExternalTermPublisher {
     	}
     	if (ret == null) {
     		ret = new ExternalTermRecord(masterFile);
+    		ret.setOwningConcept(descConcept);
+    		ret.setRootConcept(rootConcept);
+    		ret.setCreatingFactory(this.exportFactory);
     		this.recordQueue.add(ret);
     	}
     	return ret;
@@ -288,7 +296,7 @@ public class ExternalTermPublisher {
     	for (ValuePair p: this.wildcardItems) {
     		for (String m: this.masterFilesImpacted) {
     			addItem(m, p.getItemNumber(), 
-    					p.getValue(), p.getPreviousValue());
+    					p.getValue(), p.getPreviousValue(), p.getExtensionTuple());
 
     		}
     	}
@@ -351,11 +359,13 @@ public class ExternalTermPublisher {
     	String itemNumber;
     	String value;
     	String previousValue;
+    	I_ThinExtByRefTuple extensionTuple;
     	
-    	public ValuePair(String item, String val, String previousVal) {
+    	public ValuePair(String item, String val, String previousVal, I_ThinExtByRefTuple extensionTuple) {
     		setItemNumber(item);
     		setValue(val);
     		setPreviousValue(previousVal);
+    		setExtensionTuple(extensionTuple);
     	}
     	
 		public String getItemNumber() {
@@ -376,6 +386,15 @@ public class ExternalTermPublisher {
 		public void setPreviousValue(String previousValue) {
 			this.previousValue = previousValue;
 		}
+
+		public I_ThinExtByRefTuple getExtensionTuple() {
+			return extensionTuple;
+		}
+
+		public void setExtensionTuple(I_ThinExtByRefTuple extensionTuple) {
+			this.extensionTuple = extensionTuple;
+		}
+		
     }
 
 }

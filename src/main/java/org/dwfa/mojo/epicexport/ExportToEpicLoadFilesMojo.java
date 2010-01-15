@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -37,6 +38,7 @@ import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 import org.dwfa.mojo.epicexport.kp.EpicTermWarehouseFactory;
+import org.dwfa.util.id.Type5UuidFactory;
 
 
 /**
@@ -249,6 +251,23 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
     		 List<ExternalTermRecord> terms = publisher.getExternalTermRecordsForConcept(concept);
     		 for (ExternalTermRecord term: terms) {
     			 term.setVersion(version);
+    			 ///* Test code
+    			 if (term.getFirstItem("2").getValue().toString().equals("Swine Flu")) {
+    				 // getLog().info("Adding item 100 ");
+    				 //term.addMember("100", "Swine Flu");
+    			 }
+    			 
+    			 if (term.getFirstItem("2").getValue().toString().equals("Hx of traumatic vertebral FX")) {
+    				 
+    				 ExternalTermRecord.Item item = term.getFirstItem("7010");
+    				 if (item != null) {
+    					 // getLog().info("Setting item 7010");
+    					 // item.memberUpdate("Hx of traumatic vertebral FX TEST");
+    				 }
+    					
+    			 }
+    			 
+    			 
     		     exportManager.exportExternalTermRecord(term);
     		 }
     	 }

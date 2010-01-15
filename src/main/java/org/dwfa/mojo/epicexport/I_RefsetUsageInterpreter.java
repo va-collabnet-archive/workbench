@@ -18,6 +18,9 @@ package org.dwfa.mojo.epicexport;
 
 import java.util.List;
 
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.tapi.TerminologyException;
+
 /**
  * A class that implements this method is a plugin which identifies the usage for a refset.  The getApplications
  * method will return a list of "RefsetApplications", which is the masterfile and item name/number, as well as 
@@ -30,6 +33,8 @@ import java.util.List;
 public interface I_RefsetUsageInterpreter {
 
 	public List<I_RefsetApplication> getApplications(String refsetName);
+	
+	public I_GetConceptData getRefsetForItem(String masterfile, String item) throws TerminologyException;
 	
 	/**
 	 * Class used to describe a usage for a refset.  This is a masterfile, item name or number, and an optional
