@@ -443,7 +443,11 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         I_DescriptionTuple obj = concept.getDescTuple(
                             (I_IntList) columns[columnIndex].readParamaters[0],
                             (I_ConfigAceFrame) columns[columnIndex].readParamaters[1]);
-                        return new StringWithExtTuple(obj.getText(), tuple, id);
+                        if (obj != null) {
+                            return new StringWithExtTuple(obj.getText(), tuple, id);
+                        } 
+                        return new StringWithExtTuple("null obj", tuple, id);
+                        
                     } else if (tf.hasExtension(id)) {
                         I_ThinExtByRefVersioned ext = tf.getExtension(id);
                         I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
