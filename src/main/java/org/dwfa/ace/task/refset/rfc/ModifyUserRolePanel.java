@@ -444,11 +444,11 @@ public class ModifyUserRolePanel extends JPanel {
                             I_RelVersioned relVersioned = roleRel.getFixedPart();
 
                             for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
+                                I_RelPart oldPart = relVersioned.getLastTuple().getMutablePart();
                                 I_RelPart newPart =
-                                        (I_RelPart) relVersioned.getLastTuple().getMutablePart().makeAnalog(
-                                            ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-                                            editPath.getConceptId(), Long.MAX_VALUE);
-                                if (newPart.getStatusId() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
+                                        (I_RelPart) oldPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED
+                                            .localize().getNid(), editPath.getConceptId(), Long.MAX_VALUE);
+                                if (oldPart.getStatusId() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
                                     relVersioned.addVersion(newPart);
                                 }
                             }
