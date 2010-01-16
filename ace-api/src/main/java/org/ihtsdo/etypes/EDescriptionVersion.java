@@ -113,13 +113,13 @@ public class EDescriptionVersion extends EVersion implements I_DescribeExternall
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", initialCaseSignificant:");
+        buff.append(" initialCaseSignificant:");
         buff.append(this.initialCaseSignificant);
-        buff.append(", lang:");
+        buff.append(" lang:");
         buff.append(this.lang);
-        buff.append(", text:");
+        buff.append(" text:");
         buff.append(this.text);
-        buff.append(", typeUuid:");
+        buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
 
@@ -151,6 +151,9 @@ public class EDescriptionVersion extends EVersion implements I_DescribeExternall
         if (EDescriptionVersion.class.isAssignableFrom(obj.getClass())) {
             EDescriptionVersion another = (EDescriptionVersion) obj;
 
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
             // Compare initialCaseSignificant
             if (this.initialCaseSignificant != another.initialCaseSignificant) {
                 return false;

@@ -98,9 +98,9 @@ public abstract class ERefset<V extends EVersion> extends EComponent<V> {
 
         buff.append(super.toString());
 
-        buff.append(", refsetUuid:");
+        buff.append(" refsetUuid:");
         buff.append(this.refsetUuid);
-        buff.append(", componentUuid:");
+        buff.append(" componentUuid:");
         buff.append(this.componentUuid);
         buff.append("; ");
 
@@ -132,6 +132,9 @@ public abstract class ERefset<V extends EVersion> extends EComponent<V> {
         if (ERefset.class.isAssignableFrom(obj.getClass())) {
             ERefset<?> another = (ERefset<?>) obj;
 
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
             // Compare refsetUuid
             if (!this.refsetUuid.equals(another.refsetUuid)) {
                 return false;

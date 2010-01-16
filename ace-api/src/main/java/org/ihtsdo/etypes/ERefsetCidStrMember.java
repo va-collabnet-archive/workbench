@@ -112,13 +112,55 @@ public class ERefsetCidStrMember extends ERefset<ERefsetCidStrVersion> {
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", c1Uuid:");
+        buff.append(" c1Uuid:");
         buff.append(this.c1Uuid);
-        buff.append(", strValue:");
+        buff.append(" strValue:");
         buff.append(this.strValue);
         buff.append("; ");
 
         return buff.toString();
+    }
+
+    /**
+     * Returns a hash code for this <code>ERefsetCidStrMember</code>.
+     * 
+     * @return a hash code value for this <tt>ERefsetCidStrMember</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetCidStrMember</tt> object, and contains the same values, field by field, 
+     * as this <tt>ERefsetCidStrMember</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (ERefsetCidStrMember.class.isAssignableFrom(obj.getClass())) {
+            ERefsetCidStrMember another = (ERefsetCidStrMember) obj;
+
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare c1Uuid
+            if (!this.c1Uuid.equals(another.c1Uuid)) {
+                return false;
+            }
+            // Compare strValue
+            if (!this.strValue.equals(another.strValue)) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
     }
 
 }

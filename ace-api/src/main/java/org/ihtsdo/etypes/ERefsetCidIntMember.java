@@ -111,9 +111,9 @@ public class ERefsetCidIntMember extends ERefset<ERefsetCidIntVersion> {
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", c1Uuid:");
+        buff.append(" c1Uuid:");
         buff.append(this.c1Uuid);
-        buff.append(", intValue:");
+        buff.append(" intValue:");
         buff.append(this.intValue);
         buff.append("; ");
 
@@ -145,6 +145,9 @@ public class ERefsetCidIntMember extends ERefset<ERefsetCidIntVersion> {
         if (ERefsetCidIntMember.class.isAssignableFrom(obj.getClass())) {
             ERefsetCidIntMember another = (ERefsetCidIntMember) obj; 
             
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
             // Compare c1Uuid
             if (!this.c1Uuid.equals(another.c1Uuid)) {
                 return false; 

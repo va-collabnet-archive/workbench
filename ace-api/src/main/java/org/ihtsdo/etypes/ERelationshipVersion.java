@@ -98,13 +98,13 @@ public class ERelationshipVersion extends EVersion {
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", characteristicUuid:");
+        buff.append(" characteristicUuid:");
         buff.append(this.characteristicUuid);
-        buff.append(", refinabilityUuid:");
+        buff.append(" refinabilityUuid:");
         buff.append(this.refinabilityUuid);
-        buff.append(", group:");
+        buff.append(" group:");
         buff.append(this.group);
-        buff.append(", typeUuid:");
+        buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
 
@@ -136,6 +136,9 @@ public class ERelationshipVersion extends EVersion {
         if (ERelationshipVersion.class.isAssignableFrom(obj.getClass())) {
             ERelationshipVersion another = (ERelationshipVersion) obj;
 
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
             // Compare characteristicUuid
             if (!this.characteristicUuid.equals(another.characteristicUuid)) {
                 return false;
@@ -146,10 +149,6 @@ public class ERelationshipVersion extends EVersion {
             }
             // Compare group
             if (this.group != another.group) {
-                return false;
-            }
-            // Compare refinabilityUuid
-            if (!this.refinabilityUuid.equals(another.refinabilityUuid)) {
                 return false;
             }
             // Compare typeUuid

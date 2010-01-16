@@ -154,17 +154,17 @@ public class ERelationship extends EComponent<ERelationshipVersion> {
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", c1Uuid:");
+        buff.append(" c1Uuid:");
         buff.append(this.c1Uuid);
-        buff.append(", c2Uuid:");
+        buff.append(" c2Uuid:");
         buff.append(this.c2Uuid);
-        buff.append(", characteristicUuid:");
+        buff.append(" characteristicUuid:");
         buff.append(this.characteristicUuid);
-        buff.append(", refinabilityUuid:");
+        buff.append(" refinabilityUuid:");
         buff.append(this.refinabilityUuid);
-        buff.append(", relGroup:");
+        buff.append(" relGroup:");
         buff.append(this.relGroup);
-        buff.append(", typeUuid:");
+        buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
 
@@ -196,6 +196,9 @@ public class ERelationship extends EComponent<ERelationshipVersion> {
         if (ERelationship.class.isAssignableFrom(obj.getClass())) {
             ERelationship another = (ERelationship) obj;
 
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
             // Compare c1Uuid
             if (!this.c1Uuid.equals(another.c1Uuid)) {
                 return false;

@@ -435,6 +435,14 @@ public class EConcept {
         buff.append(this.conceptAttributes);
         buff.append("\n   Images: \n\t");
         buff.append(this.images);
+        buff.append("\n   destRelUuidTypeUuids: \n\t");
+        buff.append(this.destRelUuidTypeUuids);
+        buff.append("\n   refsetUuidMemberUuidForConcept: \n\t");
+        buff.append(this.refsetUuidMemberUuidForConcept);
+        buff.append("\n   refsetUuidMemberUuidForDescriptions: \n\t");
+        buff.append(this.refsetUuidMemberUuidForDescriptions);
+        buff.append("\n   refsetUuidMemberUuidForRels: \n\t");
+        buff.append(this.refsetUuidMemberUuidForRels);
         return buff.toString();
     }
 
@@ -498,6 +506,9 @@ public class EConcept {
         if (EConcept.class.isAssignableFrom(obj.getClass())) {
             EConcept another = (EConcept) obj;
             
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
             // Compare ConceptAttributes
             if (this.conceptAttributes == null) {
                 if (this.conceptAttributes != another.conceptAttributes)
@@ -541,6 +552,44 @@ public class EConcept {
             } else if (!this.refsetMembers.equals(another.refsetMembers)) {
                 return false;
             }
+            // Compare destRelUuidTypeUuids
+            if (this.destRelUuidTypeUuids == null) {
+                if (another.destRelUuidTypeUuids == null) { // Equal!
+                } else if (another.destRelUuidTypeUuids.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.destRelUuidTypeUuids.equals(another.destRelUuidTypeUuids)) {
+                return false;
+            }
+            // Compare refsetUuidMemberUuidForConcept
+            if (this.refsetUuidMemberUuidForConcept == null) {
+                if (another.refsetUuidMemberUuidForConcept == null) { // Equal!
+                } else if (another.refsetUuidMemberUuidForConcept.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.refsetUuidMemberUuidForConcept.equals(another.refsetUuidMemberUuidForConcept)) {
+                return false;
+            }
+            // Compare refsetUuidMemberUuidForDescriptions
+            if (this.refsetUuidMemberUuidForDescriptions == null) {
+                if (another.refsetUuidMemberUuidForDescriptions == null) { // Equal!
+                } else if (another.refsetUuidMemberUuidForDescriptions.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.refsetUuidMemberUuidForDescriptions.equals(another.refsetUuidMemberUuidForDescriptions)) {
+                return false;
+            }
+            // Compare refsetUuidMemberUuidForRels
+            if (this.refsetUuidMemberUuidForRels == null) {
+                if (another.refsetUuidMemberUuidForRels == null) { // Equal!
+                } else if (another.refsetUuidMemberUuidForRels.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.refsetUuidMemberUuidForRels.equals(another.refsetUuidMemberUuidForRels)) {
+                return false;
+            }
+
+            // If none of the previous comparisons fail, the objects must be equal
             return true;
         }
         return false;

@@ -119,9 +119,9 @@ public class EVersion implements I_VersionExternally {
 
         buff.append(" pathUuid:");
         buff.append(this.pathUuid);
-        buff.append(", statusUuid:");
+        buff.append(" statusUuid:");
         buff.append(this.statusUuid);
-        buff.append(", Time:");
+        buff.append(" Time:");
         buff.append("(" + new Date(this.time) + ")");
 
         return buff.toString();
@@ -152,6 +152,9 @@ public class EVersion implements I_VersionExternally {
         if (EVersion.class.isAssignableFrom(obj.getClass())) {
             EVersion another = (EVersion) obj;
 
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
             // Compare pathUuid
             if (!this.pathUuid.equals(another.pathUuid)) {
                 return false;
