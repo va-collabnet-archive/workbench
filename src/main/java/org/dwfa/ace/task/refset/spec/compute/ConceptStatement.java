@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.tapi.TerminologyException;
 
 /**
@@ -173,17 +174,25 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws IOException
      */
     private boolean conceptIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException, IOException {
-        I_IntSet allowedTypes = getIsAIds();
+        try {
+            I_IntSet allowedTypes = getIsAIds();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-        Set<? extends I_GetConceptData> children =
-                queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
+            Set<? extends I_GetConceptData> children =
+                    queryConstraintConcept.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
 
-        for (I_GetConceptData child : children) {
-            if (conceptBeingTested.equals(child)) {
-                return true;
+            for (I_GetConceptData child : children) {
+                if (conceptBeingTested.equals(child)) {
+                    return true;
+                }
             }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
         }
-        return false;
     }
 
     /**
@@ -260,8 +269,10 @@ public class ConceptStatement extends RefsetSpecStatement {
      */
     private boolean conceptStatusIs(I_GetConceptData conceptBeingTested, I_GetConceptData requiredStatusConcept)
             throws IOException, TerminologyException {
+
         List<? extends I_ConceptAttributeTuple> tuples =
-                conceptBeingTested.getConceptAttributeTuples(null, null, true, true);
+                conceptBeingTested.getConceptAttributeTuples(null, termFactory.getActiveAceFrameConfig()
+                    .getViewPositionSetReadOnly(), true, true);
 
         // get latest tuple
         I_ConceptAttributeTuple latestTuple = null;
@@ -273,7 +284,7 @@ public class ConceptStatement extends RefsetSpecStatement {
             }
         }
 
-        if (latestTuple != null && latestTuple.getConceptStatus() == requiredStatusConcept.getConceptId()) {
+        if (latestTuple != null && latestTuple.getStatusId() == requiredStatusConcept.getConceptId()) {
             return true;
         }
 
@@ -311,21 +322,29 @@ public class ConceptStatement extends RefsetSpecStatement {
     private boolean conceptStatusIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException,
             IOException {
 
-        I_IntSet allowedTypes = getIsAIds();
+        try {
+            I_IntSet allowedTypes = getIsAIds();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-        // get list of all children of input concept
-        Set<? extends I_GetConceptData> childStatuses =
-                queryConstraintConcept.getDestRelOrigins(null, allowedTypes, null, true, true);
+            // get list of all children of input concept
+            Set<? extends I_GetConceptData> childStatuses =
+                    queryConstraintConcept.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
 
-        // call conceptStatusIs on each
-        for (I_GetConceptData childStatus : childStatuses) {
-            if (conceptStatusIs(conceptBeingTested, childStatus)) {
-                return true;
+            // call conceptStatusIs on each
+            for (I_GetConceptData childStatus : childStatuses) {
+                if (conceptStatusIs(conceptBeingTested, childStatus)) {
+                    return true;
+                }
+
             }
 
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
         }
-
-        return false;
     }
 
     /**
@@ -355,18 +374,27 @@ public class ConceptStatement extends RefsetSpecStatement {
     private boolean conceptStatusIsDescendantOf(I_GetConceptData conceptBeingTested, I_GetConceptData status)
             throws TerminologyException, IOException {
 
-        I_IntSet allowedTypes = getIsAIds();
+        try {
+            I_IntSet allowedTypes = getIsAIds();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-        Set<? extends I_GetConceptData> childStatuses = status.getDestRelOrigins(null, allowedTypes, null, true, true);
+            Set<? extends I_GetConceptData> childStatuses =
+                    status.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
+                        .getViewPositionSetReadOnly(), true, true);
 
-        for (I_GetConceptData childStatus : childStatuses) {
-            if (conceptStatusIs(conceptBeingTested, childStatus)) {
-                return true;
-            } else if (conceptStatusIsDescendantOf(conceptBeingTested, childStatus)) {
-                return true;
+            for (I_GetConceptData childStatus : childStatuses) {
+                if (conceptStatusIs(conceptBeingTested, childStatus)) {
+                    return true;
+                } else if (conceptStatusIsDescendantOf(conceptBeingTested, childStatus)) {
+                    return true;
+                }
             }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
         }
-        return false;
     }
 
 }

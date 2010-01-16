@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
@@ -220,28 +221,35 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     protected boolean componentStatusIsKindOf(I_AmTuple tuple) throws TerminologyException, IOException {
 
-        List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
-        tuples.add(tuple);
+        try {
+            List<I_AmTuple> tuples = new ArrayList<I_AmTuple>();
+            tuples.add(tuple);
 
-        if (isComponentStatus((I_GetConceptData) queryConstraint, tuples)) {
-            return true;
-        }
-
-        I_IntSet allowedTypes = getIsAIds();
-
-        // get list of all children of input concept
-        Set<? extends I_GetConceptData> childStatuses =
-                ((I_GetConceptData) queryConstraint).getDestRelOrigins(termFactory.getActiveAceFrameConfig()
-                    .getAllowedStatus(), allowedTypes, null, true, true);
-
-        // call conceptStatusIs on each
-        for (I_GetConceptData childStatus : childStatuses) {
-            if (isComponentStatus(childStatus, tuples)) {
+            if (isComponentStatus((I_GetConceptData) queryConstraint, tuples)) {
                 return true;
             }
-        }
 
-        return false;
+            I_IntSet allowedTypes = getIsAIds();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+
+            // get list of all children of input concept
+            Set<? extends I_GetConceptData> childStatuses =
+                    ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+
+            // call conceptStatusIs on each
+            for (I_GetConceptData childStatus : childStatuses) {
+                if (isComponentStatus(childStatus, tuples)) {
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
+        }
     }
 
     // ** checked
