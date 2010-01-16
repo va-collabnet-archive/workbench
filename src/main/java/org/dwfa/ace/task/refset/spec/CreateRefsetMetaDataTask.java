@@ -410,7 +410,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
         if (descriptionType.getNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize()
             .getNid()) {
-            Hits hits = termFactory.doLuceneSearch(description);
+            String paddedDescription = "\"" + description + "\"";
+            Hits hits = termFactory.doLuceneSearch(paddedDescription);
             for (int i = 0; i < hits.length(); i++) {
                 Document doc = hits.doc(i);
                 int cnid = Integer.parseInt(doc.get("cnid"));
