@@ -94,11 +94,49 @@ public class ERefsetLongMember extends ERefset<ERefsetLongVersion> {
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", longValue:");
+        buff.append(" longValue:");
         buff.append(this.longValue);
         buff.append("; ");
 
         return buff.toString();
+    }
+    
+    /**
+     * Returns a hash code for this <code>ERefsetLongMember</code>.
+     * 
+     * @return a hash code value for this <tt>ERefsetLongMember</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetLongMember</tt> object, and contains the same values, field by field, 
+     * as this <tt>ERefsetLongMember</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (ERefsetLongMember.class.isAssignableFrom(obj.getClass())) {
+            ERefsetLongMember another = (ERefsetLongMember) obj;
+
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare longValue
+            if (this.longValue != another.longValue) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
     }
 
 }

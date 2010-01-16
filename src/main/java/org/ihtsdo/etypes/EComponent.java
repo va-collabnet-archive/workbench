@@ -222,11 +222,11 @@ public abstract class EComponent<V extends EVersion> extends EVersion {
 
         buff.append(super.toString());
 
-        buff.append(", primordialComponentUuid:");
+        buff.append(" primordialComponentUuid:");
         buff.append(this.primordialComponentUuid);
-        buff.append(", additionalIdComponents:");
+        buff.append(" additionalIdComponents:");
         buff.append(this.additionalIdComponents);
-        buff.append(", extraVersions:");
+        buff.append(" extraVersions:");
         buff.append(this.extraVersions);
 
         return buff.toString();
@@ -257,6 +257,9 @@ public abstract class EComponent<V extends EVersion> extends EVersion {
         if (EComponent.class.isAssignableFrom(obj.getClass())) {
             EComponent<?> another = (EComponent<?>) obj;
 
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
             // Compare primordialComponentUuid
             if (!this.primordialComponentUuid.equals(another.primordialComponentUuid)) {
                 return false;

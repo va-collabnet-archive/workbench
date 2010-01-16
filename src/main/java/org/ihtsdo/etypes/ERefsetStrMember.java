@@ -94,11 +94,49 @@ public class ERefsetStrMember extends ERefset<ERefsetStrVersion> {
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", strValue:");
+        buff.append(" strValue:");
         buff.append(this.strValue);
         buff.append("; ");
 
         return buff.toString();
+    }
+    
+    /**
+     * Returns a hash code for this <code>ERefsetStrMember</code>.
+     * 
+     * @return a hash code value for this <tt>ERefsetStrMember</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetStrMember</tt> object, and contains the same values, field by field, 
+     * as this <tt>ERefsetStrMember</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (ERefsetStrMember.class.isAssignableFrom(obj.getClass())) {
+            ERefsetStrMember another = (ERefsetStrMember) obj;
+
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare strValue
+            if (!this.strValue.equals(another.strValue)) {
+                return false;
+            }            
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
     }
 
 }

@@ -89,4 +89,37 @@ public class ERefsetMember extends ERefset<ERefsetVersion> {
         return buff.toString();
     }
 
+    /**
+     * Returns a hash code for this <code>ERefsetMember</code>.
+     * 
+     * @return a hash code value for this <tt>ERefsetMember</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetMember</tt> object, and contains the same values, field by field, 
+     * as this <tt>ERefsetMember</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (ERefsetMember.class.isAssignableFrom(obj.getClass())) {
+            ERefsetMember another = (ERefsetMember) obj;
+
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
+    }
 }

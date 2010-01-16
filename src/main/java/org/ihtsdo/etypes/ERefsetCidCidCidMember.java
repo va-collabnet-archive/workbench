@@ -124,14 +124,61 @@ public class ERefsetCidCidCidMember extends ERefset<ERefsetCidCidCidVersion> {
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", c1Uuid:");
+        buff.append(" c1Uuid:");
         buff.append(this.c1Uuid);
-        buff.append(", c2Uuid:");
+        buff.append(" c2Uuid:");
         buff.append(this.c2Uuid);
-        buff.append(", c3Uuid:");
+        buff.append(" c3Uuid:");
         buff.append(this.c3Uuid);
         buff.append("; ");
 
         return buff.toString();
     }
+    
+    /**
+     * Returns a hash code for this <code>ERefsetCidCidCidMember</code>.
+     * 
+     * @return a hash code value for this <tt>ERefsetCidCidCidMember</tt>.
+     */
+    public int hashCode() {
+        return this.primordialComponentUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetCidCidCidMember</tt> object, and contains the same values, field by field, 
+     * as this <tt>ERefsetCidCidCidMember</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (ERefsetCidCidCidMember.class.isAssignableFrom(obj.getClass())) {
+            ERefsetCidCidCidMember another = (ERefsetCidCidCidMember) obj;
+
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare c1Uuid
+            if (!this.c1Uuid.equals(another.c1Uuid)) {
+                return false;
+            }            
+            // Compare c2Uuid
+            if (!this.c2Uuid.equals(another.c2Uuid)) {
+                return false;
+            }            
+            // Compare c3Uuid
+            if (!this.c3Uuid.equals(another.c3Uuid)) {
+                return false;
+            }            
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
+    }
+
 }

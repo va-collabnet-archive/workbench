@@ -147,15 +147,15 @@ public class EImage extends EComponent<EImageVersion> {
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", conceptUuid:");
+        buff.append(" conceptUuid:");
         buff.append(this.conceptUuid);
-        buff.append(", format:");
+        buff.append(" format:");
         buff.append(this.format);
-        buff.append(", image:");
+        buff.append(" image:");
         buff.append(this.image);
-        buff.append(", textDescription:");
+        buff.append(" textDescription:");
         buff.append(this.textDescription);
-        buff.append(", typeUuid:");
+        buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
 
@@ -187,6 +187,9 @@ public class EImage extends EComponent<EImageVersion> {
         if (EImage.class.isAssignableFrom(obj.getClass())) {
             EImage another = (EImage) obj;
 
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
             // Compare conceptUuid
             if (!this.conceptUuid.equals(another.conceptUuid)) {
                 return false;

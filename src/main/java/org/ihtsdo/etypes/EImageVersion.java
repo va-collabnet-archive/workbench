@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 
 public class EImageVersion extends EVersion {
 
@@ -72,12 +73,54 @@ public class EImageVersion extends EVersion {
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", textDescription:");
+        buff.append(" textDescription:");
         buff.append(this.textDescription);
-        buff.append(", typeUuid:");
+        buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
 
         return buff.toString();
+    }
+    
+    /**
+     * Returns a hash code for this <code>EImageVersion</code>.
+     * 
+     * @return a hash code value for this <tt>EImageVersion</tt>.
+     */
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { statusUuid.hashCode(), pathUuid.hashCode(), (int) time });
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EImageVersion</tt> object, and contains the same values, field by field, 
+     * as this <tt>EImageVersion</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (EImageVersion.class.isAssignableFrom(obj.getClass())) {
+            EImageVersion another = (EImageVersion) obj;
+
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare textDescription
+            if (!this.textDescription.equals(another.textDescription)) {
+                return false;
+            }
+            // Compare typeUuid
+            if (!this.typeUuid.equals(another.typeUuid)) {
+                return false;
+            }
+            // Compare their parents
+            return super.equals(obj);
+        }
+        return false;
     }
 }

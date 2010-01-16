@@ -88,7 +88,7 @@ public class EConceptAttributes extends EComponent<EConceptAttributesVersion> im
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(super.toString());
 
-        buff.append(", defined:");
+        buff.append(" defined:");
         buff.append(this.defined);
         buff.append("; ");
 
@@ -120,6 +120,9 @@ public class EConceptAttributes extends EComponent<EConceptAttributesVersion> im
         if (EConceptAttributes.class.isAssignableFrom(obj.getClass())) {
             EConceptAttributes another = (EConceptAttributes) obj;
 
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
             // Compare defined
             if (this.defined != another.defined) {
                 return false;
