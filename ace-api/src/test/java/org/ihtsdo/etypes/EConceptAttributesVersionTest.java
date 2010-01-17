@@ -1,23 +1,21 @@
 package org.ihtsdo.etypes;
 
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
-public class ERelationshipVersionTest {
+public class EConceptAttributesVersionTest {
 
-    private ERelationshipVersion testComponent1;
-    private ERelationshipVersion testComponent2;
-    private ERelationshipVersion testComponent3;
+    private EConceptAttributesVersion testComponent1;
+    private EConceptAttributesVersion testComponent2;
+    private EConceptAttributesVersion testComponent3;
     protected long myTime = Long.MIN_VALUE;
     
     @Before
@@ -31,6 +29,9 @@ public class ERelationshipVersionTest {
 
     @Test
     public void testEqualsObject() {
+        // Set the current time to use for object creation
+        this.myTime = System.currentTimeMillis(); 
+        
         // The contract of the equals method in Object 
         // specifies that equals must implement an equivalence 
         // relation on non-null objects:
@@ -76,6 +77,11 @@ public class ERelationshipVersionTest {
         // For any non-null value x, x.equals(null) should return false.
         assertFalse(testComponent1.equals(null)); 
        
+        // Two objects known to be different should return false.
+        testComponent1 = makeTestComponent1();
+        testComponent2 = makeTestComponent2();
+        assertFalse(testComponent1.equals(testComponent2)); 
+       
     }
 
     @Test
@@ -85,7 +91,7 @@ public class ERelationshipVersionTest {
         testComponent2 = makeTestComponent1();
         
         // Put testComponent1 in a collection 
-        Set<ERelationshipVersion> coll = new java.util.HashSet<ERelationshipVersion>();
+        Set<EConceptAttributesVersion> coll = new java.util.HashSet<EConceptAttributesVersion>();
         coll.add(testComponent1);
 
         // Test for the presence of testComponent1 by using the  
@@ -94,66 +100,22 @@ public class ERelationshipVersionTest {
 
     }
 
-    @Test
-    public void testEqualsForTwoArrayLists() {
-        // Make two ArrayLists with the same components in each 
-        List<ERelationshipVersion> list1 = new ArrayList<ERelationshipVersion>();
-        List<ERelationshipVersion> list2 = new ArrayList<ERelationshipVersion>();
-        
-        // Add components to list 1
-        list1.add(makeTestComponent1());
-        list1.add(makeTestComponent2());
-        
-        // Add components to list 2
-        list2.add(makeTestComponent1());
-        list2.add(makeTestComponent2());
-        
-        // Test to see if the two arrays are equivalent 
-        assertTrue(list1.equals(list2));               
-
+    private EConceptAttributesVersion makeTestComponent1() {
+        EConceptAttributesVersion testComponent = new EConceptAttributesVersion();
+        testComponent.defined = false;
+        testComponent.pathUuid = new UUID(4, 5);
+        testComponent.statusUuid = new UUID(8, 9);
+        testComponent.time = this.myTime;
+        return testComponent;
     }
 
-    @Test
-    public void testDifferentObjectsNotEqual() {
-        // Make two different objects 
-        testComponent1 = makeTestComponent1();
-        testComponent2 = makeTestComponent2();
-        
-        // Test that they are not equal
-        assertFalse(testComponent1.equals(testComponent2));         
-        assertFalse(testComponent2.equals(testComponent1));         
-
+    private EConceptAttributesVersion makeTestComponent2() {
+        EConceptAttributesVersion testComponent = new EConceptAttributesVersion();
+        testComponent.defined = true;
+        testComponent.pathUuid = new UUID(8, 7);
+        testComponent.statusUuid = new UUID(6, 5);
+        testComponent.time = this.myTime;
+        return testComponent;
     }
-
-    
-    private ERelationshipVersion makeTestComponent1() {
-        ERelationshipVersion erv = new ERelationshipVersion();
-        erv.characteristicUuid  = new UUID(861, 947);
-        erv.refinabilityUuid  = new UUID(586, 937);
-        erv.group = 3; 
-        erv.typeUuid  = new UUID(846, 957);
-        erv.pathUuid = new UUID(425, 526);
-        erv.statusUuid = new UUID(846, 967);
-        erv.time = this.myTime;
-
-        return erv;
-    }
-
-    private ERelationshipVersion makeTestComponent2() {
-        ERelationshipVersion erv = new ERelationshipVersion();
-        erv.characteristicUuid  = new UUID(860, 861);
-        erv.refinabilityUuid  = new UUID(862, 863);
-        erv.group = 5; 
-        erv.typeUuid  = new UUID(864, 865);
-        erv.pathUuid = new UUID(866, 867);
-        erv.statusUuid = new UUID(868, 869);
-        erv.time = this.myTime;
-
-        return erv;
-    }
-
 
 }
-
-
-

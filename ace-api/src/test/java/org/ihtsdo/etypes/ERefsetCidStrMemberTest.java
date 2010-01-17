@@ -1,8 +1,7 @@
 package org.ihtsdo.etypes;
 
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +12,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ERefsetCidIntMemberTest {
+public class ERefsetCidStrMemberTest {
 
-    private ERefsetCidIntMember testComponent1;
-    private ERefsetCidIntMember testComponent2;
-    private ERefsetCidIntMember testComponent3;
+    private ERefsetCidStrMember testComponent1;
+    private ERefsetCidStrMember testComponent2;
+    private ERefsetCidStrMember testComponent3;
     protected long myTime = Long.MIN_VALUE;
     
     @Before
@@ -85,7 +84,7 @@ public class ERefsetCidIntMemberTest {
         testComponent2 = makeTestComponent1();
         
         // Put testComponent1 in a collection 
-        Set<ERefsetCidIntMember> coll = new java.util.HashSet<ERefsetCidIntMember>();
+        Set<ERefsetCidStrMember> coll = new java.util.HashSet<ERefsetCidStrMember>();
         coll.add(testComponent1);
 
         // Test for the presence of testComponent1 by using the  
@@ -97,8 +96,8 @@ public class ERefsetCidIntMemberTest {
     @Test
     public void testEqualsForTwoArrayLists() {
         // Make two ArrayLists with the same components in each 
-        List<ERefsetCidIntMember> list1 = new ArrayList<ERefsetCidIntMember>();
-        List<ERefsetCidIntMember> list2 = new ArrayList<ERefsetCidIntMember>();
+        List<ERefsetCidStrMember> list1 = new ArrayList<ERefsetCidStrMember>();
+        List<ERefsetCidStrMember> list2 = new ArrayList<ERefsetCidStrMember>();
         
         // Add components to list 1
         list1.add(makeTestComponent1());
@@ -126,51 +125,77 @@ public class ERefsetCidIntMemberTest {
     }
 
     
-    private ERefsetCidIntMember makeTestComponent1() {
-        ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
-        cidIntMember.c1Uuid = new UUID(4386, 5497);
-        cidIntMember.intValue = 33;
-        cidIntMember.refsetUuid = new UUID(14386, 65497);
-        cidIntMember.componentUuid = new UUID(64386, 75497);
-        cidIntMember.pathUuid = new UUID(4350, 5469);
-        cidIntMember.statusUuid = new UUID(5386, 4497);
-        cidIntMember.time = this.myTime;
-        cidIntMember.primordialComponentUuid = new UUID(320, 230);
-        cidIntMember.extraVersions = new ArrayList<ERefsetCidIntVersion>();
-        ERefsetCidIntVersion rciv = new ERefsetCidIntVersion();
-        rciv.c1Uuid = new UUID(114386, 656497);
-        rciv.intValue = 99;
-        rciv.pathUuid = new UUID(4350, 5469);
-        rciv.statusUuid = new UUID(5386, 4497);
-        rciv.time = this.myTime;
-        cidIntMember.extraVersions.add(rciv);
+    private ERefsetCidStrMember makeTestComponent1() {
         
-        return cidIntMember;
+        ERefsetCidStrMember member = new ERefsetCidStrMember();
+        member.componentUuid = new UUID(64386, 75497);
+        member.c1Uuid = new UUID(111, 222);
+        member.strValue = "FIRST VALUE"; 
+        member.refsetUuid = new UUID(14386, 65497);
+        member.pathUuid = new UUID(4350, 5469);
+        member.statusUuid = new UUID(5386, 4497);
+        member.time = this.myTime;
+        member.primordialComponentUuid = new UUID(320, 230);
+        // Add additionalIdComponents 
+        member.additionalIdComponents = new ArrayList<EIdentifierVersion>();
+        EIdentifierVersionUuid ac = new EIdentifierVersionUuid();
+        EIdentifierVersionUuid.primordialAuthority = new UUID(564, 564);
+        ac.authorityUuid = new UUID(4350, 5469);
+        ac.denotation = new UUID(4350, 5469);
+        ac.pathUuid = new UUID(4350, 5469);
+        ac.statusUuid = new UUID(5386, 4497);
+        ac.time = this.myTime;
+        member.additionalIdComponents.add(ac);       
+        // Add extraVersions 
+        member.extraVersions = new ArrayList<ERefsetCidStrVersion>();
+        ERefsetCidStrVersion rsv = new ERefsetCidStrVersion();
+        rsv.c1Uuid = new UUID(4350, 5469);
+        rsv.strValue = "VALUE 1"; 
+        rsv.pathUuid = new UUID(4350, 5469);
+        rsv.statusUuid = new UUID(5386, 4497);
+        rsv.time = this.myTime;
+        member.extraVersions.add(rsv);
+        
+        return member;
     }
 
-    private ERefsetCidIntMember makeTestComponent2() {
-        ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
-        cidIntMember.c1Uuid = new UUID(111, 5497);
-        cidIntMember.intValue = 17;
-        cidIntMember.refsetUuid = new UUID(222, 65497);
-        cidIntMember.componentUuid = new UUID(333, 75497);
-        cidIntMember.pathUuid = new UUID(444, 5469);
-        cidIntMember.statusUuid = new UUID(555, 4497);
-        cidIntMember.time = this.myTime;
-        cidIntMember.primordialComponentUuid = new UUID(666, 230);
-        cidIntMember.extraVersions = new ArrayList<ERefsetCidIntVersion>();
-        ERefsetCidIntVersion rciv = new ERefsetCidIntVersion();
-        rciv.c1Uuid = new UUID(777, 656497);
-        rciv.intValue = 16;
-        rciv.pathUuid = new UUID(888, 5469);
-        rciv.statusUuid = new UUID(999, 4497);
-        rciv.time = this.myTime;
-        cidIntMember.extraVersions.add(rciv);
+    private ERefsetCidStrMember makeTestComponent2() {
         
-        return cidIntMember;
+        ERefsetCidStrMember member = new ERefsetCidStrMember();
+        member.componentUuid = new UUID(111, 75497);
+        member.c1Uuid = new UUID(222, 222);
+        member.strValue = "SECOND VALUE"; 
+        member.refsetUuid = new UUID(333, 65497);
+        member.pathUuid = new UUID(444, 5469);
+        member.statusUuid = new UUID(555, 4497);
+        member.time = this.myTime;
+        member.primordialComponentUuid = new UUID(666, 230);
+        // Add additionalIdComponents 
+        member.additionalIdComponents = new ArrayList<EIdentifierVersion>();
+        EIdentifierVersionUuid ac = new EIdentifierVersionUuid();
+        EIdentifierVersionUuid.primordialAuthority = new UUID(777, 564);
+        ac.authorityUuid = new UUID(888, 5469);
+        ac.denotation = new UUID(999, 5469);
+        ac.pathUuid = new UUID(1111, 5469);
+        ac.statusUuid = new UUID(2222, 4497);
+        ac.time = this.myTime;
+        member.additionalIdComponents.add(ac);       
+        // Add extraVersions 
+        member.extraVersions = new ArrayList<ERefsetCidStrVersion>();
+        ERefsetCidStrVersion rsv = new ERefsetCidStrVersion();
+        rsv.c1Uuid = new UUID(3333, 5469);
+        rsv.strValue = "VALUE 2"; 
+        rsv.pathUuid = new UUID(4444, 5469);
+        rsv.statusUuid = new UUID(5555, 4497);
+        rsv.time = this.myTime;
+        member.extraVersions.add(rsv);
+        
+        return member;
+
     }
 
 
 }
+
 
 

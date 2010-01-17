@@ -1,8 +1,7 @@
 package org.ihtsdo.etypes;
 
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +12,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ERefsetCidIntMemberTest {
+public class ERefsetLongMemberTest {
 
-    private ERefsetCidIntMember testComponent1;
-    private ERefsetCidIntMember testComponent2;
-    private ERefsetCidIntMember testComponent3;
+    private ERefsetLongMember testComponent1;
+    private ERefsetLongMember testComponent2;
+    private ERefsetLongMember testComponent3;
     protected long myTime = Long.MIN_VALUE;
     
     @Before
@@ -85,7 +84,7 @@ public class ERefsetCidIntMemberTest {
         testComponent2 = makeTestComponent1();
         
         // Put testComponent1 in a collection 
-        Set<ERefsetCidIntMember> coll = new java.util.HashSet<ERefsetCidIntMember>();
+        Set<ERefsetLongMember> coll = new java.util.HashSet<ERefsetLongMember>();
         coll.add(testComponent1);
 
         // Test for the presence of testComponent1 by using the  
@@ -97,8 +96,8 @@ public class ERefsetCidIntMemberTest {
     @Test
     public void testEqualsForTwoArrayLists() {
         // Make two ArrayLists with the same components in each 
-        List<ERefsetCidIntMember> list1 = new ArrayList<ERefsetCidIntMember>();
-        List<ERefsetCidIntMember> list2 = new ArrayList<ERefsetCidIntMember>();
+        List<ERefsetLongMember> list1 = new ArrayList<ERefsetLongMember>();
+        List<ERefsetLongMember> list2 = new ArrayList<ERefsetLongMember>();
         
         // Add components to list 1
         list1.add(makeTestComponent1());
@@ -126,48 +125,62 @@ public class ERefsetCidIntMemberTest {
     }
 
     
-    private ERefsetCidIntMember makeTestComponent1() {
-        ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
-        cidIntMember.c1Uuid = new UUID(4386, 5497);
-        cidIntMember.intValue = 33;
-        cidIntMember.refsetUuid = new UUID(14386, 65497);
-        cidIntMember.componentUuid = new UUID(64386, 75497);
-        cidIntMember.pathUuid = new UUID(4350, 5469);
-        cidIntMember.statusUuid = new UUID(5386, 4497);
-        cidIntMember.time = this.myTime;
-        cidIntMember.primordialComponentUuid = new UUID(320, 230);
-        cidIntMember.extraVersions = new ArrayList<ERefsetCidIntVersion>();
-        ERefsetCidIntVersion rciv = new ERefsetCidIntVersion();
-        rciv.c1Uuid = new UUID(114386, 656497);
-        rciv.intValue = 99;
-        rciv.pathUuid = new UUID(4350, 5469);
-        rciv.statusUuid = new UUID(5386, 4497);
-        rciv.time = this.myTime;
-        cidIntMember.extraVersions.add(rciv);
+    private ERefsetLongMember makeTestComponent1() {
         
-        return cidIntMember;
+        ERefsetLongMember member = new ERefsetLongMember();
+        member.componentUuid = new UUID(64386, 75497);
+        member.longValue = 2; 
+        member.refsetUuid = new UUID(14386, 65497);
+        member.pathUuid = new UUID(4350, 5469);
+        member.statusUuid = new UUID(5386, 4497);
+        member.time = this.myTime;
+        member.primordialComponentUuid = new UUID(320, 230);
+        member.additionalIdComponents = new ArrayList<EIdentifierVersion>();
+        EIdentifierVersionLong ac = new EIdentifierVersionLong();
+        ac.authorityUuid = new UUID(4350, 5469);
+        ac.denotation = 44;
+        ac.pathUuid = new UUID(4350, 5469);
+        ac.statusUuid = new UUID(5386, 4497);
+        ac.time = this.myTime;
+        member.additionalIdComponents.add(ac);       
+        member.extraVersions = new ArrayList<ERefsetLongVersion>();
+        ERefsetLongVersion rsv = new ERefsetLongVersion();
+        rsv.longValue = 99;
+        rsv.pathUuid = new UUID(4350, 5469);
+        rsv.statusUuid = new UUID(5386, 4497);
+        rsv.time = this.myTime;
+        member.extraVersions.add(rsv);
+        
+        return member;
     }
 
-    private ERefsetCidIntMember makeTestComponent2() {
-        ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
-        cidIntMember.c1Uuid = new UUID(111, 5497);
-        cidIntMember.intValue = 17;
-        cidIntMember.refsetUuid = new UUID(222, 65497);
-        cidIntMember.componentUuid = new UUID(333, 75497);
-        cidIntMember.pathUuid = new UUID(444, 5469);
-        cidIntMember.statusUuid = new UUID(555, 4497);
-        cidIntMember.time = this.myTime;
-        cidIntMember.primordialComponentUuid = new UUID(666, 230);
-        cidIntMember.extraVersions = new ArrayList<ERefsetCidIntVersion>();
-        ERefsetCidIntVersion rciv = new ERefsetCidIntVersion();
-        rciv.c1Uuid = new UUID(777, 656497);
-        rciv.intValue = 16;
-        rciv.pathUuid = new UUID(888, 5469);
-        rciv.statusUuid = new UUID(999, 4497);
-        rciv.time = this.myTime;
-        cidIntMember.extraVersions.add(rciv);
+    private ERefsetLongMember makeTestComponent2() {
         
-        return cidIntMember;
+        ERefsetLongMember member = new ERefsetLongMember();
+        member.componentUuid = new UUID(11, 11);
+        member.longValue = 88; 
+        member.refsetUuid = new UUID(22, 22);
+        member.pathUuid = new UUID(33, 33);
+        member.statusUuid = new UUID(44, 44);
+        member.time = this.myTime;
+        member.primordialComponentUuid = new UUID(55, 55);
+        member.additionalIdComponents = new ArrayList<EIdentifierVersion>();
+        EIdentifierVersionLong ac = new EIdentifierVersionLong();
+        ac.authorityUuid = new UUID(66, 77);
+        ac.denotation = 999;
+        ac.pathUuid = new UUID(88, 99);
+        ac.statusUuid = new UUID(111, 111);
+        ac.time = this.myTime;
+        member.additionalIdComponents.add(ac);       
+        member.extraVersions = new ArrayList<ERefsetLongVersion>();
+        ERefsetLongVersion rsv = new ERefsetLongVersion();
+        rsv.longValue = 333;
+        rsv.pathUuid = new UUID(222, 222);
+        rsv.statusUuid = new UUID(333, 333);
+        rsv.time = this.myTime;
+        member.extraVersions.add(rsv);
+        
+        return member;
     }
 
 
