@@ -16,7 +16,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -57,7 +57,18 @@ public class EConcept {
         }
 
         public static REFSET_TYPES nidToType(int nid) throws TerminologyException, IOException {
-            if (nidTypeMap == null) {
+            setupNids();
+            if (nidTypeMap.containsKey(nid)) {
+                return nidTypeMap.get(nid);
+            } else {
+            	I_GetConceptData typeConcept = Terms.get().getConcept(nid);
+            	throw new TerminologyException("Unknown refset type: " + nid + 
+            			" concept: " + typeConcept);
+            }
+        }
+
+		private static void setupNids() {
+			if (nidTypeMap == null) {
                 nidTypeMap = new HashMap<Integer, REFSET_TYPES>();
                 for (REFSET_TYPES type : REFSET_TYPES.values()) {
                     try {
@@ -68,14 +79,7 @@ public class EConcept {
                     }
                 }
             }
-            if (nidTypeMap.containsKey(nid)) {
-                return nidTypeMap.get(nid);
-            } else {
-            	I_GetConceptData typeConcept = LocalVersionedTerminology.get().getConcept(nid);
-            	throw new TerminologyException("Unknown refset type: " + nid + 
-            			" concept: " + typeConcept);
-            }
-        }
+		}
 
         public void writeType(DataOutput output) throws IOException {
             output.writeByte(externalizedToken);
@@ -112,6 +116,7 @@ public class EConcept {
         }
 
         public int getTypeNid() {
+            setupNids();
             return typeNid;
         }
     };
