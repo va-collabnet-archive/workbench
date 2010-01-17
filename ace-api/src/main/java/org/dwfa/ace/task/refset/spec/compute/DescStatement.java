@@ -189,7 +189,11 @@ public class DescStatement extends RefsetSpecStatement {
 
         switch (tokenEnum) {
         case DESC_IS:
-            possibleDescriptions.setMember(((I_DescriptionVersioned) queryConstraint).getDescId());
+            if (isNegated()) {
+                possibleDescriptions.or(parentPossibleDescriptions);
+            } else {
+                possibleDescriptions.setMember(((I_DescriptionVersioned) queryConstraint).getDescId());
+            }
             break;
         case DESC_IS_MEMBER_OF:
             List<I_ThinExtByRefVersioned> refsetExtensions =
@@ -220,29 +224,32 @@ public class DescStatement extends RefsetSpecStatement {
             possibleDescriptions.or(parentPossibleDescriptions);
             break;
         case DESC_LUCENE_MATCH:
+            if (isNegated()) {
+                possibleDescriptions.or(parentPossibleDescriptions);
+            } else {
+                String queryConstraintString = (String) queryConstraint;
+                Hits hits;
+                try {
+                    hits = termFactory.doLuceneSearch(queryConstraintString);
 
-            String queryConstraintString = (String) queryConstraint;
-            Hits hits;
-            try {
-                hits = termFactory.doLuceneSearch(queryConstraintString);
+                    if (hits == null || hits.length() == 0) {
+                        possibleDescriptions.or(parentPossibleDescriptions);
+                        break;
+                    }
 
-                if (hits == null || hits.length() == 0) {
-                    possibleDescriptions.or(parentPossibleDescriptions);
-                    break;
+                    Iterator iterator = hits.iterator();
+                    while (iterator.hasNext()) {
+                        Hit next = (Hit) iterator.next();
+                        Document doc = next.getDocument();
+                        int dnid = Integer.parseInt(doc.get("dnid"));
+
+                        possibleDescriptions.setMember(dnid);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    throw new TerminologyException(e.getMessage());
+
                 }
-
-                Iterator iterator = hits.iterator();
-                while (iterator.hasNext()) {
-                    Hit next = (Hit) iterator.next();
-                    Document doc = next.getDocument();
-                    int dnid = Integer.parseInt(doc.get("dnid"));
-
-                    possibleDescriptions.setMember(dnid);
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
-                throw new TerminologyException(e.getMessage());
-
             }
         default:
             throw new RuntimeException("Can't handle queryToken: " + queryToken);

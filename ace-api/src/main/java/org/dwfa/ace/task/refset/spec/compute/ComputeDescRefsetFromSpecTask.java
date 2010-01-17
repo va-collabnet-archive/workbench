@@ -435,7 +435,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
             return Condition.ITEM_CANCELED;
         }
 
-        return Condition.CONTINUE;
+        return Condition.ITEM_COMPLETE;
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
