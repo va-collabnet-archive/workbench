@@ -337,7 +337,10 @@ public class IntUuidProxyToNidMap extends AbstractUuidToIntHashMap {
 
 		// stop if we find a free slot, or if we find the key itself.
 		// do skip over removed slots (yes, open addressing is like that...)
-		while (stat[i] != FREE && (stat[i] == REMOVED || (!key.equals(Bdb.getUuidDb().getUuid(tab[i]))))) {
+		
+		while (stat[i] != FREE && 
+				(stat[i] == REMOVED || 
+						(!key.equals(Bdb.getUuidDb().getUuid(tab[i]))))) {
 			i -= decrement;
 			// hashCollisions++;
 			if (i < 0)
@@ -440,25 +443,21 @@ public class IntUuidProxyToNidMap extends AbstractUuidToIntHashMap {
 	 *         the new value has now replaced the formerly associated value.
 	 */
 	public boolean put(UUID key, int value) {
-			r.lock();
+			w.lock();
 		int i = indexOfInsertion(key);
 		if (i < 0) { // already contained
 			i = -i - 1;
 			this.values[i] = value;
-			r.unlock();
+			w.unlock();
 			return false;
 		}
-			r.unlock();
 		if (this.distinct > this.highWaterMark) {
-			w.lock();
 			int newCapacity = chooseGrowCapacity(this.distinct + 1,
 					this.minLoadFactor, this.maxLoadFactor);
 			rehash(newCapacity);
 			w.unlock();
 			return put(key, value);
 		}
-
-		w.lock();
 		
 		try {
 			int unid = Bdb.getUuidDb().addUuid(key);
@@ -484,25 +483,21 @@ public class IntUuidProxyToNidMap extends AbstractUuidToIntHashMap {
 	}
 
 	public boolean put(int uNid, int value) {
-		r.lock();
+		w.lock();
 	int i = indexOfInsertion(Bdb.getUuidDb().getUuid(uNid));
 	if (i < 0) { // already contained
 		i = -i - 1;
 		this.values[i] = value;
-		r.unlock();
+		w.unlock();
 		return false;
 	}
-		r.unlock();
 	if (this.distinct > this.highWaterMark) {
-		w.lock();
 		int newCapacity = chooseGrowCapacity(this.distinct + 1,
 				this.minLoadFactor, this.maxLoadFactor);
 		rehash(newCapacity);
 		w.unlock();
 		return put(uNid, value);
 	}
-
-	w.lock();
 	
 	this.unids[i] = uNid;
 	this.values[i] = value;

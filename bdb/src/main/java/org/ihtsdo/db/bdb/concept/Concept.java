@@ -69,7 +69,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public static Concept get(EConcept eConcept) throws IOException {
-		int conceptNid = Bdb.uuidsToNid(eConcept.getConceptAttributes().getUuids());
+		int conceptNid = Bdb.uuidToNid(
+				eConcept.getConceptAttributes().getPrimordialComponentUuid());
 		assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
 		Concept c = get(conceptNid, true);
 		
@@ -102,7 +103,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 		}
 		if (eConcept.getRefsetMembers() != null) {
 			for (ERefset<?> eRefsetMember: eConcept.getRefsetMembers()) {
-				RefsetMember<?,?> refsetMember = RefsetMemberFactory.create(eRefsetMember, c);
+				RefsetMember<?,?> refsetMember = 
+					RefsetMemberFactory.create(eRefsetMember, c);
 				c.data.add(refsetMember);
 			}
 		}

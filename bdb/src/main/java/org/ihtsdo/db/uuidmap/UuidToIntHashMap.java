@@ -442,28 +442,22 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 *         the new value has now replaced the formerly associated value.
 	 */
 	public boolean put(long[] key, int value) {
-			r.lock();
+			w.lock();
 		int i = indexOfInsertion(key);
 		if (i < 0) { // already contained
 			i = -i - 1;
 			this.values[i] = value;
-			r.unlock();
+			w.unlock();
 			return false;
 		}
-			r.unlock();
 		if (this.distinct > this.highWaterMark) {
-			w.lock();
 			int newCapacity = chooseGrowCapacity(this.distinct + 1,
 					this.minLoadFactor, this.maxLoadFactor);
-			if (newCapacity > 4503061) {
-				System.out.println(" new hashmap capacity: " + newCapacity);
-			}
 			rehash(newCapacity);
 			w.unlock();
 			return put(key, value);
 		}
 
-		w.lock();
 		int msb = i * 2;
 		this.table[msb] = key[0];
 		this.table[msb + 1] = key[1];

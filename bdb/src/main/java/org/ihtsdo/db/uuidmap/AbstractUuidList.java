@@ -375,7 +375,9 @@ public abstract class AbstractUuidList extends AbstractList {
 		checkRangeFromTo(from, to, size);
 
 		for (int i = from; i <= to; i++) {
-			if (element == getQuick(i))
+			long[] another = getQuick(i);
+			if (element[0] == another[0] &&
+					element[1] == another[1])
 				return i; // found
 		}
 		return -1; // not found

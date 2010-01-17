@@ -2,6 +2,8 @@ package org.ihtsdo.db.uuidmap;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.After;
@@ -73,6 +75,33 @@ public class UuidArrayListTest {
 		assertTrue(testList.size() == 0);
  	}
 
+	@Test
+	public void testContains() {
+		int testSize = 1000;
+		UuidArrayList testList = new UuidArrayList();
+		assertTrue(testList.size() == 0);
+		testList = new UuidArrayList(1000);
+		assertTrue(testList.size() == 0);
+		UUID testValue = null;
+		List<UUID> listToTest = new ArrayList<UUID>();
+		for (int i = 0; i < testSize; i++) {
+			if (testValue != null) {
+				testList.add(UuidUtil.convert(testValue));
+				listToTest.add(testValue);
+			} else {
+				testList.add(UuidUtil.convert(UUID.randomUUID()));
+			}
+			if (i % 5 == 0) {
+				testValue = UUID.randomUUID();
+			}
+		}
+		for (UUID test: listToTest) {
+			assertTrue(testList.contains(UuidUtil.convert(test)));
+		}
+ 	}
+
+	
+	
 
 	@Test
 	public void testSort() {

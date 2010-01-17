@@ -62,15 +62,24 @@ public class NidCNidMapBdb extends ComponentBdb {
 		
 		for (int i = 0; i < mutableRecords; i++) {
 			IntegerBinding.intToEntry(i, keyEntry);
-			OperationStatus status = mutable.get(null, keyEntry, valueEntry, LockMode.READ_UNCOMMITTED);
+			int index = i;
+			if (readOnlyRecords > 0) {
+				index = (i + readOnlyRecords - 1);
+			}
+			AceLog.getAppLog().info(" reading nid cNid mutable list: " + i + 
+					" as globalList: " + index);
+			OperationStatus status = mutable.get(null, keyEntry, valueEntry, 
+					LockMode.READ_UNCOMMITTED);
 			if (status == OperationStatus.SUCCESS) {
 				TupleInput ti = new TupleInput(valueEntry.getData());
 				int j = 0;
 				while (ti.available() > 0) {
-					nidCNidMaps[i + readOnlyRecords][j++] = ti.readInt();
+					nidCNidMaps[index][j++] = ti.readInt();
 				}
 			} else {
-				throw new IOException("Unsuccessful operation: " + status);
+				throw new IOException("Unsuccessful operation: " + 
+						status + " index: " + i +
+						" mutable records: " + mutableRecords);
 			}
 		}
 		
@@ -112,8 +121,14 @@ public class NidCNidMapBdb extends ComponentBdb {
 
 	private void writeLastMap() throws IOException {
 		DatabaseEntry keyEntry = new DatabaseEntry();
+		int key = nidCNidMaps.length - 1;
+		if (readOnlyRecords > 0) {
+			// account for last list to be present in 
+			// both the readOnly and mutable database
+			key = key - (readOnlyRecords - 1);
+		}
 
-		IntegerBinding.intToEntry((nidCNidMaps.length - 1) - readOnlyRecords, keyEntry);
+		IntegerBinding.intToEntry(key, keyEntry);
 		TupleOutput output = new TupleOutput(new byte[NID_CNID_MAP_SIZE * 4]);
 		for (int i = 0; i < NID_CNID_MAP_SIZE; i++) {
 			output.writeInt(nidCNidMaps[nidCNidMaps.length - 1][i]);

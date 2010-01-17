@@ -67,16 +67,29 @@ public class UuidBdb extends ComponentBdb {
 		
 		for (int i = 0; i < mutableRecords; i++) {
 			IntegerBinding.intToEntry(i, keyEntry);
+			int index = i;
+			if (readOnlyRecords > 0) {
+				index = (i + readOnlyRecords - 1);
+			}
 			UuidArrayList uuidList = uuidMaps.get(i + readOnlyRecords - 1);
-			AceLog.getAppLog().info(" reading mutable list: " + i + " as globalList: " + (i + readOnlyRecords - 1));
-			OperationStatus status = mutable.get(null, keyEntry, valueEntry, LockMode.READ_UNCOMMITTED);
+			AceLog.getAppLog().info(" reading uuid bdb mutable list: " + 
+					i + " as globalList: " + index);
+			OperationStatus status = mutable.get(null, keyEntry, valueEntry, 
+					LockMode.READ_UNCOMMITTED);
 			if (status == OperationStatus.SUCCESS) {
 				TupleInput ti = new TupleInput(valueEntry.getData());
 				long[] uuidArray = new long[2];
+				int j = 0;
 				while (ti.available() > 0) {
 					uuidArray[0] = ti.readLong();
 					uuidArray[1] = ti.readLong();
-					uuidList.add(uuidArray);
+					if (j < uuidList.size()) {
+						assert uuidList.get(j)[0] == uuidArray[0] && 
+							uuidList.get(j)[1] == uuidArray[1];
+					} else {
+						uuidList.add(uuidArray);
+					}
+					j++;
 				}
 			} else {
 				throw new IOException("Unsuccessful operation: " + status);
@@ -125,7 +138,8 @@ public class UuidBdb extends ComponentBdb {
 		
 		IntegerBinding.intToEntry(key, keyEntry);
 		AceLog.getAppLog().info("Writing uuid list mutable index " + key + " globalIndex: " + 
-				(uuidMaps.size() - 1) + " size: " + (uuidMaps.size() - 1) * UUID_MAP_SIZE);
+				(uuidMaps.size() - 1) + " size: " + ((uuidMaps.size() - 2) * UUID_MAP_SIZE + 
+				uuidMaps.get(uuidMaps.size() - 1).size()));
 		TupleOutput output = new TupleOutput(new byte[(UUID_MAP_SIZE + 1) * 16]);
 		long[] uuidArray;
 		for (int i = 0; i < UUID_MAP_SIZE; i++) {
@@ -145,8 +159,16 @@ public class UuidBdb extends ComponentBdb {
 	}
 	
 	public synchronized int addUuid(UUID uuid) throws IOException{
+		boolean details = false;
+		if (uuid.equals(UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2"))) {
+			System.out.println(" found: " + uuid);
+			details = true;
+		}
 		int mapIndex = uuidMaps.size() - 1;
 		int uNid = UUID_MAP_SIZE * (mapIndex) + (uuidMaps.get(mapIndex).size());
+		if (details) {
+			System.out.println(" uNid: " + uNid + " for: " + uuid);
+		}
 		assert uuid.equals(getUuid(uNid -1)) == false: " mapIndex: " + mapIndex
 					+ " uNid: " + uNid;
 		ensureCapacity(uNid);
@@ -173,5 +195,18 @@ public class UuidBdb extends ComponentBdb {
 	@Override
 	protected String getDbName() {
 		return "UuidDb";
+	}
+
+	public boolean searchForUuid(UUID next) {
+		long[] data = new long[2];
+		data[0] = next.getMostSignificantBits();
+		data[1] = next.getLeastSignificantBits();
+		for (UuidArrayList list: uuidMaps) {
+			if (list.contains(data)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

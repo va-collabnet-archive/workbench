@@ -254,7 +254,7 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 			w.unlock();
 			return nid;
 		}
-		if (mutableUuidsToNidMap.size() == RECORD_SIZE) {
+		if (mutableUuidsToNidMap.size() >= RECORD_SIZE) {
 			readOnlyUuidsToNidMap.ensureCapacity(mutableUuidsToNidMap.size() + readOnlyUuidsToNidMap.size() + 1);
 			mutableUuidsToNidMap.forEachPair(new AddToReadOnlyMap());
 			mutableUuidsToNidMap.clear();
@@ -286,9 +286,13 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 				return nid;
 			}
 		}
+		/*
+		assert Bdb.getUuidDb().searchForUuid(uuids.iterator().next()) 
+			== false: " Attempt to add duplicate uuid: " + uuids;
+			*/
 		int newNid = sequence.getAndIncrement();
 		for (UUID uuid : uuids) {
-			readOnlyUuidsToNidMap.put(UuidUtil.convert(uuid), newNid);
+			mutableUuidsToNidMap.put(uuid, newNid);
 		}
 		w.unlock();
 		return newNid;
