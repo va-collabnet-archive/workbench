@@ -1,6 +1,7 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecStatement.QUERY_TOKENS;
 
 public enum RefsetComputeType {
@@ -12,7 +13,34 @@ public enum RefsetComputeType {
     private RefsetComputeType() {
     }
 
-    public static RefsetComputeType getTypeFromGroupingToken(I_GetConceptData groupingToken) {
+    public static RefsetComputeType getTypeFromGrouping(I_GetConceptData groupingToken) {
+        GROUPING_TYPE grouping = null;
+        for (GROUPING_TYPE token : GROUPING_TYPE.values()) {
+            if (groupingToken.getConceptId() == token.getNid()) {
+                grouping = token;
+                break;
+            }
+        }
+
+        if (grouping == null) {
+            throw new RuntimeException("Unknown query type : " + groupingToken);
+        }
+        switch (grouping) {
+        case OR:
+        case AND:
+            return CONCEPT;
+        case CONCEPT_CONTAINS_REL:
+        case NOT_CONCEPT_CONTAINS_REL:
+            return RELATIONSHIP;
+        case NOT_CONCEPT_CONTAINS_DESC:
+        case CONCEPT_CONTAINS_DESC:
+            return DESCRIPTION;
+        default:
+            throw new RuntimeException("Can't handle queryToken: " + groupingToken);
+        }
+    }
+
+    public static RefsetComputeType getTypeFromQueryToken(I_GetConceptData groupingToken) {
         QUERY_TOKENS tokenEnum = null;
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (groupingToken.getConceptId() == token.nid) {
