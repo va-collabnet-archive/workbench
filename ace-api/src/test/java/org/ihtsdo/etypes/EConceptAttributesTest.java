@@ -125,7 +125,7 @@ public class EConceptAttributesTest {
         testComponent.additionalIdComponents = null;
         testComponent.pathUuid = new UUID(2, 1);
         testComponent.statusUuid = new UUID(5, 8);
-        testComponent.time = System.currentTimeMillis();
+        testComponent.time = this.myTime;
         
         return testComponent;
     }
