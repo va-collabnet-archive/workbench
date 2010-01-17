@@ -16,11 +16,11 @@ public abstract class ComponentBdb {
 	protected Database readOnly;
 	protected Database mutable;
 
-	public ComponentBdb(Bdb readOnlyBdbEnv, Bdb readWriteBdbEnv)
+	public ComponentBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv)
 			throws IOException {
 		readOnly = Bdb.setupDatabase(readOnlyBdbEnv.bdbEnv.getConfig().getReadOnly(), 
 				getDbName(), readOnlyBdbEnv);
-		mutable = Bdb.setupDatabase(false, getDbName(), readWriteBdbEnv);
+		mutable = Bdb.setupDatabase(false, getDbName(), mutableBdbEnv);
 		init();
 	}
 	

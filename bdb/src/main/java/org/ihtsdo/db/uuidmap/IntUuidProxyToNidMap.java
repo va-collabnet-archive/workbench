@@ -1,16 +1,18 @@
 package org.ihtsdo.db.uuidmap;
 
+import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.ihtsdo.db.bdb.Bdb;
+
 import cern.colt.function.DoubleProcedure;
 import cern.colt.list.ByteArrayList;
 import cern.colt.list.IntArrayList;
-import cern.colt.map.HashFunctions;
 import cern.colt.map.PrimeFinder;
 
-public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
+public class IntUuidProxyToNidMap extends AbstractUuidToIntHashMap {
 	
 	/**
 	 * 
@@ -18,11 +20,11 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * The hash table keys.
+	 * The hash table proxy for keys.
 	 * 
 	 * @serial
 	 */
-	protected long table[];
+	protected int unids[];
 
 	/**
 	 * The hash table values.
@@ -57,7 +59,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	/**
 	 * Constructs an empty map with default capacity and default load factors.
 	 */
-	public UuidToIntHashMap() {
+	public IntUuidProxyToNidMap() {
 		this(defaultCapacity);
 	}
 
@@ -70,7 +72,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * @throws IllegalArgumentException
 	 *             if the initial capacity is less than zero.
 	 */
-	public UuidToIntHashMap(int initialCapacity) {
+	public IntUuidProxyToNidMap(int initialCapacity) {
 		this(initialCapacity, defaultMinLoadFactor, defaultMaxLoadFactor);
 	}
 
@@ -90,7 +92,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
 	 *             .
 	 */
-	public UuidToIntHashMap(int initialCapacity, double minLoadFactor,
+	public IntUuidProxyToNidMap(int initialCapacity, double minLoadFactor,
 			double maxLoadFactor) {
 		setUp(initialCapacity, minLoadFactor, maxLoadFactor);
 	}
@@ -190,15 +192,34 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	public boolean forEachPair(final UuidIntProcedure procedure) {
 		for (int i = state.length; i-- > 0;) {
 			if (state[i] == FULL) {
-				long[] key = new long[2];
-				key[0] = table[i*2];
-				key[1] = table[i*2+1];
-				if (!procedure.apply(key, values[i]))
+				if (!procedure.apply(Bdb.getUuidDb().getUuidAsLongArray(unids[i]), values[i]))
 					return false;
 			}
 		}
 		return true;
 	}
+
+	/**
+	 * Applies a procedure to each (key,value) pair of the receiver, if any.
+	 * Iteration order is guaranteed to be <i>identical</i> to the order used by
+	 * method {@link #forEachKey(DoubleProcedure)}.
+	 * 
+	 * @param procedure
+	 *            the procedure to be applied. Stops iteration if the procedure
+	 *            returns <tt>false</tt>, otherwise continues.
+	 * @return <tt>false</tt> if the procedure stopped before all keys where
+	 *         iterated over, <tt>true</tt> otherwise.
+	 */
+	public boolean forEachPair(final IntUuidProxyIntProcedure procedure) {
+		for (int i = state.length; i-- > 0;) {
+			if (state[i] == FULL) {
+				if (!procedure.apply(unids[i], values[i]))
+					return false;
+			}
+		}
+		return true;
+	}
+
 
 	/**
 	 * Returns the value associated with the specified key. It is often a good
@@ -244,12 +265,12 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 *         index >= 0, then it is NOT already contained and should be
 	 *         inserted at slot index.
 	 */
-	protected int indexOfInsertion(long[] key) {
-		final long tab[] = table;
+	protected int indexOfInsertion(UUID key) {
+		final int unid[] = unids;
 		final byte stat[] = state;
 		final int length = state.length;
 
-		final int hash = HashFunctions.hash(key[0] + key[1]) & 0x7FFFFFFF;
+		final int hash = key.hashCode() & 0x7FFFFFFF;
 		int i = hash % length;
 		int decrement = hash % (length - 2); // double hashing, see
 												// http://www.eece.unm.edu/faculty/heileman/hash/node4.html
@@ -259,7 +280,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 
 		// stop if we find a removed or free slot, or if we find the key itself
 		// do NOT skip over removed slots (yes, open addressing is like that...)
-		while (stat[i] == FULL && (tab[i * 2] != key[0] || tab[i * 2 + 1] != key[1])) {
+		while (stat[i] == FULL && (!Bdb.getUuidDb().getUuid(unid[i]).equals(key))) {
 			i -= decrement;
 			// hashCollisions++;
 			if (i < 0)
@@ -271,7 +292,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 			// do skip over removed slots (yes, open addressing is like that...)
 			// assertion: there is at least one FREE slot.
 			int j = i;
-			while (stat[i] != FREE && (stat[i] == REMOVED || (tab[i * 2] != key[0] || tab[i * 2 + 1] != key[1]))) {
+			while (stat[i] != FREE && (stat[i] == REMOVED || (!Bdb.getUuidDb().getUuid(unid[i]).equals(key)))) {
 				i -= decrement;
 				// hashCollisions++;
 				if (i < 0)
@@ -298,11 +319,15 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 *         if the key was not found.
 	 */
 	protected int indexOfKey(long[] key) {
-		final long tab[] = table;
+		return indexOfKey(UuidUtil.convert(key));
+	}
+
+	protected int indexOfKey(UUID key) {
+		final int tab[] = unids;
 		final byte stat[] = state;
 		final int length = stat.length;
 
-		final int hash = HashFunctions.hash(key[0] + key[1]) & 0x7FFFFFFF;
+		final int hash = key.hashCode() & 0x7FFFFFFF;
 		int i = hash % length;
 		int decrement = hash % (length - 2); // double hashing, see
 												// http://www.eece.unm.edu/faculty/heileman/hash/node4.html
@@ -312,7 +337,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 
 		// stop if we find a free slot, or if we find the key itself.
 		// do skip over removed slots (yes, open addressing is like that...)
-		while (stat[i] != FREE && (stat[i] == REMOVED || (tab[i * 2] != key[0] || tab[i * 2 + 1] != key[1]))) {
+		while (stat[i] != FREE && (stat[i] == REMOVED || (!key.equals(Bdb.getUuidDb().getUuid(tab[i]))))) {
 			i -= decrement;
 			// hashCollisions++;
 			if (i < 0)
@@ -324,32 +349,14 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		return i; // found, return index where key is contained
 	}
 
-	protected int indexOfKey(UUID key) {
-		final long tab[] = table;
-		final byte stat[] = state;
-		final int length = stat.length;
+	public int getUNid(UUID key) {
+		int index = indexOfKey(key);
+		return unids[index];
+	}
 
-		final int hash = HashFunctions.hash(key.getMostSignificantBits() + key.getLeastSignificantBits()) & 0x7FFFFFFF;
-		int i = hash % length;
-		int decrement = hash % (length - 2); // double hashing, see
-												// http://www.eece.unm.edu/faculty/heileman/hash/node4.html
-		// int decrement = (hash / length) % length;
-		if (decrement == 0)
-			decrement = 1;
-
-		// stop if we find a free slot, or if we find the key itself.
-		// do skip over removed slots (yes, open addressing is like that...)
-		while (stat[i] != FREE && (stat[i] == REMOVED || (tab[i * 2] != key.getMostSignificantBits() || 
-				tab[i * 2 + 1] != key.getLeastSignificantBits()))) {
-			i -= decrement;
-			// hashCollisions++;
-			if (i < 0)
-				i += length;
-		}
-
-		if (stat[i] == FREE)
-			return -1; // not found
-		return i; // found, return index where key is contained
+	public int getUNid(long[] key) {
+		int index = indexOfKey(key);
+		return unids[index];
 	}
 
 	/**
@@ -388,12 +395,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		int i = indexOfValue(value);
 		if (i < 0)
 			return null;
-		long[] uuid = new long[2];
-		int msb = i * 2;
-		int lsb = msb + 1;
-		uuid[0] = table[msb];
-		uuid[1] = table[lsb];
-		return uuid;
+		return Bdb.getUuidDb().getUuidAsLongArray(unids[i]);
 	}
 
 	/**
@@ -409,26 +411,22 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 *            the list to be filled, can have any size.
 	 */
 	public void keys(UuidArrayList list) {
-		list.setSize(distinct);
-		long[] elements = list.elements();
+		list.ensureCapacity(distinct);
 
-		long[] tab = table;
+		int[] tab = unids;
 		byte[] stat = state;
 
 		int j = 0;
 		for (int i = stat.length; i-- > 0;) {
 			if (stat[i] == FULL) {
-				int iMsb = i * 2;
-				int iLsb = iMsb + 1;
-				int jMsb = j * 2;
-				int jLsb = jMsb + 1;
-				elements[jMsb] = tab[iMsb];
-				elements[jLsb] = tab[iLsb];
+				list.add(Bdb.getUuidDb().getUuidAsLongArray(tab[i]));
 				j++;
 			}
 		}
 	}
-
+	public boolean put(long[] key, int value) {
+		return put(UuidUtil.convert(key), value);
+	}
 	/**
 	 * Associates the given key with the given value. Replaces any old
 	 * <tt>(key,someOtherValue)</tt> association, if existing.
@@ -441,7 +439,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 *         <tt>false</tt> if the receiver did already contain such a key -
 	 *         the new value has now replaced the formerly associated value.
 	 */
-	public boolean put(long[] key, int value) {
+	public boolean put(UUID key, int value) {
 			r.lock();
 		int i = indexOfInsertion(key);
 		if (i < 0) { // already contained
@@ -455,18 +453,20 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 			w.lock();
 			int newCapacity = chooseGrowCapacity(this.distinct + 1,
 					this.minLoadFactor, this.maxLoadFactor);
-			if (newCapacity > 4503061) {
-				System.out.println(" new hashmap capacity: " + newCapacity);
-			}
 			rehash(newCapacity);
 			w.unlock();
 			return put(key, value);
 		}
 
 		w.lock();
-		int msb = i * 2;
-		this.table[msb] = key[0];
-		this.table[msb + 1] = key[1];
+		
+		try {
+			int unid = Bdb.getUuidDb().addUuid(key);
+			this.unids[i] = unid;
+			assert  Bdb.getUuidDb().getUuid(unid).equals(key);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		this.values[i] = value;
 		if (this.state[i] == FREE)
 			this.freeEntries--;
@@ -483,6 +483,44 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		return true;
 	}
 
+	public boolean put(int uNid, int value) {
+		r.lock();
+	int i = indexOfInsertion(Bdb.getUuidDb().getUuid(uNid));
+	if (i < 0) { // already contained
+		i = -i - 1;
+		this.values[i] = value;
+		r.unlock();
+		return false;
+	}
+		r.unlock();
+	if (this.distinct > this.highWaterMark) {
+		w.lock();
+		int newCapacity = chooseGrowCapacity(this.distinct + 1,
+				this.minLoadFactor, this.maxLoadFactor);
+		rehash(newCapacity);
+		w.unlock();
+		return put(uNid, value);
+	}
+
+	w.lock();
+	
+	this.unids[i] = uNid;
+	this.values[i] = value;
+	if (this.state[i] == FREE)
+		this.freeEntries--;
+	this.state[i] = FULL;
+	this.distinct++;
+
+	if (this.freeEntries < 1) { // delta
+		int newCapacity = chooseGrowCapacity(this.distinct + 1,
+				this.minLoadFactor, this.maxLoadFactor);
+		rehash(newCapacity);
+	}
+	w.unlock();
+
+	return true;
+}
+
 	/**
 	 * Rehashes the contents of the receiver into a new table with a smaller or
 	 * larger capacity. This method is called automatically when the number of
@@ -495,11 +533,11 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 			return;
 		}
 		
-		long oldTable[] = table;
+		int oldUNids[] = unids;
 		int oldValues[] = values;
 		byte oldState[] = state;
 
-		long newTable[] = new long[newCapacity * 2 + 1];
+		int newUNids[] = new int[newCapacity];
 		int newValues[] = new int[newCapacity];
 		byte newState[] = new byte[newCapacity];
 
@@ -507,19 +545,16 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		this.highWaterMark = chooseHighWaterMark(newCapacity,
 				this.maxLoadFactor);
 
-		this.table = newTable;
+		this.unids = newUNids;
 		this.values = newValues;
 		this.state = newState;
 		this.freeEntries = newCapacity - this.distinct; // delta
 
 		for (int i = oldCapacity; i-- > 0;) {
-			long[] element = new long[2];
 			if (oldState[i] == FULL) {
-				element[0] = oldTable[i * 2];
-				element[1] = oldTable[i * 2 + 1];
-				int index = indexOfInsertion(element);
-				newTable[index * 2] = element[0];
-				newTable[index * 2 + 1] = element[1];
+				int aUNid = oldUNids[i];
+				int index = indexOfInsertion(Bdb.getUuidDb().getUuid(aUNid));
+				newUNids[index] = aUNid;
 				newValues[index] = oldValues[i];
 				newState[index] = FULL;
 			}
@@ -584,7 +619,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 			capacity = 1; // open addressing needs at least one FREE slot at any time.
 		}
 			
-		this.table = new long[capacity * 2 + 1];
+		this.unids = new int[capacity];
 		this.values = new int[capacity];
 		this.state = new byte[capacity];
 
@@ -637,7 +672,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 *            the list to be filled, can have any size.
 	 */
 	public void values(IntArrayList list) {
-		list.setSize(distinct);
+		list.ensureCapacity(distinct);
 		int[] elements = list.elements();
 
 		int[] val = values;
@@ -655,10 +690,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	public boolean forEachKey(UuidProcedure procedure) {
 		for (int i = state.length; i-- > 0;) {
 			if (state[i] == FULL) {
-				long[] key = new long[2];
-				key[0] = table[i*2];
-				key[1] = table[i*2+1];
-				if (!procedure.apply(key));
+				if (!procedure.apply(Bdb.getUuidDb().getUuidAsLongArray(unids[i])));
 					return false;
 			}
 		}

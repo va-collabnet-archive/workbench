@@ -69,6 +69,18 @@ public class UuidArrayList extends AbstractUuidList {
 		size++;
 	}
 
+	public void add(UUID element) {
+		// overridden for performance only.
+		int msbIndex = size * 2;
+		int lsbIndex = msbIndex + 1;
+		if (lsbIndex >= elements.length)
+			ensureCapacity(lsbIndex + 1);
+		elements[msbIndex] = element.getMostSignificantBits();
+		elements[lsbIndex] = element.getLeastSignificantBits();
+		size++;
+	}
+
+
 	/**
 	 * Inserts the specified element before the specified position into the
 	 * receiver. Shifts the element currently at that position (if any) and any

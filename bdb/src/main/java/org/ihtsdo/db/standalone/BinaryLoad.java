@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb;
+package org.ihtsdo.db.standalone;
 
 import java.awt.FileDialog;
 import java.io.BufferedInputStream;
@@ -20,6 +20,8 @@ import javax.swing.JFrame;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.I_ProcessConceptData;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesBinder;
@@ -28,7 +30,7 @@ import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberBinder;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.etypes.EConcept;
 
-public class Temp {
+public class BinaryLoad {
 	public static void main(String[] args) {
         try {
         	long startTime = System.currentTimeMillis();
@@ -208,7 +210,7 @@ public class Temp {
 	static ExecutorService executors = Executors.newCachedThreadPool();
     static LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
     private static int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;;
-    private static int converterSize = runtimeConverterSize;
+    private static int converterSize = 1;
     static {
         for (int i = 0; i < converterSize; i++) {
         	try {
@@ -226,12 +228,18 @@ public class Temp {
 		public void processConceptData(Concept concept) throws Exception {
 			
 			int cNid = concept.getNid();
+			int testCNid = nidCnidMap.getCNid(cNid);
+			test(cNid, testCNid);
 			int[] nids = concept.getAllNids();
 			for (int nid: nids) {
-				int testCNid = nidCnidMap.getCNid(nid);
-				if (testCNid != cNid) {
-					AceLog.getAppLog().severe("Failure in nid cid map");
-				}
+				testCNid = nidCnidMap.getCNid(nid);
+				test(cNid, testCNid);
+			}
+		}
+		private void test(int cNid, int testCNid) throws Exception {
+			if (testCNid != cNid) {
+				AceLog.getAppLog().severe("Failure in nid cid map. cNid: " + cNid + " testCNid: " + testCNid);
+				throw new Exception("Failure in nid cid map");
 			}
 		}
     }

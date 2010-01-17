@@ -136,9 +136,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		}
 	}
 
-	public StatusAtPositionBdb(Bdb readOnlyBdbEnv, Bdb readWriteBdbEnv)
+	public StatusAtPositionBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv)
 			throws IOException {
-		super(readOnlyBdbEnv, readWriteBdbEnv);
+		super(readOnlyBdbEnv, mutableBdbEnv);
 	}
 
 	public int getPositionCount() {

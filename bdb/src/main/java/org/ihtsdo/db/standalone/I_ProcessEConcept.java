@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb;
+package org.ihtsdo.db.standalone;
 
 import org.ihtsdo.etypes.EConcept;
 

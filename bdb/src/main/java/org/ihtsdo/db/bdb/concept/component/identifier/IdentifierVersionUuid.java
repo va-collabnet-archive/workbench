@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb.concept.component.identifier;
 
 import java.util.UUID;
 
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.etypes.EIdentifierVersionUuid;
 
@@ -9,19 +10,16 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class IdentifierVersionUuid extends IdentifierVersion {
-	private long mostSigBits;
-	private long leastSigBits;
+	private int uNid;
 	
 	public IdentifierVersionUuid(TupleInput input) {
 		super(input);
-		mostSigBits = input.readLong();
-		leastSigBits = input.readLong();
+		uNid = input.readInt();
 	}
 
 	public IdentifierVersionUuid(EIdentifierVersionUuid idv) {
 		super(idv);
-		mostSigBits = idv.getDenotation().getMostSignificantBits();
-		leastSigBits = idv.getDenotation().getLeastSignificantBits();
+		uNid = Bdb.getUuidsToNidMap().getUNid(idv.getDenotation());
 	}
 
 	@Override
@@ -31,24 +29,21 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 
 	@Override
 	protected void writeSourceIdToBdb(TupleOutput output) {
-		output.writeLong(mostSigBits);
-		output.writeLong(leastSigBits);
+		output.writeInt(uNid);
 	}
 
 	public UUID getUuid() {
-		return new UUID(mostSigBits, leastSigBits);
+		return Bdb.getUuidDb().getUuid(uNid);
 	}
 
 	@Override
 	public Object getDenotation() {
-		return new UUID(mostSigBits, leastSigBits);
+		return Bdb.getUuidDb().getUuid(uNid);
 	}
 
 	@Override
 	public void setDenotation(Object sourceDenotation) {
-		UUID uuid = (UUID) sourceDenotation;
-		mostSigBits = uuid.getMostSignificantBits();
-		leastSigBits = uuid.getLeastSignificantBits();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -60,8 +55,7 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 	public boolean equals(Object obj) {
 		if (IdentifierVersionUuid.class.isAssignableFrom(obj.getClass())) {
 			IdentifierVersionUuid another = (IdentifierVersionUuid) obj;
-			return this.mostSigBits == another.mostSigBits && 
-			this.leastSigBits == another.leastSigBits && super.equals(another);
+			return this.uNid == another.uNid && super.equals(another);
 		}
 		return false;
 	}

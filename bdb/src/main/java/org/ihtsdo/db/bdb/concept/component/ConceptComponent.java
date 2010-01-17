@@ -107,22 +107,15 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	 * priámorádiáal:  first created or developed
 	 * 
 	 */
-	public long primordialUuidMsb = 0;
-	/**
-	 * priámorádiáal:  first created or developed
-	 * 
-	 */
-	public long primordialUuidLsb = 0;
+	public int primordialUNid = Integer.MIN_VALUE;
 	
 	public ArrayList<V> additionalVersions;
 	private ArrayList<IdentifierVersion> additionalIdentifierParts;
 	
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("primordialUuidMsb: ");
-		buf.append(primordialUuidMsb);
-		buf.append(" primordialUuidLsb: ");
-		buf.append(primordialUuidLsb);
+		buf.append("primordial Uuid: ");
+		buf.append(Bdb.getUuidDb().getUuid(primordialUNid));
 		buf.append(" additionalIdParts: " + additionalIdentifierParts);
 		buf.append(" additionalVersions: " + additionalVersions);
 		return buf.toString();
@@ -134,17 +127,13 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		assert enclosingConcept != null;
 		this.enclosingConcept = enclosingConcept;
 		readComponentFromBdb(input);
-		if (this.primordialUuidMsb == 0) {
-			System.out.println("bad id"); // TODO remove me...
-		}
-		assert this.primordialUuidMsb != 0 : "Processing nid: " + enclosingConcept.getNid();
-		assert this.primordialUuidLsb != 0: "Processing nid: " + enclosingConcept.getNid();
+		assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConcept.getNid();
 		assert nid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
 		assert nid != Integer.MIN_VALUE: "Processing nid: " + enclosingConcept.getNid();
 	}
 	
-	//TODO move the EComponent constructors to a helper class or factory class...
-	// So that the size of this class is kept limited. 
+	// TODO move the EComponent constructors to a helper class or factory class...
+	// So that the size of this class is kept limited ? 
 	protected ConceptComponent(EComponent<?> eComponent,
 			Concept enclosingConcept) {
 		super();
@@ -156,11 +145,9 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		if (eComponent.getVersionCount() > 1) {
 			this.additionalVersions = new ArrayList<V>(eComponent.getVersionCount() - 1);
 		}
-		this.primordialUuidMsb = eComponent.getPrimordialComponentUuid().getMostSignificantBits();
-		this.primordialUuidLsb = eComponent.getPrimordialComponentUuid().getLeastSignificantBits();
+		this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
 		convertId(eComponent.additionalIdComponents);
-		assert this.primordialUuidMsb != 0: "Processing nid: " + enclosingConcept.getNid();
-		assert this.primordialUuidLsb != 0: "Processing nid: " + enclosingConcept.getNid();
+		assert this.primordialUNid != Integer.MIN_VALUE: "Processing nid: " + enclosingConcept.getNid();
 		assert nid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
 		assert nid != Integer.MIN_VALUE: "Processing nid: " + enclosingConcept.getNid();
 	}
@@ -180,8 +167,8 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 				additionalIdentifierParts.add(new IdentifierVersionString((EIdentifierVersionString)idv));
 				break;
 			case UUID:
+				Bdb.getUuidsToNidMap().put((UUID) denotation, nid);
 				additionalIdentifierParts.add(new IdentifierVersionUuid((EIdentifierVersionUuid)idv));
-				
 				break;
 			default:
 				throw new UnsupportedOperationException();
@@ -193,7 +180,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
 	 */
 	public boolean isSetup() {
-		assert primordialUuidMsb != 0 && primordialUuidLsb != 0;
+		assert primordialUNid != Integer.MIN_VALUE;
 		return primordialStatusAtPositionNid != Integer.MAX_VALUE;
 	}
 
@@ -206,8 +193,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	
 	private void readIdentifierFromBdb(TupleInput input) {
 		// nid, list size, and conceptNid are read already by the binder...
-		primordialUuidMsb = input.readLong();
-		primordialUuidLsb = input.readLong();
+		primordialUNid = input.readInt();
 		int listSize = input.readShort();
 		if (listSize != 0) {
 			additionalIdentifierParts = new ArrayList<IdentifierVersion>(listSize);
@@ -233,10 +219,8 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	private final void writeIdentifierToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
 		assert primordialStatusAtPositionNid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
-		assert primordialUuidMsb != 0: "Processing nid: " + enclosingConcept.getNid();
-		assert primordialUuidLsb != 0: "Processing nid: " + enclosingConcept.getNid();
-		output.writeLong(primordialUuidMsb);
-		output.writeLong(primordialUuidLsb);
+		assert primordialUNid != Integer.MIN_VALUE: "Processing nid: " + enclosingConcept.getNid();
+		output.writeInt(primordialUNid);
 		List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
 		if (additionalIdentifierParts != null) {
 			for (IdentifierVersion p: additionalIdentifierParts) {
@@ -288,7 +272,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	@Override
 	public final Object getDenotation() {
-		return new UUID(primordialUuidMsb, primordialUuidLsb);
+		return Bdb.getUuidDb().getUuid(primordialUNid);
 	}
 
 
@@ -311,7 +295,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	@Override
 	public final List<UUID> getUUIDs() {
 		List<UUID> returnValues = new ArrayList<UUID>();
-		returnValues.add(new UUID(primordialUuidMsb, primordialUuidLsb));
+		returnValues.add(Bdb.getUuidDb().getUuid(primordialUNid));
 		for (IdentifierVersion idv : additionalIdentifierParts) {
 			if (IdentifierVersionUuid.class.isAssignableFrom(idv
 					.getClass())) {
@@ -473,7 +457,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	public Object getDenotation(int authorityNid) throws IOException,
 			TerminologyException {
 		if (getAuthorityNid() == authorityNid) {
-			return new UUID(primordialUuidMsb, primordialUuidLsb);
+			return Bdb.getUuidDb().getUuid(primordialUNid);
 		}
 		for (I_IdPart id: getMutableIdParts()) {
 			if (id.getAuthorityNid() == authorityNid) {
@@ -571,10 +555,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		if (this.primordialStatusAtPositionNid != another.primordialStatusAtPositionNid) {
 			return false;
 		}
-		if (this.primordialUuidLsb != another.primordialUuidLsb) {
-			return false;
-		}
-		if (this.primordialUuidMsb != another.primordialUuidMsb) {
+		if (this.primordialUNid != another.primordialUNid) {
 			return false;
 		}
 		if (this.additionalIdentifierParts != null && another.additionalIdentifierParts == null) {

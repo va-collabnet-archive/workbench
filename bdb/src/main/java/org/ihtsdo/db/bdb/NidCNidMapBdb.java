@@ -1,6 +1,7 @@
 package org.ihtsdo.db.bdb;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.dwfa.ace.log.AceLog;
 
@@ -24,8 +25,8 @@ public class NidCNidMapBdb extends ComponentBdb {
 	private int readOnlyRecords;
 	
 	
-	public NidCNidMapBdb(Bdb readOnlyBdbEnv, Bdb readWriteBdbEnv) throws IOException {
-		super(readOnlyBdbEnv, readWriteBdbEnv);
+	public NidCNidMapBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
+		super(readOnlyBdbEnv, mutableBdbEnv);
 	}
 
 	@Override
@@ -37,6 +38,7 @@ public class NidCNidMapBdb extends ComponentBdb {
         nidCNidMaps = new int[nidCidMapCount][];
         for (int index = 0; index < nidCidMapCount; index++) {
         	nidCNidMaps[index] = new int[NID_CNID_MAP_SIZE];
+        	Arrays.fill(nidCNidMaps[index], Integer.MAX_VALUE);
         }
         maxId = (nidCNidMaps.length *  NID_CNID_MAP_SIZE) - Integer.MIN_VALUE; 
         
@@ -60,7 +62,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 		
 		for (int i = 0; i < mutableRecords; i++) {
 			IntegerBinding.intToEntry(i, keyEntry);
-			OperationStatus status = readOnly.get(null, keyEntry, valueEntry, LockMode.READ_UNCOMMITTED);
+			OperationStatus status = mutable.get(null, keyEntry, valueEntry, LockMode.READ_UNCOMMITTED);
 			if (status == OperationStatus.SUCCESS) {
 				TupleInput ti = new TupleInput(valueEntry.getData());
 				int j = 0;
@@ -84,6 +86,7 @@ public class NidCNidMapBdb extends ComponentBdb {
         		newNidCidMaps[i] = nidCNidMaps[i];
         	}
         	newNidCidMaps[nidCNidMaps.length] = new int[NID_CNID_MAP_SIZE];
+        	Arrays.fill(newNidCidMaps[nidCNidMaps.length], Integer.MAX_VALUE);
         	nidCNidMaps = newNidCidMaps;
 		}
 
@@ -141,6 +144,8 @@ public class NidCNidMapBdb extends ComponentBdb {
 			throw new ArrayIndexOutOfBoundsException(" maxId: " + maxId + " cNid: " + cNid + " nid: " + nid  + 
 					" mapIndex: " + mapIndex + " indexInMap: " + indexInMap);
 		}
+		assert nidCNidMaps[mapIndex][indexInMap] == Integer.MAX_VALUE: "processing cNid: " + cNid + 
+					" nid: " + nid + " found: " + nidCNidMaps[mapIndex][indexInMap];
 		nidCNidMaps[mapIndex][indexInMap] = cNid;
 	}
 

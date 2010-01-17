@@ -19,9 +19,9 @@ import com.sleepycat.je.OperationStatus;
 
 public class ConceptBdb extends ComponentBdb {
 
-	public ConceptBdb(Bdb readOnlyBdbEnv, Bdb readWriteBdbEnv)
+	public ConceptBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv)
 			throws IOException {
-		super(readOnlyBdbEnv, readWriteBdbEnv);
+		super(readOnlyBdbEnv, mutableBdbEnv);
 	}
 
 	@Override
@@ -56,7 +56,6 @@ public class ConceptBdb extends ComponentBdb {
 		mutable.put(null, key, value);
 		int[] nids = concept.getAllNids();
 		NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();
-		nidCidMap.setCidForNid(cNid, cNid);
 		for (int nid: nids) {
 			nidCidMap.setCidForNid(cNid, nid);
 		}

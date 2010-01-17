@@ -9,8 +9,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.PrimordialId;
-import org.ihtsdo.db.uuidmap.UuidIntProcedure;
-import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
+import org.ihtsdo.db.uuidmap.IntUuidProxyIntProcedure;
+import org.ihtsdo.db.uuidmap.IntUuidProxyToNidMap;
 import org.ihtsdo.db.uuidmap.UuidUtil;
 
 import com.sleepycat.bind.tuple.IntegerBinding;
@@ -51,10 +51,10 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 	}
 
 	private static final int RECORD_SIZE = 10000;
-	private static final int UUID_INT_BYTES = 20;
+	private static final int INT_UUID_PROXY_INT_BYTES = 8;
 	
-	private UuidToIntHashMap readOnlyUuidsToNidMap;
-	private UuidToIntHashMap mutableUuidsToNidMap;
+	private IntUuidProxyToNidMap readOnlyUuidsToNidMap;
+	private IntUuidProxyToNidMap mutableUuidsToNidMap;
 	private IdSequence sequence;
 	private int mutableKeyIndex;
 
@@ -64,8 +64,8 @@ public class UuidsToNidMapBdb extends ComponentBdb {
     private final Lock w = rwl.writeLock();
 
 
-	protected UuidsToNidMapBdb(Bdb readOnlyBdbEnv, Bdb readWriteBdbEnv) throws IOException {
-		super(readOnlyBdbEnv, readWriteBdbEnv);
+	protected UuidsToNidMapBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
+		super(readOnlyBdbEnv, mutableBdbEnv);
 	}
 
 
@@ -76,24 +76,12 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 		int mutableRecords = (int) mutable.count() * RECORD_SIZE;
 		AceLog.getAppLog().info("UuidIntHashMap mutableRecords: " + mutableRecords);
 		mutableKeyIndex = mutableRecords;
-		readOnlyUuidsToNidMap = new UuidToIntHashMap(readOnlyRecords + mutableRecords, .2, .7);
-		mutableUuidsToNidMap = new UuidToIntHashMap(RECORD_SIZE, .2, .7);
+		readOnlyUuidsToNidMap = new IntUuidProxyToNidMap(readOnlyRecords + mutableRecords, .2, .7);
+		mutableUuidsToNidMap = new IntUuidProxyToNidMap(RECORD_SIZE, .2, .7);
 		if (sequence == null) {
 			int max = Integer.MIN_VALUE;
 	        sequence = new IdSequence(max);
 		}
-        for (PrimordialId pid : PrimordialId.values()) {
-            for (UUID uid : pid.getUids()) {
-            	readOnlyUuidsToNidMap.put(UuidUtil.convert(uid), 
-            			pid.getNativeId(Integer.MIN_VALUE));
-            	mutableUuidsToNidMap.put(UuidUtil.convert(uid), 
-            			pid.getNativeId(Integer.MIN_VALUE));
-             	int max = Math.max(sequence.get(), pid.getNativeId(Integer.MIN_VALUE));
-             	if (max > sequence.get()) {
-             		sequence.set(max);
-             	}
-            }
-        }
 		putDataInMap(readOnly, false);
 		putDataInMap(mutable, true);
 	}
@@ -112,11 +100,32 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 	 */
 	private void putDataInMap(Database db, boolean mutable)
 			throws IOException {
+		IntUuidProxyToNidMap mapToAddTo = readOnlyUuidsToNidMap;
 		int records = (int) db.count();
+		if (records == 0) {
+			if (mutable) {
+				mapToAddTo = mutableUuidsToNidMap;
+			}
+	        for (PrimordialId pid : PrimordialId.values()) {
+	            for (UUID uid : pid.getUids()) {
+	            	if (!mapToAddTo.containsKey(uid)) {
+	            		if (readOnlyUuidsToNidMap.containsKey(uid)) {
+	            			int uNid = readOnlyUuidsToNidMap.getUNid(uid);
+	            			mapToAddTo.put(uNid, 
+	    	            			pid.getNativeId(Integer.MIN_VALUE));
+	            		} else {
+	    	            	mapToAddTo.put(uid, pid.getNativeId(Integer.MIN_VALUE));
+	            		}
+	            	}
+	             	int max = Math.max(sequence.get(), pid.getNativeId(Integer.MIN_VALUE) + 1);
+	             	if (max > sequence.get()) {
+	             		sequence.set(max);
+	             	}
+	            }
+	        }
+		}
 		DatabaseEntry key = new DatabaseEntry();
 		DatabaseEntry value = new DatabaseEntry();
-		UuidToIntHashMap mapToAddTo = readOnlyUuidsToNidMap;
-		long[] uuidData = new long[2];
 		int max = Integer.MIN_VALUE;
 		for (int i = 0; i < records; i++) {
 			if (mutable && (i == (records - 1))) {
@@ -133,11 +142,10 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 			}
 			TupleInput ti = new TupleInput(value.getData());
 			while (ti.available() > 0) {
-				uuidData[0] = ti.readLong();
-				uuidData[1] = ti.readLong();
+				int uNid = ti.readInt();
 				int nid = ti.readInt();
 				max = Math.max(nid, max);
-				mapToAddTo.put(uuidData, nid);
+				mapToAddTo.put(uNid, nid);
 			}
 		}
 		if (sequence.get() <= max) {
@@ -145,7 +153,7 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 		}
 	}
 	
-	private class WriteToBdb implements UuidIntProcedure {
+	private class WriteToBdb implements IntUuidProxyIntProcedure {
 
 		DatabaseEntry keyEntry = new DatabaseEntry();
 		DatabaseEntry valueEntry = new DatabaseEntry();
@@ -154,14 +162,13 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 		
 		public WriteToBdb() {
 			super();
-			byte[] outputBytes = new byte[UUID_INT_BYTES * RECORD_SIZE + UUID_INT_BYTES];
+			byte[] outputBytes = new byte[INT_UUID_PROXY_INT_BYTES * RECORD_SIZE + INT_UUID_PROXY_INT_BYTES];
 			data = new TupleOutput(outputBytes);
 		}
 
 		@Override
-		public boolean apply(long[] uuid, int value) {
-			data.writeLong(uuid[0]);
-			data.writeLong(uuid[1]);
+		public boolean apply(int uNid, int value) {
+			data.writeInt(uNid);
 			data.writeInt(value);
 			count++;
 			if (count == RECORD_SIZE) {
@@ -186,13 +193,13 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 		
 	}
 
-	private class AddToReadOnlyMap implements UuidIntProcedure {
+	private class AddToReadOnlyMap implements IntUuidProxyIntProcedure {
 		WriteToBdb writer = new WriteToBdb();
 		
 		@Override
-		public boolean apply(long[] key, int value) {
-			readOnlyUuidsToNidMap.put(key, value);
-			writer.apply(key, value);
+		public boolean apply(int uNid, int value) {
+			readOnlyUuidsToNidMap.put(uNid, value);
+			writer.apply(uNid, value);
 			return true;
 		}
 
@@ -295,6 +302,22 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 
 	public int getCurrentMaxNid() {
 		return sequence.get() - 1;
+	}
+
+	public int getUNid(UUID primordialComponentUuid) {
+		if (readOnlyUuidsToNidMap.containsKey(primordialComponentUuid)) {
+			return readOnlyUuidsToNidMap.getUNid(primordialComponentUuid);
+		}
+		mutableUuidsToNidMap.get(primordialComponentUuid);
+		return mutableUuidsToNidMap.getUNid(primordialComponentUuid);
+	}
+
+
+	public void put(UUID denotation, int nid) {
+		w.lock();
+		mutableUuidsToNidMap.put(denotation, nid); 
+		w.unlock();
+		
 	}
 
 }

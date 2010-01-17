@@ -27,10 +27,11 @@ public class Bdb {
 
 	private static Bdb readOnly;
 	private static Bdb mutable;
-	private static StatusAtPositionBdb statusAtPositionDb;
-	private static ConceptBdb conceptDb;
+	private static UuidBdb uuidDb;
 	private static UuidsToNidMapBdb uuidsToNidMapDb;
 	private static NidCNidMapBdb nidCidMapDb;
+	private static StatusAtPositionBdb statusAtPositionDb;
+	private static ConceptBdb conceptDb;
 	
 	private static ExecutorService executorPool;
 	
@@ -58,6 +59,7 @@ public class Bdb {
 			File readOnlyDir = new File(bdbDirectory, "read-only");
 			boolean readOnlyExists = readOnlyDir.exists();
 			readOnly = new Bdb(readOnlyExists, readOnlyDir);
+			uuidDb = new UuidBdb(readOnly, mutable);
 			uuidsToNidMapDb = new UuidsToNidMapBdb(readOnly, mutable);
 			nidCidMapDb = new NidCNidMapBdb(readOnly, mutable);
 			statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
@@ -150,10 +152,11 @@ public class Bdb {
 
 		@Override
 		public Boolean call() throws Exception {
-			nidCidMapDb.sync();
-			conceptDb.sync();
-			statusAtPositionDb.sync();
+			uuidDb.sync();
 			uuidsToNidMapDb.sync();
+			nidCidMapDb.sync();
+			statusAtPositionDb.sync();
+			conceptDb.sync();
 			mutable.bdbEnv.sync();
 			if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
 				readOnly.bdbEnv.sync();
@@ -172,10 +175,12 @@ public class Bdb {
 					syncFuture.get();
 					AceLog.getAppLog().info("SyncFuture finished.");
 				}
-				nidCidMapDb.close();
-				conceptDb.close();
-				statusAtPositionDb.close();
+				uuidDb.close();
 				uuidsToNidMapDb.close();
+				nidCidMapDb.close();
+				statusAtPositionDb.close();
+				conceptDb.close();
+				mutable.bdbEnv.sync();
 				mutable.bdbEnv.close();
 			} catch (DatabaseException dbe) {
 				AceLog.getAppLog().alertAndLogException(dbe);
@@ -184,14 +189,15 @@ public class Bdb {
 		if (readOnly.bdbEnv != null) {
 			readOnly.bdbEnv.close();
 		}
-		conceptDb = null;
 		executorPool.shutdown();
 		executorPool = null;
 		mutable = null;
-		nidCidMapDb = null;
 		readOnly = null;
-		statusAtPositionDb = null;
+		uuidDb = null;
 		uuidsToNidMapDb = null;
+		nidCidMapDb = null;
+		statusAtPositionDb = null;
+		conceptDb = null;
 	}
 
 	public static NidCNidMapBdb getNidCNidMap() {
@@ -204,6 +210,10 @@ public class Bdb {
 
 	public static int uuidToNid(UUID uuid) {
 		return uuidsToNidMapDb.uuidToNid(uuid);
+	}
+
+	public static UuidBdb getUuidDb() {
+		return uuidDb;
 	}
 
 
