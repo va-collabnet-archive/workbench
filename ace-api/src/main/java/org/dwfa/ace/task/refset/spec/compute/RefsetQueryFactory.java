@@ -132,7 +132,7 @@ public class RefsetQueryFactory {
      * @throws ParseException
      */
     private static RefsetSpecQuery processNode(DefaultMutableTreeNode node, RefsetSpecQuery query,
-            RefsetComputeType type, I_ConfigAceFrame configFrame, I_TermFactory termFactory) throws IOException,
+            RefsetComputeType computeType, I_ConfigAceFrame configFrame, I_TermFactory termFactory) throws IOException,
             TerminologyException, ParseException {
 
         if (query == null) {
@@ -172,31 +172,31 @@ public class RefsetQueryFactory {
                                     .next()).toString());
                     } // TODO add rel
 
-                    RefsetComputeType statementType = RefsetComputeType.getTypeFromGroupingToken(groupingToken);
+                    RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
                     switch (statementType) {
                     case CONCEPT:
-                        if (type.equals(RefsetComputeType.CONCEPT)) {
+                        if (computeType.equals(RefsetComputeType.CONCEPT)) {
                             query.addConceptStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
                             break;
                         } else {
-                            throw new TerminologyException("Badly formed spec: " + groupingToken.getInitialText()
-                                + " within a " + type.toString() + " refset compute.");
+                            throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
+                                + "' within a " + computeType.toString() + " refset compute.");
                         }
                     case DESCRIPTION:
-                        if (type.equals(RefsetComputeType.CONCEPT) || type.equals(RefsetComputeType.DESCRIPTION)) {
+                        if (computeType.equals(RefsetComputeType.DESCRIPTION)) {
                             query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
                             break;
                         } else {
-                            throw new TerminologyException("Badly formed spec: " + groupingToken.getInitialText()
-                                + " within a " + type.toString() + " refset compute.");
+                            throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
+                                + "' within a " + computeType.toString() + " refset compute.");
                         }
                     case RELATIONSHIP:
-                        if (type.equals(RefsetComputeType.CONCEPT) || type.equals(RefsetComputeType.RELATIONSHIP)) {
+                        if (computeType.equals(RefsetComputeType.RELATIONSHIP)) {
                             query.addRelStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
                             break;
                         } else {
-                            throw new TerminologyException("Badly formed spec: " + groupingToken.getInitialText()
-                                + " within a " + type.toString() + " refset compute.");
+                            throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
+                                + "' within a " + computeType.toString() + " refset compute.");
                         }
                     default:
                         throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
@@ -212,12 +212,27 @@ public class RefsetQueryFactory {
 
                     boolean negate = getNegation(truthToken, termFactory);
 
+                    RefsetComputeType statementType = RefsetComputeType.getTypeFromGrouping(groupingToken);
+
+                    switch (statementType) {
+                    case CONCEPT:
+                        break; // don't change compute type since it might be a concept-contains-desc followed by OR
+                    case DESCRIPTION:
+                        computeType = RefsetComputeType.DESCRIPTION;
+                        break;
+                    case RELATIONSHIP:
+                        computeType = RefsetComputeType.RELATIONSHIP;
+                        break;
+                    default:
+                        break;
+                    }
+
                     // add subquery
                     RefsetSpecQuery subquery = query.addSubquery(groupingToken);
 
                     // process each grandchild
                     if (!childNode.isLeaf()) {
-                        processNode(childNode, subquery, type, configFrame, termFactory);
+                        processNode(childNode, subquery, computeType, configFrame, termFactory);
                     }
                     if (negate) {
                         subquery.negateQuery();
@@ -230,7 +245,7 @@ public class RefsetQueryFactory {
                     I_GetConceptData groupingToken = termFactory.getConcept(part.getC2id());
                     String constraint = part.getStringValue();
 
-                    RefsetComputeType statementType = RefsetComputeType.getTypeFromGroupingToken(groupingToken);
+                    RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
                     switch (statementType) {
                     case CONCEPT:
                         throw new TerminologyException(

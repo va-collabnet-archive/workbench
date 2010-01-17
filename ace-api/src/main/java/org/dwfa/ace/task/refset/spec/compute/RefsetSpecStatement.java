@@ -53,8 +53,8 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         CONCEPT_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_CHILD_OF),
         CONCEPT_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_KIND_OF),
         CONCEPT_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_DESCENDENT_OF),
-        CONCEPT_CONTAINS_REL_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING),
-        CONCEPT_CONTAINS_DESC_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING),
+        // CONCEPT_CONTAINS_REL_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING),
+        // CONCEPT_CONTAINS_DESC_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING),
 
         DESC_IS(RefsetAuxiliary.Concept.DESC_IS),
         DESC_IS_MEMBER_OF(RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF),
