@@ -114,10 +114,10 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("primordial Uuid: ");
+		buf.append("pUuid: ");
 		buf.append(Bdb.getUuidDb().getUuid(primordialUNid));
-		buf.append(" additionalIdParts: " + additionalIdentifierParts);
-		buf.append(" additionalVersions: " + additionalVersions);
+		buf.append(" xtraIdParts: " + additionalIdentifierParts);
+		buf.append(" xtraVersions: " + additionalVersions);
 		return buf.toString();
 		
 	}

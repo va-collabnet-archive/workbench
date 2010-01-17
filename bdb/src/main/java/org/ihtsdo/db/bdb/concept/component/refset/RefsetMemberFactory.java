@@ -38,10 +38,9 @@ import com.sleepycat.bind.tuple.TupleInput;
 public class RefsetMemberFactory  {
 
 	@SuppressWarnings("unchecked")
-	public RefsetMember create(int nid, Concept enclosingConcept,
+	public RefsetMember create(int nid, int typeNid, Concept enclosingConcept,
 			TupleInput input) {
 		assert enclosingConcept != null;
-		int typeNid = input.readInt();
 		REFSET_TYPES memberType;
 		try {
 			memberType = REFSET_TYPES.nidToType(typeNid);

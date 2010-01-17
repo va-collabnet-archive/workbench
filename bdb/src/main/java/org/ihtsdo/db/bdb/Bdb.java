@@ -129,7 +129,7 @@ public class Bdb {
 	}
 	
 	public static int getConceptNid(int componentNid) {
-		throw new UnsupportedOperationException();
+		return nidCidMapDb.getCNid(componentNid);
 	}
 	public static Concept getConceptForComponent(int componentNid) {
 		throw new UnsupportedOperationException();

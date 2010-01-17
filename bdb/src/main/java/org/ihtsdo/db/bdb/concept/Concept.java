@@ -27,6 +27,7 @@ import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
@@ -768,4 +769,23 @@ public class Concept implements I_Transact, I_GetConceptData {
 		
 		return buff.toString();
 	}	
+	
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		try {
+			buff.append("\nConcept: \n attributes: ");
+			buff.append(getConceptAttributes());
+			buff.append("\n descriptions: ");
+			buff.append(getDescriptions());
+			buff.append("\n srcRels: ");
+			buff.append(getSourceRels());
+			buff.append("\n images: ");
+			buff.append(getImages());
+			buff.append("\n refset members: ");
+			//buff.append(getExtensions());
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		return buff.toString();
+	}
 }

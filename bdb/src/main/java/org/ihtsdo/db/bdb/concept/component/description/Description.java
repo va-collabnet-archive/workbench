@@ -77,15 +77,15 @@ public class Description
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("NativeId: ");
+		buf.append("Desc text: \"");
+		buf.append(text);
+		buf.append("\" nid: ");
 		buf.append(nid);
 		buf.append(" cs: ");
 		buf.append(initialCaseSignificant);
-		buf.append(" text: ");
-		buf.append(text);
 		buf.append(" lang: ");
 		buf.append(lang);
-		buf.append(" typeNid: ");
+		buf.append(" type: ");
 		buf.append(typeNid);
 		buf.append(" ");
 		buf.append(super.toString());

@@ -68,7 +68,7 @@ public class Image
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("NativeId: ");
+		buf.append("nid: ");
 		buf.append(nid);
 		buf.append(" format: ");
 		buf.append(format);

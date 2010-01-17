@@ -47,7 +47,7 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("NativeId: ");
+		buf.append("nid: ");
 		buf.append(nid);
 		buf.append(" memberTypeNid: ");
 		buf.append(memberTypeNid);

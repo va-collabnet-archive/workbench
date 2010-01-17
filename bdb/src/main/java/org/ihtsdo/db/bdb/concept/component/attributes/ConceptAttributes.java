@@ -228,7 +228,7 @@ public class ConceptAttributes
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("NativeId: ");
+		buf.append("nid: ");
 		buf.append(nid);
 		buf.append(" def: ");
 		buf.append(defined);
@@ -237,11 +237,11 @@ public class ConceptAttributes
 		return buf.toString();
 	}
 
-	public void setConId(int conId) {
+	public void setConId(int cNid) {
 		if (this.nid == Integer.MIN_VALUE) {
-			this.nid = conId;
+			this.nid = cNid;
 		} else {
-			throw new RuntimeException("Cannot change the conId once set");
+			throw new RuntimeException("Cannot change the cNid once set");
 		}
 	}
 

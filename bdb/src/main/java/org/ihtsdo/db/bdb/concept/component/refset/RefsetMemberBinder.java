@@ -47,13 +47,16 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 		}
 		
 		for (int index = 0; index < listSize; index++) {
+			int typeNid = input.readInt();
+			input.mark(8);
 			int nid = input.readInt();
+			input.reset();
 			RefsetMember<?, ?> refsetMember;
 			if (nidToRefsetMemberMap != null && nidToRefsetMemberMap.containsKey(nid)) {
 				refsetMember = nidToRefsetMemberMap.get(nid);
 				refsetMember.readComponentFromBdb(input);
 			} else {
-				refsetMember = factory.create(nid, enclosingConcept, input);
+				refsetMember = factory.create(nid, typeNid, enclosingConcept, input);
 				newRefsetMemberList.add(refsetMember);
 			}
 		}
@@ -84,7 +87,7 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 		output.writeInt(refsetMembersToWrite.size()); // List size
 		for (RefsetMember<?, ?> refsetMember: refsetMembersToWrite) {
 			written.incrementAndGet();
-			output.writeInt(refsetMember.nid);
+			output.writeInt(refsetMember.getTypeId());
 			refsetMember.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
 		}
 	}

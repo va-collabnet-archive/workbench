@@ -211,7 +211,8 @@ public class BdbTermFactory implements I_TermFactory {
 	@Override
 	public I_GetConceptData getConcept(int nid) throws TerminologyException,
 			IOException {
-		return Bdb.getConceptDb().getConcept(nid);
+		int cNid = Bdb.getConceptNid(nid);
+		return Bdb.getConceptDb().getConcept(cNid);
 	}
 
 	@Override
@@ -444,7 +445,7 @@ public class BdbTermFactory implements I_TermFactory {
 	}
 
 	@Override
-	public boolean hasPath(int nativeId) throws IOException {
+	public boolean hasPath(int nid) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
