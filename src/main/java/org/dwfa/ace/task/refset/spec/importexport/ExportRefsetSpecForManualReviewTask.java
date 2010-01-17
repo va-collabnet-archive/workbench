@@ -250,6 +250,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
 
     private void writeRefsetName(BufferedWriter exportFileWriter, I_GetConceptData memberRefset)
             throws TerminologyException, Exception {
+        exportFileWriter.write("Refset Name: ");
         exportFileWriter.write(getDescription(LocalVersionedTerminology.get().getConcept(
             ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), memberRefset.getConceptId()));
         exportFileWriter.newLine();
