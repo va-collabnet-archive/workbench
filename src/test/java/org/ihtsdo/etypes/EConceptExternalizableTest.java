@@ -160,7 +160,7 @@ public class EConceptExternalizableTest {
         img.extraVersions.add(iv);
         // Add another Image Version 
         iv = new EImageVersion();
-        iv.textDescription = "interesting image e";
+        iv.textDescription = "boring image e";
         iv.typeUuid = new UUID(2231, 2532);
         iv.pathUuid = new UUID(34450, 3469);
         iv.statusUuid = new UUID(4668, 4757);

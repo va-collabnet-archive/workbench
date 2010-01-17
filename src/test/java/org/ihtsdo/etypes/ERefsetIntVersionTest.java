@@ -1,8 +1,7 @@
 package org.ihtsdo.etypes;
 
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +12,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ERefsetCidIntMemberTest {
+public class ERefsetIntVersionTest {
 
-    private ERefsetCidIntMember testComponent1;
-    private ERefsetCidIntMember testComponent2;
-    private ERefsetCidIntMember testComponent3;
+    private ERefsetIntVersion testComponent1;
+    private ERefsetIntVersion testComponent2;
+    private ERefsetIntVersion testComponent3;
     protected long myTime = Long.MIN_VALUE;
     
     @Before
@@ -85,7 +84,7 @@ public class ERefsetCidIntMemberTest {
         testComponent2 = makeTestComponent1();
         
         // Put testComponent1 in a collection 
-        Set<ERefsetCidIntMember> coll = new java.util.HashSet<ERefsetCidIntMember>();
+        Set<ERefsetIntVersion> coll = new java.util.HashSet<ERefsetIntVersion>();
         coll.add(testComponent1);
 
         // Test for the presence of testComponent1 by using the  
@@ -97,8 +96,8 @@ public class ERefsetCidIntMemberTest {
     @Test
     public void testEqualsForTwoArrayLists() {
         // Make two ArrayLists with the same components in each 
-        List<ERefsetCidIntMember> list1 = new ArrayList<ERefsetCidIntMember>();
-        List<ERefsetCidIntMember> list2 = new ArrayList<ERefsetCidIntMember>();
+        List<ERefsetIntVersion> list1 = new ArrayList<ERefsetIntVersion>();
+        List<ERefsetIntVersion> list2 = new ArrayList<ERefsetIntVersion>();
         
         // Add components to list 1
         list1.add(makeTestComponent1());
@@ -126,51 +125,31 @@ public class ERefsetCidIntMemberTest {
     }
 
     
-    private ERefsetCidIntMember makeTestComponent1() {
-        ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
-        cidIntMember.c1Uuid = new UUID(4386, 5497);
-        cidIntMember.intValue = 33;
-        cidIntMember.refsetUuid = new UUID(14386, 65497);
-        cidIntMember.componentUuid = new UUID(64386, 75497);
-        cidIntMember.pathUuid = new UUID(4350, 5469);
-        cidIntMember.statusUuid = new UUID(5386, 4497);
-        cidIntMember.time = this.myTime;
-        cidIntMember.primordialComponentUuid = new UUID(320, 230);
-        cidIntMember.extraVersions = new ArrayList<ERefsetCidIntVersion>();
-        ERefsetCidIntVersion rciv = new ERefsetCidIntVersion();
-        rciv.c1Uuid = new UUID(114386, 656497);
-        rciv.intValue = 99;
-        rciv.pathUuid = new UUID(4350, 5469);
-        rciv.statusUuid = new UUID(5386, 4497);
-        rciv.time = this.myTime;
-        cidIntMember.extraVersions.add(rciv);
+    private ERefsetIntVersion makeTestComponent1() {
         
-        return cidIntMember;
+        ERefsetIntVersion rsv = new ERefsetIntVersion();
+        rsv.intValue = 3; 
+        rsv.pathUuid = new UUID(4350, 5469);
+        rsv.statusUuid = new UUID(5386, 4497);
+        rsv.time = this.myTime;
+
+        return rsv;
     }
 
-    private ERefsetCidIntMember makeTestComponent2() {
-        ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
-        cidIntMember.c1Uuid = new UUID(111, 5497);
-        cidIntMember.intValue = 17;
-        cidIntMember.refsetUuid = new UUID(222, 65497);
-        cidIntMember.componentUuid = new UUID(333, 75497);
-        cidIntMember.pathUuid = new UUID(444, 5469);
-        cidIntMember.statusUuid = new UUID(555, 4497);
-        cidIntMember.time = this.myTime;
-        cidIntMember.primordialComponentUuid = new UUID(666, 230);
-        cidIntMember.extraVersions = new ArrayList<ERefsetCidIntVersion>();
-        ERefsetCidIntVersion rciv = new ERefsetCidIntVersion();
-        rciv.c1Uuid = new UUID(777, 656497);
-        rciv.intValue = 16;
-        rciv.pathUuid = new UUID(888, 5469);
-        rciv.statusUuid = new UUID(999, 4497);
-        rciv.time = this.myTime;
-        cidIntMember.extraVersions.add(rciv);
+    private ERefsetIntVersion makeTestComponent2() {
         
-        return cidIntMember;
+        ERefsetIntVersion rsv = new ERefsetIntVersion();
+        rsv.intValue = 3; 
+        rsv.pathUuid = new UUID(222, 222);
+        rsv.statusUuid = new UUID(333, 333);
+        rsv.time = this.myTime;
+        
+        return rsv;
+
     }
 
 
 }
+
 
 

@@ -92,6 +92,18 @@ public class EConceptAttributesTest {
 
     }
 
+    @Test
+    public void testDifferentObjectsNotEqual() {
+        // Make two different objects 
+        testComponent1 = makeTestComponent1();
+        testComponent2 = makeTestComponent2();
+        
+        // Test that they are not equal
+        assertFalse(testComponent1.equals(testComponent2));         
+        assertFalse(testComponent2.equals(testComponent1));         
+
+    }
+
     private EConceptAttributes makeTestComponent1() {
         EConceptAttributes testComponent = new EConceptAttributes();
         testComponent.primordialComponentUuid = new UUID(2, 3);

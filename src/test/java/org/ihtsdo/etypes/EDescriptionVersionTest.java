@@ -113,6 +113,18 @@ public class EDescriptionVersionTest {
 
     }
 
+    @Test
+    public void testDifferentObjectsNotEqual() {
+        // Make two different objects 
+        testComponent1 = makeTestComponent1();
+        testComponent2 = makeTestComponent2();
+        
+        // Test that they are not equal
+        assertFalse(testComponent1.equals(testComponent2));         
+        assertFalse(testComponent2.equals(testComponent1));         
+
+    }
+
     private EDescriptionVersion makeTestComponent1() {
 
         EDescriptionVersion edv = new EDescriptionVersion();
