@@ -43,6 +43,10 @@ public class ERefsetIntMember extends ERefset<ERefsetIntVersion> {
         }
     }
 
+    public ERefsetIntMember() {
+        super();
+    }
+
     @Override
     public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);

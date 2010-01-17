@@ -49,6 +49,7 @@ public class ERelationship extends EComponent<ERelationshipVersion> {
     }
 
     public ERelationship() {
+        super();
     }
 
     @Override

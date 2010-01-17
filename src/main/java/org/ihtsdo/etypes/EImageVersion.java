@@ -31,6 +31,7 @@ public class EImageVersion extends EVersion {
     }
 
     public EImageVersion() {
+        super();
     }
 
     @Override

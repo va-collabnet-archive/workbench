@@ -41,6 +41,10 @@ public class ERefsetStrMember extends ERefset<ERefsetStrVersion> {
         }
     }
 
+    public ERefsetStrMember() {
+        super();
+    }
+
     @Override
     public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);

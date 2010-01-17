@@ -31,6 +31,10 @@ public class EIdentifierVersionUuid extends EIdentifierVersion {
         time = idp.getTime();
     }
 
+    public EIdentifierVersionUuid() {
+        super();
+    }
+
     public EIdentifierVersionUuid(EComponent<?> eComponent) {
         denotation = eComponent.primordialComponentUuid;
         if (primordialAuthority == null) {

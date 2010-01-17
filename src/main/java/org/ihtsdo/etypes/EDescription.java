@@ -50,6 +50,7 @@ public class EDescription extends EComponent<EDescriptionVersion> implements I_D
     }
 
     public EDescription() {
+        super();
     }
 
     @Override

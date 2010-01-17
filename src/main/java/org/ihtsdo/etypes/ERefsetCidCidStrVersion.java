@@ -32,6 +32,10 @@ public class ERefsetCidCidStrVersion extends EVersion {
         time = part.getTime();
     }
 
+    public ERefsetCidCidStrVersion() {
+        super();
+    }
+
     @Override
     public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);

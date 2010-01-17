@@ -14,6 +14,10 @@ public class ERefsetBooleanVersion extends EVersion {
 
     protected boolean booleanValue;
 
+    public ERefsetBooleanVersion() {
+        super();
+    }
+
     public ERefsetBooleanVersion(DataInput in) throws IOException, ClassNotFoundException {
         super();
         readExternal(in);

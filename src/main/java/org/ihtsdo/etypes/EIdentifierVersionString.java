@@ -28,6 +28,10 @@ public class EIdentifierVersionString extends EIdentifierVersion {
         time = idp.getTime();
     }
 
+    public EIdentifierVersionString() {
+        super();
+    }
+
     @Override
     public void writeDenotation(DataOutput out) throws IOException {
         out.writeUTF(denotation);

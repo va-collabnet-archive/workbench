@@ -29,6 +29,10 @@ public class EIdentifierVersionLong extends EIdentifierVersion {
         time = idp.getTime();
     }
 
+    public EIdentifierVersionLong() {
+        super();
+    }
+
     @Override
     public void writeDenotation(DataOutput out) throws IOException {
         out.writeLong(denotation);

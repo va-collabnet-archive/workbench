@@ -46,6 +46,10 @@ public class ERefsetCidLongMember extends ERefset<ERefsetCidLongVersion> {
         }
     }
 
+    public ERefsetCidLongMember() {
+        super();
+    }
+
     @Override
     public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);

@@ -41,6 +41,10 @@ public class ERefsetLongMember extends ERefset<ERefsetLongVersion> {
         }
     }
 
+    public ERefsetLongMember() {
+        super();
+    }
+
     @Override
     public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);

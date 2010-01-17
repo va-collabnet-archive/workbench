@@ -26,6 +26,10 @@ public class ERefsetLongVersion extends EVersion {
         time = part.getTime();
     }
 
+    public ERefsetLongVersion() {
+        super();
+    }
+
     @Override
     public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
