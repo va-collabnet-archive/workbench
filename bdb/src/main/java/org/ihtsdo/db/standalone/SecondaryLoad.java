@@ -21,7 +21,7 @@ public class SecondaryLoad {
 	
 	static ExecutorService executors = Executors.newCachedThreadPool();
     static LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
-    private static int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;;
+    private static int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;
     private static int converterSize = runtimeConverterSize;
     static {
         for (int i = 0; i < converterSize; i++) {
