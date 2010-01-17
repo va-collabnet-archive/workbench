@@ -16,6 +16,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -31,7 +32,19 @@ public class EConcept {
      * 
      */
     public enum REFSET_TYPES {
-        MEMBER(1, RefsetAuxiliary.Concept.MEMBER_TYPE), CID(2, RefsetAuxiliary.Concept.CONCEPT_EXTENSION), CID_CID(3, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION), CID_CID_CID(4, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION), CID_CID_STR(5, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION), STR(6, RefsetAuxiliary.Concept.STRING_EXTENSION), INT(7, RefsetAuxiliary.Concept.INT_EXTENSION), CID_INT(8, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION), BOOLEAN(9, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION), CID_STR(10, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION), CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION), CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION), LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION), ;
+        MEMBER(1, RefsetAuxiliary.Concept.MEMBER_TYPE), 
+        CID(2, RefsetAuxiliary.Concept.CONCEPT_EXTENSION), 
+        CID_CID(3, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION), 
+        CID_CID_CID(4, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION), 
+        CID_CID_STR(5, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION), 
+        STR(6, RefsetAuxiliary.Concept.STRING_EXTENSION), 
+        INT(7, RefsetAuxiliary.Concept.INT_EXTENSION), 
+        CID_INT(8, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION), 
+        BOOLEAN(9, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION), 
+        CID_STR(10, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION), 
+        CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION), 
+        CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION), 
+        LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION);
 
         private int externalizedToken;
         private int typeNid;
@@ -55,7 +68,13 @@ public class EConcept {
                     }
                 }
             }
-            return nidTypeMap.get(nid);
+            if (nidTypeMap.containsKey(nid)) {
+                return nidTypeMap.get(nid);
+            } else {
+            	I_GetConceptData typeConcept = LocalVersionedTerminology.get().getConcept(nid);
+            	throw new TerminologyException("Unknown refset type: " + nid + 
+            			" concept: " + typeConcept);
+            }
         }
 
         public void writeType(DataOutput output) throws IOException {

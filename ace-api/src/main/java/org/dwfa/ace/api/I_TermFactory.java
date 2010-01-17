@@ -256,12 +256,57 @@ public interface I_TermFactory {
 
     int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException;
 
+    /**
+     * 
+     * @param uids
+     * @param source
+     * @param idPath
+     * @param version
+     * @return
+     * @throws TerminologyException
+     * @throws IOException
+     * @deprecated new database will use uuidToNative. 
+     * There is no separate step for generating identifiers. 
+     * It will be an integral part of generating components, 
+     * not a secondary activity. 
+     */
+    @Deprecated 
     int uuidToNativeWithGeneration(Collection<UUID> uids, int source, I_Path idPath, int version)
             throws TerminologyException, IOException;
 
+    /**
+     * 
+     * @param uid
+     * @param source
+     * @param idPaths
+     * @param version
+     * @return
+     * @throws TerminologyException
+     * @throws IOException
+     * @deprecated new database will use uuidToNative. 
+     * There is no separate step for generating identifiers. 
+     * It will be an integral part of generating components, 
+     * not a secondary activity. 
+     */
+    @Deprecated 
     int uuidToNativeWithGeneration(UUID uid, int source, Collection<I_Path> idPaths, int version)
             throws TerminologyException, IOException;
 
+    /**
+     * 
+     * @param uid
+     * @param source
+     * @param idPath
+     * @param version
+     * @return
+     * @throws TerminologyException
+     * @throws IOException
+     * @deprecated new database will use uuidToNative. 
+     * There is no separate step for generating identifiers. 
+     * It will be an integral part of generating components, 
+     * not a secondary activity. 
+     */
+    @Deprecated 
     int uuidToNativeWithGeneration(UUID uid, int source, I_Path idPath, int version) throws TerminologyException,
             IOException;
 
