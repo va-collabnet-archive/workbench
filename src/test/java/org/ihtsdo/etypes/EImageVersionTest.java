@@ -143,7 +143,7 @@ public class EImageVersionTest {
         iv.typeUuid = new UUID(2231, 2532);
         iv.pathUuid = new UUID(34450, 3469);
         iv.statusUuid = new UUID(4668, 4757);
-        iv.time = System.currentTimeMillis(); 
+        iv.time = this.myTime;
         
         return iv;
     }

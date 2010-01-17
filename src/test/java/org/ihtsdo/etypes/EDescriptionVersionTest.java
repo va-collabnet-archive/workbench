@@ -134,7 +134,7 @@ public class EDescriptionVersionTest {
         edv.typeUuid  = new UUID(13, 14);
         edv.pathUuid = new UUID(4, 5);
         edv.statusUuid = new UUID(8, 9);
-        edv.time = myTime;
+        edv.time = this.myTime;
 
         return edv;
     }
@@ -147,7 +147,7 @@ public class EDescriptionVersionTest {
         edv.typeUuid  = new UUID(13, 14);
         edv.pathUuid = new UUID(4, 5);
         edv.statusUuid = new UUID(8, 9);
-        edv.time = myTime;
+        edv.time = this.myTime;
         
         return edv;
     }

@@ -126,7 +126,7 @@ public class EDescriptionTest {
         edv.typeUuid  = new UUID(13, 14);
         edv.pathUuid = new UUID(4, 5);
         edv.statusUuid = new UUID(8, 9);
-        edv.time = desc.time;
+        edv.time = this.myTime;
         desc.extraVersions.add(edv);
         return desc;
     }
@@ -140,7 +140,7 @@ public class EDescriptionTest {
         desc.typeUuid = new UUID(8, 6);
         desc.pathUuid = new UUID(3, 5);
         desc.statusUuid = new UUID(6, 2);
-        desc.time = System.currentTimeMillis();
+        desc.time = this.myTime;
         desc.primordialComponentUuid = new UUID(2, 18);
         desc.extraVersions = new ArrayList<EDescriptionVersion>();
         EDescriptionVersion edv = new EDescriptionVersion();
@@ -150,7 +150,7 @@ public class EDescriptionTest {
         edv.typeUuid  = new UUID(13, 14);
         edv.pathUuid = new UUID(4, 5);
         edv.statusUuid = new UUID(8, 9);
-        edv.time = desc.time;
+        edv.time = this.myTime;
         desc.extraVersions.add(edv);
         
         return desc;
