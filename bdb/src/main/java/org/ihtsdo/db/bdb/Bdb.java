@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.ConceptBdb;
@@ -64,6 +65,7 @@ public class Bdb {
 			nidCidMapDb = new NidCNidMapBdb(readOnly, mutable);
 			statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
 			conceptDb = new ConceptBdb(readOnly, mutable);
+			Terms.set(new BdbTermFactory());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

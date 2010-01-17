@@ -45,7 +45,6 @@ public class BinaryLoad {
 			    System.out.println(idsFile);
 			    FileInputStream fis = new FileInputStream(idsFile);
 			    BufferedInputStream bis = new BufferedInputStream(fis);
-			    DataInputStream idsDis = new DataInputStream(bis);
 			    
 			    File metaFile = new File(idsFile.getParent(), "exportData.xml");
 			    File conceptsFile = new File(idsFile.getParent(), "eConcepts.jbin");

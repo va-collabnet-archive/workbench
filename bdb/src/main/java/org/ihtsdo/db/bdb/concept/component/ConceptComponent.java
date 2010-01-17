@@ -585,10 +585,13 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object obj) {
-		return fieldsEqual((ConceptComponent<V, C>) obj);
+		if (ConceptComponent.class.isAssignableFrom(obj.getClass())) {
+			ConceptComponent<?,?> another = (ConceptComponent<?,?>) obj;
+			return this.nid == another.nid;
+		}
+		return false;
 	}
 
 	@Override

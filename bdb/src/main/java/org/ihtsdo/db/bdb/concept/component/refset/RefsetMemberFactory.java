@@ -50,6 +50,7 @@ public class RefsetMemberFactory  {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		assert memberType != null: " Member type null for nid: " + nid;
 		switch (memberType) {
 		case BOOLEAN:
 			return new BooleanMember(enclosingConcept, input);

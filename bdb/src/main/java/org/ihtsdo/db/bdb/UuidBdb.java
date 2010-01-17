@@ -160,10 +160,6 @@ public class UuidBdb extends ComponentBdb {
 	
 	public synchronized int addUuid(UUID uuid) throws IOException{
 		boolean details = false;
-		if (uuid.equals(UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2"))) {
-			System.out.println(" found: " + uuid);
-			details = true;
-		}
 		int mapIndex = uuidMaps.size() - 1;
 		int uNid = UUID_MAP_SIZE * (mapIndex) + (uuidMaps.get(mapIndex).size());
 		if (details) {
