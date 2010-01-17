@@ -153,13 +153,13 @@ public class ERefsetBooleanMemberTest {
         member.primordialComponentUuid = new UUID(328, 329);
         member.refsetUuid = new UUID(330, 331);
         member.statusUuid = new UUID(332, 333);
-        member.time = System.currentTimeMillis();
+        member.time = this.myTime;
         member.extraVersions = new ArrayList<ERefsetBooleanVersion>();
         ERefsetBooleanVersion rsv = new ERefsetBooleanVersion();
         rsv.booleanValue = true;
         rsv.pathUuid = new UUID(334, 335);
         rsv.statusUuid = new UUID(336, 337);
-        rsv.time = System.currentTimeMillis();
+        rsv.time = this.myTime;
         member.extraVersions.add(rsv);
         
         return member;
