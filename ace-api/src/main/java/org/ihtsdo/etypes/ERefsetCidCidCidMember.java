@@ -48,6 +48,10 @@ public class ERefsetCidCidCidMember extends ERefset<ERefsetCidCidCidVersion> {
         }
     }
 
+    public ERefsetCidCidCidMember()  {
+        super();
+    }
+
     @Override
     public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);

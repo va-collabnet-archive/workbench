@@ -36,6 +36,7 @@ public class EDescriptionVersion extends EVersion implements I_DescribeExternall
     }
 
     protected EDescriptionVersion() {
+        super();
     }
 
     @Override

@@ -45,6 +45,7 @@ public class ERefsetCidIntMember extends ERefset<ERefsetCidIntVersion> {
     }
 
     public ERefsetCidIntMember() {
+        super();
     }
 
     @Override

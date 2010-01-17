@@ -52,6 +52,7 @@ public class EImage extends EComponent<EImageVersion> {
     }
 
     public EImage() {
+        super();
     }
 
     @Override

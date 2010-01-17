@@ -41,6 +41,10 @@ public class ERefsetBooleanMember extends ERefset<ERefsetBooleanVersion> {
         }
     }
 
+    public ERefsetBooleanMember() {
+        super();
+    }
+
     @Override
     public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);

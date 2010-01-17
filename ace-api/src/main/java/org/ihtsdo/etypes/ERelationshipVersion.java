@@ -34,6 +34,7 @@ public class ERelationshipVersion extends EVersion {
     }
 
     public ERelationshipVersion() {
+        super();
     }
 
     @Override

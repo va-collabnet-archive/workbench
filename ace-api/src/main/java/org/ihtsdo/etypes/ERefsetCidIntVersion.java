@@ -30,6 +30,7 @@ public class ERefsetCidIntVersion extends EVersion {
     }
 
     public ERefsetCidIntVersion() {
+        super();
     }
 
     @Override
