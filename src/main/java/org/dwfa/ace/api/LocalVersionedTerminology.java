@@ -19,126 +19,81 @@ package org.dwfa.ace.api;
 import java.io.File;
 import java.io.IOException;
 
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
-
 public class LocalVersionedTerminology {
-    private static I_TermFactory factory;
 
-    private static I_Identify authorityId;
-
-    private static I_TermFactory stealthfactory;
-
-    private static Object home;
-
-    public static I_TermFactory get() {
-        if (stealthfactory != null) {
-            return stealthfactory;
-        }
-        return factory;
+    /**
+     * @deprecated user Terms instead
+     */
+	public static I_TermFactory get() {
+        return Terms.get();
     }
 
+    /**
+     * @deprecated user Terms instead
+     */
     public static void close(I_TermFactory factory) {
-        if (LocalVersionedTerminology.factory == factory) {
-            LocalVersionedTerminology.factory = null;
-        }
+        Terms.close(factory);
     }
 
+    /**
+     * @deprecated user Terms instead
+     */
     public static void set(I_TermFactory factory) {
-        if (stealthfactory != null && stealthfactory == factory) {
-            // stealth factory set
-        } else {
-            if (LocalVersionedTerminology.factory == null || LocalVersionedTerminology.factory == factory) {
-                setFactory(factory);
-            } else {
-                try {
-                    if (authorityId.equals(factory.getAuthorityId())) {
-                        setFactory(factory);
-                    } else if (authorityId.equals(factory.getPreviousAuthorityId())) {
-                        setFactory(factory);
-                    } else {
-                        AceLog.getAppLog().info("authorityId: " + authorityId);
-                        AceLog.getAppLog().info("factory.getAuthorityId(): " + factory.getAuthorityId());
-                        AceLog.getAppLog()
-                            .info("factory.getPreviousAuthorityId(): " + factory.getPreviousAuthorityId());
-                        throw new RuntimeException("LocalVersionedTerminology.factory is already set to: "
-                            + LocalVersionedTerminology.factory + " new factory: " + factory);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
+        Terms.set(factory);
     }
 
-    private static void setFactory(I_TermFactory factory) {
-        AceLog.getAppLog().info("Setting LocalVersionedTerminology to: " + factory);
-        LocalVersionedTerminology.factory = factory;
-        try {
-            LocalVersionedTerminology.authorityId = factory.getAuthorityId();
-        } catch (TerminologyException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void open(Class<I_ImplementTermFactory> factoryClass, Object envHome, boolean readOnly, Long cacheSize)
+    /**
+     * @deprecated user Terms instead
+     */
+     public static void open(Class<I_ImplementTermFactory> factoryClass, Object envHome, boolean readOnly, Long cacheSize)
             throws InstantiationException, IllegalAccessException, IOException {
-        if (stealthfactory != null && stealthfactory == factory) {
-            // stealth factory set
-        } else {
-            I_ImplementTermFactory factory = factoryClass.newInstance();
-            factory.setup(envHome, readOnly, cacheSize);
-            home = envHome;
-            set(factory);
-        }
+        Terms.open(factoryClass, envHome, readOnly, cacheSize);
     }
 
+     /**
+      * @deprecated user Terms instead
+      */
     public static void open(Class<I_ImplementTermFactory> factoryClass, Object envHome, boolean readOnly,
             Long cacheSize, DatabaseSetupConfig databaseSetupConfig) throws InstantiationException,
             IllegalAccessException, IOException {
-        if (stealthfactory != null && stealthfactory == factory) {
-            // stealth factory set
-        } else {
-            I_ImplementTermFactory factory = factoryClass.newInstance();
-            factory.setup(envHome, readOnly, cacheSize, databaseSetupConfig);
-            home = envHome;
-            set(factory);
-        }
+        Terms.open(factoryClass, envHome, readOnly, cacheSize);
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * @deprecated user Terms instead
+     */
     public static void openDefaultFactory(File envHome, boolean readOnly, Long cacheSize)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
-        if (stealthfactory != null && stealthfactory == factory) {
-            // stealth factory set
-        } else {
-            open((Class<I_ImplementTermFactory>) Class.forName("org.dwfa.vodb.VodbEnv"), envHome, readOnly, cacheSize);
-        }
+        Terms.openDefaultFactory(envHome, readOnly, cacheSize);
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * @deprecated user Terms instead
+     */
     public static void createFactory(File envHome, boolean readOnly, Long cacheSize, DatabaseSetupConfig dbSetupConfig)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
-        if (stealthfactory != null && stealthfactory == factory) {
-            // stealth factory set
-        } else {
-            open((Class<I_ImplementTermFactory>) Class.forName("org.dwfa.vodb.VodbEnv"), envHome, readOnly, cacheSize,
-                dbSetupConfig);
-        }
+        Terms.createFactory(envHome, readOnly, cacheSize, dbSetupConfig);
     }
 
+    /**
+     * @deprecated user Terms instead
+     */
     public static Object getHome() {
-        return home;
+        return Terms.getHome();
     }
 
+    /**
+     * @deprecated user Terms instead
+     */
     public static I_TermFactory getStealthfactory() {
-        return stealthfactory;
+        return Terms.getStealthfactory();
     }
 
+    /**
+     * @deprecated user Terms instead
+     */
     public static void setStealthfactory(I_TermFactory stealthfactory) {
-        LocalVersionedTerminology.stealthfactory = stealthfactory;
+        Terms.setStealthfactory(stealthfactory);
     }
 
 }

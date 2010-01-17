@@ -5,12 +5,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
