@@ -60,6 +60,7 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -1403,8 +1404,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         this.relOrigins = relOrigins;
     }
 
-    public List<I_ThinExtByRefVersioned> getExtensions() throws IOException, TerminologyException {
-        return LocalVersionedTerminology.get().getAllExtensionsForComponent(getConceptId());
+    public List<? extends I_ThinExtByRefVersioned> getExtensions() throws IOException, TerminologyException {
+        return Terms.get().getAllExtensionsForComponent(getConceptId());
     }
 
     public Object getDenotation(int authorityNid) throws IOException, TerminologyException {

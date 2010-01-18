@@ -172,11 +172,14 @@ public class IntSet implements ListDataListener, I_IntSet {
      * 
      * @see org.dwfa.ace.api.I_IntSet#addAll(int[])
      */
-    public synchronized void addAll(int[] keys) {
-        for (int i = 0; i < keys.length; i++) {
-            addNoIntervalAdded(keys[i]);
-        }
+    public synchronized IntSet addAll(int[] keys) {
+    	HashSet<Integer> members = getAsSet();
+    	for (int key: keys) {
+    		members.add(key);
+    	}
+    	replaceWithSet(members);
         intervalAdded(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
+        return this;
     }
 
     /*
@@ -185,11 +188,30 @@ public class IntSet implements ListDataListener, I_IntSet {
      * @see org.dwfa.ace.api.I_IntSet#removeAll(int[])
      */
     public synchronized void removeAll(int[] keys) {
-        for (int i = 0; i < keys.length; i++) {
-            remove(keys[i]);
-        }
+    	HashSet<Integer> members = getAsSet();
+    	for (int key: keys) {
+    		members.remove(key);
+    	}
+    	replaceWithSet(members);
         intervalRemoved(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
     }
+
+	public HashSet<Integer> getAsSet() {
+		HashSet<Integer> members = new HashSet<Integer>();
+    	for (int elem: setValues) {
+    		members.add(elem);
+    	}
+		return members;
+	}
+
+	public void replaceWithSet(HashSet<Integer> members) {
+		setValues = new int[members.size()];
+    	int i = 0;
+    	for (int elem: members) {
+    		setValues[i++] = elem;
+    	}
+    	Arrays.sort(setValues);
+	}
 
     /*
      * (non-Javadoc)

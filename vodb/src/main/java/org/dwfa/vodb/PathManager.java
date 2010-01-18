@@ -25,8 +25,8 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.BeanPropertyMap;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TerminologyHelper;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.ThinExtByRefPartProperty;
@@ -98,9 +98,9 @@ public class PathManager implements I_Manage<I_Path> {
     public Set<I_Path> getAll() throws TerminologyException {
         try {
             HashSet<I_Path> result = new HashSet<I_Path>();
-            for (I_ThinExtByRefPartConcept extPart : refsetHelper.<I_ThinExtByRefPartConcept> getAllCurrentRefsetExtensions(
-                pathRefsetId, pathConceptId)) {
-                result.add(get(extPart.getC1id()));
+            for (I_ThinExtByRefPartConcept extPart : refsetHelper.<I_ThinExtByRefPartConcept> 
+            	getAllCurrentRefsetExtensions(pathRefsetId, pathConceptId)) {
+                	result.add(get(extPart.getC1id()));
             }
             return result;
 
@@ -197,7 +197,7 @@ public class PathManager implements I_Manage<I_Path> {
 
     protected void autoCommit() throws Exception {
         if (autoCommit) {
-            LocalVersionedTerminology.get().commit();
+            Terms.get().commit();
         }
     }
 

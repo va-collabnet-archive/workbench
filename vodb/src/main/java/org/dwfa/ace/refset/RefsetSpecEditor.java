@@ -79,6 +79,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
@@ -1042,7 +1043,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 if (newRefset == false) {
                     addChildrenExpandedNodes(oldRoot);
                 }
-                List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get()
+                List<? extends I_ThinExtByRefVersioned> extensions =Terms.get()
                     .getAllExtensionsForComponent(localRefsetSpecConcept.getConceptId(), true);
                 HashMap<Integer, RefsetSpecTreeNode> extensionMap = new HashMap<Integer, RefsetSpecTreeNode>();
                 HashSet<Integer> fetchedComponents = new HashSet<Integer>();
@@ -1086,10 +1087,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             }
         }
 
-        private void addExtensionsToMap(List<I_ThinExtByRefVersioned> extensions,
+        private void addExtensionsToMap(List<? extends I_ThinExtByRefVersioned> list,
                 HashMap<Integer, RefsetSpecTreeNode> extensionMap, HashSet<Integer> fetchedComponents)
                 throws IOException {
-            for (I_ThinExtByRefVersioned ext : extensions) {
+            for (I_ThinExtByRefVersioned ext : list) {
                 if (ext.getRefsetId() == localRefsetSpecConcept.getConceptId()) {
                     int currentTupleCount = ext.getTuples(ace.getAceFrameConfig().getAllowedStatus(),
                         ace.getAceFrameConfig().getViewPositionSet(), true).size();
@@ -1097,7 +1098,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(ext, ace.getAceFrameConfig()));
                         if (fetchedComponents.contains(ext.getMemberId()) == false) {
                             fetchedComponents.add(ext.getMemberId());
-                            addExtensionsToMap(LocalVersionedTerminology.get().getAllExtensionsForComponent(
+                            addExtensionsToMap(Terms.get().getAllExtensionsForComponent(
                                 ext.getMemberId(), true), extensionMap, fetchedComponents);
                         }
                     }
