@@ -274,7 +274,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 
         int conceptId = concept.getConceptId();
 
-        List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(conceptId);
+        List<? extends I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(conceptId);
 
         // process each refset associated with this concept and work out
         // if any of them are the refset we are looking for

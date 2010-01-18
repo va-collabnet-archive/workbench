@@ -22,12 +22,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -52,7 +52,6 @@ public class ExternalTermPublisher {
 	private List<DisplayName> displayNames;
 	private I_RefsetUsageInterpreter interpreter;
 	private List<ValuePair> wildcardItems;
-	private I_TermFactory termFactory;
 	private HashSet<I_Position> positions;
 	private I_IntSet statusValues;
 	private List<ExternalTermRecord> recordQueue;
@@ -67,7 +66,6 @@ public class ExternalTermPublisher {
 	{
 		this.exportFactory = exportFactory;
 		this.interpreter = exportFactory.getInterpreter();
-		this.termFactory = LocalVersionedTerminology.get();
 		this.converter = this.exportFactory.getValueConverter(Integer.MAX_VALUE);
 	}
 
@@ -108,7 +106,7 @@ public class ExternalTermPublisher {
 			e.printStackTrace();
 		}
     	
-    	this.startingVersion = termFactory.convertToThinVersion(parsedDate.getTime());
+    	this.startingVersion = Terms.get().convertToThinVersion(parsedDate.getTime());
     	this.converter = this.exportFactory.getValueConverter(startingVersion);
 	}
 
@@ -135,7 +133,7 @@ public class ExternalTermPublisher {
 		this.rootConcept = concept;
 		int extensionsProcessed = 0;
 		for (I_DescriptionVersioned desc : descs) {
-			I_GetConceptData descriptionConcept = termFactory.getConcept(desc.getConceptId());
+			I_GetConceptData descriptionConcept = Terms.get().getConcept(desc.getConceptId());
 			extensionsProcessed += processDescriptionConcept(descriptionConcept, desc);
 			writeWildcardValues();
 			saveAndCloseRecordQueue(concept, standAloneRecords, commonItemRecords);
@@ -177,14 +175,14 @@ public class ExternalTermPublisher {
 	}
 
     private int processDescriptionConcept(I_GetConceptData concept, I_DescriptionVersioned description) throws TerminologyException, Exception {
-    	List<I_ThinExtByRefVersioned> extensions;
+    	List<? extends I_ThinExtByRefVersioned> extensions;
     	this.descConcept = concept;
     	if (description != null)
-    		extensions = termFactory.getAllExtensionsForComponent(description.getDescId());
+    		extensions = Terms.get().getAllExtensionsForComponent(description.getDescId());
     	else
-    		extensions = termFactory.getAllExtensionsForComponent(concept.getConceptId());
+    		extensions = Terms.get().getAllExtensionsForComponent(concept.getConceptId());
     	for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
-        	if (termFactory.hasConcept(thinExtByRefVersioned.getRefsetId())) {
+        	if (Terms.get().hasConcept(thinExtByRefVersioned.getRefsetId())) {
                 for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(statusValues,
                     positions, false, false)) {
                 	processExtension(thinExtByRefTuple, concept, description);
@@ -201,7 +199,7 @@ public class ExternalTermPublisher {
     		I_DescriptionVersioned description) throws Exception {
     	
     	int refsetId = extensionTuple.getRefsetId();
-    	I_GetConceptData refsetConcept = termFactory.getConcept(refsetId);
+    	I_GetConceptData refsetConcept = Terms.get().getConcept(refsetId);
     	mineRefsetsForItems(refsetConcept, extensionTuple, extendedConcept, description, 
     			getPreviousVersion(extensionTuple));
     }

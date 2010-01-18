@@ -35,6 +35,7 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -405,7 +406,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         UUID componentUuid = (UUID) currentRow.get(MemberRefsetHandler.COMPONENT_ID);
         UUID memberUuid = (UUID) currentRow.get(MemberRefsetHandler.ID);
         int componentNid = getNid(componentUuid);
-        List<I_ThinExtByRefVersioned> extensions = getTermFactory().getAllExtensionsForComponent(componentNid, true);
+        List<? extends I_ThinExtByRefVersioned> extensions = Terms.get().getAllExtensionsForComponent(componentNid, true);
 
         I_ThinExtByRefVersioned versioned = null;
         int refsetNid = getNid(refsetUuid);
