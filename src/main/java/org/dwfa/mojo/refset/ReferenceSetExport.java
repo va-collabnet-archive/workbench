@@ -341,7 +341,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * @throws Exception on DB or file error.
      */
     private void exportRefsets(int componentId) throws TerminologyException, Exception {
-        List<I_ThinExtByRefVersioned> extensions = tf.getAllExtensionsForComponent(componentId);
+        List<? extends I_ThinExtByRefVersioned> extensions = tf.getAllExtensionsForComponent(componentId);
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
             if (testSpecification(thinExtByRefVersioned.getRefsetId())) {
                 for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses,
