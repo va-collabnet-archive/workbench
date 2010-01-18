@@ -394,12 +394,12 @@ public class TupleFileUtil {
         }
 
         // add refset spec members
-        List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(
+        List<? extends I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(
             refsetSpec.getConceptId(), true);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptId());
-        RefsetQueryFactory.addExtensionsToMap(extensions, extensionMap, fetchedComponents);
+        RefsetQueryFactory.addExtensionsToMap((List<I_ThinExtByRefVersioned>) extensions, extensionMap, fetchedComponents);
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
         for (DefaultMutableTreeNode extNode : extensionMap.values()) {

@@ -1,14 +1,13 @@
 package org.ihtsdo.etypes;
 
-import java.io.IOException;
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.IOException;
 import java.util.UUID;
 
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.HashFunction;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public abstract class ERefset<V extends EVersion> extends EComponent<V> {

@@ -111,7 +111,7 @@ public class RefsetMatch extends AbstractSearchTest {
 
     private boolean isComponentInRefset(I_ConfigAceFrame frameConfig, I_TermFactory termFactory, int componentId,
             int refsetId) throws IOException {
-        List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(componentId);
+        List<? extends I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(componentId);
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
             List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();

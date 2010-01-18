@@ -607,10 +607,10 @@ public interface I_TermFactory {
     List<I_GetExtensionData> getExtensionsForComponent(int componentId) throws IOException;
 
     // TODO We need a method call that will include the concept id...
-    List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId) throws IOException;
+    List<? extends I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId) throws IOException;
 
     // TODO We need a method call that will include the concept id...
-    List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId, boolean addUncommitted)
+    List<? extends I_ThinExtByRefVersioned> getAllExtensionsForComponent(int componentId, boolean addUncommitted)
             throws IOException;
 
     String getStats() throws IOException;

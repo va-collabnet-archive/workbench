@@ -255,7 +255,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     // ** checked
     protected boolean componentIsMemberOf(int componentId) throws IOException, TerminologyException {
         // get all extensions for this concept
-        List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(componentId);
+        List<? extends I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(componentId);
 
         for (I_ThinExtByRefVersioned ext : extensions) {
             if (ext.getRefsetId() == ((I_GetConceptData) queryConstraint).getConceptId()) { // check
