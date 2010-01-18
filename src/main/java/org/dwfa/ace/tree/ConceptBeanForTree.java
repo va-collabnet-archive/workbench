@@ -346,7 +346,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.isParentOfOrEqualTo(child, addUncommitted);
     }
 
-    public List<I_ThinExtByRefVersioned> getExtensions() throws IOException, TerminologyException {
+    public List<? extends I_ThinExtByRefVersioned> getExtensions() throws IOException, TerminologyException {
         return bean.getExtensions();
     }
 
