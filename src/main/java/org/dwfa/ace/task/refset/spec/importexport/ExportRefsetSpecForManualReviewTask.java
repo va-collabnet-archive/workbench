@@ -28,13 +28,14 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -113,9 +114,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         returnCondition = Condition.ITEM_COMPLETE;
         delimiter = "\t";
         try {
-            activityPanel =
-                    LocalVersionedTerminology.get().newActivityPanel(true,
-                        LocalVersionedTerminology.get().getActiveAceFrameConfig());
+            activityPanel = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig());
             I_ConfigAceFrame configFrame =
                     (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
@@ -139,7 +138,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                 + configFrame.getRefsetSpecInSpecEditor().getInitialText());
             activityPanel.setProgressInfoLower("<html><font color='black'> In progress.");
 
-            exportRefset(outputFileName, LocalVersionedTerminology.get().getConcept(new UUID[] { uuid }));
+            exportRefset(outputFileName, Terms.get().getConcept(new UUID[] { uuid }));
 
             activityPanel.setProgressInfoUpper("Exporting refset spec : "
                 + configFrame.getRefsetSpecInSpecEditor().getInitialText());
@@ -161,7 +160,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         String fileNameNoTxt = fileNameWithTxt.replaceAll(".txt", "");
         File outputFile = new File(fileNameNoTxt + ".txt");
 
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
         RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
         I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
         BufferedWriter exportFileWriter = new BufferedWriter(new FileWriter(outputFile, false));
@@ -171,8 +170,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                 "No member spec found. Please put the refset to be exported in the refset spec panel.");
         }
 
-        List<I_ThinExtByRefVersioned> extensions =
-                LocalVersionedTerminology.get().getRefsetExtensionMembers(memberRefset.getConceptId());
+        List<I_ThinExtByRefVersioned> extensions = termFactory.getRefsetExtensionMembers(memberRefset.getConceptId());
 
         writeRefsetName(exportFileWriter, memberRefset);
         writeHeader(exportFileWriter);
@@ -251,13 +249,13 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
     private void writeRefsetName(BufferedWriter exportFileWriter, I_GetConceptData memberRefset)
             throws TerminologyException, Exception {
         exportFileWriter.write("Refset Name: ");
-        exportFileWriter.write(getDescription(LocalVersionedTerminology.get().getConcept(
+        exportFileWriter.write(getDescription(Terms.get().getConcept(
             ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), memberRefset.getConceptId()));
         exportFileWriter.newLine();
     }
 
     private String getSctId(int componentId) throws TerminologyException, IOException {
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
         I_Identify idVersioned = termFactory.getId(componentId);
         int snomedIntegerId =
                 termFactory.getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNid();
@@ -279,9 +277,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         }
     }
 
-    private String getDescription(I_GetConceptData descType, int conceptId) throws Exception {
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
-        I_GetConceptData concept = termFactory.getConcept(conceptId);
+    private String getDescription(I_GetConceptData descType, int componentId) throws Exception {
+        I_TermFactory termFactory = Terms.get();
         SpecRefsetHelper helper = new SpecRefsetHelper();
 
         I_IntSet allowedTypes = termFactory.newIntSet();
@@ -290,9 +287,17 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         String latestDescription = null;
         int latestVersion = Integer.MIN_VALUE;
 
-        List<? extends I_DescriptionTuple> descriptionResults =
-                concept.getDescriptionTuples(helper.getCurrentStatusIntSet(), allowedTypes, termFactory
-                    .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
+        List<? extends I_DescriptionTuple> descriptionResults = null;
+        if (termFactory.hasConcept(componentId)) {
+            I_GetConceptData concept = termFactory.getConcept(componentId);
+            descriptionResults =
+                    concept.getDescriptionTuples(helper.getCurrentStatusIntSet(), allowedTypes, termFactory
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
+        } else {
+            UUID descUuid = termFactory.getId(componentId).getUUIDs().iterator().next();
+            I_DescriptionVersioned descVersioned = termFactory.getDescription(descUuid.toString());
+            descriptionResults = descVersioned.getTuples(true);
+        }
 
         // find the latest tuple, so that the latest edited version of the
         // description is always used
@@ -307,7 +312,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
     }
 
     private String getDescription(TermEntry descriptionTypeTermEntry, int conceptId) throws Exception {
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
         I_GetConceptData descType = termFactory.getConcept(descriptionTypeTermEntry.getIds());
         return getDescription(descType, conceptId);
     }
