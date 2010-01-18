@@ -37,7 +37,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -146,7 +146,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
 
         try {
 
-            termFactory = LocalVersionedTerminology.get();
+            termFactory = Terms.get();
 
             retiredStatusId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
 
@@ -227,7 +227,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
 
             if (latestPart != null && latestPart.getStatusId() != retiredStatusId) {
 
-                for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
+                for (I_Path editPath : termFactory.getActiveAceFrameConfig().getPromotionPathSet()) {
                     I_ThinExtByRefPart newPart =
                             (I_ThinExtByRefPart) latestPart.makeAnalog(statusConcept.getConceptId(), editPath
                                 .getConceptId(), Long.MAX_VALUE);
@@ -244,7 +244,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
         for (I_GetConceptData currentConcept : concepts) {
             List<? extends I_DescriptionVersioned> descs = currentConcept.getDescriptions();
             for (I_DescriptionVersioned descVersioned : descs) {
-                for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
+                for (I_Path editPath : termFactory.getActiveAceFrameConfig().getPromotionPathSet()) {
                     I_DescriptionPart newPart = descVersioned.getLastTuple().getMutablePart();
                     if (newPart.getStatusId() != retiredStatusId) {
                         newPart.makeAnalog(statusConcept.getConceptId(), editPath.getConceptId(), Long.MAX_VALUE);
@@ -261,7 +261,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
         for (I_GetConceptData currentConcept : concepts) {
             List<? extends I_RelVersioned> rels = currentConcept.getSourceRels();
             for (I_RelVersioned relVersioned : rels) {
-                for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
+                for (I_Path editPath : termFactory.getActiveAceFrameConfig().getPromotionPathSet()) {
                     I_RelPart newPart = relVersioned.getLastTuple().getMutablePart();
                     if (newPart.getStatusId() != retiredStatusId) {
                         newPart.makeAnalog(statusConcept.getConceptId(), editPath.getConceptId(), Long.MAX_VALUE);
@@ -279,7 +279,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             I_ConceptAttributeVersioned v = currentConcept.getConceptAttributes();
 
             int index = v.getMutableParts().size() - 1;
-            for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
+            for (I_Path editPath : termFactory.getActiveAceFrameConfig().getPromotionPathSet()) {
                 I_ConceptAttributePart part;
                 if (index >= 0) {
                     part =

@@ -126,9 +126,6 @@ public class AddPromotionConceptsToListViewTask extends AbstractTask {
                     refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(memberRefsetConcept
                         .getConceptId()), promotionStatusConcept);
 
-            System.out.println("Filtered concepts of promotion status: " + promotionStatusConcept.getInitialText());
-            System.out.println(filteredConcepts.size());
-
             I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
             JList conceptList = config.getBatchConceptList();
             I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
