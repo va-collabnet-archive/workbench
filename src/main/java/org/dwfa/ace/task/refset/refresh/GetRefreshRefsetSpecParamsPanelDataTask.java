@@ -41,6 +41,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.Priority;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.tasks.util.FileContent;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -321,7 +322,9 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                     // -----------------------------------------
                     // File attachments
                     // -----------------------------------------
-                    process.setProperty(fileAttachmentsPropName, fileAttachments);
+                    for (File file : fileAttachments) {
+                        process.writeAttachment(file.getName(), new FileContent(file));
+                    }
 
                     // Under normal conditions this is where we should return from
                     return Condition.ITEM_COMPLETE;
