@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -77,7 +77,22 @@ public class ThinExtBinder extends TupleBinding {
     private static int CONCEPT_STRING_ID = 16;
 
     public static enum EXT_TYPE {
-        BOOLEAN(BOOLEAN_ID, "boolean", I_ThinExtByRefPartBoolean.class), CONCEPT(CONCEPT_ID, "concept", I_ThinExtByRefPartConcept.class), CON_INT(CON_INT_ID, "con int", I_ThinExtByRefPartConceptInt.class), STRING(STRING_ID, "string", I_ThinExtByRefPartString.class), INTEGER(INTEGER_ID, "integer", I_ThinExtByRefPartInteger.class), MEASUREMENT(MEASUREMENT_ID, "measurement", I_ThinExtByRefPartMeasurement.class), LANGUAGE(LANGUAGE_ID, "language", I_ThinExtByRefPartLanguage.class), SCOPED_LANGUAGE(SCOPED_LANGUAGE_ID, "scoped language", I_ThinExtByRefPartLanguageScoped.class), TEMPLATE_FOR_REL(TEMPLATE_FOR_REL_ID, "template for rel", ThinExtByRefPartTemplateForRel.class), TEMPLATE(TEMPLATE_ID, "template", ThinExtByRefPartTemplate.class), CROSS_MAP_FOR_REL(CROSS_MAP_FOR_REL_ID, "cross map for rel", ThinExtByRefPartCrossmapForRel.class), CROSS_MAP(CROSS_MAP_ID, "cross map", ThinExtByRefPartCrossmap.class), CONCEPT_CONCEPT(CONCEPT_CONCEPT_ID, "concept-concept", I_ThinExtByRefPartConceptConcept.class), CONCEPT_CONCEPT_CONCEPT(CONCEPT_CONCEPT_CONCEPT_ID, "concept-concept-concept", I_ThinExtByRefPartConceptConceptConcept.class), CONCEPT_CONCEPT_STRING(CONCEPT_CONCEPT_STRING_ID, "concept-concept-string", I_ThinExtByRefPartConceptConceptString.class), CONCEPT_STRING(CONCEPT_STRING_ID, "concept-string", I_ThinExtByRefPartConceptString.class), ;
+        BOOLEAN(BOOLEAN_ID, "boolean", I_ThinExtByRefPartBoolean.class),
+        CONCEPT(CONCEPT_ID, "concept", I_ThinExtByRefPartConcept.class),
+        CON_INT(CON_INT_ID, "con int", I_ThinExtByRefPartConceptInt.class),
+        STRING(STRING_ID, "string", I_ThinExtByRefPartString.class),
+        INTEGER(INTEGER_ID, "integer", I_ThinExtByRefPartInteger.class),
+        MEASUREMENT(MEASUREMENT_ID, "measurement", I_ThinExtByRefPartMeasurement.class),
+        LANGUAGE(LANGUAGE_ID, "language", I_ThinExtByRefPartLanguage.class),
+        SCOPED_LANGUAGE(SCOPED_LANGUAGE_ID, "scoped language", I_ThinExtByRefPartLanguageScoped.class),
+        TEMPLATE_FOR_REL(TEMPLATE_FOR_REL_ID, "template for rel", ThinExtByRefPartTemplateForRel.class),
+        TEMPLATE(TEMPLATE_ID, "template", ThinExtByRefPartTemplate.class),
+        CROSS_MAP_FOR_REL(CROSS_MAP_FOR_REL_ID, "cross map for rel", ThinExtByRefPartCrossmapForRel.class),
+        CROSS_MAP(CROSS_MAP_ID, "cross map", ThinExtByRefPartCrossmap.class),
+        CONCEPT_CONCEPT(CONCEPT_CONCEPT_ID, "concept-concept", I_ThinExtByRefPartConceptConcept.class),
+        CONCEPT_CONCEPT_CONCEPT(CONCEPT_CONCEPT_CONCEPT_ID, "concept-concept-concept", I_ThinExtByRefPartConceptConceptConcept.class),
+        CONCEPT_CONCEPT_STRING(CONCEPT_CONCEPT_STRING_ID, "concept-concept-string", I_ThinExtByRefPartConceptConceptString.class),
+        CONCEPT_STRING(CONCEPT_STRING_ID, "concept-string", I_ThinExtByRefPartConceptString.class), ;
 
         private int enumId;
 
@@ -360,7 +375,7 @@ public class ThinExtBinder extends TupleBinding {
                 part.setStatusId(ti.readInt());
                 part.setC1id(ti.readInt());
                 part.setC2id(ti.readInt());
-                part.setStr(ti.readString());
+                part.setStringValue(ti.readString());
                 versioned.addVersion(part);
             }
             break;
@@ -791,7 +806,7 @@ public class ThinExtBinder extends TupleBinding {
                 to.writeInt(part.getStatusId());
                 to.writeInt(part.getC1id());
                 to.writeInt(part.getC2id());
-                to.writeString(part.getStr());
+                to.writeString(part.getStringValue());
             }
             break;
         case CONCEPT_STRING:

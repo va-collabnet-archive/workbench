@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,6 +45,7 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.classifier.DiffTableModel;
 import org.dwfa.ace.classifier.EquivTableModel;
 import org.dwfa.ace.list.TerminologyIntList;
@@ -59,6 +60,9 @@ import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
+import org.dwfa.ace.table.refset.RefsetMemberTableModel;
+import org.dwfa.ace.table.refset.StringWithExtTuple;
+import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
@@ -67,13 +71,17 @@ import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.I_DescribeConceptUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
+import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.ThinExtByRefPartConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptConcept;
+import org.dwfa.vodb.types.ThinExtByRefPartConceptConceptString;
 
 public class TerminologyTransferHandler extends TransferHandler {
 
     /**
-	 * 
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
 
     public static DataFlavor conceptBeanFlavor;
@@ -158,6 +166,29 @@ public class TerminologyTransferHandler extends TransferHandler {
                 case VERSION:
                 case PATH:
                 case GROUP:
+                default:
+                    throw new UnsupportedOperationException("Can't convert " + columnDesc + " to a concept bean");
+                }
+            } else if (RefsetMemberTableModel.class.isAssignableFrom(tableModel.getClass())) {
+                TableModel rtm = termTable.getModel();
+                StringWithExtTuple swrt = (StringWithExtTuple) rtm.getValueAt(termTable.getSelectedRow(),
+                    termTable.getSelectedColumn());
+                I_ThinExtByRefTuple rel = swrt.getTuple();
+                TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
+                REFSET_FIELDS columnDesc = (REFSET_FIELDS) column.getIdentifier();
+                switch (columnDesc) {
+                case REFSET_ID :
+                    return new ConceptTransferable(ConceptBean.get(rel.getRefsetId()));
+                case CONCEPT_ID:
+                    return new ConceptTransferable(ConceptBean.get(((ThinExtByRefPartConceptConcept)rel.getPart()).getC1id()));
+                case CONCEPT_2_ID:
+                    return new ConceptTransferable(ConceptBean.get(((ThinExtByRefPartConceptConcept)rel.getPart()).getC2id()));
+                case STATUS:
+                    return new ConceptTransferable(ConceptBean.get(rel.getStatusId()));
+                case CONCEPT_CONCEPT_STRING_VALUE:
+                    return new StringSelection(((ThinExtByRefPartConceptConceptString)rel.getPart()).getStringValue());
+                case VERSION:
+                case PATH:
                 default:
                     throw new UnsupportedOperationException("Can't convert " + columnDesc + " to a concept bean");
                 }

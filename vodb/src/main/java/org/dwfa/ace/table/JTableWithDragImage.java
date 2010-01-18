@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,6 +49,8 @@ import javax.swing.table.TableModel;
 
 import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
@@ -78,7 +80,7 @@ import com.sleepycat.je.DatabaseException;
 
 public class JTableWithDragImage extends JTable {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -197,9 +199,15 @@ public class JTableWithDragImage extends JTable {
                     return new StringSelection(swextt.getCellText());
                 case CONCEPT_ID:
                     return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartConcept) swextt.getTuple()
-                        .getPart()).getConceptId()));
+                        .getPart()).getC1id()));
+                case CONCEPT_2_ID:
+                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartConceptConcept) swextt.getTuple()
+                        .getPart()).getC2id()));
                 case INTEGER_VALUE:
                     return new StringSelection(swextt.getCellText());
+                case CONCEPT_CONCEPT_STRING_VALUE:
+                    return new StringSelection(
+                        ((I_ThinExtByRefPartConceptConceptString) swextt.getTuple().getPart()).getStringValue());
                 case ACCEPTABILITY:
                     return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple()
                         .getPart()).getAcceptabilityId()));

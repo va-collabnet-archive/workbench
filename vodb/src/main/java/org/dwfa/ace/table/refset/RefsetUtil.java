@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -173,7 +173,7 @@ public class RefsetUtil {
                 .getStatusPopupIds());
             JComboBox comboBox = new JComboBox() {
                 /**
-                 * 
+                 *
                  */
                 private static final long serialVersionUID = 1L;
 
@@ -235,6 +235,27 @@ public class RefsetUtil {
                 .getRefsetPreferencesForToggle(toggle)
                 .getConIntPreferences()
                 .getConceptPopupIds());
+
+            break;
+        case CONCEPT_CONCEPT_STRING:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getConceptConceptStringPreferences()
+                .getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getConceptConceptStringPreferences()
+                .getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getConceptConceptStringPreferences()
+                .getConceptPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_2_ID, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getConceptConceptStringPreferences()
+                .getConceptPopupIds());
+            extTable.getColumn(REFSET_FIELDS.CONCEPT_CONCEPT_STRING_VALUE).setCellEditor(
+                new RefsetMemberTableModel.StringExtFieldEditor());
 
             break;
         case INTEGER:

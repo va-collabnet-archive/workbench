@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -444,14 +444,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
              * Could not get the focus system working. TODO get focus system
              * working with alerts. component.addFocusListener(new
              * FocusListener() {
-             * 
+             *
              * public void focusGained(FocusEvent e) {
              * AceLog.getAppLog().info("Alert is now focused"); }
-             * 
+             *
              * public void focusLost(FocusEvent e) { // nothing to do...
-             * 
+             *
              * }
-             * 
+             *
              * });
              */
         }
@@ -737,8 +737,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     /*
-	 *
-	 */
+     *
+     */
     public static void commit() {
         if (commitInProgress) {
             AceLog.getAppLog().alertAndLogException(new Exception("Commit is already in process."));
@@ -1247,7 +1247,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 }
             }
         }
-        
+
 
         public void componentHidden(ComponentEvent e) {
         }
@@ -1361,8 +1361,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private static String taxonomyTabLabel = "taxonomy";
 
     /**
-	 *
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
 
     private class RightPalettePoint implements I_GetPalettePoint {
@@ -1420,14 +1420,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     /**
      * http://java.sun.com/developer/JDCTechTips/2003/tt1210.html#2
-     * 
+     *
      * @param aceFrameConfig
      * @throws PrivilegedActionException
      * @throws IOException
      * @throws ConfigurationException
      * @throws LoginException
      * @throws DatabaseException
-     * 
+     *
      * @throws DatabaseException
      */
     public ACE(Configuration config, String pluginRoot) {
@@ -1884,9 +1884,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
          * Code to add a popup menu to the queue list...
          * queueViewer.getTableOfQueues().addMouseListener(new MouseAdapter() {
          * public void mousePressed(MouseEvent e) { showPopup(e); }
-         * 
+         *
          * public void mouseReleased(MouseEvent e) { showPopup(e); }
-         * 
+         *
          * private void showPopup(MouseEvent e) { if (e.isPopupTrigger()) {
          * JPopupMenu popupMenu = new JPopupMenu(); JMenuItem menuItem = new
          * JMenuItem("Hide"); //menuItem.addActionListener(new
@@ -2530,6 +2530,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 "Concept types for popup:")));
 
             break;
+        case CONCEPT_CONCEPT_STRING:
+            addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
+                .getConceptConceptStringPreferences(), type);
+            editDefaultsTabs.addTab("concept types", new JScrollPane(makePopupConfigPanel(
+                aceFrameConfig.getRefsetPreferencesForToggle(toggle).getConceptConceptStringPreferences().getConceptPopupIds(),
+                "Concept types for popup:")));
+
+            break;
         case INTEGER:
             addDefaults(editDefaultsTabs, (RefsetDefaults) aceFrameConfig.getRefsetPreferencesForToggle(toggle)
                 .getIntegerPreferences(), type);
@@ -2643,6 +2651,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             defaultForConIntRefset.setTermComponent(((RefsetDefaultsConcept) defaults).getDefaultForConceptRefset());
             gluePreferenceLabel(defaults, "defaultForConIntRefset", defaultForConIntRefset);
             wrapAndAdd(refsetsDefault, defaultForConIntRefset, "Default concept: ");
+            break;
+        case CONCEPT_CONCEPT_STRING:
+            TermComponentLabel defaultForConConStrRefset = new TermComponentLabel(aceFrameConfig);
+            defaultForConConStrRefset.setTermComponent(((RefsetDefaultsConcept) defaults).getDefaultForConceptRefset());
+            gluePreferenceLabel(defaults, "defaultForConIntRefset", defaultForConConStrRefset);
+            wrapAndAdd(refsetsDefault, defaultForConConStrRefset, "Default concept: ");
             break;
         case INTEGER:
             // @todo

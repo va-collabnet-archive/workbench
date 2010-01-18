@@ -14,20 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dwfa.ace.api.ebr;
+package org.dwfa.ace.refset;
 
-public interface I_ThinExtByRefPartConceptConceptString extends I_ThinExtByRefPartConceptConcept {
+import org.dwfa.ace.api.I_GetConceptData;
 
-    /** @deprecated Use {@link #getStringValue()} */
-    @Deprecated
-    public String getStr();
+public interface I_RefsetDefaultsConceptConceptString extends I_RefsetDefaultsConcept {
+    public I_GetConceptData getDefaultForConcept2Refset();
+    public String getDefaultForStringValue();
 
-    /** @deprecated Use {@link #setStringValue(String)} */
-    @Deprecated
-    public void setStr(String str);
-
-    public String getStringValue();
-
-    public void setStringValue(String value);
+    public String[] getStringPopupItems();
 
 }

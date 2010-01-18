@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,6 +25,7 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaultsBoolean;
 import org.dwfa.ace.refset.I_RefsetDefaultsConInt;
+import org.dwfa.ace.refset.I_RefsetDefaultsConceptConceptString;
 import org.dwfa.ace.refset.I_RefsetDefaultsConcept;
 import org.dwfa.ace.refset.I_RefsetDefaultsCrossMap;
 import org.dwfa.ace.refset.I_RefsetDefaultsCrossMapForRel;
@@ -41,11 +42,11 @@ import org.dwfa.vodb.ToIoException;
 public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 4;
+    private static final int dataVersion = 5;
 
     private I_RefsetDefaultsBoolean booleanPreferences = new RefsetDefaultsBoolean();
 
@@ -62,6 +63,8 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
     private I_RefsetDefaultsString stringPreferences = new RefsetDefaultsString();
 
     private I_RefsetDefaultsConInt conIntPreferences = new RefsetDefaultsConInt();
+
+    private I_RefsetDefaultsConceptConceptString conceptConceptStringPreferences = new RefsetDefaultsConceptConceptString();
 
     private I_RefsetDefaultsCrossMap crossMapPreferences = new RefsetDefaultsCrossMap();
 
@@ -85,6 +88,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
         out.writeObject(templatePreferences);
         out.writeObject(templateForRelPreferences);
         out.writeObject(stringPreferences);
+        out.writeObject(conceptConceptStringPreferences);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -129,6 +133,15 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
                     throw new ToIoException(e);
                 }
             }
+            if (objDataVersion > 4) {
+                conceptConceptStringPreferences = (I_RefsetDefaultsConceptConceptString) in.readObject();
+            } else {
+                try {
+                    conceptConceptStringPreferences = new RefsetDefaultsConceptConceptString();
+                } catch (TerminologyException e) {
+                    throw new ToIoException(e);
+                }
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -141,7 +154,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getBooleanPreferences
      * ()
@@ -152,7 +165,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getConceptPreferences
      * ()
@@ -163,7 +176,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getIntegerPreferences
      * ()
@@ -174,7 +187,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getLanguagePreferences
      * ()
@@ -185,7 +198,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getMeasurementPreferences
      * ()
@@ -196,7 +209,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.dwfa.ace.table.refset.I_DefineRefsetPreferences#
      * getLanguageScopedPreferences()
      */
@@ -206,7 +219,7 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getStringPreferences
      * ()
@@ -224,13 +237,17 @@ public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.ace.table.refset.I_DefineRefsetPreferences#getConIntPreferences
      * ()
      */
     public I_RefsetDefaultsConInt getConIntPreferences() {
         return conIntPreferences;
+    }
+
+    public I_RefsetDefaultsConceptConceptString getConceptConceptStringPreferences() {
+        return conceptConceptStringPreferences;
     }
 
     public I_RefsetDefaultsCrossMap getCrossMapPreferences() {
