@@ -116,9 +116,6 @@ public class CalculateNextUserOwnerOrReviewerTask extends AbstractTask {
             process.setDestination(inboxAddress);
             process.setProperty(nextUserPropName, inboxAddress);
 
-            process.setProperty(ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey(), new UUID[] { nextUserConcept
-                .getUids().iterator().next() });
-
             if (nextUserConcept.equals(owner)) {
                 return Condition.PREVIOUS;
             } else {

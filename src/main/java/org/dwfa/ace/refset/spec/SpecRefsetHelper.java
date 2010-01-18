@@ -1270,7 +1270,7 @@ public class SpecRefsetHelper {
             I_GetConceptData requiredPromotionStatusConcept) throws Exception {
 
         List<I_GetConceptData> filteredList = new ArrayList<I_GetConceptData>();
-        System.out.println("Number of extensions>>>>>>>>>>>>> " + allExtensions.size());
+
         for (I_ThinExtByRefVersioned extension : allExtensions) {
             I_ThinExtByRefPart latestMemberPart = getLatestCurrentPart(extension);
             if (latestMemberPart == null) {
@@ -1280,7 +1280,7 @@ public class SpecRefsetHelper {
             if (extension != null) {
                 promotionStatus = getPromotionStatus(extension);
             }
-            System.out.println(">>>>>>>> PROMOTION STATUS: " + promotionStatus.getInitialText());
+
             if (promotionStatus != null && promotionStatus.equals(requiredPromotionStatusConcept)) {
                 if (termFactory.hasConcept(extension.getComponentId())) {
                     filteredList.add(termFactory.getConcept(extension.getComponentId()));
@@ -1289,11 +1289,6 @@ public class SpecRefsetHelper {
                     filteredList.add(termFactory.getConcept(termFactory.getDescription(descUuid.toString())
                         .getConceptId()));
                 }
-                System.out.println("Adding to filtered list. "
-                    + termFactory.getConcept(extension.getComponentId()).getInitialText());
-            } else {
-                System.out.println("Not adding to filtered list."
-                    + termFactory.getConcept(extension.getComponentId()).getInitialText());
             }
         }
         return filteredList;
