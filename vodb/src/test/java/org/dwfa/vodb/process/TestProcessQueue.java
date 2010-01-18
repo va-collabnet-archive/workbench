@@ -69,6 +69,38 @@ public class TestProcessQueue extends TestCase {
         }
     }
 
+    public void testMaxQueueSizeProcess() throws Exception {
+        ProcessQueue processQueue = new ProcessQueue(3);
+
+        for (int i = 0; i <= 200; i++) {
+            processQueue.execute(new SimpleProcessor(30));
+        }
+
+        processQueue.awaitCompletion();
+        assertTrue("Queue not empty", processQueue.isEmpty());
+
+        try{
+            processQueue.execute(new SimpleProcessor(30));
+            fail("cannot add work items once the pool has awaited completation.");
+        } catch(Exception e) {
+            assertTrue(e instanceof RuntimeException);
+        }
+    }
+
+    public void testNothingToProcess() throws Exception {
+        ProcessQueue processQueue = new ProcessQueue(3);
+
+        processQueue.awaitCompletion();
+        assertTrue("Queue not empty", processQueue.isEmpty());
+
+        try{
+            processQueue.execute(new SimpleProcessor(30));
+            fail("cannot add work items once the pool has awaited completation.");
+        } catch(Exception e) {
+            assertTrue(e instanceof RuntimeException);
+        }
+    }
+
     class SimpleProcessor implements Runnable {
         private long processingTime;
 

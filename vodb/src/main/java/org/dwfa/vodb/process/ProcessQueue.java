@@ -41,6 +41,7 @@ public class ProcessQueue implements I_ProcessQueue {
     private String name;
     private List<Exception> errorsList = Collections.synchronizedList(new ArrayList<Exception>());
     private boolean failFast = true;
+    private int maxQueuSize = 100;
 
     public ProcessQueue(int nThreadsToUse) {
         this(Integer.toHexString(System.identityHashCode(new String())), nThreadsToUse);
@@ -73,6 +74,13 @@ public class ProcessQueue implements I_ProcessQueue {
             if (acceptNoMore) {
                 throw new RuntimeException("Cannot add more while queue has been instructed to wait for completion");
             }
+            if (queue.size() > maxQueuSize) {
+                try {
+                    logger.info("Waiting producer thread as queue size is over " + maxQueuSize);
+                    queue.wait();
+                } catch (InterruptedException egnored) {
+                }
+            }
             queue.addLast(r);
             queue.notify();
         }
@@ -95,7 +103,8 @@ public class ProcessQueue implements I_ProcessQueue {
     /**
      * Pauses the calling thread until all items have been process.
      *
-     * After this call completes you cannot use the this object to process any further items.
+     * After this call completes you cannot use the this object to process any
+     * further items.
      */
     public void awaitCompletion() {
         synchronized (queue) {
@@ -149,6 +158,17 @@ public class ProcessQueue implements I_ProcessQueue {
         this.failFast = failFast;
     }
 
+    /**
+     * Set the maximum queue size to process. Use to manage the heap space.
+     *
+     * Default 100
+     *
+     * @param maxQueuSize int
+     */
+    public final void setMaxQueuSize(int maxQueuSize) {
+        this.maxQueuSize = maxQueuSize;
+    }
+
     private class PoolWorker extends Thread {
         private boolean running;
         private final int id;
@@ -183,12 +203,15 @@ public class ProcessQueue implements I_ProcessQueue {
                     setRunning(true);
                     if (!queue.isEmpty()) {
                         r = (Runnable) queue.removeFirst();
+                        if (queue.size() == maxQueuSize) {
+                            queue.notifyAll();
+                        }
                         logger.info("Worker thread " + name + "_" + System.identityHashCode(this) + " dequeued " + r
                             + " for processing, " + queue.size() + " remaining");
                     }
                 }
 
-                if(r != null) {
+                if (r != null) {
                     try {
                         r.run();
                     } catch (Exception e) {
