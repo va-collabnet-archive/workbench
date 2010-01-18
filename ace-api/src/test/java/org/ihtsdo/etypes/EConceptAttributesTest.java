@@ -16,11 +16,12 @@ public class EConceptAttributesTest {
     private EConceptAttributes testComponent1;
     private EConceptAttributes testComponent2;
     private EConceptAttributes testComponent3;
-    protected long myTime = Long.MIN_VALUE;
+    protected long myTime = 1263758387001L;
     
     @Before
     public void setUp() throws Exception {
-        this.myTime = System.currentTimeMillis(); 
+//        this.myTime = System.currentTimeMillis(); 
+//        System.out.println("MyTime='" + this.myTime + "'");
     }
 
     @After
