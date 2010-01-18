@@ -238,7 +238,7 @@ public class TestForEdgCType2Req extends AbstractConceptTest {
 
         List<? extends I_DescriptionVersioned> descList = concept.getDescriptions();
         for (I_DescriptionVersioned desc : descList) {
-            List<I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid());
+            List<? extends I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid());
             // check each member for presence of Clinical Type 2 extension
             for (I_ThinExtByRefVersioned ext : extList) {
                 int refSetNid = ext.getRefsetId();
@@ -254,7 +254,7 @@ public class TestForEdgCType2Req extends AbstractConceptTest {
 
         descList = concept.getUncommittedDescriptions();
         for (I_DescriptionVersioned desc : descList) {
-            List<I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid());
+            List<? extends I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid());
             // check each member for presence of Clinical Type 2 extension
             for (I_ThinExtByRefVersioned ext : extList) {
                 int refSetNid = ext.getRefsetId();

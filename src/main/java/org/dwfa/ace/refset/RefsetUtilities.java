@@ -425,7 +425,7 @@ public abstract class RefsetUtilities {
 
     protected I_ThinExtByRefVersioned getExtensionForComponent(int conceptId, Integer refset) throws IOException {
 
-        List<I_ThinExtByRefVersioned> exts = termFactory.getAllExtensionsForComponent(conceptId);
+        List<? extends I_ThinExtByRefVersioned> exts = termFactory.getAllExtensionsForComponent(conceptId);
         for (I_ThinExtByRefVersioned ext : exts) {
             if (ext.getRefsetId() == refset.intValue()) {
                 return ext;

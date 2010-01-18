@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,8 +34,6 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.classify.SnoTable;
-import org.dwfa.ace.task.commit.AbstractConceptTest;
-import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
@@ -275,7 +272,7 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
         boolean addUncommited = true;
         List<? extends I_DescriptionVersioned> descList = concept.getDescriptions();
         for (I_DescriptionVersioned desc : descList) {
-            List<I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid(),
+            List<? extends I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid(),
                 addUncommited);
             // check each member for presence of Clinical Type 2 extension
             for (I_ThinExtByRefVersioned ext : extList) {
@@ -292,7 +289,7 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
 
         descList = concept.getUncommittedDescriptions();
         for (I_DescriptionVersioned desc : descList) {
-            List<I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid(),
+            List<? extends I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid(),
                 addUncommited);
             // check each member for presence of Clinical Type 2 extension
             for (I_ThinExtByRefVersioned ext : extList) {

@@ -29,7 +29,7 @@ public interface I_IntSet extends ListDataListener {
 
     public void remove(int key);
 
-    public void addAll(int[] keys);
+    public I_IntSet addAll(int[] keys);
 
     public void removeAll(int[] keys);
 

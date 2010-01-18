@@ -255,7 +255,7 @@ public class AutoGenPathProcess implements I_ProcessConcepts {
         List<? extends I_DescriptionVersioned> dl = cb.getDescriptions();
         for (I_DescriptionVersioned d : dl) {
             // :@@@:!!!: d.? tf.get? HOW TO GET members extending description
-            List<I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(d.getNid());
+            List<? extends I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(d.getNid());
             for (I_ThinExtByRefVersioned ext : extList) {
                 int refsetNid = ext.getRefsetId();
                 int l = nidsEDGClinicalItem_2.length;

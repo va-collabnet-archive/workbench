@@ -131,6 +131,8 @@ public class EConcept {
     protected List<UUID> refsetUuidMemberUuidForConcept;
     protected List<UUID> refsetUuidMemberUuidForDescriptions;
     protected List<UUID> refsetUuidMemberUuidForRels;
+    protected List<UUID> refsetUuidMemberUuidForImages;
+    protected List<UUID> refsetUuidMemberUuidForRefsetMembers;
 
     public EConcept(DataInput in) throws IOException, ClassNotFoundException {
         super();
@@ -239,6 +241,20 @@ public class EConcept {
         		refsetUuidMemberUuidForRels.add(new UUID(in.readLong(), in.readLong()));
         	}
         }
+        int refsetUuidMemberUuidForImagesCount = in.readInt();
+        if (refsetUuidMemberUuidForImagesCount > 0) {
+        	refsetUuidMemberUuidForImages = new ArrayList<UUID>(refsetUuidMemberUuidForImagesCount);
+        	for (int i = 0; i < refsetUuidMemberUuidForImagesCount; i++) {
+        		refsetUuidMemberUuidForImages.add(new UUID(in.readLong(), in.readLong()));
+        	}
+        }
+        int refsetUuidMemberUuidForRefsetMembersCount = in.readInt();
+        if (refsetUuidMemberUuidForRefsetMembersCount > 0) {
+        	refsetUuidMemberUuidForRefsetMembers = new ArrayList<UUID>(refsetUuidMemberUuidForRefsetMembersCount);
+        	for (int i = 0; i < refsetUuidMemberUuidForRefsetMembersCount; i++) {
+        		refsetUuidMemberUuidForRefsetMembers.add(new UUID(in.readLong(), in.readLong()));
+        	}
+        }
     }
 
     public void writeExternal(DataOutput out) throws IOException {
@@ -313,6 +329,24 @@ public class EConcept {
                 out.writeLong(uuid.getLeastSignificantBits());
             }
         }
+        if (refsetUuidMemberUuidForImages == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(refsetUuidMemberUuidForImages.size());
+            for (UUID uuid : refsetUuidMemberUuidForImages) {
+                out.writeLong(uuid.getMostSignificantBits());
+                out.writeLong(uuid.getLeastSignificantBits());
+            }
+        }
+        if (refsetUuidMemberUuidForRefsetMembers == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(refsetUuidMemberUuidForRefsetMembers.size());
+            for (UUID uuid : refsetUuidMemberUuidForRefsetMembers) {
+                out.writeLong(uuid.getMostSignificantBits());
+                out.writeLong(uuid.getLeastSignificantBits());
+            }
+        }
     }
 
     public List<EDescription> getDescriptions() {
@@ -368,7 +402,7 @@ public class EConcept {
             }
         }
 
-        Collection<I_ThinExtByRefVersioned> conceptMembers = EComponent.getRefsetMembersForComponent(c.getNid());
+        Collection<? extends I_ThinExtByRefVersioned> conceptMembers = EComponent.getRefsetMembersForComponent(c.getNid());
         if (conceptMembers != null) {
         	ArrayList<ERefset<?>> refsetMemberForComponent = new ArrayList<ERefset<?>>(conceptMembers.size());
         	refsetUuidMemberUuidForConcept = new ArrayList<UUID>(refsetMemberForComponent.size() * 2);
@@ -380,15 +414,18 @@ public class EConcept {
             }
         }
 
-        Collection<I_ThinExtByRefVersioned> descriptionMembers = new ArrayList<I_ThinExtByRefVersioned>();
+        Collection<I_ThinExtByRefVersioned> descriptionMembers = 
+        	new ArrayList<I_ThinExtByRefVersioned>();
         for (I_DescriptionVersioned desc: c.getDescriptions()) {
-        	Collection<I_ThinExtByRefVersioned> componentMembers = EComponent.getRefsetMembersForComponent(desc.getNid());
+        	Collection<? extends I_ThinExtByRefVersioned> componentMembers = 
+        		EComponent.getRefsetMembersForComponent(desc.getNid());
         	if (componentMembers != null) {
         		descriptionMembers.addAll(componentMembers);
         	}
         }
         if (descriptionMembers.size() > 0) {
-        	refsetUuidMemberUuidForDescriptions = new ArrayList<UUID>(descriptionMembers.size() * 2);
+        	refsetUuidMemberUuidForDescriptions = 
+        		new ArrayList<UUID>(descriptionMembers.size() * 2);
         	for (I_ThinExtByRefVersioned m : descriptionMembers) {
                 UUID refsetUuid = EVersion.nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForDescriptions.add(refsetUuid);
@@ -397,9 +434,11 @@ public class EConcept {
             }
         }
 
-        Collection<I_ThinExtByRefVersioned> relMembers = new ArrayList<I_ThinExtByRefVersioned>();
+        Collection<I_ThinExtByRefVersioned> relMembers = 
+        	new ArrayList<I_ThinExtByRefVersioned>();
         for (I_RelVersioned r: c.getSourceRels()) {
-        	Collection<I_ThinExtByRefVersioned> componentMembers = EComponent.getRefsetMembersForComponent(r.getNid());
+        	Collection<? extends I_ThinExtByRefVersioned> componentMembers = 
+        		EComponent.getRefsetMembersForComponent(r.getNid());
         	if (componentMembers != null) {
         		relMembers.addAll(componentMembers);
         	}
@@ -411,6 +450,26 @@ public class EConcept {
                 refsetUuidMemberUuidForRels.add(refsetUuid);
                 UUID memberUuid = EVersion.nidToUuid(m.getNid());
                 refsetUuidMemberUuidForRels.add(memberUuid);
+            }
+        }
+        
+        Collection<I_ThinExtByRefVersioned> imageMembers = 
+        	new ArrayList<I_ThinExtByRefVersioned>();
+        for (I_ImageVersioned img: c.getImages()) {
+        	Collection<? extends I_ThinExtByRefVersioned> componentMembers = 
+        		EComponent.getRefsetMembersForComponent(img.getNid());
+        	if (componentMembers != null) {
+        		relMembers.addAll(componentMembers);
+        	}
+        }
+        
+        if (imageMembers.size() > 0) {
+        	refsetUuidMemberUuidForImages = new ArrayList<UUID>(relMembers.size() * 2);
+        	for (I_ThinExtByRefVersioned m : relMembers) {
+                UUID refsetUuid = EVersion.nidToUuid(m.getRefsetId());
+                refsetUuidMemberUuidForImages.add(refsetUuid);
+                UUID memberUuid = EVersion.nidToUuid(m.getNid());
+                refsetUuidMemberUuidForImages.add(memberUuid);
             }
         }
         
@@ -467,6 +526,8 @@ public class EConcept {
         buff.append(this.refsetUuidMemberUuidForDescriptions);
         buff.append("\n   refsetUuidMemberUuidForRels: \n\t");
         buff.append(this.refsetUuidMemberUuidForRels);
+        buff.append("\n   refsetUuidMemberUuidForImages: \n\t");
+        buff.append(this.refsetUuidMemberUuidForImages);
         return buff.toString();
     }
 
@@ -618,5 +679,23 @@ public class EConcept {
         }
         return false;
     }
+
+	public List<UUID> getRefsetUuidMemberUuidForImages() {
+		return refsetUuidMemberUuidForImages;
+	}
+
+	public void setRefsetUuidMemberUuidForImages(
+			List<UUID> refsetUuidMemberUuidForImages) {
+		this.refsetUuidMemberUuidForImages = refsetUuidMemberUuidForImages;
+	}
+
+	public List<UUID> getRefsetUuidMemberUuidForRefsetMembers() {
+		return refsetUuidMemberUuidForRefsetMembers;
+	}
+
+	public void setRefsetUuidMemberUuidForRefsetMembers(
+			List<UUID> refsetUuidMemberUuidForRefsetMembers) {
+		this.refsetUuidMemberUuidForRefsetMembers = refsetUuidMemberUuidForRefsetMembers;
+	}
 
 }

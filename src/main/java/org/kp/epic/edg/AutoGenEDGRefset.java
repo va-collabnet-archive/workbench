@@ -51,7 +51,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.api.ebr.ThinExtByRefPartProperty;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoCon;
 import org.dwfa.bpa.process.Condition;
@@ -905,7 +904,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     private void doEDGClinicalItem_200x(int nidConcept, List<String> icd9Codes) {
         try {
             // Check for existing Item 200 or Item 2000 RefSet member.
-            List<I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(nidConcept);
+            List<? extends I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(nidConcept);
 
             I_ThinExtByRefVersioned ext200 = null;
             I_ThinExtByRefPart ext200part = null;
@@ -1128,7 +1127,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
                 int dNid = desc.getNid();
 
                 // Check for existing Item 200 or Item 2000 RefSet member.
-                List<I_ThinExtByRefVersioned> extList = null;
+                List<? extends I_ThinExtByRefVersioned> extList = null;
                 try {
                     extList = tf.getAllExtensionsForComponent(dNid);
                 } catch (IOException e) {
@@ -1416,7 +1415,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
     }
 
     private FoundMember memberFind(int nidConcept, int nidClinicalItem_Num) throws IOException {
-        List<I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(nidConcept);
+        List<? extends I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(nidConcept);
 
         // 
         I_ThinExtByRefVersioned extResult = null;
@@ -1503,7 +1502,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         I_GetConceptData concept = tf.getConcept(cNid);
         List<? extends I_DescriptionVersioned> descList = concept.getDescriptions();
         for (I_DescriptionVersioned desc : descList) {
-            List<I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid());
+            List<? extends I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid());
             // check each member for presence of Clinical Type 2 extension
             for (I_ThinExtByRefVersioned ext : extList) {
                 int refSetNid = ext.getRefsetId();
@@ -1524,7 +1523,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
         I_GetConceptData concept = tf.getConcept(cNid);
         List<? extends I_DescriptionVersioned> descList = concept.getDescriptions();
         for (I_DescriptionVersioned desc : descList) {
-            List<I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid());
+            List<? extends I_ThinExtByRefVersioned> extList = tf.getAllExtensionsForComponent(desc.getNid());
             // check each member for presence of Clinical Type 2 extension
             for (I_ThinExtByRefVersioned ext : extList) {
                 int refSetNid = ext.getRefsetId();
@@ -1611,7 +1610,7 @@ public class AutoGenEDGRefset extends AbstractTask implements ActionListener {
 
         try {
             // Find all ICD9 Mapping extensions to Snomed concept
-            List<I_ThinExtByRefVersioned> snoExtList = tf.getAllExtensionsForComponent(snoNid);
+            List<? extends I_ThinExtByRefVersioned> snoExtList = tf.getAllExtensionsForComponent(snoNid);
             for (I_ThinExtByRefVersioned ext : snoExtList) {
                 if (ext.getRefsetId() == nidICD9CodeMappings) {
 

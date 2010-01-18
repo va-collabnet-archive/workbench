@@ -9,8 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
@@ -19,26 +18,24 @@ public class EVersion implements I_VersionExternally {
 
     public static final long serialVersionUID = 1;
 
-    private static I_TermFactory tf = LocalVersionedTerminology.get();
-
     protected static UUID nidToUuid(int nid) throws TerminologyException, IOException {
-        return tf.getId(nid).getUUIDs().iterator().next();
+        return Terms.get().getId(nid).getUUIDs().iterator().next();
     }
 
     protected static int uuidToNid(Collection<UUID> collection) throws TerminologyException, IOException {
-        return tf.uuidToNative(collection);
+        return Terms.get().uuidToNative(collection);
     }
 
     protected static I_Identify nidToIdentifier(int nid) throws TerminologyException, IOException {
-        return tf.getId(nid);
+        return Terms.get().getId(nid);
     }
 
     protected static List<I_ThinExtByRefVersioned> getRefsetMembers(int nid) throws TerminologyException, IOException {
-        return tf.getRefsetExtensionMembers(nid);
+        return Terms.get().getRefsetExtensionMembers(nid);
     }
 
-    protected static List<I_ThinExtByRefVersioned> getRefsetMembersForComponent(int nid) throws TerminologyException, IOException {
-        return tf.getAllExtensionsForComponent(nid);
+    protected static List<? extends I_ThinExtByRefVersioned> getRefsetMembersForComponent(int nid) throws TerminologyException, IOException {
+        return Terms.get().getAllExtensionsForComponent(nid);
     }
 
     protected UUID pathUuid;

@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
@@ -47,12 +48,12 @@ public class RefsetQueryFactory {
             TerminologyException, ParseException {
 
         // create tree object that corresponds to the database's refset spec
-        List<I_ThinExtByRefVersioned> extensions =
+        List<? extends I_ThinExtByRefVersioned> extensions =
                 LocalVersionedTerminology.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptId());
-        addExtensionsToMap(extensions, extensionMap, fetchedComponents);
+        addExtensionsToMap((List<I_ThinExtByRefVersioned>) extensions, extensionMap, fetchedComponents);
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
         for (DefaultMutableTreeNode extNode : extensionMap.values()) {
@@ -299,19 +300,19 @@ public class RefsetQueryFactory {
      * structure representing the refset spec, prior to being converted to a
      * query object.
      * 
-     * @param extensions
+     * @param list
      * @param extensionMap
      * @param fetchedComponents
      * @throws IOException
      */
-    public static void addExtensionsToMap(List<I_ThinExtByRefVersioned> extensions,
+    public static void addExtensionsToMap(List<? extends I_ThinExtByRefVersioned> list,
             HashMap<Integer, DefaultMutableTreeNode> extensionMap, HashSet<Integer> fetchedComponents)
             throws IOException {
-        for (I_ThinExtByRefVersioned ext : extensions) {
+        for (I_ThinExtByRefVersioned ext : list) {
             extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
             if (fetchedComponents.contains(ext.getMemberId()) == false) {
                 fetchedComponents.add(ext.getMemberId());
-                addExtensionsToMap(LocalVersionedTerminology.get()
+                addExtensionsToMap(Terms.get()
                     .getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap, fetchedComponents);
             }
         }

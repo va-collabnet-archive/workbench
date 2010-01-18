@@ -122,7 +122,7 @@ public class TestGetUncommittedRefset extends AbstractTask {
         List<? extends I_RelTuple> srcRelTuples = userInfo.getSourceRelTuples(config.getAllowedStatus(), allowedTypes,
             config.getViewPositionSetReadOnly(), true);
         for (I_RelTuple relTuple : srcRelTuples) {
-            List<I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(relTuple.getRelId(),
+            List<? extends I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(relTuple.getRelId(),
                 true);
             msg.append(comment + extensions.size() + "\n");
             for (I_ThinExtByRefVersioned ext : extensions) {
