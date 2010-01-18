@@ -32,6 +32,7 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesVersion;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
@@ -143,6 +144,25 @@ public class Concept implements I_Transact, I_GetConceptData {
 			}
 			c.data.setRefsetNidMemberNidForRelsList(refsetNidMemberNidForRelsList);
 		}
+
+		if (eConcept.getRefsetUuidMemberUuidForImages() != null) {
+			ArrayIntList refsetNidMemberNidForImagesList = 
+				new ArrayIntList(eConcept.getRefsetUuidMemberUuidForImages().size());
+			for (UUID uuid: eConcept.getRefsetUuidMemberUuidForImages()) {
+				refsetNidMemberNidForImagesList.add(Bdb.uuidToNid(uuid));
+			}
+			c.data.setRefsetNidMemberNidForImagesList(refsetNidMemberNidForImagesList);
+		}
+
+		if (eConcept.getRefsetUuidMemberUuidForRefsetMembers() != null) {
+			ArrayIntList refsetNidMemberNidForRefsetMembersList = 
+				new ArrayIntList(eConcept.getRefsetUuidMemberUuidForRefsetMembers().size());
+			for (UUID uuid: eConcept.getRefsetUuidMemberUuidForRefsetMembers()) {
+				refsetNidMemberNidForRefsetMembersList.add(Bdb.uuidToNid(uuid));
+			}
+			c.data.setRefsetNidMemberNidForRefsetMembersList(refsetNidMemberNidForRefsetMembersList);
+		}
+
 		return c;
 	}	
 	
@@ -782,10 +802,22 @@ public class Concept implements I_Transact, I_GetConceptData {
 			buff.append("\n images: ");
 			buff.append(getImages());
 			buff.append("\n refset members: ");
-			//buff.append(getExtensions());
+			buff.append(getExtensions());
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return buff.toString();
+	}
+
+	public ConceptComponent<?, ?> getComponent(int nid) throws IOException {
+		return data.getComponent(nid);
+	}
+
+	public List<RefsetMember<?, ?>> getExtensionsForComponent(int nid) throws IOException {
+		return data.getExtensionsForComponent(nid);
+	}
+
+	public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException {
+		return data.getRefsetMember(memberNid);
 	}
 }

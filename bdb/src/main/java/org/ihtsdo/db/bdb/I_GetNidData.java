@@ -16,7 +16,7 @@ public interface I_GetNidData {
 	public TupleInput getReadOnlyTupleInput() throws InterruptedException,
 			ExecutionException, IOException;
 
-	public TupleInput getReadWriteTupleInput() throws InterruptedException,
+	public TupleInput getMutableTupleInput() throws InterruptedException,
 			ExecutionException;
 
 }

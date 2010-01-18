@@ -51,7 +51,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	 * TODO future optimization is to use a map that uses an index to the <code>PositionArrays</code>
 	 * rather than duplicating the key data. 
 	 */
-	private StatusAtPositionToIntHashMap sapToIntMap;
+	private SapToIntHashMap sapToIntMap;
 	private boolean changedSinceSync = false;
 	private static class PositionArrayBinder extends
 			TupleBinding<PositionArrays> {
@@ -167,7 +167,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			int readOnlySize = readOnlyArray.getSize();
 			int readWriteSize = readWriteArray.getSize();
 			sequence.set(FIRST_ID + size);
-			sapToIntMap = new StatusAtPositionToIntHashMap(sequence.get() + FIRST_ID);
+			sapToIntMap = new SapToIntHashMap(sequence.get() + FIRST_ID);
 			for (int i = 0; i < readOnlySize; i++) {
 				sapToIntMap.put(readOnlyArray.commitTimes[i], 
 						readOnlyArray.statusNids[i], 
@@ -311,7 +311,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		return index - readOnlyArray.getSize() - FIRST_ID;
 	}
 
-	public int getStatusAtPositionNid(int statusNid, int pathNid, long time) {
+	public int getSapNid(int statusNid, int pathNid, long time) {
 		if (time == Long.MAX_VALUE) {
 			UncommittedStatusForPath usp = new UncommittedStatusForPath(statusNid, pathNid);
 			if (uncomittedStatusPathEntries.containsKey(usp)) {
@@ -360,8 +360,8 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 	private Semaphore expandPermit = new Semaphore(1);
 
-	public int getStatusAtPositionNid(TimeStatusPosition tsp) {
-		return getStatusAtPositionNid(tsp.getStatusNid(), tsp.getPathNid(), tsp.getTime());
+	public int getSapNid(TimeStatusPosition tsp) {
+		return getSapNid(tsp.getStatusNid(), tsp.getPathNid(), tsp.getTime());
 	}
 	
 	public static void reportStats() {

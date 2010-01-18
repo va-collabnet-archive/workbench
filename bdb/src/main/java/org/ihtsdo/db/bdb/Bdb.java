@@ -10,8 +10,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.dwfa.vodb.PathManager;
+import org.ihtsdo.db.bdb.concept.BdbLegacyFixedFactory;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.ConceptBdb;
 import org.ihtsdo.db.bdb.concept.OFFSETS;
@@ -65,8 +70,13 @@ public class Bdb {
 			nidCidMapDb = new NidCNidMapBdb(readOnly, mutable);
 			statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
 			conceptDb = new ConceptBdb(readOnly, mutable);
-			Terms.set(new BdbTermFactory());
+			BdbTermFactory tf = new BdbTermFactory();
+			Terms.set(tf);
+			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
+			tf.setPathManager(new PathManager());
 		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (TerminologyException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -108,7 +118,7 @@ public class Bdb {
 		assert version.getTime() != Long.MIN_VALUE: "Time is Long.MIN_VALUE; was it initialized?";
 		assert version.getStatusUuid() != null: "Status is null; was it initialized?";
 		assert version.getPathUuid() != null: "Path is null; was it initialized?";
-		return statusAtPositionDb.getStatusAtPositionNid(
+		return statusAtPositionDb.getSapNid(
 				uuidToNid(version.getStatusUuid()), 
 				uuidToNid(version.getPathUuid()), 
 				version.getTime());
@@ -214,8 +224,21 @@ public class Bdb {
 		return uuidsToNidMapDb.uuidToNid(uuid);
 	}
 
+	public static int uuidToNid(UUID... uuids) {
+		return uuidsToNidMapDb.uuidsToNid(uuids);
+	}
+
 	public static UuidBdb getUuidDb() {
 		return uuidDb;
+	}
+
+	public static I_AmTermComponent getComponent(int nid) throws IOException {
+		int cNid = Bdb.getConceptNid(nid);
+		Concept c = Bdb.getConceptDb().getConcept(cNid);
+		if (cNid == nid) {
+			return c;
+		}
+		return c.getComponent(nid);
 	}
 
 

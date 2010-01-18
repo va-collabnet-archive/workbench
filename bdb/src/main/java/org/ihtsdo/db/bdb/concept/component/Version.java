@@ -32,7 +32,7 @@ public abstract class Version<V extends Version<V, C>,
 	}
 
 	public Version(int statusNid, int pathNid, long time, C primordialComponent) {
-		this.statusAtPositionNid = sapBdb.getStatusAtPositionNid(statusNid, pathNid, time);
+		this.statusAtPositionNid = sapBdb.getSapNid(statusNid, pathNid, time);
 		this.primordialComponent = primordialComponent;
 		assert primordialComponent != null;
 		assert statusAtPositionNid != Integer.MAX_VALUE;
@@ -140,7 +140,7 @@ public abstract class Version<V extends Version<V, C>,
 	public abstract V makeAnalog(int statusNid, int pathNid, long time);
 
 	public void setStatusAtPosition(int statusNid, int pathNid, long time) {
-		this.statusAtPositionNid = sapBdb.getStatusAtPositionNid(statusNid, pathNid, time);
+		this.statusAtPositionNid = sapBdb.getSapNid(statusNid, pathNid, time);
 	}
 
 	@Override

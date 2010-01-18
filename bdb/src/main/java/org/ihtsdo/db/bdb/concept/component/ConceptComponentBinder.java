@@ -82,7 +82,7 @@ public class ConceptComponentBinder<V extends Version<V, C>,
 		List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
 		for (C conceptComponent: conceptComponentList) {
 			componentsEncountered.incrementAndGet();
-			if (conceptComponent.primordialStatusAtPositionNid > maxReadOnlyStatusAtPositionId) {
+			if (conceptComponent.primordialSapNid > maxReadOnlyStatusAtPositionId) {
 				componentListToWrite.add(conceptComponent);
 			} else {
 				if (conceptComponent.additionalVersions != null) {

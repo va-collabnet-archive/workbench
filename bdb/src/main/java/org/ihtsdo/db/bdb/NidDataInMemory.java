@@ -29,7 +29,7 @@ public class NidDataInMemory implements I_GetNidData {
 	}
 
 	@Override
-	public TupleInput getReadWriteTupleInput()  {
+	public TupleInput getMutableTupleInput()  {
 		return new TupleInput(getReadWriteBytes());
 	}
 

@@ -80,8 +80,7 @@ public class BinaryLoad {
 	            	executors.execute(conceptConverter);
 	    			if (conceptsRead.get() % 10000 == 0) {
 	    				System.out.println("concepts: " + conceptsRead);
-	    			}
-	            		
+	    			}	
 			    }
 	            // See if any exceptions in the last converters;
 	            while (converters.isEmpty() == false) {

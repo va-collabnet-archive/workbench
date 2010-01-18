@@ -78,7 +78,7 @@ public class NidDataFromBdb implements I_GetNidData {
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.db.bdb.I_GetNidData#getReadWriteTupleInput()
 	 */
-	public  synchronized TupleInput getReadWriteTupleInput() throws InterruptedException, ExecutionException {
+	public  synchronized TupleInput getMutableTupleInput() throws InterruptedException, ExecutionException {
 		return new TupleInput(getReadWriteBytes());
 	}
 

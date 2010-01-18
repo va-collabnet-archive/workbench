@@ -39,8 +39,8 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 		super(refsetMember, enclosingConcept);
 		memberTypeNid = refsetMember.getType().getTypeNid();
 		referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());
-		primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(refsetMember);
-		assert primordialStatusAtPositionNid != Integer.MAX_VALUE;
+		primordialSapNid = Bdb.getStatusAtPositionNid(refsetMember);
+		assert primordialSapNid != Integer.MAX_VALUE;
 	}
 	
 

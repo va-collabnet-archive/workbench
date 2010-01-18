@@ -2,7 +2,7 @@ package org.ihtsdo.db.bdb;
 
 import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
 
-public class StatusAtPositionToIntHashMap {
+public class SapToIntHashMap {
 	
 	private UuidToIntHashMap map;
 
@@ -13,7 +13,7 @@ public class StatusAtPositionToIntHashMap {
 	/**
 	 * Constructs an empty map with default capacity and default load factors.
 	 */
-	public StatusAtPositionToIntHashMap() {
+	public SapToIntHashMap() {
 		this(defaultCapacity);
 	}
 
@@ -26,7 +26,7 @@ public class StatusAtPositionToIntHashMap {
 	 * @throws IllegalArgumentException
 	 *             if the initial capacity is less than zero.
 	 */
-	public StatusAtPositionToIntHashMap(int initialCapacity) {
+	public SapToIntHashMap(int initialCapacity) {
 		this(initialCapacity, defaultMinLoadFactor, defaultMaxLoadFactor);
 	}
 
@@ -46,7 +46,7 @@ public class StatusAtPositionToIntHashMap {
 	 *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
 	 *             .
 	 */
-	public StatusAtPositionToIntHashMap(int initialCapacity, double minLoadFactor,
+	public SapToIntHashMap(int initialCapacity, double minLoadFactor,
 			double maxLoadFactor) {
 		setup(initialCapacity, minLoadFactor, maxLoadFactor);
 	}

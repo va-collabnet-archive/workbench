@@ -7,11 +7,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntIterator;
+import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.bdb.NidDataFromBdb;
@@ -54,6 +56,16 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	protected SoftReference<ArrayIntList> refsetNidMemberNidForConceptListRef;
 	protected SoftReference<ArrayIntList> refsetNidMemberNidForDescriptionsListRef;
 	protected SoftReference<ArrayIntList> refsetNidMemberNidForRelsListRef;
+	protected SoftReference<ArrayIntList> refsetNidMemberNidForImagesListRef;
+	protected SoftReference<ArrayIntList> refsetNidMemberNidForRefsetMembersListRef;
+	protected SoftReference<IntSet> descNidsRef;
+	protected SoftReference<IntSet> srcRelNidsRef;
+	protected SoftReference<IntSet> imageNidsRef;
+	protected SoftReference<HashMap<Integer, RefsetMember<?, ?>>> refsetMembersMapRef;
+	/**
+	 * If the concept is editable, add all changes to the strongReferences to
+	 * ensure they don't get garbage collected inappropriately.
+	 */
 	private ArrayList<Object> strongReferences;
 
 	ConceptDataSoftReference(Concept enclosingConcept) throws IOException {
@@ -95,7 +107,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	public int getReadWriteDataVersion() throws InterruptedException,
 			ExecutionException, IOException {
 		DataVersionBinder binder = DataVersionBinder.getBinder();
-		return binder.entryToObject(nidData.getReadWriteTupleInput());
+		return binder.entryToObject(nidData.getMutableTupleInput());
 	}
 
 	/*
@@ -175,7 +187,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		}
 		assert componentList != null;
 		binder.setTermComponentList(componentList);
-		TupleInput readWriteInput = nidData.getReadWriteTupleInput();
+		TupleInput readWriteInput = nidData.getMutableTupleInput();
 		if (readWriteInput.available() > 0) {
 			checkFormatAndVersion(readWriteInput);
 			readWriteInput.mark(128);
@@ -223,7 +235,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		}
 		assert componentList != null;
 		binder.setTermComponentList(componentList);
-		TupleInput readWriteInput = nidData.getReadWriteTupleInput();
+		TupleInput readWriteInput = nidData.getMutableTupleInput();
 		if (readWriteInput.available() > 0) {
 			readWriteInput.mark(128);
 			checkFormatAndVersion(readWriteInput);
@@ -400,6 +412,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		if (enclosingConcept.isEditable() == false) {
 			throw new IOException("Attempting to add to an uneditable concept");
 		}
+		getDescNids().add(desc.nid);
 		getDescriptions().add(desc);
 	}
 
@@ -414,6 +427,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		if (enclosingConcept.isEditable() == false) {
 			throw new IOException("Attempting to add to an uneditable concept");
 		}
+		getSrcRelNids().add(rel.nid);
 		getSourceRels().add(rel);
 	}
 
@@ -428,6 +442,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		if (enclosingConcept.isEditable() == false) {
 			throw new IOException("Attempting to add to an uneditable concept");
 		}
+		getImageNids().add(img.nid);
 		getImages().add(img);
 	}
 
@@ -483,7 +498,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	@Override
 	public TupleInput getReadWriteTupleInput() throws InterruptedException,
 			ExecutionException {
-		return nidData.getReadWriteTupleInput();
+		return nidData.getMutableTupleInput();
 	}
 
 	@Override
@@ -532,6 +547,29 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	}
 
 	@Override
+	public void setRefsetNidMemberNidForImagesList(
+			ArrayIntList refsetNidMemberNidForImagesList) throws IOException {
+		if (enclosingConcept.isEditable() == false) {
+			throw new IOException("Attempting to add to an uneditable concept");
+		}
+		refsetNidMemberNidForImagesListRef = new SoftReference<ArrayIntList>(
+				refsetNidMemberNidForImagesList);
+		strongReferences.add(refsetNidMemberNidForImagesList);
+	}
+
+
+	@Override
+	public void setRefsetNidMemberNidForRefsetMembersList(
+			ArrayIntList refsetNidMemberNidForRefsetMembersList) throws IOException {
+		if (enclosingConcept.isEditable() == false) {
+			throw new IOException("Attempting to add to an uneditable concept");
+		}
+		refsetNidMemberNidForRefsetMembersListRef = new SoftReference<ArrayIntList>(
+				refsetNidMemberNidForRefsetMembersList);
+		strongReferences.add(refsetNidMemberNidForRefsetMembersListRef);
+	}
+
+	@Override
 	public ArrayIntList getDestRelNidTypeNidList() throws IOException {
 		ArrayIntList returnList = null;
 		if (refsetNidMemberNidForRelsListRef != null) {
@@ -549,13 +587,12 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		return returnList;
 	}
 
-	private ArrayIntList getArrayIntList(OFFSETS offset)
-			throws IOException {
+	private ArrayIntList getArrayIntList(OFFSETS offset) throws IOException {
 		try {
 			ArrayIntList roList = getReadOnlyArrayIntList(offset);
 			IntListPairsBinder binder = new IntListPairsBinder();
 			binder.setReadOnlyList(roList);
-			TupleInput readWriteInput = nidData.getReadWriteTupleInput();
+			TupleInput readWriteInput = nidData.getMutableTupleInput();
 			if (readWriteInput.available() < 4) {
 				return new ArrayIntList();
 			}
@@ -586,6 +623,46 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			readOnlyInput.skipFast(dataOffset);
 			IntListPairsBinder binder = new IntListPairsBinder();
 			return binder.entryToObject(readOnlyInput);
+		} catch (InterruptedException e) {
+			throw new IOException(e);
+		} catch (ExecutionException e) {
+			throw new IOException(e);
+		}
+	}
+
+	private IntSet getReadOnlyIntSet(OFFSETS offset) throws IOException {
+		try {
+			TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
+			if (readOnlyInput.available() < 4) {
+				return new IntSet();
+			}
+			readOnlyInput.mark(128);
+			readOnlyInput.skipFast(offset.offset);
+			int dataOffset = readOnlyInput.readInt();
+			readOnlyInput.reset();
+			readOnlyInput.skipFast(dataOffset);
+			IntSetBinder binder = new IntSetBinder();
+			return binder.entryToObject(readOnlyInput);
+		} catch (InterruptedException e) {
+			throw new IOException(e);
+		} catch (ExecutionException e) {
+			throw new IOException(e);
+		}
+	}
+
+	private IntSet getMutableIntSet(OFFSETS offset) throws IOException {
+		try {
+			TupleInput mutableInput = nidData.getMutableTupleInput();
+			if (mutableInput.available() < 4) {
+				return new IntSet();
+			}
+			mutableInput.mark(128);
+			mutableInput.skipFast(offset.offset);
+			int dataOffset = mutableInput.readInt();
+			mutableInput.reset();
+			mutableInput.skipFast(dataOffset);
+			IntSetBinder binder = new IntSetBinder();
+			return binder.entryToObject(mutableInput);
 		} catch (InterruptedException e) {
 			throw new IOException(e);
 		} catch (ExecutionException e) {
@@ -650,6 +727,44 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	}
 
 	@Override
+	public ArrayIntList getRefsetNidMemberNidForImagesList() throws IOException {
+		ArrayIntList returnList = null;
+		if (refsetNidMemberNidForImagesListRef != null) {
+			returnList = refsetNidMemberNidForImagesListRef.get();
+		}
+		if (returnList != null) {
+			return returnList;
+		}
+		returnList = getArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_IMAGES);
+		refsetNidMemberNidForImagesListRef = new SoftReference<ArrayIntList>(
+				returnList);
+		if (enclosingConcept.isEditable()) {
+			strongReferences.add(returnList);
+		}
+		return returnList;
+	}
+
+
+	@Override
+	public ArrayIntList getRefsetNidMemberNidForRefsetMembersList() throws IOException {
+		ArrayIntList returnList = null;
+		if (refsetNidMemberNidForRefsetMembersListRef != null) {
+			returnList = refsetNidMemberNidForRefsetMembersListRef.get();
+		}
+		if (returnList != null) {
+			return returnList;
+		}
+		returnList = getArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_REFSETMEMBERS);
+		refsetNidMemberNidForRefsetMembersListRef = new SoftReference<ArrayIntList>(
+				returnList);
+		if (enclosingConcept.isEditable()) {
+			strongReferences.add(returnList);
+		}
+		return returnList;
+	}
+
+
+	@Override
 	public ArrayIntList getDestRelNidTypeNidListReadOnly() throws IOException {
 		return getReadOnlyArrayIntList(OFFSETS.DEST_REL_NID_TYPE_NIDS);
 	}
@@ -670,6 +785,184 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	public ArrayIntList getRefsetNidMemberNidForRelsListReadOnly()
 			throws IOException {
 		return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_RELATIONSHIPS);
+	}
+
+	@Override
+	public ArrayIntList getRefsetNidMemberNidForRefsetMembersListReadOnly()
+			throws IOException {
+		return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_REFSETMEMBERS);
+	}
+
+
+	@Override
+	public ArrayIntList getRefsetNidMemberNidForImagesListReadOnly()
+			throws IOException {
+		return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_IMAGES);
+	}
+
+	@Override
+	public ConceptComponent<?, ?> getComponent(int nid) throws IOException {
+		if (getDescNids().contains(nid)) {
+			for (Description d : getDescriptions()) {
+				if (d.getNid() == nid) {
+					return d;
+				}
+			}
+		}
+		if (getSrcRelNids().contains(nid)) {
+			for (Relationship r : getSourceRels()) {
+				if (r.getNid() == nid) {
+					return r;
+				}
+			}
+		}
+		if (getImageNids().contains(nid)) {
+			for (Image i : getImages()) {
+				if (i.getNid() == nid) {
+					return i;
+				}
+			}
+		}
+		for (RefsetMember<?, ?> r : getRefsetMembers()) {
+			if (r.getNid() == nid) {
+				return r;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * TODO add call for getRefsetMembersForComponent(int refset, int componentNid);
+	 * @throws IOException 
+	 */
+	@Override
+	public List<RefsetMember<?, ?>> getExtensionsForComponent(int componentNid) throws IOException {
+		if (componentNid == enclosingConcept.getConceptId()) {
+			ArrayIntList conceptMembers = getRefsetNidMemberNidForConceptList();	
+			return getRefsetMembers(conceptMembers);
+		} else if (getDescNids().contains(componentNid)) {
+			ArrayIntList descMembers = getRefsetNidMemberNidForDescriptionsList();
+			return getRefsetMembers(descMembers);
+		} else if (getSrcRelNids().contains(componentNid)) {
+			ArrayIntList srcRelMembers = getRefsetNidMemberNidForRelsList();
+			return getRefsetMembers(srcRelMembers);
+		} else if (getImageNids().contains(componentNid)) {
+			ArrayIntList imageMembers = getRefsetNidMemberNidForImagesList();
+			return getRefsetMembers(imageMembers);
+		} // must be in one of the refset members by elimination
+		ArrayIntList refsetMembers = getRefsetNidMemberNidForRefsetMembersList();
+		return getRefsetMembers(refsetMembers);
+	}
+
+	private List<RefsetMember<?, ?>> getRefsetMembers(
+			ArrayIntList members) throws IOException {
+		List<RefsetMember<?, ?>> refsetMembers = new ArrayList<RefsetMember<?,?>>();
+		int i = 0;
+		while (i < members.size()) {
+			int refsetNid = members.get(i++);
+			int memberNid = members.get(i++);
+			Concept c = Bdb.getConceptDb().getConcept(refsetNid);
+			refsetMembers.add(c.getRefsetMember(memberNid));
+		}
+		return refsetMembers;
+	}
+
+	@Override
+	public IntSet getDescNids()  throws IOException {
+		if (descNidsRef != null) {
+			IntSet nids = descNidsRef.get();
+			if (nids != null) {
+				return nids;
+			}
+		}
+		IntSet nids = getDescNidsReadOnly().addAll(
+				getMutableIntSet(OFFSETS.DESC_NIDS).getSetValues());
+		if (enclosingConcept.isEditable()) {
+			strongReferences.add(nids);
+		}
+		descNidsRef = new SoftReference<IntSet>(nids);
+		return nids;
+	}
+
+	@Override
+	public IntSet getDescNidsReadOnly() throws IOException {
+		return getReadOnlyIntSet(OFFSETS.DESC_NIDS);
+	}
+
+	@Override
+	public IntSet getImageNids()  throws IOException {
+		if (imageNidsRef != null) {
+			IntSet nids = imageNidsRef.get();
+			if (nids != null) {
+				return nids;
+			}
+		}
+		IntSet nids = getImageNidsReadOnly().addAll(
+				getMutableIntSet(OFFSETS.IMAGE_NIDS).getSetValues());
+		if (enclosingConcept.isEditable()) {
+			strongReferences.add(nids);
+		}
+		imageNidsRef = new SoftReference<IntSet>(nids);
+		return nids;
+	}
+
+	@Override
+	public IntSet getImageNidsReadOnly() throws IOException {
+		return getReadOnlyIntSet(OFFSETS.IMAGE_NIDS);
+	}
+
+	@Override
+	public IntSet getSrcRelNids()  throws IOException {
+		if (srcRelNidsRef != null) {
+			IntSet nids = srcRelNidsRef.get();
+			if (nids != null) {
+				return nids;
+			}
+		}
+		IntSet nids = getDescNidsReadOnly().addAll(
+				getMutableIntSet(OFFSETS.SRC_REL_NIDS).getSetValues());
+		if (enclosingConcept.isEditable()) {
+			strongReferences.add(nids);
+		}
+		srcRelNidsRef = new SoftReference<IntSet>(nids);
+		return nids;
+	}
+
+	@Override
+	public IntSet getSrcRelNidsReadOnly() throws IOException {
+		return getReadOnlyIntSet(OFFSETS.SRC_REL_NIDS);
+	}
+
+	public SoftReference<ArrayIntList> getRefsetNidMemberNidForImagesListRef() {
+		return refsetNidMemberNidForImagesListRef;
+	}
+
+	public SoftReference<ArrayIntList> getRefsetNidMemberNidForRefsetMembersListRef() {
+		return refsetNidMemberNidForRefsetMembersListRef;
+	}
+
+	public void setRefsetNidMemberNidForRefsetMembersListRef(
+			SoftReference<ArrayIntList> refsetNidMemberNidForRefsetMembersListRef) {
+		this.refsetNidMemberNidForRefsetMembersListRef = refsetNidMemberNidForRefsetMembersListRef;
+	}
+
+
+	@Override
+	public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException {
+		HashMap<Integer, RefsetMember<?, ?>> memberMap = null;
+		if (refsetMembersMapRef != null) {
+			memberMap = refsetMembersMapRef.get();
+		}
+		if (memberMap == null) {
+			List<RefsetMember<?, ?>> refsetMemberList = getRefsetMembers();
+			memberMap = new HashMap<Integer, RefsetMember<?,?>>(refsetMemberList.size());
+			for (RefsetMember<?, ?> m: refsetMemberList) {
+				memberMap.put(m.nid, m);
+			}
+			refsetMembersMapRef = 
+				new SoftReference<HashMap<Integer,RefsetMember<?,?>>>(memberMap);
+		}
+		return memberMap.get(memberNid);
 	}
 
 }

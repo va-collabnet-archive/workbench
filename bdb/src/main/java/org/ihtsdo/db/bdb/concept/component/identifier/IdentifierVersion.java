@@ -29,7 +29,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 	private int authorityNid;
 	
 	protected IdentifierVersion(int statusNid, int pathNid, long time) {
-		this.statusAtPositionNid = sapBdb.getStatusAtPositionNid(statusNid, pathNid, time);
+		this.statusAtPositionNid = sapBdb.getSapNid(statusNid, pathNid, time);
 	}
 
 	protected IdentifierVersion(TupleInput input) {
@@ -41,7 +41,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 	
 	protected IdentifierVersion(EIdentifierVersion idv) {
 		super();
-		this.statusAtPositionNid = sapBdb.getStatusAtPositionNid(Bdb.uuidToNid(idv.getStatusUuid()), 
+		this.statusAtPositionNid = sapBdb.getSapNid(Bdb.uuidToNid(idv.getStatusUuid()), 
 				Bdb.uuidToNid(idv.getPathUuid()), idv.getTime());
 		this.authorityNid = Bdb.uuidToNid(idv.getAuthorityUuid());
 	}

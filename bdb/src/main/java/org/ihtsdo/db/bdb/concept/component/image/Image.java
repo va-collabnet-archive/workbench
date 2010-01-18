@@ -56,7 +56,7 @@ public class Image
 		super(eImage, enclosingConcept);
 		image = eImage.getImage();
 		format = eImage.getFormat();
-		primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(eImage);
+		primordialSapNid = Bdb.getStatusAtPositionNid(eImage);
 		if (eImage.getExtraVersionsList() != null) {
 			additionalVersions = new ArrayList<ImageVersion>(eImage.getExtraVersionsList().size());
 			for (EImageVersion eiv: eImage.getExtraVersionsList()) {

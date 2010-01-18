@@ -1,6 +1,7 @@
 package org.ihtsdo.db.bdb;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -266,6 +267,11 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 		return newNid;
 	}
 
+
+	public int uuidsToNid(UUID[] uuids) {
+		return uuidsToNid(Arrays.asList(uuids));
+	}
+
 	public int uuidsToNid(Collection<UUID> uuids) {
 		for (UUID uuid : uuids) {
 			if (readOnlyUuidsToNidMap.containsKey(uuid)) {
@@ -323,5 +329,4 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 		w.unlock();
 		
 	}
-
 }

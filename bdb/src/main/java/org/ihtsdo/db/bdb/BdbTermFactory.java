@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -63,9 +64,13 @@ import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
+import org.dwfa.vodb.PathManager;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.ihtsdo.db.bdb.concept.Concept;
 
 public class BdbTermFactory implements I_TermFactory {
+
+	private PathManager pathManager;
 
 	@Override
 	public void addChangeSetReader(I_ReadChangeSet reader) {
@@ -165,15 +170,17 @@ public class BdbTermFactory implements I_TermFactory {
 	}
 
 	@Override
-	public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(
-			int componentId) throws IOException {
-		throw new UnsupportedOperationException();
+	public List<? extends I_ThinExtByRefVersioned> getAllExtensionsForComponent(
+			int nid) throws IOException {
+		Concept c = Bdb.getConceptDb().getConcept(Bdb.getNidCNidMap().getCNid(nid));
+		return c.getExtensionsForComponent(nid);
 	}
 
 	@Override
-	public List<I_ThinExtByRefVersioned> getAllExtensionsForComponent(
-			int componentId, boolean addUncommitted) throws IOException {
-		throw new UnsupportedOperationException();
+	@Deprecated
+	public List<? extends I_ThinExtByRefVersioned> getAllExtensionsForComponent(
+			int nid, boolean addUncommitted) throws IOException {
+		return getAllExtensionsForComponent(nid);
 	}
 
 	@Override
@@ -338,17 +345,17 @@ public class BdbTermFactory implements I_TermFactory {
 	@Override
 	public I_Path getPath(Collection<UUID> uids) throws TerminologyException,
 			IOException {
-		throw new UnsupportedOperationException();
+		return pathManager.get(uuidToNative(uids));
 	}
 
 	@Override
 	public I_Path getPath(UUID... ids) throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		return pathManager.get(Bdb.uuidToNid(ids));
 	}
 
 	@Override
 	public List<I_Path> getPaths() throws Exception {
-		throw new UnsupportedOperationException();
+		return new ArrayList<I_Path>(pathManager.getAll());
 	}
 
 	@Override
@@ -787,19 +794,28 @@ public class BdbTermFactory implements I_TermFactory {
 	}
 
 	@Override
+	@Deprecated 
 	public void writeId(I_Identify versioned) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void writePath(I_Path p) throws IOException {
-		throw new UnsupportedOperationException();
+		try {
+			pathManager.write(p);
+		} catch (TerminologyException e) {
+			throw new IOException(e);
+		}
 	}
 
 	@Override
 	public void writePathOrigin(I_Path path, I_Position origin)
 			throws TerminologyException {
-		throw new UnsupportedOperationException();
+		pathManager.writeOrigin(path, origin);
+	}
+
+	public void setPathManager(PathManager pathManager) {
+		this.pathManager = pathManager;
 	}
 
 }

@@ -62,7 +62,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 		group = eRel.getRelGroup();
 		refinabilityNid = Bdb.uuidToNid(eRel.getRefinabilityUuid());
 		typeNid = Bdb.uuidToNid(eRel.getTypeUuid());
-		primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(eRel);
+		primordialSapNid = Bdb.getStatusAtPositionNid(eRel);
 		if (eRel.getExtraVersionsList() != null) {
 			additionalVersions = new ArrayList<RelationshipVersion>(eRel.getExtraVersionsList().size());
 			for (ERelationshipVersion erv: eRel.getExtraVersionsList()) {

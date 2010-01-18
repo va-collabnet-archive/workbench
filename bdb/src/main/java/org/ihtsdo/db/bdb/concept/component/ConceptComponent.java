@@ -100,9 +100,9 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	/**
 	 * priámorádiáal:  first created or developed
-	 * 
+	 * Sap = Status At Position
 	 */
-	public int primordialStatusAtPositionNid = Integer.MAX_VALUE;
+	public int primordialSapNid = Integer.MAX_VALUE;
 	/**
 	 * priámorádiáal:  first created or developed
 	 * 
@@ -141,7 +141,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		this.nid = Bdb.uuidToNid(eComponent.primordialComponentUuid);
 		assert this.nid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
 		this.enclosingConcept = enclosingConcept;
-		this.primordialStatusAtPositionNid = Bdb.getStatusAtPositionNid(eComponent);
+		this.primordialSapNid = Bdb.getStatusAtPositionNid(eComponent);
 		if (eComponent.getVersionCount() > 1) {
 			this.additionalVersions = new ArrayList<V>(eComponent.getVersionCount() - 1);
 		}
@@ -181,14 +181,14 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	 */
 	public boolean isSetup() {
 		assert primordialUNid != Integer.MIN_VALUE;
-		return primordialStatusAtPositionNid != Integer.MAX_VALUE;
+		return primordialSapNid != Integer.MAX_VALUE;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#setStatusAtPositionNid(int)
 	 */
 	public void setStatusAtPositionNid(int sapNid) {
-		this.primordialStatusAtPositionNid = sapNid;
+		this.primordialSapNid = sapNid;
 	}
 	
 	private void readIdentifierFromBdb(TupleInput input) {
@@ -218,7 +218,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	private final void writeIdentifierToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
-		assert primordialStatusAtPositionNid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
+		assert primordialSapNid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
 		assert primordialUNid != Integer.MIN_VALUE: "Processing nid: " + enclosingConcept.getNid();
 		output.writeInt(primordialUNid);
 		List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
@@ -385,14 +385,14 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	public final void readComponentFromBdb(TupleInput input) {
 		nid = input.readInt();
-		primordialStatusAtPositionNid = input.readInt();
+		primordialSapNid = input.readInt();
 		readIdentifierFromBdb(input);
 		readFromBdb(input);
 	}
 	
 	public final void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		output.writeInt(nid);
-		output.writeInt(primordialStatusAtPositionNid);
+		output.writeInt(primordialSapNid);
 		writeIdentifierToBdb(output, maxReadOnlyStatusAtPositionNid);
 		writeToBdb(output, maxReadOnlyStatusAtPositionNid);
 	}
@@ -469,17 +469,17 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	@Override
 	public final int getPathId() {
-		return Bdb.getStatusAtPositionDb().getPathId(primordialStatusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getPathId(primordialSapNid);
 	}
 
 	@Override
 	public final int getStatusId() {
-		return Bdb.getStatusAtPositionDb().getStatusId(primordialStatusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getStatusId(primordialSapNid);
 	}
 
 	@Override
 	public final long getTime() {
-		return Bdb.getStatusAtPositionDb().getTime(primordialStatusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getTime(primordialSapNid);
 	}
 
 	@Override
@@ -537,7 +537,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	}
 
 	protected int getPrimordialStatusAtPositionNid() {
-		return primordialStatusAtPositionNid;
+		return primordialSapNid;
 	}
 
 	protected Concept getEnclosingConcept() {
@@ -552,7 +552,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		if (this.nid != another.nid) {
 			return false;
 		}
-		if (this.primordialStatusAtPositionNid != another.primordialStatusAtPositionNid) {
+		if (this.primordialSapNid != another.primordialSapNid) {
 			return false;
 		}
 		if (this.primordialUNid != another.primordialUNid) {
@@ -596,6 +596,6 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	@Override
 	public int hashCode() {
-		return HashFunction.hashCode(new int[] { nid, primordialStatusAtPositionNid });
+		return HashFunction.hashCode(new int[] { nid, primordialSapNid });
 	}
 }

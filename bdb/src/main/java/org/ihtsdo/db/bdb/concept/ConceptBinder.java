@@ -5,6 +5,7 @@ import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 import org.ihtsdo.db.bdb.concept.component.Version;
@@ -62,7 +63,6 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			byte[] refsetOutput = getRefsetBytes(conceptData, primordial,
 					OFFSETS.REFSET_MEMBERS, conceptData.getRefsetMembersRef(),
 					new RefsetMemberBinder());
-
 			IntListPairsBinder pairsBinder = new IntListPairsBinder();
 			
 			byte[] destRelOutput = pairsBinder.getBytes(
@@ -80,44 +80,108 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			byte[] refsetNidMemberNidForRelsOutput = pairsBinder.getBytes(
 					conceptData.getRefsetNidMemberNidForRelsListReadOnly(),
 					conceptData.getRefsetNidMemberNidForRelsList());
+			
+			byte[] refsetNidMemberNidForImagesOutput = pairsBinder.getBytes(
+					conceptData.getRefsetNidMemberNidForImagesListReadOnly(),
+					conceptData.getRefsetNidMemberNidForImagesList());
 
-			finalOutput.writeInt(1); // Format version
-			finalOutput.writeInt(1); // Data version
+			byte[] refsetNidMemberNidForRefsetMembersOutput = pairsBinder.getBytes(
+					conceptData.getRefsetNidMemberNidForRefsetMembersListReadOnly(),
+					conceptData.getRefsetNidMemberNidForRefsetMembersList());
+
+			byte[] descNidOutput = getNidSetBytes(conceptData, primordial,
+					conceptData.getDescNidsReadOnly(),
+					conceptData.getDescNids());
+			byte[] srcRelNidOutput = getNidSetBytes(conceptData, primordial,
+					conceptData.getSrcRelNidsReadOnly(),
+					conceptData.getSrcRelNids());
+			byte[] imageNidOutput = getNidSetBytes(conceptData, primordial,
+					conceptData.getImageNidsReadOnly(),
+					conceptData.getImageNids());
+
+			finalOutput.writeInt(1); // FORMAT_VERSION
+			finalOutput.writeInt(1); // DATA_VERSION
 			int nextDataLocation = OFFSETS.getHeaderSize();
 			finalOutput.writeInt(nextDataLocation); // ATTRIBUTES
 			nextDataLocation = nextDataLocation + attrOutput.length;
+			
 			finalOutput.writeInt(nextDataLocation); // DESCRIPTIONS
 			nextDataLocation = nextDataLocation + descOutput.length;
+			
 			finalOutput.writeInt(nextDataLocation); // SOURCE_RELS
 			nextDataLocation = nextDataLocation + relOutput.length;
-			finalOutput.writeInt(nextDataLocation); // IMAGES
-			nextDataLocation = nextDataLocation + imageOutput.length;
+			
 			finalOutput.writeInt(nextDataLocation); // REFSET_MEMBERS
 			nextDataLocation = nextDataLocation + refsetOutput.length;
+			
 			finalOutput.writeInt(nextDataLocation); // DEST_REL_NID_TYPE_NIDS
 			nextDataLocation = nextDataLocation + destRelOutput.length;
+			
 			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_CONCEPT
 			nextDataLocation = nextDataLocation
 					+ refsetNidMemberNidForConceptOutput.length;
+			
 			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_DESCRIPTIONS
 			nextDataLocation = nextDataLocation
 					+ refsetNidMemberNidForDescOutput.length;
+			
 			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_RELATIONSHIPS
 			nextDataLocation = nextDataLocation
-					+ refsetNidMemberNidForRelsOutput.length;
+				+ refsetNidMemberNidForRelsOutput.length;
+			
+			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_IMAGES
+			nextDataLocation = nextDataLocation
+					+ refsetNidMemberNidForImagesOutput.length;
+			
+			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_REFSETMEMBERS
+			nextDataLocation = nextDataLocation
+					+ refsetNidMemberNidForRefsetMembersOutput.length;
+			
+			finalOutput.writeInt(nextDataLocation); // DESC_NIDS
+			nextDataLocation = nextDataLocation
+					+ descNidOutput.length;
+			
+			finalOutput.writeInt(nextDataLocation); // SRC_REL_NIDS
+			nextDataLocation = nextDataLocation
+					+ srcRelNidOutput.length;
+			
+			finalOutput.writeInt(nextDataLocation); // IMAGE_NIDS
+			nextDataLocation = nextDataLocation
+					+ imageNidOutput.length;
+			
+			finalOutput.writeInt(nextDataLocation); // IMAGES
+			nextDataLocation = nextDataLocation + imageOutput.length;
+			
 			finalOutput.makeSpace(nextDataLocation);
-			finalOutput.writeFast(attrOutput); // ATTRIBUTES
-			finalOutput.writeFast(descOutput); // DESCRIPTIONS
-			finalOutput.writeFast(relOutput); // SOURCE_RELS
-			finalOutput.writeFast(imageOutput); // IMAGES
+			finalOutput.writeFast(attrOutput);   // ATTRIBUTES
+			finalOutput.writeFast(descOutput);   // DESCRIPTIONS
+			finalOutput.writeFast(relOutput);    // SOURCE_RELS
 			finalOutput.writeFast(refsetOutput); // REFSET_MEMBERS
-			finalOutput.writeFast(destRelOutput); // DEST_REL_ORIGIN_NID_TYPE_NIDS
+			finalOutput.writeFast(destRelOutput);// DEST_REL_ORIGIN_NID_TYPE_NIDS
 			finalOutput.writeFast(refsetNidMemberNidForConceptOutput); // REFSETNID_MEMBERNID_FOR_CONCEPT
-			finalOutput.writeFast(refsetNidMemberNidForDescOutput); // REFSETNID_MEMBERNID_FOR_DESCRIPTIONS
-			finalOutput.writeFast(refsetNidMemberNidForRelsOutput); // REFSETNID_MEMBERNID_FOR_RELATIONSHIPS
+			finalOutput.writeFast(refsetNidMemberNidForDescOutput);    // REFSETNID_MEMBERNID_FOR_DESCRIPTIONS
+			finalOutput.writeFast(refsetNidMemberNidForRelsOutput);    // REFSETNID_MEMBERNID_FOR_RELATIONSHIPS
+			finalOutput.writeFast(refsetNidMemberNidForImagesOutput);    // REFSETNID_MEMBERNID_FOR_IMAGES
+			finalOutput.writeFast(refsetNidMemberNidForRefsetMembersOutput); // REFSETNID_MEMBERNID_FOR_REFSETMEMBERS
+			finalOutput.writeFast(descNidOutput);  // DESC_NIDS
+			finalOutput.writeFast(srcRelNidOutput);// SRC_REL_NIDS
+			finalOutput.writeFast(imageNidOutput); // IMAGE_NIDS
+			finalOutput.writeFast(imageOutput);    // IMAGES
+		
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	private static IntSetBinder intSetBinder = new IntSetBinder();
+	private byte[] getNidSetBytes(I_ManageConceptData conceptData,
+			boolean primordial, IntSet nidsReadOnly, IntSet nids) {
+		IntSet nidsToWrite = new IntSet();
+		nidsToWrite.addAll(nids.getSetValues());
+		nidsToWrite.removeAll(nidsReadOnly.getSetValues());
+		TupleOutput output = new TupleOutput();
+		intSetBinder.objectToEntry(nidsToWrite, output);
+		return output.toByteArray();
 	}
 
 	private byte[] getAttributeBytes(

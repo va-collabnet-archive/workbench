@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
@@ -80,6 +82,13 @@ public interface I_ManageConceptData {
 	public void setRefsetNidMemberNidForRelsList(
 			ArrayIntList refsetNidMemberNidForRelsList) throws IOException;
 
+
+	public void setRefsetNidMemberNidForImagesList(
+			ArrayIntList refsetNidMemberNidForImagesList) throws IOException;
+
+	public void setRefsetNidMemberNidForRefsetMembersList(
+			ArrayIntList refsetNidMemberNidForRefsetMembersList) throws IOException;
+
 	public ArrayIntList getDestRelNidTypeNidList() throws IOException;
 	public ArrayIntList getDestRelNidTypeNidListReadOnly() throws IOException;
 
@@ -91,4 +100,30 @@ public interface I_ManageConceptData {
 
 	public ArrayIntList getRefsetNidMemberNidForRelsList() throws IOException;
 	public ArrayIntList getRefsetNidMemberNidForRelsListReadOnly() throws IOException;
+
+	public ArrayIntList getRefsetNidMemberNidForImagesList() throws IOException;
+	public ArrayIntList getRefsetNidMemberNidForImagesListReadOnly() throws IOException;
+
+	public ArrayIntList getRefsetNidMemberNidForRefsetMembersList() throws IOException;
+	public ArrayIntList getRefsetNidMemberNidForRefsetMembersListReadOnly() throws IOException;
+
+	public ConceptComponent<?, ?> getComponent(int nid) throws IOException;
+
+	public List<RefsetMember<?, ?>> getExtensionsForComponent(int nid) throws IOException;
+
+	public IntSet getDescNidsReadOnly() throws IOException;
+
+	public IntSet getDescNids()  throws IOException;
+
+	public IntSet getSrcRelNidsReadOnly()  throws IOException;
+
+	public IntSet getSrcRelNids()  throws IOException;
+
+	public IntSet getImageNidsReadOnly()  throws IOException;
+
+	public IntSet getImageNids()  throws IOException;
+
+
+	public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException;
+
 }
