@@ -35,7 +35,8 @@ import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
 import org.dwfa.tapi.TerminologyException;
 
 public class RegionalHibernationBuilder {
-	public static final String[] ALL_REGIONS = {"NCAL", "SCAL", "CO", "HI", "NW", "MAS", "OH", "GA"};
+	// Order of regions is important, used to determine an integer identifier for Epic hibernation
+	public static final String[] ALL_REGIONS = {"NCAL", "SCAL", "CO", "GA", "HI", "MAS", "NW", "OH"};
 	public static final String NATIONAL_REGION = "National";
 	
 	private String outputDirectory = null;
@@ -136,7 +137,12 @@ public class RegionalHibernationBuilder {
 		}
 		
 		public void addRegion(String region) {
-			this.regions.add(region);
+			if (region.equals("CAL")) {
+				this.regions.add("NCAL");
+				this.regions.add("SCAL");
+			}
+			else
+				this.regions.add(region);
 		}
 		
 		public void setOutputDir(String outputDir) {
@@ -163,7 +169,6 @@ public class RegionalHibernationBuilder {
 		public void writeHibernation(String dir, String cid) throws IOException {
 			this.setOutputDir(dir);
 			List<String> regions = this.getRegionsNotUsing();
-			int i = 0;
 			if (regions.size() > 0)
 				++this.cidsHibernated;
 			for (String r: regions) {
@@ -172,7 +177,7 @@ public class RegionalHibernationBuilder {
 				s.append("^CID.");
 				s.append(cid);
 				s.append('^');
-				s.append(++i);
+				s.append(getRegionNumber(r));
 				s.append("^3^Hibernated in ");
 				s.append(r);
 				writeLine(s.toString());
@@ -200,6 +205,16 @@ public class RegionalHibernationBuilder {
 				AceLog.getAppLog().info("Wrote " + this.regionsHibernated + 
 						" hibernations for " + this.cidsHibernated + " cid's in file " + this.filename);
 			}
+		}
+		
+		public int getRegionNumber(String region) {
+			int i = 0;
+			for (String s: RegionalHibernationBuilder.ALL_REGIONS) {
+				i++;
+				if (s.equals(region))
+					return i;
+			}
+			return 0;
 		}
 	}
 

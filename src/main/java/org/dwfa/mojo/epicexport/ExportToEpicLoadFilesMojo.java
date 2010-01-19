@@ -22,7 +22,6 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -32,13 +31,12 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.epicexport.kp.EpicLoadFileFactory;
 import org.dwfa.mojo.epicexport.kp.EpicTermWarehouseFactory;
-import org.dwfa.util.id.Type5UuidFactory;
 
 
 /**
@@ -161,7 +159,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 				return;
 			}
 
-			termFactory = LocalVersionedTerminology.get();
+			termFactory = Terms.get();
 
 			positions = new HashSet<I_Position>(
 					positionsForExport.length);
@@ -178,16 +176,25 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			}
 			
 			this.setFactories();
-			ExternalTermPublisher mapper = new ExternalTermPublisher(this.exportFactory);
-			mapper.setStartingDate(deltaStartDate);
-			mapper.setPositions(positions);
-			mapper.setStatusValues(statusValues);
-			/* //TEST CODE:
+			ExternalTermPublisher publisher = new ExternalTermPublisher(this.exportFactory);
+			publisher.setStartingDate(deltaStartDate);
+			publisher.setPositions(positions);
+			publisher.setStatusValues(statusValues);
+			/* //TEST CODE: dbdd4eb3-1457-34d5-a248-bdeb1b86bd3f
 			I_GetConceptData concept = termFactory.getConcept(UUID.fromString("1ca9b835-cbf6-40e8-82b3-acbf0eb30293"));
 
-			List<ExternalTermRecord> er = mapper.getExternalTermRecordsForConcept(concept);
-			for (ExternalTermRecord record: er)
+			List<ExternalTermRecord> er = publisher.getExternalTermRecordsForConcept(concept);
+			for (ExternalTermRecord record: er) {
 				System.out.println(record.toString());
+				 // getLog().info("Adding item 100 ");
+				 // record.addMember("100", "Swine Flu");
+				 ExternalTermRecord.Item item = record.getFirstItem("7010");
+				 if (item != null) {
+					 getLog().info("Setting item 7010");
+					 item.memberUpdate("Hx of traumatic vertebral FX TEST");
+				 }
+
+			}
 			// END TEST CODE */
 			
 			getLog().info(
@@ -198,7 +205,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 				outputDirectory = outputDirectory + "/";
 			}
 			
-			ExportIterator expItr = new ExportIterator(mapper, this.exportManager, this.dropName);
+			ExportIterator expItr = new ExportIterator(publisher, this.exportManager, this.dropName);
 			
 			
 			/*
@@ -209,7 +216,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			 * 
 			*/
 			// Iterate through all concepts
-			LocalVersionedTerminology.get().iterateConcepts(expItr);
+			Terms.get().iterateConcepts(expItr);
 			expItr.close();
 
 		} catch (Exception e) {
@@ -251,23 +258,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
     		 List<ExternalTermRecord> terms = publisher.getExternalTermRecordsForConcept(concept);
     		 for (ExternalTermRecord term: terms) {
     			 term.setVersion(version);
-    			 ///* Test code
-    			 if (term.getFirstItem("2").getValue().toString().equals("Swine Flu")) {
-    				 // getLog().info("Adding item 100 ");
-    				 //term.addMember("100", "Swine Flu");
-    			 }
-    			 
-    			 if (term.getFirstItem("2").getValue().toString().equals("Hx of traumatic vertebral FX")) {
-    				 
-    				 ExternalTermRecord.Item item = term.getFirstItem("7010");
-    				 if (item != null) {
-    					 // getLog().info("Setting item 7010");
-    					 // item.memberUpdate("Hx of traumatic vertebral FX TEST");
-    				 }
-    					
-    			 }
-    			 
-    			 
     		     exportManager.exportExternalTermRecord(term);
     		 }
     	 }

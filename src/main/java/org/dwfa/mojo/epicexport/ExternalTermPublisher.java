@@ -56,7 +56,6 @@ public class ExternalTermPublisher {
 	private I_IntSet statusValues;
 	private List<ExternalTermRecord> recordQueue;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
-	@SuppressWarnings("unused")
 	private I_GetConceptData rootConcept;
 	private I_GetConceptData descConcept;
 	private I_ExportValueConverter converter;
