@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,16 +15,6 @@
  * limitations under the License.
  */
 package org.dwfa.mojo;
-
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -39,12 +29,9 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
-import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_WriteDirectToDb;
@@ -56,19 +43,28 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.refset.ExportSpecification;
 import org.dwfa.tapi.TerminologyException;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Given a root node, this mojo will copy the latest version of every component
  * in this hierarchy
  * o the destination path if it isn't already on that path.
- * 
+ *
  * @goal copy-hierarchy-to-path
- * 
+ *
  */
 public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcepts {
 
     /**
      * Path to copy the data to
-     * 
+     *
      * @parameter
      * @required
      */
@@ -76,7 +72,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 
     /**
      * Root node to copy data from
-     * 
+     *
      * @parameter
      * @required
      */
@@ -84,7 +80,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 
     /**
      * Relationship type for the hierarchy - defaults to SNOMED "Is a"
-     * 
+     *
      * @parameter
      */
     ConceptDescriptor[] hierarchyRelationshipTypes = null;
@@ -92,14 +88,14 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
     /**
      * Allowed statuses for the hierarchy - defaults to active or a child of
      * active
-     * 
+     *
      * @parameter
      */
     ConceptDescriptor[] hierarchyStatuses = null;
 
     /**
      * Exclusion from the hierarchy
-     * 
+     *
      * @parameter
      */
     ExportSpecification[] exclusions = null;
@@ -107,7 +103,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
     /**
      * Flag that indicates if the just the latest data or all history should be
      * copied - defaults to latest only
-     * 
+     *
      * @parameter
      */
     boolean latestStateOnly = true;
@@ -118,7 +114,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
      * exist on the target path (true), or to omit inactive versions in the copy
      * if the
      * entity doesn't exist in the target path (false). Default is false.
-     * 
+     *
      * @parameter
      */
     private boolean copyInactiveVersionsNotInTarget = false;
@@ -153,7 +149,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
      * Allows specification of paths for source data that should be excluded
      * from
      * the copy
-     * 
+     *
      * @parameter
      */
     private ConceptDescriptor[] excludedPaths;
@@ -184,7 +180,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
                 hierarchyStatuses = new ConceptDescriptor[] { activeStatus, currentStatus };
 
                 Set<I_GetConceptData> children = activeStatus.getVerifiedConcept().getDestRelOrigins(
-                    toIntSet(hierarchyStatuses), toIntSet(hierarchyRelationshipTypes), null, false);
+                    toIntSet(hierarchyStatuses), toIntSet(hierarchyRelationshipTypes), null, false, true);
 
                 ArrayList<ConceptDescriptor> statusDescriptors = new ArrayList<ConceptDescriptor>();
                 statusDescriptors.add(activeStatus);
@@ -195,7 +191,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
                     statusDescriptors.add(childStatus);
                 }
 
-                hierarchyStatuses = statusDescriptors.toArray(hierarchyStatuses);
+                hierarchyStatuses = statusDescriptors.toArray(new ConceptDescriptor[statusDescriptors.size()]);
             }
 
             if (excludedPaths != null) {
@@ -277,7 +273,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
      * Gets the latest tuples for the given pathid - if the pathid is null the
      * latest
      * tuples will be returned for all paths
-     * 
+     *
      * @param <T> tuple type
      * @param tuples list of tuples to examine
      * @param pathid path
