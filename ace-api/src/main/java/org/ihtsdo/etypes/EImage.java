@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
 import org.dwfa.tapi.TerminologyException;
 
 public class EImage extends EComponent<EImageVersion> {
