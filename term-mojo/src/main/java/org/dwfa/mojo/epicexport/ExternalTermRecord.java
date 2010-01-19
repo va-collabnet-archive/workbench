@@ -9,7 +9,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
@@ -260,7 +260,7 @@ public class ExternalTermRecord {
 	@SuppressWarnings("deprecation")
 	public void addMember(String item, String val) throws TerminologyException {
 		try {
-			I_TermFactory tf = LocalVersionedTerminology.get();
+			I_TermFactory tf = Terms.get();
 	        int nidUnspecifiedUuid = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid();
 	        I_Path editIPath;
 	        I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
@@ -459,9 +459,10 @@ System.out.println("Updating item to: " + val);
 	            I_ThinExtByRefPartString duplStr = (I_ThinExtByRefPartString) dupl;
 	            duplStr.setStringValue(val);
 	            core.addVersion(dupl);
-	            LocalVersionedTerminology.get().addUncommitted(core);
+	            Terms.get().addUncommitted(core);
+System.out.println("Uncommitted: " +Terms.get().getUncommitted().size());          
 	    	}
-	    	// I_TermFactory tf = LocalVersionedTerminology.get();
+	    	// I_TermFactory tf = Terms.get();
 	    	//tf.commitTransaction();
 	    	// tf.commit();
 		}
@@ -484,7 +485,7 @@ System.out.println("Updating item to: " + val);
 		    	I_ThinExtByRefPartInteger duplInt = (I_ThinExtByRefPartInteger) dupl;
 		    	duplInt.setIntValue(val);
 	            core.addVersion(dupl);
-	            LocalVersionedTerminology.get().addUncommitted(core);
+	            Terms.get().addUncommitted(core);
 	    	}
 		}
 
@@ -505,7 +506,7 @@ System.out.println("Updating item to: " + val);
 		    	I_ThinExtByRefPartBoolean duplBool = (I_ThinExtByRefPartBoolean) dupl;
 		    	duplBool.setBooleanValue(val);
 	            core.addVersion(dupl);
-	            LocalVersionedTerminology.get().addUncommitted(core);
+	            Terms.get().addUncommitted(core);
 	    	}
 		}
 		
@@ -515,9 +516,9 @@ System.out.println("Updating item to: " + val);
 			I_ThinExtByRefPart extPart = sourceExtensionTuple.getMutablePart();
 			I_ThinExtByRefVersioned core = sourceExtensionTuple.getCore();
 	        I_ThinExtByRefPart dupl = (I_ThinExtByRefPart) extPart.makeAnalog(nidRetired, extPart.getPathId(), 
-	        		LocalVersionedTerminology.get().convertToThickVersion(nidVersion));
+	        		Terms.get().convertToThickVersion(nidVersion));
 	        core.addVersion(dupl);
-	        LocalVersionedTerminology.get().addUncommitted(core);
+	        Terms.get().addUncommitted(core);
 
 		}
 
