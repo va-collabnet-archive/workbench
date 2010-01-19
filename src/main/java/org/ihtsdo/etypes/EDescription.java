@@ -137,19 +137,18 @@ public class EDescription extends EComponent<EDescriptionVersion> implements I_D
         StringBuffer buff = new StringBuffer();
 
         buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append(super.toString());
-
-        buff.append(" conceptUuid:");
+        buff.append(" text: \"");
+        buff.append(this.text);
+        buff.append("\" conceptUuid:");
         buff.append(this.conceptUuid);
         buff.append(" initialCaseSignificant:");
         buff.append(this.initialCaseSignificant);
         buff.append(" lang:");
         buff.append(this.lang);
-        buff.append(" text:");
-        buff.append(this.text);
         buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
+        buff.append(super.toString());
 
         return buff.toString();
     }
