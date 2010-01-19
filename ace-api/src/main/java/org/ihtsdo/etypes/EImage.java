@@ -151,8 +151,8 @@ public class EImage extends EComponent<EImageVersion> {
         buff.append(this.conceptUuid);
         buff.append(" format:");
         buff.append(this.format);
-        buff.append(" image:");
-        buff.append(this.image);
+        buff.append(" image:");       
+        buff.append( new String(this.image));
         buff.append(" textDescription:");
         buff.append(this.textDescription);
         buff.append(" typeUuid:");
