@@ -61,9 +61,13 @@ public class EConcept {
             if (nidTypeMap.containsKey(nid)) {
                 return nidTypeMap.get(nid);
             } else {
-            	I_GetConceptData typeConcept = Terms.get().getConcept(nid);
-            	throw new TerminologyException("Unknown refset type: " + nid + 
-            			" concept: " + typeConcept);
+            	if (Terms.get().hasConcept(nid)) {
+                	I_GetConceptData typeConcept = Terms.get().getConcept(nid);
+                	throw new TerminologyException("Unknown refset type: " + nid + 
+                			" concept: " + typeConcept.getInitialText());
+            	} else {
+                	throw new TerminologyException("Unknown refset type: " + nid);
+            	}
             }
         }
 
