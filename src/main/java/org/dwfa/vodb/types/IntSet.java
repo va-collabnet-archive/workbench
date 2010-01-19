@@ -33,9 +33,11 @@ import javax.swing.event.ListDataListener;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
+import org.dwfa.tapi.TerminologyException;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -80,13 +82,22 @@ public class IntSet implements ListDataListener, I_IntSet {
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[");
+        int count = 0;
         for (int i : setValues) {
             try {
-                buf.append(ConceptBean.get(i).getInitialText());
+            	if (Terms.get().hasConcept(i)) {
+                    buf.append(Terms.get().getConcept(i).getInitialText());
+            	} else {
+                    buf.append(i);
+            	}
             } catch (IOException e) {
                 buf.append(i);
+            } catch (TerminologyException e) {
+                buf.append(i);
+			}
+            if (count++ < setValues.length - 1) {
+                buf.append(", ");
             }
-            buf.append(", ");
         }
         buf.append("]");
         return buf.toString();
