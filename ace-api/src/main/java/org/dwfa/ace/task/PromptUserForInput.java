@@ -170,8 +170,6 @@ public class PromptUserForInput extends AbstractTask {
                     c.weightx = 0.0;
                     c.fill = GridBagConstraints.HORIZONTAL;
                     c.gridx++;
-                    workflowPanel.add(new JLabel("  "), c);
-                    c.gridx++;
                     JTextField nameField = new JTextField(15);
                     workflowPanel.add(nameField, c);
                     c.gridx++;
@@ -189,12 +187,12 @@ public class PromptUserForInput extends AbstractTask {
                     workflowPanel.add(stopButton, c);
                     stopButton.addActionListener(new StopActionListener());
                     c.gridx++;
-                    workflowPanel.add(new JLabel("     "), c);
+                    workflowPanel.add(new JLabel(" "), c);
                     workflowPanel.validate();
                     Container cont = workflowPanel;
-                    while (cont != null) {
+                    while (cont != null) {                        
                         cont.validate();
-                        cont = cont.getParent();
+                        cont = cont.getParent();                        
                     }
                     stepButton.requestFocusInWindow();
                 }
