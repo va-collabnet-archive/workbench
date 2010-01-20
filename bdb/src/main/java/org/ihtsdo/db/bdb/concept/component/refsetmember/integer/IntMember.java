@@ -9,6 +9,7 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetIntVersion;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -79,9 +80,20 @@ public class IntMember extends RefsetMember<IntVersion, IntMember> {
 	public int getIntValue() {
 		return intValue;
 	}
+	@Override
+	protected String getTypeFieldsString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append(" intValue: ");
+		buf.append(intValue);
+		return buf.toString();
+	}
 
 	public void setIntValue(int intValue) {
 		this.intValue = intValue;
+	}
+	@Override
+	public int getTypeId() {
+		return REFSET_TYPES.INT.getTypeNid();
 	}
 
 }

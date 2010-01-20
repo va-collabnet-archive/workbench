@@ -75,7 +75,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 				eConcept.getConceptAttributes().getPrimordialComponentUuid());
 		assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
 		Concept c = get(conceptNid, true);
-		
 		EConceptAttributes eAttr = eConcept.getConceptAttributes();
 		
 		ConceptAttributes attr = new ConceptAttributes(eAttr, c);
@@ -116,7 +115,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 				new ArrayIntList(eConcept.getDestRelUuidTypeUuids().size());
 			for (UUID uuid: eConcept.getDestRelUuidTypeUuids()) {
 				destRelOriginNidTypeNidList.add(Bdb.uuidToNid(uuid));
-				
 			}
 			c.data.setDestRelNidTypeNidList(destRelOriginNidTypeNidList);
 		}
@@ -408,8 +406,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public String getInitialText() throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
+		return getDescriptions().iterator().next().getText();
 	}
 
 	public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config)
@@ -803,6 +800,24 @@ public class Concept implements I_Transact, I_GetConceptData {
 			buff.append(getImages());
 			buff.append("\n refset members: ");
 			buff.append(getExtensions());
+			buff.append("\n dest rel nid, type nid: ");
+			buff.append(data.getDestRelNidTypeNidList());
+			buff.append("\n refset/member for concept: ");
+			buff.append(data.getRefsetNidMemberNidForConceptList());
+			buff.append("\n refset/member for desc: ");
+			buff.append(data.getRefsetNidMemberNidForDescriptionsList());
+			buff.append("\n refset/member for rels: ");
+			buff.append(data.getRefsetNidMemberNidForRelsList());
+			buff.append("\n refset/member for image: ");
+			buff.append(data.getRefsetNidMemberNidForImagesList());
+			buff.append("\n refset/member for members: ");
+			buff.append(data.getRefsetNidMemberNidForRefsetMembersList());
+			buff.append("\n desc nids: ");
+			buff.append(data.getDescNids());
+			buff.append("\n src rel nids: ");
+			buff.append(data.getSrcRelNids());
+			buff.append("\n image nids: ");
+			buff.append(data.getImageNids());
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}

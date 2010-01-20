@@ -423,7 +423,10 @@ public class BdbTermFactory implements I_TermFactory {
 
 	@Override
 	public boolean hasConcept(int conceptId) throws IOException {
-		throw new UnsupportedOperationException();
+		if (Bdb.getNidCNidMap().getCNid(conceptId) == conceptId) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override

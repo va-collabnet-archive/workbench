@@ -71,28 +71,30 @@ public class UuidBdb extends ComponentBdb {
 			if (readOnlyRecords > 0) {
 				index = (i + readOnlyRecords - 1);
 			}
-			UuidArrayList uuidList = uuidMaps.get(i + readOnlyRecords - 1);
-			AceLog.getAppLog().info(" reading uuid bdb mutable list: " + 
-					i + " as globalList: " + index);
-			OperationStatus status = mutable.get(null, keyEntry, valueEntry, 
-					LockMode.READ_UNCOMMITTED);
-			if (status == OperationStatus.SUCCESS) {
-				TupleInput ti = new TupleInput(valueEntry.getData());
-				long[] uuidArray = new long[2];
-				int j = 0;
-				while (ti.available() > 0) {
-					uuidArray[0] = ti.readLong();
-					uuidArray[1] = ti.readLong();
-					if (j < uuidList.size()) {
-						assert uuidList.get(j)[0] == uuidArray[0] && 
-							uuidList.get(j)[1] == uuidArray[1];
-					} else {
-						uuidList.add(uuidArray);
+			if (index >= 0) {
+				UuidArrayList uuidList = uuidMaps.get(index);
+				AceLog.getAppLog().info(" reading uuid bdb mutable list: " + 
+						i + " as globalList: " + index);
+				OperationStatus status = mutable.get(null, keyEntry, valueEntry, 
+						LockMode.READ_UNCOMMITTED);
+				if (status == OperationStatus.SUCCESS) {
+					TupleInput ti = new TupleInput(valueEntry.getData());
+					long[] uuidArray = new long[2];
+					int j = 0;
+					while (ti.available() > 0) {
+						uuidArray[0] = ti.readLong();
+						uuidArray[1] = ti.readLong();
+						if (j < uuidList.size()) {
+							assert uuidList.get(j)[0] == uuidArray[0] && 
+								uuidList.get(j)[1] == uuidArray[1];
+						} else {
+							uuidList.add(uuidArray);
+						}
+						j++;
 					}
-					j++;
+				} else {
+					throw new IOException("Unsuccessful operation: " + status);
 				}
-			} else {
-				throw new IOException("Unsuccessful operation: " + status);
 			}
 		}
 		

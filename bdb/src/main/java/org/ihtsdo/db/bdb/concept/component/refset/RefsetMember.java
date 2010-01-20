@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -17,6 +19,7 @@ import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.etypes.ERefset;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -26,7 +29,6 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 			extends ConceptComponent<V, C> 
 			implements I_ThinExtByRefVersioned {
 
-	private int memberTypeNid; 
 	private int referencedComponentNid;
 
 
@@ -37,7 +39,6 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 	public RefsetMember(ERefset<?> refsetMember, 
 			Concept enclosingConcept) {
 		super(refsetMember, enclosingConcept);
-		memberTypeNid = refsetMember.getType().getTypeNid();
 		referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());
 		primordialSapNid = Bdb.getStatusAtPositionNid(refsetMember);
 		assert primordialSapNid != Integer.MAX_VALUE;
@@ -49,20 +50,36 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 		StringBuffer buf = new StringBuffer();
 		buf.append("nid: ");
 		buf.append(nid);
-		buf.append(" memberTypeNid: ");
-		buf.append(memberTypeNid);
-		buf.append(" referencedComponentNid: ");
-		buf.append(referencedComponentNid);
+		buf.append(" refset: ");
+		try {
+			buf.append(enclosingConcept.getInitialText());
+		} catch (IOException e1) {
+			buf.append(e1.getLocalizedMessage());
+		}
+		buf.append(" type: ");
+		try {
+			buf.append(REFSET_TYPES.nidToType(getTypeId()));
+		} catch (TerminologyException e) {
+			buf.append(e.getLocalizedMessage());
+		} catch (IOException e) {
+			buf.append(e.getLocalizedMessage());
+		}
+		buf.append(" rcNid: ");
+		addNidToBuffer(buf, referencedComponentNid);
+		buf.append(" ");
+		buf.append(getTypeFieldsString());
 		buf.append(" ");
 		buf.append(super.toString());
 		return buf.toString();
 	}
 
+	protected abstract String getTypeFieldsString();
+
 	@Override
 	public boolean fieldsEqual(ConceptComponent<V, C> obj) {
 		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
 			RefsetMember<V,C> another = (RefsetMember<V,C>) obj;
-			if (this.memberTypeNid != another.memberTypeNid) {
+			if (this.getTypeId() != another.getTypeId()) {
 				return false;
 			}
 			if (membersEqual(obj)) {
@@ -75,11 +92,12 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 	protected abstract boolean membersEqual(ConceptComponent<V, C> obj);
 
 	public void readFromBdb(TupleInput input)  {
-		memberTypeNid = input.readInt();
 		referencedComponentNid = input.readInt();
 		readMember(input);
 		int additionalVersionCount = input.readShort();
-		readMemberParts(input, additionalVersionCount);
+		if (additionalVersionCount > 0) {
+			readMemberParts(input, additionalVersionCount);
+		}
 	}
 
 	protected abstract void readMember(TupleInput input);
@@ -98,7 +116,6 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 			}
 		}
 		output.writeInt(referencedComponentNid);
-		output.writeInt(memberTypeNid);
 		writeMember(output);
 		output.writeShort(additionalVersionsToWrite.size());
 		for (RefsetVersion<V, C> p: additionalVersionsToWrite) {
@@ -150,12 +167,6 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 			throws TerminologyException, IOException {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-
-	@Override
-	public int getTypeId() {
-		return memberTypeNid;
 	}
 
 

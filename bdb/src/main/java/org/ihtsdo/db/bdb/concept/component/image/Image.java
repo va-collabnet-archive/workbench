@@ -56,6 +56,8 @@ public class Image
 		super(eImage, enclosingConcept);
 		image = eImage.getImage();
 		format = eImage.getFormat();
+		textDescription = eImage.getTextDescription();
+		typeNid = Bdb.uuidToNid(eImage.getPrimordialComponentUuid());
 		primordialSapNid = Bdb.getStatusAtPositionNid(eImage);
 		if (eImage.getExtraVersionsList() != null) {
 			additionalVersions = new ArrayList<ImageVersion>(eImage.getExtraVersionsList().size());
@@ -107,6 +109,8 @@ public class Image
 		int imageBytes = input.readInt();
 		image = new byte[imageBytes];
 		input.read(image, 0, imageBytes);
+		textDescription = input.readString();
+		typeNid = input.readInt();
 		int additionalVersionCount = input.readShort();
 		for (int i = 0; i < additionalVersionCount; i++) {
 			additionalVersions.add(new ImageVersion(input, this));
@@ -128,6 +132,8 @@ public class Image
 		output.writeString(format);
 		output.writeInt(image.length);
 		output.write(image);
+		output.writeString(textDescription);
+		output.writeInt(typeNid);
 		output.writeShort(partsToWrite.size());
 		for (ImageVersion p: partsToWrite) {
 			p.writePartToBdb(output);

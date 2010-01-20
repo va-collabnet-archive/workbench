@@ -9,6 +9,7 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERefsetVersion;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -73,4 +74,15 @@ public class MembershipMember extends RefsetMember<MembershipVersion, Membership
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public int getTypeId() {
+		return REFSET_TYPES.MEMBER.getTypeNid();
+	}
+
+	@Override
+	protected String getTypeFieldsString() {
+		return "";
+	}
+
 }

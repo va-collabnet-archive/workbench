@@ -19,6 +19,7 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.utypes.UniversalAceIdentification;
@@ -29,7 +30,6 @@ import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
-import org.ihtsdo.db.bdb.concept.ConceptBdb;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersion;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionLong;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionString;
@@ -48,10 +48,24 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	implements I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion,
 	I_HandleFutureStatusAtPositionSetup {
 	
-	private static ConceptBdb conceptBdb = Bdb.getConceptDb();
-	
+	public static void addNidToBuffer(StringBuffer buf, int nidToConvert) {
+		try {
+			if (Terms.get().hasConcept(nidToConvert)) {
+				buf.append("\"");
+				buf.append(Terms.get().getConcept(nidToConvert).getInitialText());
+				buf.append("\"");
+			} else {
+				buf.append(nidToConvert);
+			}
+		} catch (IOException e) {
+			buf.append(e.getLocalizedMessage());
+		} catch (TerminologyException e) {
+			buf.append(e.getLocalizedMessage());
+		}
+	}
+
 	private static List<UUID> getUuids(int conceptNid) throws IOException {
-		return conceptBdb.getUuidsForConcept(conceptNid);
+		return Bdb.getConceptDb().getUuidsForConcept(conceptNid);
 	}
 
 	public enum IDENTIFIER_PART_TYPES {
@@ -390,7 +404,8 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		readFromBdb(input);
 	}
 	
-	public final void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+	public final void writeComponentToBdb(TupleOutput output, 
+			int maxReadOnlyStatusAtPositionNid) {
 		output.writeInt(nid);
 		output.writeInt(primordialSapNid);
 		writeIdentifierToBdb(output, maxReadOnlyStatusAtPositionNid);

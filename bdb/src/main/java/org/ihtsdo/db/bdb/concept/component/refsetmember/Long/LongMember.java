@@ -9,6 +9,7 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetLongVersion;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -83,5 +84,18 @@ public class LongMember extends RefsetMember<LongVersion, LongMember> {
 		this.longValue = longValue;
 	}
 
+	@Override
+	protected String getTypeFieldsString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append(" longValue: ");
+		buf.append(longValue);
+		return buf.toString();
+	}
+
+
+	@Override
+	public int getTypeId() {
+		return REFSET_TYPES.LONG.getTypeNid();
+	}
 
 }

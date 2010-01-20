@@ -61,13 +61,15 @@ public class ConceptAttributes
 			// nid, list size, and conceptNid are read already by the binder...
 			defined = input.readBoolean();
 			int additionalVersionCount = input.readShort();
-			if (additionalVersions == null) {
-				additionalVersions = new ArrayList<ConceptAttributesVersion>(additionalVersionCount);
-			} else {
-				additionalVersions.ensureCapacity(additionalVersions.size() + additionalVersionCount);
-			}
-			for (int i = 0; i < additionalVersionCount; i++) {
-				additionalVersions.add(new ConceptAttributesVersion(input, this));
+			if (additionalVersionCount > 0) {
+				if (additionalVersions == null) {
+					additionalVersions = new ArrayList<ConceptAttributesVersion>(additionalVersionCount);
+				} else {
+					additionalVersions.ensureCapacity(additionalVersions.size() + additionalVersionCount);
+				}
+				for (int i = 0; i < additionalVersionCount; i++) {
+					additionalVersions.add(new ConceptAttributesVersion(input, this));
+				}
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(" Processing nid: " + this.enclosingConcept.getNid(), e);

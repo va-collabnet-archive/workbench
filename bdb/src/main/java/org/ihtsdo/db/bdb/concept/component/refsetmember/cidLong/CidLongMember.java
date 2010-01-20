@@ -10,6 +10,7 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetCidLongMember;
 import org.ihtsdo.etypes.ERefsetCidLongVersion;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -71,6 +72,16 @@ public class CidLongMember
 	}
 
 	@Override
+	protected String getTypeFieldsString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("c1Nid: ");
+		addNidToBuffer(buf, c1Nid);
+		buf.append(" longValue: ");
+		buf.append(longValue);
+		return buf.toString();
+	}
+
+	@Override
 	protected ArrayIntList getVariableVersionNids() {
 		// TODO Auto-generated method stub
 		return null;
@@ -96,6 +107,11 @@ public class CidLongMember
 
 	public void setLongValue(long longValue) {
 		this.longValue = longValue;
+	}
+
+	@Override
+	public int getTypeId() {
+		return REFSET_TYPES.CID_LONG.getTypeNid();
 	}
 
 }

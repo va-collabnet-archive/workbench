@@ -1,6 +1,7 @@
 package org.ihtsdo.db.bdb.concept.component.refset;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.Concept;
@@ -43,6 +44,7 @@ public class RefsetMemberFactory  {
 		assert enclosingConcept != null;
 		REFSET_TYPES memberType;
 		try {
+			assert Arrays.asList(REFSET_TYPES.values()).contains(REFSET_TYPES.nidToType(typeNid));
 			memberType = REFSET_TYPES.nidToType(typeNid);
 		} catch (TerminologyException e) {
 			throw new RuntimeException(e);

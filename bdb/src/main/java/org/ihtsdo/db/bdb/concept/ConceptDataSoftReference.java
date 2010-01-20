@@ -572,14 +572,14 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	@Override
 	public ArrayIntList getDestRelNidTypeNidList() throws IOException {
 		ArrayIntList returnList = null;
-		if (refsetNidMemberNidForRelsListRef != null) {
-			returnList = refsetNidMemberNidForRelsListRef.get();
+		if (destRelNidTypeNidListRef != null) {
+			returnList = destRelNidTypeNidListRef.get();
 		}
 		if (returnList != null) {
 			return returnList;
 		}
 		returnList = getArrayIntList(OFFSETS.DEST_REL_NID_TYPE_NIDS);
-		refsetNidMemberNidForRelsListRef = new SoftReference<ArrayIntList>(
+		destRelNidTypeNidListRef = new SoftReference<ArrayIntList>(
 				returnList);
 		if (enclosingConcept.isEditable()) {
 			strongReferences.add(returnList);
@@ -919,7 +919,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 				return nids;
 			}
 		}
-		IntSet nids = getDescNidsReadOnly().addAll(
+		IntSet nids = getSrcRelNidsReadOnly().addAll(
 				getMutableIntSet(OFFSETS.SRC_REL_NIDS).getSetValues());
 		if (enclosingConcept.isEditable()) {
 			strongReferences.add(nids);

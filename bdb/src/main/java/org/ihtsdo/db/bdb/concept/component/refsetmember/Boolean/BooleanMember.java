@@ -9,6 +9,7 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanVersion;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -62,7 +63,6 @@ public class BooleanMember extends RefsetMember<BooleanVersion, BooleanMember> {
 	@Override
 	protected void readMember(TupleInput input) {
 		booleanValue = input.readBoolean();
-
 	}
 	@Override
 	protected void writeMember(TupleOutput output) {
@@ -87,6 +87,16 @@ public class BooleanMember extends RefsetMember<BooleanVersion, BooleanMember> {
 
 	public void setBooleanValue(boolean booleanValue) {
 		this.booleanValue = booleanValue;
+	}
+
+	@Override
+	public int getTypeId() {
+		return REFSET_TYPES.BOOLEAN.getTypeNid();
+	}
+
+	@Override
+	protected String getTypeFieldsString() {
+		return Boolean.toString(booleanValue);
 	}
 
 }

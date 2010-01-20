@@ -34,11 +34,6 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 
 		public final int getAndIncrement() {
 			int next = sequence.getAndIncrement();
-			try {
-				Bdb.getNidCNidMap().ensureCapacity(next);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
 			return next;
 		}
 

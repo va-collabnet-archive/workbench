@@ -10,6 +10,7 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetCidCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidCidStrVersion;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -74,6 +75,17 @@ public class CidCidStrMember extends RefsetMember<CidCidStrVersion, CidCidStrMem
 		output.writeInt(c2Nid);
 		output.writeString(strValue);
 	}
+	@Override
+	protected String getTypeFieldsString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("c1Nid: ");
+		addNidToBuffer(buf, c1Nid);
+		buf.append(" c2Nid: ");
+		addNidToBuffer(buf, c2Nid);
+		buf.append(" strValue: ");
+		buf.append(strValue);
+		return buf.toString();
+	}
 
 	@Override
 	protected ArrayIntList getVariableVersionNids() {
@@ -109,6 +121,11 @@ public class CidCidStrMember extends RefsetMember<CidCidStrVersion, CidCidStrMem
 
 	public void setStrValue(String strValue) {
 		this.strValue = strValue;
+	}
+
+	@Override
+	public int getTypeId() {
+		return REFSET_TYPES.CID_CID_STR.getTypeNid();
 	}
 
 }

@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.dwfa.ace.log.AceLog;
 
@@ -21,9 +22,10 @@ public class NidCNidMapBdb extends ComponentBdb {
 	
 	private static final int NID_CNID_MAP_SIZE = 50000;
 	private int[][] nidCNidMaps;
-	private int maxId;
+	private boolean[] mapChanged;
 	private int readOnlyRecords;
-	
+	ReentrantLock writeLock = new ReentrantLock();
+
 	
 	public NidCNidMapBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
 		super(readOnlyBdbEnv, mutableBdbEnv);
@@ -31,11 +33,13 @@ public class NidCNidMapBdb extends ComponentBdb {
 
 	@Override
 	protected void init() throws IOException {
-		maxId = Bdb.getUuidsToNidMap().getCurrentMaxNid();
+		int maxId = Bdb.getUuidsToNidMap().getCurrentMaxNid();
 		readOnlyRecords = (int) readOnly.count();
 		int mutableRecords = (int) mutable.count();
         int nidCidMapCount = ((maxId - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE) + 1;
         nidCNidMaps = new int[nidCidMapCount][];
+        mapChanged = new boolean[nidCidMapCount];
+        Arrays.fill(mapChanged, false);
         for (int index = 0; index < nidCidMapCount; index++) {
         	nidCNidMaps[index] = new int[NID_CNID_MAP_SIZE];
         	Arrays.fill(nidCNidMaps[index], Integer.MAX_VALUE);
@@ -47,14 +51,14 @@ public class NidCNidMapBdb extends ComponentBdb {
 		
 		for (int i = 0; i < readOnlyRecords; i++) {
 			IntegerBinding.intToEntry(i, keyEntry);
-			OperationStatus status = readOnly.get(null, keyEntry, valueEntry, LockMode.READ_UNCOMMITTED);
+			OperationStatus status = readOnly.get(null, keyEntry, 
+					valueEntry, LockMode.READ_UNCOMMITTED);
 			if (status == OperationStatus.SUCCESS) {
 				TupleInput ti = new TupleInput(valueEntry.getData());
 				int j = 0;
 				while (ti.available() > 0) {
 					nidCNidMaps[i][j++] = ti.readInt();
 				}
-				
 			} else {
 				throw new IOException("Unsuccessful operation: " + status);
 			}
@@ -85,26 +89,41 @@ public class NidCNidMapBdb extends ComponentBdb {
 		
 	}
 
-	public void ensureCapacity(int nextId) throws IOException {
+	private void ensureCapacity(int nextId) throws IOException {
         int nidCidMapCount = ((nextId - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE) + 1;
         if (nidCidMapCount > nidCNidMaps.length) {
         	// Write the last map to the database
-    		writeLastMap();
-            int[][] newNidCidMaps = new int[nidCidMapCount][];
-        	for (int i = 0; i < nidCNidMaps.length; i++) {
-        		newNidCidMaps[i] = nidCNidMaps[i];
+        	writeLock.lock();
+        	if (nidCidMapCount > nidCNidMaps.length) {
+            	try {
+            		expandCapacity(nidCidMapCount);
+                	} finally {
+                		writeLock.unlock();
+                	}
+        	} else {
+        		writeLock.unlock();
         	}
-        	newNidCidMaps[nidCNidMaps.length] = new int[NID_CNID_MAP_SIZE];
-        	Arrays.fill(newNidCidMaps[nidCNidMaps.length], Integer.MAX_VALUE);
-        	nidCNidMaps = newNidCidMaps;
 		}
 
-        maxId = (nidCNidMaps.length *  NID_CNID_MAP_SIZE) - Integer.MIN_VALUE; 
+	}
+
+	private void expandCapacity(int nidCidMapCount) throws IOException {
+		int[][] newNidCidMaps = new int[nidCidMapCount][];
+		boolean[] newMapChanged = new boolean[nidCidMapCount];
+		for (int i = 0; i < nidCNidMaps.length; i++) {
+			newNidCidMaps[i] = nidCNidMaps[i];
+			newMapChanged[i] = mapChanged[i];
+		}
+		newNidCidMaps[nidCNidMaps.length] = new int[NID_CNID_MAP_SIZE];
+		newMapChanged[nidCNidMaps.length] = true;
+		Arrays.fill(newNidCidMaps[nidCNidMaps.length], Integer.MAX_VALUE);
+		nidCNidMaps = newNidCidMaps;
+		mapChanged = newMapChanged;
 	}
 
 	@Override
 	public void sync() throws IOException {
-		writeLastMap();
+		writeChangedMaps();
 		super.sync();
 	}
 
@@ -119,44 +138,71 @@ public class NidCNidMapBdb extends ComponentBdb {
 		super.close();
 	}
 
-	private void writeLastMap() throws IOException {
-		DatabaseEntry keyEntry = new DatabaseEntry();
-		int key = nidCNidMaps.length - 1;
-		if (readOnlyRecords > 0) {
-			// account for last list to be present in 
-			// both the readOnly and mutable database
-			key = key - (readOnlyRecords - 1);
-		}
-
-		IntegerBinding.intToEntry(key, keyEntry);
-		TupleOutput output = new TupleOutput(new byte[NID_CNID_MAP_SIZE * 4]);
-		for (int i = 0; i < NID_CNID_MAP_SIZE; i++) {
-			output.writeInt(nidCNidMaps[nidCNidMaps.length - 1][i]);
-		}
-		DatabaseEntry valueEntry = new DatabaseEntry(output.toByteArray());
-		OperationStatus status = mutable.put(null, keyEntry, valueEntry);
-		if (status != OperationStatus.SUCCESS) {
-			throw new IOException("Unsuccessful operation: " + status);
+	private void writeChangedMaps() throws IOException {
+		writeLock.lock();
+		try {
+			DatabaseEntry keyEntry = new DatabaseEntry();
+			int key = nidCNidMaps.length - 1;
+			if (readOnlyRecords > 0) {
+				// account for last list to be present in 
+				// both the readOnly and mutable database
+				key = key - (readOnlyRecords - 1);
+			}
+	System.out.println("Writing last nidCnid map: " + key);
+			IntegerBinding.intToEntry(key, keyEntry);
+			TupleOutput output = new TupleOutput(new byte[NID_CNID_MAP_SIZE * 4]);
+			for (int i = 0; i < NID_CNID_MAP_SIZE; i++) {
+				output.writeInt(nidCNidMaps[nidCNidMaps.length - 1][i]);
+			}
+			DatabaseEntry valueEntry = new DatabaseEntry(output.toByteArray());
+			OperationStatus status = mutable.put(null, keyEntry, valueEntry);
+			if (status != OperationStatus.SUCCESS) {
+				throw new IOException("Unsuccessful operation: " + status);
+			}
+			if (readOnlyRecords > 0) {
+				// account for last list to be present in 
+				// both the readOnly and mutable database
+				key = (readOnlyRecords - 1);
+			} else {
+				key = 0;
+			}
+			while (key < nidCNidMaps.length) {
+				if (mapChanged[key]) {
+					IntegerBinding.intToEntry(key, keyEntry);
+					output = new TupleOutput(new byte[NID_CNID_MAP_SIZE * 4]);
+					for (int i = 0; i < NID_CNID_MAP_SIZE; i++) {
+						output.writeInt(nidCNidMaps[key][i]);
+					}
+					valueEntry = new DatabaseEntry(output.toByteArray());
+					status = mutable.put(null, keyEntry, valueEntry);
+					if (status != OperationStatus.SUCCESS) {
+						throw new IOException("Unsuccessful operation: " + status);
+					}
+					System.out.println("Rewrote nidCnid map: " + key);				
+					mapChanged[key] = false;
+				}
+				key++;
+			}
+		} finally {
+			writeLock.unlock();
 		}
 	}
 
 	public int getCNid(int nid) {
-		if (maxId < nid) {
-			throw new ArrayIndexOutOfBoundsException(" maxId: " + maxId + " nid: " + nid);
-		}
 		int mapIndex = (nid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
 		int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
+		assert nidCNidMaps[mapIndex][indexInMap] != Integer.MAX_VALUE : 
+			"uninitialized value: [" + mapIndex + "][" + indexInMap + "]";
 		return nidCNidMaps[mapIndex][indexInMap];
 	}
 	
-	public void setCidForNid(int cNid, int nid) {
-		if (maxId < cNid || maxId < nid) {
-			throw new ArrayIndexOutOfBoundsException(" maxId: " + maxId + " cNid: " + cNid + " nid: " + nid);
-		}
+	public void setCidForNid(int cNid, int nid) throws IOException {
+		ensureCapacity(nid);
 		int mapIndex = (nid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
+		mapChanged[mapIndex] = true;
 		int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
 		if (mapIndex < 0 || indexInMap < 0) {
-			throw new ArrayIndexOutOfBoundsException(" maxId: " + maxId + " cNid: " + cNid + " nid: " + nid  + 
+			throw new ArrayIndexOutOfBoundsException(" cNid: " + cNid + " nid: " + nid  + 
 					" mapIndex: " + mapIndex + " indexInMap: " + indexInMap);
 		}
 		assert nidCNidMaps[mapIndex][indexInMap] == Integer.MAX_VALUE: "processing cNid: " + cNid + 

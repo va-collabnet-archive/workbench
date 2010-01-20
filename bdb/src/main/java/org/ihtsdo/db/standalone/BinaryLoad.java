@@ -75,6 +75,10 @@ public class BinaryLoad {
 	            while (fis.available() > 0) {
 	            	conceptsRead.incrementAndGet();
 	            	EConcept eConcept = new EConcept(in);
+	            	if (eConcept.getConceptAttributes().getPrimordialComponentUuid().equals(
+	            			UUID.fromString("4459d8cf-5a6f-3952-9458-6d64324b27b7"))) {
+	            		System.out.println(eConcept);
+	            	}
 	            	I_ProcessEConcept conceptConverter = converters.take(); 
 	            	conceptConverter.setEConcept(eConcept);
 	            	executors.execute(conceptConverter);

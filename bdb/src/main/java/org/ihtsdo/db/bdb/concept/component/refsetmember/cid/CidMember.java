@@ -1,15 +1,19 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cid;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetCidVersion;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -70,6 +74,16 @@ public class CidMember extends RefsetMember<CidVersion, CidMember> {
 	}
 
 	@Override
+	protected String getTypeFieldsString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("cNid: ");
+		addNidToBuffer(buf, c1Nid);
+		return buf.toString();
+	}
+
+
+
+	@Override
 	protected ArrayIntList getVariableVersionNids() {
 		// TODO Auto-generated method stub
 		return null;
@@ -88,4 +102,10 @@ public class CidMember extends RefsetMember<CidVersion, CidMember> {
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
 	}
+	
+	@Override
+	public int getTypeId() {
+		return REFSET_TYPES.CID.getTypeNid();
+	}
+
 }

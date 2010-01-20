@@ -9,6 +9,7 @@ import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrVersion;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -85,6 +86,17 @@ public class StrMember extends RefsetMember<StrVersion, StrMember> {
 	public void setStringValue(String stringValue) {
 		this.stringValue = stringValue;
 	}
+	@Override
+	public int getTypeId() {
+		return REFSET_TYPES.STR.getTypeNid();
+	}
 
+	@Override
+	protected String getTypeFieldsString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append(" stringValue: ");
+		buf.append(stringValue);
+		return buf.toString();
+	}
 
 }
