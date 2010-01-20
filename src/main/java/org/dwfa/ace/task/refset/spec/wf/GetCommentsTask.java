@@ -91,6 +91,7 @@ public class GetCommentsTask extends AbstractTask {
                     if (comments != null) {
                         process.setProperty(commentsPropName, comments);
                     } else {
+                        process.setProperty(commentsPropName, "");
                         return Condition.ITEM_CANCELED;
                     }
                 }
