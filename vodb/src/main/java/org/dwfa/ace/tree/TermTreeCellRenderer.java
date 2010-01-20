@@ -24,6 +24,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -164,6 +165,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                             BorderFactory.createEmptyBorder(0, 2, 0, 0)));
                     }
 
+                   
                     Rectangle iconRect = getIconRect(cb.getParentDepth());
                     I_DescriptionTuple tdt = cb.getDescTuple(aceConfig);
                     if (tdt != null) {
@@ -192,15 +194,18 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
                                 for (I_Path editPath : aceConfig.getEditingPathSet()) {
                                     if (editPath.getConceptId() == cb.getConceptId()) {
-                                        htmlSuffixes.add("<font color=red>&nbsp;[Editing]</font>");
+                                        String colour = sel ? "white" : "red";
+                                        htmlSuffixes.add("<font color=" + colour + ">&nbsp;[Editing]</font>");
                                     }
                                 }
 
                                 for (I_Position viewPosition : aceConfig.getViewPositionSet()) {
                                     if (viewPosition.getPath().getConceptId() == cb.getConceptId()) {
-                                        String version = ThinVersionHelper.format(viewPosition.getVersion(),
-                                            MAX_VALUE_TYPE.LATEST);
-                                        htmlSuffixes.add("<font color='#007FAE'>&nbsp;[Viewing:" + version + "]</font>");
+                                        String version = 
+                                            ThinVersionHelper.format(viewPosition.getVersion(), MAX_VALUE_TYPE.LATEST);
+                                        String colour = sel ? "white" : "#007FAE";
+                                        htmlSuffixes.add(
+                                            "<font color='" + colour + "'>&nbsp;[Viewing:" + version + "]</font>");
                                     }
                                     for (I_Position origin : viewPosition.getPath().getNormalisedOrigins()) {
                                         if (origin.getPath().getConceptId() == cb.getConceptId()) {
@@ -213,17 +218,19 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                 }
 
                                 if (latestInheritedViewPosition != null) {
-                                    String version = ThinVersionHelper.format(latestInheritedViewPosition.getVersion(),
-                                        MAX_VALUE_TYPE.LATEST);
-                                    htmlSuffixes.add("<font color='#967F49'>&nbsp;[Inherited view:" + version
-                                        + "]</font>");
+                                    String version = 
+                                        ThinVersionHelper.format(latestInheritedViewPosition.getVersion(), MAX_VALUE_TYPE.LATEST);
+                                    String colour = sel ? "white" : "#967F49";
+                                    htmlSuffixes.add(
+                                        "<font color='" + colour + "'>&nbsp;[Inherited view:" + version + "]</font>");
                                 }
                             }
                         }
 
                         if (showRefsetInfoInTaxonomy) {
-                            List<I_GetExtensionData> extensions = AceConfig.getVodb().getExtensionsForComponent(
-                                cb.getConceptId());
+                            List<I_GetExtensionData> extensions = 
+                                AceConfig.getVodb().getExtensionsForComponent(cb.getConceptId());
+                            
                             for (int i : refsetsToShow.getListArray()) {
                                 for (I_GetExtensionData ext : extensions) {
                                     if (ext != null && ext.getExtension() != null
@@ -296,6 +303,13 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
                         }
 
+                        if (aceConfig.getContext() != null) {
+                            if (aceConfig.getContext().getConceptId() == cb.getConceptId()) {
+                                String colour = sel ? "white" : "#967F49";
+                                htmlSuffixes.add("<font color='" + colour + "'>&nbsp;[Working Context]</font>");
+                            }
+                        }
+                        
                         StringBuffer buff = new StringBuffer();
                         if (htmlPrefixes.size() > 0 || htmlSuffixes.size() > 0) {
                             buff.append("<html>");
