@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -19,6 +20,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -301,6 +303,8 @@ public class EConcept {
             out.writeInt(0);
         } else {
             out.writeInt(destRelUuidTypeUuids.size());
+            assert destRelUuidTypeUuids.size() % 2 == 0: 
+            	"Illegal size: " + destRelUuidTypeUuids.size();
             for (UUID uuid : destRelUuidTypeUuids) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -310,6 +314,8 @@ public class EConcept {
             out.writeInt(0);
         } else {
             out.writeInt(refsetUuidMemberUuidForConcept.size());
+            assert refsetUuidMemberUuidForConcept.size() % 2 == 0: 
+            	"Illegal size: " + refsetUuidMemberUuidForConcept.size();
             for (UUID uuid : refsetUuidMemberUuidForConcept) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -319,6 +325,8 @@ public class EConcept {
             out.writeInt(0);
         } else {
             out.writeInt(refsetUuidMemberUuidForDescriptions.size());
+            assert refsetUuidMemberUuidForDescriptions.size() % 2 == 0: 
+            	"Illegal size: " + refsetUuidMemberUuidForDescriptions.size();
             for (UUID uuid : refsetUuidMemberUuidForDescriptions) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -328,6 +336,8 @@ public class EConcept {
             out.writeInt(0);
         } else {
             out.writeInt(refsetUuidMemberUuidForRels.size());
+            assert refsetUuidMemberUuidForRels.size() % 2 == 0: 
+            	"Illegal size: " + refsetUuidMemberUuidForRels.size();
             for (UUID uuid : refsetUuidMemberUuidForRels) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -337,6 +347,8 @@ public class EConcept {
             out.writeInt(0);
         } else {
             out.writeInt(refsetUuidMemberUuidForImages.size());
+            assert refsetUuidMemberUuidForImages.size() % 2 == 0: 
+            	"Illegal size: " + refsetUuidMemberUuidForImages.size();
             for (UUID uuid : refsetUuidMemberUuidForImages) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -346,6 +358,8 @@ public class EConcept {
             out.writeInt(0);
         } else {
             out.writeInt(refsetUuidMemberUuidForRefsetMembers.size());
+            assert refsetUuidMemberUuidForRefsetMembers.size() % 2 == 0: 
+            	"Illegal size: " + refsetUuidMemberUuidForRefsetMembers.size();
             for (UUID uuid : refsetUuidMemberUuidForRefsetMembers) {
                 out.writeLong(uuid.getMostSignificantBits());
                 out.writeLong(uuid.getLeastSignificantBits());
@@ -372,8 +386,40 @@ public class EConcept {
     public EConcept() {
         super();
     }
+    
+    private static Map<Integer, Set<I_ThinExtByRefVersioned>> componentRefsetMap;
+    
+    private void initComponentRefsetMap() throws IOException, TerminologyException {
+    	componentRefsetMap = new HashMap<Integer, Set<I_ThinExtByRefVersioned>>();
+    	addMembersToMap(RefsetAuxiliary.Concept.PATH_ORIGIN.localize().getNid());
+    	addMembersToMap(RefsetAuxiliary.Concept.REFSET_PATHS.localize().getNid());
+    	addMembersToMap(RefsetAuxiliary.Concept.REFSET_PATH_ORIGINS.localize().getNid());
+    	addMembersToMap(ArchitectonicAuxiliary.Concept.PATH.localize().getNid());
+		System.out.println("component refset map: " + componentRefsetMap);
+    }
 
+	private void addMembersToMap(int nid) throws IOException {
+		for (I_ThinExtByRefVersioned member: Terms.get().getRefsetExtensionMembers(nid)) {
+			System.out.println("adding to map: " + member);
+			Set<I_ThinExtByRefVersioned> set = componentRefsetMap.get(member.getComponentId());
+			if (set == null) {
+				set = new HashSet<I_ThinExtByRefVersioned>();
+				componentRefsetMap.put(member.getComponentId(), set);
+			}
+			set.add(member);
+    	}
+	}
+
+	/**
+	 * @TODO remove componentRefsetMap added to get around bug in current database implementation!
+	 * @param c
+	 * @throws IOException
+	 * @throws TerminologyException
+	 */
     public EConcept(I_GetConceptData c) throws IOException, TerminologyException {
+    	if (componentRefsetMap == null) {
+    		initComponentRefsetMap();
+    	}
         conceptAttributes = new EConceptAttributes(c.getConceptAttributes());
         conceptAttributes.convert(c.getIdentifier());
         relationships = new ArrayList<ERelationship>(c.getSourceRels().size());
@@ -406,11 +452,27 @@ public class EConcept {
             }
         }
 
-        Collection<? extends I_ThinExtByRefVersioned> conceptMembers = EComponent.getRefsetMembersForComponent(c.getNid());
+        if (conceptAttributes.primordialComponentUuid.equals(UUID.fromString("4459d8cf-5a6f-3952-9458-6d64324b27b7"))) {
+        	// PATH
+        	System.out.println("PATH");
+        }
+        if (conceptAttributes.primordialComponentUuid.equals(UUID.fromString("c281a8f7-01f4-58bb-813b-911d28754133"))) {
+        	// NHS UK Extension Path
+        	System.out.println("NHS UK Extension Path");
+        }
+        if (conceptAttributes.primordialComponentUuid.equals(UUID.fromString("087de18f-edbb-5b96-af11-117c6c063e20"))) {
+        	// NHS UK Drug Extension Path
+        	System.out.println("NHS UK Drug Extension Path");
+        }
+        Collection<? extends I_ThinExtByRefVersioned> conceptMembers = componentRefsetMap.get(c.getNid());
         if (conceptMembers != null) {
         	ArrayList<ERefset<?>> refsetMemberForComponent = new ArrayList<ERefset<?>>(conceptMembers.size());
         	refsetUuidMemberUuidForConcept = new ArrayList<UUID>(refsetMemberForComponent.size() * 2);
-        	for (I_ThinExtByRefVersioned m : members) {
+        	for (I_ThinExtByRefVersioned m : conceptMembers) {
+        		assert m.getComponentId() == c.getNid() : 
+        			"getRefsetMembersForComponent query error: componentId: " + m.getComponentId() + 
+        			" conceptId: " + c.getNid();
+        		System.out.println("Found concept extension: " + m + " for component: " + this);
                 UUID refsetUuid = EVersion.nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForConcept.add(refsetUuid);
                 UUID memberUuid = EVersion.nidToUuid(m.getNid());
@@ -422,7 +484,7 @@ public class EConcept {
         	new ArrayList<I_ThinExtByRefVersioned>();
         for (I_DescriptionVersioned desc: c.getDescriptions()) {
         	Collection<? extends I_ThinExtByRefVersioned> componentMembers = 
-        		EComponent.getRefsetMembersForComponent(desc.getNid());
+        		componentRefsetMap.get(desc.getNid());
         	if (componentMembers != null) {
         		descriptionMembers.addAll(componentMembers);
         	}
@@ -431,6 +493,7 @@ public class EConcept {
         	refsetUuidMemberUuidForDescriptions = 
         		new ArrayList<UUID>(descriptionMembers.size() * 2);
         	for (I_ThinExtByRefVersioned m : descriptionMembers) {
+        		System.out.println("Found description extension: " + m + " for component: " + this);
                 UUID refsetUuid = EVersion.nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForDescriptions.add(refsetUuid);
                 UUID memberUuid = EVersion.nidToUuid(m.getNid());
@@ -442,7 +505,7 @@ public class EConcept {
         	new ArrayList<I_ThinExtByRefVersioned>();
         for (I_RelVersioned r: c.getSourceRels()) {
         	Collection<? extends I_ThinExtByRefVersioned> componentMembers = 
-        		EComponent.getRefsetMembersForComponent(r.getNid());
+        		componentRefsetMap.get(r.getNid());
         	if (componentMembers != null) {
         		relMembers.addAll(componentMembers);
         	}
@@ -450,6 +513,7 @@ public class EConcept {
         if (relMembers.size() > 0) {
         	refsetUuidMemberUuidForRels = new ArrayList<UUID>(relMembers.size() * 2);
         	for (I_ThinExtByRefVersioned m : relMembers) {
+        		System.out.println("Found rel extension: " + m + " for component: " + this);
                 UUID refsetUuid = EVersion.nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForRels.add(refsetUuid);
                 UUID memberUuid = EVersion.nidToUuid(m.getNid());
@@ -461,16 +525,17 @@ public class EConcept {
         	new ArrayList<I_ThinExtByRefVersioned>();
         for (I_ImageVersioned img: c.getImages()) {
         	Collection<? extends I_ThinExtByRefVersioned> componentMembers = 
-        		EComponent.getRefsetMembersForComponent(img.getNid());
+        		componentRefsetMap.get(img.getNid());
         	if (componentMembers != null) {
-        		relMembers.addAll(componentMembers);
+        		imageMembers.addAll(componentMembers);
         	}
         }
         
         if (imageMembers.size() > 0) {
         	refsetUuidMemberUuidForImages = new ArrayList<UUID>(relMembers.size() * 2);
-        	for (I_ThinExtByRefVersioned m : relMembers) {
-                UUID refsetUuid = EVersion.nidToUuid(m.getRefsetId());
+        	for (I_ThinExtByRefVersioned m : imageMembers) {
+        		System.out.println("Found image extension: " + m + " for component: " + this);
+        		UUID refsetUuid = EVersion.nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForImages.add(refsetUuid);
                 UUID memberUuid = EVersion.nidToUuid(m.getNid());
                 refsetUuidMemberUuidForImages.add(memberUuid);
