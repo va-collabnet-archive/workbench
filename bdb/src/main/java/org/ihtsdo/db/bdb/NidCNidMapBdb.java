@@ -148,7 +148,6 @@ public class NidCNidMapBdb extends ComponentBdb {
 				// both the readOnly and mutable database
 				key = key - (readOnlyRecords - 1);
 			}
-	System.out.println("Writing last nidCnid map: " + key);
 			IntegerBinding.intToEntry(key, keyEntry);
 			TupleOutput output = new TupleOutput(new byte[NID_CNID_MAP_SIZE * 4]);
 			for (int i = 0; i < NID_CNID_MAP_SIZE; i++) {
@@ -178,7 +177,6 @@ public class NidCNidMapBdb extends ComponentBdb {
 					if (status != OperationStatus.SUCCESS) {
 						throw new IOException("Unsuccessful operation: " + status);
 					}
-					System.out.println("Rewrote nidCnid map: " + key);				
 					mapChanged[key] = false;
 				}
 				key++;

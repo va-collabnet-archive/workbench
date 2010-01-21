@@ -5,6 +5,8 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -24,12 +26,19 @@ public class NidDataFromBdb implements I_GetNidData {
 	private Reference<byte[]> readOnlyBytes;
 	private byte[] readWriteBytes;
 
+	private static ExecutorService executorPool;
+
 	public NidDataFromBdb(int nid, Database readOnly, Database readWrite) {
 		super();
 		this.nid = nid;
 		this.readOnly = readOnly;
-		readOnlyFuture = Bdb.getExecutorPool().submit(new GetNidData(nid, readOnly));
-		readWriteFuture = Bdb.getExecutorPool().submit(new GetNidData(nid, readWrite));
+		
+		if (executorPool == null) {
+			executorPool = Executors.newFixedThreadPool(Bdb.getExecutorPoolSize());
+		}
+
+		readOnlyFuture = executorPool.submit(new GetNidData(nid, readOnly));
+		readWriteFuture = executorPool.submit(new GetNidData(nid, readWrite));
 	}
 
 	/* (non-Javadoc)

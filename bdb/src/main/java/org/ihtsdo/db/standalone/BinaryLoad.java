@@ -76,10 +76,6 @@ public class BinaryLoad {
 	            while (fis.available() > 0) {
 	            	conceptsRead.incrementAndGet();
 	            	EConcept eConcept = new EConcept(in);
-	            	if (eConcept.getConceptAttributes().getPrimordialComponentUuid().equals(
-	            			UUID.fromString("4459d8cf-5a6f-3952-9458-6d64324b27b7"))) {
-	            		System.out.println(eConcept);
-	            	}
 	            	I_ProcessEConcept conceptConverter = converters.take(); 
 	            	conceptConverter.setEConcept(eConcept);
 	            	executors.execute(conceptConverter);
@@ -117,7 +113,7 @@ public class BinaryLoad {
 	            		" written: " + RefsetMemberBinder.written);    
 	            
 	            AceLog.getAppLog().info("Starting ValidateNidCidMap");	            
-	            Bdb.getConceptDb().iterateConceptData(new ValidateNidCidMap());
+	            Bdb.getConceptDb().iterateConceptDataInSequence(new ValidateNidCidMap());
 	            AceLog.getAppLog().info("Finished ValidateNidCidMap");
 	            AceLog.getAppLog().info("Starting db sync.");
 	            Bdb.sync();
@@ -224,18 +220,6 @@ public class BinaryLoad {
 				nidCnidMap = Bdb.getNidCNidMap();
 			}
 			try {
-				if (UUID.fromString("c281a8f7-01f4-58bb-813b-911d28754133").equals(eConcept.getConceptAttributes().primordialComponentUuid)) {
-		    		System.out.println("\nNHS UK Extension Path\n");
-					System.out.println();
-					System.out.println(eConcept);
-					System.out.println();
-				}
-				if (UUID.fromString("087de18f-edbb-5b96-af11-117c6c063e20").equals(eConcept.getConceptAttributes().primordialComponentUuid)) {
-		    		System.out.println("\nNHS UK Drug Extension Path\n");
-					System.out.println();
-					System.out.println(eConcept);
-					System.out.println();
-				}
 				newConcept = Concept.get(eConcept);
 				Bdb.getConceptDb().writeConcept(newConcept);
 				conceptsProcessed.incrementAndGet();

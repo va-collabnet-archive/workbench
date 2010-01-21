@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.uuidmap.UuidArrayList;
@@ -139,9 +140,11 @@ public class UuidBdb extends ComponentBdb {
 		UuidArrayList listToWrite = uuidMaps.get(uuidMaps.size() - 1);
 		
 		IntegerBinding.intToEntry(key, keyEntry);
-		AceLog.getAppLog().info("Writing uuid list mutable index " + key + " globalIndex: " + 
-				(uuidMaps.size() - 1) + " size: " + ((uuidMaps.size() - 2) * UUID_MAP_SIZE + 
-				uuidMaps.get(uuidMaps.size() - 1).size()));
+		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+			AceLog.getAppLog().fine("Writing uuid list mutable index " + key + " globalIndex: " + 
+					(uuidMaps.size() - 1) + " size: " + ((uuidMaps.size() - 2) * UUID_MAP_SIZE + 
+					uuidMaps.get(uuidMaps.size() - 1).size()));
+		}
 		TupleOutput output = new TupleOutput(new byte[(UUID_MAP_SIZE + 1) * 16]);
 		long[] uuidArray;
 		for (int i = 0; i < UUID_MAP_SIZE; i++) {

@@ -39,6 +39,7 @@ public class Bdb {
 	private static ConceptBdb conceptDb;
 	
 	private static ExecutorService executorPool;
+	private static int executorPoolSize;
 	
 	public static void commit() throws IOException {
 		long commitTime = System.currentTimeMillis();
@@ -55,7 +56,8 @@ public class Bdb {
 			for (@SuppressWarnings("unused") OFFSETS o: OFFSETS.values()) {
 				// ensure all OFFSETS are initialized prior to multi-threading. 
 			}
-			executorPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+			executorPoolSize = (Runtime.getRuntime().availableProcessors() * 2);
+			executorPool = Executors.newFixedThreadPool(executorPoolSize);
 			File buildDirectory = new File(dbRoot);
 			buildDirectory.mkdirs();
 			File bdbDirectory = new File(buildDirectory, "berkeley-db");
@@ -238,6 +240,10 @@ public class Bdb {
 			return c;
 		}
 		return c.getComponent(nid);
+	}
+
+	public static int getExecutorPoolSize() {
+		return executorPoolSize;
 	}
 
 
