@@ -135,12 +135,15 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		buf.append(additionalIdentifierParts);
 		buf.append(" xtraVersions: ");
 		buf.append(additionalVersions);
-		buf.append(" path: ");
+		buf.append(" sap: ");
+		buf.append(primordialSapNid);
+		buf.append(" (path: ");
 		ConceptComponent.addNidToBuffer(buf, getPathId());
 		buf.append(" tm: ");
 		buf.append(Version.fileDateFormat.format(new Date(getTime())));
 		buf.append(" status: ");
 		ConceptComponent.addNidToBuffer(buf, getStatusId());
+		buf.append(")");
 		return buf.toString();
 	}
 	

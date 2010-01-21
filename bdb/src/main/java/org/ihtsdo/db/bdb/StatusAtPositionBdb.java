@@ -35,7 +35,8 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	private static PositionArrayBinder positionArrayBinder = new PositionArrayBinder();
 	private static LinkedList<PositionMapper> mapperCache = new LinkedList<PositionMapper>();
 	
-	private static final int FIRST_ID = 0;
+	private static final int FIRST_ID = 1;
+	private static final int MIN_ARRAY_SIZE = 100;
 
 	
 	private static HashMap<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries = 
@@ -58,6 +59,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
 		@Override
 		public PositionArrays entryToObject(TupleInput input) {
+			int size = input.readInt();
 			int length = input.readInt();
 			PositionArrays pa = new PositionArrays(length);
 			for (int i = 0; i < length; i++) {
@@ -65,21 +67,22 @@ public class StatusAtPositionBdb extends ComponentBdb {
 				pa.statusNids[i] = input.readInt();
 				pa.commitTimes[i] = input.readLong();
 			}
+			pa.size = size;
 			return pa;
 		}
 
 		@Override
-		public void objectToEntry(PositionArrays object, TupleOutput output) {
-			output.writeInt(object.pathNids.length);
-			for (int i = 0; i < object.pathNids.length; i++) {
-				output.writeInt(object.pathNids[i]);
-				output.writeInt(object.statusNids[i]);
-				output.writeLong(object.commitTimes[i]);
+		public void objectToEntry(PositionArrays pa, TupleOutput output) {
+			output.writeInt(pa.size);
+			output.writeInt(pa.pathNids.length);
+			for (int i = 0; i < pa.pathNids.length; i++) {
+				output.writeInt(pa.pathNids[i]);
+				output.writeInt(pa.statusNids[i]);
+				output.writeLong(pa.commitTimes[i]);
 			}
 		}
 	}
 
-	private static final int MIN_ARRAY_SIZE = 500;
 	private static class PositionArrays {
 		int size = 0;
 		int[] pathNids;
@@ -115,11 +118,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
 		private void ensureCapacity(int size) {
 			if (size > getCapacity()) {
-				int newCapacity = Math.max(pathNids.length * 2, MIN_ARRAY_SIZE);
-				
-				if (newCapacity > 100000) {
-					newCapacity = pathNids.length + 1000;
-				}
+				int newCapacity = pathNids.length + MIN_ARRAY_SIZE;
 				
 				int[] tempPathNids = new int[newCapacity];
 				System.arraycopy(pathNids, 0, tempPathNids, 0, pathNids.length);
@@ -153,12 +152,12 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		IntegerBinding.intToEntry(0, theKey);
 		DatabaseEntry theData = new DatabaseEntry();
 		try {
-			if (readOnly.get(null, theKey, theData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (readOnly.get(null, theKey, theData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
 				readOnlyArray = positionArrayBinder.entryToObject(theData);
 			} else {
 				readOnlyArray = new PositionArrays();
 			}
-			if (mutable.get(null, theKey, theData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			if (mutable.get(null, theKey, theData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
 				readWriteArray = positionArrayBinder.entryToObject(theData);
 			} else {
 				readWriteArray = new PositionArrays();
@@ -187,7 +186,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	public I_Position getPosition(int index) throws IOException, PathNotExistsException, TerminologyException {
 		int pathNid = -1;
 		long time = -1;
-		if (index < readOnlyArray.getSize()) {
+		if (getReadOnlyIndex(index) < readOnlyArray.getSize()) {
 			pathNid = readOnlyArray.pathNids[getReadOnlyIndex(index)];
 			time = readOnlyArray.commitTimes[getReadOnlyIndex(index)];
 		} else {
@@ -199,7 +198,8 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 	
 	public int getPathId(int index) {
-		if (index < readOnlyArray.getSize()) {
+		assert index != 0;
+		if (getReadOnlyIndex(index) < readOnlyArray.getSize()) {
 			return readOnlyArray.pathNids[getReadOnlyIndex(index)];
 		} else {
 			return readWriteArray.pathNids[getReadWriteIndex(index)];
@@ -207,7 +207,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 
 	public int getStatusId(int index) {
-		if (index < readOnlyArray.getSize()) {
+		if (getReadOnlyIndex(index) < readOnlyArray.getSize()) {
 			return readOnlyArray.statusNids[getReadOnlyIndex(index)];
 		} else {
 			return readWriteArray.statusNids[getReadWriteIndex(index)];
@@ -215,7 +215,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 
 	public long getTime(int index) {
-		if (index < readOnlyArray.getSize()) {
+		if (getReadOnlyIndex(index) < readOnlyArray.getSize()) {
 			return readOnlyArray.commitTimes[getReadOnlyIndex(index)];
 		} else {
 			return readWriteArray.commitTimes[getReadWriteIndex(index)];
@@ -227,7 +227,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 	
 	public int getVersion(int index) {
-		if (index < readOnlyArray.getSize()) {
+		if (getReadOnlyIndex(index) < readOnlyArray.getSize()) {
 			return ThinVersionHelper.convert(readOnlyArray.commitTimes[getReadOnlyIndex(index)]);
 		} else {
 			return ThinVersionHelper.convert(readWriteArray.commitTimes[getReadWriteIndex(index)]);
@@ -393,6 +393,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			DatabaseEntry valueEntry = new DatabaseEntry();
 			expandPermit.acquireUninterruptibly();
 			positionArrayBinder.objectToEntry(readWriteArray, valueEntry);
+			DatabaseEntry theKey = new DatabaseEntry();
+			IntegerBinding.intToEntry(0, theKey);
+			mutable.put(null, theKey, valueEntry);
 			changedSinceSync = false;
 			expandPermit.release();
 		}

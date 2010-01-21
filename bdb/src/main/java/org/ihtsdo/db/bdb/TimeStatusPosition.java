@@ -20,6 +20,9 @@ public class TimeStatusPosition implements Comparable<TimeStatusPosition> {
 	private int pathNid;
 	
 	public static long[] timeStatusPositionToUuid(long time, int statusNid, int pathNid)  {
+		assert time != 0;
+		assert statusNid != 0;
+		assert pathNid != 0;
 		long[] uuid = new long[2];
 		uuid[0] = time;
 		uuid[1] = pathNid;
@@ -32,12 +35,15 @@ public class TimeStatusPosition implements Comparable<TimeStatusPosition> {
 	}
 
 	public static long getTime(long[] data)  {
+		assert data[0] != 0;
 		return data[0];
 	}
 	public static int getStatusNid(long[] data)  {
+		assert (int) data[0] != 0;
 		return (int)  data[1];
 	}
 	public static int getPathNid(long[] data)  {
+		assert (int) (data[1] >>> 32) != 0;
 		return (int) (data[1] >>> 32);
 	}
 
@@ -52,6 +58,9 @@ public class TimeStatusPosition implements Comparable<TimeStatusPosition> {
 		this.time = time;
 		this.statusNid = statusNid;
 		this.pathNid = pathNid;
+		assert time != 0;
+		assert statusNid != 0;
+		assert pathNid != 0;
 	}
 	
 	public long[] toUuid() {
