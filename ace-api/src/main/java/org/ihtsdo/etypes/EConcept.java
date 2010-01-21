@@ -452,18 +452,6 @@ public class EConcept {
             }
         }
 
-        if (conceptAttributes.primordialComponentUuid.equals(UUID.fromString("4459d8cf-5a6f-3952-9458-6d64324b27b7"))) {
-        	// PATH
-        	System.out.println("PATH");
-        }
-        if (conceptAttributes.primordialComponentUuid.equals(UUID.fromString("c281a8f7-01f4-58bb-813b-911d28754133"))) {
-        	// NHS UK Extension Path
-        	System.out.println("NHS UK Extension Path");
-        }
-        if (conceptAttributes.primordialComponentUuid.equals(UUID.fromString("087de18f-edbb-5b96-af11-117c6c063e20"))) {
-        	// NHS UK Drug Extension Path
-        	System.out.println("NHS UK Drug Extension Path");
-        }
         Collection<? extends I_ThinExtByRefVersioned> conceptMembers = componentRefsetMap.get(c.getNid());
         if (conceptMembers != null) {
         	ArrayList<ERefset<?>> refsetMemberForComponent = new ArrayList<ERefset<?>>(conceptMembers.size());
@@ -577,14 +565,14 @@ public class EConcept {
 
         buff.append(this.getClass().getSimpleName());
         buff.append(": ");
+        buff.append("\n   ConceptAttributes: \n\t");
+        buff.append(this.conceptAttributes);
         buff.append("\n   Descriptions: \n\t");
         buff.append(this.descriptions);
         buff.append("\n   Relationships: \n\t");
         buff.append(this.relationships);
         buff.append("\n   RefsetMembers: \n\t");
         buff.append(this.refsetMembers);
-        buff.append("\n   ConceptAttributes: \n\t");
-        buff.append(this.conceptAttributes);
         buff.append("\n   Images: \n\t");
         buff.append(this.images);
         buff.append("\n   destRelUuidTypeUuids: \n\t");
