@@ -1409,7 +1409,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     public Object getDenotation(int authorityNid) throws IOException, TerminologyException {
-        I_IntSet allowedStatus = LocalVersionedTerminology.get().getActiveAceFrameConfig().getAllowedStatus();
+        I_IntSet allowedStatus = Terms.get().getActiveAceFrameConfig().getAllowedStatus();
         for (I_IdVersion idTuple : getIdentifier().getIdVersions()) {
             if (allowedStatus.contains(idTuple.getStatusId()) && idTuple.getAuthorityNid() == authorityNid) {
                 return idTuple.getDenotation();
@@ -1423,7 +1423,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
-        I_RepresentIdSet possibleKindOfConcepts = LocalVersionedTerminology.get().getEmptyIdSet();
+        I_RepresentIdSet possibleKindOfConcepts = Terms.get().getEmptyIdSet();
         getPossibleKindOfConcepts(config, possibleKindOfConcepts);
         return possibleKindOfConcepts;
     }
@@ -1483,7 +1483,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         }
 
         for (int id : idsToPromote.getSetValues()) {
-            I_Identify idv = LocalVersionedTerminology.get().getId(id);
+            I_Identify idv = Terms.get().getId(id);
             if (idv.promote(viewPosition, pomotionPaths, allowedStatus)) {
                 promotedAnything = true;
                 if (uncommittedIds == null) {

@@ -28,10 +28,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
@@ -323,13 +325,16 @@ public class Path implements I_Transact, I_Path {
 
     public String toString() {
         StringBuffer buff = new StringBuffer();
-        ConceptBean cb = ConceptBean.get(getConceptId());
         try {
+            I_GetConceptData cb = Terms.get().getConcept(getConceptId());
             buff.append(cb.getInitialText());
         } catch (IOException e) {
             buff.append(e.getMessage());
             AceLog.getAppLog().alertAndLogException(e);
-        }
+        } catch (TerminologyException e) {
+            buff.append(e.getMessage());
+            AceLog.getAppLog().alertAndLogException(e);
+		}
         return buff.toString();
     }
 
