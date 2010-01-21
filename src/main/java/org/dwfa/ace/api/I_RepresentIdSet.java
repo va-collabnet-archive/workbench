@@ -30,6 +30,15 @@ public interface I_RepresentIdSet {
 
     public I_IterateIds iterator();
 
+    @Deprecated
     public int size();
+
+    /**
+     * 
+     * @return number of set bits. 
+     */
+    public int cardinality();
+
+    public int totalBits();
 
 }
