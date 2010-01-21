@@ -30,6 +30,10 @@ public class IdentifierSet implements I_RepresentIdSet {
         super();
         this.bitSet = bitSet;
     }
+    public IdentifierSet(IdentifierSet anotherSet) {
+        super();
+        this.bitSet = (OpenBitSet) anotherSet.bitSet.clone();
+    }
 
     public IdentifierSet() {
         bitSet = new OpenBitSet();
@@ -117,4 +121,11 @@ public class IdentifierSet implements I_RepresentIdSet {
     public int size() {
         return (int) bitSet.cardinality();
     }
+	public int cardinality() {
+		return (int) bitSet.cardinality();
+	}
+	
+	public int totalBits() {
+		return bitSet.getNumWords() * 64;
+	}
 }
