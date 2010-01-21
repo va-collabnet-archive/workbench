@@ -15,7 +15,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
-import org.dwfa.vodb.PathManager;
 import org.ihtsdo.db.bdb.concept.BdbLegacyFixedFactory;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.ConceptBdb;
@@ -73,7 +72,7 @@ public class Bdb {
 			BdbTermFactory tf = new BdbTermFactory();
 			Terms.set(tf);
 			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
-			tf.setPathManager(new PathManager());
+			tf.setPathManager(new BdbPathManager());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (TerminologyException e) {

@@ -48,7 +48,7 @@ public class IntListPairsBinder extends TupleBinding<ArrayIntList> {
 
 	@Override
 	public void objectToEntry(ArrayIntList object, TupleOutput output) {
-		if (priorEntries != null) {
+		if (priorEntries != null && priorEntries.size() > 0) {
 			ArrayIntList listToWrite = new ArrayIntList(object.size());
 			IntIterator roListItr = roList.iterator();
 			while (roListItr.hasNext()) {

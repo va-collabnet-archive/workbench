@@ -1,12 +1,12 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cid;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.tapi.TerminologyException;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
@@ -18,7 +18,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class CidMember extends RefsetMember<CidVersion, CidMember> {
+public class CidMember extends RefsetMember<CidVersion, CidMember> implements I_ThinExtByRefPartConcept {
 
 	private int c1Nid;
 
@@ -107,5 +107,47 @@ public class CidMember extends RefsetMember<CidVersion, CidMember> {
 	public int getTypeId() {
 		return REFSET_TYPES.CID.getTypeNid();
 	}
+
+
+	@Override
+	@Deprecated
+	public int getC1id() {
+		return getC1Nid();
+	}
+
+
+	@Override
+	@Deprecated
+	public int getConceptId() {
+		return getC1Nid();
+	}
+
+
+	@Override
+	@Deprecated
+	public void setC1id(int c1id) {
+		setC1Nid(c1id);
+	}
+
+
+	@Override
+	public void setConceptId(int conceptId) {
+		setConceptId(conceptId);
+	}
+
+	@Override
+	public int compareTo(I_ThinExtByRefPart o) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public I_ThinExtByRefPart makePromotionPart(I_Path promotionPath) {
+		throw new UnsupportedOperationException();
+	}
+	
+	public I_ThinExtByRefPart duplicate() {
+		throw new UnsupportedOperationException();
+	}
+
 
 }

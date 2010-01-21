@@ -1,5 +1,7 @@
 package org.ihtsdo.db.bdb.concept.component;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -9,7 +11,6 @@ import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.StatusAtPositionBdb;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -18,7 +19,8 @@ public abstract class Version<V extends Version<V, C>,
 							  C extends ConceptComponent<V, C>> 
 	implements I_AmPart, I_AmTuple, I_HandleFutureStatusAtPositionSetup {
 	
-	private static StatusAtPositionBdb sapBdb = Bdb.getStatusAtPositionDb();
+	public static SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
+
 	
 	public int statusAtPositionNid = Integer.MAX_VALUE;
 	public C primordialComponent;
@@ -32,7 +34,7 @@ public abstract class Version<V extends Version<V, C>,
 	}
 
 	public Version(int statusNid, int pathNid, long time, C primordialComponent) {
-		this.statusAtPositionNid = sapBdb.getSapNid(statusNid, pathNid, time);
+		this.statusAtPositionNid = Bdb.getStatusAtPositionDb().getSapNid(statusNid, pathNid, time);
 		this.primordialComponent = primordialComponent;
 		assert primordialComponent != null;
 		assert statusAtPositionNid != Integer.MAX_VALUE;
@@ -107,21 +109,21 @@ public abstract class Version<V extends Version<V, C>,
 	
 	@Override
 	public int getPathId() {
-		return sapBdb.getPathId(statusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getPathId(statusAtPositionNid);
 	}
 
 	@Override
 	public int getStatusId() {
-		return sapBdb.getStatusId(statusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getStatusId(statusAtPositionNid);
 	}
 
 	@Override
 	public int getVersion() {
-		return sapBdb.getVersion(statusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getVersion(statusAtPositionNid);
 	}
 
 	public long getTime() {
-		return sapBdb.getTime(statusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getTime(statusAtPositionNid);
 	}
 
 	@Override
@@ -140,7 +142,7 @@ public abstract class Version<V extends Version<V, C>,
 	public abstract V makeAnalog(int statusNid, int pathNid, long time);
 
 	public void setStatusAtPosition(int statusNid, int pathNid, long time) {
-		this.statusAtPositionNid = sapBdb.getSapNid(statusNid, pathNid, time);
+		this.statusAtPositionNid = Bdb.getStatusAtPositionDb().getSapNid(statusNid, pathNid, time);
 	}
 
 	@Override
@@ -164,7 +166,15 @@ public abstract class Version<V extends Version<V, C>,
 	
 	
 	public String toString() {
-		return " sapNid: " + statusAtPositionNid;
+		StringBuffer buf = new StringBuffer();
+		buf.append(" path: ");
+		ConceptComponent.addNidToBuffer(buf, getPathId());
+		buf.append(" tm: ");
+		buf.append(fileDateFormat.format(new Date(getTime())));
+		buf.append(" status: ");
+		ConceptComponent.addNidToBuffer(buf, getStatusId());
+		return buf.toString();
+		
 	}
 
 	@SuppressWarnings("unchecked")

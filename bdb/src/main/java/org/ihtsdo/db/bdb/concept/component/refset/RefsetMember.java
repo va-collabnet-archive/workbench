@@ -5,14 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
@@ -225,5 +224,11 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 	public RefsetMember<V, C> getMutablePart() {
 		return this;
 	}
+
+	public UniversalAceExtByRefPart getUniversalPart()
+			throws TerminologyException, IOException {
+		throw new UnsupportedOperationException();
+	}
+
 
 }

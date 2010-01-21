@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JFrame;
 
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.NidCNidMapBdb;
@@ -223,6 +224,18 @@ public class BinaryLoad {
 				nidCnidMap = Bdb.getNidCNidMap();
 			}
 			try {
+				if (UUID.fromString("c281a8f7-01f4-58bb-813b-911d28754133").equals(eConcept.getConceptAttributes().primordialComponentUuid)) {
+		    		System.out.println("\nNHS UK Extension Path\n");
+					System.out.println();
+					System.out.println(eConcept);
+					System.out.println();
+				}
+				if (UUID.fromString("087de18f-edbb-5b96-af11-117c6c063e20").equals(eConcept.getConceptAttributes().primordialComponentUuid)) {
+		    		System.out.println("\nNHS UK Drug Extension Path\n");
+					System.out.println();
+					System.out.println(eConcept);
+					System.out.println();
+				}
 				newConcept = Concept.get(eConcept);
 				Bdb.getConceptDb().writeConcept(newConcept);
 				conceptsProcessed.incrementAndGet();

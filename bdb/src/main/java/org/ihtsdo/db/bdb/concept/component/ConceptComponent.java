@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb.concept.component;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -50,7 +51,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	
 	public static void addNidToBuffer(StringBuffer buf, int nidToConvert) {
 		try {
-			if (Terms.get().hasConcept(nidToConvert)) {
+			if (nidToConvert != 0 && Terms.get().hasConcept(nidToConvert)) {
 				buf.append("\"");
 				buf.append(Terms.get().getConcept(nidToConvert).getInitialText());
 				buf.append("\"");
@@ -130,10 +131,17 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		StringBuffer buf = new StringBuffer();
 		buf.append("pUuid: ");
 		buf.append(Bdb.getUuidDb().getUuid(primordialUNid));
-		buf.append(" xtraIdParts: " + additionalIdentifierParts);
-		buf.append(" xtraVersions: " + additionalVersions);
+		buf.append(" xtraIds: ");
+		buf.append(additionalIdentifierParts);
+		buf.append(" xtraVersions: ");
+		buf.append(additionalVersions);
+		buf.append(" path: ");
+		ConceptComponent.addNidToBuffer(buf, getPathId());
+		buf.append(" tm: ");
+		buf.append(Version.fileDateFormat.format(new Date(getTime())));
+		buf.append(" status: ");
+		ConceptComponent.addNidToBuffer(buf, getStatusId());
 		return buf.toString();
-		
 	}
 	
 	protected ConceptComponent(Concept enclosingConcept, TupleInput input) {
@@ -370,9 +378,13 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	public final List<V> getMutableParts() {
 		if (enclosingConcept.isEditable()) {
+			if (additionalVersions == null) {
+				additionalVersions = new ArrayList<V>();
+
+			}
 			return additionalVersions;
 		}
-		return Collections.unmodifiableList(additionalVersions);
+		return Collections.unmodifiableList(new ArrayList<V>());
 	}
 	
 
@@ -425,6 +437,9 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 
 	public final boolean addVersion(V newPart) {
 		if (enclosingConcept.isEditable()) {
+			if (additionalVersions == null) {
+				additionalVersions = new ArrayList<V>(1);
+			}
 			return additionalVersions.add(newPart);
 		}
 		throw new RuntimeException("versions is not editable");
@@ -432,12 +447,18 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	
 	public final boolean addVersionNoRedundancyCheck(V newPart) {
 		if (enclosingConcept.isEditable()) {
+			if (additionalVersions == null) {
+				additionalVersions = new ArrayList<V>(1);
+			}
 			return additionalVersions.add(newPart);
 		}
 		throw new RuntimeException("versions is not editable");
 	}
 	
 	public final boolean hasVersion(V version) {
+		if (additionalVersions == null) {
+			return false;
+		}
 		return additionalVersions.contains(version);
 	}
 	
@@ -613,4 +634,17 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 	public int hashCode() {
 		return HashFunction.hashCode(new int[] { nid, primordialSapNid });
 	}
+	
+
+
+	@Deprecated
+	public int getStatus() {
+		return getStatusId();
+	}
+
+	@Deprecated
+	public void setStatus(int idStatus) {
+		setStatusId(idStatus);
+	}
+
 }

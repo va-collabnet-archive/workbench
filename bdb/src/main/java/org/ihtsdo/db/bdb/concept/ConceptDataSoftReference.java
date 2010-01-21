@@ -594,7 +594,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			binder.setReadOnlyList(roList);
 			TupleInput readWriteInput = nidData.getMutableTupleInput();
 			if (readWriteInput.available() < 4) {
-				return new ArrayIntList();
+				return roList;
 			}
 			readWriteInput.mark(128);
 			readWriteInput.skipFast(offset.offset);

@@ -191,8 +191,8 @@ public class NidCNidMapBdb extends ComponentBdb {
 	public int getCNid(int nid) {
 		int mapIndex = (nid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
 		int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
-		assert nidCNidMaps[mapIndex][indexInMap] != Integer.MAX_VALUE : 
-			"uninitialized value: [" + mapIndex + "][" + indexInMap + "]";
+		assert mapIndex >= 0 && indexInMap >= 0: "mapIndex: " + mapIndex + " indexInMap: " + 
+				indexInMap + " nid: " + nid;
 		return nidCNidMaps[mapIndex][indexInMap];
 	}
 	

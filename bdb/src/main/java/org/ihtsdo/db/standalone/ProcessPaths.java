@@ -21,7 +21,6 @@ public class ProcessPaths {
 	public static void main(String[] args) {
     	Bdb.setup();
     	try {
-    		printConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT);
     		printConcept(RefsetAuxiliary.Concept.REFSET_PATHS);
     		printConcept(RefsetAuxiliary.Concept.REFSET_PATH_ORIGINS);
     		printConcept(ArchitectonicAuxiliary.Concept.PATH);
@@ -33,13 +32,6 @@ public class ProcessPaths {
     		System.out.println(Bdb.getConceptDb().getConcept(
     				Bdb.uuidToNid(UUID.fromString("087de18f-edbb-5b96-af11-117c6c063e20"))));
 
-    		
-    		System.out.println("\nfirst\n");
-    		System.out.println(Bdb.getConceptDb().getConcept(Bdb.getNidCNidMap().getCNid(-2147479472)));
-    		System.out.println(Bdb.getComponent(-2147479472));
-    		System.out.println("\nsecond\n");
-    		System.out.println(Bdb.getConceptDb().getConcept(Bdb.getNidCNidMap().getCNid(-2147481805)));
-    		System.out.println(Bdb.getComponent(-2147481805));
             for (I_Path p: Terms.get().getPaths()) {
 				AceLog.getAppLog().info("Found path: " + p);
 			}

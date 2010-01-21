@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.apache.commons.collections.primitives.IntIterator;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -824,6 +825,32 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return buff.toString();
 	}
 
+	public List<RefsetMember<?, ?>> getConceptExtensions() throws IOException {
+		List<RefsetMember<?, ?>> returnValues = new ArrayList<RefsetMember<?,?>>();
+		IntIterator itr = data.getRefsetNidMemberNidForConceptList().iterator();
+		while (itr.hasNext()) {
+			int refsetNid = itr.next();
+			int memberNid = itr.next();
+			Concept c = Bdb.getConceptDb().getConcept(refsetNid);
+			RefsetMember<?, ?> member = c.getRefsetMember(memberNid);
+			returnValues.add(member);
+		}
+		return returnValues;
+	}
+	public List<RefsetMember<?, ?>> getConceptExtensions(int specifiedRefsetNid) throws IOException {
+		List<RefsetMember<?, ?>> returnValues = new ArrayList<RefsetMember<?,?>>();
+		IntIterator itr = data.getRefsetNidMemberNidForConceptList().iterator();
+		while (itr.hasNext()) {
+			int refsetNid = itr.next();
+			int memberNid = itr.next();
+			if (specifiedRefsetNid == refsetNid) {
+				Concept c = Bdb.getConceptDb().getConcept(refsetNid);
+				RefsetMember<?, ?> member = c.getRefsetMember(memberNid);
+				returnValues.add(member);
+			}
+		}
+		return returnValues;
+	}
 	public ConceptComponent<?, ?> getComponent(int nid) throws IOException {
 		return data.getComponent(nid);
 	}

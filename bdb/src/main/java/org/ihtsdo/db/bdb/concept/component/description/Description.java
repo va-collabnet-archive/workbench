@@ -86,7 +86,7 @@ public class Description
 		buf.append(" lang: ");
 		buf.append(lang);
 		buf.append(" type: ");
-		buf.append(typeNid);
+		ConceptComponent.addNidToBuffer(buf, typeNid);
 		buf.append(" ");
 		buf.append(super.toString());
 		return buf.toString();

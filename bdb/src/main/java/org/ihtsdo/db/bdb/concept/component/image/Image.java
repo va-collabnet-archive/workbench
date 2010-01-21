@@ -77,7 +77,7 @@ public class Image
 		buf.append(" textDescription: ");
 		buf.append(textDescription);
 		buf.append(" typeNid: ");
-		buf.append(typeNid);
+		ConceptComponent.addNidToBuffer(buf, typeNid);
 		buf.append(" ");
 		buf.append(super.toString());
 		return buf.toString();

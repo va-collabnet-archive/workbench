@@ -70,7 +70,7 @@ import org.ihtsdo.db.bdb.concept.Concept;
 
 public class BdbTermFactory implements I_TermFactory {
 
-	private PathManager pathManager;
+	private BdbPathManager pathManager;
 
 	@Override
 	public void addChangeSetReader(I_ReadChangeSet reader) {
@@ -817,7 +817,7 @@ public class BdbTermFactory implements I_TermFactory {
 		pathManager.writeOrigin(path, origin);
 	}
 
-	public void setPathManager(PathManager pathManager) {
+	public void setPathManager(BdbPathManager pathManager) {
 		this.pathManager = pathManager;
 	}
 

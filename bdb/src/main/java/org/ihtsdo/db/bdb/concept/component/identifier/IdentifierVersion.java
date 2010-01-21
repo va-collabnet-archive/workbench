@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.identifier;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.StatusAtPositionBdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.I_HandleFutureStatusAtPositionSetup;
+import org.ihtsdo.db.bdb.concept.component.Version;
 import org.ihtsdo.etypes.EIdentifierVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -177,7 +179,16 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 
 	
 	public String toString() {
-			return 	"statusAtPositionNid: " + statusAtPositionNid + " authorityNid: " + authorityNid;
+		StringBuffer buf = new StringBuffer();
+		buf.append(" authority: ");
+		ConceptComponent.addNidToBuffer(buf, authorityNid);
+		buf.append(" path: ");
+		ConceptComponent.addNidToBuffer(buf, getPathId());
+		buf.append(" tm: ");
+		buf.append(Version.fileDateFormat.format(new Date(getTime())));
+		buf.append(" status: ");
+		ConceptComponent.addNidToBuffer(buf, getStatusId());
+		return buf.toString();
 	}
 
 	@Override
