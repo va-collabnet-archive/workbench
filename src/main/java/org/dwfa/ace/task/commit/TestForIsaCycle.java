@@ -61,7 +61,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
 
         boolean foundCycle = false;
         for (I_RelVersioned rv : usrl) {
-            List<I_RelTuple> rvtl = rv.getTuples();
+            List<? extends I_RelTuple> rvtl = rv.getTuples();
             for (I_RelTuple rt : rvtl) {
                 try {
 
