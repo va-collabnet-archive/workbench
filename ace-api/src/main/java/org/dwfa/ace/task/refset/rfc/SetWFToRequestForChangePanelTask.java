@@ -36,13 +36,13 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.commit.TestForCreateNewRefsetPermission;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
@@ -128,7 +128,10 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
             wfSheet.setSize(width, height);
             wfSheet.setLayout(new GridLayout(1, 1));
 
-            wfSheet.add(new RequestForChangePanel(refsets, wfSheet));
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            Set<? extends I_GetConceptData> allValidUsers = helper.getAllValidUsers();
+
+            wfSheet.add(new RequestForChangePanel(refsets, allValidUsers));
             wfSheet.repaint();
         } catch (Exception e) {
             ex = e;
@@ -144,11 +147,10 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(owner));
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(owner));
 
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+        I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
 
         for (I_GetConceptData parent : permissibleRefsetParents) {
-            Set<I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, true, true);
+            Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, true, true);
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
                     refsets.add(child);
@@ -163,7 +165,7 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
 
-        List<I_RelTuple> relationships = child.getDestRelTuples(null, allowedTypes, null, true, true);
+        List<? extends I_RelTuple> relationships = child.getDestRelTuples(null, allowedTypes, null, true, true);
         if (relationships.size() > 0) {
             return true;
         } else {

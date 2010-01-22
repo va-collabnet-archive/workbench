@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,11 +17,13 @@
 package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.util.HashFunction;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinDescTuple implements I_DescriptionTuple {
     I_DescriptionVersioned fixedPart;
@@ -41,7 +43,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getPathId()
      */
     public int getPathId() {
@@ -50,7 +52,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getInitialCaseSignificant()
      */
     public boolean getInitialCaseSignificant() {
@@ -59,7 +61,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getLang()
      */
     public String getLang() {
@@ -68,7 +70,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getStatusId()
      */
     public int getStatusId() {
@@ -77,7 +79,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getText()
      */
     public String getText() {
@@ -86,7 +88,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getTypeId()
      */
     public int getTypeId() {
@@ -95,7 +97,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getVersion()
      */
     public int getVersion() {
@@ -104,7 +106,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getConceptId()
      */
     public int getConceptId() {
@@ -113,7 +115,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getDescId()
      */
     public int getDescId() {
@@ -122,7 +124,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_DescriptionTuple#setInitialCaseSignificant(boolean)
      */
@@ -132,7 +134,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#setLang(java.lang.String)
      */
     public void setLang(String lang) {
@@ -141,7 +143,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#setPathId(int)
      */
     public void setPathId(int pathId) {
@@ -150,7 +152,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#setStatusId(int)
      */
     public void setStatusId(int status) {
@@ -159,7 +161,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#setText(java.lang.String)
      */
     public void setText(String text) {
@@ -168,7 +170,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#setTypeId(int)
      */
     public void setTypeId(int typeInt) {
@@ -177,7 +179,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#setVersion(int)
      */
     public void setVersion(int version) {
@@ -186,7 +188,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#duplicatePart()
      */
     @Deprecated
@@ -196,7 +198,7 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionTuple#getDescVersioned()
      */
     public I_DescriptionVersioned getDescVersioned() {
@@ -243,6 +245,19 @@ public class ThinDescTuple implements I_DescriptionTuple {
 
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
+    }
+    @Override
+    public long getTime() {
+        return ThinVersionHelper.convert(getVersion());
+    }
+
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        I_DescriptionPart newPart = duplicate();
+        newPart.setStatusId(statusNid);
+        newPart.setPathId(pathNid);
+        newPart.setVersion(ThinVersionHelper.convert(time));
+        return newPart;
     }
 
 }

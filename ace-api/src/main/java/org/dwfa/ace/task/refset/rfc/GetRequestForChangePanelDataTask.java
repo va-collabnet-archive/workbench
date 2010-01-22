@@ -34,7 +34,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.refset.RefsetHelper;
-import org.dwfa.ace.refset.RefsetUtilImpl;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpecWizardTask;
 import org.dwfa.bpa.process.Condition;
@@ -60,12 +59,13 @@ import org.dwfa.util.bean.Spec;
 public class GetRequestForChangePanelDataTask extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
     private String nextUserTermEntryPropName = ProcessAttachmentKeys.NEXT_USER.getAttachmentKey();
     private String commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private String refsetUuidPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
     private String originalRequestPropName = ProcessAttachmentKeys.SEARCH_ALL.getAttachmentKey();
+    private String reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
 
     private I_TermFactory termFactory;
 
@@ -76,6 +76,7 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
         out.writeObject(refsetUuidPropName);
         out.writeObject(originalRequestPropName);
         out.writeObject(refsetSpecUuidPropName);
+        out.writeObject(reviewerUuidPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -89,6 +90,11 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                 refsetSpecUuidPropName = (String) in.readObject();
             } else {
                 refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
+            }
+            if (objDataVersion >= 3) {
+                reviewerUuidPropName = (String) in.readObject();
+            } else {
+                reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -118,6 +124,7 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                     String priority = panel.getPriority();
                     HashSet<File> attachments = panel.getAttachments();
                     I_GetConceptData owner = config.getDbConfig().getUserConcept();
+                    I_GetConceptData reviewer = panel.getReviewer();
 
                     Priority p;
                     if (priority == null) {
@@ -149,10 +156,10 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                         RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();
                         String inboxAddress = wizard.getInbox(editor);
                         process.setProperty(nextUserTermEntryPropName, inboxAddress);
-                        process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(),
-                            new UUID[] { editor.getUids().iterator().next() });
-                        process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(),
-                            new UUID[] { owner.getUids().iterator().next() });
+                        process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { editor
+                            .getUids().iterator().next() });
+                        process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { owner
+                            .getUids().iterator().next() });
                         if (inboxAddress == null) {
                             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                                 "Request for change wizard cannot be completed. The selected editor has no assigned inbox : "
@@ -170,6 +177,11 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                         process.setProperty(originalRequestPropName, originalRequest);
                     }
 
+                    // optional reviewer
+                    if (reviewer != null) {
+                        process.setProperty(reviewerUuidPropName, new UUID[] { reviewer.getUids().iterator().next() });
+                    }
+
                     process.setOriginator(config.getUsername());
 
                     if (refset == null) {
@@ -179,6 +191,8 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                     }
                     process.setSubject("Request a change for refset");
                     process.setName(refset.getInitialText());
+                    process.setProperty(ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey(), refset
+                        .getInitialText());
                     process.setPriority(p);
 
                     if (deadline == null) {
@@ -191,10 +205,10 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
                     process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
                     process.setProperty(refsetSpecUuidPropName, RefsetHelper.getSpecificationRefsetForRefset(refset,
                         config).iterator().next().getUids().iterator().next());
-                    process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(),
-                        new UUID[] { config.getDbConfig().getUserConcept().getUids().iterator().next() });
-                    process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(),
-                        new UUID[] { editor.getUids().iterator().next() });
+                    process.setProperty(ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey(), new UUID[] { config
+                        .getDbConfig().getUserConcept().getUids().iterator().next() });
+                    process.setProperty(ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey(), new UUID[] { editor
+                        .getUids().iterator().next() });
                     for (File file : attachments) {
                         process.writeAttachment(file.getName(), new FileContent(file));
                     }
@@ -256,6 +270,14 @@ public class GetRequestForChangePanelDataTask extends AbstractTask {
 
     public void setRefsetSpecUuidPropName(String refsetSpecUuidPropName) {
         this.refsetSpecUuidPropName = refsetSpecUuidPropName;
+    }
+
+    public String getReviewerUuidPropName() {
+        return reviewerUuidPropName;
+    }
+
+    public void setReviewerUuidPropName(String reviewerUuidPropName) {
+        this.reviewerUuidPropName = reviewerUuidPropName;
     }
 
 }

@@ -37,16 +37,16 @@ public class GetRequestForChangePanelDataTaskBeanInfo extends SimpleBeanInfo {
         try {
 
             PropertyDescriptor refsetSpecUuidPropName;
-            refsetSpecUuidPropName = new PropertyDescriptor("refsetSpecUuidPropName",
-                getBeanDescriptor().getBeanClass());
+            refsetSpecUuidPropName =
+                    new PropertyDescriptor("refsetSpecUuidPropName", getBeanDescriptor().getBeanClass());
             refsetSpecUuidPropName.setBound(true);
             refsetSpecUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             refsetSpecUuidPropName.setDisplayName("<html><font color='green'>specification refset UUID prop:");
             refsetSpecUuidPropName.setShortDescription("The property to put the specification refset UUID into.");
 
             PropertyDescriptor nextUserTermEntryPropName;
-            nextUserTermEntryPropName = new PropertyDescriptor("nextUserTermEntryPropName",
-                getBeanDescriptor().getBeanClass());
+            nextUserTermEntryPropName =
+                    new PropertyDescriptor("nextUserTermEntryPropName", getBeanDescriptor().getBeanClass());
             nextUserTermEntryPropName.setBound(true);
             nextUserTermEntryPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             nextUserTermEntryPropName.setDisplayName("<html><font color='green'>next person:");
@@ -67,15 +67,23 @@ public class GetRequestForChangePanelDataTaskBeanInfo extends SimpleBeanInfo {
             refsetUuidPropName.setShortDescription("The property to put the member refset UUID into.");
 
             PropertyDescriptor originalRequestPropName;
-            originalRequestPropName = new PropertyDescriptor("originalRequestPropName",
-                getBeanDescriptor().getBeanClass());
+            originalRequestPropName =
+                    new PropertyDescriptor("originalRequestPropName", getBeanDescriptor().getBeanClass());
             originalRequestPropName.setBound(true);
             originalRequestPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             originalRequestPropName.setDisplayName("<html><font color='green'>original request prop:");
             originalRequestPropName.setShortDescription("The property to put the original request into.");
 
-            PropertyDescriptor rv[] = { nextUserTermEntryPropName, commentsPropName, refsetUuidPropName,
-                                       originalRequestPropName, refsetSpecUuidPropName };
+            PropertyDescriptor reviewerUuidPropName;
+            reviewerUuidPropName = new PropertyDescriptor("reviewerUuidPropName", getBeanDescriptor().getBeanClass());
+            reviewerUuidPropName.setBound(true);
+            reviewerUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            reviewerUuidPropName.setDisplayName("<html><font color='green'>reviewer UUID prop name:");
+            reviewerUuidPropName.setShortDescription("The property to put the reviewer uuid into.");
+
+            PropertyDescriptor rv[] =
+                    { nextUserTermEntryPropName, commentsPropName, refsetUuidPropName, originalRequestPropName,
+                     refsetSpecUuidPropName, reviewerUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

@@ -542,44 +542,44 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         final DescChangesProcessor p = new DescChangesProcessor(values);
         final CountDownLatch latch = new CountDownLatch(4);
         new Thread() {
-        	public void run() {
+            public void run() {
                 try {
-					iterateDescriptions(p);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+                    iterateDescriptions(p);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 latch.countDown();
-        	}
+            }
         }.start();
         new Thread() {
-        	public void run() {
+            public void run() {
                 try {
-					iterateConceptAttributes(p);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+                    iterateConceptAttributes(p);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 latch.countDown();
-        	}
+            }
         }.start();
         new Thread() {
-        	public void run() {
+            public void run() {
                 try {
-					iterateRelationships(p);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+                    iterateRelationships(p);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 latch.countDown();
-        	}
+            }
         }.start();
         new Thread() {
-        	public void run() {
-        		try {
-					iterateExtByRefs(p);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+            public void run() {
+                try {
+                    iterateExtByRefs(p);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 latch.countDown();
-        	}
+            }
         }.start();
         latch.await();
         addPositions(values);
@@ -599,7 +599,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
                 TimePathId tb = new TimePathId(d.getVersion(), d.getPathId());
                 synchronized (values) {
                     values.add(tb);
-				}
+                }
             }
         }
 
@@ -610,7 +610,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
                         TimePathId tb = new TimePathId(c.getVersion(), c.getPathId());
                         synchronized (values) {
                             values.add(tb);
-        				}
+                        }
                     }
                 } else {
                     AceLog.getAppLog().warning("null concept versions for: " + ConceptBean.get(conc.getConId()));
@@ -625,7 +625,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
                 TimePathId tb = new TimePathId(r.getVersion(), r.getPathId());
                 synchronized (values) {
                     values.add(tb);
-				}
+                }
             }
         }
 
@@ -634,7 +634,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
                 TimePathId tb = new TimePathId(extPart.getVersion(), extPart.getPathId());
                 synchronized (values) {
                     values.add(tb);
-				}
+                }
             }
         }
 
@@ -1960,18 +1960,26 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
         return bdbEnv.getReadOnlyConceptIdSet();
     }
-	
-	@Override
-	public I_ProcessQueue newProcessQueue(int threadCount) {
-		return new ProcessQueue(threadCount);
-	}
 
-	@Override
-	public I_ProcessQueue newProcessQueue(String name, int threadCount) {
-		return new ProcessQueue(name, threadCount);
-	}
+    @Override
+    public I_ProcessQueue newProcessQueue(int threadCount) {
+        return new ProcessQueue(threadCount);
+    }
+
+    @Override
+    public I_ProcessQueue newProcessQueue(String name, int threadCount) {
+        return new ProcessQueue(name, threadCount);
+    }
 
     public <T extends I_ThinExtByRefPart> int getRefsetTypeIdByExtensionType(Class<T> extType) {
         return ThinExtBinder.getExtensionTypeNid(ThinExtBinder.getExtensionType(extType));
+    }
+
+    public I_RepresentIdSet getDescriptionIdSet() throws IOException {
+        return bdbEnv.getDescriptionIdSet();
+    }
+
+    public I_RepresentIdSet getRelationshipIdSet() throws IOException {
+        return bdbEnv.getRelationshipIdSet();
     }
 }

@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -165,14 +165,14 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
 
     /**
      * Connect to database and reset any cached objects.
-     * 
+     *
      * @param vodb VodbEnv
      * @param envHome File
      * @param readOnly boolean
      * @param cacheSize Long
      * @param luceneDir File
      * @param dbSetupConfig DatabaseSetupConfig
-     * 
+     *
      * @throws DatabaseException connecting to DB
      * @throws IOException reading DB files
      */
@@ -893,6 +893,14 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
 
     public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
         return conAttBdb.getReadOnlyConceptIdSet();
+    }
+
+    public IdentifierSet getRelationshipIdSet() throws IOException {
+        return conAttBdb.getRelationshipIdSet();
+    }
+
+    public IdentifierSet getDescriptionIdSet() throws IOException {
+        return conAttBdb.getDescriptionIdSet();
     }
 
 }

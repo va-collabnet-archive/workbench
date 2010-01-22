@@ -79,6 +79,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
@@ -88,7 +89,6 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
-import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -1018,8 +1018,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             ;
             if (refsetConcept != null) {
                 relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
-                List<I_RelTuple> refsetSpecTuples = refsetConcept.getDestRelTuples(ace.getAceFrameConfig()
-                    .getAllowedStatus(), relTypes, ace.getAceFrameConfig().getViewPositionSet(), true);
+                List<? extends I_RelTuple> refsetSpecTuples = refsetConcept.getDestRelTuples(ace.getAceFrameConfig()
+                    .getAllowedStatus(), relTypes, ace.getAceFrameConfig().getViewPositionSetReadOnly(), true);
                 if (refsetSpecTuples != null && refsetSpecTuples.size() > 0) {
                     refsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
                     localRefsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
@@ -1043,7 +1043,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 if (newRefset == false) {
                     addChildrenExpandedNodes(oldRoot);
                 }
-                List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get()
+                List<? extends I_ThinExtByRefVersioned> extensions =Terms.get()
                     .getAllExtensionsForComponent(localRefsetSpecConcept.getConceptId(), true);
                 HashMap<Integer, RefsetSpecTreeNode> extensionMap = new HashMap<Integer, RefsetSpecTreeNode>();
                 HashSet<Integer> fetchedComponents = new HashSet<Integer>();
@@ -1087,10 +1087,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             }
         }
 
-        private void addExtensionsToMap(List<I_ThinExtByRefVersioned> extensions,
+        private void addExtensionsToMap(List<? extends I_ThinExtByRefVersioned> list,
                 HashMap<Integer, RefsetSpecTreeNode> extensionMap, HashSet<Integer> fetchedComponents)
                 throws IOException {
-            for (I_ThinExtByRefVersioned ext : extensions) {
+            for (I_ThinExtByRefVersioned ext : list) {
                 if (ext.getRefsetId() == localRefsetSpecConcept.getConceptId()) {
                     int currentTupleCount = ext.getTuples(ace.getAceFrameConfig().getAllowedStatus(),
                         ace.getAceFrameConfig().getViewPositionSet(), true).size();
@@ -1098,7 +1098,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(ext, ace.getAceFrameConfig()));
                         if (fetchedComponents.contains(ext.getMemberId()) == false) {
                             fetchedComponents.add(ext.getMemberId());
-                            addExtensionsToMap(LocalVersionedTerminology.get().getAllExtensionsForComponent(
+                            addExtensionsToMap(Terms.get().getAllExtensionsForComponent(
                                 ext.getMemberId(), true), extensionMap, fetchedComponents);
                         }
                     }
@@ -1149,8 +1149,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             }
             if (childrenExpandedNodes.contains(getId(node))) {
                 specTree.expandPath(new TreePath(node.getPath()));
-                for (RefsetSpecTreeNode childNode : node.getChildren()) {
-                    expandNodes(childNode);
+                if (node.getChildren() != null) {
+                    for (RefsetSpecTreeNode childNode : node.getChildren()) {
+                        expandNodes(childNode);
+                    }
                 }
             }
         }
@@ -1164,7 +1166,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         I_GetConceptData refsetConcept = (I_GetConceptData) getLabel().getTermComponent();
         if (refsetConcept != null) {
-            Set<I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept,
+            Set<? extends I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept,
                 ace.getAceFrameConfig());
             if (specs.size() > 0) {
                 refsetSpecConcept = specs.iterator().next();

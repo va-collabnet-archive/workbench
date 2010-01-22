@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,9 @@ import org.dwfa.ace.batch.Batch;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.AllowDataCheckSuppression;
+import org.dwfa.tapi.NoMappingException;
 
 /**
  * Utility class providing refset membership operations.
@@ -57,7 +59,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
     /**
      * Add a collection of concepts to a refset.
-     * 
+     *
      * @param members
      *            The collection of concepts to be added to the refset
      * @param batchDescription
@@ -80,7 +82,8 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
             @Override
             public void onComplete() throws Exception {
-                List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
+                List<UUID> markedParentsUuid =
+                        Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
 
                 if (termFactory.hasId(markedParentsUuid)) {
                     if (useMonitor) {
@@ -105,7 +108,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
     /**
      * Add a collection of concepts to a refset.
-     * 
+     *
      * @param members
      *            The collection of concepts to be added to the refset
      * @param batchDescription
@@ -121,13 +124,21 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
         new SpecMarkedParentRefsetHelper(memberRefsetId, memberTypeId).addParentMembers(conceptIds);
     }
 
+    public void addDescriptionMarkedParents(Integer... conceptIds) throws Exception {
+        new SpecMarkedParentRefsetHelper(memberRefsetId, memberTypeId).addDescriptionParentMembers(conceptIds);
+    }
+
     public void removeMarkedParents(Integer... conceptIds) throws Exception {
         new SpecMarkedParentRefsetHelper(memberRefsetId, memberTypeId).removeParentMembers(conceptIds);
     }
 
+    public void removeDescriptionMarkedParents(Integer... conceptIds) throws Exception {
+        new SpecMarkedParentRefsetHelper(memberRefsetId, memberTypeId).removeDescriptionParentMembers(conceptIds);
+    }
+
     /**
      * Remove a collection of concepts from a refset.
-     * 
+     *
      * @param members
      *            The collection of concepts to be removed from the refset
      * @param batchDescription
@@ -150,7 +161,8 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
             @Override
             public void onComplete() throws Exception {
-                List<UUID> markedParentsUuid = Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
+                List<UUID> markedParentsUuid =
+                        Arrays.asList(ConceptConstants.INCLUDES_MARKED_PARENTS_REL_TYPE.getUuids());
 
                 if (termFactory.hasId(markedParentsUuid)) {
                     if (useMonitor) {
@@ -174,7 +186,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
     /**
      * Remove a collection of concepts from a refset.
-     * 
+     *
      * @param members
      *            The collection of concepts to be removed from the refset
      * @param batchDescription
@@ -189,7 +201,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
     /**
      * Add a concept to a refset
-     * 
+     *
      * @param newMemberId
      *            The concept to be added
      */
@@ -203,7 +215,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
     /**
      * Remove a concept from a refset
-     * 
+     *
      * @param newMemberId
      *            The concept to be removed
      */
@@ -241,8 +253,9 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
 
-            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(config.getAllowedStatus(),
-                config.getViewPositionSet(), true, false);
+            List<I_ThinExtByRefTuple> extensions =
+                    thinExtByRefVersioned
+                        .getTuples(config.getAllowedStatus(), config.getViewPositionSet(), true, false);
 
             for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == memberRefsetId) {
@@ -266,7 +279,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
      * <li>Is a <i>refset identity</i>
      * <li>A <i>refset purpose</i> of <i>refset membership</i>
      */
-    public static Set<Integer> getMemberRefsets() throws Exception {
+    public Set<Integer> getMemberRefsets() throws Exception {
 
         HashSet<Integer> memberRefsets = new HashSet<Integer>();
         I_TermFactory termFactory = LocalVersionedTerminology.get();
@@ -281,9 +294,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
         I_IntSet purposeTypes = termFactory.newIntSet();
         purposeTypes.add(RefsetAuxiliary.Concept.REFSET_PURPOSE.localize().getNid());
 
-        I_IntSet isATypes = termFactory.newIntSet();
-        isATypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-        isATypes.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
+        I_IntSet isATypes = getAvailableIsARelTypes();
 
         I_GetConceptData memberPurpose = termFactory.getConcept(memberRefsetPurposeId);
 
@@ -299,4 +310,52 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper {
         return memberRefsets;
     }
 
+    /**
+     * Check for a is_a relationship type defined on the member refset concept
+     * otherwise default to just using
+     * either a SNOMED or ArchitectonicAuxiliary is_a relationship type
+     *
+     * @throws Exception
+     */
+    protected I_IntSet getAvailableIsARelTypes() throws Exception {
+        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_IntSet results = termFactory.newIntSet();
+
+        try {
+
+            I_IntSet relTypes = termFactory.newIntSet();
+            relTypes.add(termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids())
+                .getConceptId());
+            I_GetConceptData memberRefset = termFactory.getConcept(getMemberRefsetId());
+            Set<? extends I_GetConceptData> requiredIsAType =
+                    memberRefset.getSourceRelTargets(getCurrentStatusIntSet(), relTypes, null, false, true);
+
+            if (requiredIsAType != null && requiredIsAType.size() > 0) {
+                // relationship exists so use the is-a specified by the
+                // marked-parent-is-a relationship
+                for (I_GetConceptData concept : requiredIsAType) {
+                    results.add(concept.getConceptId());
+                }
+
+                // Added for backwards compatability. All newly created refset specs will have one or more
+                // relationships specifiying the relationship types to use. e.g. if in a database with Snomed IS-a
+                // and the AA is-a, it will have 2 relationships... one to each. Previously only one relationship
+                // would have been created (to the SNOMED is-a), so this step ensures that the AA is-a is also added
+                // in SNOMED databases.
+                if (!results.contains(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid())) {
+                    results.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+                }
+            } else {
+                // no specified marked-parent-is-a relationship defined, so
+                // first default to using SNOMED and ArchitectonicAuxiliary is_a relationship type
+                results.add(SNOMED.Concept.IS_A.localize().getNid());
+                results.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+            }
+        } catch (NoMappingException ex) {
+            // marked-parent-is-a relationship type is unknown so default to just using AA is-a
+            results.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+        }
+
+        return results;
+    }
 }

@@ -439,8 +439,7 @@ public class ExportIterator implements I_ProcessConcepts {
                 writeIdPartToFile(newIdPart, idVersioned);
                 writeIdToMap(uuidString, generatedSctId);
 
-                log.info("Generated new SCTID '" + generatedSctId + "' for component '" + component + "' uuids "
-                    + uuidString);
+                log.info("Generated new SCTID '" + generatedSctId + "' for uuids " + uuidString);
             }
         }
     }

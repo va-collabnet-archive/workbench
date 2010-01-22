@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.util.HashFunction;
@@ -45,7 +46,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_DescriptionPart#hasNewData(org.dwfa.vodb.types.
      * ThinDescPart)
@@ -58,7 +59,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#getPathId()
      */
     public int getPathId() {
@@ -67,7 +68,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#setPathId(int)
      */
     public void setPathId(int pathId) {
@@ -76,7 +77,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#getInitialCaseSignificant()
      */
     public boolean getInitialCaseSignificant() {
@@ -85,7 +86,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_DescriptionPart#setInitialCaseSignificant(boolean)
      */
@@ -95,7 +96,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#getLang()
      */
     public String getLang() {
@@ -104,7 +105,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#setLang(java.lang.String)
      */
     public void setLang(String lang) {
@@ -113,7 +114,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#getStatusId()
      */
     public int getStatusId() {
@@ -122,7 +123,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#setStatusId(int)
      */
     public void setStatusId(int status) {
@@ -131,7 +132,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#getText()
      */
     public String getText() {
@@ -140,7 +141,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#setText(java.lang.String)
      */
     public void setText(String text) {
@@ -149,7 +150,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#getTypeId()
      */
     public int getTypeId() {
@@ -158,7 +159,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#setTypeId(int)
      */
     public void setTypeId(int typeInt) {
@@ -167,7 +168,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#getVersion()
      */
     public int getVersion() {
@@ -176,7 +177,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_DescriptionPart#setVersion(int)
      */
     public void setVersion(int version) {
@@ -216,7 +217,7 @@ public class ThinDescPart implements I_DescriptionPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.dwfa.vodb.types.I_DescriptionPart#convertIds(org.dwfa.vodb.jar.
      * I_MapNativeToNative)
      */
@@ -261,6 +262,21 @@ public class ThinDescPart implements I_DescriptionPart {
 
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public long getTime() {
+        return ThinVersionHelper.convert(version);
+    }
+
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        ThinDescPart newPart = duplicate();
+        newPart.setStatusId(statusNid);
+        newPart.setPathId(pathNid);
+        newPart.setVersion(ThinVersionHelper.convert(time));
+        return newPart;
     }
 
 }

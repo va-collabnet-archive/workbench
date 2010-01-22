@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,6 @@ import javax.swing.TransferHandler;
 
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
-import org.apache.lucene.util.OpenBitSet;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
@@ -48,8 +47,8 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.api.process.I_ProcessQueue;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -67,7 +66,7 @@ public interface I_TermFactory {
      * Return a map of all properties in the database. The returned map is
      * unmodifiable. To
      * set properties, use the <code>setProperty</code> method.
-     * 
+     *
      * @return an unmodifable map of the properties.
      * @throws IOException
      */
@@ -93,7 +92,7 @@ public interface I_TermFactory {
     /**
      * Find a concept using a textual identifier from a known identifier scheme
      * (it is known to be a UUID or an SCTID, etc)
-     * 
+     *
      * @param conceptId Any textual id, for instance a SNOMED CT ID or a UUID
      * @param sourceId The native id of the source scheme concept, eg
      *            {@link ArchitectonicAuxiliary.Concept.SNOMED_INT_ID}
@@ -106,7 +105,7 @@ public interface I_TermFactory {
      * Find concepts with a matching textual identifier where the identifier
      * scheme/type is unknown.
      * This may result in multiple matches.
-     * 
+     *
      * @param conceptId Any textual id, for instance a SNOMED CT id
      * @throws TerminologyException if no suitable concepts are located
      */
@@ -122,7 +121,7 @@ public interface I_TermFactory {
 
     /**
      * Gets a description given a description native ID and a concept native ID
-     * 
+     *
      * @param dnid description native ID
      * @param cnid concept native ID
      * @return description matching the description and concept IDs
@@ -133,7 +132,7 @@ public interface I_TermFactory {
 
     /**
      * Gets a description given a description ID
-     * 
+     *
      * @param descriptionId
      * @return
      * @throws TerminologyException
@@ -147,7 +146,7 @@ public interface I_TermFactory {
      * Uses the configuration to set default values for the relationship, and
      * uses the currently selected concept in the hierarchy viewer as the
      * relationship destination.
-     * 
+     *
      * @param newRelUid
      * @param concept
      * @return
@@ -160,7 +159,7 @@ public interface I_TermFactory {
     /**
      * New relationship that <em>DOES NOT</em> use the default values set by
      * the configuration.
-     * 
+     *
      * @param newRelUid
      * @param concept
      * @param relType
@@ -206,7 +205,7 @@ public interface I_TermFactory {
     void addUncommittedNoChecks(I_ThinExtByRefVersioned extension);
 
     /**
-     * 
+     *
      * @return An unmodifiable set of uncommitted items.
      */
     Set<I_Transact> getUncommitted();
@@ -216,7 +215,7 @@ public interface I_TermFactory {
      * will be encountered.
      * Useful for checking for errors prior to commit performed by a workflow
      * process.
-     * 
+     *
      * @return Data Constraint failures that would be encountered if
      *         <code>commit()</code> is called.
      */
@@ -248,7 +247,7 @@ public interface I_TermFactory {
     void loadFromDirectory(File dataDir, String encoding) throws Exception;
 
     /**
-     * 
+     *
      * @param args
      * @param unjaringDir
      * @throws Exception
@@ -289,25 +288,39 @@ public interface I_TermFactory {
     public Iterator<I_GetConceptData> getConceptIterator() throws IOException;
 
     /**
-     * 
+     *
      * @return a set of all the concept native identifiers in the database.
      * @throws IOException
      */
     public I_IntSet getConceptNids() throws IOException;
 
     /**
-     * 
+     *
      * @return a read-only bit set, with all concept identifiers set to true.
      * @throws IOException
      */
     public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException;
 
     /**
-     * 
+     *
      * @return a mutable bit set, with all concept identifiers set to true.
      * @throws IOException
      */
     public I_RepresentIdSet getConceptIdSet() throws IOException;
+
+    /**
+     * 
+     * @return a mutable bit set, with all description identifiers set to true.
+     * @throws IOException
+     */
+    public I_RepresentIdSet getDescriptionIdSet() throws IOException;
+
+    /**
+     * 
+     * @return a mutable bit set, with all relationship identifiers set to true.
+     * @throws IOException
+     */
+    public I_RepresentIdSet getRelationshipIdSet() throws IOException;
 
     /**
      * 
@@ -318,7 +331,7 @@ public interface I_TermFactory {
     public I_RepresentIdSet getEmptyIdSet() throws IOException;
 
     /**
-     * 
+     *
      * @return a bit set, sized to hold all current identifiers, members of ids
      *         set to true.
      * @throws IOException
@@ -326,7 +339,7 @@ public interface I_TermFactory {
     public I_RepresentIdSet getIdSetFromIntCollection(Collection<Integer> ids) throws IOException;
 
     /**
-     * 
+     *
      * @return a bit set, sized to hold all current identifiers, members of ids
      *         set to true.
      * @throws IOException
@@ -377,11 +390,11 @@ public interface I_TermFactory {
      * Gets a collection of matching I_IdVersioned given an ID and an ID scheme
      * -
      * if no matches are found an empty collection is returned.
-     * 
+     *
      * Usually only one match will be returned, however given the data structure
      * it is possible for more than one I_IdVersioned to have the same
      * ID/ID scheme combination.
-     * 
+     *
      * @param id identifier to find
      * @param scheme native id of the provided identifier's scheme
      * @return Collection of matching I_IdVersioned objects, or an empty
@@ -400,7 +413,7 @@ public interface I_TermFactory {
 
     /**
      * Delete any uncommitted changes.
-     * 
+     *
      * @throws IOException
      */
 
@@ -410,7 +423,7 @@ public interface I_TermFactory {
      * Turn off the writing of changes to change sets.
      * Typical usage is to call this method before importing
      * change sets so that the changes don't get duplicated.
-     * 
+     *
      */
     void suspendChangeSetWriters();
 
@@ -419,12 +432,12 @@ public interface I_TermFactory {
      * Typical usage is to call this methods after completion
      * of importing change sets, so than user changes get
      * properly recorded.
-     * 
+     *
      */
     void resumeChangeSetWriters();
 
     /**
-     * 
+     *
      * @return a new description part with all content uninitialized.
      */
     I_DescriptionPart newDescriptionPart();
@@ -448,7 +461,7 @@ public interface I_TermFactory {
      * Create a new concrete extension part.
      * <p>
      * eg. newExtensionPart(I_ThinExtByRefPartConcept.class)
-     * 
+     *
      * @param <T> A sub-type of {@link I_ThinExtByRefPart}.
      * @param t The interface to be instantiated.
      * @return A new strongly typed extension part which is assignable from T.
@@ -530,13 +543,13 @@ public interface I_TermFactory {
     I_ThinExtByRefPartString newStringExtensionPart();
 
     /**
-     * 
+     *
      * @return a new concept attribute part with all content uninitialized.
      */
     I_ConceptAttributePart newConceptAttributePart();
 
     /**
-     * 
+     *
      * @return a new relationship part with all content uninitialized.
      */
     I_RelPart newRelPart();
@@ -551,7 +564,7 @@ public interface I_TermFactory {
      * Removes an extesion from the extension cache and rolls back pending
      * transactions. We need to do this to keep
      * the caches and transactions in synch.
-     * 
+     *
      * @param memberId The extension to remove from cache.
      * @throws IOException If an exception occurs.
      */
@@ -580,7 +593,7 @@ public interface I_TermFactory {
      * classification or a refset generation.
      * It should not be used to bypass the transactional model for manually
      * generated changes.
-     * 
+     *
      * @return
      */
     I_WriteDirectToDb getDirectInterface();
@@ -621,7 +634,7 @@ public interface I_TermFactory {
      * Count of the number of concepts in the database.
      * The count may not be accurate in the face of concurrent update operations
      * in the database
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -635,7 +648,7 @@ public interface I_TermFactory {
 
     /**
      * Create or modify a path
-     * 
+     *
      * @param p
      * @throws IOException
      */
@@ -648,14 +661,14 @@ public interface I_TermFactory {
 
     /**
      * Gets a path from a native id
-     * 
+     *
      * @param pathId
      * @return
      */
     I_Path getPath(int pathId) throws TerminologyException;
 
     /**
-     * 
+     *
      * @param threadCount
      * @return a new process queue configured with the specified thread count
      */
@@ -667,6 +680,6 @@ public interface I_TermFactory {
      * @return a new process queue configured with the specified thread count
      */
     I_ProcessQueue newProcessQueue(String name, int threadCount);
-    
+
     public <T extends I_ThinExtByRefPart> int getRefsetTypeIdByExtensionType(Class<T> extType);
 }

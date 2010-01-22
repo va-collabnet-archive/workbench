@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,19 +28,23 @@ import org.dwfa.tapi.TerminologyException;
 public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
 
     /**
-     * @return the membership identifier - this is the surrogate key for the
-     *         I_ThinExtByRefVersioned object itself which represents a
-     *         component's membership of a given reference set
+     * @return <code><b>int</b></code> -- native identifier (nid) of this reference set member.<br>
+     *         This is the surrogate key <code>I_ThinExtByRefVersioned</code> object itself.<br>
+     *         The <code>I_ThinExtByRefVersioned</code> object associates a
+     *         concept, description or relationship component as member of a given reference set
      */
     public int getMemberId();
 
     /**
-     * @return the component that is "in the reference set" - really the
-     *         component that this I_ThinExtByRefVersioned represents the
-     *         membership of relative to a given reference set
+     * @return <code><b>int</b></code> -- native identifier (nid) of the component which this reference set member extends.<br>
+     *         The component extended by this <code>I_ThinExtByRefVersioned</code> may be a concept, description or relationship.<br>
      */
     public int getComponentId();
 
+    /**
+     * @return <code><b>int</b></code> -- native identifier (nid) for the concept which represent this reference set member's extension type.<br>
+     *         Example types which this <code>I_ThinExtByRefVersioned</code> reference set member type are boolean, String, Concept and so on...<br>
+     */
     public int getTypeId();
 
     public List<? extends I_ThinExtByRefPart> getVersions();
@@ -48,8 +52,8 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
     public I_ThinExtByRefPart getLatestVersion();
 
     /**
-     * @return the id of the reference set which this I_ThinExtByRefVersioned
-     *         represents a component's membership of
+     * @return <code><b>int</b></code> -- native identifier (nid) for the reference set to which this <code>I_ThinExtByRefVersioned</code>
+     *         extension is a member.
      */
     public int getRefsetId();
 
@@ -66,13 +70,13 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
      * strategy</strong>.
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
-     * 
+     *
      * @see #addTuples(I_IntSet, Set, List, boolean, boolean)
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
-     *            postions a tuple must be on to be returned
+     *            positions a tuple must be on to be returned
      * @param returnTuples
      *            List to be populated with the result of the search
      * @param addUncommitted
@@ -88,11 +92,11 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions -
      * tuples are returned in the supplied returnTuples List parameter
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
-     *            postions a tuple must be on to be returned
+     *            positions a tuple must be on to be returned
      * @param returnTuples
      *            List to be populated with the result of the search
      * @param addUncommitted
@@ -111,7 +115,7 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
      * Retrieves tuples matching the specified allowedStatuses and positions
      * configured in the current profile - tuples are returned in the supplied
      * returnTuples List parameter
-     * 
+     *
      * @param returnTuples
      *            List to be populated with the result of the search
      * @param addUncommitted
@@ -131,9 +135,9 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
      * configured in the current profile - <strong>NOTE: this does not use the
      * conflict management strategy</strong>. It is strongly recommended that
      * you use a method that does use a conflict management strategy.
-     * 
+     *
      * @see #getTuples(I_IntSet, Set, boolean, boolean)
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
@@ -148,11 +152,11 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
-     *            postions a tuple must be on to be returned
+     *            positions a tuple must be on to be returned
      * @param addUncommitted
      *            if true matching items from the uncommitted list will be
      *            added, if false the uncommitted list is ignored
@@ -169,11 +173,11 @@ public interface I_ThinExtByRefVersioned extends I_AmTermComponent {
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
      * configured in the current profile
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
-     *            postions a tuple must be on to be returned
+     *            positions a tuple must be on to be returned
      * @param addUncommitted
      *            if true matching items from the uncommitted list will be
      *            added, if false the uncommitted list is ignored

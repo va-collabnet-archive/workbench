@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.util.Date;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -26,6 +27,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable<I_ThinExtByRefPart> {
     private int pathId;
@@ -34,7 +36,7 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefPart#getStatus()
      */
     @Deprecated
@@ -44,7 +46,7 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.api.I_AmPart#getStatusId()
      */
     public int getStatusId() {
@@ -53,7 +55,7 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefPart#setStatus(int)
      */
     @Deprecated
@@ -63,7 +65,7 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.api.I_AmPart#setStatusId(int)
      */
     public void setStatusId(int statusId) {
@@ -72,7 +74,7 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefPart#getPathId()
      */
     public int getPathId() {
@@ -81,7 +83,7 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefPart#setPathId(int)
      */
     public void setPathId(int pathId) {
@@ -90,7 +92,7 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefPart#getVersion()
      */
     public int getVersion() {
@@ -99,7 +101,7 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefPart#setVersion(int)
      */
     public void setVersion(int version) {
@@ -119,7 +121,7 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefPart#getUniversalPart()
      */
     public abstract UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException;
@@ -172,6 +174,19 @@ public abstract class ThinExtByRefPart implements I_ThinExtByRefPart, Comparable
 
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
+    }
+    @Override
+    public long getTime() {
+        return ThinVersionHelper.convert(getVersion());
+    }
+
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        I_ThinExtByRefPart newPart = duplicate();
+        newPart.setStatusId(statusNid);
+        newPart.setPathId(pathNid);
+        newPart.setVersion(ThinVersionHelper.convert(time));
+        return newPart;
     }
 
 }

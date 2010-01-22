@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,11 +17,13 @@
 package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinImageTuple implements I_ImageTuple {
     private I_ImageVersioned core;
@@ -39,7 +41,7 @@ public class ThinImageTuple implements I_ImageTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageTuple#getImage()
      */
     public byte[] getImage() {
@@ -48,7 +50,7 @@ public class ThinImageTuple implements I_ImageTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageTuple#getImageId()
      */
     public int getImageId() {
@@ -57,7 +59,7 @@ public class ThinImageTuple implements I_ImageTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageTuple#getPathId()
      */
     public int getPathId() {
@@ -66,7 +68,7 @@ public class ThinImageTuple implements I_ImageTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageTuple#getStatusId()
      */
     public int getStatusId() {
@@ -75,7 +77,7 @@ public class ThinImageTuple implements I_ImageTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageTuple#getVersion()
      */
     public int getVersion() {
@@ -84,7 +86,7 @@ public class ThinImageTuple implements I_ImageTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageTuple#getTextDescription()
      */
     public String getTextDescription() {
@@ -93,7 +95,7 @@ public class ThinImageTuple implements I_ImageTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageTuple#getTypeId()
      */
     public int getTypeId() {
@@ -102,7 +104,7 @@ public class ThinImageTuple implements I_ImageTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageTuple#getFormat()
      */
     public String getFormat() {
@@ -111,7 +113,7 @@ public class ThinImageTuple implements I_ImageTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImageTuple#getConceptId()
      */
     public int getConceptId() {
@@ -160,7 +162,7 @@ public class ThinImageTuple implements I_ImageTuple {
     }
 
     public int getFixedPartId() {
-        return core.getTermComponentId();
+        return core.getNid();
     }
 
     public int getPositionId() {
@@ -171,4 +173,17 @@ public class ThinImageTuple implements I_ImageTuple {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public long getTime() {
+        return ThinVersionHelper.convert(getVersion());
+    }
+
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        I_AmPart newPart = duplicate();
+        newPart.setStatusId(statusNid);
+        newPart.setPathId(pathNid);
+        newPart.setVersion(ThinVersionHelper.convert(time));
+        return newPart;
+    }
 }

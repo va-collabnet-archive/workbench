@@ -127,6 +127,11 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "template relationship extension", "template for rel" }, REFSET_TYPE), TEMPLATE_EXTENSION(new String[] {
             "template extension", "template" }, REFSET_TYPE),
 
+        REFSET_COMPUTE_TYPE(new String[] {"refset compute type", "refset compute type" }, REFSET_AUXILIARY),
+        CONCEPT_COMPUTE_TYPE(new String[] {"concept compute type", "concept compute type" }, REFSET_COMPUTE_TYPE),
+        DESCRIPTION_COMPUTE_TYPE(new String[] {"description compute type", "description compute type" }, REFSET_COMPUTE_TYPE),
+        RELATIONSHIP_COMPUTE_TYPE(new String[] {"relationship compute type", "relationship compute type" }, REFSET_COMPUTE_TYPE),
+
         BOOLEAN_CIRCLE_ICONS(new String[] { "boolean with circle icon", "boolean with circle" }, REFSET_AUXILIARY), BOOLEAN_CIRCLE_ICONS_TRUE(new String[] {
             "true with circle check icon", "true" }, BOOLEAN_CIRCLE_ICONS), BOOLEAN_CIRCLE_ICONS_FALSE(new String[] {
             "false with forbidden icon", "false" }, BOOLEAN_CIRCLE_ICONS), BOOLEAN_CHECK_CROSS_ICONS(new String[] {
@@ -222,6 +227,8 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "marked parent is-a type", "marked parent is-a type" }, REFSET_RELATIONSHIP), PROMOTION_REL(new String[] {
             "promotion rel", "promotion rel" }, REFSET_RELATIONSHIP), COMMENTS_REL(new String[] { "comments rel",
             "comments rel" }, REFSET_RELATIONSHIP),
+            REFSET_COMPUTE_TYPE_REL(new String[] { "refset compute type rel", "refset compute type rel" }, REFSET_RELATIONSHIP),
+
 
         SUPPORTING_REFSETS(new String[] { "supporting refsets", "supporting refsets" }, REFSET_AUXILIARY),
 
@@ -392,6 +399,13 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             CONCEPT_STRING_EXTENSION }, new I_ConceptualizeUniversally[] { ArchitectonicAuxiliary.Concept.IS_A_REL,
             REFSET_TYPE_REL }),
 
+        // Issue Repository Auxiliary root;
+        ISSUE_MANAGER_ROOT(new String[] { "Issue Manager Auxiliary Concept", "Issue Manager Auxiliary Concept" }, 
+        		new I_ConceptualizeUniversally[] {}),
+		ISSUE_REPOSITORY(new String[] { "Issue repository", "Issue repository" }, 
+	    		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),
+		ISSUE_REPOSITORY_METADATA_REFSET(new String[] { "Issue repository metadata refset", "Issue repository metadata refset" }, 
+        		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),;		
         ;
 
         private Collection<UUID> conceptUids = new ArrayList<UUID>();

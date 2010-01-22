@@ -23,33 +23,32 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.Box;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
+import org.dwfa.ace.task.commit.TestForReviewRefsetPermission;
 import org.dwfa.ace.task.util.DatePicker;
-import org.dwfa.ace.task.util.DynamicWidthComboBox;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
+import org.dwfa.bpa.data.ArrayListModel;
 
 /**
  * The request for change panel that allows user to input:
@@ -60,8 +59,9 @@ import org.dwfa.tapi.TerminologyException;
  * 5) deadline (date picker)
  * 6) priority (from pulldown menu)
  * 7) request attachments (file chooser)
+ * 8) reviewer (from pulldown menu)
  * 
- * @author Chrissy
+ * @author Chrissy Hill
  * 
  */
 public class RequestForChangePanel extends JPanel {
@@ -78,10 +78,11 @@ public class RequestForChangePanel extends JPanel {
     private JLabel commentsLabel;
     private JLabel deadlineLabel;
     private JLabel priorityLabel;
-    private JLabel fileAttachmentLabel;
+    private JLabel reviewerLabel;
     private JButton openFileChooserButton;
-    private DynamicWidthComboBox refsetNameComboBox;
-    private DynamicWidthComboBox editorComboBox;
+    private JComboBox refsetNameComboBox;
+    private JComboBox editorComboBox;
+    private JComboBox reviewerComboBox;
     private JComboBox priorityComboBox;
     private JTextArea originalRequestTextField;
     private JTextArea commentsTextField;
@@ -89,20 +90,27 @@ public class RequestForChangePanel extends JPanel {
     private JScrollPane originalRequestScrollPane;
     private JScrollPane commentsScrollPane;
 
-    private HashSet<File> attachments = new HashSet<File>();
-    private Set<I_GetConceptData> refsets;
-    private JPanel wfPanel;
+    // File Attachments
+    private JList attachmentList;
+    private HashSet<File> attachmentSet = new HashSet<File>();
+    private ArrayListModel<File> attachmentListModel;
 
-    public RequestForChangePanel(Set<I_GetConceptData> refsets, JPanel wfPanel) {
+    private Set<I_GetConceptData> refsets;
+    private Set<? extends I_GetConceptData> allValidUsers;
+
+    private String noReviewText = "no reviewer assigned";
+
+    public RequestForChangePanel(Set<I_GetConceptData> refsets, Set<? extends I_GetConceptData> allValidUsers) {
         super();
-        this.wfPanel = wfPanel;
         this.refsets = refsets;
+        this.allValidUsers = allValidUsers;
         init();
     }
 
     private void init() {
         setDefaultValues();
         addListeners();
+        setUpComboBoxes();
         layoutComponents();
     }
 
@@ -115,18 +123,11 @@ public class RequestForChangePanel extends JPanel {
         commentsLabel = new JLabel("Comments (optional):");
         deadlineLabel = new JLabel("Deadline (required):");
         priorityLabel = new JLabel("Priority (required):");
-        fileAttachmentLabel = new JLabel("Request attachment(s) (optional):");
+        reviewerLabel = new JLabel("Reviewer (optional):");
 
         // buttons and boxes
-        openFileChooserButton = new JButton("Attach a file");
-        refsetNameComboBox = new DynamicWidthComboBox(refsets.toArray());
-        refsetNameComboBox.setMaximumSize(new Dimension(200, 25));
-        refsetNameComboBox.setMinimumSize(new Dimension(200, 25));
-        refsetNameComboBox.setPreferredSize(new Dimension(200, 25));
-        editorComboBox = new DynamicWidthComboBox();
-        editorComboBox.setMaximumSize(new Dimension(200, 25));
-        editorComboBox.setMinimumSize(new Dimension(200, 25));
-        editorComboBox.setPreferredSize(new Dimension(200, 25));
+        openFileChooserButton = new JButton("Attach a file...");
+        refsetNameComboBox = new JComboBox(refsets.toArray());
         priorityComboBox = new JComboBox(new String[] { "Highest", "High", "Normal", "Low", "Lowest" });
 
         // date picker
@@ -139,21 +140,44 @@ public class RequestForChangePanel extends JPanel {
         originalRequestTextField.setWrapStyleWord(true);
         originalRequestScrollPane = new JScrollPane(originalRequestTextField);
         originalRequestScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        originalRequestScrollPane.setMaximumSize(new Dimension(200, 50));
-        originalRequestScrollPane.setMinimumSize(new Dimension(200, 50));
-        originalRequestScrollPane.setPreferredSize(new Dimension(200, 50));
         commentsTextField = new JTextArea();
         commentsTextField.setLineWrap(true);
         commentsTextField.setWrapStyleWord(true);
         commentsScrollPane = new JScrollPane(commentsTextField);
         commentsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        commentsScrollPane.setMaximumSize(new Dimension(200, 50));
-        commentsScrollPane.setMinimumSize(new Dimension(200, 50));
-        commentsScrollPane.setPreferredSize(new Dimension(200, 50));
+    }
+
+    private void setUpComboBoxes() {
+
+        Set<I_GetConceptData> editors = getValidEditors();
+        Set<Object> reviewers = getValidReviewers();
+
+        if (editorComboBox != null) {
+            I_GetConceptData previousEditor = (I_GetConceptData) editorComboBox.getSelectedItem();
+            editorComboBox = new JComboBox(editors.toArray());
+            if (previousEditor != null || editors.size() == 0) {
+                editorComboBox.setSelectedItem(previousEditor);
+            }
+        } else {
+            editorComboBox = new JComboBox(editors.toArray());
+        }
+
+        if (reviewerComboBox != null) {
+            Object previousReviewer = reviewerComboBox.getSelectedItem();
+            reviewerComboBox = new JComboBox(reviewers.toArray());
+            if (previousReviewer != null || reviewers.size() == 0) {
+                reviewerComboBox.setSelectedItem(previousReviewer);
+            } else {
+                reviewerComboBox.setSelectedItem(noReviewText);
+            }
+        } else {
+            reviewerComboBox = new JComboBox(reviewers.toArray());
+            reviewerComboBox.setSelectedItem(noReviewText);
+        }
     }
 
     private void addListeners() {
-        openFileChooserButton.addActionListener(new ButtonListener());
+        openFileChooserButton.addActionListener(new AddAttachmentActionLister());
         refsetNameComboBox.addActionListener(new RefsetListener());
     }
 
@@ -163,230 +187,205 @@ public class RequestForChangePanel extends JPanel {
         this.removeAll();
 
         // refset name label & box
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.add(refsetNameLabel, gridBagConstraints);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(refsetNameLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.weighty = 0.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        gbc.weightx = 1;
         if (refsets.size() == 0) {
-            this.add(new JLabel("No available refsets."), gridBagConstraints);
+            this.add(new JLabel("No available refsets."), gbc);
         } else {
-            this.add(refsetNameComboBox, gridBagConstraints);
+            this.add(refsetNameComboBox, gbc);
         }
 
         // editor
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.add(editorLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(editorLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        try {
-            editorComboBox = new DynamicWidthComboBox(getValidEditors().toArray());
-        } catch (Exception e) {
-            editorComboBox = new DynamicWidthComboBox();
-            e.printStackTrace();
-        }
-        editorComboBox.setMaximumSize(new Dimension(200, 25));
-        editorComboBox.setMinimumSize(new Dimension(200, 25));
-        editorComboBox.setPreferredSize(new Dimension(200, 25));
-        this.add(editorComboBox, gridBagConstraints);
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(editorComboBox, gbc);
+
+        // reviewer
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(reviewerLabel, gbc);
+
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(reviewerComboBox, gbc);
 
         // original request
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.add(originalRequestLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 40, 5);
+        this.add(originalRequestLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(originalRequestScrollPane, gridBagConstraints);
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(originalRequestScrollPane, gbc);
 
         // comments
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(commentsLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 40, 5);
+        this.add(commentsLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(commentsScrollPane, gridBagConstraints);
+        gbc.gridx = 2;
+        gbc.gridy = 4;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(commentsScrollPane, gbc);
 
         // deadline
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(deadlineLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(deadlineLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(deadlinePicker, gridBagConstraints);
+        gbc.gridx = 2;
+        gbc.gridy = 5;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(deadlinePicker, gbc);
 
         // priority
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(priorityLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.weighty = 0.0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(priorityLabel, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(priorityComboBox, gridBagConstraints);
+        gbc.gridx = 2;
+        gbc.gridy = 6;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 0, 5);
+        this.add(priorityComboBox, gbc);
 
         // file attachments
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.insets = new Insets(0, 5, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(fileAttachmentLabel, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.insets = new Insets(15, 5, 0, 5); // padding (top, left, bottom, right)
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        this.add(openFileChooserButton, gbc);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(openFileChooserButton, gridBagConstraints);
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1;
+        gbc.insets = new Insets(15, 10, 10, 10); // padding (top, left, bottom, right)
 
-        int fileCount = 0;
-        for (File attachment : attachments) {
+        attachmentListModel = new ArrayListModel<File>();
+        attachmentList = new JList(attachmentListModel);
+        attachmentList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
+        attachmentList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
+        attachmentList.getActionMap().put("deleteTask", new DeleteAction());
 
-            JCheckBox checkBox = new JCheckBox();
-            checkBox.setSelected(true);
-            checkBox.addItemListener(new CheckBoxListener(attachment));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 7 + fileCount;
-            gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.weightx = 0.0;
-            gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-            this.add(checkBox, gridBagConstraints);
+        JScrollPane attachmentScroller = new JScrollPane(attachmentList);
+        attachmentScroller.setMinimumSize(new Dimension(100, 100));
+        attachmentScroller.setMaximumSize(new Dimension(500, 300));
+        attachmentScroller.setPreferredSize(new Dimension(150, 150));
+        attachmentScroller.setBorder(BorderFactory.createTitledBorder("Attachments (optional):"));
+        this.add(attachmentScroller, gbc);
 
-            JLabel attachmentLabel = new JLabel(attachment.getName());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 7 + fileCount;
-            gridBagConstraints.insets = new Insets(0, 10, 10, 10); // padding
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.weightx = 0.0;
-            gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-            this.add(attachmentLabel, gridBagConstraints);
-
-            fileCount++;
-        }
-
-        // column filler
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 8 + fileCount;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        this.add(Box.createGlue(), gridBagConstraints);
-
-        this.setPreferredSize(new Dimension(0, 0));
-        this.setMaximumSize(new Dimension(0, 0));
-        this.setMinimumSize(new Dimension(0, 0));
-        this.revalidate();
-
-        this.setPreferredSize(null);
-        this.setMaximumSize(null);
-        this.setMinimumSize(null);
-        this.repaint();
-
-        wfPanel.setPreferredSize(new Dimension(0, 0));
-        wfPanel.setMaximumSize(new Dimension(0, 0));
-        wfPanel.setMinimumSize(new Dimension(0, 0));
-
-        wfPanel.setPreferredSize(null);
-        wfPanel.setMaximumSize(null);
-        wfPanel.setMinimumSize(null);
-        wfPanel.repaint();
-
+        this.validate();
     }
 
     class RefsetListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
+            setUpComboBoxes();
             layoutComponents();
         }
 
     }
 
-    private Set<I_GetConceptData> getAllUsers() throws IOException, TerminologyException {
-        I_GetConceptData userParent = LocalVersionedTerminology.get().getConcept(
-            ArchitectonicAuxiliary.Concept.USER.getUids());
-        I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
-        allowedTypes.add(LocalVersionedTerminology.get()
-            .getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
-            .getConceptId());
-
-        return userParent.getDestRelOrigins(allowedTypes, true, true);
-    }
-
-    private Set<I_GetConceptData> getValidEditors() throws Exception {
+    private Set<I_GetConceptData> getValidEditors() {
         I_GetConceptData selectedRefset = getRefset();
         Set<I_GetConceptData> editors = new HashSet<I_GetConceptData>();
-        if (selectedRefset != null) {
-            for (I_GetConceptData user : getAllUsers()) {
-                if (hasPermission(user, selectedRefset)) {
-                    editors.add(user);
+        try {
+            if (selectedRefset != null) {
+                for (I_GetConceptData user : allValidUsers) {
+                    if (hasEditPermission(user, selectedRefset)) {
+                        editors.add(user);
+                    }
                 }
             }
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            editors.addAll(allValidUsers);
+            return editors;
         }
 
         return editors;
     }
 
-    private boolean hasPermission(I_GetConceptData user, I_GetConceptData selectedRefset) throws Exception {
+    private boolean hasEditPermission(I_GetConceptData user, I_GetConceptData selectedRefset) throws Exception {
         TestForEditRefsetPermission permissionTest = new TestForEditRefsetPermission();
         Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
         parents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(user));
@@ -400,39 +399,42 @@ public class RequestForChangePanel extends JPanel {
         return false;
     }
 
-    class CheckBoxListener implements ItemListener {
-        File file;
-
-        public CheckBoxListener(File file) {
-            this.file = file;
-        }
-
-        public void itemStateChanged(ItemEvent e) {
-            if (e.getStateChange() == ItemEvent.DESELECTED) {
-                attachments.remove(file);
-                layoutComponents();
+    private Set<Object> getValidReviewers() {
+        I_GetConceptData selectedRefset = getRefset();
+        Set<Object> permissibleReviewers = new HashSet<Object>();
+        permissibleReviewers.add(noReviewText);
+        try {
+            if (selectedRefset == null) {
+                permissibleReviewers.addAll(allValidUsers);
+                return permissibleReviewers;
             }
+
+            for (I_GetConceptData user : allValidUsers) {
+                if (hasReviewerPermission(user, selectedRefset)) {
+                    permissibleReviewers.add(user);
+                }
+            }
+
+            return permissibleReviewers;
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            permissibleReviewers.addAll(allValidUsers);
+            return permissibleReviewers;
         }
     }
 
-    class ButtonListener implements ActionListener {
+    private boolean hasReviewerPermission(I_GetConceptData user, I_GetConceptData selectedRefset) throws Exception {
+        TestForReviewRefsetPermission permissionTest = new TestForReviewRefsetPermission();
+        Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
+        parents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(user));
+        parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
 
-        public ButtonListener() {
-        }
-
-        public void actionPerformed(ActionEvent e) {
-
-            if (e.getActionCommand().equals("Attach a file")) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fileChooser.setDialogTitle("Attach a file");
-                int returnValue = fileChooser.showDialog(new Frame(), "Attach file");
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    attachments.add(fileChooser.getSelectedFile());
-                    layoutComponents();
-                }
+        for (I_GetConceptData parent : parents) {
+            if (parent.isParentOfOrEqualTo(selectedRefset, true)) {
+                return true;
             }
         }
+        return false;
     }
 
     public String getComments() {
@@ -457,10 +459,6 @@ public class RequestForChangePanel extends JPanel {
         }
     }
 
-    public HashSet<File> getAttachments() {
-        return attachments;
-    }
-
     public I_GetConceptData getRefset() {
         if (refsets.size() == 0) {
             return null;
@@ -473,11 +471,73 @@ public class RequestForChangePanel extends JPanel {
         return (I_GetConceptData) editorComboBox.getSelectedItem();
     }
 
+    public I_GetConceptData getReviewer() {
+        Object selectedObject = reviewerComboBox.getSelectedItem();
+        if (selectedObject == null || I_GetConceptData.class.isAssignableFrom(selectedObject.getClass())) {
+            return (I_GetConceptData) selectedObject;
+        } else {
+            return null;
+        }
+    }
+
     public Calendar getDeadline() {
         return deadlinePicker.getSelectedDate();
     }
 
     public String getPriority() {
         return (String) priorityComboBox.getSelectedItem();
+    }
+
+    private class AddAttachmentActionLister implements ActionListener {
+        public AddAttachmentActionLister() {
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (e.getActionCommand().equals(openFileChooserButton.getText())) {
+                    JFileChooser fileChooser = new JFileChooser();
+                    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                    fileChooser.setDialogTitle("Attach a File");
+                    int returnValue = fileChooser.showDialog(new Frame(), "Attach file");
+                    if (returnValue == JFileChooser.APPROVE_OPTION) {
+                        File selectedFile = fileChooser.getSelectedFile();
+                        if (attachmentSet.contains(selectedFile)) {
+                            // Warn the user that the file is already attached
+                            JOptionPane.showMessageDialog(null, "The file '" + selectedFile.getName() + "' "
+                                + " is already an attachment. \nPlease select a different file. ",
+                                "Attachment Already Exists Warning", JOptionPane.WARNING_MESSAGE);
+                        } else {
+                            // Add the attachment
+                            attachmentSet.add(selectedFile);
+                            attachmentListModel.add(selectedFile);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+
+    }
+
+    public class DeleteAction extends AbstractAction {
+        private static final long serialVersionUID = 1L;
+
+        public void actionPerformed(ActionEvent e) {
+            File selectedFile = (File) attachmentList.getSelectedValue();
+            attachmentListModel.remove(selectedFile);
+            attachmentSet.remove(selectedFile);
+        }
+    }
+
+    public HashSet<File> getAttachments() {
+        return attachmentSet;
+    }
+
+    public void setAttachments(HashSet<File> files) {
+        attachmentSet.clear();
+        attachmentSet.addAll(files);
+        attachmentListModel.clear();
+        attachmentListModel.addAll(files);
     }
 }

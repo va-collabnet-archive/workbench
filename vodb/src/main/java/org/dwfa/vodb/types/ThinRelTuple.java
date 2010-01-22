@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,11 +17,13 @@
 package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.util.HashFunction;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinRelTuple implements I_RelTuple {
 
@@ -42,7 +44,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getC1Id()
      */
     public int getC1Id() {
@@ -51,7 +53,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getC2Id()
      */
     public int getC2Id() {
@@ -60,7 +62,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getRelId()
      */
     public int getRelId() {
@@ -69,7 +71,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getPathId()
      */
     public int getPathId() {
@@ -78,7 +80,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getCharacteristicId()
      */
     public int getCharacteristicId() {
@@ -87,7 +89,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getGroup()
      */
     public int getGroup() {
@@ -96,7 +98,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getRefinabilityId()
      */
     public int getRefinabilityId() {
@@ -105,7 +107,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getRelTypeId()
      */
     @Deprecated
@@ -115,7 +117,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getStatusId()
      */
     public int getStatusId() {
@@ -124,7 +126,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getVersion()
      */
     public int getVersion() {
@@ -133,7 +135,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#setRelTypeId(java.lang.Integer)
      */
     @Deprecated
@@ -144,7 +146,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#setStatusId(java.lang.Integer)
      */
     public void setStatusId(Integer statusId) {
@@ -154,7 +156,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_RelTuple#setCharacteristicId(java.lang.Integer)
      */
@@ -165,7 +167,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#setRefinabilityId(java.lang.Integer)
      */
     public void setRefinabilityId(Integer refinabilityId) {
@@ -175,7 +177,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#setGroup(java.lang.Integer)
      */
     public void setGroup(Integer group) {
@@ -185,7 +187,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#duplicatePart()
      */
     @Deprecated
@@ -195,7 +197,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getRelVersioned()
      */
     public I_RelVersioned getRelVersioned() {
@@ -218,7 +220,7 @@ public class ThinRelTuple implements I_RelTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelTuple#getFixedPart()
      */
     public I_RelVersioned getFixedPart() {
@@ -272,7 +274,7 @@ public class ThinRelTuple implements I_RelTuple {
     }
 
     public int getFixedPartId() {
-        return fixedPart.getTermComponentId();
+        return fixedPart.getNid();
     }
 
     public int getPositionId() {
@@ -283,4 +285,17 @@ public class ThinRelTuple implements I_RelTuple {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public long getTime() {
+        return ThinVersionHelper.convert(getVersion());
+    }
+
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        I_AmPart newPart = duplicate();
+        newPart.setStatusId(statusNid);
+        newPart.setPathId(pathNid);
+        newPart.setVersion(ThinVersionHelper.convert(time));
+        return newPart;
+    }
 }

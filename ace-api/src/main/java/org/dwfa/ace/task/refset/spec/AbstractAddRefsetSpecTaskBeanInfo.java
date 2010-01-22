@@ -29,11 +29,13 @@ public abstract class AbstractAddRefsetSpecTaskBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
 
-            PropertyDescriptor clauseIsTrue = new PropertyDescriptor("clauseIsTrue", getBeanDescriptor().getBeanClass());
+            PropertyDescriptor clauseIsTrue =
+                    new PropertyDescriptor("clauseIsTrue", getBeanDescriptor().getBeanClass());
             clauseIsTrue.setBound(true);
             clauseIsTrue.setPropertyEditorClass(CheckboxEditor.class);
             clauseIsTrue.setDisplayName("<html><font color='green'>true:");
-            clauseIsTrue.setShortDescription("If checked, the clause must be true. If not checked, the clause must be false.");
+            clauseIsTrue
+                .setShortDescription("If checked, the clause must be true. If not checked, the clause must be false.");
 
             PropertyDescriptor activeConceptPropName;
             activeConceptPropName = new PropertyDescriptor("activeConceptPropName", getBeanDescriptor().getBeanClass());
@@ -42,7 +44,15 @@ public abstract class AbstractAddRefsetSpecTaskBeanInfo extends SimpleBeanInfo {
             activeConceptPropName.setDisplayName("<html><font color='green'>active concept uuid prop name:");
             activeConceptPropName.setShortDescription("The property to put the active concept into.");
 
-            PropertyDescriptor rv[] = { clauseIsTrue, activeConceptPropName };
+            PropertyDescriptor activeDescriptionPropName;
+            activeDescriptionPropName =
+                    new PropertyDescriptor("activeDescriptionPropName", getBeanDescriptor().getBeanClass());
+            activeDescriptionPropName.setBound(true);
+            activeDescriptionPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            activeDescriptionPropName.setDisplayName("<html><font color='green'>active description uuid prop name:");
+            activeDescriptionPropName.setShortDescription("The property to put the active description into.");
+
+            PropertyDescriptor rv[] = { clauseIsTrue, activeConceptPropName, activeDescriptionPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

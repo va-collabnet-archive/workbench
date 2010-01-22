@@ -207,7 +207,7 @@ public class JTableWithDragImage extends JTable {
                     return new StringSelection(swextt.getCellText());
                 case CONCEPT_CONCEPT_STRING_VALUE:
                     return new StringSelection(
-                        ((I_ThinExtByRefPartConceptConceptString) swextt.getTuple().getPart()).getStringValue());
+                        ((I_ThinExtByRefPartConceptConceptString) swextt.getTuple().getPart()).getStringValue().replaceAll("\t", " "));
                 case ACCEPTABILITY:
                     return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple()
                         .getPart()).getAcceptabilityId()));

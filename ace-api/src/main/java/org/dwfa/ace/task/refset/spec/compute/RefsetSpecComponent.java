@@ -56,4 +56,10 @@ public abstract class RefsetSpecComponent {
 
     public abstract I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame config,
             I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException;
+
+    public abstract I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config,
+            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException;
+
+    public abstract I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame config,
+            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException;
 }

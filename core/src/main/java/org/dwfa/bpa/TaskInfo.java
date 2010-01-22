@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,6 +23,7 @@ import java.awt.Rectangle;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -57,10 +58,14 @@ public class TaskInfo implements Serializable {
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if ((objDataVersion > 0) && (objDataVersion <= dataVersion)) {
-            this.task = (I_DefineTask) in.readObject();
-            this.branches = (List<Branch>) in.readObject();
-            this.executionRecords = (List<ExecutionRecord>) in.readObject();
-            this.bounds = (Rectangle) in.readObject();
+            try{
+                this.task = (I_DefineTask) in.readObject();
+                this.branches = (List<Branch>) in.readObject();
+                this.executionRecords = (List<ExecutionRecord>) in.readObject();
+                this.bounds = (Rectangle) in.readObject();
+            } catch (StreamCorruptedException ignor){
+                System.out.println("Cannot load object" + ignor);
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }

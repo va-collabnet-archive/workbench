@@ -24,14 +24,17 @@ import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.lucene.queryParser.ParseException;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -40,21 +43,17 @@ import org.dwfa.tapi.TerminologyException;
 
 public class RefsetQueryFactory {
 
-    private final static int REL = 1;
-    private final static int DESC = 2;
-    private final static int CONCEPT = 3;
-
     public static RefsetSpecQuery createQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
-            I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
-            ParseException {
+            I_GetConceptData refsetSpec, I_GetConceptData refset, RefsetComputeType refsetType) throws IOException,
+            TerminologyException, ParseException {
 
         // create tree object that corresponds to the database's refset spec
-        List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(
-            refsetSpec.getConceptId(), true);
+        List<? extends I_ThinExtByRefVersioned> extensions =
+                LocalVersionedTerminology.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptId());
-        addExtensionsToMap(extensions, extensionMap, fetchedComponents);
+        addExtensionsToMap((List<I_ThinExtByRefVersioned>) extensions, extensionMap, fetchedComponents);
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
         for (DefaultMutableTreeNode extNode : extensionMap.values()) {
@@ -70,7 +69,7 @@ public class RefsetQueryFactory {
         I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
 
         RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
-        query = processNode(root, query, CONCEPT, configFrame, termFactory);
+        query = processNode(root, query, refsetType, configFrame, termFactory);
         return query;
 
     }
@@ -88,36 +87,33 @@ public class RefsetQueryFactory {
      * @throws TerminologyException
      * @throws ParseException
      */
-    public static RefsetSpecQuery createPossibleQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
-            I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
-            ParseException {
-
-        // create tree object that corresponds to the database's refset spec
-        List<I_ThinExtByRefVersioned> extensions = LocalVersionedTerminology.get().getAllExtensionsForComponent(
-            refsetSpec.getConceptId(), true);
-        HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
-        HashSet<Integer> fetchedComponents = new HashSet<Integer>();
-        fetchedComponents.add(refsetSpec.getConceptId());
-        addExtensionsToMap(extensions, extensionMap, fetchedComponents);
-
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
-        for (DefaultMutableTreeNode extNode : extensionMap.values()) {
-            I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) extNode.getUserObject();
-            if (ext.getComponentId() == refsetSpec.getConceptId()) {
-                root.add(extNode);
-            } else {
-                extensionMap.get(ext.getComponentId()).add(extNode);
-            }
-        }
-
-        // create refset spec query
-        I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
-
-        RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
-        query = processNode(root, query, CONCEPT, configFrame, termFactory);
-        return query;
-
-    }
+    /*
+     * public static RefsetSpecQuery createPossibleQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
+     * I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
+     * ParseException {
+     * // create tree object that corresponds to the database's refset spec
+     * List<I_ThinExtByRefVersioned> extensions =
+     * LocalVersionedTerminology.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
+     * HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
+     * HashSet<Integer> fetchedComponents = new HashSet<Integer>();
+     * fetchedComponents.add(refsetSpec.getConceptId());
+     * addExtensionsToMap(extensions, extensionMap, fetchedComponents);
+     * DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
+     * for (DefaultMutableTreeNode extNode : extensionMap.values()) {
+     * I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) extNode.getUserObject();
+     * if (ext.getComponentId() == refsetSpec.getConceptId()) {
+     * root.add(extNode);
+     * } else {
+     * extensionMap.get(ext.getComponentId()).add(extNode);
+     * }
+     * }
+     * // create refset spec query
+     * I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
+     * RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
+     * query = processNode(root, query, CONCEPT, configFrame, termFactory);
+     * return query;
+     * }
+     */
 
     /**
      * Processes a node in our refset spec tree structure. For each child of the
@@ -136,9 +132,9 @@ public class RefsetQueryFactory {
      * @throws TerminologyException
      * @throws ParseException
      */
-    private static RefsetSpecQuery processNode(DefaultMutableTreeNode node, RefsetSpecQuery query, int type,
-            I_ConfigAceFrame configFrame, I_TermFactory termFactory) throws IOException, TerminologyException,
-            ParseException {
+    private static RefsetSpecQuery processNode(DefaultMutableTreeNode node, RefsetSpecQuery query,
+            RefsetComputeType computeType, I_ConfigAceFrame configFrame, I_TermFactory termFactory) throws IOException,
+            TerminologyException, ParseException {
 
         if (query == null) {
             throw new TerminologyException("Invalid refset spec : null query item used.");
@@ -155,8 +151,9 @@ public class RefsetQueryFactory {
 
             boolean addUncommitted = true;
             boolean returnConflictResolvedLatestState = true;
-            List<I_ThinExtByRefTuple> extensions = currExt.getTuples(configFrame.getAllowedStatus(),
-                configFrame.getViewPositionSet(), addUncommitted, returnConflictResolvedLatestState);
+            List<I_ThinExtByRefTuple> extensions =
+                    currExt.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSet(), addUncommitted,
+                        returnConflictResolvedLatestState);
             if (extensions.size() > 0) {
                 I_ThinExtByRefPart thinPart = extensions.get(0).getPart();
 
@@ -167,18 +164,41 @@ public class RefsetQueryFactory {
 
                     I_GetConceptData truthToken = termFactory.getConcept(part.getC1id());
                     I_GetConceptData groupingToken = termFactory.getConcept(part.getC2id());
-                    I_GetConceptData constraint = termFactory.getConcept(part.getC3id());
+                    I_AmTermComponent constraint;
+                    if (termFactory.hasConcept(part.getC3id())) {
+                        constraint = termFactory.getConcept(part.getC3id());
+                    } else {
+                        constraint =
+                                termFactory.getDescription((termFactory.getId(part.getC3id()).getUIDs().iterator()
+                                    .next()).toString());
+                    } // TODO add rel
 
-                    switch (type) {
-                    case (CONCEPT):
-                        query.addConceptStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
-                        break;
-                    case (DESC):
-                        query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
-                        break;
-                    case (REL):
-                        query.addRelStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
-                        break;
+                    RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
+                    switch (statementType) {
+                    case CONCEPT:
+                        if (computeType.equals(RefsetComputeType.CONCEPT)) {
+                            query.addConceptStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
+                            break;
+                        } else {
+                            throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
+                                + "' within a " + computeType.toString() + " refset compute.");
+                        }
+                    case DESCRIPTION:
+                        if (computeType.equals(RefsetComputeType.DESCRIPTION)) {
+                            query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
+                            break;
+                        } else {
+                            throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
+                                + "' within a " + computeType.toString() + " refset compute.");
+                        }
+                    case RELATIONSHIP:
+                        if (computeType.equals(RefsetComputeType.RELATIONSHIP)) {
+                            query.addRelStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
+                            break;
+                        } else {
+                            throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
+                                + "' within a " + computeType.toString() + " refset compute.");
+                        }
                     default:
                         throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
                     }
@@ -193,22 +213,53 @@ public class RefsetQueryFactory {
 
                     boolean negate = getNegation(truthToken, termFactory);
 
+                    RefsetComputeType statementType = RefsetComputeType.getTypeFromGrouping(groupingToken);
+
+                    switch (statementType) {
+                    case CONCEPT:
+                        break; // don't change compute type since it might be a concept-contains-desc followed by OR
+                    case DESCRIPTION:
+                        computeType = RefsetComputeType.DESCRIPTION;
+                        break;
+                    case RELATIONSHIP:
+                        computeType = RefsetComputeType.RELATIONSHIP;
+                        break;
+                    default:
+                        break;
+                    }
+
                     // add subquery
                     RefsetSpecQuery subquery = query.addSubquery(groupingToken);
 
-                    int subtype = getType(groupingToken, termFactory);
-                    if (subtype == -1) {
-                        subtype = type;
-                    }
-
                     // process each grandchild
                     if (!childNode.isLeaf()) {
-                        processNode(childNode, subquery, subtype, configFrame, termFactory);
+                        processNode(childNode, subquery, computeType, configFrame, termFactory);
                     }
                     if (negate) {
                         subquery.negateQuery();
                     }
+                } else if (thinPart instanceof I_ThinExtByRefPartConceptConceptString) {
+                    // structural query with string value
+                    I_ThinExtByRefPartConceptConceptString part = (I_ThinExtByRefPartConceptConceptString) thinPart;
 
+                    I_GetConceptData truthToken = termFactory.getConcept(part.getC1id());
+                    I_GetConceptData groupingToken = termFactory.getConcept(part.getC2id());
+                    String constraint = part.getStringValue();
+
+                    RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
+                    switch (statementType) {
+                    case CONCEPT:
+                        throw new TerminologyException(
+                            "Error: Concept statement type returned within a concept-concept-string ext. This should only be description.");
+                    case RELATIONSHIP:
+                        throw new TerminologyException(
+                            "Error: Relationship statement type returned within a concept-concept-string ext. This should only be description.");
+                    case DESCRIPTION:
+                        query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
+                        break;
+                    default:
+                        throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
+                    }
                 } else if (thinPart instanceof I_ThinExtByRefPartString) {
                     // ignore - comments refset
                 } else if (thinPart instanceof I_ThinExtByRefPartConcept) {
@@ -219,19 +270,6 @@ public class RefsetQueryFactory {
             }
         }
         return query;
-    }
-
-    private static int getType(I_GetConceptData groupingToken, I_TermFactory termFactory) throws TerminologyException,
-            IOException {
-        if (termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING.getUids()).equals(
-            groupingToken)) {
-            return REL;
-        } else if (termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.getUids()).equals(
-            groupingToken)) {
-            return DESC;
-        } else {
-            return -1;
-        }
     }
 
     /**
@@ -262,19 +300,19 @@ public class RefsetQueryFactory {
      * structure representing the refset spec, prior to being converted to a
      * query object.
      * 
-     * @param extensions
+     * @param list
      * @param extensionMap
      * @param fetchedComponents
      * @throws IOException
      */
-    public static void addExtensionsToMap(List<I_ThinExtByRefVersioned> extensions,
+    public static void addExtensionsToMap(List<? extends I_ThinExtByRefVersioned> list,
             HashMap<Integer, DefaultMutableTreeNode> extensionMap, HashSet<Integer> fetchedComponents)
             throws IOException {
-        for (I_ThinExtByRefVersioned ext : extensions) {
+        for (I_ThinExtByRefVersioned ext : list) {
             extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
             if (fetchedComponents.contains(ext.getMemberId()) == false) {
                 fetchedComponents.add(ext.getMemberId());
-                addExtensionsToMap(LocalVersionedTerminology.get()
+                addExtensionsToMap(Terms.get()
                     .getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap, fetchedComponents);
             }
         }

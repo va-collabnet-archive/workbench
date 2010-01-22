@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
 package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -32,7 +33,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
     }
 
     public void setConceptStatus(int conceptStatus) {
-        part.setConceptStatus(conceptStatus);
+        part.setStatusId(conceptStatus);
     }
 
     transient Integer hash;
@@ -45,7 +46,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getConId()
      */
     public int getConId() {
@@ -54,7 +55,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getConceptStatus()
      */
     @Deprecated
@@ -64,7 +65,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.api.I_AmPart#setStatusId(int)
      */
     public void setStatusId(int statusId) {
@@ -73,7 +74,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getPathId()
      */
     public int getPathId() {
@@ -82,7 +83,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getVersion()
      */
     public int getVersion() {
@@ -91,7 +92,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_ConceptAttributeTuple#hasNewData(org.dwfa.vodb.
      * types.ThinConPart)
@@ -102,7 +103,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#isDefined()
      */
     public boolean isDefined() {
@@ -111,7 +112,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_ConceptAttributeTuple#setStatusId(java.lang.Integer
      * )
@@ -123,7 +124,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#setDefined(boolean)
      */
     public void setDefined(boolean defined) {
@@ -133,7 +134,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getConVersioned()
      */
     public I_ConceptAttributeVersioned getConVersioned() {
@@ -142,7 +143,7 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#duplicatePart()
      */
     @Deprecated
@@ -194,6 +195,14 @@ public class ThinConTuple implements I_ConceptAttributeTuple {
     }
 
     public int getFixedPartId() {
-        return core.getTermComponentId();
+        return core.getConId();
+    }
+
+    public long getTime() {
+        return part.getTime();
+    }
+
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        return part.makeAnalog(statusNid, pathNid, time);
     }
 }

@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -45,7 +46,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getPathId()
      */
     public int getPathId() {
@@ -54,7 +55,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getStatus()
      */
     @Deprecated
@@ -64,7 +65,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getVersion()
      */
     public int getVersion() {
@@ -73,7 +74,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#setPathId(int)
      */
     public void setPathId(int pathId) {
@@ -82,7 +83,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#setStatus(int)
      */
     @Deprecated
@@ -92,7 +93,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#setVersion(int)
      */
     public void setVersion(int version) {
@@ -101,7 +102,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_ThinExtByRefTuple#addVersion(org.dwfa.vodb.types
      * .ThinExtByRefPart)
@@ -112,7 +113,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getComponentId()
      */
     public int getComponentId() {
@@ -121,7 +122,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getMemberId()
      */
     public int getMemberId() {
@@ -130,7 +131,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getRefsetId()
      */
     public int getRefsetId() {
@@ -139,7 +140,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getTypeId()
      */
     public int getTypeId() {
@@ -148,7 +149,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getVersions()
      */
     public List<? extends I_ThinExtByRefPart> getVersions() {
@@ -157,7 +158,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getCore()
      */
     public I_ThinExtByRefVersioned getCore() {
@@ -166,7 +167,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ThinExtByRefTuple#getPart()
      */
     public I_ThinExtByRefPart getPart() {
@@ -209,7 +210,7 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
     }
 
     public int getFixedPartId() {
-        return core.getTermComponentId();
+        return core.getNid();
     }
 
     public I_ThinExtByRefPart makePromotionPart(I_Path promotionPath) {
@@ -220,5 +221,13 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
         I_ThinExtByRefPart promotionPart = part.makePromotionPart(promotionPath);
         addVersion(promotionPart);
         return true;
+    }
+
+    public long getTime() {
+        return part.getTime();
+    }
+
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        return part.makeAnalog(statusNid, pathNid, time);
     }
 }

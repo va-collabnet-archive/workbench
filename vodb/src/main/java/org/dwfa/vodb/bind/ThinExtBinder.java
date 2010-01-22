@@ -91,7 +91,7 @@ public class ThinExtBinder extends TupleBinding {
         CROSS_MAP(CROSS_MAP_ID, "cross map", ThinExtByRefPartCrossmap.class),
         CONCEPT_CONCEPT(CONCEPT_CONCEPT_ID, "concept-concept", I_ThinExtByRefPartConceptConcept.class),
         CONCEPT_CONCEPT_CONCEPT(CONCEPT_CONCEPT_CONCEPT_ID, "concept-concept-concept", I_ThinExtByRefPartConceptConceptConcept.class),
-        CONCEPT_CONCEPT_STRING(CONCEPT_CONCEPT_STRING_ID, "concept-concept-string", I_ThinExtByRefPartConceptConceptString.class),
+        CONCEPT_CONCEPT_STRING(CONCEPT_CONCEPT_STRING_ID, "concept concept string", I_ThinExtByRefPartConceptConceptString.class),
         CONCEPT_STRING(CONCEPT_STRING_ID, "concept-string", I_ThinExtByRefPartConceptString.class), ;
 
         private int enumId;
@@ -806,7 +806,7 @@ public class ThinExtBinder extends TupleBinding {
                 to.writeInt(part.getStatusId());
                 to.writeInt(part.getC1id());
                 to.writeInt(part.getC2id());
-                to.writeString(part.getStringValue());
+                to.writeString(part.getStringValue().replaceAll("\t", " "));
             }
             break;
         case CONCEPT_STRING:

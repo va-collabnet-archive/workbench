@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,6 +50,8 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
@@ -267,6 +269,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 
     public Set<I_Path> getEditingPathSet() {
         return config.getPromotionPathSet();
+    }
+
+    public PathSetReadOnly getEditingPathSetReadOnly() {
+        return new PathSetReadOnly(config.getPromotionPathSet());
     }
 
     public I_IntList getEditRelCharacteristicPopup() {
@@ -1093,14 +1099,19 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.validate();
     }
 
-    @Override
-    public void setSuppressChangeEvents(boolean suppressChangeEvents) {
-        config.setSuppressChangeEvents(suppressChangeEvents);
+    public PositionSetReadOnly getViewPositionSetReadOnly() {
+        return config.getViewPositionSetReadOnly();
     }
 
     @Override
     public void svnCommitNoPrompt(SubversionData svd) throws TaskFailedException {
         config.svnCommitNoPrompt(svd);
+    }
+
+    @Override
+    public void setSuppressChangeEvents(boolean suppressChangeEvents) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

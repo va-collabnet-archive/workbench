@@ -41,7 +41,7 @@ public class ComputeRefsetFromSpecTaskBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(ComputeRefsetFromSpecTask.class);
-        bd.setDisplayName("<html><font color='green'><center>Compute refset from<br>Refset Spec");
+        bd.setDisplayName("<html><font color='green'><center>Compute concept refset from<br>Refset Spec");
         return bd;
     }
 

@@ -18,9 +18,14 @@ package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.Hit;
+import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -29,12 +34,12 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * Represents partial information contained in a refset spec.
- * An example of a statement is : "NOT: Concept is : Paracetamol"
+ * Represents partial information contained in a refset spec. An example of a
+ * statement is : "NOT: Concept is : Paracetamol"
  * 
  * @author Chrissy Hill
  * 
@@ -44,11 +49,37 @@ public class DescStatement extends RefsetSpecStatement {
     /**
      * Constructor for refset spec statement.
      * 
-     * @param useNotQualifier Whether to use the NOT qualifier.
-     * @param queryToken The query type to use (e.g. "concept is")
-     * @param queryConstraint The destination concept (e.g. "paracetamol")
+     * @param useNotQualifier
+     *            Whether to use the NOT qualifier.
+     * @param queryToken
+     *            The query type to use (e.g. "concept is")
+     * @param queryConstraint
+     *            The destination concept (e.g. "paracetamol")
      */
-    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_GetConceptData queryConstraint) {
+    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint) {
+        super(useNotQualifier, queryToken, queryConstraint);
+        for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
+            if (queryToken.getConceptId() == token.nid) {
+                tokenEnum = token;
+                break;
+            }
+        }
+        if (tokenEnum == null) {
+            throw new RuntimeException("Unknown query type : " + queryToken);
+        }
+    }
+
+    /**
+     * Constructor for refset spec statement.
+     * 
+     * @param useNotQualifier
+     *            Whether to use the NOT qualifier.
+     * @param queryToken
+     *            The query type to use (e.g. "concept is")
+     * @param queryConstraint
+     *            String value for regex or lucene search
+     */
+    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, String queryConstraint) {
         super(useNotQualifier, queryToken, queryConstraint);
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptId() == token.nid) {
@@ -62,37 +93,40 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     public boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException {
+        if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
+            I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
+            I_DescriptionTuple descriptionTuple = descriptionVersioned.getLastTuple();
 
-        I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
-        I_DescriptionTuple descriptionTuple = descriptionVersioned.getLastTuple();
-
-        switch (tokenEnum) {
-        case DESC_IS:
-            return descriptionIs(descriptionTuple);
-        case DESC_IS_MEMBER_OF:
-            return descriptionIsMemberOf(descriptionTuple);
-        case DESC_STATUS_IS:
-            return descriptionStatusIs(descriptionTuple);
-        case DESC_STATUS_IS_CHILD_OF:
-            return descriptionStatusIsChildOf(descriptionTuple);
-        case DESC_STATUS_IS_KIND_OF:
-            return descriptionStatusIsKindOf(descriptionTuple);
-        case DESC_STATUS_IS_DESCENDENT_OF:
-            return descriptionStatusIsDescendentOf(descriptionTuple);
-        case DESC_TYPE_IS:
-            return descriptionTypeIs(descriptionTuple);
-        case DESC_TYPE_IS_CHILD_OF:
-            return descriptionTypeIsChildOf(descriptionTuple);
-        case DESC_TYPE_IS_KIND_OF:
-            return descriptionTypeIsKindOf(descriptionTuple);
-        case DESC_TYPE_IS_DESCENDENT_OF:
-            return descriptionTypeIsDescendentOf(descriptionTuple);
-        case DESC_REGEX_MATCH:
-            return descriptionRegexMatch(descriptionTuple);
-        case DESC_LUCENE_MATCH:
-            return descriptionLuceneMatch(descriptionTuple);
-        default:
-            throw new RuntimeException("Can't handle queryToken: " + queryToken);
+            switch (tokenEnum) {
+            case DESC_IS:
+                return descriptionIs(descriptionTuple);
+            case DESC_IS_MEMBER_OF:
+                return descriptionIsMemberOf(descriptionTuple);
+            case DESC_STATUS_IS:
+                return descriptionStatusIs(descriptionTuple);
+            case DESC_STATUS_IS_CHILD_OF:
+                return descriptionStatusIsChildOf(descriptionTuple);
+            case DESC_STATUS_IS_KIND_OF:
+                return descriptionStatusIsKindOf(descriptionTuple);
+            case DESC_STATUS_IS_DESCENDENT_OF:
+                return descriptionStatusIsDescendentOf(descriptionTuple);
+            case DESC_TYPE_IS:
+                return descriptionTypeIs(descriptionTuple);
+            case DESC_TYPE_IS_CHILD_OF:
+                return descriptionTypeIsChildOf(descriptionTuple);
+            case DESC_TYPE_IS_KIND_OF:
+                return descriptionTypeIsKindOf(descriptionTuple);
+            case DESC_TYPE_IS_DESCENDENT_OF:
+                return descriptionTypeIsDescendentOf(descriptionTuple);
+            case DESC_REGEX_MATCH:
+                return descriptionRegexMatch(descriptionTuple);
+            case DESC_LUCENE_MATCH:
+                return descriptionLuceneMatch(descriptionTuple);
+            default:
+                throw new RuntimeException("Can't handle queryToken: " + queryToken);
+            }
+        } else {
+            return false;
         }
     }
 
@@ -109,7 +143,8 @@ public class DescStatement extends RefsetSpecStatement {
             possibleConcepts.or(parentPossibleConcepts);
             break;
         case DESC_IS_MEMBER_OF:
-            List<I_ThinExtByRefVersioned> refsetExtensions = termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
+            List<I_ThinExtByRefVersioned> refsetExtensions =
+                    termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ThinExtByRefVersioned ext : refsetExtensions) {
                 refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
@@ -143,6 +178,92 @@ public class DescStatement extends RefsetSpecStatement {
         return possibleConcepts;
     }
 
+    @SuppressWarnings( { "deprecation", "unchecked" })
+    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame configFrame,
+            I_RepresentIdSet parentPossibleDescriptions) throws TerminologyException, IOException {
+
+        I_RepresentIdSet possibleDescriptions = termFactory.getEmptyIdSet();
+        if (parentPossibleDescriptions == null) {
+            parentPossibleDescriptions = termFactory.getDescriptionIdSet();
+        }
+
+        switch (tokenEnum) {
+        case DESC_IS:
+            if (isNegated()) {
+                possibleDescriptions.or(parentPossibleDescriptions);
+            } else {
+                possibleDescriptions.setMember(((I_DescriptionVersioned) queryConstraint).getDescId());
+            }
+            break;
+        case DESC_IS_MEMBER_OF:
+            List<I_ThinExtByRefVersioned> refsetExtensions =
+                    termFactory.getRefsetExtensionMembers(((I_AmTermComponent) queryConstraint).getNid());
+            Set<Integer> refsetMembers = new HashSet<Integer>();
+            for (I_ThinExtByRefVersioned ext : refsetExtensions) {
+                refsetMembers.add(ext.getComponentId());
+            }
+            I_RepresentIdSet refsetMemberSet = termFactory.getIdSetFromIntCollection(refsetMembers);
+            if (isNegated()) {
+                possibleDescriptions.or(parentPossibleDescriptions);
+                // possibleConcepts = termFactory.getConceptIdSet();
+                // possibleConcepts.removeAll(refsetMemberSet);
+            } else {
+                possibleDescriptions.or(refsetMemberSet);
+            }
+
+            break;
+        case DESC_STATUS_IS:
+        case DESC_STATUS_IS_CHILD_OF:
+        case DESC_STATUS_IS_KIND_OF:
+        case DESC_STATUS_IS_DESCENDENT_OF:
+        case DESC_TYPE_IS:
+        case DESC_TYPE_IS_CHILD_OF:
+        case DESC_TYPE_IS_KIND_OF:
+        case DESC_TYPE_IS_DESCENDENT_OF:
+        case DESC_REGEX_MATCH:
+            possibleDescriptions.or(parentPossibleDescriptions);
+            break;
+        case DESC_LUCENE_MATCH:
+            if (isNegated()) {
+                possibleDescriptions.or(parentPossibleDescriptions);
+            } else {
+                String queryConstraintString = (String) queryConstraint;
+                Hits hits;
+                try {
+                    hits = termFactory.doLuceneSearch(queryConstraintString);
+
+                    if (hits == null || hits.length() == 0) {
+                        possibleDescriptions.or(parentPossibleDescriptions);
+                        break;
+                    }
+
+                    Iterator iterator = hits.iterator();
+                    while (iterator.hasNext()) {
+                        Hit next = (Hit) iterator.next();
+                        Document doc = next.getDocument();
+                        int dnid = Integer.parseInt(doc.get("dnid"));
+
+                        possibleDescriptions.setMember(dnid);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    throw new TerminologyException(e.getMessage());
+
+                }
+            }
+        default:
+            throw new RuntimeException("Can't handle queryToken: " + queryToken);
+        }
+        setPossibleConceptsCount(possibleDescriptions.size());
+        return possibleDescriptions;
+    }
+
+    @Override
+    public I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame configFrame,
+            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException {
+        throw new TerminologyException("Get possible relationships in desc statement unsupported operation.");
+    }
+
     private boolean descriptionIsMemberOf(I_DescriptionTuple descriptionBeingTested) throws IOException,
             TerminologyException {
         return componentIsMemberOf(descriptionBeingTested.getDescId());
@@ -159,8 +280,8 @@ public class DescStatement extends RefsetSpecStatement {
 
     /**
      * Checks if the description being tested has a description type matching
-     * the query constraint.
-     * This also checks for the description type's children (depth >= 1);
+     * the query constraint. This also checks for the description type's
+     * children (depth >= 1);
      */
     private boolean descriptionTypeIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws IOException,
             TerminologyException {
@@ -184,23 +305,31 @@ public class DescStatement extends RefsetSpecStatement {
     private boolean descriptionTypeIsDescendentOf(I_GetConceptData requiredType,
             I_DescriptionTuple descriptionBeingChecked) throws IOException, TerminologyException {
 
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        try {
+            I_IntSet allowedTypes = getIsAIds();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-        // get list of all children of input concept
-        Set<I_GetConceptData> childDescTypes = requiredType.getDestRelOrigins(null, allowedTypes, null, true, true);
+            // get list of all children of input concept
+            Set<? extends I_GetConceptData> childDescTypes =
+                    requiredType.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
+                        .getViewPositionSetReadOnly(), true, true);
 
-        // call descriptionTypeIs on each
-        for (I_GetConceptData childDescType : childDescTypes) {
+            // call descriptionTypeIs on each
+            for (I_GetConceptData childDescType : childDescTypes) {
 
-            if (descriptionTypeIs(childDescType, descriptionBeingChecked)) {
-                return true;
-            } else if (descriptionTypeIsDescendentOf(childDescType, descriptionBeingChecked)) {
-                return true;
+                if (descriptionTypeIs(childDescType, descriptionBeingChecked)) {
+                    return true;
+                } else if (descriptionTypeIsDescendentOf(childDescType, descriptionBeingChecked)) {
+                    return true;
+                }
             }
-        }
 
-        return false;
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
+        }
     }
 
     private boolean descriptionTypeIsDescendentOf(I_DescriptionTuple descriptionBeingChecked) throws IOException,
@@ -210,18 +339,25 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionTypeIsChildOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
             IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        try {
+            I_IntSet allowedTypes = getIsAIds();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-        // get list of all children of input concept
-        Set<I_GetConceptData> childDescTypes = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null,
-            allowedTypes, null, true, true);
+            // get list of all children of input concept
+            Set<? extends I_GetConceptData> childDescTypes =
+                    ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
 
-        // call descriptionTypeIs on each
-        for (I_GetConceptData childDescType : childDescTypes) {
-            if (descriptionTypeIs(childDescType, descriptionBeingChecked)) {
-                return true;
+            // call descriptionTypeIs on each
+            for (I_GetConceptData childDescType : childDescTypes) {
+                if (descriptionTypeIs(childDescType, descriptionBeingChecked)) {
+                    return true;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
         }
 
         return false;
@@ -238,19 +374,26 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionStatusIsChildOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
             IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        try {
+            I_IntSet allowedTypes = getIsAIds();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-        Set<I_GetConceptData> childStatuses = ((I_GetConceptData) queryConstraint).getDestRelOrigins(null,
-            allowedTypes, null, true, true);
+            Set<? extends I_GetConceptData> childStatuses =
+                    ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
 
-        for (I_GetConceptData childStatus : childStatuses) {
-            if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {
-                return true;
+            for (I_GetConceptData childStatus : childStatuses) {
+                if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {
+                    return true;
+                }
             }
-        }
 
-        return false;
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
+        }
     }
 
     private boolean descriptionStatusIsDescendentOf(I_DescriptionTuple descriptionBeingChecked)
@@ -260,20 +403,28 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionStatusIsDescendentOf(I_GetConceptData requiredStatus,
             I_DescriptionTuple descriptionBeingChecked) throws TerminologyException, IOException {
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+        try {
+            I_IntSet allowedTypes = getIsAIds();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-        Set<I_GetConceptData> childStatuses = requiredStatus.getDestRelOrigins(null, allowedTypes, null, true, true);
+            Set<? extends I_GetConceptData> childStatuses =
+                    requiredStatus.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
 
-        for (I_GetConceptData childStatus : childStatuses) {
-            if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {
-                return true;
-            } else if (descriptionStatusIsDescendentOf(childStatus, descriptionBeingChecked)) {
-                return true;
+            for (I_GetConceptData childStatus : childStatuses) {
+                if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {
+                    return true;
+                } else if (descriptionStatusIsDescendentOf(childStatus, descriptionBeingChecked)) {
+                    return true;
+                }
             }
-        }
 
-        return false;
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
+        }
     }
 
     private boolean descriptionStatusIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
@@ -285,28 +436,50 @@ public class DescStatement extends RefsetSpecStatement {
         return descriptionStatusIsDescendentOf(descriptionBeingChecked);
     }
 
-    // //////////////////////////////////////////////////////////////////////////////////
-
     private boolean descriptionIs(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
-        I_DescriptionTuple queryConstraintDesc = (I_DescriptionTuple) queryConstraint;
-        return descriptionBeingChecked.equals(queryConstraintDesc); // TODO
-        // check
+        I_DescriptionVersioned queryConstraintDesc = (I_DescriptionVersioned) queryConstraint;
+        return descriptionBeingChecked.getDescId() == queryConstraintDesc.getDescId();
     }
 
     private boolean descriptionRegexMatch(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
-        throw new TerminologyException("Unimplemented"); // TODO
+        String queryConstraintString = (String) queryConstraint;
+
+        if (descriptionBeingChecked.getText().contains(queryConstraintString)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
+    @SuppressWarnings( { "deprecation", "unchecked" })
     private boolean descriptionLuceneMatch(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
-        // String queryConstraintString = (String) queryConstraint;
-        // Hits hits = termFactory.doLuceneSearch(queryConstraintString);
-        // termFactory.doLuceneSearch(query)
-        // termFactory.doLuceneSearch("");
-        // termFactory.getActiveAceFrameConfig().performLuceneSearch(String
-        // query, I_GetConceptData root);
+        String queryConstraintString = (String) queryConstraint;
+        Hits hits;
+        try {
+            hits = termFactory.doLuceneSearch(queryConstraintString);
 
-        // termFactory.getActiveAceFrameConfig().performLuceneSearch(String
-        // query, List<I_TestSearchResults> extraCriterion);
-        throw new TerminologyException("Unimplemented"); // TODO
+            if (hits == null || hits.length() == 0) {
+                return false;
+            } else {
+
+                Iterator iterator = hits.iterator();
+                while (iterator.hasNext()) {
+                    Hit next = (Hit) iterator.next();
+                    Document doc = next.getDocument();
+                    int dnid = Integer.parseInt(doc.get("dnid"));
+                    int cnid = Integer.parseInt(doc.get("cnid"));
+
+                    I_DescriptionVersioned description = termFactory.getDescription(dnid, cnid);
+                    if (descriptionBeingChecked.getDescId() == description.getDescId()) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
+        }
     }
 }

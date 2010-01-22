@@ -1152,6 +1152,8 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
 
     private static int[] conceptNids;
     private static IdentifierSetReadOnly idSet;
+    private static ArrayList<Integer> relationshipNids;
+    private static ArrayList<Integer> descriptionNids;
 
     private void refreshConceptNids() throws IOException {
         Cursor concCursor = null;
@@ -2120,4 +2122,97 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         }
         return new IntSet(conceptNids);
     }
+
+    public IdentifierSet getRelationshipIdSet() throws IOException {
+        try {
+            IdentifierSet cidSet = new IdentifierSet(identifierDb.getMaxId() - Integer.MIN_VALUE);
+            refreshRelationshipNids();
+            for (int nid : relationshipNids) {
+                cidSet.setMember(nid);
+            }
+            return cidSet;
+        } catch (DatabaseException e) {
+            throw new IOException(e);
+        }
+    }
+
+    private void refreshRelationshipNids() throws IOException {
+        Cursor concCursor = null;
+        try {
+            refreshConceptNids();
+            relationshipNids = new ArrayList<Integer>();
+            concCursor = conDescRelDb.openCursor(null, null);
+            DatabaseEntry foundKey = new DatabaseEntry();
+            DatabaseEntry foundData = new DatabaseEntry();
+            for (int i = 0; i < conceptNids.length; i++) {
+                if (concCursor.getNext(foundKey, foundData, LockMode.DEFAULT) != OperationStatus.SUCCESS) {
+                    AceLog.getAppLog()
+                        .alertAndLogException(new Exception("premature end of relationship cursor: " + i));
+                }
+                int conceptId = (Integer) intBinder.entryToObject(foundKey);
+                List<I_RelVersioned> allRelationships = getSrcRels(conceptId);
+
+                for (I_RelVersioned relationship : allRelationships) {
+                    relationshipNids.add(relationship.getRelId());
+                }
+            }
+
+        } catch (DatabaseException ex) {
+            throw new IOException(ex);
+        } finally {
+            if (concCursor != null) {
+                try {
+                    concCursor.close();
+                } catch (DatabaseException e) {
+                    throw new IOException(e);
+                }
+            }
+        }
+    }
+
+    public IdentifierSet getDescriptionIdSet() throws IOException {
+        try {
+            IdentifierSet cidSet = new IdentifierSet(identifierDb.getMaxId() - Integer.MIN_VALUE);
+            refreshDescriptionNids();
+            for (int nid : descriptionNids) {
+                cidSet.setMember(nid);
+            }
+            return cidSet;
+        } catch (DatabaseException e) {
+            throw new IOException(e);
+        }
+    }
+
+    private void refreshDescriptionNids() throws IOException {
+        Cursor concCursor = null;
+        try {
+            refreshConceptNids();
+            descriptionNids = new ArrayList<Integer>();
+            concCursor = conDescRelDb.openCursor(null, null);
+            DatabaseEntry foundKey = new DatabaseEntry();
+            DatabaseEntry foundData = new DatabaseEntry();
+            for (int i = 0; i < conceptNids.length; i++) {
+                if (concCursor.getNext(foundKey, foundData, LockMode.DEFAULT) != OperationStatus.SUCCESS) {
+                    AceLog.getAppLog().alertAndLogException(new Exception("premature end of description cursor: " + i));
+                }
+                int conceptId = (Integer) intBinder.entryToObject(foundKey);
+                List<I_DescriptionVersioned> allDescriptions = getDescriptions(conceptId);
+
+                for (I_DescriptionVersioned description : allDescriptions) {
+                    descriptionNids.add(description.getDescId());
+                }
+            }
+        } catch (DatabaseException ex) {
+            throw new IOException(ex);
+        } finally {
+            if (concCursor != null) {
+                try {
+                    concCursor.close();
+                } catch (DatabaseException e) {
+                    throw new IOException(e);
+                }
+            }
+        }
+    }
+
 }

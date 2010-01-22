@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,9 +17,11 @@
 package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.util.HashFunction;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinImagePart implements I_ImagePart {
     private int pathId;
@@ -42,7 +44,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImagePart#getPathId()
      */
     public int getPathId() {
@@ -51,7 +53,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImagePart#getStatusId()
      */
     public int getStatusId() {
@@ -60,7 +62,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImagePart#getVersion()
      */
     public int getVersion() {
@@ -87,7 +89,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImagePart#setPathId(int)
      */
     public void setPathId(int pathId) {
@@ -96,7 +98,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImagePart#setStatusId(int)
      */
     public void setStatusId(int status) {
@@ -105,7 +107,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImagePart#setVersion(int)
      */
     public void setVersion(int version) {
@@ -114,7 +116,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImagePart#getTextDescription()
      */
     public String getTextDescription() {
@@ -123,7 +125,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImagePart#setTextDescription(java.lang.String)
      */
     public void setTextDescription(String name) {
@@ -132,7 +134,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImagePart#getTypeId()
      */
     public int getTypeId() {
@@ -141,7 +143,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_ImagePart#setTypeId(int)
      */
     public void setTypeId(int type) {
@@ -150,13 +152,13 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * 
-     * 
-     * 
-     * 
-     * 
+     *
+     *
+     *
+     *
+     *
      * org.dwfa.vodb.types.I_ImagePart#hasNewData(org.dwfa.vodb.types.ThinImagePart
      * )
      */
@@ -166,7 +168,7 @@ public class ThinImagePart implements I_ImagePart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.dwfa.vodb.types.I_ImagePart#convertIds(org.dwfa.vodb.jar.
      * I_MapNativeToNative)
      */
@@ -200,4 +202,17 @@ public class ThinImagePart implements I_ImagePart {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public long getTime() {
+        return ThinVersionHelper.convert(getVersion());
+    }
+
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        I_AmPart newPart = duplicate();
+        newPart.setStatusId(statusNid);
+        newPart.setPathId(pathNid);
+        newPart.setVersion(ThinVersionHelper.convert(time));
+        return newPart;
+    }
 }

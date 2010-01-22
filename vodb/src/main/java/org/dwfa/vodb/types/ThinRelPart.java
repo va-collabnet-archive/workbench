@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.util.HashFunction;
@@ -47,7 +48,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_RelPart#hasNewData(org.dwfa.vodb.types.ThinRelPart)
      */
@@ -59,7 +60,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#getPathId()
      */
     public int getPathId() {
@@ -68,7 +69,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#setPathId(int)
      */
     public void setPathId(int pathId) {
@@ -77,7 +78,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#getCharacteristicId()
      */
     public int getCharacteristicId() {
@@ -86,7 +87,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#setCharacteristicId(int)
      */
     public void setCharacteristicId(int characteristicId) {
@@ -95,7 +96,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#getGroup()
      */
     public int getGroup() {
@@ -104,7 +105,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#setGroup(int)
      */
     public void setGroup(int group) {
@@ -113,7 +114,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#getRefinabilityId()
      */
     public int getRefinabilityId() {
@@ -122,7 +123,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#setRefinabilityId(int)
      */
     public void setRefinabilityId(int refinabilityId) {
@@ -131,7 +132,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#getRelTypeId()
      */
     @Deprecated
@@ -141,7 +142,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#setRelTypeId(int)
      */
     @Deprecated
@@ -151,7 +152,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#getVersion()
      */
     public int getVersion() {
@@ -160,7 +161,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#setVersion(int)
      */
     public void setVersion(int version) {
@@ -169,7 +170,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#getStatusId()
      */
     public int getStatusId() {
@@ -178,7 +179,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#setStatusId(int)
      */
     public void setStatusId(int statusId) {
@@ -236,7 +237,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.dwfa.vodb.types.I_RelPart#convertIds(org.dwfa.vodb.jar.
      * I_MapNativeToNative)
      */
@@ -250,7 +251,7 @@ public class ThinRelPart implements I_RelPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_RelPart#duplicate()
      */
     public ThinRelPart duplicate() {
@@ -281,4 +282,17 @@ public class ThinRelPart implements I_RelPart {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public long getTime() {
+        return ThinVersionHelper.convert(getVersion());
+    }
+
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        I_AmPart newPart = duplicate();
+        newPart.setStatusId(statusNid);
+        newPart.setPathId(pathNid);
+        newPart.setVersion(ThinVersionHelper.convert(time));
+        return newPart;
+    }
 }

@@ -248,5 +248,20 @@ public class ThinDescPartCore implements I_AmPart {
     public void setPositionId(int pid) {
         throw new UnsupportedOperationException();
     }
+    
+	@Override
+	public long getTime() {
+		return ThinVersionHelper.convert(version);
+	}
+
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		ThinDescPartCore newPart = duplicate();
+		newPart.setStatusId(statusNid);
+		newPart.setPathId(pathNid);
+		newPart.setVersion(ThinVersionHelper.convert(time));
+		return newPart;
+	}
+
 
 }

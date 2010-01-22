@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,10 @@
 package org.dwfa.vodb.types;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.util.HashFunction;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
     private ThinIdPartCore core;
@@ -43,7 +45,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdPart#getPathId()
      */
     public int getPathId() {
@@ -52,7 +54,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdPart#setPathId(int)
      */
     public void setPathId(int pathId) {
@@ -61,7 +63,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdPart#getIdStatus()
      */
     @Deprecated
@@ -71,7 +73,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdPart#setIdStatus(int)
      */
     @Deprecated
@@ -81,7 +83,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdPart#getSource()
      */
     public int getSource() {
@@ -90,7 +92,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdPart#setSource(int)
      */
     public void setSource(int source) {
@@ -99,7 +101,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdPart#getSourceId()
      */
     public Object getSourceId() {
@@ -108,7 +110,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdPart#setSourceId(java.lang.Object)
      */
     public void setSourceId(Object sourceId) {
@@ -117,7 +119,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdPart#getVersion()
      */
     public int getVersion() {
@@ -126,7 +128,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdPart#setVersion(int)
      */
     public void setVersion(int version) {
@@ -135,7 +137,7 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_IdPart#hasNewData(org.dwfa.vodb.types.ThinIdPart)
      */
@@ -192,4 +194,17 @@ public class ThinIdIntegerPartWithCoreDelegate implements I_IdPart {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public long getTime() {
+        return ThinVersionHelper.convert(getVersion());
+    }
+
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        I_IdPart newPart = duplicate();
+        newPart.setStatusId(statusNid);
+        newPart.setPathId(pathNid);
+        newPart.setVersion(ThinVersionHelper.convert(time));
+        return newPart;
+    }
 }

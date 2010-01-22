@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,9 +49,9 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
      * strategy</strong>.
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
-     * 
+     *
      * @see #addTuples(I_IntSet, Set, List, boolean, boolean)
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
@@ -72,9 +72,9 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
      * strategy</strong>.
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
-     * 
+     *
      * @see #addTuples(I_IntSet, Set, List, boolean, boolean)
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
@@ -94,7 +94,7 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions -
      * tuples are returned in the supplied returnTuples List parameter
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions

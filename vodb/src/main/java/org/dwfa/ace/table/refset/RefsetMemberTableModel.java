@@ -316,7 +316,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         CONCEPT_ID("concept", 5, 300, 1000),
 
         // Concept extension
-        CONCEPT_2_ID("concept-2", 5, 300, 1000),
+        CONCEPT_2_ID("concept 2", 5, 300, 1000),
 
         // Integer extension
         INTEGER_VALUE("integer value", 5, 100, 500),

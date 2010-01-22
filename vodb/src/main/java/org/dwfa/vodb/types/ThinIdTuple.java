@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,11 +21,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdTuple;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ThinIdTuple implements I_IdTuple {
     I_IdVersioned core;
@@ -43,7 +45,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#getNativeId()
      */
     public int getNativeId() {
@@ -52,7 +54,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#getTimePathSet()
      */
     public Set<TimePathId> getTimePathSet() {
@@ -61,7 +63,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#getUIDs()
      */
     public List<UUID> getUIDs() {
@@ -70,7 +72,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#getVersions()
      */
     public List<I_IdPart> getVersions() {
@@ -79,7 +81,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_IdTuple#hasVersion(org.dwfa.vodb.types.I_IdPart)
      */
@@ -89,7 +91,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#setNativeId(int)
      */
     public void setNativeId(int nativeId) {
@@ -98,7 +100,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#getIdStatus()
      */
     @Deprecated
@@ -108,7 +110,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#getPathId()
      */
     public int getPathId() {
@@ -117,7 +119,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#getSource()
      */
     public int getSource() {
@@ -126,7 +128,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#getSourceId()
      */
     public Object getSourceId() {
@@ -135,7 +137,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#getVersion()
      */
     public int getVersion() {
@@ -144,7 +146,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#getIdVersioned()
      */
     public I_IdVersioned getIdVersioned() {
@@ -153,7 +155,7 @@ public class ThinIdTuple implements I_IdTuple {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_IdTuple#duplicatePart()
      */
     @Deprecated
@@ -196,7 +198,7 @@ public class ThinIdTuple implements I_IdTuple {
     }
 
     public int getFixedPartId() {
-        return core.getTermComponentId();
+        return core.getNid();
     }
 
     public int getPositionId() {
@@ -207,4 +209,17 @@ public class ThinIdTuple implements I_IdTuple {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public long getTime() {
+        return ThinVersionHelper.convert(getVersion());
+    }
+
+    @Override
+    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        I_IdPart newPart = duplicate();
+        newPart.setStatusId(statusNid);
+        newPart.setPathId(pathNid);
+        newPart.setVersion(ThinVersionHelper.convert(time));
+        return newPart;
+    }
 }
