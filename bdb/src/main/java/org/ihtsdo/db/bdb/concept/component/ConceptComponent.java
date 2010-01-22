@@ -44,8 +44,8 @@ import org.ihtsdo.etypes.EIdentifierVersionUuid;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class ConceptComponent<V extends Revision<V, C>, 
-									   C extends ConceptComponent<V, C>> 
+public abstract class ConceptComponent<R extends Revision<R, C>, 
+									   C extends ConceptComponent<R, C>> 
 	implements I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion,
 	I_HandleFutureStatusAtPositionSetup {
 	
@@ -107,6 +107,100 @@ public abstract class ConceptComponent<V extends Revision<V, C>,
 		}
 	};
 
+	public abstract class Version implements I_AmTuple {
+		protected int index = -1;
+		
+
+		public Version() {
+			super();
+		}
+
+		public Version(int index) {
+			super();
+			this.index = index;
+		}
+
+		@Override
+		public I_AmPart getMutablePart() {
+			if (index >= 0) {
+				return additionalVersions.get(index);
+			}
+			return this;
+		}
+		
+		public int getSapNid() {
+			if (index >= 0) {
+				return additionalVersions.get(index).sapNid;
+			}
+			return primordialSapNid;
+		}
+
+		@Override
+		public int getPathId() {
+			if (index >= 0) {
+				return getMutablePart().getPathId();
+			}
+			return Bdb.getStatusAtPositionDb().getPathId(primordialSapNid);
+		}
+
+		@Override
+		public int getStatusId() {
+			if (index >= 0) {
+				return getMutablePart().getStatusId();
+			}
+			return Bdb.getStatusAtPositionDb().getStatusId(primordialSapNid);
+		}
+
+		@Override
+		public long getTime() {
+			if (index >= 0) {
+				return getMutablePart().getTime();
+			}
+			return Bdb.getStatusAtPositionDb().getTime(primordialSapNid);
+		}
+
+		@Override
+		public int getVersion() {
+			if (index >= 0) {
+				return getMutablePart().getVersion();
+			}
+			return Bdb.getStatusAtPositionDb().getVersion(primordialSapNid);
+		}
+
+		@Override
+		public I_AmTermComponent getFixedPart() {
+			return ConceptComponent.this;
+		}
+
+		@Override
+		public int getNid() {
+			return nid;
+		}
+
+		@Override
+		@Deprecated
+		public void setPathId(int pathId) {
+			throw new UnsupportedOperationException("Use makeAnalog instead");
+		}
+
+		@Override
+		@Deprecated
+		public void setStatusId(int statusId) {
+			throw new UnsupportedOperationException("Use makeAnalog instead");
+		}
+
+		@Override
+		@Deprecated
+		public void setVersion(int version) {
+			throw new UnsupportedOperationException("Use makeAnalog instead");
+		}
+
+		@Override
+		@Deprecated
+		public I_AmPart duplicate() {
+			throw new UnsupportedOperationException("Use makeAnalog instead");
+		}
+	}
 
 	
 	public int nid;
@@ -124,7 +218,7 @@ public abstract class ConceptComponent<V extends Revision<V, C>,
 	 */
 	public int primordialUNid = Integer.MIN_VALUE;
 	
-	public ArrayList<V> additionalVersions;
+	public ArrayList<R> additionalVersions;
 	private ArrayList<IdentifierVersion> additionalIdentifierParts;
 	
 	public String toString() {
@@ -168,7 +262,7 @@ public abstract class ConceptComponent<V extends Revision<V, C>,
 		this.enclosingConcept = enclosingConcept;
 		this.primordialSapNid = Bdb.getStatusAtPositionNid(eComponent);
 		if (eComponent.getVersionCount() > 1) {
-			this.additionalVersions = new ArrayList<V>(eComponent.getVersionCount() - 1);
+			this.additionalVersions = new ArrayList<R>(eComponent.getVersionCount() - 1);
 		}
 		this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
 		convertId(eComponent.additionalIdComponents);
@@ -375,32 +469,24 @@ public abstract class ConceptComponent<V extends Revision<V, C>,
 	}
 
 
-	public final boolean addMutablePart(V version) {
+	public final boolean addMutablePart(R version) {
 		return addVersion(version);
 	}
 
-	public final List<V> getMutableParts() {
+	public final List<R> getMutableParts() {
 		if (enclosingConcept.isEditable()) {
 			if (additionalVersions == null) {
-				additionalVersions = new ArrayList<V>();
+				additionalVersions = new ArrayList<R>();
 
 			}
 			return additionalVersions;
 		}
-		return Collections.unmodifiableList(new ArrayList<V>());
+		return Collections.unmodifiableList(new ArrayList<R>());
 	}
 	
 
-	public final List<V> getMutableParts(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
-		if (returnConflictResolvedLatestState) {
-	        List<V> returnList = new ArrayList<V>(additionalVersions.size());
-	        if (returnConflictResolvedLatestState) {
-	            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
-	            returnList = config.getConflictResolutionStrategy().resolveParts(returnList);
-	        }
-	        return returnList;
-		}
-		return getMutableParts();
+	public final List<Version> getMutableParts(boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
+		throw new UnsupportedOperationException("use getVersions()");
 	}
 
 	
@@ -438,37 +524,33 @@ public abstract class ConceptComponent<V extends Revision<V, C>,
 		return additionalIdentifierParts;
 	}
 
-	public final boolean addVersion(V newPart) {
+	public final boolean addVersion(R newPart) {
 		if (enclosingConcept.isEditable()) {
 			if (additionalVersions == null) {
-				additionalVersions = new ArrayList<V>(1);
+				additionalVersions = new ArrayList<R>(1);
 			}
 			return additionalVersions.add(newPart);
 		}
 		throw new RuntimeException("versions is not editable");
 	}
 	
-	public final boolean addVersionNoRedundancyCheck(V newPart) {
+	public final boolean addVersionNoRedundancyCheck(R newPart) {
 		if (enclosingConcept.isEditable()) {
 			if (additionalVersions == null) {
-				additionalVersions = new ArrayList<V>(1);
+				additionalVersions = new ArrayList<R>(1);
 			}
 			return additionalVersions.add(newPart);
 		}
 		throw new RuntimeException("versions is not editable");
 	}
 	
-	public final boolean hasVersion(V version) {
+	public final boolean hasVersion(R version) {
 		if (additionalVersions == null) {
 			return false;
 		}
 		return additionalVersions.contains(version);
 	}
 	
-	public final List<? extends V> getVersions(boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		return getMutableParts(returnConflictResolvedLatestState);
-	}
 
 	public final int versionCount() {
 		if (additionalVersions == null) {
@@ -481,7 +563,7 @@ public abstract class ConceptComponent<V extends Revision<V, C>,
 		Set<TimePathId> set = new TreeSet<TimePathId>();
 		set.add(new TimePathId(getVersion(), getPathId()));
 		if (additionalVersions != null) {
-			for (V p : additionalVersions) {
+			for (R p : additionalVersions) {
 				set.add(new TimePathId(p.getVersion(), p.getPathId()));
 			}
 		}
@@ -585,9 +667,9 @@ public abstract class ConceptComponent<V extends Revision<V, C>,
 	
 	
 	
-	public abstract boolean fieldsEqual(ConceptComponent<V, C> another);
+	public abstract boolean fieldsEqual(ConceptComponent<R, C> another);
 	
-	public boolean conceptComponentFieldsEqual(ConceptComponent<V, C> another) { 
+	public boolean conceptComponentFieldsEqual(ConceptComponent<R, C> another) { 
 		if (this.nid != another.nid) {
 			return false;
 		}

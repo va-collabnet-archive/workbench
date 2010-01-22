@@ -12,7 +12,7 @@ import java.util.TreeSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.Revision;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 
 import cern.colt.bitvector.BitMatrix;
 
@@ -44,43 +44,43 @@ public class PositionMapper {
 	 * 
 	 * @param <T>
 	 *            the type of part being tested.
-	 * @param part
+	 * @param version
 	 *            the part to be tested to determine if it is on route to the
 	 *            destination.
 	 * @return true if the part's position is on the route to the destination of
 	 *         the class's instance.
 	 * @throws IOException
 	 */
-	public <V extends Revision<V, ?>> boolean onRoute(V part) {
-		return positionDistance[part.getStatusAtPositionNid()] >= 0;
+	public <V extends ConceptComponent<?, ?>.Version> boolean onRoute(V version) {
+		return positionDistance[version.getSapNid()] >= 0;
 	}
 
 	/**
 	 * 
 	 * @param <T>
 	 *            the type of part being tested.
-	 * @param part1
+	 * @param v1
 	 *            the first part of the comparison.
-	 * @param part2
+	 * @param v2
 	 *            the second part of the comparison.
 	 * @return the <code>RELATIVE_POSITION</code> of part1 compared to part2
 	 *         with respect to the destination position of the class's instance.
 	 * @throws IOException
 	 */
-	public <V extends Revision<V, ?>> RELATIVE_POSITION relativePosition(V part1, V part2)
+	public <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION 
+		relativePosition(V v1, V v2)
 			throws IOException {
-		if (onRoute(part1) && onRoute(part2)) {
-			if (conflictMatrix.get(part1.getStatusAtPositionNid(), part2
-					.getStatusAtPositionNid())) {
+		if (onRoute(v1) && onRoute(v2)) {
+			if (conflictMatrix.get(v1.getSapNid(), v2.getSapNid())) {
 				return RELATIVE_POSITION.CONFLICTING;
-			} else if (positionDistance[part1.getStatusAtPositionNid()] > positionDistance[part2
-					.getStatusAtPositionNid()]) {
+			} else if (positionDistance[v1.getSapNid()] > 
+					positionDistance[v2.getSapNid()]) {
 				return RELATIVE_POSITION.BEFORE;
-			} else if (positionDistance[part1.getStatusAtPositionNid()] < positionDistance[part2
-					.getStatusAtPositionNid()]) {
+			} else if (positionDistance[v1.getSapNid()] < 
+					positionDistance[v2.getSapNid()]) {
 				return RELATIVE_POSITION.AFTER;
-			} else if (positionDistance[part1.getStatusAtPositionNid()] == positionDistance[part2
-					.getStatusAtPositionNid()]) {
+			} else if (positionDistance[v1.getSapNid()] == 
+				positionDistance[v2.getSapNid()]) {
 				return RELATIVE_POSITION.EQUAL;
 			}
 		}
@@ -94,16 +94,15 @@ public class PositionMapper {
 	 * @return
 	 * @throws IOException
 	 */
-	public <V extends Revision<V, ?>> RELATIVE_POSITION fastRelativePosition(V part1,
-			V part2) {
-		if (conflictMatrix.get(part1.getStatusAtPositionNid(), part2
-				.getStatusAtPositionNid())) {
+	public <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION 
+		fastRelativePosition(V part1, V part2) {
+		if (conflictMatrix.get(part1.getSapNid(), part2.getSapNid())) {
 			return RELATIVE_POSITION.CONFLICTING;
-		} else if (positionDistance[part1.getStatusAtPositionNid()] > positionDistance[part2
-				.getStatusAtPositionNid()]) {
+		} else if (positionDistance[part1.getSapNid()] > 
+			positionDistance[part2.getSapNid()]) {
 			return RELATIVE_POSITION.BEFORE;
-		} else if (positionDistance[part1.getStatusAtPositionNid()] < positionDistance[part2
-				.getStatusAtPositionNid()]) {
+		} else if (positionDistance[part1.getSapNid()] < 
+			positionDistance[part2.getSapNid()]) {
 			return RELATIVE_POSITION.AFTER;
 		} 
 		return RELATIVE_POSITION.EQUAL;

@@ -156,9 +156,4 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
 		this.c2Nid = c2id;
 	}
 
-	@Override
-	public I_AmPart getMutablePart() {
-		return this;
-	}
-
 }

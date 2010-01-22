@@ -96,9 +96,4 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 		this.intValue = value;
 	}
 
-	@Override
-	public IntRevision getMutablePart() {
-		return this;
-	}
-
 }

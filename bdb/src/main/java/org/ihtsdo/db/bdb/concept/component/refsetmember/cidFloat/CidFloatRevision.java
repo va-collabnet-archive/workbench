@@ -81,11 +81,6 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public CidFloatRevision getMutablePart() {
-		return this;
-	}
-
 	public int getC1Nid() {
 		return c1Nid;
 	}

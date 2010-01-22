@@ -82,10 +82,4 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 	public void setStringValue(String stringValue) {
 		this.stringValue = stringValue;
 	}
-
-	@Override
-	public StrRevision getMutablePart() {
-		return this;
-	}
-
 }

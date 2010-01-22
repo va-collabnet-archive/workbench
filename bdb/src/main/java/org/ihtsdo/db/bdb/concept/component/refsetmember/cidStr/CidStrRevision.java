@@ -120,10 +120,4 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 	public void setStr(String str) {
 		this.strValue = str;
 	}
-
-	@Override
-	public I_AmPart getMutablePart() {
-		return this;
-	}
-
 }

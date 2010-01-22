@@ -75,12 +75,6 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 		throw new UnsupportedOperationException();
 	}
 
-
-	@Override
-	public LongRevision getMutablePart() {
-		return this;
-	}
-
 	public long getLongValue() {
 		return longValue;
 	}

@@ -67,9 +67,4 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public MembershipRevision getMutablePart() {
-		return this;
-	}
-
 }

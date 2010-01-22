@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb.concept.component.relationship;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -24,7 +25,6 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipVersion;
@@ -33,13 +33,149 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship> 
-	implements I_RelVersioned, I_RelPart, I_RelTuple {
+	implements I_RelVersioned, I_RelPart {
 
-	private static class RelTupleComputer extends
-			VersionComputer<Relationship, RelationshipRevision> {
+	public class Version 
+	extends ConceptComponent<RelationshipRevision, Relationship>.Version 
+	implements I_RelTuple, I_RelPart {
+	
+	public Version() {
+		super();
 	}
 
-	private static RelTupleComputer computer = new RelTupleComputer();
+	public Version(int index) {
+		super(index);
+	}
+
+	@Override
+	public int getC1Id() {
+		return getEnclosingConcept().getNid();
+	}
+
+	@Override
+	public int getC2Id() {
+		return c2Nid;
+	}
+
+	@Override
+	public int getCharacteristicId() {
+		if (index >= 0) {
+			return additionalVersions.get(index).getCharacteristicId();
+		}
+		return characteristicNid;
+	}
+
+	@Override
+	public int getGroup() {
+		if (index >= 0) {
+			return additionalVersions.get(index).getGroup();
+		}
+		return group;
+	}
+
+	@Override
+	public int getRefinabilityId() {
+		if (index >= 0) {
+			return additionalVersions.get(index).getRefinabilityId();
+		}
+		return refinabilityNid;
+	}
+
+	@Override
+	public int getRelId() {
+		return nid;
+	}
+
+	@Override
+	public I_RelVersioned getRelVersioned() {
+		return Relationship.this;
+	}
+
+	@Override
+	public void setCharacteristicId(int characteristicId) {
+		if (index >= 0) {
+			additionalVersions.get(index).setCharacteristicId(characteristicId);
+		} else {
+			Relationship.this.characteristicNid = characteristicId;
+		}
+	}
+
+	@Override
+	public void setGroup(int group) {
+		if (index >= 0) {
+			additionalVersions.get(index).setGroup(group);
+		} else {
+			Relationship.this.group = group;
+		}
+	}
+
+	@Override
+	public void setRefinabilityId(int refinabilityId) {
+		if (index >= 0) {
+			additionalVersions.get(index).setRefinabilityId(refinabilityId);
+		} else {
+			Relationship.this.refinabilityNid = refinabilityId;
+		}
+	}
+
+	@Override
+	public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getTypeId() {
+		if (index >= 0) {
+			return additionalVersions.get(index).getTypeId();
+		} else {
+			return Relationship.this.typeNid;
+		}
+	}
+
+	@Override
+	public void setTypeId(int type) {
+		if (index >= 0) {
+			additionalVersions.get(index).setTypeId(type);
+		} else {
+			Relationship.this.typeNid = type;
+		}		
+	}
+	
+	public Relationship getFixedPart() {
+		return Relationship.this;
+	}
+
+
+	@Override
+	public ArrayIntList getPartComponentNids() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+		if (index >= 0) {
+			return additionalVersions.get(index).makeAnalog(statusNid, pathNid, time);
+		} else {
+			return Relationship.this.makeAnalog(statusNid, pathNid, time);
+		}
+	}
+
+	@Override
+	public RelationshipRevision getMutablePart() {
+		return (RelationshipRevision) super.getMutablePart();
+	}
+	
+	@Override
+	@Deprecated
+	public RelationshipRevision duplicate() {
+		throw new UnsupportedOperationException("Use makeAnalog instead");
+	}
+
+	}
+	
+	private static VersionComputer<Relationship.Version> computer = 
+		new VersionComputer<Relationship.Version>();
 
 	private int c2Nid;
 
@@ -91,7 +227,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	@Override
 	public boolean fieldsEqual(ConceptComponent<RelationshipRevision, Relationship> obj) {
-		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
+		if (Relationship.class.isAssignableFrom(obj.getClass())) {
 			Relationship another = (Relationship) obj;
 			if (this.c2Nid != another.c2Nid) {
 				return false;
@@ -177,9 +313,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	}
 
 	private void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<RelationshipRevision> matchingTuples) {
+			List<Version> matchingTuples) {
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples,
-				additionalVersions, this);
+				getTuples());
 	}
 
 	public void addTuples(I_IntSet allowedTypes, 
@@ -193,6 +329,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	}
 
 	public boolean addVersion(I_RelPart part) {
+		this.versions = null;
 		return additionalVersions.add((RelationshipRevision) part);
 	}
 
@@ -216,39 +353,51 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	}
 
 	@Override
-	public RelationshipRevision getFirstTuple() {
-		return additionalVersions.get(0);
+	public Version getFirstTuple() {
+		return getTuples().get(0);
 	}
 
 	@Override
-	public RelationshipRevision getLastTuple() {
-		return additionalVersions.get(additionalVersions.size() - 1);
+	public Version getLastTuple() {
+		return getTuples().get(getTuples().size() - 1);
 	}
 
 	@Override
 	public int getRelId() {
 		return nid;
 	}
+	List<Version> versions;
 
 	@Override
-	public List<I_RelTuple> getTuples() {
-		List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
-		for (RelationshipRevision p: additionalVersions) {
-			tuples.add(p);
+	public List<Version> getTuples() {
+		if (versions == null) {
+			versions = new ArrayList<Version>();
+			versions.add(new Version());
 		}
-		return tuples;
+		if (additionalVersions != null) {
+			for (int i = 0; i < additionalVersions.size(); i++) {
+				versions.add(new Version(i));
+			}
+		}
+		return Collections.unmodifiableList(versions);
 	}
 
-	@Override
-	public List<I_RelTuple> getTuples(boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
-		for (RelationshipRevision p : getVersions(returnConflictResolvedLatestState)) {
-			tuples.add(p);
-		}
-		return tuples;
+	public List<Version> getVersions() {
+		return getTuples();
 	}
-
+	
+	public List<Version> getVersions(boolean resolveConflicts) {
+		// implement conflict resolution
+		return getTuples();
+	}
+	
+	public List<Version> getTuples(boolean resolveConflicts) {
+		// implement conflict resolution
+		return getTuples();
+	}
+	
+	
+	
 	@Override
 	public UniversalAceRelationship getUniversal() throws IOException,
 			TerminologyException {
@@ -286,16 +435,16 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
 			throws IOException, TerminologyException {
 		int viewPathId = viewPosition.getPath().getConceptId();
-		List<RelationshipRevision> matchingTuples = new ArrayList<RelationshipRevision>();
+		List<Version> matchingTuples = new ArrayList<Version>();
 		addTuples(allowedStatus, viewPosition, matchingTuples);
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {
-			for (RelationshipRevision rt : matchingTuples) {
+			for (Version rt : matchingTuples) {
 				if (rt.getPathId() == viewPathId) {
 					RelationshipRevision promotionPart = 
-						rt.makeAnalog(rt.getStatusId(),
-									promotionPath.getConceptId(),
-									Long.MAX_VALUE);
+						(RelationshipRevision) rt.makeAnalog(rt.getStatusId(),
+								promotionPath.getConceptId(),
+								Long.MAX_VALUE);
 					rt.getRelVersioned().addVersion(promotionPart);
 					promotedAnything = true;
 				}
@@ -361,12 +510,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	@Override
 	public void setRefinabilityId(int refinabilityId) {
 		this.refinabilityNid = refinabilityId;
-	}
-
-
-	@Override
-	public I_RelVersioned getRelVersioned() {
-		return this;
 	}
 
 	@Override

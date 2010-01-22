@@ -93,12 +93,13 @@ public class BdbPathManager implements I_Manage<I_Path> {
         }
     }
 
-    public Set<I_Path> getAll() throws TerminologyException {
+    @SuppressWarnings("unchecked")
+	public Set<I_Path> getAll() throws TerminologyException {
         try {
             HashSet<I_Path> result = new HashSet<I_Path>();
             Concept pathRefsetConcept = Bdb.getConceptDb().getConcept(pathRefsetId);
             
-            for (RefsetMember<?, ?> extPart : pathRefsetConcept.getExtensions()) {
+            for (RefsetMember extPart : pathRefsetConcept.getExtensions()) {
             	CidMember conceptExtension = (CidMember) extPart;
                 	result.add(get(conceptExtension.getC1Nid()));
             }
@@ -109,11 +110,12 @@ public class BdbPathManager implements I_Manage<I_Path> {
         }
     }
 
-    protected List<I_Position> getPathOrigins(int nid) throws TerminologyException {
+    @SuppressWarnings("unchecked")
+	protected List<I_Position> getPathOrigins(int nid) throws TerminologyException {
         try {
             ArrayList<I_Position> result = new ArrayList<I_Position>();
             Concept pathConcept = Bdb.getConceptDb().getConcept(nid);
-            for (RefsetMember<?, ?> extPart : pathConcept.getConceptExtensions(pathOriginRefsetId)) {
+            for (RefsetMember extPart : pathConcept.getConceptExtensions(pathOriginRefsetId)) {
             	CidIntMember conceptExtension = (CidIntMember) extPart;
                 result.add(new Position(conceptExtension.getIntValue(), get(conceptExtension.getC1Nid())));
             }

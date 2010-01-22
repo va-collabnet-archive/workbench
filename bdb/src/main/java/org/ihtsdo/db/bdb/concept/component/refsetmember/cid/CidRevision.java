@@ -13,7 +13,7 @@ import org.ihtsdo.etypes.ERefsetCidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidRevisioin extends RefsetRevision<CidRevisioin, CidMember>
+public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 	implements I_ThinExtByRefPartConcept {
 	
 	private int c1Nid;
@@ -24,8 +24,8 @@ public class CidRevisioin extends RefsetRevision<CidRevisioin, CidMember>
 
 	@Override
 	public boolean equals(Object obj) {
-		if (CidRevisioin.class.isAssignableFrom(obj.getClass())) {
-			CidRevisioin another = (CidRevisioin) obj;
+		if (CidRevision.class.isAssignableFrom(obj.getClass())) {
+			CidRevision another = (CidRevision) obj;
 			if (this.c1Nid != another.c1Nid) {
 				return false;
 			}
@@ -34,25 +34,25 @@ public class CidRevisioin extends RefsetRevision<CidRevisioin, CidMember>
 		return false;
 	}
 
-	protected CidRevisioin(int statusNid, int pathNid, long time, 
+	protected CidRevision(int statusNid, int pathNid, long time, 
 			CidMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	protected CidRevisioin(int statusAtPositionNid, 
+	protected CidRevision(int statusAtPositionNid, 
 			CidMember primoridalMember) {
 		super(statusAtPositionNid, 
 				primoridalMember);
 	}
 
-	public CidRevisioin(TupleInput input, 
+	public CidRevision(TupleInput input, 
 			CidMember primoridalMember) {
 		super(input, primoridalMember);
 		c1Nid = input.readInt();
 	}
 
-	public CidRevisioin(ERefsetCidVersion eVersion,
+	public CidRevision(ERefsetCidVersion eVersion,
 			CidMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
@@ -98,10 +98,4 @@ public class CidRevisioin extends RefsetRevision<CidRevisioin, CidMember>
 	public void setConceptId(int conceptId) {
 		this.c1Nid = conceptId;
 	}
-
-	@Override
-	public CidRevisioin getMutablePart() {
-		return this;
-	}
-
 }

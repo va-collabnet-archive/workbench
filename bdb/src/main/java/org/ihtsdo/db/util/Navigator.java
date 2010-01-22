@@ -12,7 +12,7 @@ import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.PositionMapper;
-import org.ihtsdo.db.bdb.concept.component.Revision;
+import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 
 /**
  * The Navigation class can take multiple positions and determine where they are
@@ -25,7 +25,7 @@ import org.ihtsdo.db.bdb.concept.component.Revision;
  */
 public abstract class Navigator {
 
-	public <V extends Revision<V,?>> List<V> locateLatest(List<V> parts,
+	public <V extends ConceptComponent<?,?>.Version> List<V> locateLatest(List<V> parts,
 			I_ConfigAceFrame config) throws IOException, PathNotExistsException, TerminologyException {
 		V latest = null;
 		OpenBitSet resultsPartSet = new OpenBitSet(parts.size());

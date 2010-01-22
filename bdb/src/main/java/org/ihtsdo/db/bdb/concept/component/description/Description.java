@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb.concept.component.description;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -10,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -41,13 +41,138 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Description 
 	extends ConceptComponent<DescriptionRevision, Description> 
-	implements I_DescriptionVersioned, I_DescriptionPart, I_DescriptionTuple {
+	implements I_DescriptionVersioned, I_DescriptionPart {
 
-	private static class DescTupleComputer extends
-			VersionComputer<Description, DescriptionRevision> {
+	private static VersionComputer<Description.Version> computer = 
+		new VersionComputer<Description.Version>();
+	
+	public class Version 
+		extends ConceptComponent<DescriptionRevision, Description>.Version 
+		implements I_DescriptionTuple, I_DescriptionPart {
+
+		public Version() {
+			super();
+		}
+
+		public Version(int index) {
+			super(index);
+		}
+
+		@Override
+		public int getConceptId() {
+			return enclosingConcept.getNid();
+		}
+
+		@Override
+		public int getDescId() {
+			return nid;
+		}
+
+		@Override
+		public I_DescriptionVersioned getDescVersioned() {
+			return Description.this;
+		}
+
+		@Override
+		public String getLang() {
+			if (index >= 0) {
+				return additionalVersions.get(index).getLang();
+			}
+			return Description.this.lang;
+		}
+
+		@Override
+		public String getText() {
+			if (index >= 0) {
+				return additionalVersions.get(index).getText();
+			}
+			return Description.this.text;
+		}
+
+		@Override
+		public boolean isInitialCaseSignificant() {
+			if (index >= 0) {
+				return additionalVersions.get(index).isInitialCaseSignificant();
+			}
+			return Description.this.initialCaseSignificant;
+		}
+
+		@Override
+		public void setInitialCaseSignificant(boolean capStatus) {
+			if (index >= 0) {
+				additionalVersions.get(index).setInitialCaseSignificant(capStatus);
+			} else {
+				Description.this.initialCaseSignificant = capStatus;
+			}
+		}
+
+		@Override
+		public void setLang(String lang) {
+			if (index >= 0) {
+				additionalVersions.get(index).setLang(lang);
+			} else {
+				Description.this.lang = lang;
+			}
+		}
+
+		@Override
+		public void setText(String text) {
+			if (index >= 0) {
+				additionalVersions.get(index).setText(text);
+			} else {
+				Description.this.text = text;
+			}
+		}
+
+		@Override
+		public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public int getTypeId() {
+			if (index >= 0) {
+				return additionalVersions.get(index).getTypeId();
+			} else {
+				return Description.this.typeNid;
+			}
+		}
+
+		@Override
+		public void setTypeId(int type) {
+			if (index >= 0) {
+				additionalVersions.get(index).setTypeId(type);
+			} else {
+				Description.this.typeNid = type;
+			}
+		}
+
+		@Override
+		public ArrayIntList getPartComponentNids() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public I_DescriptionPart getMutablePart() {
+			return (I_DescriptionPart) super.getMutablePart();
+		}
+		@Override
+		public I_DescriptionPart makeAnalog(int statusNid, int pathNid, long time) {
+			if (index >= 0) {
+				return additionalVersions.get(index).makeAnalog(statusNid, pathNid, time);
+			} else {
+				return Description.this.makeAnalog(statusNid, pathNid, time);
+			}
+		}
+		@Override
+		@Deprecated
+		public I_DescriptionPart duplicate() {
+			throw new UnsupportedOperationException("Use makeAnalog instead");
+		}
+		
 	}
-
-	private static DescTupleComputer computer = new DescTupleComputer();
 	
 	private String text;
 	private boolean initialCaseSignificant;
@@ -169,25 +294,35 @@ public class Description
 	}
 
 	@Override
-	public DescriptionRevision getFirstTuple() {
-		return additionalVersions.get(0);
+	public Version getFirstTuple() {
+		return getTuples().get(0);
 	}
 
 	@Override
-	public DescriptionRevision getLastTuple() {
-		return additionalVersions.get(additionalVersions.size() - 1);
+	public Version getLastTuple() {
+		return getTuples().get(getTuples().size() - 1);
 	}
-
-
 	@Override
-	public List<I_DescriptionTuple> getTuples(
+	public List<Version> getVersions(
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-		for (DescriptionRevision p : getMutableParts(returnConflictResolvedLatestState)) {
-			tuples.add(p);
+		return getTuples(returnConflictResolvedLatestState);
+	}
+
+
+	@Override
+	public List<Version> getTuples(
+			boolean returnConflictResolvedLatestState)
+			throws TerminologyException, IOException {
+		//TODO support returnConflictResolvedLatestState
+		List<Version> versions = new ArrayList<Version>();
+		versions.add(new Version());
+		if (additionalVersions != null) {
+			for (int i = 0; i < additionalVersions.size(); i++) {
+				versions.add(new Version(i));
+			}
 		}
-		return tuples;
+		return versions;
 	}
 
 	@Override
@@ -267,6 +402,7 @@ public class Description
 
 	@Override
 	public boolean addVersion(I_DescriptionPart newPart) {
+		this.versions = null;
 		return additionalVersions.add((DescriptionRevision) newPart);
 	}
 
@@ -283,14 +419,20 @@ public class Description
 	 * Consider depreciating the below methods...
 	 */
 	
+	List<Version> versions;
 	
 
-	public final List<? extends I_DescriptionTuple> getTuples() {
-		List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-		for (DescriptionRevision p : additionalVersions) {
-			tuples.add(p);
+	public final List<Version> getTuples() {
+		if (versions == null) {
+			versions = new ArrayList<Version>();
+			versions.add(new Version());
 		}
-		return additionalVersions;
+		if (additionalVersions != null) {
+			for (int i = 0; i < additionalVersions.size(); i++) {
+				versions.add(new Version(i));
+			}
+		}
+		return Collections.unmodifiableList(versions);
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
@@ -313,13 +455,13 @@ public class Description
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples,
+			PositionSetReadOnly positions, List<Version> matchingTuples,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<DescriptionRevision> tuples = new ArrayList<DescriptionRevision>();
+		List<Version> tuples = new ArrayList<Version>();
 
 		computer.addTuples(allowedStatus, allowedTypes, positions,
-				tuples, addUncommitted, additionalVersions, this);
+				tuples, addUncommitted, getTuples());
 
 		if (returnConflictResolvedLatestState) {
 			I_ConfigAceFrame config = AceConfig.getVodb()
@@ -395,13 +537,8 @@ public class Description
 	}
 
 	@Override
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+	public I_DescriptionPart makeAnalog(int statusNid, int pathNid, long time) {
 		return new DescriptionRevision(this, statusNid, pathNid, time, this);
-	}
-
-	@Override
-	public I_DescriptionVersioned getDescVersioned() {
-		return this;
 	}
 	
 	@Override

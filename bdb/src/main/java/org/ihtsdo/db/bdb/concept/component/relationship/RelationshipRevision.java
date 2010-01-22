@@ -13,7 +13,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class RelationshipRevision 
 	extends Revision<RelationshipRevision, Relationship> 
-	implements I_RelPart, I_RelTuple {
+	implements I_RelPart {
 	
 	private transient Relationship relationship;
 	
@@ -55,7 +55,7 @@ public class RelationshipRevision
 
 	public RelationshipRevision(RelationshipRevision another, 
 			Relationship primordialRel) {
-		super(another.statusAtPositionNid, primordialRel);
+		super(another.sapNid, primordialRel);
 		this.characteristicNid = another.characteristicNid;
 		this.group = another.group;
 		this.refinabilityNid = another.refinabilityNid;
@@ -90,7 +90,7 @@ public class RelationshipRevision
 		this.group = erv.getGroup();
 		this.refinabilityNid = Bdb.uuidToNid(erv.getRefinabilityUuid());
 		this.typeNid = Bdb.uuidToNid(erv.getTypeUuid());
-		this.statusAtPositionNid = Bdb.getStatusAtPositionNid(erv);
+		this.sapNid = Bdb.getStatusAtPositionNid(erv);
 	}
 
 	@Override
@@ -156,32 +156,5 @@ public class RelationshipRevision
 		nids.add(refinabilityNid);
 		nids.add(typeNid);
 		return nids;
-	}
-
-	@Override
-	public int getC1Id() {
-		return relationship.getC1Id();
-	}
-
-	@Override
-	public int getC2Id() {
-		return relationship.getC2Id();
-	}
-
-	@Override
-	public I_RelPart getMutablePart() {
-		return this;
-	}
-
-	@Override
-	public int getRelId() {
-		return relationship.nid;
-	}
-
-	@Override
-	public Relationship getRelVersioned() {
-		return relationship;
-	}
-	
-	
+	}	
 }

@@ -272,7 +272,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ConceptAttributesRevision> getConceptAttributeTuples(
+	public List<ConceptAttributes.Version> getConceptAttributeTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
 		//TODO
@@ -301,7 +301,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	@Override
-	public DescriptionRevision getDescTuple(I_IntList descTypePreferenceList,
+	public Description.Version getDescTuple(I_IntList descTypePreferenceList,
 			I_ConfigAceFrame config) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
@@ -321,7 +321,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<DescriptionRevision> getDescriptionTuples(
+	public List<Description.Version> getDescriptionTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
 		//TODO
@@ -395,7 +395,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ImageRevision> getImageTuples(
+	public List<Image.Version> getImageTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
 		//TODO

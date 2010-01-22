@@ -154,10 +154,4 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 	public void setConceptId(int conceptId) {
 		this.c1Nid = conceptId;
 	}
-
-	@Override
-	public I_AmPart getMutablePart() {
-		return this;
-	}
-
 }

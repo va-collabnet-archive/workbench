@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,14 +35,103 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Image 
 	extends ConceptComponent<ImageRevision, Image> 
-	implements I_ImageVersioned, I_ImagePart, I_ImageTuple {
+	implements I_ImageVersioned, I_ImagePart {
+	
+	public class Version 
+	extends ConceptComponent<ImageRevision, Image>.Version 
+	implements I_ImageTuple {
 
-	private static class ImageTupleComputer extends
-			VersionComputer<Image, ImageRevision> {
+		public Version() {
+			super();
+		}
+
+		public Version(int index) {
+			super(index);
+		}
+
+		@Override
+		public int getConceptId() {
+			return enclosingConcept.getConceptId();
+		}
+
+		@Override
+		public String getFormat() {
+			return format;
+		}
+
+		@Override
+		public byte[] getImage() {
+			return image;
+		}
+
+		@Override
+		public int getImageId() {
+			return nid;
+		}
+
+		@Override
+		public String getTextDescription() {
+			if (index >= 0) {
+				return additionalVersions.get(index).getTextDescription();
+			}
+			return textDescription;
+		}
+
+		@Override
+		public I_ImageVersioned getVersioned() {
+			return Image.this;
+		}
+
+		@Override
+		public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getTypeId() {
+			if (index >= 0) {
+				return additionalVersions.get(index).getTypeId();
+			}
+			return typeNid;
+		}
+
+		@Override
+		public void setTypeId(int type) {
+			if (index >= 0) {
+				additionalVersions.get(index).setTypeId(type);
+			}
+			typeNid = type;
+		}
+
+		@Override
+		public ArrayIntList getPartComponentNids() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public I_ImagePart makeAnalog(int statusNid, int pathNid, long time) {
+			if (index >= 0) {
+				return additionalVersions.get(index).makeAnalog(statusNid, pathNid, time);
+			}
+			return Image.this.makeAnalog(statusNid, pathNid, time);
+		}
+		@Override
+		public I_ImagePart getMutablePart() {
+			return (I_ImagePart) super.getMutablePart();
+		}
+		
+		@Override
+		@Deprecated
+		public I_ImagePart duplicate() {
+			throw new UnsupportedOperationException("Use makeAnalog instead");
+		}
 
 	}
 
-	private static ImageTupleComputer computer = new ImageTupleComputer();
+	private static VersionComputer<Image.Version> computer = 
+		new VersionComputer<Image.Version>();
+
 	private String format;
 	private byte[] image;
 	
@@ -182,21 +272,27 @@ public class Image
 	 * 
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getLastTuple()
 	 */
-	public ImageRevision getLastTuple() {
-		return additionalVersions.get(additionalVersions.size() - 1);
+	public Version getLastTuple() {
+		return getTuples().get(getTuples().size() - 1);
 	}
 
+	List<Version> versions;
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getTuples()
 	 */
-	public List<I_ImageTuple> getTuples() {
-		List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
-		for (ImageRevision p : additionalVersions) {
-			tuples.add(p);
+	public List<Version> getTuples() {
+		if (versions == null) {
+			versions = new ArrayList<Version>();
+			versions.add(new Version());
 		}
-		return tuples;
+		if (additionalVersions != null) {
+			for (int i = 0; i < additionalVersions.size(); i++) {
+				versions.add(new Version(i));
+			}
+		}
+		return Collections.unmodifiableList(versions);
 	}
 
 	/*
@@ -243,14 +339,14 @@ public class Image
 	public boolean promote(I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus) {
 		int viewPathId = viewPosition.getPath().getConceptId();
-		List<ImageRevision> matchingTuples = new ArrayList<ImageRevision>();
+		List<Version> matchingTuples = new ArrayList<Version>();
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples, 
-				additionalVersions, this);
+				getTuples());
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {
-			for (ImageRevision it : matchingTuples) {
+			for (Version it : matchingTuples) {
 				if (it.getPathId() == viewPathId) {
-					ImageRevision promotionPart = it.makeAnalog(
+					ImageRevision promotionPart = (ImageRevision) it.makeAnalog(
 							it.getStatusId(), promotionPath.getConceptId(),
 							Long.MAX_VALUE);
 					it.getVersioned().addVersion(promotionPart);
@@ -263,6 +359,7 @@ public class Image
 
 	@Override
 	public boolean addVersion(I_ImagePart part) {
+		this.versions = null;
 		return additionalVersions.add((ImageRevision) part);
 	}
 
@@ -301,11 +398,6 @@ public class Image
 	@Override
 	public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
 		return new ImageRevision(this, statusNid, pathNid, time, this);
-	}
-
-	@Override
-	public I_ImageVersioned getVersioned() {
-		return this;
 	}
 
 	@Override

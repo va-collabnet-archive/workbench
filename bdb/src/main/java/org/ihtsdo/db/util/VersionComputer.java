@@ -17,14 +17,12 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.PositionMapper;
 import org.ihtsdo.db.bdb.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.bdb.concept.component.Revision;
 
-public abstract class VersionComputer<C extends ConceptComponent<P, C>, 
-									P extends Revision<P, C>> {
+public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
-	private class SortPartsByTime implements Comparator<P> {
+	private class SortVersionsByTime implements Comparator<V> {
 
-		public int compare(P p1, P p2) {
+		public int compare(V p1, V p2) {
 
 			if (p1.getTime() < p2.getTime()) {
 				return -1;
@@ -46,23 +44,23 @@ public abstract class VersionComputer<C extends ConceptComponent<P, C>,
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<P> matchingTuples, List<P> versions, C core) {
+			List<V> matchingTuples, List<V> versions) {
 
-		HashSet<P> partsToAdd = new HashSet<P>();
-		List<P> partsForPosition = new LinkedList<P>();
+		HashSet<V> partsToAdd = new HashSet<V>();
+		List<V> partsForPosition = new LinkedList<V>();
 		PositionMapper mapper = Bdb.getStatusAtPositionDb().getMapper(
 				viewPosition);
-		for (P part : versions) {
-			if (mapper.onRoute(part)) {
+		for (V version : versions) {
+			if (mapper.onRoute(version)) {
 				if (partsForPosition.size() == 0) {
-					partsForPosition.add(part);
+					partsForPosition.add(version);
 				} else {
-					ListIterator<P> latestIterator = partsForPosition
+					ListIterator<V> latestIterator = partsForPosition
 							.listIterator();
 					boolean added = false;
 					while (latestIterator.hasNext()) {
-						P partToTest = latestIterator.next();
-						switch (mapper.fastRelativePosition(part, partToTest)) {
+						V partToTest = latestIterator.next();
+						switch (mapper.fastRelativePosition(version, partToTest)) {
 						case AFTER:
 							if (added) {
 								latestIterator.remove();
@@ -94,7 +92,7 @@ public abstract class VersionComputer<C extends ConceptComponent<P, C>,
 			}
 		}
 		boolean addParts = false;
-		for (P part : partsForPosition) {
+		for (V part : partsForPosition) {
 			if (allowedStatus != null) {
 				if (allowedStatus.contains(part.getStatusId())) {
 					addParts = true;
@@ -109,10 +107,10 @@ public abstract class VersionComputer<C extends ConceptComponent<P, C>,
 	}
 
 	public void addTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions, List<P> matchingTuples,
-			boolean addUncommitted, List<P> versions, C core) {
+			PositionSetReadOnly positions, List<V> matchingTuples,
+			boolean addUncommitted, List<V> versions) {
 		addTuples(allowedStatus, null, positions, matchingTuples,
-				addUncommitted, versions, core);
+				addUncommitted, versions);
 	}
 
 	/**
@@ -131,25 +129,25 @@ public abstract class VersionComputer<C extends ConceptComponent<P, C>,
 	 * @param core
 	 */
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<P> matchingTuples,
-			boolean addUncommitted, List<P> versions, C core) {
+			PositionSetReadOnly positions, List<V> matchingTuples,
+			boolean addUncommitted, List<V> versions) {
 		if (positions == null) {
 			addTuplesNullPositions(allowedStatus, allowedTypes, matchingTuples,
-					addUncommitted, versions, core);
+					addUncommitted, versions);
 		} else {
 			addTuplesWithPositions(allowedStatus, allowedTypes, positions,
-					matchingTuples, versions, core);
+					matchingTuples, versions);
 		}
 	}
 
 	public void addTuplesWithPositions(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, PositionSetReadOnly positions,
-			List<P> matchingTuples, List<P> versions, C core) {
-		HashSet<P> partsToAdd = new HashSet<P>();
-		List<P> partsForPosition = new LinkedList<P>();
+			List<V> matchingTuples, List<V> versions) {
+		HashSet<V> partsToAdd = new HashSet<V>();
+		List<V> partsForPosition = new LinkedList<V>();
 		for (I_Position p : positions) {
 			PositionMapper mapper = Bdb.getStatusAtPositionDb().getMapper(p);
-			for (P part : versions) {
+			for (V part : versions) {
 				if (allowedTypes != null) {
 					if (allowedTypes.contains(((I_AmTypedPart) part)
 							.getTypeId()) == false) {
@@ -160,11 +158,11 @@ public abstract class VersionComputer<C extends ConceptComponent<P, C>,
 					if (partsForPosition.size() == 0) {
 						partsForPosition.add(part);
 					} else {
-						ListIterator<P> latestIterator = partsForPosition
+						ListIterator<V> latestIterator = partsForPosition
 								.listIterator();
 						boolean added = false;
 						while (latestIterator.hasNext()) {
-							P partToTest = latestIterator.next();
+							V partToTest = latestIterator.next();
 							switch (mapper.fastRelativePosition(part,
 									partToTest)) {
 							case AFTER:
@@ -200,7 +198,7 @@ public abstract class VersionComputer<C extends ConceptComponent<P, C>,
 				}
 			}
 			boolean addParts = false;
-			for (P part : partsForPosition) {
+			for (V part : partsForPosition) {
 				if (allowedStatus != null) {
 					if (allowedStatus.contains(part.getStatusId())) {
 						addParts = true;
@@ -224,51 +222,51 @@ public abstract class VersionComputer<C extends ConceptComponent<P, C>,
 	 * @param core
 	 */
 	public void addTuplesNullPositions(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, List<P> matchingTuples,
-			boolean addUncommitted, List<P> versions, C core) {
-		HashSet<P> partsToAdd = new HashSet<P>();
-		HashSet<P> uncommittedParts = new HashSet<P>();
-		HashSet<P> rejectedParts = new HashSet<P>();
-		for (P part : versions) {
+			I_IntSet allowedTypes, List<V> matchingTuples,
+			boolean addUncommitted, List<V> versions) {
+		HashSet<V> versionsToAdd = new HashSet<V>();
+		HashSet<V> uncommittedVersions = new HashSet<V>();
+		HashSet<V> rejectedVersions = new HashSet<V>();
+		for (V part : versions) {
 			if (part.getTime() == Long.MAX_VALUE) {
 				if (addUncommitted) {
-					uncommittedParts.add(part);
+					uncommittedVersions.add(part);
 				}
 				continue;
 			}
 			if (allowedStatus != null
 					&& allowedStatus.contains(part.getStatusId()) == false) {
-				rejectedParts.add(part);
+				rejectedVersions.add(part);
 				continue;
 			}
 			if (allowedTypes != null
 					&& allowedTypes
 							.contains(((I_AmTypedPart) part).getTypeId()) == false) {
-				rejectedParts.add(part);
+				rejectedVersions.add(part);
 				continue;
 			}
-			partsToAdd.add(part);
+			versionsToAdd.add(part);
 		}
-		ArrayList<P> partsToRemove = new ArrayList<P>();
-		for (P reject : rejectedParts) {
-			for (P possibleAdd : partsToAdd) {
+		ArrayList<V> versionToRemove = new ArrayList<V>();
+		for (V reject : rejectedVersions) {
+			for (V possibleAdd : versionsToAdd) {
 				if (reject.getPathId() == possibleAdd.getPathId()) {
 					if (reject.getVersion() > possibleAdd.getVersion()) {
-						partsToRemove.add(possibleAdd);
+						versionToRemove.add(possibleAdd);
 					}
 				}
 			}
 		}
-		partsToAdd.removeAll(partsToRemove);
+		versionsToAdd.removeAll(versionToRemove);
 
-		SortedSet<P> sortedPartsToAdd = new TreeSet<P>(new SortPartsByTime());
-		sortedPartsToAdd.addAll(partsToAdd);
-		matchingTuples.addAll(sortedPartsToAdd);
-		for (P part : uncommittedParts) {
+		SortedSet<V> sortedVersionsToAdd = new TreeSet<V>(new SortVersionsByTime());
+		sortedVersionsToAdd.addAll(versionsToAdd);
+		matchingTuples.addAll(sortedVersionsToAdd);
+		for (V version : uncommittedVersions) {
 			if (allowedTypes == null
 					|| allowedTypes
-							.contains(((I_AmTypedPart) part).getTypeId()) == true) {
-				matchingTuples.add(part);
+							.contains(((I_AmTypedPart) version).getTypeId()) == true) {
+				matchingTuples.add(version);
 			}
 		}
 	}

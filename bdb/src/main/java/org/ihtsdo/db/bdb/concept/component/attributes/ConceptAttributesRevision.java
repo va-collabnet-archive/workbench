@@ -12,7 +12,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ConceptAttributesRevision 
 	extends Revision<ConceptAttributesRevision, ConceptAttributes> 
-	implements I_ConceptAttributePart, I_ConceptAttributeTuple {
+	implements I_ConceptAttributePart {
 
 	private transient ConceptAttributes conceptAttributes;
 	
@@ -87,25 +87,6 @@ public class ConceptAttributesRevision
 		output.writeBoolean(defined);
 	}
 
-	@Override
-	public int getConId() {
-		return conceptAttributes.nid;
-	}
-
-	@Override
-	public ConceptAttributes getConVersioned() {
-		return conceptAttributes;
-	}
-
-	@Override
-	public int getConceptStatus() {
-		return getStatusId();
-	}
-
-	@Override
-	public ConceptAttributesRevision getMutablePart() {
-		return this;
-	}
 	public String toString() {
 		return " defined: " + defined + " " + super.toString();
 	}

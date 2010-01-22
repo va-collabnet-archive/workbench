@@ -119,7 +119,7 @@ public class ConceptAttributesVersionTest {
 		ConceptAttributesRevision cav = ca1.additionalVersions.get(0);
 		assertEquals(ca1.getStatusId(), cav.getStatusId());
 		assertEquals(ca1.getPathId(), cav.getPathId());
-		if (ca1.primordialSapNid == cav.statusAtPositionNid) {
+		if (ca1.primordialSapNid == cav.sapNid) {
 			fail("statusAtPositionNid should not be equal. ");
 		}
 

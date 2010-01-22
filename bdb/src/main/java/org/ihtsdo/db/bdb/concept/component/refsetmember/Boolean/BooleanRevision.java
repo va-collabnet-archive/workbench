@@ -2,7 +2,6 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.Boolean;
 
 import java.io.IOException;
 
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
@@ -82,10 +81,5 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 
 	public void setBooleanValue(boolean booleanValue) {
 		this.booleanValue = booleanValue;
-	}
-
-	@Override
-	public I_AmPart getMutablePart() {
-		return this;
 	}
 }

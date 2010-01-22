@@ -112,9 +112,4 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
 		this.c1Nid = conceptId;
 	}
 
-	@Override
-	public I_AmPart getMutablePart() {
-		return this;
-	}
-
 }

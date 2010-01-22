@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
@@ -17,27 +16,27 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public abstract class Revision<V extends Revision<V, C>, 
 							  C extends ConceptComponent<V, C>> 
-	implements I_AmPart, I_AmTuple, I_HandleFutureStatusAtPositionSetup {
+	implements I_AmPart, I_HandleFutureStatusAtPositionSetup {
 	
 	public static SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
 
 	
-	public int statusAtPositionNid = Integer.MAX_VALUE;
+	public int sapNid = Integer.MAX_VALUE;
 	public C primordialComponent;
 
 	public Revision(int statusAtPositionNid, C primordialComponent) {
 		super();
-		this.statusAtPositionNid = statusAtPositionNid;
+		this.sapNid = statusAtPositionNid;
 		this.primordialComponent = primordialComponent;
 		assert primordialComponent != null;
 		assert statusAtPositionNid != Integer.MAX_VALUE;
 	}
 
 	public Revision(int statusNid, int pathNid, long time, C primordialComponent) {
-		this.statusAtPositionNid = Bdb.getStatusAtPositionDb().getSapNid(statusNid, pathNid, time);
+		this.sapNid = Bdb.getStatusAtPositionDb().getSapNid(statusNid, pathNid, time);
 		this.primordialComponent = primordialComponent;
 		assert primordialComponent != null;
-		assert statusAtPositionNid != Integer.MAX_VALUE;
+		assert sapNid != Integer.MAX_VALUE;
 	}
 	
 	public Revision(TupleInput input, C conceptComponent) {
@@ -46,7 +45,7 @@ public abstract class Revision<V extends Revision<V, C>,
 
 	
 	public final void writePartToBdb(TupleOutput output) {
-		output.writeInt(statusAtPositionNid);
+		output.writeInt(sapNid);
 		writeFieldsToBdb(output);
 	}
 	
@@ -54,30 +53,20 @@ public abstract class Revision<V extends Revision<V, C>,
 	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
 	 */
 	public boolean isSetup() {
-		return statusAtPositionNid != Integer.MAX_VALUE;
+		return sapNid != Integer.MAX_VALUE;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#setStatusAtPositionNid(int)
 	 */
 	public void setStatusAtPositionNid(int sapNid) {
-		this.statusAtPositionNid = sapNid;
+		this.sapNid = sapNid;
 	}
 	
 	protected abstract void writeFieldsToBdb(TupleOutput output);
 	
 	public final C getVersioned() {
 		return primordialComponent;
-	}
-
-	@Override
-	public final C getFixedPart() {
-		return primordialComponent;
-	}
-
-	@Override
-	public final int getNid() {
-		return primordialComponent.getNid();
 	}
 
 	public final Set<TimePathId> getTimePathSet() {
@@ -95,7 +84,7 @@ public abstract class Revision<V extends Revision<V, C>,
 
 
 	public final int getStatusAtPositionNid() {
-		return statusAtPositionNid;
+		return sapNid;
 	}
 
 	public final ArrayIntList getPartComponentNids() {
@@ -109,21 +98,21 @@ public abstract class Revision<V extends Revision<V, C>,
 	
 	@Override
 	public int getPathId() {
-		return Bdb.getStatusAtPositionDb().getPathId(statusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getPathId(sapNid);
 	}
 
 	@Override
 	public int getStatusId() {
-		return Bdb.getStatusAtPositionDb().getStatusId(statusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getStatusId(sapNid);
 	}
 
 	@Override
 	public int getVersion() {
-		return Bdb.getStatusAtPositionDb().getVersion(statusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getVersion(sapNid);
 	}
 
 	public long getTime() {
-		return Bdb.getStatusAtPositionDb().getTime(statusAtPositionNid);
+		return Bdb.getStatusAtPositionDb().getTime(sapNid);
 	}
 
 	@Override
@@ -142,7 +131,7 @@ public abstract class Revision<V extends Revision<V, C>,
 	public abstract V makeAnalog(int statusNid, int pathNid, long time);
 
 	public void setStatusAtPosition(int statusNid, int pathNid, long time) {
-		this.statusAtPositionNid = Bdb.getStatusAtPositionDb().getSapNid(statusNid, pathNid, time);
+		this.sapNid = Bdb.getStatusAtPositionDb().getSapNid(statusNid, pathNid, time);
 	}
 
 	@Override
@@ -182,7 +171,7 @@ public abstract class Revision<V extends Revision<V, C>,
 	public boolean equals(Object obj) {
 		if (Revision.class.isAssignableFrom(obj.getClass())) {
 			Revision<V, C> another = (Revision<V, C>) obj;
-			if (this.statusAtPositionNid == another.statusAtPositionNid) {
+			if (this.sapNid == another.sapNid) {
 				return true;
 			}
 		}

@@ -16,7 +16,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class DescriptionRevision 
 	extends Revision<DescriptionRevision, Description> 
-	implements I_DescriptionPart, I_DescriptionTuple {
+	implements I_DescriptionPart {
 	
 	@SuppressWarnings("unused")
 	private static Charset utf8 = Charset.forName("UTF-8");
@@ -113,7 +113,7 @@ public class DescriptionRevision
 		lang = edv.getLang();
 		text = edv.getText();
 		typeNid = Bdb.uuidToNid(edv.getTypeUuid());
-		statusAtPositionNid = Bdb.getStatusAtPositionNid(edv);
+		sapNid = Bdb.getStatusAtPositionNid(edv);
 	}
 
 	@Override
@@ -195,25 +195,4 @@ public class DescriptionRevision
 		list.add(typeNid);
 		return list;
 	}
-
-	@Override
-	public int getConceptId() {
-		return description.getConceptNid();
-	}
-
-	@Override
-	public int getDescId() {
-		return description.nid;
-	}
-
-	@Override
-	public Description getDescVersioned() {
-		return description;
-	}
-
-	@Override
-	public I_DescriptionPart getMutablePart() {
-		return this;
-	}
-
 }

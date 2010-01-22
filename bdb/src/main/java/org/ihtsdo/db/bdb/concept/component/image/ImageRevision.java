@@ -1,10 +1,7 @@
 package org.ihtsdo.db.bdb.concept.component.image;
 
-import java.util.Arrays;
-
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
-import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Revision;
@@ -14,14 +11,14 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ImageRevision extends Revision<ImageRevision, Image> 
-		implements I_ImagePart, I_ImageTuple {
+		implements I_ImagePart {
 
-	private transient Image image;
 	private String textDescription;
 	private int typeNid;
 	
 	public String toString() {
-		return " textDescription: " + textDescription + " typeNid: " + typeNid + " " + super.toString();
+		return " textDescription: " + textDescription + " typeNid: " + 
+				typeNid + " " + super.toString();
 	}
 
 	@Override
@@ -32,9 +29,6 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 				return false;
 			}
 			if (!this.textDescription.equals(another.textDescription)) {
-				return false;
-			}
-			if (!Arrays.equals(this.getImage(), another.getImage())) {
 				return false;
 			}
 			return super.equals(obj);
@@ -57,7 +51,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 
 	private ImageRevision(ImageRevision another, 
 			Image primoridalMember) {
-		super(another.statusAtPositionNid, 
+		super(another.sapNid, 
 				primoridalMember);
 		this.textDescription = another.textDescription;
 		this.typeNid = another.typeNid;
@@ -141,30 +135,4 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	public ImageRevision duplicate() {
 		throw new UnsupportedOperationException();
 	}
-
-	@Override
-	public int getConceptId() {
-		return image.getConceptId();
-	}
-
-	@Override
-	public String getFormat() {
-		return image.getFormat();
-	}
-
-	@Override
-	public byte[] getImage() {
-		return image.getImage();
-	}
-
-	@Override
-	public int getImageId() {
-		return image.nid;
-	}
-
-	@Override
-	public I_ImagePart getMutablePart() {
-		return this;
-	}
-	
 }

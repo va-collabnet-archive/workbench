@@ -122,9 +122,4 @@ public class CidIntRevision
 		this.c1Nid = conceptId;
 	}
 
-	@Override
-	public I_AmPart getMutablePart() {
-		return this;
-	}
-
 }
