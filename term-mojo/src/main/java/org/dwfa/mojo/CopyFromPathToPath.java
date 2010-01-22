@@ -546,7 +546,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    private Collection<I_IdVersion> getLatest(List<? extends I_IdVersion> tuples) {
+    private Collection<? extends I_IdVersion> getLatest(List<? extends I_IdVersion> tuples) {
         Map<Integer, I_IdVersion> map = new HashMap<Integer, I_IdVersion>();
         for (I_IdVersion ids : tuples) {
             if (map.containsKey(ids.getNid())) {
@@ -582,7 +582,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             getLog().info("processed image " + imageCount);
         }
 
-        Collection<I_ImageTuple> images;
+        Collection<? extends I_ImageTuple> images;
         if (readLatestPartOnly) {
             images = getLatest(imageVersioned.getTuples());
         } else {
@@ -614,7 +614,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    private Collection<I_ImageTuple> getLatest(Collection<I_ImageTuple> tuples) {
+    private Collection<I_ImageTuple> getLatest(Collection<? extends I_ImageTuple> tuples) {
         Map<Integer, I_ImageTuple> map = new HashMap<Integer, I_ImageTuple>();
         for (I_ImageTuple image : tuples) {
             if (map.containsKey(image.getImageId())) {
@@ -655,7 +655,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             getLog().info("processed relationship " + relCount);
         }
 
-        Collection<I_RelTuple> allTuples = relVersioned.getTuples();
+        Collection<? extends I_RelTuple> allTuples = relVersioned.getTuples();
         Map<TupleKey, List<I_AmTypedTuple>> versionsMap = new HashMap<TupleKey, List<I_AmTypedTuple>>();
 
         // Check for multi-versioned relationships, with the same path and
@@ -690,7 +690,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             versionsMap.put(key, versions);
         }
 
-        Collection<I_RelTuple> rels;
+        Collection<? extends I_RelTuple> rels;
         if (readLatestPartOnly) {
             rels = getLatestRelationships((List<I_RelTuple>) allTuples);
         } else {
