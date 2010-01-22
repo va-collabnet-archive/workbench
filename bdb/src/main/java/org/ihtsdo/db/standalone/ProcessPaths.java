@@ -29,7 +29,7 @@ public class ProcessPaths {
 		AtomicInteger matchCount = new AtomicInteger();
 		IntSet allowedStatus = new IntSet();
 		private I_Position viewPosition;
-	    Pattern p = Pattern.compile("^A|\\@|$");
+	    Pattern p = Pattern.compile("ace|joint");
 		
 		public CountDescriptionTuplesRegex(I_Position viewPosition) throws IOException, TerminologyException {
 			super();
@@ -61,7 +61,7 @@ public class ProcessPaths {
 		AtomicInteger matchCount = new AtomicInteger();
 		IntSet allowedStatus = new IntSet();
 		private I_Position viewPosition;
-	    Pattern p = Pattern.compile("^A|\\@|$");
+	    Pattern p = Pattern.compile("ace|joint");
 		
 		public ParallelCountDescriptionTuplesRegex(I_Position viewPosition) throws IOException, TerminologyException {
 			super();
