@@ -3027,7 +3027,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         });
         topPanel.add(showProgressButton, c);
         c.gridx++;
-
+        
         JPanel topActivityPanel = new JPanel(new GridLayout(1, 1));
         topActivityListener = new ActivityPanel(false, null, aceFrameConfig);
         topActivityListener.setEraseWhenFinishedEnabled(true);
@@ -3045,6 +3045,20 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         // topPanel.add(getComponentToggles2(), c);
         // c.gridx++;
 
+        String headerImage = System.getProperty("toppanel.image");
+        String headerText = System.getProperty("toppanel.text");
+        if (headerImage != null || headerText != null) {
+            JLabel headerLabel = new JLabel();
+            if (headerImage != null) {
+                headerLabel.setIcon(new ImageIcon(ACE.class.getResource(headerImage)));
+            }
+            if (headerText != null) {
+                headerLabel.setText(headerText);
+            }
+            topPanel.add(headerLabel, c);
+            c.gridx++;
+        }
+        
         File componentPluginDir = new File(getPluginRoot() + File.separator + "viewer");
         File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
             public boolean accept(File arg0, String fileName) {
