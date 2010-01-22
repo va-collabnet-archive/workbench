@@ -1102,4 +1102,9 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public void svnCommitNoPrompt(SubversionData svd) throws TaskFailedException {
         config.svnCommitNoPrompt(svd);
     }
+
+    @Override
+    public void showWizardPanel() {
+        config.showWizardPanel();        
+    }
 }
