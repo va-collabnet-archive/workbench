@@ -146,30 +146,20 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
                     }
                     workflowPanel.setLayout(new GridBagLayout());
                     GridBagConstraints c = new GridBagConstraints();
-                    c.fill = GridBagConstraints.BOTH;
-                    c.gridx = 0;
-                    c.gridy = 0;
-                    c.weightx = 1.0;
-                    c.weighty = 0;
-                    c.anchor = GridBagConstraints.WEST;
-                    c.weightx = 0.0;
+                    
                     workflowPanel.add(new JLabel(instruction), c);
-                    c.gridx++;
-                    workflowPanel.add(new JLabel("  "), c);
-                    c.gridx++;
-                    c.anchor = GridBagConstraints.SOUTHWEST;
+                    c.insets = new java.awt.Insets(0, 10, 0, 0);
+
                     JButton stepButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getTrueImage())));
                     stepButton.setToolTipText("Step");
                     workflowPanel.add(stepButton, c);
-
-                    c.gridx++;
                     stepButton.addActionListener(new StepActionListener());
+
                     JButton stopButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getFalseImage())));
                     workflowPanel.add(stopButton, c);
                     stopButton.addActionListener(new StopActionListener());
                     stopButton.setToolTipText("Cancel");
-                    c.gridx++;
-                    workflowPanel.add(new JLabel("  "), c);
+
                     workflowPanel.validate();
                     Container cont = workflowPanel;
                     while (cont != null) {
@@ -199,7 +189,6 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
                         cont = cont.getParent();
                     }
                     workflowPanel.repaint();
-                    workflowPanel.setVisible(false);
                 }
 
             });

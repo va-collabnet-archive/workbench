@@ -148,7 +148,8 @@ public class PromptUserForInput extends AbstractTask {
         boolean subversionButtonVisible = config.isBuilderToggleVisible();
         config.setSubversionToggleVisible(false);
         boolean inboxButtonVisible = config.isInboxToggleVisible();
-        config.setInboxToggleVisible(false);
+        config.setInboxToggleVisible(false);        
+        
         try {
             final JPanel workflowPanel = config.getWorkflowPanel();
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -159,42 +160,34 @@ public class PromptUserForInput extends AbstractTask {
                         workflowPanel.remove(components[i]);
                     }
                     workflowPanel.setLayout(new GridBagLayout());
-                    GridBagConstraints c = new GridBagConstraints();
-                    c.fill = GridBagConstraints.BOTH;
-                    c.gridx = 0;
-                    c.gridy = 0;
-                    c.weightx = 1.0;
-                    c.weighty = 0;
-                    c.anchor = GridBagConstraints.EAST;
+                    GridBagConstraints c = new GridBagConstraints();                    
+                    
                     workflowPanel.add(new JLabel(instruction), c);
-                    c.weightx = 0.0;
-                    c.fill = GridBagConstraints.HORIZONTAL;
-                    c.gridx++;
+                    c.insets = new java.awt.Insets(0, 10, 0, 0);
+
                     JTextField nameField = new JTextField(15);
                     workflowPanel.add(nameField, c);
-                    c.gridx++;
-                    c.anchor = GridBagConstraints.EAST;
+ 
                     JButton stepButton = new JButton(new ImageIcon(
                         InstructAndWait.class.getResource("/16x16/plain/media_step_forward.png")));
                     stepButton.setToolTipText("Next step");
                     workflowPanel.add(stepButton, c);
-
-                    c.gridx++;
                     stepButton.addActionListener(new StepActionListener());
+
                     JButton stopButton = new JButton(new ImageIcon(
                         InstructAndWait.class.getResource("/16x16/plain/media_stop_red.png")));
                     stopButton.setToolTipText("Cancel");
                     workflowPanel.add(stopButton, c);
                     stopButton.addActionListener(new StopActionListener());
-                    c.gridx++;
-                    workflowPanel.add(new JLabel(" "), c);
+
                     workflowPanel.validate();
                     Container cont = workflowPanel;
                     while (cont != null) {                        
                         cont.validate();
                         cont = cont.getParent();                        
                     }
-                    stepButton.requestFocusInWindow();
+                    workflowPanel.repaint();
+                    nameField.requestFocusInWindow(); 
                 }
             });
             synchronized (this) {
@@ -213,6 +206,8 @@ public class PromptUserForInput extends AbstractTask {
                         cont.validate();
                         cont = cont.getParent();
                     }
+                    workflowPanel.repaint();
+                    workflowPanel.setVisible(false);
                 }
 
             });
