@@ -226,7 +226,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
             throws Exception {
         processConcept(concept);
 
-        Set<I_GetConceptData> children = concept.getDestRelOrigins(allowedStatus, allowedType, null, false);
+        Set<I_GetConceptData> children = concept.getDestRelOrigins(allowedStatus, allowedType, null, false, true);
         for (I_GetConceptData getConceptData : children) {
             processAllChildren(getConceptData, allowedType, allowedStatus);
         }
