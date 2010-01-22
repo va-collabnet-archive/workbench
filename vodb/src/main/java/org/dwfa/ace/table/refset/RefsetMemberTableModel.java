@@ -1145,7 +1145,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     tuple.getMemberId(), inConflict);
 
             case CONCEPT_CONCEPT_STRING_VALUE:
-                return new StringWithExtTuple(((I_ThinExtByRefPartConceptConceptString) tuple.getPart()).getStringValue(), tuple,
+                return new StringWithExtTuple(((I_ThinExtByRefPartConceptConceptString) tuple.getPart()).getStringValue().replaceAll("\t", " "), tuple,
                     tuple.getMemberId(), inConflict);
 
             case CONCEPT_ID:
