@@ -64,7 +64,6 @@ import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
-import org.dwfa.vodb.PathManager;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.db.bdb.concept.Concept;
 

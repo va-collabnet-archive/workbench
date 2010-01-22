@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JFrame;
 
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.NidCNidMapBdb;

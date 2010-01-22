@@ -2,7 +2,6 @@ package org.ihtsdo.db.bdb.concept.component.refsetmember.cidInt;
 
 import java.io.IOException;
 
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;

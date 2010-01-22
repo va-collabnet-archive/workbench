@@ -2,7 +2,6 @@ package org.ihtsdo.db.bdb.concept.component.attributes;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Revision;
 import org.ihtsdo.etypes.I_ConceptualizeExternally;

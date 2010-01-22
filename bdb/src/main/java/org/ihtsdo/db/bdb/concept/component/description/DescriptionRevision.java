@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
 import org.ihtsdo.db.bdb.Bdb;

@@ -1,5 +1,7 @@
 package org.ihtsdo.db.uuidmap;
 
+import java.util.Comparator;
+
 import cern.colt.list.AbstractList;
 
 public abstract class AbstractUuidList extends AbstractList {

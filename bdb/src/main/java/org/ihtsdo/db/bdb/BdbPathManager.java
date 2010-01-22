@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -31,7 +30,6 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.I_Manage;
-import org.dwfa.vodb.PathManager;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.db.bdb.concept.Concept;
@@ -58,8 +56,6 @@ public class BdbPathManager implements I_Manage<I_Path> {
     protected int pathConceptId;
 
     protected boolean autoCommit = false;
-
-    private Logger logger = Logger.getLogger(PathManager.class.getName());
     
     protected Path editPath;
 
