@@ -436,22 +436,16 @@ public class Description
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<I_DescriptionTuple> matchingTuples) {
-		throw new UnsupportedOperationException();
-		/*
+			List<Description.Version> matchingTuples) {
 		computer.addTuples(allowedStatus, viewPosition,
-				matchingTuples, mutableParts, this);
-		*/
+				matchingTuples, getTuples());
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples,
+			PositionSetReadOnly positions, List<Description.Version> matchingTuples,
 			boolean addUncommitted) {
-		throw new UnsupportedOperationException();
-		/*
 		computer.addTuples(allowedStatus, allowedTypes, positions,
-				matchingTuples, addUncommitted, mutableParts, this);
-		*/
+				matchingTuples, addUncommitted, getTuples());
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,

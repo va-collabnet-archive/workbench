@@ -129,10 +129,13 @@ public class PositionMapper {
 	 * position is not on a route that leads to the destination.
 	 */
 	private int[] positionDistance;
+	
+	private static BdbPathManager pathManager;
 
 	private void setup() throws IOException, PathNotExistsException,
 			TerminologyException {
-		Collection<I_Position> origins = this.destination.getAllOrigins();
+		pathManager = new BdbPathManager();
+		Collection<I_Position> origins = pathManager.getPathOrigins(destination.getPath().getConceptId());
 		origins.add(this.destination);
 
 		// Map of the origin position's path id, to the origin position... See
@@ -308,7 +311,7 @@ public class PositionMapper {
 			return BigInteger.valueOf(-1);
 		}
 		for (I_Position child : testPath.getPath().getOrigins()) {
-			BigInteger depth = getDepth(testPath, child, depthSeed + 1);
+			BigInteger depth = getDepth(child, depthFinder, depthSeed + 1);
 			if (depth.compareTo(BigInteger.ZERO) > 0) {
 				return depth;
 			}

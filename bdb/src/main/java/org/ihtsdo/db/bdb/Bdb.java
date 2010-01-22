@@ -41,6 +41,8 @@ public class Bdb {
 	private static ExecutorService executorPool;
 	private static int executorPoolSize;
 	
+	private static BdbPathManager pathManager;
+	
 	public static void commit() throws IOException {
 		long commitTime = System.currentTimeMillis();
 		statusAtPositionDb.commit(commitTime);
@@ -74,7 +76,8 @@ public class Bdb {
 			BdbTermFactory tf = new BdbTermFactory();
 			Terms.set(tf);
 			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
-			tf.setPathManager(new BdbPathManager());
+			pathManager = new BdbPathManager();
+			tf.setPathManager(pathManager);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (TerminologyException e) {
@@ -244,6 +247,10 @@ public class Bdb {
 
 	public static int getExecutorPoolSize() {
 		return executorPoolSize;
+	}
+
+	public static BdbPathManager getPathManager() {
+		return pathManager;
 	}
 
 

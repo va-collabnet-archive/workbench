@@ -11,7 +11,6 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.PathManager;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.Position;
 
@@ -35,7 +34,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	private static PositionArrayBinder positionArrayBinder = new PositionArrayBinder();
 	private static LinkedList<PositionMapper> mapperCache = new LinkedList<PositionMapper>();
 	
-	private static final int FIRST_ID = 1;
+	private static final int FIRST_ID = 0;
 	private static final int MIN_ARRAY_SIZE = 100;
 
 	
@@ -193,7 +192,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			pathNid = readWriteArray.pathNids[getReadWriteIndex(index)];
 			time = readWriteArray.commitTimes[getReadWriteIndex(index)];
 		}
-		I_Path path = new PathManager().get(pathNid);
+		I_Path path = Bdb.getPathManager().get(pathNid);
 		return new Position(ThinVersionHelper.convert(time), path);
 	}
 	
