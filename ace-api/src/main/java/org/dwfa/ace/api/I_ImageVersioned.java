@@ -39,7 +39,7 @@ public interface I_ImageVersioned extends I_AmTermComponent {
 
     public I_ImageTuple getLastTuple();
 
-    public List<I_ImageTuple> getTuples();
+    public List<? extends I_ImageTuple> getTuples();
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 

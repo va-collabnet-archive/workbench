@@ -199,7 +199,7 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
 
         boolean isChildOf = false;
         for (I_RelVersioned rv : combList) {
-            List<I_RelTuple> rvtl = rv.getTuples();
+            List<? extends I_RelTuple> rvtl = rv.getTuples();
             for (I_RelTuple rt : rvtl) {
                 try {
 

@@ -118,6 +118,6 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
 
     public UniversalAceConceptAttributes getUniversal() throws IOException, TerminologyException;
 
-    public List<I_ConceptAttributeTuple> getTuples(I_IntSet allowedStatus, Set<I_Position> viewPositionSet);
+    public List<? extends I_ConceptAttributeTuple> getTuples(I_IntSet allowedStatus, Set<I_Position> viewPositionSet);
 
 }

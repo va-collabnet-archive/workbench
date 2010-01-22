@@ -33,8 +33,6 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.classify.SnoTable;
-import org.dwfa.ace.task.commit.AbstractConceptTest;
-import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
@@ -166,7 +164,7 @@ public class TestForEdgCType2Req extends AbstractConceptTest {
 
         boolean isChildOf = false;
         for (I_RelVersioned rv : combList) {
-            List<I_RelTuple> rvtl = rv.getTuples();
+            List<? extends I_RelTuple> rvtl = rv.getTuples();
             for (I_RelTuple rt : rvtl) {
                 try {
 

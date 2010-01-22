@@ -58,7 +58,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
      * @throws TerminologyException
      * @throws IOException
      */
-    public List<I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException,
+    public List<? extends I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException,
             IOException;
 
     public I_DescriptionTuple getFirstTuple();

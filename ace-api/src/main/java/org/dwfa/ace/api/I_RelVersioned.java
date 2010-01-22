@@ -58,7 +58,7 @@ public interface I_RelVersioned extends I_AmTermComponent {
     /**
      * @return all the tuples for this relationship
      */
-    public List<I_RelTuple> getTuples();
+    public List<? extends I_RelTuple> getTuples();
 
     /**
      * @param returnConflictResolvedLatestState
@@ -67,7 +67,7 @@ public interface I_RelVersioned extends I_AmTermComponent {
      * @throws TerminologyException
      * @throws IOException
      */
-    public List<I_RelTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException,
+    public List<? extends I_RelTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException,
             IOException;
 
     public I_RelTuple getFirstTuple();
