@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_Path;
@@ -21,6 +23,71 @@ import org.ihtsdo.db.bdb.concept.I_ProcessConceptData;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
 
 public class ProcessPaths {
+
+	private static class CountDescriptionTuplesRegex implements I_ProcessConceptData {
+		AtomicInteger descCount = new AtomicInteger();
+		AtomicInteger matchCount = new AtomicInteger();
+		IntSet allowedStatus = new IntSet();
+		private I_Position viewPosition;
+	    Pattern p = Pattern.compile("^A|\\@|$");
+		
+		public CountDescriptionTuplesRegex(I_Position viewPosition) throws IOException, TerminologyException {
+			super();
+			allowedStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+			allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+			this.viewPosition = viewPosition;
+		         System.err.println("Email addresses don't start" +
+		                            " with dots or @ signs.");		}
+
+
+		@Override
+		public void processConceptData(Concept concept) throws Exception {
+			for (Description d: concept.getDescriptions()) {
+				List<Description.Version> tuples = new ArrayList<Description.Version>();
+				tuples.clear();
+				d.addTuples(allowedStatus, viewPosition, tuples);
+				for (I_DescriptionTuple v: tuples) {
+				      Matcher m = p.matcher(v.getText());
+				      if (m.find()) {
+				    	  matchCount.incrementAndGet();
+				      }
+					descCount.incrementAndGet();
+				}
+			}
+		}
+	}
+
+	private static class ParallelCountDescriptionTuplesRegex implements I_ProcessConceptData {
+		AtomicInteger descCount = new AtomicInteger();
+		AtomicInteger matchCount = new AtomicInteger();
+		IntSet allowedStatus = new IntSet();
+		private I_Position viewPosition;
+	    Pattern p = Pattern.compile("^A|\\@|$");
+		
+		public ParallelCountDescriptionTuplesRegex(I_Position viewPosition) throws IOException, TerminologyException {
+			super();
+			allowedStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+			allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+			this.viewPosition = viewPosition;
+		}
+
+
+		@Override
+		public void processConceptData(Concept concept) throws Exception {
+			for (Description d: concept.getDescriptions()) {
+				List<Description.Version> tuples = new ArrayList<Description.Version>();
+				tuples.clear();
+				d.addTuples(allowedStatus, viewPosition, tuples);
+				for (I_DescriptionTuple v: tuples) {
+				      Matcher m = p.matcher(v.getText());
+				      if (m.find()) {
+				    	  matchCount.incrementAndGet();
+				      }
+					descCount.incrementAndGet();
+				}
+			}
+		}
+	}
 
 	private static class CountDescriptionTuples implements I_ProcessConceptData {
 		AtomicInteger descCount = new AtomicInteger();
@@ -131,6 +198,20 @@ public class ProcessPaths {
 				ParallelCountDescriptionTuples parallelTupleCounter = new ParallelCountDescriptionTuples(pos);
 				Bdb.getConceptDb().iterateConceptDataInParallel(parallelTupleCounter);
 				System.out.println("parallel iteration found " + parallelTupleCounter.descCount.get() + " description tuples in: " + 
+						(System.currentTimeMillis() - startTime) + " ms.");
+
+				startTime = System.currentTimeMillis();
+				CountDescriptionTuplesRegex tupleCounterRegex = new CountDescriptionTuplesRegex(pos);
+				Bdb.getConceptDb().iterateConceptDataInSequence(tupleCounterRegex);
+				System.out.println("parallel iteration found " + tupleCounterRegex.descCount.get() + " description tuples, and " +
+						tupleCounterRegex.matchCount.get() + " regex matches to + " + tupleCounterRegex.p + " in: " + 
+						(System.currentTimeMillis() - startTime) + " ms.");
+				
+				startTime = System.currentTimeMillis();
+				ParallelCountDescriptionTuplesRegex parallelTupleCounterRexex = new ParallelCountDescriptionTuplesRegex(pos);
+				Bdb.getConceptDb().iterateConceptDataInParallel(parallelTupleCounterRexex);
+				System.out.println("parallel iteration found " + parallelTupleCounterRexex.descCount.get() + " description tuples, and " +
+						parallelTupleCounterRexex.matchCount.get() + " regex matches to + " + parallelTupleCounterRexex.p + " in: " + 
 						(System.currentTimeMillis() - startTime) + " ms.");
 }
 		} catch (Exception e) {
