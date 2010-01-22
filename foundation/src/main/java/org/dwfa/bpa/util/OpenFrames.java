@@ -45,15 +45,15 @@ public class OpenFrames implements PropertyChangeListener {
 
     private static OpenFrames singleton = new OpenFrames();
 
-    static {
-        try {
-            if (GraphicsEnvironment.isHeadless() == false) {
-                singleton.addFrame(new PhantomFrame(null, null));
-            }
-        } catch (Exception e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
-        }
-    }
+//    static {
+//        try {
+//            if (GraphicsEnvironment.isHeadless() == false) {
+//                singleton.addFrame(new PhantomFrame(null, null));
+//            }
+//        } catch (Exception e) {
+//            Logger.getAnonymousLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
+//        }
+//    }
 
     private Collection<JFrame> frames;
 
