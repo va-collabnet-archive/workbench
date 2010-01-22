@@ -36,8 +36,7 @@ public class ProcessPaths {
 			allowedStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
 			allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 			this.viewPosition = viewPosition;
-		         System.err.println("Email addresses don't start" +
-		                            " with dots or @ signs.");		}
+		}
 
 
 		@Override
@@ -185,7 +184,7 @@ public class ProcessPaths {
 				startTime = System.currentTimeMillis();
 				ParallelDescriptions parallelCounter = new ParallelDescriptions();
 				Bdb.getConceptDb().iterateConceptDataInParallel(parallelCounter);
-				System.out.println("parallel iteration found " + parallelCounter.descCount.get() + " descriptions in: " + 
+				System.out.println("  parallel iteration found " + parallelCounter.descCount.get() + " descriptions in: " + 
 						(System.currentTimeMillis() - startTime) + " ms.");
 
 				startTime = System.currentTimeMillis();
@@ -197,20 +196,20 @@ public class ProcessPaths {
 				startTime = System.currentTimeMillis();
 				ParallelCountDescriptionTuples parallelTupleCounter = new ParallelCountDescriptionTuples(pos);
 				Bdb.getConceptDb().iterateConceptDataInParallel(parallelTupleCounter);
-				System.out.println("parallel iteration found " + parallelTupleCounter.descCount.get() + " description tuples in: " + 
+				System.out.println("  parallel iteration found " + parallelTupleCounter.descCount.get() + " description tuples in: " + 
 						(System.currentTimeMillis() - startTime) + " ms.");
 
 				startTime = System.currentTimeMillis();
 				CountDescriptionTuplesRegex tupleCounterRegex = new CountDescriptionTuplesRegex(pos);
 				Bdb.getConceptDb().iterateConceptDataInSequence(tupleCounterRegex);
-				System.out.println("parallel iteration found " + tupleCounterRegex.descCount.get() + " description tuples, and " +
+				System.out.println("sequential iteration found " + tupleCounterRegex.descCount.get() + " description tuples, and " +
 						tupleCounterRegex.matchCount.get() + " regex matches to + " + tupleCounterRegex.p + " in: " + 
 						(System.currentTimeMillis() - startTime) + " ms.");
 				
 				startTime = System.currentTimeMillis();
 				ParallelCountDescriptionTuplesRegex parallelTupleCounterRexex = new ParallelCountDescriptionTuplesRegex(pos);
 				Bdb.getConceptDb().iterateConceptDataInParallel(parallelTupleCounterRexex);
-				System.out.println("parallel iteration found " + parallelTupleCounterRexex.descCount.get() + " description tuples, and " +
+				System.out.println("  parallel iteration found " + parallelTupleCounterRexex.descCount.get() + " description tuples, and " +
 						parallelTupleCounterRexex.matchCount.get() + " regex matches to + " + parallelTupleCounterRexex.p + " in: " + 
 						(System.currentTimeMillis() - startTime) + " ms.");
 }
