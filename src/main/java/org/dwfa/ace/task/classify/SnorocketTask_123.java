@@ -150,8 +150,8 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
     private boolean continueThisAction = true;
 
     // :DEBUG:
-    private boolean debug = true;
-    private boolean debugDump = true; // save to files
+    private boolean debug = false;
+    private boolean debugDump = false; // save to files
 
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -502,13 +502,26 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
     }
 
     private void addPathOrigins(List<I_Position> origins, I_Path p) {
-        for (I_Position o : p.getOrigins()) {
-            if (o.getPath().getConceptId() != workbenchAuxPath)
-                origins.add(o);
-        }
+        List<I_Position> thisLevel = new ArrayList<I_Position>();
 
         for (I_Position o : p.getOrigins()) {
-            addPathOrigins(origins, o.getPath()); // recursive
+                origins.add(o);
+            thisLevel.add(o);
+        }
+
+        // do a breadth first traversal of path origins.
+        while (thisLevel.size() > 0) {
+            List<I_Position> nextLevel = new ArrayList<I_Position>();
+            for (I_Position p1 : thisLevel) {
+                for (I_Position p2 : p1.getPath().getOrigins())
+                    if ((origins.contains(p2) == false)
+                            && (p2.getPath().getConceptId() != workbenchAuxPath)) {
+                        origins.add(p2);
+                        nextLevel.add(p2);
+                    }
+            }
+
+            thisLevel = nextLevel;
         }
     }
 
@@ -1252,7 +1265,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
     // :DEBUG: dumps role-types to console
     private void dumpRoles() { // SORT BY [ROLE-C1-GROUP-C2]
         boolean countRoles = false;
-        boolean countRolesVerbose = false;
+        boolean countRolesVerbose = false; // :DEBUG:
 
         Comparator<SnoRel> comp = new Comparator<SnoRel>() {
             public int compare(SnoRel o1, SnoRel o2) {
