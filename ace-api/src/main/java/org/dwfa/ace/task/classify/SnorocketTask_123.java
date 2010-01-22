@@ -34,6 +34,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
@@ -150,8 +151,8 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
     private boolean continueThisAction = true;
 
     // :DEBUG:
-    private boolean debug = false;
-    private boolean debugDump = false; // save to files
+    private boolean debug = true;
+    private boolean debugDump = true; // save to files
 
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -215,8 +216,8 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
-        debug = false;
-        debugDump = false;
+        debug = true;
+        debugDump = true;
         logger = worker.getLogger();
         logger.info("\r\n::: [SnorocketTask] evaluate() -- begin");
 
@@ -300,8 +301,11 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
 
             // ADD RELATIONSHIPS
             Collections.sort(cEditSnoRels);
-            for (SnoRel sr : cEditSnoRels)
-                rocket_123.addRelationship(sr.c1Id, sr.typeId, sr.c2Id, sr.group);
+            for (SnoRel sr : cEditSnoRels) {
+                int err = rocket_123.addRelationship(sr.c1Id, sr.typeId, sr.c2Id, sr.group);
+                if (debug && err > 0)
+                    logger.info("\r\n::: " + dumpSnoRelStr(sr));
+            }
 
             // 
             ArrayList<SnoDL> dll = SnoDLSet.getDLList();
@@ -341,7 +345,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             // activity
             // viewer
             gui.addActionListener(this);
-            gui.setProgressInfoUpper("Classifier 2/6: classify data");
+            gui.setProgressInfoUpper("Classifier 2/5: classify data");
             gui.setProgressInfoLower("... can take 4 to 6 minutes ...");
             gui.setIndeterminate(true);
 
@@ -362,12 +366,41 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
                 return Condition.CONTINUE;
             }
 
+            // ** GUI: * GET CLASSIFIER EQUIVALENTS **
+            // Show in activity viewer
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig());
+            gui.addActionListener(this);
+            gui.setProgressInfoUpper("Classifier */*: retrieve equivalent concepts");
+            gui.setIndeterminate(true);
+            // gui.setMaximum(1000000);
+            // gui.setValue(0);
+
+            // GET CLASSIFER EQUIVALENTS
+            worker.getLogger().info("::: GET EQUIVALENT CONCEPTS...");
+            startTime = System.currentTimeMillis();
+            ProcessEquiv pe = new ProcessEquiv();
+            rocket_123.getEquivalents(pe);
+            logger.info("\r\n::: [SnorocketTask] ProcessEquiv() count=" + pe.countConSet
+                    + " time= " + toStringLapseSec(startTime));
+
+            // ** GUI: * -- done
+            if (continueThisAction) {
+                gui.setProgressInfoLower("solution set rels = " + pe.countConSet
+                        + ", lapsed time = " + toStringLapseSec(startTime));
+                gui.complete(); // GET CONCEPT EQUIVALENTS -- done
+                pe = null; // :MEMORY:
+            } else {
+                gui.setProgressInfoLower("get evquivalents stopped by user");
+                gui.complete(); // PHASE 1. DONE
+                return Condition.CONTINUE;
+            }
+
             // ** GUI: 3 GET CLASSIFIER RESULTS **
             gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
             // activity
             // viewer
             gui.addActionListener(this);
-            gui.setProgressInfoUpper("Classifier 3/6: retrieve solution set");
+            gui.setProgressInfoUpper("Classifier 3/5: retrieve solution set");
             gui.setIndeterminate(false);
             gui.setMaximum(1000000);
             gui.setValue(0);
@@ -378,7 +411,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             startTime = System.currentTimeMillis();
             ProcessResults pr = new ProcessResults(cRocketSnoRels);
             rocket_123.getDistributionFormRelationships(pr);
-            logger.info("\r\n::: [SnorocketTask] ProcessEquiv() count=" + pr.countRel + " time= "
+            logger.info("\r\n::: [SnorocketTask] GET CLASSIFIER RESULTS count=" + pr.countRel + " time= "
                     + toStringLapseSec(startTime));
 
             // ** GUI: 3 -- done
@@ -387,9 +420,12 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
                         + toStringLapseSec(startTime));
                 gui.complete(); // 3 GET CLASSIFIER RESULTS -- done
                 pr = null; // :MEMORY:
+                rocket_123 = null; // :MEMORY:
+                System.gc();
             } else {
                 gui.setProgressInfoLower("classification stopped by user");
                 gui.complete(); // PHASE 1. DONE
+                rocket_123 = null; // :MEMORY:
                 return Condition.CONTINUE;
             }
 
@@ -401,7 +437,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             // activity
             // viewer
             gui.addActionListener(this);
-            String tmpS = "Classifier 4/6: get previously inferred & compare";
+            String tmpS = "Classifier 4/5: get previously inferred & compare";
             gui.setProgressInfoUpper(tmpS);
             gui.setIndeterminate(false);
             gui.setMaximum(1000000);
@@ -437,7 +473,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             // activity
             // viewer
             gui.addActionListener(this);
-            gui.setProgressInfoUpper("Classifier 5/6: write back updates" + " to classifier path");
+            gui.setProgressInfoUpper("Classifier 5/5: write back updates" + " to classifier path");
             gui.setIndeterminate(true);
 
             // WRITEBACK RESULTS
@@ -450,37 +486,6 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             gui.setProgressInfoLower("writeback completed, lapsed time = "
                     + toStringLapseSec(startTime));
             gui.complete(); // PHASE 5. DONE
-
-            // ** GUI: 6 GET CLASSIFIER EQUIVALENTS **
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
-            // activity
-            // viewer
-            gui.addActionListener(this);
-            gui.setProgressInfoUpper("Classifier 6/6: retrieve equivalent concepts");
-            gui.setIndeterminate(true);
-            // gui.setMaximum(1000000);
-            // gui.setValue(0);
-
-            // GET CLASSIFER EQUIVALENTS
-            worker.getLogger().info("::: GET EQUIVALENT CONCEPTS...");
-            startTime = System.currentTimeMillis();
-            ProcessEquiv pe = new ProcessEquiv();
-            rocket_123.getEquivalents(pe);
-            logger.info("\r\n::: [SnorocketTask] ProcessEquiv() count=" + pe.countConSet
-                    + " time= " + toStringLapseSec(startTime));
-
-            // ** GUI: 6 -- done
-            if (continueThisAction) {
-                gui.setProgressInfoLower("solution set rels = " + pe.countConSet
-                        + ", lapsed time = " + toStringLapseSec(startTime));
-                gui.complete(); // GET CONCEPT EQUIVALENTS -- done
-                rocket_123 = null; // :MEMORY:
-                pe = null; // :MEMORY:
-            } else {
-                gui.setProgressInfoLower("get evquivalents stopped by user");
-                gui.complete(); // PHASE 1. DONE
-                return Condition.CONTINUE;
-            }
 
         } catch (TerminologyException e) {
             logger.info("\r\n::: TerminologyException");
@@ -1206,7 +1211,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
     // GET ROLES
     private ArrayList<SnoRel> getRoles() { // SORT BY [ROLE-C1-GROUP-C2]
         ArrayList<SnoRel> results = new ArrayList<SnoRel>();
-        boolean countRolesVerbose = false;
+        boolean countRolesVerbose = true;
 
         Comparator<SnoRel> comp = new Comparator<SnoRel>() {
             public int compare(SnoRel o1, SnoRel o2) {
@@ -1264,8 +1269,8 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
 
     // :DEBUG: dumps role-types to console
     private void dumpRoles() { // SORT BY [ROLE-C1-GROUP-C2]
-        boolean countRoles = false;
-        boolean countRolesVerbose = false; // :DEBUG:
+        boolean countRoles = true;
+        boolean countRolesVerbose = true; // :DEBUG:
 
         Comparator<SnoRel> comp = new Comparator<SnoRel>() {
             public int compare(SnoRel o1, SnoRel o2) {
@@ -1410,6 +1415,34 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
     }
 
     // :DEBUG: dumps relationships to a file
+    private String dumpSnoRelStr(SnoRel sr) {
+        StringBuffer sb = new StringBuffer();
+        try {
+            I_GetConceptData c1 = tf.getConcept(sr.c1Id);
+            I_GetConceptData t = tf.getConcept(sr.typeId);
+            I_GetConceptData c2 = tf.getConcept(sr.c2Id);
+            int g = sr.group;
+            sb.append(c1.getUids().iterator().next() + "\t" + t.getUids().iterator().next() + "\t"
+                    + c2.getUids().iterator().next() + "\t" + g + "\t");
+            sb.append(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group + "\t");
+            sb.append(c1.getInitialText() + "\t|" + t.getInitialText() + "\t|"
+                    + c2.getInitialText() + "\t" + g + "\r\n");
+
+            sb.append("\tc2 versions: ");
+            for (I_ConceptAttributePart mp : c2.getConceptAttributes().getMutableParts())
+                sb.append(mp.getVersion()+", ");
+            
+            return sb.toString();
+        } catch (TerminologyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
     private void dumpSnoRel(List<SnoRel> srl, String fName, int format) {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
